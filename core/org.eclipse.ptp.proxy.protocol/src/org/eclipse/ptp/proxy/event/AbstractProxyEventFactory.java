@@ -17,17 +17,12 @@
 
 package org.eclipse.ptp.proxy.event;
 
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
+
 
 public abstract class AbstractProxyEventFactory implements IProxyEventFactory {
-	public abstract IProxyEvent toEvent(int type, int transID, String[] args);
-	
-	public static String join(int start, String[] strs, String delim) {
-		StringBuffer buf = new StringBuffer();
-		for (int i = start; i < strs.length; i++) {
-			if (i > start)
-				buf.append(delim);
-			buf.append(strs[i]);
-		}
-		return buf.toString();
-	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#toEvent(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	 */
+	public abstract IProxyEvent toEvent(ProxyPacket packet);
 }

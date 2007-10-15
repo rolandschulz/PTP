@@ -6,10 +6,11 @@ import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommand;
 public class ProxyRuntimeSubmitJobCommand extends AbstractProxyCommand implements IProxyRuntimeCommand {
 
 	public ProxyRuntimeSubmitJobCommand(String[] args) {
+		super(SUBMIT_JOB);
 		addArguments(args);
 	}
 
-	public int getCommandID() {
-		return SUBMIT_JOB;
+	public ProxyRuntimeSubmitJobCommand(int transID, String[] args) {
+		super(SUBMIT_JOB, transID, args);
 	}
 }

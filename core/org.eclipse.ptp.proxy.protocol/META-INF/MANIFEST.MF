@@ -12,6 +12,7 @@ Export-Package: org.eclipse.ptp.proxy.client;uses:="org.eclipse.ptp.proxy.event,
  org.eclipse.ptp.proxy.runtime.client;uses:="org.eclipse.ptp.proxy.event,org.eclipse.ptp.proxy.client,org.eclipse.ptp.proxy.runtime.event",
  org.eclipse.ptp.proxy.runtime.command,
  org.eclipse.ptp.proxy.runtime.event;uses:="org.eclipse.ptp.proxy.event,org.eclipse.ptp.proxy.util",
+ org.eclipse.ptp.proxy.runtime.server,
  org.eclipse.ptp.proxy.server,
  org.eclipse.ptp.proxy.util
 Eclipse-LazyStart: true

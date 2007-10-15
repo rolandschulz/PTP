@@ -19,6 +19,6 @@ public class ProxyRuntimeRemoveAllEvent
 		implements IProxyRuntimeRemoveAllEvent {
 
 	public ProxyRuntimeRemoveAllEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_REMOVE_ALL_EVENT, transID, args);
+		super(REMOVE_ALL, transID, args);
 	}
 }

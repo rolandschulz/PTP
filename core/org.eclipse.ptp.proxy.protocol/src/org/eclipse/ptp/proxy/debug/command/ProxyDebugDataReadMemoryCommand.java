@@ -5,7 +5,7 @@ public class ProxyDebugDataReadMemoryCommand extends AbstractProxyDebugCommand i
 	
 	public ProxyDebugDataReadMemoryCommand(String bits, long offset, String address, 
 			String format, int wordSize, int rows, int cols, Character asChar) {
-		super(bits);
+		super(DATAREADMEMORY, bits);
 		addArgument(offset);
 		addArgument(address);
 		addArgument(format);
@@ -14,8 +14,8 @@ public class ProxyDebugDataReadMemoryCommand extends AbstractProxyDebugCommand i
 		addArgument(cols);
 		addArgument(asChar);
 	}
-
-	public int getCommandID() {
-		return DATAREADMEMORY;
+	
+	public ProxyDebugDataReadMemoryCommand(int transID, String[] args) {
+		super(DATAREADMEMORY, transID, args);
 	}
 }

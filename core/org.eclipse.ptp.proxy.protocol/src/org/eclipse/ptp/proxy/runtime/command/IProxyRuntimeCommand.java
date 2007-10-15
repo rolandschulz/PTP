@@ -1,7 +1,9 @@
 package org.eclipse.ptp.proxy.runtime.command;
 
+import org.eclipse.ptp.proxy.command.IProxyCommand;
 
-public interface IProxyRuntimeCommand {
+
+public interface IProxyRuntimeCommand extends IProxyCommand {
 	/*
 	 * Command IDs
 	 */

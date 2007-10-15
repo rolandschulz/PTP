@@ -17,6 +17,8 @@
 
 package org.eclipse.ptp.proxy.event;
 
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
+
 public interface IProxyEventFactory {
-	public IProxyEvent toEvent(int type, int transID, String[] args);
+	public IProxyEvent toEvent(ProxyPacket packet);
 }

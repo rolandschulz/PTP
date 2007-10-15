@@ -21,14 +21,13 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeMessageEvent;
 
 public class ProxyRuntimeMessageEvent extends AbstractProxyEvent 
 		implements IProxyRuntimeMessageEvent {
 
 	public ProxyRuntimeMessageEvent(int transID, String[] args) {
-		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, transID, args);
+		super(MESSAGE, transID, args);
 	}
 	
 	public ProxyRuntimeMessageEvent(Level level, String message) {
@@ -36,7 +35,7 @@ public class ProxyRuntimeMessageEvent extends AbstractProxyEvent
 	}
 
 	public ProxyRuntimeMessageEvent(Level level, int code, String message) {
-		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, 0, new String[] {
+		super(MESSAGE, 0, new String[] {
 			IProxyMessageEvent.LEVEL_ATTR + "=" + level.name(),
 			IProxyMessageEvent.CODE_ATTR + "=" + code,
 			IProxyMessageEvent.TEXT_ATTR + "=" + message

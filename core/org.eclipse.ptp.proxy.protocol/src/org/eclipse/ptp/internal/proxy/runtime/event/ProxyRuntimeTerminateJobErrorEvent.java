@@ -19,6 +19,6 @@ public class ProxyRuntimeTerminateJobErrorEvent
 		implements IProxyRuntimeTerminateJobErrorEvent {
 
 	public ProxyRuntimeTerminateJobErrorEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_TERMINATEJOB_ERROR_EVENT, transID, args);
+		super(TERMINATEJOB_ERROR, transID, args);
 	}
 }

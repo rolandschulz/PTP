@@ -4,11 +4,11 @@ package org.eclipse.ptp.proxy.debug.command;
 public class ProxyDebugDeleteBreakpointCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugDeleteBreakpointCommand(String bits, int bpid) {
-		super(bits);
+		super(DELETEBREAKPOINT, bits);
 		addArgument(bpid);
 	}
-
-	public int getCommandID() {
-		return DELETEBREAKPOINT;
+	
+	public ProxyDebugDeleteBreakpointCommand(int transID, String[] args) {
+		super(DELETEBREAKPOINT, transID, args);
 	}
 }

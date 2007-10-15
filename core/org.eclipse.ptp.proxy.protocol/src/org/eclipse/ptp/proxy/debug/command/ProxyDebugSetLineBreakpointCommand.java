@@ -6,7 +6,7 @@ public class ProxyDebugSetLineBreakpointCommand extends AbstractProxyDebugComman
 	public ProxyDebugSetLineBreakpointCommand(String bits, 
 			int bpid, boolean isTemporary, boolean isHardware, String file, int line, 
 			String expression, int ignoreCount, int tid) {
-		super(bits);
+		super(SETLINEBREAKPOINT, bits);
 		addArgument(bpid);
 		addArgument(isTemporary);
 		addArgument(isHardware);
@@ -16,8 +16,8 @@ public class ProxyDebugSetLineBreakpointCommand extends AbstractProxyDebugComman
 		addArgument(ignoreCount);
 		addArgument(tid);
 	}
-
-	public int getCommandID() {
-		return SETLINEBREAKPOINT;
+	
+	public ProxyDebugSetLineBreakpointCommand(int transID, String[] args) {
+		super(SETLINEBREAKPOINT, transID, args);
 	}
 }

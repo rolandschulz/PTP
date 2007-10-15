@@ -6,7 +6,7 @@ public class ProxyDebugSetWatchpointCommand extends AbstractProxyDebugCommand im
 	public ProxyDebugSetWatchpointCommand(String bits, 
 			int bpid, String expression, boolean isAccess, boolean isRead, String condition, 
 			int ignoreCount) {
-		super(bits);
+		super(SETWATCHPOINT, bits);
 		addArgument(bpid);
 		addArgument(expression);
 		addArgument(isAccess);
@@ -14,8 +14,8 @@ public class ProxyDebugSetWatchpointCommand extends AbstractProxyDebugCommand im
 		addArgument(condition);
 		addArgument(ignoreCount);
 	}
-
-	public int getCommandID() {
-		return SETWATCHPOINT;
+	
+	public ProxyDebugSetWatchpointCommand(int transID, String[] args) {
+		super(SETWATCHPOINT, transID, args);
 	}
 }

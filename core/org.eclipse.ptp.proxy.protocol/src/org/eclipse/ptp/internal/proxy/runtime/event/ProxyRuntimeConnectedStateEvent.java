@@ -27,7 +27,7 @@ public class ProxyRuntimeConnectedStateEvent
 		implements IProxyRuntimeConnectedStateEvent {
 
 	public ProxyRuntimeConnectedStateEvent() {
-		super(PROXY_RUNTIME_CONNECTED_STATE_EVENT, 0);
+		super(CONNECTED_STATE, 0);
 	}
 
 }

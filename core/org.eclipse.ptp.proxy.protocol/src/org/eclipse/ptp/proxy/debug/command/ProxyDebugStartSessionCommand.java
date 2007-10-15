@@ -1,18 +1,18 @@
 package org.eclipse.ptp.proxy.debug.command;
 
-import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
 
-public class ProxyDebugStartSessionCommand extends AbstractProxyCommand implements IProxyDebugCommand {
+public class ProxyDebugStartSessionCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
-	public ProxyDebugStartSessionCommand(String bits, String path, 
+	public ProxyDebugStartSessionCommand(String prog, String path, 
 			String dir, String[] args) {
-		addArgument(bits);
+		super(STARTSESSION);
+		addArgument(prog);
 		addArgument(path);
 		addArgument(dir);
 		addArguments(args);
 	}
-
-	public int getCommandID() {
-		return STARTSESSION;
+	
+	public ProxyDebugStartSessionCommand(int transID, String[] args) {
+		super(STARTSESSION, transID, args);
 	}
 }

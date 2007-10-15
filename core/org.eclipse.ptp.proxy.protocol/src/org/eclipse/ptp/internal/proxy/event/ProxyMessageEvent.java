@@ -26,11 +26,11 @@ public class ProxyMessageEvent extends AbstractProxyEvent implements IProxyMessa
 	public static final int EVENT_ERR_EVENT = 11;
 	
 	public ProxyMessageEvent(int transactionID, String[] args) {
-		super(EVENT_MESSAGE, transactionID, args);
+		super(MESSAGE, transactionID, args);
 	}
 
 	public ProxyMessageEvent(Level level, String message) {
-		super(EVENT_MESSAGE, 0, new String[] {
+		super(MESSAGE, 0, new String[] {
 			LEVEL_ATTR + "=" + level.name(),
 			TEXT_ATTR + "=" + message
 		});

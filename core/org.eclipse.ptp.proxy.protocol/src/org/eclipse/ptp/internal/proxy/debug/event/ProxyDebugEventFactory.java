@@ -32,27 +32,30 @@ import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProxyDebugEventFactory extends ProxyEventFactory {
 	
-	public IProxyEvent toEvent(int type, int transID, String[] args) {
+	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyDebugEvent	evt = null;
 		int numVars;
 		String vars[];
 
-		IProxyEvent e = super.toEvent(type, transID, args);
+		IProxyEvent e = super.toEvent(packet);
 		if (e != null) {
 			return e;
 		}
 
+		String[] args = packet.getArgs();
+		
 		/*
 		 * [0]: bit list
 		 */
 		String bits = args[0];
 		
-		switch (type) {
+		switch (packet.getID()) {
 		case IProxyDebugEvent.EVENT_DBG_OK:
-			evt = new ProxyDebugOKEvent(transID, bits);
+			evt = new ProxyDebugOKEvent(packet.getTransID(), bits);
 			break;
 			
 		/**
@@ -61,7 +64,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		 */
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			int errCode = Integer.parseInt(args[1]);
-			evt = new ProxyDebugErrorEvent(transID, bits, errCode, args[2]);
+			evt = new ProxyDebugErrorEvent(packet.getTransID(), bits, errCode, args[2]);
 			break;
 
 		/**
@@ -69,7 +72,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		 */			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			int num_servers = Integer.parseInt(args[1]);
-			evt = new ProxyDebugInitEvent(transID, bits, num_servers);
+			evt = new ProxyDebugInitEvent(packet.getTransID(), bits, num_servers);
 			break;
 			
 		/**
@@ -91,7 +94,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 				for (int i = 0; i<numVars; i++) {
 					vars[i] = args[i+5];
 				}
-				evt = new ProxyDebugBreakpointHitEvent(transID, bits, hitId, bpTid, vars);
+				evt = new ProxyDebugBreakpointHitEvent(packet.getTransID(), bits, hitId, bpTid, vars);
 				break;
 				
 			/**
@@ -123,7 +126,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 					vars[i] = args[i+14];
 				}
 
-				evt = new ProxyDebugSignalEvent(transID, bits, args[2], args[6], sigLoc, sigTid, vars);
+				evt = new ProxyDebugSignalEvent(packet.getTransID(), bits, args[2], args[6], sigLoc, sigTid, vars);
 				break;
 				
 			/**
@@ -144,7 +147,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 				for (int i = 0; i<numVars; i++) {
 					vars[i] = args[i+9];
 				}
-				evt = new ProxyDebugStepEvent(transID, bits, frame, stTid, vars);
+				evt = new ProxyDebugStepEvent(packet.getTransID(), bits, frame, stTid, vars);
 				break;
 				
 			/**
@@ -165,7 +168,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 				for (int i = 0; i<numVars; i++) {
 					vars[i] = args[i+9];
 				}
-				evt = new ProxyDebugSuspendEvent(transID, bits, suspendLoc, susTid, vars);
+				evt = new ProxyDebugSuspendEvent(packet.getTransID(), bits, suspendLoc, susTid, vars);
 				break;
 			}
 			break;
@@ -187,7 +190,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			int bpId = Integer.parseInt(args[1]);
 			ProxyDebugLineLocation loc = toLineLocation(args[7], args[10]);
 			ProxyDebugBreakpoint bpt = toBreakpoint(args[3], args[4], args[5], args[6], loc);
-			evt = new ProxyDebugBreakpointSetEvent(transID, bits, bpId, bpt);
+			evt = new ProxyDebugBreakpointSetEvent(packet.getTransID(), bits, bpId, bpt);
 			break;
 
 		/**
@@ -204,7 +207,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			for (int i = 0; i<numSignals; i++) {
 				signals[i] = new ProxyDebugSignal(args[5*i+2], toBoolean(Integer.parseInt(args[5*i+3])), toBoolean(Integer.parseInt(args[5*i+4])), toBoolean(Integer.parseInt(args[5*i+5])), args[5*i+6]);
 			}
-			evt = new ProxyDebugSignalsEvent(transID, bits, signals);
+			evt = new ProxyDebugSignalsEvent(packet.getTransID(), bits, signals);
 			break;
 			
 		/**
@@ -217,7 +220,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			 */
 			case IProxyDebugEvent.EVENT_DBG_EXIT_NORMAL:
 				int status = Integer.parseInt(args[2]);
-				evt = new ProxyDebugExitEvent(transID, bits, status);
+				evt = new ProxyDebugExitEvent(packet.getTransID(), bits, status);
 				break;
 			/**
 			 * [2]: signal info -> name
@@ -227,7 +230,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			 * [6]: signal info -> description
 			 */
 			case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
-				evt = new ProxyDebugSignalExitEvent(transID, bits, args[2], args[6]);
+				evt = new ProxyDebugSignalExitEvent(packet.getTransID(), bits, args[2], args[6]);
 				break;
 			}
 			break;
@@ -246,7 +249,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			for (int i = 0; i < numFrames; i++) {
 				frames[i] = toFrame(args[5*i+2], args[5*i+3], args[5*i+4], args[5*i+6], args[5*i+5]);
 			}
-			evt = new ProxyDebugStackframeEvent(transID, bits, frames);
+			evt = new ProxyDebugStackframeEvent(packet.getTransID(), bits, frames);
 			break;
 
 		/**
@@ -260,7 +263,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		case IProxyDebugEvent.EVENT_DBG_THREAD_SELECT:
 			int current_thread_id = Integer.parseInt(args[1]);
 			ProxyDebugStackFrame th_frame = toFrame(args[2], args[3], args[4], args[6], args[7]);
-			evt = new ProxyDebugSetThreadSelectEvent(transID, bits, current_thread_id, th_frame);
+			evt = new ProxyDebugSetThreadSelectEvent(packet.getTransID(), bits, current_thread_id, th_frame);
 			break;
 		
 		/**
@@ -275,7 +278,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			for (int i=1; i<thread_ids.length; i++) {
 				thread_ids[i] = args[i+2];
 			}
-			evt = new ProxyDebugInfoThreadsEvent(transID, bits, thread_ids);
+			evt = new ProxyDebugInfoThreadsEvent(packet.getTransID(), bits, thread_ids);
 			break;
 
 		/**
@@ -283,7 +286,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		 */
 		case IProxyDebugEvent.EVENT_DBG_STACK_INFO_DEPTH:
 			int depth = Integer.parseInt(args[1]);
-			evt = new ProxyDebugStackInfoDepthEvent(transID, bits, depth);
+			evt = new ProxyDebugStackInfoDepthEvent(packet.getTransID(), bits, depth);
 			break;
 
 		/**
@@ -315,7 +318,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 				data_len = new_data_len;
 				memories[i] = new ProxyDebugMemory(addr, ascii, data_str);
 			}
-			evt = new ProxyDebugMemoryInfoEvent(transID, bits, toMemoryInfo(args[1], args[2], args[3], args[4], args[5], args[6], args[7], memories));
+			evt = new ProxyDebugMemoryInfoEvent(packet.getTransID(), bits, toMemoryInfo(args[1], args[2], args[3], args[4], args[5], args[6], args[7], memories));
 			break;
 			
 		/**
@@ -328,7 +331,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			for (int i = 0; i < numVars; i++) {
 				vars[i] = args[i+2];
 			}
-			evt = new ProxyDebugVarsEvent(transID, bits, vars);
+			evt = new ProxyDebugVarsEvent(packet.getTransID(), bits, vars);
 			break;
 
 		/**
@@ -341,14 +344,14 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			for (int i = 0; i < numArgs; i++) {
 				arg_strs[i] = args[i+2];
 			}
-			evt = new ProxyDebugArgsEvent(transID, bits, arg_strs);
+			evt = new ProxyDebugArgsEvent(packet.getTransID(), bits, arg_strs);
 			break;
 			
 		/**
 		 * [1]: type name
 		 */
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
-			evt = new ProxyDebugTypeEvent(transID, bits, args[1]);
+			evt = new ProxyDebugTypeEvent(packet.getTransID(), bits, args[1]);
 			break;
 			
 		/**
@@ -358,14 +361,14 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		 */
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugAIF data = new ProxyDebugAIF(args[1], args[2], args[3]);
-			evt = new ProxyDebugDataEvent(transID, bits, data);
+			evt = new ProxyDebugDataEvent(packet.getTransID(), bits, data);
 			break;
 
 		/**
 		 * [1]: data value 
 		 */
 		case IProxyDebugEvent.EVENT_DBG_DATA_EVA_EX:
-			evt = new ProxyDebugDataExpValueEvent(transID, bits, args[1]);
+			evt = new ProxyDebugDataExpValueEvent(packet.getTransID(), bits, args[1]);
 			break;
 
 		/**
@@ -375,7 +378,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		 */
 		case IProxyDebugEvent.EVENT_DBG_PARTIAL_AIF:
 			ProxyDebugAIF partial_data = new ProxyDebugAIF(args[1], args[2], args[3]);
-			evt = new ProxyDebugPartialAIFEvent(transID, bits, partial_data, args[4]);
+			evt = new ProxyDebugPartialAIFEvent(packet.getTransID(), bits, partial_data, args[4]);
 			break;
 		}
 		return evt;

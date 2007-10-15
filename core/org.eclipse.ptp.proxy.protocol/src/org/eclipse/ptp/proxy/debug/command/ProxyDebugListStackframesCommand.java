@@ -5,12 +5,12 @@ public class ProxyDebugListStackframesCommand extends AbstractProxyDebugCommand 
 	
 	public ProxyDebugListStackframesCommand(String bits, 
 			int low, int high) {
-		super(bits);
+		super(LISTSTACKFRAMES, bits);
 		addArgument(low);
 		addArgument(high);
 	}
-
-	public int getCommandID() {
-		return LISTSTACKFRAMES;
+	
+	public ProxyDebugListStackframesCommand(int transID, String[] args) {
+		super(LISTSTACKFRAMES, transID, args);
 	}
 }

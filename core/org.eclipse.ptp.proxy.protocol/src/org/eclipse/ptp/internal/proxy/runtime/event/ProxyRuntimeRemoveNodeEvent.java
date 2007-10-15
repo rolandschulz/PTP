@@ -19,6 +19,6 @@ public class ProxyRuntimeRemoveNodeEvent
 		implements IProxyRuntimeRemoveNodeEvent {
 
 	public ProxyRuntimeRemoveNodeEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_REMOVE_NODE_EVENT, transID, args);
+		super(REMOVE_NODE, transID, args);
 	}
 }

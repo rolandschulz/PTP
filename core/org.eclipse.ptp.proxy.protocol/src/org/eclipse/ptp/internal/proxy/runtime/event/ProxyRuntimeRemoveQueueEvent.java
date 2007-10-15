@@ -19,6 +19,6 @@ public class ProxyRuntimeRemoveQueueEvent
 		implements IProxyRuntimeRemoveQueueEvent {
 
 	public ProxyRuntimeRemoveQueueEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_REMOVE_QUEUE_EVENT, transID, args);
+		super(REMOVE_QUEUE, transID, args);
 	}
 }

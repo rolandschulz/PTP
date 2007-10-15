@@ -25,6 +25,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeQueueChangeEvent;
 public class ProxyRuntimeQueueChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeQueueChangeEvent {
 
 	public ProxyRuntimeQueueChangeEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_QUEUE_CHANGE_EVENT, transID, args);
+		super(QUEUE_CHANGE, transID, args);
 	}
 }

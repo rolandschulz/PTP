@@ -24,6 +24,6 @@ import org.eclipse.ptp.proxy.event.IProxyErrorEvent;
 
 public class ProxyErrorEvent extends AbstractProxyEvent implements IProxyErrorEvent {
 	public ProxyErrorEvent(int transactionID, String[] args) {
-		super(EVENT_ERROR, transactionID, args);
+		super(ERROR, transactionID, args);
 	}
 }

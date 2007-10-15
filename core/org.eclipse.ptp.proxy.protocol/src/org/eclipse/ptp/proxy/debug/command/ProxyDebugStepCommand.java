@@ -5,12 +5,12 @@ public class ProxyDebugStepCommand extends AbstractProxyDebugCommand implements 
 	
 	public ProxyDebugStepCommand(String bits, 
 			int count, int type) {
-		super(bits);
+		super(STEP, bits);
 		addArgument(count);
 		addArgument(type);
 	}
-
-	public int getCommandID() {
-		return STEP;
+	
+	public ProxyDebugStepCommand(int transID, String[] args) {
+		super(STEP, transID, args);
 	}
 }

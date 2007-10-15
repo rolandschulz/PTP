@@ -3,8 +3,7 @@ package org.eclipse.ptp.proxy.util;
 import java.math.BigInteger;
 import java.nio.CharBuffer;
 
-import org.eclipse.ptp.proxy.command.IProxyCommand;
-import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProtocolUtil {
 	public final static int HEXADECIMAL = 0;
@@ -96,7 +95,7 @@ public class ProtocolUtil {
 	 * @return proxy string converted to Java String
 	 */
 	public static String decodeString(CharBuffer buf, int start) {
-		int end = start + IProxyEvent.EVENT_ARG_LEN_SIZE;
+		int end = start + ProxyPacket.PACKET_ARG_LEN_SIZE;
 		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
 		start = end + 1; // Skip ':'
 		end = start + len;
@@ -140,7 +139,7 @@ public class ProtocolUtil {
 			len = str.length();
 		}
 		
-		return encodeIntVal(len, IProxyCommand.CMD_ARGS_LEN_SIZE) + ":" + str;		
+		return encodeIntVal(len, ProxyPacket.PACKET_ARG_LEN_SIZE) + ":" + str;		
 	}	
 
 }

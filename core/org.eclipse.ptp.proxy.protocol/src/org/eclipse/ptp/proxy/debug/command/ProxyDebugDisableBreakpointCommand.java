@@ -4,11 +4,11 @@ package org.eclipse.ptp.proxy.debug.command;
 public class ProxyDebugDisableBreakpointCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugDisableBreakpointCommand(String bits, int bpid) {
-		super(bits);
+		super(DISABLEBREAKPOINT, bits);
 		addArgument(bpid);
 	}
-
-	public int getCommandID() {
-		return DISABLEBREAKPOINT;
+	
+	public ProxyDebugDisableBreakpointCommand(int transID, String[] args) {
+		super(DISABLEBREAKPOINT, transID, args);
 	}
 }

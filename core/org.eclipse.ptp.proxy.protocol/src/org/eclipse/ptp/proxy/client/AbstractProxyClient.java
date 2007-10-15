@@ -24,21 +24,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.ptp.internal.proxy.command.ProxyQuitCommand;
 import org.eclipse.ptp.internal.proxy.event.ProxyConnectedEvent;
@@ -58,13 +52,12 @@ import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.proxy.event.IProxyShutdownEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
-import org.eclipse.ptp.proxy.util.ProtocolUtil;
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public abstract class AbstractProxyClient implements IProxyClient {
 
 	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN}
 	
-	private boolean				debug = false;
 	private int					transactionID = 1;
 	private int					sessPort = 0;
 	private ServerSocketChannel	sessSvrSock = null;
@@ -79,13 +72,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 
 	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 
-	private Charset			charset = Charset.forName("US-ASCII");
-	private CharsetEncoder	encoder = charset.newEncoder();
-	private CharsetDecoder	decoder = charset.newDecoder();
-	
 	private SessionState state = SessionState.SHUTDOWN;
-	
-	private final ReentrantLock stateLock = new ReentrantLock();
 
 	public AbstractProxyClient(IProxyEventFactory factory) {
 		proxyEventFactory = factory;
@@ -96,42 +83,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	public void addProxyEventListener(IProxyEventListener listener) {
 		listeners.add(listener);
-	}
-
-	/**
-	 * Character set decoder
-	 * 
-	 * @return decoder
-	 */
-	public CharsetDecoder decoder() {
-		return decoder;
-	}
-	
-	/**
-	 * Character set encoder
-	 * 
-	 * @return encoder
-	 */
-	public CharsetEncoder encoder() {
-		return encoder;
-	}
-	
-	/**
-	 * Write a full buffer to the socket.
-	 * 
-	 * @param buf
-	 * @return number of bytes written
-	 * @throws IOException
-	 */
-	public int fullWrite(ByteBuffer buf) throws IOException {
-		int n = 0;
-		while (buf.remaining() > 0) {
-			n = sessOutput.write(buf);
-			if (n < 0) {
-				throw new IOException("EOF from proxy");
-			}
-		}
-		return n;
 	}
 	
 	/* (non-Javadoc)
@@ -145,11 +96,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#isReady()
 	 */
 	public boolean isReady() {
-		stateLock.lock();
-		try {
+		synchronized (state) {
 			return state == SessionState.RUNNING;
-		} finally {
-			stateLock.unlock();
 		}
 	}
 
@@ -159,11 +107,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @return shut down state
 	 */
 	public boolean isShutdown() {
-		stateLock.lock();
-		try {
+		synchronized (state) {
 			return state == SessionState.SHUTDOWN;
-		} finally {
-			stateLock.unlock();
 		}
 	}
 	
@@ -185,12 +130,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sendCommand(java.lang.String)
 	 */
 	public void sendCommand(IProxyCommand cmd) throws IOException {
-		if (isReady()) {
-			sendCommandBuffer(cmd.getEncodedMessage());
-		}
-		else {
-			throw new IOException("proxy not ready to send");
-		}
+		ProxyPacket packet = new ProxyPacket(cmd);
+		packet.send(sessOutput);
 	}
 	
 	/* (non-Javadoc)
@@ -227,12 +168,10 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
 		
-		stateLock.lock();
-		try {
+		synchronized (state) {
 			state = SessionState.WAITING;
-		} finally {
-			stateLock.unlock();
 		}
+		
 		System.out.println("port=" + sessPort);
 		acceptThread = new Thread("Proxy Client Accept Thread") {
 			public void run() {
@@ -257,8 +196,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					} catch (IOException e) {
 						System.out.println("IO Exception trying to close server socket (non fatal)");
 					}
-					stateLock.lock();
-					try {
+					synchronized (state) {
 						if (isInterrupted()) {
 							error = true;
 							fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, "Connection cancelled by user"));
@@ -269,8 +207,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						} else {
 							state = SessionState.SHUTDOWN;
 						}
-					} finally {
-						stateLock.unlock();
 					}
 					System.out.println("accept thread exiting...");
 				}
@@ -291,11 +227,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		System.out.println("sessionCreate(stdin, stdout)");
 		sessInput = Channels.newChannel(input);
 		sessOutput = Channels.newChannel(output);
-		stateLock.lock();
-		try {
+		synchronized (state) {
 			state = SessionState.CONNECTED;
-		} finally {
-			stateLock.unlock();
 		}
 		fireProxyConnectedEvent(new ProxyConnectedEvent());
 	}
@@ -304,8 +237,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionFinish()
 	 */
 	public void sessionFinish() throws IOException {
-		stateLock.lock();
-		try {
+		synchronized (state) {
 			SessionState oldState = state;
 			
 			state = SessionState.SHUTTING_DOWN;
@@ -333,10 +265,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				 * received or after shutdownTimeout.
 				 */
 				IProxyCommand cmd = new ProxyQuitCommand();
-				String cmdBuf = cmd.getEncodedMessage();
 				// TODO: start shutdown timeout
 				try {
-					sendCommandBuffer(cmdBuf);
+					sendCommand(cmd);
 				} catch (IOException e) {
 					// Tell event thread to exit
 					state = SessionState.SHUTDOWN;
@@ -344,8 +275,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				}
 				break;
 			}
-		} finally {
-			stateLock.unlock();
 		}
 	}
 	
@@ -364,27 +293,21 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				System.out.println("event thread starting...");
 				try {
 					while (errorCount < MAX_ERRORS && !isInterrupted()) {
-						stateLock.lock();
-						try {
+						synchronized (state) {
 							if (state == SessionState.SHUTDOWN) {
 								break;
 							}
-						} finally {
-							stateLock.unlock();
 						}
 						if (!sessionProgress()) {
 							errorCount++;
 						}
 					}
 				} catch (IOException e) {
-					stateLock.lock();
-					try {
+					synchronized (state) {
 						if (!isInterrupted() && state != SessionState.SHUTTING_DOWN) {
 							error = true;
 							System.out.println("event thread IOException . . . " + e.getMessage());
 						}
-					} finally {
-						stateLock.unlock();
 					}
 				} 
 				
@@ -397,11 +320,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				} catch (IOException e) {
 				} 
 				
-				stateLock.lock();
-				try {
+				synchronized (state) {
 					state = SessionState.SHUTDOWN;
-				} finally {
-					stateLock.unlock();
 				}
 
 				fireProxyDisconnectedEvent(new ProxyDisconnectedEvent(error));
@@ -409,173 +329,31 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			}
 		};
 
-		stateLock.lock();
-		try {
+		synchronized (state) {
 			if (state != SessionState.CONNECTED) {
 				throw new IOException("Not ready to receive events");
 			}
 			state = SessionState.RUNNING;
-		} finally {
-			stateLock.unlock();
 		}
 		eventThread.start();
 	}
-
+	
 	/**
-	 * Read a full buffer from the socket.
+	 * Process incoming events
 	 * 
-	 * @return	number of bytes read
-	 * @throws	IOException if EOF
-	 */
-	private int fullRead(ByteBuffer buf) throws IOException {
-		int n = 0;
-		buf.clear();
-		while (buf.remaining() > 0) {
-			n = sessInput.read(buf);
-			if (n < 0) {
-				throw new IOException("EOF from proxy");
-			}
-		}
-		buf.flip();
-		return n;
-	}
-
-	/**
-	 * Send the supplied string to the remote proxy. Formats the string
-	 * into the correct proxy format.
-	 * 
-	 * @param buf
+	 * @return
 	 * @throws IOException
 	 */
-	private void sendCommandBuffer(String buf) throws IOException {
-		/*
-		 * Note: command length includes the first space!
-		 */
-		String sendCmd = ProtocolUtil.encodeIntVal(buf.length() + 1, 
-				IProxyCommand.CMD_LENGTH_SIZE) + " " + buf;
-		if (debug) {
-			System.out.println("COMMAND: " + sendCmd);
-		}
-		fullWrite(encoder.encode(CharBuffer.wrap(sendCmd)));
-		
-	}
-
-	/**
-	 * Process packets from the wire. Each packet comprises a length, header and a body 
-	 * formatted as follows:
-	 * 
-	 * LENGTH HEADER BODY
-	 * 
-	 * where:
-	 * 
-	 * LENGTH	is an IProxyEvent.EVENT_LENGTH_SIZE hexadecimal number representing
-	 * 			the total length of the event excluding the LENGTH field.
-	 * 
-	 * HEADER consists of the following fields:
-	 * 
-	 * ' ' EVENT_ID ':' TRANS_ID ':' NUM_ARGS
-	 * 
-	 * where:
-	 * 
-	 * EVENT_ID	is an IProxyEvent.EVENT_ID_SIZE hexadecimal number representing
-	 * 			the type of this event.
-	 * TRANS_ID	is an IProxyEvent.EVENT_TRANS_ID_SIZE hexadecimal number representing
-	 * 			the transaction ID of the event.
-	 * NUM_ARGS	is an IProxyEvent.EVENT_ARGS_SIZE hexadecimal number representing
-	 * 			the number of arguments. 
-	 * 
-	 * The event body is formatted as a list of NUM_ARGS string arguments, each 
-	 * preceeded by a space (0x20) characters as follows:
-	 * 	
-	 * ' ' LENGTH ':' BYTES ... ' ' LENGTH ':' BYTES
-	 * 
-	 * where:
-	 * 
-	 * LENGTH	is an IProxyEvent.EVENT_ARG_SIZE hexadecimal number representing
-	 * 			the length of the string.
-	 * BYTES	are LENGTH bytes of the string. Any characters are permitted, 
-	 * 			including spaces
-	 * 	
-	 * @return	false if a protocol error occurs
-	 * @throws	IOException if the connection is terminated (read returns < 0)
-	 * 		
-	 */
 	private boolean sessionProgress() throws IOException {
-		/*
-		 * First EVENT_LENGTH_SIZE bytes are the length of the event
-		 */
-		ByteBuffer lengthBytes = ByteBuffer.allocate(IProxyEvent.EVENT_LENGTH_SIZE);
-		int readLen;
-		
-		readLen = fullRead(lengthBytes);
-		if (readLen != IProxyEvent.EVENT_LENGTH_SIZE) {
+		ProxyPacket packet = new ProxyPacket();
+		if (!packet.read(sessInput)) {
 			return false;
 		}
 		
-		CharBuffer len_str = decoder.decode(lengthBytes);
-
-		int len = Integer.parseInt(len_str.subSequence(0, IProxyEvent.EVENT_LENGTH_SIZE).toString(), 16);
-		
-		/*
-		 * Read len bytes of rest of event
-		 */
-		ByteBuffer eventBytes = ByteBuffer.allocate(len);
-
-		readLen = fullRead(eventBytes);
-		if (readLen < IProxyEvent.EVENT_ID_SIZE + IProxyEvent.EVENT_TRANS_ID_SIZE + IProxyEvent.EVENT_NARGS_SIZE + 3) {
-			return false;
-		}
-
-		CharBuffer eventBuf = decoder.decode(eventBytes);
-		
-		/*
-		 * Extract transaction ID and event type
-		 */
-		
-		int idStart = 1; // Skip ' '
-		int idEnd = idStart + IProxyEvent.EVENT_ID_SIZE;
-		int transStart = idEnd + 1; // Skip ':'
-		int transEnd = transStart + IProxyEvent.EVENT_TRANS_ID_SIZE;
-		int numArgsStart = transEnd + 1; // Skip ':'
-		int numArgsEnd = numArgsStart + IProxyEvent.EVENT_NARGS_SIZE;
-		
-		int eventTransID;
-		int eventID;
-		String[] eventArgs;
-		
-		try {
-			eventID = Integer.parseInt(eventBuf.subSequence(idStart, idEnd).toString(), 16);
-			eventTransID = Integer.parseInt(eventBuf.subSequence(transStart, transEnd).toString(), 16);
-			int eventNumArgs = Integer.parseInt(eventBuf.subSequence(numArgsStart, numArgsEnd).toString(), 16);
-			
-			/*
-			 * Extract rest of event arguments. Each argument is an 8 byte hex length, ':' and
-			 * then the characters of the argument.
-			 */
-			
-			eventArgs = new String[eventNumArgs];
-			int argPos = numArgsEnd + 1;
-			
-			for (int i = 0; i < eventNumArgs; i++) {
-				eventArgs[i] = ProtocolUtil.decodeString(eventBuf, argPos);
-				argPos += eventArgs[i].length() + IProxyEvent.EVENT_ARG_LEN_SIZE + 2;
-			}
-			
-			if (debug) {
-				System.out.print("EVENT ID:" + eventID + " TID:" + eventTransID);
-				for (String arg : eventArgs) {
-					System.out.print(" ARG:\"" + arg + "\"");
-				}
-				System.out.println();
-			}
-		} catch (IndexOutOfBoundsException e1) {
-			return false;
-		}
-
 		/*
 		 * Now convert the event into an IProxyEvent
 		 */
-		IProxyEvent e = proxyEventFactory.toEvent(eventID, eventTransID, eventArgs);
+		IProxyEvent e = proxyEventFactory.toEvent(packet);
 				
 		if (e != null) {
 			if (e instanceof IProxyMessageEvent) {

@@ -27,7 +27,7 @@ public class ProxyDisconnectedEvent extends AbstractProxyEvent implements IProxy
 	private boolean error = false;
 	
 	public ProxyDisconnectedEvent(boolean error) {
-		super(EVENT_DISCONNECTED, 0, null);
+		super(DISCONNECTED, 0, null);
 		this.error = error;
 	}
 	

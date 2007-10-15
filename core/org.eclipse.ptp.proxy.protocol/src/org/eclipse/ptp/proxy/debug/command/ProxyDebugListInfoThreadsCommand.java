@@ -4,11 +4,10 @@ package org.eclipse.ptp.proxy.debug.command;
 public class ProxyDebugListInfoThreadsCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugListInfoThreadsCommand(String bits) {
-		super(bits);
+		super(LISTINFOTHREADS, bits);
 	}
-
-	public int getCommandID() {
-		return LISTINFOTHREADS;
+	
+	public ProxyDebugListInfoThreadsCommand(int transID, String[] args) {
+		super(LISTINFOTHREADS, transID, args);
 	}
-
 }

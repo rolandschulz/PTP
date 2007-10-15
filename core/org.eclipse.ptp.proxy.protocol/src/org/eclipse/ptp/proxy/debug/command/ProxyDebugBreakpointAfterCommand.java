@@ -5,12 +5,12 @@ public class ProxyDebugBreakpointAfterCommand extends AbstractProxyDebugCommand 
 	
 	public ProxyDebugBreakpointAfterCommand(String bits, 
 			int bpid, int icount) {
-		super(bits);
+		super(BREAKPOINTAFTER, bits);
 		addArgument(bpid);
 		addArgument(icount);
 	}
-
-	public int getCommandID() {
-		return BREAKPOINTAFTER;
+	
+	public ProxyDebugBreakpointAfterCommand(int transID, String[] args) {
+		super(BREAKPOINTAFTER, transID, args);
 	}
 }

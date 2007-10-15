@@ -19,89 +19,88 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEvent;
 
 public class ProxyRuntimeEventFactory extends ProxyEventFactory {
-	public IProxyEvent toEvent(int type, int transID, String[] args) {
+	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyRuntimeEvent	evt = null;
 
-		IProxyEvent e = super.toEvent(type, transID, args);
+		IProxyEvent e = super.toEvent(packet);
 		if (e != null) {
 			return e;
 		}
 		
-		switch (type) {
-		case IProxyRuntimeEvent.PROXY_RUNTIME_ATTR_DEF_EVENT:
-			evt = new ProxyRuntimeAttributeDefEvent(transID, args);
+		switch (packet.getID()) {
+		case IProxyRuntimeEvent.ATTR_DEF:
+			evt = new ProxyRuntimeAttributeDefEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_JOB_EVENT:
-			evt = new ProxyRuntimeNewJobEvent(transID, args);
+		case IProxyRuntimeEvent.NEW_JOB:
+			evt = new ProxyRuntimeNewJobEvent(packet.getTransID(), packet.getArgs());
 			break;
 		
-		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_MACHINE_EVENT:
-			evt = new ProxyRuntimeNewMachineEvent(transID, args);
+		case IProxyRuntimeEvent.NEW_MACHINE:
+			evt = new ProxyRuntimeNewMachineEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_NODE_EVENT:
-			evt = new ProxyRuntimeNewNodeEvent(transID, args);
+		case IProxyRuntimeEvent.NEW_NODE:
+			evt = new ProxyRuntimeNewNodeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_PROCESS_EVENT:
-			evt = new ProxyRuntimeNewProcessEvent(transID, args);
+		case IProxyRuntimeEvent.NEW_PROCESS:
+			evt = new ProxyRuntimeNewProcessEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_QUEUE_EVENT:
-			evt = new ProxyRuntimeNewQueueEvent(transID, args);
+		case IProxyRuntimeEvent.NEW_QUEUE:
+			evt = new ProxyRuntimeNewQueueEvent(packet.getTransID(), packet.getArgs());
 			break;
 			
-		case IProxyRuntimeEvent.PROXY_RUNTIME_JOB_CHANGE_EVENT:
-			evt = new ProxyRuntimeJobChangeEvent(transID, args);
+		case IProxyRuntimeEvent.JOB_CHANGE:
+			evt = new ProxyRuntimeJobChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 		
-		case IProxyRuntimeEvent.PROXY_RUNTIME_MACHINE_CHANGE_EVENT:
-			evt = new ProxyRuntimeMachineChangeEvent(transID, args);
+		case IProxyRuntimeEvent.MACHINE_CHANGE:
+			evt = new ProxyRuntimeMachineChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_NODE_CHANGE_EVENT:
-			evt = new ProxyRuntimeNodeChangeEvent(transID, args);
+		case IProxyRuntimeEvent.NODE_CHANGE:
+			evt = new ProxyRuntimeNodeChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_PROCESS_CHANGE_EVENT:
-			evt = new ProxyRuntimeProcessChangeEvent(transID, args);
+		case IProxyRuntimeEvent.PROCESS_CHANGE:
+			evt = new ProxyRuntimeProcessChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_QUEUE_CHANGE_EVENT:
-			evt = new ProxyRuntimeQueueChangeEvent(transID, args);
+		case IProxyRuntimeEvent.QUEUE_CHANGE:
+			evt = new ProxyRuntimeQueueChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_ALL_EVENT:
-			evt = new ProxyRuntimeRemoveAllEvent(transID, args);
+		case IProxyRuntimeEvent.REMOVE_ALL:
+			evt = new ProxyRuntimeRemoveAllEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_JOB_EVENT:
-			evt = new ProxyRuntimeRemoveJobEvent(transID, args);
+		case IProxyRuntimeEvent.REMOVE_JOB:
+			evt = new ProxyRuntimeRemoveJobEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_MACHINE_EVENT:
-			evt = new ProxyRuntimeRemoveMachineEvent(transID, args);
+		case IProxyRuntimeEvent.REMOVE_MACHINE:
+			evt = new ProxyRuntimeRemoveMachineEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_NODE_EVENT:
-			evt = new ProxyRuntimeRemoveNodeEvent(transID, args);
+		case IProxyRuntimeEvent.REMOVE_NODE:
+			evt = new ProxyRuntimeRemoveNodeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_PROCESS_EVENT:
-			evt = new ProxyRuntimeRemoveProcessEvent(transID, args);
+		case IProxyRuntimeEvent.REMOVE_PROCESS:
+			evt = new ProxyRuntimeRemoveProcessEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_QUEUE_EVENT:
-			evt = new ProxyRuntimeRemoveQueueEvent(transID, args);
+		case IProxyRuntimeEvent.REMOVE_QUEUE:
+			evt = new ProxyRuntimeRemoveQueueEvent(packet.getTransID(), packet.getArgs());
 			break;
 		}
 
-
 		return evt;
 	}
-
 }

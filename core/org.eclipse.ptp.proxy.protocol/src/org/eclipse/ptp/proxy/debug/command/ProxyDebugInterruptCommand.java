@@ -4,10 +4,10 @@ package org.eclipse.ptp.proxy.debug.command;
 public class ProxyDebugInterruptCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugInterruptCommand(String bits) {
-		super(bits);
+		super(INTERRUPT, bits);
 	}
-
-	public int getCommandID() {
-		return INTERRUPT;
+	
+	public ProxyDebugInterruptCommand(int transID, String[] args) {
+		super(INTERRUPT, transID, args);
 	}
 }

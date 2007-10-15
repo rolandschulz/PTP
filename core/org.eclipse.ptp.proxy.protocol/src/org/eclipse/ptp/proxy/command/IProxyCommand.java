@@ -13,12 +13,6 @@ package org.eclipse.ptp.proxy.command;
 
 
 public interface IProxyCommand {
-
-	public static final int CMD_LENGTH_SIZE = 8;
-	public static final int CMD_ID_SIZE = 4;
-	public static final int CMD_TRANS_ID_SIZE = 8;
-	public static final int CMD_ARGS_LEN_SIZE = 8;
-	
 	/*
 	 * Base command ids
 	 */
@@ -37,7 +31,7 @@ public interface IProxyCommand {
 	/**
 	 * @return the encoded message buffer to be sent to the proxy
 	 */
-	public String getEncodedMessage();
+	public String[] getArguments();
 	
 	/**
 	 * @return the transaction id used by this command
