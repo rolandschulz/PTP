@@ -25,6 +25,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeMachineChangeEvent;
 public class ProxyRuntimeMachineChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeMachineChangeEvent {
 
 	public ProxyRuntimeMachineChangeEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_NODE_CHANGE_EVENT, transID, args);
+		super(NODE_CHANGE, transID, args);
 	}
 }

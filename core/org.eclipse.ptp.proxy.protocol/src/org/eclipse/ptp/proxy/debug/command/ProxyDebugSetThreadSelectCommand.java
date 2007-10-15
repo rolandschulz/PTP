@@ -4,11 +4,11 @@ package org.eclipse.ptp.proxy.debug.command;
 public class ProxyDebugSetThreadSelectCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugSetThreadSelectCommand(String bits, int thread) {
-		super(bits);
+		super(SETTHREADSELECT, bits);
 		addArgument(thread);
 	}
-
-	public int getCommandID() {
-		return SETTHREADSELECT;
+	
+	public ProxyDebugSetThreadSelectCommand(int transID, String[] args) {
+		super(SETTHREADSELECT, transID, args);
 	}
 }

@@ -19,6 +19,6 @@ public class ProxyRuntimeRemoveProcessEvent
 		implements IProxyRuntimeRemoveProcessEvent {
 
 	public ProxyRuntimeRemoveProcessEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_REMOVE_PROCESS_EVENT, transID, args);
+		super(REMOVE_PROCESS, transID, args);
 	}
 }

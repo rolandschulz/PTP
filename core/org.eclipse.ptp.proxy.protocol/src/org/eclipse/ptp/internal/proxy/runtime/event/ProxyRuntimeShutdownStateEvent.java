@@ -27,6 +27,6 @@ public class ProxyRuntimeShutdownStateEvent
 		implements IProxyRuntimeShutdownStateEvent {
 
 	public ProxyRuntimeShutdownStateEvent() {
-		super(PROXY_RUNTIME_SHUTDOWN_STATE_EVENT, 0);
+		super(SHUTDOWN_STATE, 0);
 	}
 }

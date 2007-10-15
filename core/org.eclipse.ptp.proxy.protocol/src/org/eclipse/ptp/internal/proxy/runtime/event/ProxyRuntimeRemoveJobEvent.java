@@ -19,6 +19,6 @@ public class ProxyRuntimeRemoveJobEvent
 		implements IProxyRuntimeRemoveJobEvent {
 
 	public ProxyRuntimeRemoveJobEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_REMOVE_JOB_EVENT, transID, args);
+		super(REMOVE_JOB, transID, args);
 	}
 }

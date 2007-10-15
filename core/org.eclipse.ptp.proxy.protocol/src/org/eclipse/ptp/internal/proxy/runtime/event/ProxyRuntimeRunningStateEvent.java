@@ -27,6 +27,6 @@ public class ProxyRuntimeRunningStateEvent
 		implements IProxyRuntimeRunningStateEvent {
 
 	public ProxyRuntimeRunningStateEvent() {
-		super(PROXY_RUNTIME_RUNNING_STATE_EVENT, 0);
+		super(RUNNING_STATE, 0);
 	}
 }

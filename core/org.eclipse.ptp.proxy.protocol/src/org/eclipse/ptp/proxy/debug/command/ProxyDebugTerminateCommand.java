@@ -4,10 +4,10 @@ package org.eclipse.ptp.proxy.debug.command;
 public class ProxyDebugTerminateCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugTerminateCommand(String bits) {
-		super(bits);
+		super(TERMINATE, bits);
 	}
-
-	public int getCommandID() {
-		return TERMINATE;
+	
+	public ProxyDebugTerminateCommand(int transID, String[] args) {
+		super(TERMINATE, transID, args);
 	}
 }

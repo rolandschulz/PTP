@@ -19,6 +19,6 @@ public class ProxyRuntimeRemoveMachineEvent
 		implements IProxyRuntimeRemoveMachineEvent {
 
 	public ProxyRuntimeRemoveMachineEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_REMOVE_MACHINE_EVENT, transID, args);
+		super(REMOVE_MACHINE, transID, args);
 	}
 }

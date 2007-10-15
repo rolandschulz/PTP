@@ -19,6 +19,6 @@ public class ProxyRuntimeSubmitJobErrorEvent
 		implements IProxyRuntimeSubmitJobErrorEvent {
 
 	public ProxyRuntimeSubmitJobErrorEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_SUBMITJOB_ERROR_EVENT, transID, args);
+		super(SUBMITJOB_ERROR, transID, args);
 	}
 }

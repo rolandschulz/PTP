@@ -24,6 +24,6 @@ import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 
 public class ProxyOKEvent extends AbstractProxyEvent implements IProxyOKEvent {
 	public ProxyOKEvent(int transactionID) {
-		super(EVENT_OK, transactionID, null);
+		super(OK, transactionID, null);
 	}
 }

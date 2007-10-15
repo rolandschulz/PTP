@@ -25,6 +25,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewProcessEvent;
 public class ProxyRuntimeNewProcessEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNewProcessEvent {
 
 	public ProxyRuntimeNewProcessEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_NEW_PROCESS_EVENT, transID, args);
+		super(NEW_PROCESS, transID, args);
 	}
 }

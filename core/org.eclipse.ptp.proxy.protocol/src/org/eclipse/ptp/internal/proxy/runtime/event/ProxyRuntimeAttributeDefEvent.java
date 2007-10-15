@@ -27,7 +27,7 @@ public class ProxyRuntimeAttributeDefEvent extends AbstractProxyEvent
 	implements IProxyRuntimeAttributeDefEvent {
 
 	public ProxyRuntimeAttributeDefEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_ATTR_DEF_EVENT, transID, args);
+		super(ATTR_DEF, transID, args);
 	}
 }
 

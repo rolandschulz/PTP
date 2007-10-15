@@ -5,12 +5,12 @@ public class ProxyDebugListArgumentsCommand extends AbstractProxyDebugCommand im
 	
 	public ProxyDebugListArgumentsCommand(String bits, 
 			int low, int high) {
-		super(bits);
+		super(LISTARGUMENTS, bits);
 		addArgument(low);
 		addArgument(high);
 	}
-
-	public int getCommandID() {
-		return LISTARGUMENTS;
+	
+	public ProxyDebugListArgumentsCommand(int transID, String[] args) {
+		super(LISTARGUMENTS, transID, args);
 	}
 }

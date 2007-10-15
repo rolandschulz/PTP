@@ -25,6 +25,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewJobEvent;
 public class ProxyRuntimeNewJobEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNewJobEvent {
 
 	public ProxyRuntimeNewJobEvent(int transid, String[] args) {
-		super(PROXY_RUNTIME_NEW_JOB_EVENT, transid, args);
+		super(NEW_JOB, transid, args);
 	}
 }

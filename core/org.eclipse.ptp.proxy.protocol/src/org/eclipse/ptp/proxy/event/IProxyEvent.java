@@ -20,25 +20,31 @@
 package org.eclipse.ptp.proxy.event;
 
 public interface IProxyEvent {
-	public static final int EVENT_OK = 0;
-	public static final int EVENT_MESSAGE = 1;
-	public static final int EVENT_CONNECTED = 2;
-	public static final int EVENT_DISCONNECTED = 3;
-	public static final int EVENT_TIMEOUT = 4;
-	public static final int EVENT_ERROR = 5;
-	public static final int EVENT_SHUTDOWN = 6;
-	
-	/*
-	 * Sizeof encoded values (bytes)
+	public static final int OK = 0;
+	public static final int MESSAGE = 1;
+	public static final int CONNECTED = 2;
+	public static final int DISCONNECTED = 3;
+	public static final int TIMEOUT = 4;
+	public static final int ERROR = 5;
+	public static final int SHUTDOWN = 6;
+		
+	/**
+	 * Get the event ID (type)
+	 * 
+	 * @return event ID
 	 */
-	public static final int EVENT_LENGTH_SIZE = 8;
-	public static final int EVENT_CHANNEL_SIZE = 2;
-	public static final int EVENT_ID_SIZE = 4;
-	public static final int EVENT_TRANS_ID_SIZE = 8;
-	public static final int EVENT_NARGS_SIZE = 8;
-	public static final int EVENT_ARG_LEN_SIZE = 8;
-	
 	public int getEventID();
+	
+	/**
+	 * Get the transaction ID
+	 * 
+	 * @return transaction ID
+	 */
 	public int getTransactionID();
+	
+	/**
+	 * Get the event attributes
+	 * @return event attributes
+	 */
 	public String[] getAttributes();
 }

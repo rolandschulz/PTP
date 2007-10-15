@@ -27,6 +27,6 @@ public class ProxyRuntimeErrorStateEvent
 		implements IProxyRuntimeErrorStateEvent {
 
 	public ProxyRuntimeErrorStateEvent() {
-		super(PROXY_RUNTIME_ERROR_STATE_EVENT, 0);
+		super(ERROR_STATE, 0);
 	}
 }

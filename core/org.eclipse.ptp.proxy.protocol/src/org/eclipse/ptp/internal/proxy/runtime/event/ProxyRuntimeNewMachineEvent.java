@@ -25,6 +25,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewMachineEvent;
 public class ProxyRuntimeNewMachineEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNewMachineEvent {
 
 	public ProxyRuntimeNewMachineEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_NEW_MACHINE_EVENT, transID, args);
+		super(NEW_MACHINE, transID, args);
 	}
 }

@@ -24,6 +24,6 @@ import org.eclipse.ptp.proxy.event.IProxyShutdownEvent;
 
 public class ProxyShutdownEvent extends AbstractProxyEvent implements IProxyShutdownEvent {
 	public ProxyShutdownEvent(int transactionID) {
-		super(EVENT_SHUTDOWN, transactionID, null);
+		super(SHUTDOWN, transactionID, null);
 	}
 }

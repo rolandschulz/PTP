@@ -5,12 +5,12 @@ public class ProxyDebugConditionBreakpointCommand extends AbstractProxyDebugComm
 	
 	public ProxyDebugConditionBreakpointCommand(String bits, 
 			int bpid, String expr) {
-		super(bits);
+		super(CONDITIONBREAKPOINT, bits);
 		addArgument(bpid);
 		addArgument(expr);
 	}
-
-	public int getCommandID() {
-		return CONDITIONBREAKPOINT;
+	
+	public ProxyDebugConditionBreakpointCommand(int transID, String[] args) {
+		super(CONDITIONBREAKPOINT, transID, args);
 	}
 }

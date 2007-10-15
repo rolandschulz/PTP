@@ -25,6 +25,6 @@ import org.eclipse.ptp.proxy.event.IProxyConnectedEvent;
 public class ProxyConnectedEvent extends AbstractProxyEvent implements IProxyConnectedEvent {
 	
 	public ProxyConnectedEvent() {
-		super(EVENT_CONNECTED, 0, null);
+		super(CONNECTED, 0, null);
 	}
 }

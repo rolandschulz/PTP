@@ -12,13 +12,17 @@
 package org.eclipse.ptp.internal.proxy.command;
 
 import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
+import org.eclipse.ptp.proxy.command.IProxyQuitCommand;
 
-public class ProxyQuitCommand extends AbstractProxyCommand {
-
-	public int getCommandID() {
-		return QUIT;
+public class ProxyQuitCommand extends AbstractProxyCommand implements IProxyQuitCommand {
+	public ProxyQuitCommand() {
+		super(QUIT);
 	}
-
+	
+	public ProxyQuitCommand(int transID, String[] args) {
+		super(QUIT, transID, args);
+	}
+	
 	public String toString() {
 		return "ProxyQuitCommand tid=" + getTransactionID();
 	}

@@ -14,58 +14,56 @@ package org.eclipse.ptp.proxy.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.proxy.util.ProtocolUtil;
-
 public abstract class AbstractProxyCommand implements IProxyCommand {
 	
 	private static List<IProxyCommand> pendingCommands = new ArrayList<IProxyCommand>();
 
-	private int					id;
+	private int					commandID;
+	private int					transactionID;
 	private ArrayList<String>	args;
 	
-	protected AbstractProxyCommand() {
-		super();
-		this.id = newTransactionID(this);
+	protected AbstractProxyCommand(int commandID) {
+		this.commandID = commandID;
+		this.transactionID = newTransactionID(this);
 		this.args = new ArrayList<String>();
 	}
-	
-	protected AbstractProxyCommand(String[] args) {
-		this();
+
+	protected AbstractProxyCommand(int commandID, int transID, String[] args) {
+		this.commandID = commandID;
+		this.transactionID = transID;
 		for (String arg : args) {
 			this.args.add(arg);
 		}
 	}
-	
+
+
 	/**
 	 * Mark the command that it has been completed so the transaction
 	 * ID can be used by future commands.
 	 */
 	public void completed() {
-		pendingCommands.add(id, null);
+		pendingCommands.add(transactionID, null);
 	}
 	
-	public abstract int getCommandID();
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getCommandID()
+	 */
+	public int getCommandID() {
+		return commandID;
+	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.client.IProxyCommand#getEncodedMessage()
+	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getArguments()
 	 */
-	public String getEncodedMessage()  {
-		String msg = ProtocolUtil.encodeIntVal(getCommandID(), CMD_ID_SIZE) 
-						+ ":" + ProtocolUtil.encodeIntVal(getTransactionID(), CMD_TRANS_ID_SIZE)
-						+ ":" + ProtocolUtil.encodeIntVal(args.size(), CMD_ARGS_LEN_SIZE);
-		
-		for (String arg : args) {
-			msg += " " + ProtocolUtil.encodeString(arg);
-		}
-		
-		return msg;
+	public String[] getArguments() {
+		return args.toArray(new String[args.size()]);
 	}
 	
 	/**
 	 * Return the transaction id used by this command
 	 */
 	public int getTransactionID() {
-		return id;
+		return transactionID;
 	}
 
 	public String toString() {
@@ -102,22 +100,37 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		return transID;
 	}
 
+	/**
+	 * @param arg
+	 */
 	protected void addArgument(boolean arg) {
 		addArgument(arg?"1":"0");
 	}
 
+	/**
+	 * @param arg
+	 */
 	protected void addArgument(Character arg) {
 		args.add(arg==null ? "" : arg.toString());
 	}
 
+	/**
+	 * @param arg
+	 */
 	protected void addArgument(int arg) {
 		args.add(Integer.toString(arg));
 	}
 
+	/**
+	 * @param arg
+	 */
 	protected void addArgument(long arg) {
 		args.add(Long.toString(arg));
 	}
 
+	/**
+	 * @param arg
+	 */
 	protected void addArgument(String arg) {
 		if (arg == null) {
 			args.add("");
@@ -126,6 +139,9 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		}
 	}
 
+	/**
+	 * @param args
+	 */
 	protected void addArguments(String[] args) {
 		for (String arg : args) {
 			addArgument(arg);

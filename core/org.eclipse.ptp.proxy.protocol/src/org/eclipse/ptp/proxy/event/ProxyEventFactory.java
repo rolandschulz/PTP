@@ -20,22 +20,23 @@ package org.eclipse.ptp.proxy.event;
 import org.eclipse.ptp.internal.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.internal.proxy.event.ProxyMessageEvent;
 import org.eclipse.ptp.internal.proxy.event.ProxyOKEvent;
+import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProxyEventFactory extends AbstractProxyEventFactory {
-	public IProxyEvent toEvent(int type, int transID, String[] args) {
+	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyEvent evt = null;
 
-		switch (type) {
-		case IProxyEvent.EVENT_OK:
-			evt = new ProxyOKEvent(transID);
+		switch (packet.getID()) {
+		case IProxyEvent.OK:
+			evt = new ProxyOKEvent(packet.getTransID());
 			break;
 			
-		case IProxyEvent.EVENT_MESSAGE:
-			evt = new ProxyMessageEvent(transID, args);
+		case IProxyEvent.MESSAGE:
+			evt = new ProxyMessageEvent(packet.getTransID(), packet.getArgs());
 			break;
 
-		case IProxyEvent.EVENT_ERROR:
-			evt = new ProxyErrorEvent(transID, args);
+		case IProxyEvent.ERROR:
+			evt = new ProxyErrorEvent(packet.getTransID(), packet.getArgs());
 			break;
 		}
 

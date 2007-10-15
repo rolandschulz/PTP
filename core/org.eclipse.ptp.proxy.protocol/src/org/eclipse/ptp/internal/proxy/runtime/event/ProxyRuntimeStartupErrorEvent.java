@@ -20,13 +20,13 @@ public class ProxyRuntimeStartupErrorEvent
 		implements IProxyRuntimeStartupErrorEvent {
 
 	public ProxyRuntimeStartupErrorEvent(String message) {
-		super(PROXY_RUNTIME_STARTUP_ERROR_EVENT, 0, new String[] {
+		super(STARTUP_ERROR, 0, new String[] {
 				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + 0,
 				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message
 		});
 	}
 
 	public ProxyRuntimeStartupErrorEvent(String[] attrs) {
-		super(PROXY_RUNTIME_STARTUP_ERROR_EVENT, 0, attrs);
+		super(STARTUP_ERROR, 0, attrs);
 	}
 }
