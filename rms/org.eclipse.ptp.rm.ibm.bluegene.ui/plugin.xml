@@ -7,21 +7,21 @@
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
             class="org.eclipse.ptp.bluegene.ui.preferences.BGPreferencePage"
-            id="org.eclipse.ptp.orte.ui.preferences.OMPIPreferencePage"
-            name="Open RTE">
+            id="org.eclipse.ptp.bluegene.ui.preferences.BGPreferencePage"
+            name="Blue Gene">
       </page>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
             class="org.eclipse.ptp.bluegene.ui.wizards.BGResourceManagerConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.orte.ui.configurationWizard"/>
+            id="org.eclipse.ptp.bluegene.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfiguration">
       <launchConfiguration
             class="org.eclipse.ptp.orte.bluegene.rmLaunchConfiguration.BGRMLaunchConfigurationFactory"
-            id="org.eclipse.ptp.orte.ui.launchConfiguration"/>
+            id="org.eclipse.ptp.bluegene.ui.launchConfiguration"/>
    </extension>
 
 </plugin>

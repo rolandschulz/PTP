@@ -31,7 +31,7 @@ import org.eclipse.ui.IMemento;
 public class BGResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	public BGResourceManagerFactory() {
-		super("BlueGene");
+		super("Blue Gene");
 	}
 
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {

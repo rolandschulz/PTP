@@ -5,7 +5,7 @@
          point="org.eclipse.ptp.core.resourcemanager">
       <resourcemanager
             class="org.eclipse.ptp.bluegene.core.rmsystem.BGResourceManagerFactory"
-            id="org.eclipse.ptp.orte.core.resourcemanager"/>
+            id="org.eclipse.ptp.bluegene.core.resourcemanager"/>
    </extension>
 
 </plugin>
