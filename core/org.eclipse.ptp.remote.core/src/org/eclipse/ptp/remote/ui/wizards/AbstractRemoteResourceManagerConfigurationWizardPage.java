@@ -130,10 +130,17 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 */
 		if (!loading) {
 			muxPortFwd = portForwardingButton.getSelection();
-			localAddr = localAddrCombo.getItem(localAddrCombo.getSelectionIndex());
 			manualLaunch = manualButton.getSelection();
 		}
-		
+
+		/*
+		 * If no localAddr has been specified in the configuration, select
+		 * a default one.
+		 */
+		if (!loading || localAddr.equals("")) {
+			localAddr = localAddrCombo.getItem(localAddrCombo.getSelectionIndex());
+		}
+
 		/*
 		 * Fix settings
 		 */
@@ -671,7 +678,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		int selection = 0;
 		for (String addr : addrs) {
 			localAddrCombo.add(addr);
-			if (addr.equals(localAddr)) {
+			if ((localAddr.equals("") && addr.equals("localhost"))
+					|| addr.equals(localAddr)) {
 				selection = index;
 			}
 			index++;
