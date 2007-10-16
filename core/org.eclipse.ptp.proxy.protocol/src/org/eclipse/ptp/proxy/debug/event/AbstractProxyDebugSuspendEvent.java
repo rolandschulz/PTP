@@ -19,16 +19,17 @@
 
 package org.eclipse.ptp.proxy.debug.event;
 
-import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 public abstract class AbstractProxyDebugSuspendEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
 	private int	thread_id = 0;
-	private ProxyDebugLocator locator;
+	private ProxyDebugStackFrame frame;
 	private String[] changed_vars;
-	
-	public AbstractProxyDebugSuspendEvent(int transID, String set, ProxyDebugLocator loc, int tid, String[] vars) {
+	private int depth = 0;
+
+	public AbstractProxyDebugSuspendEvent(int transID, String set, ProxyDebugStackFrame frame, int tid, int depth, String[] vars) {
 		super(EVENT_DBG_SUSPEND, transID, set);
-		this.locator = loc;
+		this.frame = frame;
 		this.thread_id = tid;
 		this.changed_vars = vars;
 	}
@@ -37,11 +38,15 @@ public abstract class AbstractProxyDebugSuspendEvent extends AbstractProxyDebugE
 		return this.thread_id;
 	}
 	
-	public ProxyDebugLocator getLocator() {
-		return this.locator;
+	public ProxyDebugStackFrame getFrame() {
+		return this.frame;
 	}
 	
 	public String[] getChangedVars() {
 		return this.changed_vars;
+	}
+
+	public int getDepth() {
+		return this.depth;
 	}
 }

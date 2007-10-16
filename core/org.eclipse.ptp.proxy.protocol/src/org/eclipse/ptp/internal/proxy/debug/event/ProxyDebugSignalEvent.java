@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.internal.proxy.debug.event;
 
-import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugSuspendEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
 
@@ -27,8 +27,8 @@ public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implem
 	private String		signalName;
 	private String		signalMeaning;
 	
-	public ProxyDebugSignalEvent(int transID, String set, String name, String meaning, ProxyDebugLocator loc, int tid, String[] vars) {
-		super(transID, set, loc, tid, vars);
+	public ProxyDebugSignalEvent(int transID, String set, String name, String meaning, ProxyDebugStackFrame frame, int tid, int depth, String[] vars) {
+		super(transID, set, frame, tid, depth, vars);
 		this.signalName = name;
 		this.signalMeaning = meaning;
 	}
@@ -43,8 +43,8 @@ public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implem
 	
 	public String toString() {
 		String res = "EVENT_DBG_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName;
-		if (this.getLocator() != null)
-			res += " " + getLocator().toString();
+		if (this.getFrame() != null)
+			res += " " + getFrame().toString();
 		return res;
 	}
 }
