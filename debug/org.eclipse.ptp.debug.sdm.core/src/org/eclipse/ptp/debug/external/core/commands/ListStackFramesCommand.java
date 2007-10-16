@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 /**
  * @author Clement chu
@@ -45,12 +45,12 @@ public class ListStackFramesCommand extends AbstractDebugCommand {
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listStackFrames(tasks, low, high);
 	}		
-	public ProxyDebugStackframe[] getStackFrames() throws PCDIException {
+	public ProxyDebugStackFrame[] getStackFrames() throws PCDIException {
 		Object res = getResultValue();
-		if (res instanceof ProxyDebugStackframe[]) {
-			return (ProxyDebugStackframe[])res;
+		if (res instanceof ProxyDebugStackFrame[]) {
+			return (ProxyDebugStackFrame[])res;
 		}
-		return new ProxyDebugStackframe[0];
+		return new ProxyDebugStackFrame[0];
 	}
 	public String getCommandName() {
 		return "List stack frames"; 

@@ -20,9 +20,11 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugPartialAIFEvent;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugAIF;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugPartialAIFEvent;
 
 /**
  * @author Clement chu
@@ -55,15 +57,16 @@ public class GetPartialAIFCommand extends AbstractDebugCommand {
 	}
 	public IAIF getPartialAIF() throws PCDIException {
 		Object res = getResultValue();
-		if (res instanceof ProxyDebugPartialAIFEvent) {
-			return ((ProxyDebugPartialAIFEvent)res).getData();
+		if (res instanceof IProxyDebugPartialAIFEvent) {
+			ProxyDebugAIF pa = ((IProxyDebugPartialAIFEvent)res).getData();
+			return new AIF(pa.getFDS(), pa.getData(), pa.getDescription());
 		}
 		throw new PCDIException("No aif found.");
 	}
 	public String getName() throws PCDIException {
 		Object res = getResultValue();
-		if (res instanceof ProxyDebugPartialAIFEvent) {
-			return ((ProxyDebugPartialAIFEvent)res).getName();
+		if (res instanceof IProxyDebugPartialAIFEvent) {
+			return ((IProxyDebugPartialAIFEvent)res).getName();
 		}
 		throw new PCDIException("No aif found.");
 	}

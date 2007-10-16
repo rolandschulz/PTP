@@ -89,7 +89,7 @@ public class Memory {
 	/** Get string format
 	 * @return
 	 */
-	public String toSting() {
+	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("addr=\"" + addr + "\"");
 		buffer.append("data=[");

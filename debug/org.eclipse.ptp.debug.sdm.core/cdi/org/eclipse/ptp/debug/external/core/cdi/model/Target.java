@@ -51,6 +51,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
+import org.eclipse.ptp.debug.external.core.cdi.Locator;
 import org.eclipse.ptp.debug.external.core.cdi.MemoryManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.SessionObject;
@@ -68,7 +69,7 @@ import org.eclipse.ptp.debug.external.core.commands.SetThreadSelectCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepOverCommand;
 import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
-import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 /**
  * @author Clement chu
@@ -176,10 +177,12 @@ public class Target extends SessionObject implements IPCDITarget {
 				throw new PCDIException("Cannot SetThreadSelectCommand error");
 			}
 			currentThreadId = ((Integer)objects[0]).intValue();
-			ProxyDebugStackframe frame = (ProxyDebugStackframe)objects[1];
+			ProxyDebugStackFrame frame = (ProxyDebugStackFrame)objects[1];
 			
 			int depth = pthread.getStackFrameCount();
-			pthread.currentFrame = new StackFrame(pthread, depth - frame.getLevel(), frame.getLocator(), null);
+			Locator loc = new Locator(frame.getLocator().getFile(), frame.getLocator().getFunction(),
+				frame.getLocator().getLineNumber(), frame.getLocator().getAddress());
+			pthread.currentFrame = new StackFrame(pthread, depth - frame.getLevel(), loc, null);
 
 			if (doUpdate) {
 				/*

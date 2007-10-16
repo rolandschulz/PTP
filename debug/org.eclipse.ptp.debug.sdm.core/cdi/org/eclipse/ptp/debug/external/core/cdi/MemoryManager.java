@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.ptp.debug.core.ExtFormat;
+
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
@@ -34,6 +34,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.DataReadMemoryInfo;
 import org.eclipse.ptp.debug.external.core.cdi.model.MemoryBlock;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.commands.DataReadMemoryCommand;
+import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
 /**
  * @author Clement chu
@@ -160,7 +161,7 @@ public class MemoryManager extends Manager {
 	 * Post a -data-read-memory to gdb/mi.
 	 */
 	DataReadMemoryInfo createDataReadMemoryInfo(Target target, String exp, int units, int wordSize) throws PCDIException {
-		DataReadMemoryCommand command = new DataReadMemoryCommand(target.getTask(), 0, exp, ExtFormat.HEXADECIMAL, wordSize, 1, units, null);
+		DataReadMemoryCommand command = new DataReadMemoryCommand(target.getTask(), 0, exp, ProtocolUtil.HEXADECIMAL, wordSize, 1, units, null);
 		target.getDebugger().postCommand(command);
 		DataReadMemoryInfo info = command.getDataReadMemoryInfo();
 		if (info == null) {

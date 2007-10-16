@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugDataExpValueEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataExpValueEvent;
 
 /**
  * @author Clement chu
@@ -43,8 +43,8 @@ public class DataEvaluateExpressionCommand extends AbstractDebugCommand {
 	}
 	public String getExpressionValue() throws PCDIException {
 		Object res = getResultValue();
-		if (res instanceof ProxyDebugDataExpValueEvent) {
-			return ((ProxyDebugDataExpValueEvent)res).getValue();
+		if (res instanceof IProxyDebugDataExpValueEvent) {
+			return ((IProxyDebugDataExpValueEvent)res).getValue();
 		}
 		return "";
 	}

@@ -19,10 +19,11 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.math.BigInteger;
-import org.eclipse.ptp.debug.core.ExtFormat;
+
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.ITypeIntegral;
 import org.eclipse.ptp.debug.core.aif.IValueIntegral;
+import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
 /**
  * @author Clement chu
@@ -52,7 +53,7 @@ public abstract class ValueIntegral extends AIFValue implements IValueIntegral {
 		}
 
 		try {
-			return ExtFormat.getBigInteger(valueString);
+			return ProtocolUtil.decodeAddress(valueString);
 		} catch (NumberFormatException e) {
 		}
 		return BigInteger.ZERO;

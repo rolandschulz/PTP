@@ -19,13 +19,14 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.ptp.debug.core.ExtFormat;
+
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
 import org.eclipse.ptp.debug.external.core.cdi.MemoryManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.commands.DataWriteMemoryCommand;
+import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
 /**
  * @author Clement chu
@@ -76,7 +77,7 @@ public class MemoryBlock extends PObject implements IPCDIMemoryBlock {
 	 * @param m
 	 */
 	public void setDataReadMemoryInfo(DataReadMemoryInfo m) {
-		cStartAddress = ExtFormat.getBigInteger(m.getAddress());
+		cStartAddress = ProtocolUtil.decodeAddress(m.getAddress());
 		cBytes = getBytes(m);
 		mem = m;
 	}
@@ -255,7 +256,7 @@ public class MemoryBlock extends PObject implements IPCDIMemoryBlock {
 			long l = new Byte(bytes[i]).longValue() & 0xff;
 			String value = "0x" + Long.toHexString(l);
 PDebugUtils.println("----------- DataWriteMemoryCommand is called --------------");
-			DataWriteMemoryCommand command = new DataWriteMemoryCommand(target.getTask(), offset + i, expression, ExtFormat.HEXADECIMAL, 1, value);
+			DataWriteMemoryCommand command = new DataWriteMemoryCommand(target.getTask(), offset + i, expression, ProtocolUtil.HEXADECIMAL, 1, value);
 			target.getDebugger().postCommand(command);
 			if (command.getDataWriteMemoryInfo() == null) {
 				throw new PCDIException("No response");
