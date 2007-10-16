@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP Proxy Server for BlueGene
+Bundle-SymbolicName: org.eclipse.ptp.bluegene.proxy
+Bundle-Version: 2.0.0
+Export-Package: org.eclipse.ptp.bluegene
+Require-Bundle: org.eclipse.ptp.proxy.protocol
