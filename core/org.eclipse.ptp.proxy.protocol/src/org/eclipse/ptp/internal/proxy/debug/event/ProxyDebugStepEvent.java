@@ -24,17 +24,11 @@ import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugSuspendEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugStepEvent;
 
 public class ProxyDebugStepEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugStepEvent {
-	private ProxyDebugStackFrame		frame;
-	
-	public ProxyDebugStepEvent(int transID, String set, ProxyDebugStackFrame frame, int thread_id, String[] vars) {
-		super(transID, set, null, thread_id, vars);
-		this.frame = frame;
+	public ProxyDebugStepEvent(int transID, String set, ProxyDebugStackFrame frame, int thread_id, int depth, String[] vars) {
+		super(transID, set, frame, thread_id, depth, vars);
 	}
 	
-	public ProxyDebugStackFrame getFrame() {
-		return this.frame;
-	}
 	public String toString() {
-		return "EVENT_DBG_STEP transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.frame.toString();
+		return "EVENT_DBG_STEP transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getFrame().toString();
 	}
 }

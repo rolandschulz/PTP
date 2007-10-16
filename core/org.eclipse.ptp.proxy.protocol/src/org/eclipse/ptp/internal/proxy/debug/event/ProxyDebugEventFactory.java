@@ -83,19 +83,23 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			/**
 			 * [2]: bpt id
 			 * [3]: thread id
-			 * [4]: var changed list -> length
-			 * [5]: var changed list -> name
+			 * [4]: depth
+			 * [5]: var changed list -> length
+			 * [6]: var changed list -> name
+			 * 
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_BPHIT:
 				int hitId = Integer.parseInt(args[2]);
 				int bpTid = Integer.parseInt(args[3]);
-				numVars = Integer.parseInt(args[4]);
+				int bpDep = Integer.parseInt(args[4]);
+				numVars = Integer.parseInt(args[5]);
 				vars = new String[numVars];
 				for (int i = 0; i<numVars; i++) {
-					vars[i] = args[i+5];
+					vars[i] = args[i+6];
 				}
-				evt = new ProxyDebugBreakpointHitEvent(packet.getTransID(), bits, hitId, bpTid, vars);
+				evt = new ProxyDebugBreakpointHitEvent(packet.getTransID(), bits, hitId, bpTid, bpDep, vars);
 				break;
+				
 				
 			/**
 			 * [2]: signal info -> name
@@ -109,24 +113,26 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			 * [10]: frame -> location -> address
 			 * [11]: frame -> location -> line number
 			 * [12]: thread id
-			 * [13]: var changed list -> length
-			 * [14]: var changed list -> name
+			 * [13]: depth
+			 * [14]: var changed list -> length
+			 * [15]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_SIGNAL:
 				int sigTid = Integer.parseInt(args[12]);
-				ProxyDebugLocator sigLoc = null;
+				int sigDep = Integer.parseInt(args[13]);
+				ProxyDebugStackFrame sigFrame = null;
 				
 				if (!(args[7].compareTo("*") == 0)) {
-					sigLoc = toLocator(args[8], args[9], args[10], args[11]);
+					sigFrame = toFrame(args[7], args[8], args[9], args[11], args[10]);
 				}
 	
-				numVars = Integer.parseInt(args[13]);
+				numVars = Integer.parseInt(args[14]);
 				vars = new String[numVars];
 				for (int i = 0; i<numVars; i++) {
-					vars[i] = args[i+14];
+					vars[i] = args[i+15];
 				}
 
-				evt = new ProxyDebugSignalEvent(packet.getTransID(), bits, args[2], args[6], sigLoc, sigTid, vars);
+				evt = new ProxyDebugSignalEvent(packet.getTransID(), bits, args[2], args[6], sigFrame, sigTid, sigDep, vars);
 				break;
 				
 			/**
@@ -136,18 +142,20 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			 * [5]: frame -> location -> address
 			 * [6]: frame -> location -> line number
 			 * [7]: thread id
-			 * [8]: var changed list -> length
-			 * [9]: var changed list -> name
+			 * [8]: depth
+			 * [9]: var changed list -> length
+			 * [10]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_STEP:
 				ProxyDebugStackFrame frame = toFrame(args[2], args[3], args[4], args[6], args[5]);
 				int stTid = Integer.parseInt(args[7]);
-				numVars = Integer.parseInt(args[8]);
+				int stDep = Integer.parseInt(args[8]);
+				numVars = Integer.parseInt(args[9]);
 				vars = new String[numVars];
 				for (int i = 0; i<numVars; i++) {
-					vars[i] = args[i+9];
+					vars[i] = args[i+10];
 				}
-				evt = new ProxyDebugStepEvent(packet.getTransID(), bits, frame, stTid, vars);
+				evt = new ProxyDebugStepEvent(packet.getTransID(), bits, frame, stTid, stDep, vars);
 				break;
 				
 			/**
@@ -157,18 +165,20 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			 * [5]: frame -> location -> address
 			 * [6]: frame -> location -> line number
 			 * [7]: thread id
-			 * [8]: var changed list -> length
-			 * [9]: var changed list -> name
+			 * [8]: depth
+			 * [9]: var changed list -> length
+			 * [10]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_INT:
-				ProxyDebugLocator suspendLoc = toLocator(args[3], args[4], args[5], args[6]);
+				ProxyDebugStackFrame suspendFrame = toFrame(args[2], args[3], args[4], args[6], args[5]);
 				int susTid = Integer.parseInt(args[7]);
-				numVars = Integer.parseInt(args[8]);
+				int susDep = Integer.parseInt(args[8]);
+				numVars = Integer.parseInt(args[9]);
 				vars = new String[numVars];
 				for (int i = 0; i<numVars; i++) {
-					vars[i] = args[i+9];
+					vars[i] = args[i+10];
 				}
-				evt = new ProxyDebugSuspendEvent(packet.getTransID(), bits, suspendLoc, susTid, vars);
+				evt = new ProxyDebugSuspendEvent(packet.getTransID(), bits, suspendFrame, susTid, susDep, vars);
 				break;
 			}
 			break;

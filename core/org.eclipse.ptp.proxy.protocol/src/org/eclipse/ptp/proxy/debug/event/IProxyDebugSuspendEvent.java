@@ -18,10 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.proxy.debug.event;
 
-import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 public interface IProxyDebugSuspendEvent extends IProxyDebugEvent {
 	public int getThreadId();
-	public ProxyDebugLocator getLocator();
 	public String[] getChangedVars();
+	int getDepth();
+	ProxyDebugStackFrame getFrame();
 }

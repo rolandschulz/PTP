@@ -18,16 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.proxy.debug.event;
 
-import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugSuspendEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSuspendEvent;
 
 public class ProxyDebugSuspendEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugSuspendEvent {
-	public ProxyDebugSuspendEvent(int transID, String set, ProxyDebugLocator loc, int thread_id, String[] vars) {
-		super(transID, set, loc, thread_id, vars);
+	public ProxyDebugSuspendEvent(int transID, String set, ProxyDebugStackFrame frame, int thread_id, int depth, String[] vars) {
+		super(transID, set, frame, thread_id, depth, vars);
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_SUSPEND transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getLocator().toString();
+		return "EVENT_DBG_SUSPEND transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getFrame().toString();
 	}
 }
