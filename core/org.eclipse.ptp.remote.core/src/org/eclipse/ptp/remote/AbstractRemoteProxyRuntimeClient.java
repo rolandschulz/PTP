@@ -20,7 +20,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient;
+import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
@@ -35,7 +35,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
 			int baseModelId) {
-		super(config, baseModelId);
+		super(config.getName(), baseModelId);
 		this.remoteServicesId = config.getRemoteServicesId();
 		this.connectionName = config.getConnectionName();
 		this.proxyName = config.getName();

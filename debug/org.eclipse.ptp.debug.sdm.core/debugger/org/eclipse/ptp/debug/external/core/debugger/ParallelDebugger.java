@@ -30,7 +30,6 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.PDebugUtils;
@@ -43,34 +42,35 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
+import org.eclipse.ptp.debug.external.core.cdi.Locator;
 import org.eclipse.ptp.debug.external.core.cdi.model.Signal;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
-import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugArgsEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointHitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointSetEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugDataEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugDataExpValueEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugErrorEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugExitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugInfoThreadsEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugInitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugMemoryInfoEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugOKEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugPartialAIFEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSetThreadSelectEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSignalEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSignalExitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSignalsEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugStackInfoDepthEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugStackframeEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugStepEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSuspendEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugTypeEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugVarsEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugSignal;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugArgsEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointHitEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointSetEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataExpValueEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugErrorEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugExitEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugInitEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugOKEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugPartialAIFEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugSetThreadSelectEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalExitEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalsEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugStackInfoDepthEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugStackframeEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugStepEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugSuspendEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugTypeEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugVarsEvent;
+import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
@@ -351,25 +351,25 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	private String createFormat(int wordFormat) {
 		switch (wordFormat) {
-		case ExtFormat.UNSIGNED :
+		case ProtocolUtil.UNSIGNED :
 			return "u";
-		case ExtFormat.FLOAT :
+		case ProtocolUtil.FLOAT :
 			return "f";
-		case ExtFormat.ADDRESS :
+		case ProtocolUtil.ADDRESS :
 			return "a";
-		case ExtFormat.INSTRUCTION :
+		case ProtocolUtil.INSTRUCTION :
 			return "i";
-		case ExtFormat.CHAR :
+		case ProtocolUtil.CHAR :
 			return "c";
-		case ExtFormat.STRING :
+		case ProtocolUtil.STRING :
 			return "s";
-		case ExtFormat.DECIMAL :
+		case ProtocolUtil.DECIMAL :
 			return "d";
-		case ExtFormat.BINARY :
+		case ProtocolUtil.BINARY :
 			return "t";
-		case ExtFormat.OCTAL :
+		case ProtocolUtil.OCTAL :
 			return "o";
-		case ExtFormat.HEXADECIMAL:
+		case ProtocolUtil.HEXADECIMAL:
 		default :
 			return "x";
 		}
@@ -491,28 +491,28 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 
 	public void handleProxyDebugArgsEvent(IProxyDebugArgsEvent e) {
-		completeCommand(e.getBitSet(),e.getVariables());			
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()),e.getVariables());			
 	}
 
 	public void handleProxyDebugBreakpointHitEvent(IProxyDebugBreakpointHitEvent e) {
-		handleBreakpointHitEvent(e.getBitSet(), e.getBreakpointId(), e.getThreadId(), e.getChangedVars());
+		handleBreakpointHitEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getBreakpointId(), e.getThreadId(), e.getChangedVars());
 	}
 
 	public void handleProxyDebugBreakpointSetEvent(IProxyDebugBreakpointSetEvent e) {
-		completeCommand(e.getBitSet(), e.getBreakpoint());
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getBreakpoint());
 	}
 
 	public void handleProxyDebugDataEvent(IProxyDebugDataEvent e) {
-		completeCommand(e.getBitSet(), e.getData());
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getData());
 	}
 
 	public void handleProxyDebugDataExpValueEvent(IProxyDebugDataExpValueEvent e) {
-		completeCommand(e.getBitSet(), e);
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e);
 	}
 
 	public void handleProxyDebugExitEvent(IProxyDebugExitEvent e) {
 		PDebugUtils.println("======================= EVENT_DBG_EXIT ====================");
-		handleProcessTerminatedEvent(e.getBitSet(), e.getExitStatus());
+		handleProcessTerminatedEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getExitStatus());
 	}
 
 	public void handleProxyDebugErrorEvent(IProxyDebugErrorEvent e) {
@@ -521,59 +521,61 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			errMsg = "Unknown Error";
 		
 		int err_code = getErrorCode(e.getErrorCode());
-		completeCommand(e.getBitSet(), new PCDIException(errMsg, err_code));
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), new PCDIException(errMsg, err_code));
 		//handleErrorEvent(e.getBitSet(), errMsg, err_code);
 		//handleException(e.getBitSet(), err_code);
 	}
 
 	public void handleProxyDebugInfoThreadsEvent(IProxyDebugInfoThreadsEvent e) {
-		completeCommand(e.getBitSet(), e.getThreadIds());			
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getThreadIds());			
 	}
 
 	public void handleProxyDebugInitEvent(IProxyDebugInitEvent e) {
-		int numServers = ((ProxyDebugInitEvent)e).getNumServers();
+		int numServers = ((IProxyDebugInitEvent)e).getNumServers();
 		PDebugUtils.println("num servers = " + numServers);
-		completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), IDebugCommand.RETURN_OK);
 	}
 
 	public void handleProxyDebugMemoryInfoEvent(IProxyDebugMemoryInfoEvent e) {
-		completeCommand(e.getBitSet(), e.getMemoryInfo());			
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getMemoryInfo());			
 	}
 
 	public void handleProxyDebugOKEvent(IProxyDebugOKEvent e) {
-		completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), IDebugCommand.RETURN_OK);
 	}
 	
 	public void handleProxyDebugPartialAIFEvent(IProxyDebugPartialAIFEvent e) {
-		completeCommand(e.getBitSet(), e);
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e);
 	}
 
 	public void handleProxyDebugSetThreadSelectEvent(IProxyDebugSetThreadSelectEvent e) {
 		Object[] objects = new Object[2];
 		objects[0] = new Integer(e.getThreadId());
 		objects[1] = e.getFrame();
-		completeCommand(e.getBitSet(), objects);
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), objects);
 	}
 
 	public void handleProxyDebugSignalEvent(IProxyDebugSignalEvent e) {
 		IDebugCommand cmd = getInterruptCommand();
 		if (cmd != null) {
-			cmd.setReturn(e.getBitSet(), IDebugCommand.RETURN_OK);
+			cmd.setReturn(ProxyDebugClient.decodeBitSet(e.getBitSet()), IDebugCommand.RETURN_OK);
 		}
 		else {
 			//send signal if the current command is not terminate command.
-			handleProcessSignaledEvent(e.getBitSet(), e.getLocator(), e.getThreadId(), e.getChangedVars());
+			Locator loc = new Locator(e.getLocator().getFile(), e.getLocator().getFunction(),
+					e.getLocator().getLineNumber(), e.getLocator().getAddress());
+			handleProcessSignaledEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), loc, e.getThreadId(), e.getChangedVars());
 		}
 	}
 
 	public void handleProxyDebugSignalExitEvent(IProxyDebugSignalExitEvent e) {
 		PDebugUtils.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
-		handleProcessTerminatedEvent(e.getBitSet(), e.getSignalName(), e.getSignalMeaning());
+		handleProcessTerminatedEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getSignalName(), e.getSignalMeaning());
 	}
 
 	public void handleProxyDebugSignalsEvent(IProxyDebugSignalsEvent e) {
 		IPCDISignal[] pcdiSignals = new IPCDISignal[0];
-		IPProcess[] sigProcs = getProcesses(e.getBitSet());
+		IPProcess[] sigProcs = getProcesses(ProxyDebugClient.decodeBitSet(e.getBitSet()));
 		if (sigProcs.length > 0) {
 			String taskIdStr = sigProcs[0].getProcessIndex();
 			try {
@@ -587,31 +589,33 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			} catch (NumberFormatException e1) {
 			}
 		}
-		completeCommand(e.getBitSet(), pcdiSignals);
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), pcdiSignals);
 	}
 
 	public void handleProxyDebugStackInfoDepthEvent(IProxyDebugStackInfoDepthEvent e) {
-		completeCommand(e.getBitSet(), new Integer(e.getDepth()));			
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), new Integer(e.getDepth()));			
 	}
 
 	public void handleProxyDebugStackframeEvent(IProxyDebugStackframeEvent e) {
-		completeCommand(e.getBitSet(), e.getFrames());
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getFrames());
 	}
 
 	public void handleProxyDebugStepEvent(IProxyDebugStepEvent e) {
-		handleEndSteppingEvent(e.getBitSet(), e.getFrame().getLocator().getLineNumber(), e.getFrame().getLocator().getFile(), e.getThreadId(), e.getChangedVars());
+		handleEndSteppingEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getFrame().getLocator().getLineNumber(), e.getFrame().getLocator().getFile(), e.getThreadId(), e.getChangedVars());
 	}
 
 	public void handleProxyDebugSuspendEvent(IProxyDebugSuspendEvent e) {
-		handleSuspendEvent(e.getBitSet(), e.getLocator(), e.getThreadId(), e.getChangedVars());
+		Locator loc = new Locator(e.getLocator().getFile(), e.getLocator().getFunction(),
+				e.getLocator().getLineNumber(), e.getLocator().getAddress());
+		handleSuspendEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), loc, e.getThreadId(), e.getChangedVars());
 	}
 
 	public void handleProxyDebugTypeEvent(IProxyDebugTypeEvent e) {
-		completeCommand(e.getBitSet(), e.getType());
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getType());
 	}
 
 	public void handleProxyDebugVarsEvent(IProxyDebugVarsEvent e) {
-		completeCommand(e.getBitSet(), e.getVariables());			
+		completeCommand(ProxyDebugClient.decodeBitSet(e.getBitSet()), e.getVariables());			
 	}
 
 }

@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
@@ -27,13 +28,14 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorage;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorageDescriptor;
+import org.eclipse.ptp.debug.external.core.cdi.Locator;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.ThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.core.commands.GetStackInfoDepthCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListStackFramesCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetCurrentStackFrameCommand;
-import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 /**
  * @author Clement chu
@@ -98,9 +100,11 @@ public class Thread extends PObject implements IPCDIThread {
 			ListStackFramesCommand command = new ListStackFramesCommand(target.getTask());
 			try {
 				target.getDebugger().postCommand(command);
-				ProxyDebugStackframe[] frames = command.getStackFrames();
+				ProxyDebugStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
-					currentFrames.add(new StackFrame(this, depth - frames[i].getLevel(), frames[i].getLocator(), null));
+					Locator loc = new Locator(frames[i].getLocator().getFile(), frames[i].getLocator().getFunction(),
+							frames[i].getLocator().getLineNumber(), frames[i].getLocator().getAddress());
+					currentFrames.add(new StackFrame(this, depth - frames[i].getLevel(), loc, null));
 				}
 			} finally {
 				target.setCurrentThread(currentThread, false);
@@ -162,9 +166,11 @@ public class Thread extends PObject implements IPCDIThread {
 
 				ListStackFramesCommand command = new ListStackFramesCommand(target.getTask(), 0, upperBound);
 				target.getDebugger().postCommand(command);
-				ProxyDebugStackframe[] frames = command.getStackFrames();
+				ProxyDebugStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
-					currentFrames.add(new StackFrame(this, depth - frames[i].getLevel(), frames[i].getLocator(), null));
+					Locator loc = new Locator(frames[i].getLocator().getFile(), frames[i].getLocator().getFunction(),
+							frames[i].getLocator().getLineNumber(), frames[i].getLocator().getAddress());
+					currentFrames.add(new StackFrame(this, depth - frames[i].getLevel(), loc, null));
 				}
 			} finally {
 				target.setCurrentThread(currentThread, false);
