@@ -46,6 +46,7 @@ import org.eclipse.ptp.debug.external.core.cdi.Locator;
 import org.eclipse.ptp.debug.external.core.cdi.model.Signal;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugSignal;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugArgsEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointHitEvent;
@@ -562,8 +563,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 		else {
 			//send signal if the current command is not terminate command.
-			Locator loc = new Locator(e.getLocator().getFile(), e.getLocator().getFunction(),
-					e.getLocator().getLineNumber(), e.getLocator().getAddress());
+			ProxyDebugLocator ploc = e.getFrame().getLocator();
+			Locator loc = new Locator(ploc.getFile(), ploc.getFunction(),
+					ploc.getLineNumber(), ploc.getAddress());
 			handleProcessSignaledEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), loc, e.getThreadId(), e.getChangedVars());
 		}
 	}
@@ -605,8 +607,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 
 	public void handleProxyDebugSuspendEvent(IProxyDebugSuspendEvent e) {
-		Locator loc = new Locator(e.getLocator().getFile(), e.getLocator().getFunction(),
-				e.getLocator().getLineNumber(), e.getLocator().getAddress());
+		ProxyDebugLocator ploc = e.getFrame().getLocator();
+		Locator loc = new Locator(ploc.getFile(), ploc.getFunction(),
+				ploc.getLineNumber(), ploc.getAddress());
 		handleSuspendEvent(ProxyDebugClient.decodeBitSet(e.getBitSet()), loc, e.getThreadId(), e.getChangedVars());
 	}
 
