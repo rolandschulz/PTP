@@ -31,7 +31,10 @@ public class BGResourceManagerConfigurationWizardPageFactory extends
 	}
 
 	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
-		return new RMConfigurationWizardPage[]{new BGResourceManagerConfigurationWizardPage(wizard)};
+		return new RMConfigurationWizardPage[]{
+				new BGResourceManagerConfigurationWizardPage(wizard),
+				new BGDB2ConfigurationWizardPage(wizard)
+				};
 	}
 
 	public Class<BGResourceManagerFactory> getRMFactoryClass() {
