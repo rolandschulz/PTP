@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photran UI Plug-in
 Bundle-SymbolicName: org.eclipse.photran.ui; singleton:=true
-Bundle-Version: 4.0.0
+Bundle-Version: 4.0.2
 Bundle-ClassPath: photranui.jar
 Bundle-Activator: org.eclipse.photran.ui.FortranUIPlugin
 Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory

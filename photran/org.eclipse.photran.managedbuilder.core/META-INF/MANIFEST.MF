@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photran Managed Builder Core Plug-in
 Bundle-SymbolicName: org.eclipse.photran.managedbuilder.core
-Bundle-Version: 4.0.0
+Bundle-Version: 4.0.2
 Bundle-Activator: org.eclipse.photran.managedbuilder.core.ManagedBuilderCorePlugin
 Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
 Bundle-Localization: plugin

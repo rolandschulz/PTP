@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran_feature"
       label="Photran"
-      version="4.0.0"
+      version="4.0.2"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
       os="linux,macosx,solaris,win32"
       nl="en_US">
@@ -140,69 +140,65 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.ltk.ui.refactoring"/>
-      <import feature="org.eclipse.cdt" version="3.1.0" match="equivalent"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
-      <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.cdt.make.ui"/>
+      <import feature="org.eclipse.cdt" version="4.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
          id="org.eclipse.photran.core"
          download-size="0"
          install-size="0"
-         version="4.0.0"/>
+         version="4.0.2"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.core"
          download-size="0"
          install-size="0"
-         version="4.0.0"
+         version="4.0.2"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.ui"
          download-size="0"
          install-size="0"
-         version="4.0.0"/>
+         version="4.0.2"/>
 
    <plugin
          id="org.eclipse.photran.cdtinterface"
          download-size="0"
          install-size="0"
-         version="4.0.0"/>
+         version="4.0.2"/>
 
    <plugin
          id="org.eclipse.photran.ui"
          download-size="0"
          install-size="0"
-         version="4.0.0"/>
+         version="4.0.2"/>
 
    <plugin
          id="org.eclipse.photran.errorparsers.xlf"
          download-size="0"
          install-size="0"
-         version="4.0.0"
+         version="4.0.2"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.gnu.ui"
          download-size="0"
          install-size="0"
-         version="4.0.0"
+         version="4.0.2"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.intel.ui"
          download-size="0"
          install-size="0"
-         version="4.0.0"/>
+         version="4.0.2"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.xlf.ui"
          download-size="0"
          install-size="0"
-         version="4.0.0"
+         version="4.0.2"
          unpack="false"/>
 
 </feature>
