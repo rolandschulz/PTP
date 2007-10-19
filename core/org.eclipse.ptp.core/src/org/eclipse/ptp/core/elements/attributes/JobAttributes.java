@@ -32,6 +32,11 @@ public class JobAttributes {
 		UNKNOWN
 	};
 	
+	public static final int IO_FORWARDING_NONE = 0x0;
+	public static final int IO_FORWARDING_STDIN = 0x01;
+	public static final int IO_FORWARDING_STDOUT = 0x02;
+	public static final int IO_FORWARDING_STDERR = 0x04;
+	
 	private static final String STATE_ATTR_ID = "jobState";
 	private static final String SUBID_ATTR_ID = "jobSubId";
 	private static final String QUEUEID_ATTR_ID = "queueId";
@@ -45,6 +50,7 @@ public class JobAttributes {
 	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath";
 	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs";
 	private static final String DEBUG_FLAG_ATTR_ID = "debug";
+	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding";
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job", 
@@ -87,7 +93,7 @@ public class JobAttributes {
 				"Name of debugger executable", true, "");
 
 	private final static StringAttributeDefinition debugExecPathAttrDef = 
-		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable NaPathme",
+		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable Path",
 				"Path to debugger executable", true,"");
 
 	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
@@ -97,6 +103,10 @@ public class JobAttributes {
 	private final static BooleanAttributeDefinition debugFlagAttrDef = 
 		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, 
 				"Debug Flag", true, false);
+
+	private final static IntegerAttributeDefinition ioForwardingAttrDef = 
+		new IntegerAttributeDefinition(IO_FORWARDING_ATTR_ID, "I/O Forwarding", 
+				"Specify which I/O channels to foward", false, IO_FORWARDING_STDOUT);
 
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
@@ -150,6 +160,10 @@ public class JobAttributes {
 		return debugFlagAttrDef;
 	}
 
+	public static IntegerAttributeDefinition getIOForwardingAttributeDefinition() {
+		return ioForwardingAttrDef;
+	}
+	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 					stateAttrDef, 
@@ -164,7 +178,8 @@ public class JobAttributes {
 					debugExecNameAttrDef,
 					debugExecPathAttrDef,
 					debugArgsAttrDef,
-					debugFlagAttrDef
+					debugFlagAttrDef,
+					ioForwardingAttrDef,
 				};
 	}
 }
