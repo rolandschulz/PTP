@@ -20,7 +20,6 @@
 package org.eclipse.ptp.ui;
 
 import java.util.HashMap;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
@@ -33,90 +32,52 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
 import org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.ui.consoles.ConsoleManager;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The main plugin class to be used in the desktop.
+ * The main PTP user interface plugin.
  */
 public class PTPUIPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp.ui";
 
 	//The shared instance.
 	private static PTPUIPlugin plugin;
-	//Resource bundle.
-	private ResourceBundle resourceBundle;
-
-	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
 	
-	private AbstractUIManager machineManager = null;
-	private AbstractUIManager jobManager = null;
-
-	public PTPUIPlugin() {
-		super();
-		plugin = this;
-	}
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		registerAdapterFactories();
-		retrieveConfigurationWizardPageFactories();
-		machineManager = new MachineManager();
-		jobManager = new JobManager();
+	/**
+	 * Get the currently active workbench page from the active workbench window.
+	 * 
+	 * @return currently active workbench page
+	 */
+	public static IWorkbenchPage getActivePage() {
+		IWorkbenchWindow w = getActiveWorkbenchWindow();
+		if (w != null) {
+			return w.getActivePage();
+		}
+		return null;
 	}
 
-	private void registerAdapterFactories() {
-		IAdapterManager manager = Platform.getAdapterManager();
-		IAdapterFactory factory = new PropertyAdapterFactory();
-		//manager.registerAdapters(factory, IResourceManager.class);
-		manager.registerAdapters(factory, IPElement.class);
-		factory = new WorkbenchAdapterAdapterFactory();
-		manager.registerAdapters(factory, IPElement.class);
+	/**
+	 * Gets the currently active workbench window
+	 * 
+	 * @return the active workbench window
+	 */
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 	
-	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
-		machineManager.shutdown();
-		jobManager.shutdown();
-		machineManager = null;
-		jobManager = null;
-		plugin = null;
-		resourceBundle = null;
-	}
-	
-	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
-		return (RMConfigurationWizardPageFactory) configurationWizardPageFactories.get(factory.getClass().getName());
-	}
-	
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
-			return PLUGIN_ID;
-
-		return getDefault().getBundle().getSymbolicName();
-	}	
-	
-	public AbstractUIManager getMachineManager() {
-		return machineManager;
-	}
-	
-	public AbstractUIManager getJobManager() {
-		return jobManager;
-	}
-
 	/**
 	 * Returns the shared instance.
 	 */
@@ -125,130 +86,142 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle,
-	 * or 'key' if not found.
-	 */
-	public static String getResourceString(String key) {
-		ResourceBundle bundle = PTPUIPlugin.getDefault().getResourceBundle();
-		try {
-			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
-			return key;
-		}
-	}
-
-	/**
-	 * Returns the plugin's resource bundle,
-	 */
-	public ResourceBundle getResourceBundle() {
-		try {
-			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.ui.UIPluginResources");
-		} catch (MissingResourceException x) {
-			resourceBundle = null;
-		}
-		return resourceBundle;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.ui", path);
-	}
-	
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}	
-	
-	public static IWorkbenchPage getActivePage() {
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null) {
-			return w.getActivePage();
-		}
-		return null;
-	}
-	/*
-    public String getPluginPath() {
-        try {
-            return Platform.resolve(Platform.getBundle(PLUGIN_ID).getEntry("/")).getPath();
-        } catch (IOException e) {
-        	return null;
-        }
-    }
-    */
-	
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
+	 * Get the display instance.
 	 * 
-	 * @return the active workbench shell or <code>null</code> if none
+	 * @return the display instance
 	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-	public static Shell getShell() {
-		if (getActiveWorkbenchWindow() != null) {
-			return getActiveWorkbenchWindow().getShell();
-		}
-		return null;
-	}	
-	
-	public String getCurrentPerspectiveID() {
-		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
-	}
-	
-	public void addPersepectiveListener(IPerspectiveListener listener) {
-		getActiveWorkbenchWindow().addPerspectiveListener(listener);
-	}
-	public void removePersepectiveListener(IPerspectiveListener listener) {
-		getActiveWorkbenchWindow().removePerspectiveListener(listener);
-	}
-	
-	/***** LOG *****/
-	public static void log(String msg) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
-	}
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
-	}
 	public static Display getDisplay() {
 		Display display= Display.getCurrent();
 		if (display == null) {
 			display= Display.getDefault();
 		}
 		return display;		
-	}		
-	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
-		IStatus status;
-		if (t instanceof CoreException) {
-			status = ((CoreException)t).getStatus();
-		} else {
-			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within PTP UI: ", t);
-			log(status);	
-		}
-		errorDialog(shell, title, message, status);
 	}
-	public static void errorDialog(Shell shell, String title, IStatus s) {
-		errorDialog(shell, title, s.getMessage(), s);
-	}
-	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
-		if (s != null && message != null && message.equals(s.getMessage()))
-			message = null;
+	
+	/**
+	 * Get a unique identifier for this plugin (used for logging)
+	 * 
+	 * @return unique identifier
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			return PLUGIN_ID;
 
-		ErrorDialog.openError(shell, title, message, s);
+		return getDefault().getBundle().getSymbolicName();
+	}
+	
+	/**
+	 * Generate a log message given an IStatus object
+	 * 
+	 * @param status IStatus object
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
 	}
 
+	/**
+	 * Generate a log message
+	 * 
+	 * @param msg message to log
+	 */
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
+
+	/**
+	 * Generate a log message for an exception
+	 * 
+	 * @param e exception used to generate message
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
+	}
+
+	//Resource bundle.
+	private ResourceBundle resourceBundle;
+
+	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
+	
+	private AbstractUIManager machineManager = null;	
+	
+	private AbstractUIManager jobManager = null;
+	
+	private ConsoleManager consoleManager = null;
+	
+	public PTPUIPlugin() {
+		super();
+		plugin = this;
+	}	
+	
+	/**
+	 * Get the job manager instance
+	 * 
+	 * @return job manager
+	 */
+	public AbstractUIManager getJobManager() {
+		return jobManager;
+	}
+	
+	/**
+	 * Get the machine manager instance
+	 * 
+	 * @return machine manager
+	 */
+	public AbstractUIManager getMachineManager() {
+		return machineManager;
+	}
+	
+	/**
+	 * Get the wizard page factory associated with a resource manager factory
+	 * 
+	 * @param factory resource manager factory
+	 * @return factory for creating wizard pages for this resource manager
+	 */
+	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
+		return (RMConfigurationWizardPageFactory) configurationWizardPageFactories.get(factory.getClass().getName());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		registerAdapterFactories();
+		retrieveConfigurationWizardPageFactories();
+		machineManager = new MachineManager();
+		jobManager = new JobManager();
+		consoleManager = new ConsoleManager();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		machineManager.shutdown();
+		jobManager.shutdown();
+		consoleManager.shutdown();
+		machineManager = null;
+		jobManager = null;
+		consoleManager = null;
+		plugin = null;
+		resourceBundle = null;
+	}
+	
+	/**
+	 * Register adapter factories
+	 */
+	private void registerAdapterFactories() {
+		IAdapterManager manager = Platform.getAdapterManager();
+		IAdapterFactory factory = new PropertyAdapterFactory();
+		manager.registerAdapters(factory, IPElement.class);
+		factory = new WorkbenchAdapterAdapterFactory();
+		manager.registerAdapters(factory, IPElement.class);
+	}
+
+	/**
+	 * Locate and load wizard page factory extensions
+	 */
 	private void retrieveConfigurationWizardPageFactories() {
     	configurationWizardPageFactories.clear();
     	
