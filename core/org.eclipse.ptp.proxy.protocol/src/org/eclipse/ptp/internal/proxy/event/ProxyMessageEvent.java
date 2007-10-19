@@ -21,6 +21,8 @@ package org.eclipse.ptp.internal.proxy.event;
 
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
+import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
+
 
 public class ProxyMessageEvent extends AbstractProxyEvent implements IProxyMessageEvent {
 	public static final int EVENT_ERR_EVENT = 11;
