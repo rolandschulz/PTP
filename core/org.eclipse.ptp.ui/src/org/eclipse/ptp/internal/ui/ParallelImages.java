@@ -54,6 +54,7 @@ public class ParallelImages {
 	public static final String ICON_TERMINATE_JOB_DISABLE = "terminate_job_disable.gif";
 	public static final String ICON_TERMINATE_JOB_NORMAL = "terminate_job_normal.gif";
 	public static final String ICON_REMOVEALLTERMINATED_NORMAL = "remove_all_terminated_normal.gif";
+	public static final String ICON_REMOVETERMINATED_NORMAL = "remove_terminated_normal.gif";
 	
 	// SHOW LEGEND
 	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif";
@@ -145,7 +146,8 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_TERMINATE_JOB_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_JOB_DISABLE, ICON_TERMINATE_JOB_DISABLE);
 	public static final ImageDescriptor ID_ICON_TERMINATE_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_JOB_NORMAL, ICON_TERMINATE_JOB_NORMAL);
 	public static final ImageDescriptor ID_ICON_REMOVEALLTERMINATED_NORMAL = createImageDescriptor(TOOLICONURL, ICON_REMOVEALLTERMINATED_NORMAL, ICON_REMOVEALLTERMINATED_NORMAL);
-
+	public static final ImageDescriptor ID_ICON_REMOVETERMINATED_NORMAL = createImageDescriptor(TOOLICONURL, ICON_REMOVETERMINATED_NORMAL, ICON_REMOVETERMINATED_NORMAL);
+	
 	// SHOW LEGEND
 	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_NORMAL, ICON_SHOWLEGEND_ACTION_NORMAL);
 

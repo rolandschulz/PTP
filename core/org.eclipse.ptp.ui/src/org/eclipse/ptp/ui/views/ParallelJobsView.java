@@ -39,17 +39,17 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
+import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewQueueEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
-import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
-import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
@@ -60,6 +60,7 @@ import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
+import org.eclipse.ptp.internal.ui.actions.RemoveSelectedJobAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -599,9 +600,21 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 	 * @param menuManager
 	 */
 	protected void fillJobContextMenu(IMenuManager menuManager) {
+		ISelection selection;
+		IPJob selectedJob;
+
 		ParallelAction removeAllTerminatedAction = new RemoveAllTerminatedAction(this);
 		removeAllTerminatedAction.setEnabled(getJobManager().hasStoppedJob());
 		menuManager.add(removeAllTerminatedAction);
+		selection = jobTableViewer.getSelection();
+		if (selection != null) {
+			selectedJob = (IPJob) ((IStructuredSelection) selection).getFirstElement();
+			if (selectedJob != null && selectedJob.isTerminated()) {
+				ParallelAction removeSelectedJobAction = new RemoveSelectedJobAction(this, jobTableViewer);
+				removeSelectedJobAction.setEnabled(true);
+				menuManager.add(removeSelectedJobAction);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
