@@ -27,6 +27,11 @@ import org.eclipse.ui.IMemento;
 
 final public class BGResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration {
 
+	private static final String TAG_SERVICE_NODE = "bgServiceNode"; //$NON-NLS-1$
+	private static final String TAG_DB_NAME = "bgDatabaseName"; //$NON-NLS-1$
+	private static final String TAG_DB_USERNAME = "bgDatabaseUsername"; //$NON-NLS-1$
+	private static final String TAG_DB_PASSWORD = "bgDatabasePassword"; //$NON-NLS-1$
+	
 	public static IResourceManagerConfiguration load(BGResourceManagerFactory factory,
 			IMemento memento) {
 
@@ -35,7 +40,22 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 		BGResourceManagerConfiguration config = 
 			new BGResourceManagerConfiguration(factory, remoteConfig);
 
+		config.setServiceNode(memento.getString(TAG_SERVICE_NODE));
+		config.setDatabaseName(memento.getString(TAG_DB_NAME));
+		config.setDatabasePassword(memento.getString(TAG_DB_USERNAME));
+		config.setDatabasePassword(memento.getString(TAG_DB_PASSWORD));
+
 		return config;
+	}
+	private String serviceNode = "";
+	private String dbName = "";
+	private String dbUsername = "";
+
+	private String dbPassword = "";
+	
+	public BGResourceManagerConfiguration(BGResourceManagerFactory factory) {
+		this(factory, new RemoteConfig());
+		setDefaultNameAndDesc();
 	}
 	
 	public BGResourceManagerConfiguration(BGResourceManagerFactory factory,
@@ -43,12 +63,35 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 		super(remoteConfig, factory);
 	}
 	
-	public BGResourceManagerConfiguration(BGResourceManagerFactory factory) {
-		this(factory, new RemoteConfig());
-		setDefaultNameAndDesc();
+
+	public String getDatabaseName() {
+		return dbName;
 	}
 	
-
+	public String getDatabasePassword() {
+		return dbPassword;
+	}
+	
+	public String getDatabaseUsername() {
+		return dbUsername;
+	}
+	
+	public String getServiceNode() {
+		return serviceNode;
+	}
+	
+	public void setDatabaseName(String dbName) {
+		this.dbName = dbName;
+	}
+	
+	public void setDatabasePassword(String password) {
+		this.dbPassword = password;
+	}
+	
+	public void setDatabaseUsername(String username) {
+		this.dbUsername = username;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
 	 */
@@ -60,5 +103,20 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 		}
 		setName(name);
 		setDescription("Blue Gene Resource Manager");
+	}
+	
+	public void setServiceNode(String serviceNode) {
+		this.serviceNode = serviceNode;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration#doSave(org.eclipse.ui.IMemento)
+	 */
+	protected void doSave(IMemento memento) {
+		memento.putString(TAG_SERVICE_NODE, getServiceNode());
+		memento.putString(TAG_DB_NAME, getDatabaseName());
+		memento.putString(TAG_DB_USERNAME, getDatabaseUsername());
+		memento.putString(TAG_DB_PASSWORD, getDatabasePassword());
+		doSave(memento);
 	}
 }
