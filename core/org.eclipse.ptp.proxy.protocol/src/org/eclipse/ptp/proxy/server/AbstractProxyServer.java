@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2007 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.ptp.proxy.server;
 
 import java.io.IOException;
@@ -60,12 +71,12 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	 * calling sessionProgress(). 
 	 */
 	public void start() {
-		commandThread = new Thread("Proxy Server Thread") {
+		commandThread = new Thread("Proxy Server Command Thread") {
 			public void run() {
 				boolean error = false;
 				int errorCount = 0;			
 				
-				System.out.println("server thread starting...");
+				System.out.println("server command thread starting...");
 				try {
 					while (errorCount < MAX_ERRORS && !isInterrupted()) {
 						synchronized(state) {
