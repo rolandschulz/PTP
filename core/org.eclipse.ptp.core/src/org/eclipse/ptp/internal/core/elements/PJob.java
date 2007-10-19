@@ -49,9 +49,6 @@ import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 
 public class PJob extends Parent implements IPJobControl {
-	final public static int BASE_OFFSET = 10000;
-	final public static int STATE_NEW = 5000;
-
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private HashMap<String, IPProcessControl> indexMap = 
