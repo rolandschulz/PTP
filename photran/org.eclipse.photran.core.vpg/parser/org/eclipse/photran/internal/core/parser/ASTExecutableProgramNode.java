@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTExecutableProgramNode extends ScopingNode implements Iterable<ASTProgramUnitNode>
+public class ASTExecutableProgramNode extends ScopingNode implements  Iterable<ASTProgramUnitNode>
 {
     protected int count = -1;
 
@@ -117,8 +117,9 @@ public class ASTExecutableProgramNode extends ScopingNode implements Iterable<AS
 
             public ASTProgramUnitNode next()
             {
-                ASTProgramUnitNode result = (ASTProgramUnitNode)node.getChild(1);
-                node = (ASTExecutableProgramNode)node.parent;
+                int child = (index == 0 ? 0 : 1);
+                ASTProgramUnitNode result = (ASTProgramUnitNode)node.getChild(child);
+                node = (index == listSize-1 ? null : (ASTExecutableProgramNode)node.parent);
                 index++;
                 return result;
             }

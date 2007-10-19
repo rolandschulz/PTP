@@ -47,11 +47,11 @@ public class ASTInterfaceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_929)
+        if (getProduction() == Production.INTERFACE_STMT_936)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.INTERFACE_STMT_930)
+        else if (getProduction() == Production.INTERFACE_STMT_937)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.INTERFACE_STMT_931)
+        else if (getProduction() == Production.INTERFACE_STMT_938)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -61,11 +61,11 @@ public class ASTInterfaceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_929)
+        if (getProduction() == Production.INTERFACE_STMT_936)
             return (Token)getChild(1);
-        else if (getProduction() == Production.INTERFACE_STMT_930)
+        else if (getProduction() == Production.INTERFACE_STMT_937)
             return (Token)getChild(1);
-        else if (getProduction() == Production.INTERFACE_STMT_931)
+        else if (getProduction() == Production.INTERFACE_STMT_938)
             return (Token)getChild(1);
         else
             return null;
@@ -75,7 +75,7 @@ public class ASTInterfaceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_929)
+        if (getProduction() == Production.INTERFACE_STMT_936)
             return (ASTGenericNameNode)getChild(2);
         else
             return null;
@@ -85,11 +85,11 @@ public class ASTInterfaceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_929)
+        if (getProduction() == Production.INTERFACE_STMT_936)
             return (Token)getChild(3);
-        else if (getProduction() == Production.INTERFACE_STMT_930)
+        else if (getProduction() == Production.INTERFACE_STMT_937)
             return (Token)getChild(3);
-        else if (getProduction() == Production.INTERFACE_STMT_931)
+        else if (getProduction() == Production.INTERFACE_STMT_938)
             return (Token)getChild(2);
         else
             return null;
@@ -99,7 +99,7 @@ public class ASTInterfaceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_930)
+        if (getProduction() == Production.INTERFACE_STMT_937)
             return (ASTGenericSpecNode)getChild(2);
         else
             return null;

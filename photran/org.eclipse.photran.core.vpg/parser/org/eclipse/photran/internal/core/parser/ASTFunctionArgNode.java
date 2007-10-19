@@ -47,7 +47,7 @@ public class ASTFunctionArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_ARG_968)
+        if (getProduction() == Production.FUNCTION_ARG_975)
             return (ASTNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTFunctionArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_ARG_968)
+        if (getProduction() == Production.FUNCTION_ARG_975)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTFunctionArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_ARG_968)
+        if (getProduction() == Production.FUNCTION_ARG_975)
             return (ASTExprNode)getChild(2);
         else
             return null;

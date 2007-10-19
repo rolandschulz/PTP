@@ -99,9 +99,9 @@ public class ASTOnlyListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOnlyListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ONLY_LIST_906)
+        if (node.getProduction() == Production.ONLY_LIST_913)
             return (ASTOnlyNode)node.getChild(0);
-        else if (node.getProduction() == Production.ONLY_LIST_907)
+        else if (node.getProduction() == Production.ONLY_LIST_914)
             return (ASTOnlyNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTOnlyListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_LIST_907)
+        if (getProduction() == Production.ONLY_LIST_914)
             return (ASTOnlyListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTOnlyListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOnlyListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ONLY_LIST_907)
+        if (node.getProduction() == Production.ONLY_LIST_914)
             return (Token)node.getChild(1);
         else
             return null;

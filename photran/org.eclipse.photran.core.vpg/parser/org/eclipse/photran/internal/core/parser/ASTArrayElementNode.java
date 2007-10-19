@@ -47,7 +47,7 @@ public class ASTArrayElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ELEMENT_439)
+        if (getProduction() == Production.ARRAY_ELEMENT_441)
             return (ASTVariableNameNode)getChild(0);
         else
             return null;
@@ -57,9 +57,9 @@ public class ASTArrayElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ELEMENT_439)
+        if (getProduction() == Production.ARRAY_ELEMENT_441)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ARRAY_ELEMENT_440)
+        else if (getProduction() == Production.ARRAY_ELEMENT_442)
             return (Token)getChild(1);
         else
             return null;
@@ -69,9 +69,9 @@ public class ASTArrayElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ELEMENT_439)
+        if (getProduction() == Production.ARRAY_ELEMENT_441)
             return (ASTSectionSubscriptListNode)getChild(2);
-        else if (getProduction() == Production.ARRAY_ELEMENT_440)
+        else if (getProduction() == Production.ARRAY_ELEMENT_442)
             return (ASTSectionSubscriptListNode)getChild(2);
         else
             return null;
@@ -81,9 +81,9 @@ public class ASTArrayElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ELEMENT_439)
+        if (getProduction() == Production.ARRAY_ELEMENT_441)
             return (Token)getChild(3);
-        else if (getProduction() == Production.ARRAY_ELEMENT_440)
+        else if (getProduction() == Production.ARRAY_ELEMENT_442)
             return (Token)getChild(3);
         else
             return null;
@@ -93,7 +93,7 @@ public class ASTArrayElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ELEMENT_440)
+        if (getProduction() == Production.ARRAY_ELEMENT_442)
             return (ASTStructureComponentNode)getChild(0);
         else
             return null;

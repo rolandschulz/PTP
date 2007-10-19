@@ -99,9 +99,9 @@ public class ASTLblRefListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTLblRefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.LBL_REF_LIST_729)
+        if (node.getProduction() == Production.LBL_REF_LIST_736)
             return (ASTLblRefNode)node.getChild(0);
-        else if (node.getProduction() == Production.LBL_REF_LIST_730)
+        else if (node.getProduction() == Production.LBL_REF_LIST_737)
             return (ASTLblRefNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTLblRefListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LBL_REF_LIST_730)
+        if (getProduction() == Production.LBL_REF_LIST_737)
             return (ASTLblRefListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTLblRefListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTLblRefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.LBL_REF_LIST_730)
+        if (node.getProduction() == Production.LBL_REF_LIST_737)
             return (Token)node.getChild(1);
         else
             return null;

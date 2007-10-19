@@ -47,9 +47,9 @@ public class ASTWhereRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_RANGE_600)
+        if (getProduction() == Production.WHERE_RANGE_603)
             return (ASTEndWhereStmtNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_601)
+        else if (getProduction() == Production.WHERE_RANGE_604)
             return (ASTEndWhereStmtNode)getChild(1);
         else
             return null;
@@ -59,11 +59,11 @@ public class ASTWhereRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_RANGE_601)
+        if (getProduction() == Production.WHERE_RANGE_604)
             return (ASTWhereBodyConstructBlockNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_603)
+        else if (getProduction() == Production.WHERE_RANGE_606)
             return (ASTWhereBodyConstructBlockNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_605)
+        else if (getProduction() == Production.WHERE_RANGE_608)
             return (ASTWhereBodyConstructBlockNode)getChild(0);
         else
             return null;
@@ -73,9 +73,9 @@ public class ASTWhereRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_RANGE_602)
+        if (getProduction() == Production.WHERE_RANGE_605)
             return (ASTMaskedElsewhereConstructNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_603)
+        else if (getProduction() == Production.WHERE_RANGE_606)
             return (ASTMaskedElsewhereConstructNode)getChild(1);
         else
             return null;
@@ -85,9 +85,9 @@ public class ASTWhereRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_RANGE_604)
+        if (getProduction() == Production.WHERE_RANGE_607)
             return (ASTElsewhereConstructNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_605)
+        else if (getProduction() == Production.WHERE_RANGE_608)
             return (ASTElsewhereConstructNode)getChild(1);
         else
             return null;

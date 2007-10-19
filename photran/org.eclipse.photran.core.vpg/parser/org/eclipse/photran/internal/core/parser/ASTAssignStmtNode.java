@@ -47,7 +47,7 @@ public class ASTAssignStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGN_STMT_1049)
+        if (getProduction() == Production.ASSIGN_STMT_1056)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTAssignStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGN_STMT_1049)
+        if (getProduction() == Production.ASSIGN_STMT_1056)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTAssignStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGN_STMT_1049)
+        if (getProduction() == Production.ASSIGN_STMT_1056)
             return (ASTLblRefNode)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTAssignStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGN_STMT_1049)
+        if (getProduction() == Production.ASSIGN_STMT_1056)
             return (Token)getChild(3);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTAssignStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGN_STMT_1049)
+        if (getProduction() == Production.ASSIGN_STMT_1056)
             return (ASTVariableNameNode)getChild(4);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTAssignStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGN_STMT_1049)
+        if (getProduction() == Production.ASSIGN_STMT_1056)
             return (Token)getChild(5);
         else
             return null;

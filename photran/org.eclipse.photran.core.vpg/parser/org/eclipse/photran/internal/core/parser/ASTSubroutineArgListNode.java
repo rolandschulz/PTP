@@ -99,9 +99,9 @@ public class ASTSubroutineArgListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSubroutineArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_963)
+        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_970)
             return (ASTSubroutineArgNode)node.getChild(0);
-        else if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_964)
+        else if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_971)
             return (ASTSubroutineArgNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTSubroutineArgListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_LIST_964)
+        if (getProduction() == Production.SUBROUTINE_ARG_LIST_971)
             return (ASTSubroutineArgListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTSubroutineArgListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSubroutineArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_964)
+        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_971)
             return (Token)node.getChild(1);
         else
             return null;

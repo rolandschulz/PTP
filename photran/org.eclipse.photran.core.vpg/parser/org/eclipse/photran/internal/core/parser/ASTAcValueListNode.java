@@ -47,7 +47,7 @@ public class ASTAcValueListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.AC_VALUE_LIST_218)
+        if (getProduction() == Production.AC_VALUE_LIST_220)
             return (ASTExprNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTAcValueListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.AC_VALUE_LIST_219)
+        if (getProduction() == Production.AC_VALUE_LIST_221)
             return (ASTAcValueList1Node)getChild(0);
         else
             return null;

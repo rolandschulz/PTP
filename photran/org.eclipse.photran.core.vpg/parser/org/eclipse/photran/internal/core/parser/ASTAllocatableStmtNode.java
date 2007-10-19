@@ -47,9 +47,9 @@ public class ASTAllocatableStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATABLE_STMT_344)
+        if (getProduction() == Production.ALLOCATABLE_STMT_346)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ALLOCATABLE_STMT_345)
+        else if (getProduction() == Production.ALLOCATABLE_STMT_347)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTAllocatableStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATABLE_STMT_344)
+        if (getProduction() == Production.ALLOCATABLE_STMT_346)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ALLOCATABLE_STMT_345)
+        else if (getProduction() == Production.ALLOCATABLE_STMT_347)
             return (Token)getChild(1);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTAllocatableStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATABLE_STMT_344)
+        if (getProduction() == Production.ALLOCATABLE_STMT_346)
             return (Token)getChild(2);
         else
             return null;
@@ -81,7 +81,7 @@ public class ASTAllocatableStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATABLE_STMT_344)
+        if (getProduction() == Production.ALLOCATABLE_STMT_346)
             return (Token)getChild(3);
         else
             return null;
@@ -91,9 +91,9 @@ public class ASTAllocatableStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATABLE_STMT_344)
+        if (getProduction() == Production.ALLOCATABLE_STMT_346)
             return (ASTArrayAllocationListNode)getChild(4);
-        else if (getProduction() == Production.ALLOCATABLE_STMT_345)
+        else if (getProduction() == Production.ALLOCATABLE_STMT_347)
             return (ASTArrayAllocationListNode)getChild(2);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTAllocatableStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATABLE_STMT_344)
+        if (getProduction() == Production.ALLOCATABLE_STMT_346)
             return (Token)getChild(5);
-        else if (getProduction() == Production.ALLOCATABLE_STMT_345)
+        else if (getProduction() == Production.ALLOCATABLE_STMT_347)
             return (Token)getChild(3);
         else
             return null;

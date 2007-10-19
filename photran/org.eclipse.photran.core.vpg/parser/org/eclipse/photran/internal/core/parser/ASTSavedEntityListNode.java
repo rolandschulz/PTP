@@ -99,9 +99,9 @@ public class ASTSavedEntityListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSavedEntityListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SAVED_ENTITY_LIST_334)
+        if (node.getProduction() == Production.SAVED_ENTITY_LIST_336)
             return (ASTSavedEntityNode)node.getChild(0);
-        else if (node.getProduction() == Production.SAVED_ENTITY_LIST_335)
+        else if (node.getProduction() == Production.SAVED_ENTITY_LIST_337)
             return (ASTSavedEntityNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTSavedEntityListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVED_ENTITY_LIST_335)
+        if (getProduction() == Production.SAVED_ENTITY_LIST_337)
             return (ASTSavedEntityListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTSavedEntityListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSavedEntityListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SAVED_ENTITY_LIST_335)
+        if (node.getProduction() == Production.SAVED_ENTITY_LIST_337)
             return (Token)node.getChild(1);
         else
             return null;

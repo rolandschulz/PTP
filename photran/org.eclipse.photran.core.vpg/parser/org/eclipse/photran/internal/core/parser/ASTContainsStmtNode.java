@@ -47,7 +47,7 @@ public class ASTContainsStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONTAINS_STMT_1013)
+        if (getProduction() == Production.CONTAINS_STMT_1020)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTContainsStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONTAINS_STMT_1013)
+        if (getProduction() == Production.CONTAINS_STMT_1020)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTContainsStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONTAINS_STMT_1013)
+        if (getProduction() == Production.CONTAINS_STMT_1020)
             return (Token)getChild(2);
         else
             return null;

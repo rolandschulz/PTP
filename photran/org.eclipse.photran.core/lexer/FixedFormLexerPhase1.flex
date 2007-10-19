@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.LinkedList;
-import org.eclipse.photran.internal.core.parser.Parser.Terminal;
 import org.eclipse.core.resources.IFile;
 
 %%
@@ -50,7 +49,7 @@ import org.eclipse.core.resources.IFile;
 //%8bit
 %unicode 
 %implements ILexer
-%type Token
+%type IToken
 
 %{
 	private FixedFormLexerPrepass prepass;
@@ -78,7 +77,7 @@ import org.eclipse.core.resources.IFile;
     protected IFile lastTokenFile = null;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
     
-	private Token token(Terminal terminal)
+	private IToken token(Terminal terminal)
 	{
 		lastTokenLine = prepass.getLine(yychar)+1;
 		lastTokenCol = prepass.getColumn(yychar)+1;
@@ -94,9 +93,9 @@ import org.eclipse.core.resources.IFile;
 	}
 
 	/*
-	private Token token(Terminal terminal)
+	private IToken token(Terminal terminal)
 	{
-		Token t = new Token();
+		IToken t = new Token();
 		t.setTerminal(terminal);
 		t.setFilename(this.filename);
 		t.setFileOffset(prepass.getOffset(yychar));
@@ -232,7 +231,7 @@ CppError="#error"[^\r\n]*{LineTerminator}
 CppPragma="#pragma"[^\r\n]*{LineTerminator}
 CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppEndIf}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
 
-FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
+FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 %state IMPLICIT
 %state QUOTED
@@ -460,7 +459,7 @@ FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
 .								{ 	yypushback(1); 
 									int state=yystate();
 									yybegin(IDENT);
-									Token token = yylex();
+									IToken token = yylex();
 									yybegin(state);
 									return token;
 								}
@@ -514,4 +513,5 @@ FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
 
 
 /* Error */
-.								{ throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Unexpected character " + yytext()); }
+/*.								{ throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Unexpected character " + yytext()); }*/
+.								{ wantEos = true; unsetSOL();          return token(Terminal.T_UNEXPECTED_CHARACTER); }

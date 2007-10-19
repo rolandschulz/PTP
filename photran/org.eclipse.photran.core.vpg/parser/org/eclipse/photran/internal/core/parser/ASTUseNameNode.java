@@ -47,7 +47,7 @@ public class ASTUseNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.USE_NAME_1040)
+        if (getProduction() == Production.USE_NAME_1047)
             return (Token)getChild(0);
         else
             return null;

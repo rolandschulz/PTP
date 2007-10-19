@@ -47,7 +47,7 @@ public class ASTAccessIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ACCESS_ID_329)
+        if (getProduction() == Production.ACCESS_ID_331)
             return (ASTGenericNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTAccessIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ACCESS_ID_330)
+        if (getProduction() == Production.ACCESS_ID_332)
             return (ASTGenericSpecNode)getChild(0);
         else
             return null;

@@ -47,7 +47,7 @@ public class ASTComponentArraySpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_ARRAY_SPEC_196)
+        if (getProduction() == Production.COMPONENT_ARRAY_SPEC_198)
             return (ASTExplicitShapeSpecListNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTComponentArraySpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_ARRAY_SPEC_197)
+        if (getProduction() == Production.COMPONENT_ARRAY_SPEC_199)
             return (ASTDeferredShapeSpecListNode)getChild(0);
         else
             return null;

@@ -47,11 +47,11 @@ public class ASTLevel2ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_2_EXPR_530)
+        if (getProduction() == Production.LEVEL_2_EXPR_532)
             return (ASTAddOperandNode)getChild(0);
-        else if (getProduction() == Production.LEVEL_2_EXPR_531)
+        else if (getProduction() == Production.LEVEL_2_EXPR_533)
             return (ASTAddOperandNode)getChild(2);
-        else if (getProduction() == Production.LEVEL_2_EXPR_532)
+        else if (getProduction() == Production.LEVEL_2_EXPR_534)
             return (ASTAddOperandNode)getChild(1);
         else
             return null;
@@ -61,7 +61,7 @@ public class ASTLevel2ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_2_EXPR_531)
+        if (getProduction() == Production.LEVEL_2_EXPR_533)
             return (ASTLevel2ExprNode)getChild(0);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTLevel2ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_2_EXPR_531)
+        if (getProduction() == Production.LEVEL_2_EXPR_533)
             return (ASTAddOpNode)getChild(1);
         else
             return null;
@@ -81,7 +81,7 @@ public class ASTLevel2ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_2_EXPR_532)
+        if (getProduction() == Production.LEVEL_2_EXPR_534)
             return (ASTSignNode)getChild(0);
         else
             return null;

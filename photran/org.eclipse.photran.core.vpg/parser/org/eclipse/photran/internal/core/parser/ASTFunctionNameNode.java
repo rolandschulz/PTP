@@ -47,7 +47,7 @@ public class ASTFunctionNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_NAME_1027)
+        if (getProduction() == Production.FUNCTION_NAME_1034)
             return (Token)getChild(0);
         else
             return null;

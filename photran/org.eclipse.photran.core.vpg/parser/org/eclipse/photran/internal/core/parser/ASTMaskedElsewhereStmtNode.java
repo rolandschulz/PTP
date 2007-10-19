@@ -47,9 +47,13 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_618)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_621)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +63,9 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_618)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_621)
             return (Token)getChild(1);
-        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
             return (Token)getChild(1);
         else
             return null;
@@ -71,10 +75,14 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_618)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_621)
             return (Token)getChild(2);
-        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
             return (Token)getChild(2);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (Token)getChild(3);
         else
             return null;
     }
@@ -83,10 +91,14 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_618)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_621)
             return (ASTMaskExprNode)getChild(3);
-        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
             return (ASTMaskExprNode)getChild(3);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (ASTMaskExprNode)getChild(4);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (ASTMaskExprNode)getChild(4);
         else
             return null;
     }
@@ -95,10 +107,14 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_618)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_621)
             return (Token)getChild(4);
-        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
             return (Token)getChild(4);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (Token)getChild(5);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (Token)getChild(5);
         else
             return null;
     }
@@ -107,10 +123,14 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_618)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_621)
             return (Token)getChild(5);
-        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
             return (Token)getChild(6);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (Token)getChild(6);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (Token)getChild(7);
         else
             return null;
     }
@@ -119,8 +139,34 @@ public class ASTMaskedElsewhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_619)
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_622)
             return (ASTEndNameNode)getChild(5);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (ASTEndNameNode)getChild(6);
+        else
+            return null;
+    }
+
+    public Token getTElse()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (Token)getChild(1);
+        else
+            return null;
+    }
+
+    public Token getTWhere()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.MASKED_ELSEWHERE_STMT_623)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.MASKED_ELSEWHERE_STMT_624)
+            return (Token)getChild(2);
         else
             return null;
     }

@@ -47,9 +47,9 @@ public class ASTExitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXIT_STMT_721)
+        if (getProduction() == Production.EXIT_STMT_728)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.EXIT_STMT_722)
+        else if (getProduction() == Production.EXIT_STMT_729)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTExitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXIT_STMT_721)
+        if (getProduction() == Production.EXIT_STMT_728)
             return (Token)getChild(1);
-        else if (getProduction() == Production.EXIT_STMT_722)
+        else if (getProduction() == Production.EXIT_STMT_729)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTExitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXIT_STMT_721)
+        if (getProduction() == Production.EXIT_STMT_728)
             return (Token)getChild(2);
-        else if (getProduction() == Production.EXIT_STMT_722)
+        else if (getProduction() == Production.EXIT_STMT_729)
             return (Token)getChild(3);
         else
             return null;
@@ -83,7 +83,7 @@ public class ASTExitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXIT_STMT_722)
+        if (getProduction() == Production.EXIT_STMT_729)
             return (ASTNameNode)getChild(2);
         else
             return null;

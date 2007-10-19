@@ -15,11 +15,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDataStmtNode extends InteriorNode
+public class ASTDataStmtNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTDataStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
-         super(production);
+         super(production, discardedSymbols);
          
          for (Object o : childNodes)
              addChild((CSTNode)o);
@@ -47,7 +47,9 @@ public class ASTDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_368)
+        if (getProduction() == Production.DATA_STMT_370)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.DATA_STMT_ERROR_1)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +59,9 @@ public class ASTDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_368)
+        if (getProduction() == Production.DATA_STMT_370)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.DATA_STMT_ERROR_1)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +71,7 @@ public class ASTDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_368)
+        if (getProduction() == Production.DATA_STMT_370)
             return (ASTDatalistNode)getChild(2);
         else
             return null;
@@ -77,7 +81,7 @@ public class ASTDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_368)
+        if (getProduction() == Production.DATA_STMT_370)
             return (Token)getChild(3);
         else
             return null;

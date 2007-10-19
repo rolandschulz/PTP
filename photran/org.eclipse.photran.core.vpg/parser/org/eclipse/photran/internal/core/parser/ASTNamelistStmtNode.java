@@ -47,7 +47,7 @@ public class ASTNamelistStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_STMT_396)
+        if (getProduction() == Production.NAMELIST_STMT_398)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTNamelistStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_STMT_396)
+        if (getProduction() == Production.NAMELIST_STMT_398)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTNamelistStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_STMT_396)
+        if (getProduction() == Production.NAMELIST_STMT_398)
             return (ASTNamelistGroupsNode)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTNamelistStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_STMT_396)
+        if (getProduction() == Production.NAMELIST_STMT_398)
             return (Token)getChild(3);
         else
             return null;

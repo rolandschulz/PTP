@@ -47,7 +47,7 @@ public class ASTSFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_580)
+        if (getProduction() == Production.SFEXPR_582)
             return (ASTSFTermNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTSFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_581)
+        if (getProduction() == Production.SFEXPR_583)
             return (ASTSignNode)getChild(0);
         else
             return null;
@@ -67,9 +67,9 @@ public class ASTSFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_581)
+        if (getProduction() == Production.SFEXPR_583)
             return (ASTAddOperandNode)getChild(1);
-        else if (getProduction() == Production.SFEXPR_582)
+        else if (getProduction() == Production.SFEXPR_584)
             return (ASTAddOperandNode)getChild(2);
         else
             return null;
@@ -79,7 +79,7 @@ public class ASTSFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_582)
+        if (getProduction() == Production.SFEXPR_584)
             return (ASTSFExprNode)getChild(0);
         else
             return null;
@@ -89,7 +89,7 @@ public class ASTSFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_582)
+        if (getProduction() == Production.SFEXPR_584)
             return (ASTAddOpNode)getChild(1);
         else
             return null;

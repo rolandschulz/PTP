@@ -47,7 +47,7 @@ public class ASTCPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CPRIMARY_496)
+        if (getProduction() == Production.CPRIMARY_498)
             return (ASTCOperandNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CPRIMARY_497)
+        if (getProduction() == Production.CPRIMARY_499)
             return (Token)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTCPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CPRIMARY_497)
+        if (getProduction() == Production.CPRIMARY_499)
             return (ASTCExprNode)getChild(1);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTCPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CPRIMARY_497)
+        if (getProduction() == Production.CPRIMARY_499)
             return (Token)getChild(2);
         else
             return null;

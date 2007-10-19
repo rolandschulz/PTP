@@ -47,13 +47,13 @@ public class ASTEndWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_WHERE_STMT_622)
+        if (getProduction() == Production.END_WHERE_STMT_629)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_WHERE_STMT_623)
+        else if (getProduction() == Production.END_WHERE_STMT_630)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_WHERE_STMT_624)
+        else if (getProduction() == Production.END_WHERE_STMT_631)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_WHERE_STMT_625)
+        else if (getProduction() == Production.END_WHERE_STMT_632)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -63,9 +63,9 @@ public class ASTEndWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_WHERE_STMT_622)
+        if (getProduction() == Production.END_WHERE_STMT_629)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_WHERE_STMT_623)
+        else if (getProduction() == Production.END_WHERE_STMT_630)
             return (Token)getChild(1);
         else
             return null;
@@ -75,13 +75,13 @@ public class ASTEndWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_WHERE_STMT_622)
+        if (getProduction() == Production.END_WHERE_STMT_629)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_WHERE_STMT_623)
+        else if (getProduction() == Production.END_WHERE_STMT_630)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_WHERE_STMT_624)
+        else if (getProduction() == Production.END_WHERE_STMT_631)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_WHERE_STMT_625)
+        else if (getProduction() == Production.END_WHERE_STMT_632)
             return (Token)getChild(4);
         else
             return null;
@@ -91,9 +91,9 @@ public class ASTEndWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_WHERE_STMT_623)
+        if (getProduction() == Production.END_WHERE_STMT_630)
             return (ASTEndNameNode)getChild(2);
-        else if (getProduction() == Production.END_WHERE_STMT_625)
+        else if (getProduction() == Production.END_WHERE_STMT_632)
             return (ASTEndNameNode)getChild(3);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTEndWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_WHERE_STMT_624)
+        if (getProduction() == Production.END_WHERE_STMT_631)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_WHERE_STMT_625)
+        else if (getProduction() == Production.END_WHERE_STMT_632)
             return (Token)getChild(1);
         else
             return null;
@@ -115,9 +115,9 @@ public class ASTEndWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_WHERE_STMT_624)
+        if (getProduction() == Production.END_WHERE_STMT_631)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_WHERE_STMT_625)
+        else if (getProduction() == Production.END_WHERE_STMT_632)
             return (Token)getChild(2);
         else
             return null;

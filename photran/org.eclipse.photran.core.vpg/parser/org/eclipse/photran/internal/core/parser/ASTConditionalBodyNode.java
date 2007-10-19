@@ -47,9 +47,9 @@ public class ASTConditionalBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONDITIONAL_BODY_660)
+        if (getProduction() == Production.CONDITIONAL_BODY_667)
             return (ASTExecutionPartConstructNode)getChild(0);
-        else if (getProduction() == Production.CONDITIONAL_BODY_661)
+        else if (getProduction() == Production.CONDITIONAL_BODY_668)
             return (ASTExecutionPartConstructNode)getChild(1);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTConditionalBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONDITIONAL_BODY_661)
+        if (getProduction() == Production.CONDITIONAL_BODY_668)
             return (ASTConditionalBodyNode)getChild(0);
         else
             return null;

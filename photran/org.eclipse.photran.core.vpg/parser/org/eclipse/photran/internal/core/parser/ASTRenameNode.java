@@ -47,7 +47,7 @@ public class ASTRenameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_908)
+        if (getProduction() == Production.RENAME_915)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTRenameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_908)
+        if (getProduction() == Production.RENAME_915)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTRenameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_908)
+        if (getProduction() == Production.RENAME_915)
             return (ASTUseNameNode)getChild(2);
         else
             return null;

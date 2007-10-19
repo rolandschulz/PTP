@@ -47,13 +47,13 @@ public class ASTEndTypeStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_210)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_TYPE_STMT_211)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_TYPE_STMT_212)
+        if (getProduction() == Production.END_TYPE_STMT_212)
             return (ASTLblDefNode)getChild(0);
         else if (getProduction() == Production.END_TYPE_STMT_213)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.END_TYPE_STMT_214)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.END_TYPE_STMT_215)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -63,9 +63,9 @@ public class ASTEndTypeStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_210)
+        if (getProduction() == Production.END_TYPE_STMT_212)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_TYPE_STMT_212)
+        else if (getProduction() == Production.END_TYPE_STMT_214)
             return (Token)getChild(1);
         else
             return null;
@@ -75,9 +75,9 @@ public class ASTEndTypeStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_210)
+        if (getProduction() == Production.END_TYPE_STMT_212)
             return (ASTTypeNameNode)getChild(2);
-        else if (getProduction() == Production.END_TYPE_STMT_211)
+        else if (getProduction() == Production.END_TYPE_STMT_213)
             return (ASTTypeNameNode)getChild(3);
         else
             return null;
@@ -87,13 +87,13 @@ public class ASTEndTypeStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_210)
+        if (getProduction() == Production.END_TYPE_STMT_212)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_TYPE_STMT_211)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.END_TYPE_STMT_212)
-            return (Token)getChild(2);
         else if (getProduction() == Production.END_TYPE_STMT_213)
+            return (Token)getChild(4);
+        else if (getProduction() == Production.END_TYPE_STMT_214)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.END_TYPE_STMT_215)
             return (Token)getChild(3);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTEndTypeStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_211)
+        if (getProduction() == Production.END_TYPE_STMT_213)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_TYPE_STMT_213)
+        else if (getProduction() == Production.END_TYPE_STMT_215)
             return (Token)getChild(1);
         else
             return null;
@@ -115,9 +115,9 @@ public class ASTEndTypeStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_211)
+        if (getProduction() == Production.END_TYPE_STMT_213)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_TYPE_STMT_213)
+        else if (getProduction() == Production.END_TYPE_STMT_215)
             return (Token)getChild(2);
         else
             return null;

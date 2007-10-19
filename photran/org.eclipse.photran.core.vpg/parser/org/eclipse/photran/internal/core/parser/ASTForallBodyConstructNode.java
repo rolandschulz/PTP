@@ -47,7 +47,7 @@ public class ASTForallBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_637)
+        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_644)
             return (ASTAssignmentStmtNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTForallBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_638)
+        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_645)
             return (ASTPointerAssignmentStmtNode)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTForallBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_639)
+        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_646)
             return (ASTWhereStmtNode)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTForallBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_640)
+        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_647)
             return (ASTWhereConstructNode)getChild(0);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTForallBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_641)
+        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_648)
             return (ASTForallConstructNode)getChild(0);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTForallBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_642)
+        if (getProduction() == Production.FORALL_BODY_CONSTRUCT_649)
             return (ASTForallStmtNode)getChild(0);
         else
             return null;

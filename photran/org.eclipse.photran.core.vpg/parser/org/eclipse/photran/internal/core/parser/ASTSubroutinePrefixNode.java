@@ -47,9 +47,9 @@ public class ASTSubroutinePrefixNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_PREFIX_998)
+        if (getProduction() == Production.SUBROUTINE_PREFIX_1005)
             return (Token)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_PREFIX_999)
+        else if (getProduction() == Production.SUBROUTINE_PREFIX_1006)
             return (Token)getChild(1);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTSubroutinePrefixNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_PREFIX_999)
+        if (getProduction() == Production.SUBROUTINE_PREFIX_1006)
             return (ASTPrefixSpecListNode)getChild(0);
         else
             return null;

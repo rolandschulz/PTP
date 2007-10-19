@@ -99,7 +99,7 @@ public class ASTCloseSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTCloseSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CLOSE_SPEC_LIST_757)
+        if (node.getProduction() == Production.CLOSE_SPEC_LIST_764)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
@@ -110,9 +110,9 @@ public class ASTCloseSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTCloseSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CLOSE_SPEC_LIST_758)
+        if (node.getProduction() == Production.CLOSE_SPEC_LIST_765)
             return (ASTCloseSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.CLOSE_SPEC_LIST_759)
+        else if (node.getProduction() == Production.CLOSE_SPEC_LIST_766)
             return (ASTCloseSpecNode)node.getChild(2);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTCloseSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_LIST_759)
+        if (getProduction() == Production.CLOSE_SPEC_LIST_766)
             return (ASTCloseSpecListNode)getChild(0);
         else
             return null;
@@ -133,7 +133,7 @@ public class ASTCloseSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTCloseSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CLOSE_SPEC_LIST_759)
+        if (node.getProduction() == Production.CLOSE_SPEC_LIST_766)
             return (Token)node.getChild(1);
         else
             return null;

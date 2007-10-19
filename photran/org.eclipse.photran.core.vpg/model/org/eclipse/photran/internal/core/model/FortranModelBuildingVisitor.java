@@ -83,6 +83,18 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
         }
     }
 
+    private void addToModelNoChildren(FortranElement element)
+    {
+        try
+        {
+            modelBuilder.addF90Element(element);
+        }
+        catch (CModelException e)
+        {
+            ;
+        }
+    }
+
     private void beginAddingChildrenFor(InteriorNode parseTreeNode, FortranElement element)
     {
         parentParseTreeNodeStack.addLast(parseTreeNode);
@@ -157,7 +169,7 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
         {
             ASTComponentDeclListNode list = node.getComponentDeclList();
             for (int i = 0; i < list.size(); i++)
-                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getComponentDecl(i).getComponentName().getTIdent()));
+				addToModelNoChildren(new FortranElement.Variable(getCurrentParent(), list.getComponentDecl(i).getComponentName().getTIdent()));
         }
     
         public void visitASTExternalStmtNode(ASTExternalStmtNode node)

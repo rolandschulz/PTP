@@ -47,9 +47,9 @@ public class ASTBlockDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_STMT_912)
+        if (getProduction() == Production.BLOCK_DATA_STMT_919)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_913)
+        else if (getProduction() == Production.BLOCK_DATA_STMT_920)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTBlockDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_STMT_912)
+        if (getProduction() == Production.BLOCK_DATA_STMT_919)
             return (Token)getChild(1);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_913)
+        else if (getProduction() == Production.BLOCK_DATA_STMT_920)
             return (Token)getChild(1);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTBlockDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_STMT_912)
+        if (getProduction() == Production.BLOCK_DATA_STMT_919)
             return (ASTBlockDataNameNode)getChild(2);
         else
             return null;
@@ -81,9 +81,9 @@ public class ASTBlockDataStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_STMT_912)
+        if (getProduction() == Production.BLOCK_DATA_STMT_919)
             return (Token)getChild(3);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_913)
+        else if (getProduction() == Production.BLOCK_DATA_STMT_920)
             return (Token)getChild(2);
         else
             return null;

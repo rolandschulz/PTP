@@ -47,7 +47,7 @@ public class ASTOnlyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_909)
+        if (getProduction() == Production.ONLY_916)
             return (ASTGenericSpecNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTOnlyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_910)
+        if (getProduction() == Production.ONLY_917)
             return (Token)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTOnlyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_910)
+        if (getProduction() == Production.ONLY_917)
             return (Token)getChild(1);
         else
             return null;
@@ -77,9 +77,9 @@ public class ASTOnlyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_910)
+        if (getProduction() == Production.ONLY_917)
             return (ASTUseNameNode)getChild(2);
-        else if (getProduction() == Production.ONLY_911)
+        else if (getProduction() == Production.ONLY_918)
             return (ASTUseNameNode)getChild(0);
         else
             return null;

@@ -47,9 +47,9 @@ public class ASTUFTermNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFTERM_527)
+        if (getProduction() == Production.UFTERM_529)
             return (ASTUFFactorNode)getChild(0);
-        else if (getProduction() == Production.UFTERM_528)
+        else if (getProduction() == Production.UFTERM_530)
             return (ASTUFFactorNode)getChild(2);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTUFTermNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFTERM_528)
+        if (getProduction() == Production.UFTERM_530)
             return (ASTUFTermNode)getChild(0);
-        else if (getProduction() == Production.UFTERM_529)
+        else if (getProduction() == Production.UFTERM_531)
             return (ASTUFTermNode)getChild(0);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTUFTermNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFTERM_528)
+        if (getProduction() == Production.UFTERM_530)
             return (ASTMultOpNode)getChild(1);
         else
             return null;
@@ -81,7 +81,7 @@ public class ASTUFTermNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFTERM_529)
+        if (getProduction() == Production.UFTERM_531)
             return (ASTConcatOpNode)getChild(1);
         else
             return null;
@@ -91,7 +91,7 @@ public class ASTUFTermNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFTERM_529)
+        if (getProduction() == Production.UFTERM_531)
             return (ASTUFPrimaryNode)getChild(2);
         else
             return null;

@@ -47,7 +47,7 @@ public class ASTDataIDoObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IDO_OBJECT_381)
+        if (getProduction() == Production.DATA_IDO_OBJECT_383)
             return (ASTArrayElementNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTDataIDoObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IDO_OBJECT_382)
+        if (getProduction() == Production.DATA_IDO_OBJECT_384)
             return (ASTDataImpliedDoNode)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTDataIDoObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IDO_OBJECT_383)
+        if (getProduction() == Production.DATA_IDO_OBJECT_385)
             return (ASTStructureComponentNode)getChild(0);
         else
             return null;

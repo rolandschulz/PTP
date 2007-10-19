@@ -47,7 +47,7 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_498)
+        if (getProduction() == Production.COPERAND_500)
             return (Token)getChild(0);
         else
             return null;
@@ -57,17 +57,17 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_499)
-            return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.COPERAND_500)
-            return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.COPERAND_501)
+        if (getProduction() == Production.COPERAND_501)
             return (ASTNameNode)getChild(0);
         else if (getProduction() == Production.COPERAND_502)
             return (ASTNameNode)getChild(0);
         else if (getProduction() == Production.COPERAND_503)
             return (ASTNameNode)getChild(0);
         else if (getProduction() == Production.COPERAND_504)
+            return (ASTNameNode)getChild(0);
+        else if (getProduction() == Production.COPERAND_505)
+            return (ASTNameNode)getChild(0);
+        else if (getProduction() == Production.COPERAND_506)
             return (ASTNameNode)getChild(0);
         else
             return null;
@@ -77,13 +77,13 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_500)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.COPERAND_502)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.COPERAND_503)
+        if (getProduction() == Production.COPERAND_502)
             return (Token)getChild(1);
         else if (getProduction() == Production.COPERAND_504)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.COPERAND_505)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.COPERAND_506)
             return (Token)getChild(1);
         else
             return null;
@@ -93,13 +93,13 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_500)
-            return (ASTSectionSubscriptListNode)getChild(2);
-        else if (getProduction() == Production.COPERAND_502)
-            return (ASTSectionSubscriptListNode)getChild(4);
-        else if (getProduction() == Production.COPERAND_503)
+        if (getProduction() == Production.COPERAND_502)
             return (ASTSectionSubscriptListNode)getChild(2);
         else if (getProduction() == Production.COPERAND_504)
+            return (ASTSectionSubscriptListNode)getChild(4);
+        else if (getProduction() == Production.COPERAND_505)
+            return (ASTSectionSubscriptListNode)getChild(2);
+        else if (getProduction() == Production.COPERAND_506)
             return (ASTSectionSubscriptListNode)getChild(2);
         else
             return null;
@@ -109,13 +109,13 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_500)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.COPERAND_502)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.COPERAND_503)
+        if (getProduction() == Production.COPERAND_502)
             return (Token)getChild(3);
         else if (getProduction() == Production.COPERAND_504)
+            return (Token)getChild(5);
+        else if (getProduction() == Production.COPERAND_505)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.COPERAND_506)
             return (Token)getChild(3);
         else
             return null;
@@ -125,13 +125,13 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_501)
+        if (getProduction() == Production.COPERAND_503)
             return (Token)getChild(1);
-        else if (getProduction() == Production.COPERAND_502)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.COPERAND_503)
-            return (Token)getChild(4);
         else if (getProduction() == Production.COPERAND_504)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.COPERAND_505)
+            return (Token)getChild(4);
+        else if (getProduction() == Production.COPERAND_506)
             return (Token)getChild(4);
         else
             return null;
@@ -141,13 +141,13 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_501)
+        if (getProduction() == Production.COPERAND_503)
             return (ASTDataRefNode)getChild(2);
-        else if (getProduction() == Production.COPERAND_502)
-            return (ASTDataRefNode)getChild(2);
-        else if (getProduction() == Production.COPERAND_503)
-            return (ASTDataRefNode)getChild(5);
         else if (getProduction() == Production.COPERAND_504)
+            return (ASTDataRefNode)getChild(2);
+        else if (getProduction() == Production.COPERAND_505)
+            return (ASTDataRefNode)getChild(5);
+        else if (getProduction() == Production.COPERAND_506)
             return (ASTDataRefNode)getChild(5);
         else
             return null;
@@ -157,7 +157,7 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_504)
+        if (getProduction() == Production.COPERAND_506)
             return (Token)getChild(6);
         else
             return null;
@@ -167,7 +167,7 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_504)
+        if (getProduction() == Production.COPERAND_506)
             return (ASTSectionSubscriptListNode)getChild(7);
         else
             return null;
@@ -177,7 +177,7 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_504)
+        if (getProduction() == Production.COPERAND_506)
             return (Token)getChild(8);
         else
             return null;
@@ -187,7 +187,7 @@ public class ASTCOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COPERAND_505)
+        if (getProduction() == Production.COPERAND_507)
             return (ASTFunctionReferenceNode)getChild(0);
         else
             return null;

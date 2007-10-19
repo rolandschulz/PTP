@@ -47,9 +47,9 @@ public class ASTElsewherePartNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSEWHERE_PART_608)
+        if (getProduction() == Production.ELSEWHERE_PART_611)
             return (ASTEndWhereStmtNode)getChild(0);
-        else if (getProduction() == Production.ELSEWHERE_PART_609)
+        else if (getProduction() == Production.ELSEWHERE_PART_612)
             return (ASTEndWhereStmtNode)getChild(1);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTElsewherePartNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSEWHERE_PART_609)
+        if (getProduction() == Production.ELSEWHERE_PART_612)
             return (ASTWhereBodyConstructBlockNode)getChild(0);
         else
             return null;

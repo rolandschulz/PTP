@@ -47,7 +47,7 @@ public class ASTSFVarNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFVAR_NAME_1036)
+        if (getProduction() == Production.SFVAR_NAME_1043)
             return (ASTNameNode)getChild(0);
         else
             return null;

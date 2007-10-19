@@ -47,7 +47,7 @@ public class ASTEquivalenceObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_OBJECT_408)
+        if (getProduction() == Production.EQUIVALENCE_OBJECT_410)
             return (ASTVariableNode)getChild(0);
         else
             return null;

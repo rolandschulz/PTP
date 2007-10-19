@@ -47,7 +47,7 @@ public class ASTAssumedShapeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_305)
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_307)
             return (ASTLowerBoundNode)getChild(0);
         else
             return null;
@@ -57,9 +57,9 @@ public class ASTAssumedShapeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_305)
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_307)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_306)
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_308)
             return (Token)getChild(0);
         else
             return null;

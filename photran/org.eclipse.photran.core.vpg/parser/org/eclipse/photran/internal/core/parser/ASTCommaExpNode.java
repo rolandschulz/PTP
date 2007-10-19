@@ -47,7 +47,7 @@ public class ASTCommaExpNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMA_EXP_728)
+        if (getProduction() == Production.COMMA_EXP_735)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCommaExpNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMA_EXP_728)
+        if (getProduction() == Production.COMMA_EXP_735)
             return (ASTExprNode)getChild(1);
         else
             return null;

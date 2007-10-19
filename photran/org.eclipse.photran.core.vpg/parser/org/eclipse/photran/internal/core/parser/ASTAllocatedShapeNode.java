@@ -47,7 +47,7 @@ public class ASTAllocatedShapeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATED_SHAPE_460)
+        if (getProduction() == Production.ALLOCATED_SHAPE_462)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTAllocatedShapeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATED_SHAPE_460)
+        if (getProduction() == Production.ALLOCATED_SHAPE_462)
             return (ASTSectionSubscriptListNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTAllocatedShapeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATED_SHAPE_460)
+        if (getProduction() == Production.ALLOCATED_SHAPE_462)
             return (Token)getChild(2);
         else
             return null;

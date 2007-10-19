@@ -47,9 +47,9 @@ public class ASTPrintStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRINT_STMT_784)
+        if (getProduction() == Production.PRINT_STMT_791)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.PRINT_STMT_785)
+        else if (getProduction() == Production.PRINT_STMT_792)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTPrintStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRINT_STMT_784)
+        if (getProduction() == Production.PRINT_STMT_791)
             return (Token)getChild(1);
-        else if (getProduction() == Production.PRINT_STMT_785)
+        else if (getProduction() == Production.PRINT_STMT_792)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTPrintStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRINT_STMT_784)
+        if (getProduction() == Production.PRINT_STMT_791)
             return (ASTFormatIdentifierNode)getChild(2);
-        else if (getProduction() == Production.PRINT_STMT_785)
+        else if (getProduction() == Production.PRINT_STMT_792)
             return (ASTFormatIdentifierNode)getChild(2);
         else
             return null;
@@ -83,7 +83,7 @@ public class ASTPrintStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRINT_STMT_784)
+        if (getProduction() == Production.PRINT_STMT_791)
             return (Token)getChild(3);
         else
             return null;
@@ -93,7 +93,7 @@ public class ASTPrintStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRINT_STMT_784)
+        if (getProduction() == Production.PRINT_STMT_791)
             return (ASTOutputItemListNode)getChild(4);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTPrintStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRINT_STMT_784)
+        if (getProduction() == Production.PRINT_STMT_791)
             return (Token)getChild(5);
-        else if (getProduction() == Production.PRINT_STMT_785)
+        else if (getProduction() == Production.PRINT_STMT_792)
             return (Token)getChild(3);
         else
             return null;

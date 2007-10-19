@@ -47,9 +47,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (Token)getChild(0);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (Token)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (ASTDataIDoObjectListNode)getChild(1);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (ASTDataIDoObjectListNode)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (Token)getChild(2);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (Token)getChild(2);
         else
             return null;
@@ -83,9 +83,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (ASTImpliedDoVariableNode)getChild(3);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (ASTImpliedDoVariableNode)getChild(3);
         else
             return null;
@@ -95,9 +95,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (Token)getChild(4);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (Token)getChild(4);
         else
             return null;
@@ -107,9 +107,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (ASTExprNode)getChild(5);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (ASTExprNode)getChild(5);
         else
             return null;
@@ -119,9 +119,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (Token)getChild(6);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (Token)getChild(6);
         else
             return null;
@@ -131,9 +131,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (ASTExprNode)getChild(7);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (ASTExprNode)getChild(7);
         else
             return null;
@@ -143,9 +143,9 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_377)
+        if (getProduction() == Production.DATA_IMPLIED_DO_379)
             return (Token)getChild(8);
-        else if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        else if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (Token)getChild(10);
         else
             return null;
@@ -155,7 +155,7 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (Token)getChild(8);
         else
             return null;
@@ -165,7 +165,7 @@ public class ASTDataImpliedDoNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IMPLIED_DO_378)
+        if (getProduction() == Production.DATA_IMPLIED_DO_380)
             return (ASTExprNode)getChild(9);
         else
             return null;

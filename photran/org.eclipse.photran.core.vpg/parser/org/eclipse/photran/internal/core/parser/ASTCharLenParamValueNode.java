@@ -47,7 +47,7 @@ public class ASTCharLenParamValueNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_284)
+        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_286)
             return (ASTExprNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCharLenParamValueNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_285)
+        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_287)
             return (Token)getChild(0);
         else
             return null;

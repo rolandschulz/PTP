@@ -99,11 +99,11 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_470)
+        if (node.getProduction() == Production.POINTER_FIELD_472)
             return (ASTNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.POINTER_FIELD_471)
+        else if (node.getProduction() == Production.POINTER_FIELD_473)
             return (ASTNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.POINTER_FIELD_472)
+        else if (node.getProduction() == Production.POINTER_FIELD_474)
             return (ASTNameNode)node.getChild(0);
         else
             return null;
@@ -114,9 +114,9 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_470)
+        if (node.getProduction() == Production.POINTER_FIELD_472)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.POINTER_FIELD_471)
+        else if (node.getProduction() == Production.POINTER_FIELD_473)
             return (Token)node.getChild(1);
         else
             return null;
@@ -127,7 +127,7 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_470)
+        if (node.getProduction() == Production.POINTER_FIELD_472)
             return (ASTSFExprListNode)node.getChild(2);
         else
             return null;
@@ -138,9 +138,9 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_470)
+        if (node.getProduction() == Production.POINTER_FIELD_472)
             return (Token)node.getChild(3);
-        else if (node.getProduction() == Production.POINTER_FIELD_471)
+        else if (node.getProduction() == Production.POINTER_FIELD_473)
             return (Token)node.getChild(3);
         else
             return null;
@@ -151,11 +151,11 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_470)
+        if (node.getProduction() == Production.POINTER_FIELD_472)
             return (Token)node.getChild(4);
-        else if (node.getProduction() == Production.POINTER_FIELD_471)
+        else if (node.getProduction() == Production.POINTER_FIELD_473)
             return (Token)node.getChild(4);
-        else if (node.getProduction() == Production.POINTER_FIELD_472)
+        else if (node.getProduction() == Production.POINTER_FIELD_474)
             return (Token)node.getChild(1);
         else
             return null;
@@ -166,11 +166,11 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_470)
+        if (node.getProduction() == Production.POINTER_FIELD_472)
             return (ASTNameNode)node.getChild(5);
-        else if (node.getProduction() == Production.POINTER_FIELD_471)
+        else if (node.getProduction() == Production.POINTER_FIELD_473)
             return (ASTNameNode)node.getChild(5);
-        else if (node.getProduction() == Production.POINTER_FIELD_472)
+        else if (node.getProduction() == Production.POINTER_FIELD_474)
             return (ASTNameNode)node.getChild(2);
         else
             return null;
@@ -181,7 +181,7 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_471)
+        if (node.getProduction() == Production.POINTER_FIELD_473)
             return (ASTSFDummyArgNameListNode)node.getChild(2);
         else
             return null;
@@ -191,7 +191,7 @@ public class ASTPointerFieldNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_FIELD_473)
+        if (getProduction() == Production.POINTER_FIELD_475)
             return (ASTPointerFieldNode)getChild(0);
         else
             return null;
@@ -202,7 +202,7 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_473)
+        if (node.getProduction() == Production.POINTER_FIELD_475)
             return (ASTFieldSelectorNode)node.getChild(1);
         else
             return null;

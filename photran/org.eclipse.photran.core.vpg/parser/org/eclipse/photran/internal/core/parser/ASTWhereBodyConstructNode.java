@@ -47,7 +47,7 @@ public class ASTWhereBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_614)
+        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_617)
             return (ASTAssignmentStmtNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTWhereBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_615)
+        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_618)
             return (ASTWhereStmtNode)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTWhereBodyConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_616)
+        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_619)
             return (ASTWhereConstructNode)getChild(0);
         else
             return null;

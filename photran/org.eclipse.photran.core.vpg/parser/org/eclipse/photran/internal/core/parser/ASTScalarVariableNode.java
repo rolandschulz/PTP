@@ -47,7 +47,7 @@ public class ASTScalarVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SCALAR_VARIABLE_425)
+        if (getProduction() == Production.SCALAR_VARIABLE_427)
             return (ASTVariableNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTScalarVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SCALAR_VARIABLE_426)
+        if (getProduction() == Production.SCALAR_VARIABLE_428)
             return (ASTArrayElementNode)getChild(0);
         else
             return null;

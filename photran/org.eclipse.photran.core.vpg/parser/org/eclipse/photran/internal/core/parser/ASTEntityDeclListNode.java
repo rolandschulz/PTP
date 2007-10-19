@@ -99,9 +99,9 @@ public class ASTEntityDeclListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTEntityDeclListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ENTITY_DECL_LIST_258)
+        if (node.getProduction() == Production.ENTITY_DECL_LIST_260)
             return (ASTEntityDeclNode)node.getChild(0);
-        else if (node.getProduction() == Production.ENTITY_DECL_LIST_259)
+        else if (node.getProduction() == Production.ENTITY_DECL_LIST_261)
             return (ASTEntityDeclNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTEntityDeclListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ENTITY_DECL_LIST_259)
+        if (getProduction() == Production.ENTITY_DECL_LIST_261)
             return (ASTEntityDeclListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTEntityDeclListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTEntityDeclListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ENTITY_DECL_LIST_259)
+        if (node.getProduction() == Production.ENTITY_DECL_LIST_261)
             return (Token)node.getChild(1);
         else
             return null;

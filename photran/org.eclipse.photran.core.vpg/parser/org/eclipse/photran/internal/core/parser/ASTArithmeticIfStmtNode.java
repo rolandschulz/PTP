@@ -47,7 +47,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (Token)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (ASTExprNode)getChild(3);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (Token)getChild(4);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (ASTLblRefNode)getChild(5);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (Token)getChild(6);
         else
             return null;
@@ -117,7 +117,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (ASTLblRefNode)getChild(7);
         else
             return null;
@@ -127,7 +127,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (Token)getChild(8);
         else
             return null;
@@ -137,7 +137,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (ASTLblRefNode)getChild(9);
         else
             return null;
@@ -147,7 +147,7 @@ public class ASTArithmeticIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARITHMETIC_IF_STMT_732)
+        if (getProduction() == Production.ARITHMETIC_IF_STMT_739)
             return (Token)getChild(10);
         else
             return null;

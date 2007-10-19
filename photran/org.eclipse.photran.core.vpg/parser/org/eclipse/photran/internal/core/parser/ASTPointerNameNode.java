@@ -47,7 +47,7 @@ public class ASTPointerNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_NAME_356)
+        if (getProduction() == Production.POINTER_NAME_358)
             return (Token)getChild(0);
         else
             return null;

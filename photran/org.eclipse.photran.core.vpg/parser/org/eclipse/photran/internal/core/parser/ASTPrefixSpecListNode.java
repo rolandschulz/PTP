@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTPrefixSpecListNode extends InteriorNode implements Iterable<ASTPrefixSpecNode>
+public class ASTPrefixSpecListNode extends InteriorNode implements  Iterable<ASTPrefixSpecNode>
 {
     protected int count = -1;
 
@@ -117,8 +117,9 @@ public class ASTPrefixSpecListNode extends InteriorNode implements Iterable<ASTP
 
             public ASTPrefixSpecNode next()
             {
-                ASTPrefixSpecNode result = (ASTPrefixSpecNode)node.getChild(1);
-                node = (ASTPrefixSpecListNode)node.parent;
+                int child = (index == 0 ? 0 : 1);
+                ASTPrefixSpecNode result = (ASTPrefixSpecNode)node.getChild(child);
+                node = (index == listSize-1 ? null : (ASTPrefixSpecListNode)node.parent);
                 index++;
                 return result;
             }
@@ -135,9 +136,9 @@ public class ASTPrefixSpecListNode extends InteriorNode implements Iterable<ASTP
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPrefixSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.PREFIX_SPEC_LIST_984)
+        if (node.getProduction() == Production.PREFIX_SPEC_LIST_991)
             return (ASTPrefixSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.PREFIX_SPEC_LIST_985)
+        else if (node.getProduction() == Production.PREFIX_SPEC_LIST_992)
             return (ASTPrefixSpecNode)node.getChild(1);
         else
             return null;
@@ -147,7 +148,7 @@ public class ASTPrefixSpecListNode extends InteriorNode implements Iterable<ASTP
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PREFIX_SPEC_LIST_985)
+        if (getProduction() == Production.PREFIX_SPEC_LIST_992)
             return (ASTPrefixSpecListNode)getChild(0);
         else
             return null;

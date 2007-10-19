@@ -99,7 +99,7 @@ public class ASTStructureComponentNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTStructureComponentNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.STRUCTURE_COMPONENT_435)
+        if (node.getProduction() == Production.STRUCTURE_COMPONENT_437)
             return (ASTVariableNameNode)node.getChild(0);
         else
             return null;
@@ -110,9 +110,9 @@ public class ASTStructureComponentNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTStructureComponentNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.STRUCTURE_COMPONENT_435)
+        if (node.getProduction() == Production.STRUCTURE_COMPONENT_437)
             return (ASTFieldSelectorNode)node.getChild(1);
-        else if (node.getProduction() == Production.STRUCTURE_COMPONENT_436)
+        else if (node.getProduction() == Production.STRUCTURE_COMPONENT_438)
             return (ASTFieldSelectorNode)node.getChild(1);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTStructureComponentNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STRUCTURE_COMPONENT_436)
+        if (getProduction() == Production.STRUCTURE_COMPONENT_438)
             return (ASTStructureComponentNode)getChild(0);
         else
             return null;

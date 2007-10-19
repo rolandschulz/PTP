@@ -99,7 +99,7 @@ public class ASTSelectCaseBodyNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSelectCaseBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SELECT_CASE_BODY_678)
+        if (node.getProduction() == Production.SELECT_CASE_BODY_685)
             return (ASTCaseStmtNode)node.getChild(0);
         else
             return null;
@@ -109,7 +109,7 @@ public class ASTSelectCaseBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_BODY_679)
+        if (getProduction() == Production.SELECT_CASE_BODY_686)
             return (ASTSelectCaseBodyNode)getChild(0);
         else
             return null;
@@ -120,7 +120,7 @@ public class ASTSelectCaseBodyNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSelectCaseBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SELECT_CASE_BODY_679)
+        if (node.getProduction() == Production.SELECT_CASE_BODY_686)
             return (ASTCaseBodyConstructNode)node.getChild(1);
         else
             return null;

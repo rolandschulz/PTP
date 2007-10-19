@@ -47,7 +47,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_743)
+        if (getProduction() == Production.CONNECT_SPEC_750)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_743)
+        if (getProduction() == Production.CONNECT_SPEC_750)
             return (ASTUnitIdentifierNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_744)
+        if (getProduction() == Production.CONNECT_SPEC_751)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_744)
+        if (getProduction() == Production.CONNECT_SPEC_751)
             return (ASTLblRefNode)getChild(1);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_745)
+        if (getProduction() == Production.CONNECT_SPEC_752)
             return (Token)getChild(0);
         else
             return null;
@@ -97,23 +97,23 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_745)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_746)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_747)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_748)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_750)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_752)
+        if (getProduction() == Production.CONNECT_SPEC_752)
             return (ASTCExprNode)getChild(1);
         else if (getProduction() == Production.CONNECT_SPEC_753)
             return (ASTCExprNode)getChild(1);
         else if (getProduction() == Production.CONNECT_SPEC_754)
             return (ASTCExprNode)getChild(1);
         else if (getProduction() == Production.CONNECT_SPEC_755)
+            return (ASTCExprNode)getChild(1);
+        else if (getProduction() == Production.CONNECT_SPEC_757)
+            return (ASTCExprNode)getChild(1);
+        else if (getProduction() == Production.CONNECT_SPEC_759)
+            return (ASTCExprNode)getChild(1);
+        else if (getProduction() == Production.CONNECT_SPEC_760)
+            return (ASTCExprNode)getChild(1);
+        else if (getProduction() == Production.CONNECT_SPEC_761)
+            return (ASTCExprNode)getChild(1);
+        else if (getProduction() == Production.CONNECT_SPEC_762)
             return (ASTCExprNode)getChild(1);
         else
             return null;
@@ -123,7 +123,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_746)
+        if (getProduction() == Production.CONNECT_SPEC_753)
             return (Token)getChild(0);
         else
             return null;
@@ -133,7 +133,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_747)
+        if (getProduction() == Production.CONNECT_SPEC_754)
             return (Token)getChild(0);
         else
             return null;
@@ -143,7 +143,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_748)
+        if (getProduction() == Production.CONNECT_SPEC_755)
             return (Token)getChild(0);
         else
             return null;
@@ -153,7 +153,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_749)
+        if (getProduction() == Production.CONNECT_SPEC_756)
             return (Token)getChild(0);
         else
             return null;
@@ -163,7 +163,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_749)
+        if (getProduction() == Production.CONNECT_SPEC_756)
             return (ASTExprNode)getChild(1);
         else
             return null;
@@ -173,7 +173,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_750)
+        if (getProduction() == Production.CONNECT_SPEC_757)
             return (Token)getChild(0);
         else
             return null;
@@ -183,7 +183,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_751)
+        if (getProduction() == Production.CONNECT_SPEC_758)
             return (Token)getChild(0);
         else
             return null;
@@ -193,7 +193,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_751)
+        if (getProduction() == Production.CONNECT_SPEC_758)
             return (ASTScalarVariableNode)getChild(1);
         else
             return null;
@@ -203,7 +203,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_752)
+        if (getProduction() == Production.CONNECT_SPEC_759)
             return (Token)getChild(0);
         else
             return null;
@@ -213,7 +213,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_753)
+        if (getProduction() == Production.CONNECT_SPEC_760)
             return (Token)getChild(0);
         else
             return null;
@@ -223,7 +223,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_754)
+        if (getProduction() == Production.CONNECT_SPEC_761)
             return (Token)getChild(0);
         else
             return null;
@@ -233,7 +233,7 @@ public class ASTConnectSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_755)
+        if (getProduction() == Production.CONNECT_SPEC_762)
             return (Token)getChild(0);
         else
             return null;

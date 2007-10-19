@@ -47,9 +47,9 @@ public class ASTSubroutineArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_969)
+        if (getProduction() == Production.SUBROUTINE_ARG_976)
             return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_971)
+        else if (getProduction() == Production.SUBROUTINE_ARG_978)
             return (ASTExprNode)getChild(2);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTSubroutineArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_970)
+        if (getProduction() == Production.SUBROUTINE_ARG_977)
             return (Token)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_972)
+        else if (getProduction() == Production.SUBROUTINE_ARG_979)
             return (Token)getChild(2);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTSubroutineArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_970)
+        if (getProduction() == Production.SUBROUTINE_ARG_977)
             return (ASTLblRefNode)getChild(1);
-        else if (getProduction() == Production.SUBROUTINE_ARG_972)
+        else if (getProduction() == Production.SUBROUTINE_ARG_979)
             return (ASTLblRefNode)getChild(3);
         else
             return null;
@@ -83,11 +83,11 @@ public class ASTSubroutineArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_971)
+        if (getProduction() == Production.SUBROUTINE_ARG_978)
             return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_972)
+        else if (getProduction() == Production.SUBROUTINE_ARG_979)
             return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_974)
+        else if (getProduction() == Production.SUBROUTINE_ARG_981)
             return (ASTNameNode)getChild(0);
         else
             return null;
@@ -97,11 +97,11 @@ public class ASTSubroutineArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_971)
+        if (getProduction() == Production.SUBROUTINE_ARG_978)
             return (Token)getChild(1);
-        else if (getProduction() == Production.SUBROUTINE_ARG_972)
+        else if (getProduction() == Production.SUBROUTINE_ARG_979)
             return (Token)getChild(1);
-        else if (getProduction() == Production.SUBROUTINE_ARG_974)
+        else if (getProduction() == Production.SUBROUTINE_ARG_981)
             return (Token)getChild(1);
         else
             return null;
@@ -111,9 +111,9 @@ public class ASTSubroutineArgNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_973)
+        if (getProduction() == Production.SUBROUTINE_ARG_980)
             return (Token)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_974)
+        else if (getProduction() == Production.SUBROUTINE_ARG_981)
             return (Token)getChild(2);
         else
             return null;

@@ -15,11 +15,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTElseIfStmtNode extends InteriorNode
+public class ASTElseIfStmtNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTElseIfStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
-         super(production);
+         super(production, discardedSymbols);
          
          for (Object o : childNodes)
              addChild((CSTNode)o);
@@ -47,13 +47,17 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ELSE_IF_STMT_666)
+        else if (getProduction() == Production.ELSE_IF_STMT_673)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_7)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -63,9 +67,11 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_7)
             return (Token)getChild(1);
         else
             return null;
@@ -75,13 +81,13 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
             return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_666)
+        else if (getProduction() == Production.ELSE_IF_STMT_673)
             return (Token)getChild(3);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
             return (Token)getChild(3);
         else
             return null;
@@ -91,13 +97,13 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
             return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.ELSE_IF_STMT_666)
+        else if (getProduction() == Production.ELSE_IF_STMT_673)
             return (ASTExprNode)getChild(4);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
             return (ASTExprNode)getChild(4);
         else
             return null;
@@ -107,13 +113,13 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (Token)getChild(4);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
             return (Token)getChild(4);
-        else if (getProduction() == Production.ELSE_IF_STMT_666)
+        else if (getProduction() == Production.ELSE_IF_STMT_673)
             return (Token)getChild(5);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
             return (Token)getChild(5);
         else
             return null;
@@ -123,13 +129,13 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (Token)getChild(5);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
             return (Token)getChild(5);
-        else if (getProduction() == Production.ELSE_IF_STMT_666)
+        else if (getProduction() == Production.ELSE_IF_STMT_673)
             return (Token)getChild(6);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
             return (Token)getChild(6);
         else
             return null;
@@ -139,13 +145,13 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_664)
+        if (getProduction() == Production.ELSE_IF_STMT_671)
             return (Token)getChild(6);
-        else if (getProduction() == Production.ELSE_IF_STMT_665)
+        else if (getProduction() == Production.ELSE_IF_STMT_672)
             return (Token)getChild(7);
-        else if (getProduction() == Production.ELSE_IF_STMT_666)
+        else if (getProduction() == Production.ELSE_IF_STMT_673)
             return (Token)getChild(7);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
             return (Token)getChild(8);
         else
             return null;
@@ -155,9 +161,9 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_665)
+        if (getProduction() == Production.ELSE_IF_STMT_672)
             return (ASTEndNameNode)getChild(6);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
             return (ASTEndNameNode)getChild(7);
         else
             return null;
@@ -167,9 +173,11 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_666)
+        if (getProduction() == Production.ELSE_IF_STMT_673)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8)
             return (Token)getChild(1);
         else
             return null;
@@ -179,9 +187,11 @@ public class ASTElseIfStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_666)
+        if (getProduction() == Production.ELSE_IF_STMT_673)
             return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_667)
+        else if (getProduction() == Production.ELSE_IF_STMT_674)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8)
             return (Token)getChild(2);
         else
             return null;

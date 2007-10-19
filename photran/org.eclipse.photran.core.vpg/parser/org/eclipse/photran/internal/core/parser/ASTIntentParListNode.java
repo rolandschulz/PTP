@@ -99,9 +99,9 @@ public class ASTIntentParListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTIntentParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTENT_PAR_LIST_316)
+        if (node.getProduction() == Production.INTENT_PAR_LIST_318)
             return (ASTIntentParNode)node.getChild(0);
-        else if (node.getProduction() == Production.INTENT_PAR_LIST_317)
+        else if (node.getProduction() == Production.INTENT_PAR_LIST_319)
             return (ASTIntentParNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTIntentParListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTENT_PAR_LIST_317)
+        if (getProduction() == Production.INTENT_PAR_LIST_319)
             return (ASTIntentParListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTIntentParListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTIntentParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTENT_PAR_LIST_317)
+        if (node.getProduction() == Production.INTENT_PAR_LIST_319)
             return (Token)node.getChild(1);
         else
             return null;

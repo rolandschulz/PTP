@@ -47,7 +47,7 @@ public class ASTFormatsepNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATSEP_886)
+        if (getProduction() == Production.FORMATSEP_893)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTFormatsepNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATSEP_887)
+        if (getProduction() == Production.FORMATSEP_894)
             return (Token)getChild(0);
         else
             return null;

@@ -47,7 +47,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_587)
+        if (getProduction() == Production.SFPRIMARY_589)
             return (ASTArrayConstructorNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_588)
+        if (getProduction() == Production.SFPRIMARY_590)
             return (Token)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_589)
+        if (getProduction() == Production.SFPRIMARY_591)
             return (ASTSFVarNameNode)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_590)
+        if (getProduction() == Production.SFPRIMARY_592)
             return (ASTSFDataRefNode)getChild(0);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_591)
+        if (getProduction() == Production.SFPRIMARY_593)
             return (ASTFunctionReferenceNode)getChild(0);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_592)
+        if (getProduction() == Production.SFPRIMARY_594)
             return (Token)getChild(0);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_592)
+        if (getProduction() == Production.SFPRIMARY_594)
             return (ASTExprNode)getChild(1);
         else
             return null;
@@ -117,7 +117,7 @@ public class ASTSFPrimaryNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFPRIMARY_592)
+        if (getProduction() == Production.SFPRIMARY_594)
             return (Token)getChild(2);
         else
             return null;

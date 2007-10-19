@@ -47,7 +47,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_840)
+        if (getProduction() == Production.INQUIRE_SPEC_847)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_840)
+        if (getProduction() == Production.INQUIRE_SPEC_847)
             return (ASTUnitIdentifierNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_841)
+        if (getProduction() == Production.INQUIRE_SPEC_848)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_841)
+        if (getProduction() == Production.INQUIRE_SPEC_848)
             return (ASTCExprNode)getChild(1);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_842)
+        if (getProduction() == Production.INQUIRE_SPEC_849)
             return (Token)getChild(0);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_842)
+        if (getProduction() == Production.INQUIRE_SPEC_849)
             return (ASTLblRefNode)getChild(1);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_843)
+        if (getProduction() == Production.INQUIRE_SPEC_850)
             return (Token)getChild(0);
         else
             return null;
@@ -117,21 +117,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_843)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_844)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_845)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_846)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_847)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_848)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_849)
-            return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_850)
+        if (getProduction() == Production.INQUIRE_SPEC_850)
             return (ASTScalarVariableNode)getChild(1);
         else if (getProduction() == Production.INQUIRE_SPEC_851)
             return (ASTScalarVariableNode)getChild(1);
@@ -140,6 +126,8 @@ public class ASTInquireSpecNode extends InteriorNode
         else if (getProduction() == Production.INQUIRE_SPEC_853)
             return (ASTScalarVariableNode)getChild(1);
         else if (getProduction() == Production.INQUIRE_SPEC_854)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_855)
             return (ASTScalarVariableNode)getChild(1);
         else if (getProduction() == Production.INQUIRE_SPEC_856)
             return (ASTScalarVariableNode)getChild(1);
@@ -153,11 +141,23 @@ public class ASTInquireSpecNode extends InteriorNode
             return (ASTScalarVariableNode)getChild(1);
         else if (getProduction() == Production.INQUIRE_SPEC_861)
             return (ASTScalarVariableNode)getChild(1);
-        else if (getProduction() == Production.INQUIRE_SPEC_862)
-            return (ASTScalarVariableNode)getChild(1);
         else if (getProduction() == Production.INQUIRE_SPEC_863)
             return (ASTScalarVariableNode)getChild(1);
         else if (getProduction() == Production.INQUIRE_SPEC_864)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_865)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_866)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_867)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_868)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_869)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_870)
+            return (ASTScalarVariableNode)getChild(1);
+        else if (getProduction() == Production.INQUIRE_SPEC_871)
             return (ASTScalarVariableNode)getChild(1);
         else
             return null;
@@ -167,7 +167,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_844)
+        if (getProduction() == Production.INQUIRE_SPEC_851)
             return (Token)getChild(0);
         else
             return null;
@@ -177,7 +177,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_845)
+        if (getProduction() == Production.INQUIRE_SPEC_852)
             return (Token)getChild(0);
         else
             return null;
@@ -187,7 +187,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_846)
+        if (getProduction() == Production.INQUIRE_SPEC_853)
             return (Token)getChild(0);
         else
             return null;
@@ -197,7 +197,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_847)
+        if (getProduction() == Production.INQUIRE_SPEC_854)
             return (Token)getChild(0);
         else
             return null;
@@ -207,7 +207,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_848)
+        if (getProduction() == Production.INQUIRE_SPEC_855)
             return (Token)getChild(0);
         else
             return null;
@@ -217,7 +217,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_849)
+        if (getProduction() == Production.INQUIRE_SPEC_856)
             return (Token)getChild(0);
         else
             return null;
@@ -227,7 +227,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_850)
+        if (getProduction() == Production.INQUIRE_SPEC_857)
             return (Token)getChild(0);
         else
             return null;
@@ -237,7 +237,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_851)
+        if (getProduction() == Production.INQUIRE_SPEC_858)
             return (Token)getChild(0);
         else
             return null;
@@ -247,7 +247,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_852)
+        if (getProduction() == Production.INQUIRE_SPEC_859)
             return (Token)getChild(0);
         else
             return null;
@@ -257,7 +257,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_853)
+        if (getProduction() == Production.INQUIRE_SPEC_860)
             return (Token)getChild(0);
         else
             return null;
@@ -267,7 +267,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_854)
+        if (getProduction() == Production.INQUIRE_SPEC_861)
             return (Token)getChild(0);
         else
             return null;
@@ -277,7 +277,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_855)
+        if (getProduction() == Production.INQUIRE_SPEC_862)
             return (Token)getChild(0);
         else
             return null;
@@ -287,7 +287,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_855)
+        if (getProduction() == Production.INQUIRE_SPEC_862)
             return (ASTExprNode)getChild(1);
         else
             return null;
@@ -297,7 +297,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_856)
+        if (getProduction() == Production.INQUIRE_SPEC_863)
             return (Token)getChild(0);
         else
             return null;
@@ -307,7 +307,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_857)
+        if (getProduction() == Production.INQUIRE_SPEC_864)
             return (Token)getChild(0);
         else
             return null;
@@ -317,7 +317,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_858)
+        if (getProduction() == Production.INQUIRE_SPEC_865)
             return (Token)getChild(0);
         else
             return null;
@@ -327,7 +327,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_859)
+        if (getProduction() == Production.INQUIRE_SPEC_866)
             return (Token)getChild(0);
         else
             return null;
@@ -337,7 +337,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_860)
+        if (getProduction() == Production.INQUIRE_SPEC_867)
             return (Token)getChild(0);
         else
             return null;
@@ -347,7 +347,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_861)
+        if (getProduction() == Production.INQUIRE_SPEC_868)
             return (Token)getChild(0);
         else
             return null;
@@ -357,7 +357,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_862)
+        if (getProduction() == Production.INQUIRE_SPEC_869)
             return (Token)getChild(0);
         else
             return null;
@@ -367,7 +367,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_863)
+        if (getProduction() == Production.INQUIRE_SPEC_870)
             return (Token)getChild(0);
         else
             return null;
@@ -377,7 +377,7 @@ public class ASTInquireSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_864)
+        if (getProduction() == Production.INQUIRE_SPEC_871)
             return (Token)getChild(0);
         else
             return null;

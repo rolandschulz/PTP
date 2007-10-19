@@ -47,7 +47,7 @@ public class ASTFieldSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_437)
+        if (getProduction() == Production.FIELD_SELECTOR_439)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTFieldSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_437)
+        if (getProduction() == Production.FIELD_SELECTOR_439)
             return (ASTSectionSubscriptListNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTFieldSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_437)
+        if (getProduction() == Production.FIELD_SELECTOR_439)
             return (Token)getChild(2);
         else
             return null;
@@ -77,9 +77,9 @@ public class ASTFieldSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_437)
+        if (getProduction() == Production.FIELD_SELECTOR_439)
             return (Token)getChild(3);
-        else if (getProduction() == Production.FIELD_SELECTOR_438)
+        else if (getProduction() == Production.FIELD_SELECTOR_440)
             return (Token)getChild(0);
         else
             return null;
@@ -89,9 +89,9 @@ public class ASTFieldSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_437)
+        if (getProduction() == Production.FIELD_SELECTOR_439)
             return (ASTNameNode)getChild(4);
-        else if (getProduction() == Production.FIELD_SELECTOR_438)
+        else if (getProduction() == Production.FIELD_SELECTOR_440)
             return (ASTNameNode)getChild(1);
         else
             return null;

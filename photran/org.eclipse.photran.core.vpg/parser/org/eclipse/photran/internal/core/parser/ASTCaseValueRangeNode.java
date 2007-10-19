@@ -47,13 +47,13 @@ public class ASTCaseValueRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_VALUE_RANGE_696)
+        if (getProduction() == Production.CASE_VALUE_RANGE_703)
             return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_697)
+        else if (getProduction() == Production.CASE_VALUE_RANGE_704)
             return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_698)
+        else if (getProduction() == Production.CASE_VALUE_RANGE_705)
             return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_699)
+        else if (getProduction() == Production.CASE_VALUE_RANGE_706)
             return (ASTExprNode)getChild(0);
         else
             return null;
@@ -63,11 +63,11 @@ public class ASTCaseValueRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_VALUE_RANGE_697)
+        if (getProduction() == Production.CASE_VALUE_RANGE_704)
             return (Token)getChild(1);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_698)
+        else if (getProduction() == Production.CASE_VALUE_RANGE_705)
             return (Token)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_699)
+        else if (getProduction() == Production.CASE_VALUE_RANGE_706)
             return (Token)getChild(1);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTCaseValueRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_VALUE_RANGE_699)
+        if (getProduction() == Production.CASE_VALUE_RANGE_706)
             return (ASTExprNode)getChild(2);
         else
             return null;

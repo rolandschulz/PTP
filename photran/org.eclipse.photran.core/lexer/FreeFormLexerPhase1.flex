@@ -30,7 +30,6 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.photran.internal.core.parser.Parser.Terminal;
 import org.eclipse.core.resources.IFile;
 
 %%
@@ -44,12 +43,12 @@ import org.eclipse.core.resources.IFile;
 %unicode
 %implements ILexer
 %ignorecase
-%type Token
+%type IToken
 %{
 	private StringBuffer whiteBeforeSB = new StringBuffer();
 	protected IFile lastTokenFile = null;
 	protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
-	private Token lastToken = null;
+	private IToken lastToken = null;
 	private StringBuffer whiteAfterSB = new StringBuffer();
 	
 	private void storeNonTreeToken()
@@ -57,7 +56,7 @@ import org.eclipse.core.resources.IFile;
 		whiteBeforeSB.append(yytext());
 	}
 	
-	private Token token(Terminal terminal)
+	private IToken token(Terminal terminal)
 	{
 		if (terminal == Terminal.END_OF_INPUT && lastToken != null)
 		{
@@ -232,7 +231,7 @@ CppError="#error"[^\r\n]*{LineTerminator}
 CppPragma="#pragma"[^\r\n]*{LineTerminator}
 CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppEndIf}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
 
-FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
+FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 
 %state IMPLICIT
 %state QUOTED
@@ -487,4 +486,5 @@ FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
 }
 
 /* Error */
-.								{ throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): Unexpected character " + yytext()); }
+/*.								{ throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): Unexpected character " + yytext()); }*/
+.								{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_UNEXPECTED_CHARACTER); }

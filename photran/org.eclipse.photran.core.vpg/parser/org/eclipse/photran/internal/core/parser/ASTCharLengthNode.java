@@ -47,7 +47,7 @@ public class ASTCharLengthNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LENGTH_282)
+        if (getProduction() == Production.CHAR_LENGTH_284)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCharLengthNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LENGTH_282)
+        if (getProduction() == Production.CHAR_LENGTH_284)
             return (ASTCharLenParamValueNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTCharLengthNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LENGTH_282)
+        if (getProduction() == Production.CHAR_LENGTH_284)
             return (Token)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTCharLengthNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LENGTH_283)
+        if (getProduction() == Production.CHAR_LENGTH_285)
             return (Token)getChild(0);
         else
             return null;

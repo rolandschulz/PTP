@@ -47,9 +47,9 @@ public class ASTFunctionReferenceNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_958)
+        if (getProduction() == Production.FUNCTION_REFERENCE_965)
             return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_959)
+        else if (getProduction() == Production.FUNCTION_REFERENCE_966)
             return (ASTNameNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTFunctionReferenceNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_958)
+        if (getProduction() == Production.FUNCTION_REFERENCE_965)
             return (Token)getChild(1);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_959)
+        else if (getProduction() == Production.FUNCTION_REFERENCE_966)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTFunctionReferenceNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_958)
+        if (getProduction() == Production.FUNCTION_REFERENCE_965)
             return (Token)getChild(2);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_959)
+        else if (getProduction() == Production.FUNCTION_REFERENCE_966)
             return (Token)getChild(3);
         else
             return null;
@@ -83,7 +83,7 @@ public class ASTFunctionReferenceNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_959)
+        if (getProduction() == Production.FUNCTION_REFERENCE_966)
             return (ASTFunctionArgListNode)getChild(2);
         else
             return null;

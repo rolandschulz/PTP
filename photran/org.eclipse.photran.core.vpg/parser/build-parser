@@ -15,6 +15,7 @@ java -Xmx256M -jar $SRCDIR/ludwig.jar \
 	-package "org.eclipse.photran.internal.core.parser" \
 	-imports "import org.eclipse.photran.internal.core.lexer.*; \
                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;" \
+	-onError "throw new Exception(\"Syntax error: Unexpected \" + lookahead.getTerminal().toString() + \" (\" + (lookahead.getFile()==null ? \"\" : lookahead.getFile().getName() + \", \") + \"line \" + lookahead.getLine() + \", column \" + lookahead.getCol() + \")\");" \
 	-lexerClass IAccumulatingLexer \
 	-parserClass Parser \
 	-tokenClass Token \

@@ -47,7 +47,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_881)
+        if (getProduction() == Production.EDIT_ELEMENT_888)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_882)
+        if (getProduction() == Production.EDIT_ELEMENT_889)
             return (Token)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_883)
+        if (getProduction() == Production.EDIT_ELEMENT_890)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_884)
+        if (getProduction() == Production.EDIT_ELEMENT_891)
             return (Token)getChild(0);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_884)
+        if (getProduction() == Production.EDIT_ELEMENT_891)
             return (ASTFmtSpecNode)getChild(1);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_884)
+        if (getProduction() == Production.EDIT_ELEMENT_891)
             return (Token)getChild(2);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTEditElementNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_885)
+        if (getProduction() == Production.EDIT_ELEMENT_892)
             return (Token)getChild(0);
         else
             return null;

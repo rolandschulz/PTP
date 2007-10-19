@@ -99,9 +99,9 @@ public class ASTAllocateObjectListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAllocateObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ALLOCATE_OBJECT_LIST_461)
+        if (node.getProduction() == Production.ALLOCATE_OBJECT_LIST_463)
             return (ASTAllocateObjectNode)node.getChild(0);
-        else if (node.getProduction() == Production.ALLOCATE_OBJECT_LIST_462)
+        else if (node.getProduction() == Production.ALLOCATE_OBJECT_LIST_464)
             return (ASTAllocateObjectNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTAllocateObjectListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATE_OBJECT_LIST_462)
+        if (getProduction() == Production.ALLOCATE_OBJECT_LIST_464)
             return (ASTAllocateObjectListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTAllocateObjectListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAllocateObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ALLOCATE_OBJECT_LIST_462)
+        if (node.getProduction() == Production.ALLOCATE_OBJECT_LIST_464)
             return (Token)node.getChild(1);
         else
             return null;

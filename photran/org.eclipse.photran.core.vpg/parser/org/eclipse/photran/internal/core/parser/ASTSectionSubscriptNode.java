@@ -47,7 +47,7 @@ public class ASTSectionSubscriptNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SECTION_SUBSCRIPT_444)
+        if (getProduction() == Production.SECTION_SUBSCRIPT_446)
             return (ASTExprNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTSectionSubscriptNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SECTION_SUBSCRIPT_445)
+        if (getProduction() == Production.SECTION_SUBSCRIPT_447)
             return (ASTSubscriptTripletNode)getChild(0);
         else
             return null;

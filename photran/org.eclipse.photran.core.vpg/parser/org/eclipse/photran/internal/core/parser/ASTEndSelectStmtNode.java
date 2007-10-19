@@ -47,13 +47,13 @@ public class ASTEndSelectStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SELECT_STMT_688)
+        if (getProduction() == Production.END_SELECT_STMT_695)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SELECT_STMT_689)
+        else if (getProduction() == Production.END_SELECT_STMT_696)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SELECT_STMT_690)
+        else if (getProduction() == Production.END_SELECT_STMT_697)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SELECT_STMT_691)
+        else if (getProduction() == Production.END_SELECT_STMT_698)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -63,9 +63,9 @@ public class ASTEndSelectStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SELECT_STMT_688)
+        if (getProduction() == Production.END_SELECT_STMT_695)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_SELECT_STMT_689)
+        else if (getProduction() == Production.END_SELECT_STMT_696)
             return (Token)getChild(1);
         else
             return null;
@@ -75,13 +75,13 @@ public class ASTEndSelectStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SELECT_STMT_688)
+        if (getProduction() == Production.END_SELECT_STMT_695)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_SELECT_STMT_689)
+        else if (getProduction() == Production.END_SELECT_STMT_696)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_SELECT_STMT_690)
+        else if (getProduction() == Production.END_SELECT_STMT_697)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_SELECT_STMT_691)
+        else if (getProduction() == Production.END_SELECT_STMT_698)
             return (Token)getChild(4);
         else
             return null;
@@ -91,9 +91,9 @@ public class ASTEndSelectStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SELECT_STMT_689)
+        if (getProduction() == Production.END_SELECT_STMT_696)
             return (ASTEndNameNode)getChild(2);
-        else if (getProduction() == Production.END_SELECT_STMT_691)
+        else if (getProduction() == Production.END_SELECT_STMT_698)
             return (ASTEndNameNode)getChild(3);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTEndSelectStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SELECT_STMT_690)
+        if (getProduction() == Production.END_SELECT_STMT_697)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_SELECT_STMT_691)
+        else if (getProduction() == Production.END_SELECT_STMT_698)
             return (Token)getChild(1);
         else
             return null;
@@ -115,9 +115,9 @@ public class ASTEndSelectStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SELECT_STMT_690)
+        if (getProduction() == Production.END_SELECT_STMT_697)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_SELECT_STMT_691)
+        else if (getProduction() == Production.END_SELECT_STMT_698)
             return (Token)getChild(2);
         else
             return null;

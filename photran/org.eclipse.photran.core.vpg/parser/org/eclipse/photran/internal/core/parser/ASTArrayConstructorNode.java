@@ -47,7 +47,7 @@ public class ASTArrayConstructorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_CONSTRUCTOR_217)
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_219)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTArrayConstructorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_CONSTRUCTOR_217)
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_219)
             return (ASTAcValueListNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTArrayConstructorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_CONSTRUCTOR_217)
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_219)
             return (Token)getChild(2);
         else
             return null;

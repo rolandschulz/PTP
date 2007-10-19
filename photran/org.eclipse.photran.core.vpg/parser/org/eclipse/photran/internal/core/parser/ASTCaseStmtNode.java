@@ -15,11 +15,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCaseStmtNode extends InteriorNode
+public class ASTCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTCaseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
-         super(production);
+         super(production, discardedSymbols);
          
          for (Object o : childNodes)
              addChild((CSTNode)o);
@@ -47,9 +47,11 @@ public class ASTCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_686)
+        if (getProduction() == Production.CASE_STMT_693)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.CASE_STMT_687)
+        else if (getProduction() == Production.CASE_STMT_694)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.CASE_STMT_ERROR_15)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +61,11 @@ public class ASTCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_686)
+        if (getProduction() == Production.CASE_STMT_693)
             return (Token)getChild(1);
-        else if (getProduction() == Production.CASE_STMT_687)
+        else if (getProduction() == Production.CASE_STMT_694)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.CASE_STMT_ERROR_15)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +75,9 @@ public class ASTCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_686)
+        if (getProduction() == Production.CASE_STMT_693)
             return (ASTCaseSelectorNode)getChild(2);
-        else if (getProduction() == Production.CASE_STMT_687)
+        else if (getProduction() == Production.CASE_STMT_694)
             return (ASTCaseSelectorNode)getChild(2);
         else
             return null;
@@ -83,9 +87,9 @@ public class ASTCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_686)
+        if (getProduction() == Production.CASE_STMT_693)
             return (Token)getChild(3);
-        else if (getProduction() == Production.CASE_STMT_687)
+        else if (getProduction() == Production.CASE_STMT_694)
             return (Token)getChild(4);
         else
             return null;
@@ -95,7 +99,7 @@ public class ASTCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_687)
+        if (getProduction() == Production.CASE_STMT_694)
             return (ASTNameNode)getChild(3);
         else
             return null;

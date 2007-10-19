@@ -47,7 +47,7 @@ public class ASTCloseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_STMT_756)
+        if (getProduction() == Production.CLOSE_STMT_763)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCloseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_STMT_756)
+        if (getProduction() == Production.CLOSE_STMT_763)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTCloseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_STMT_756)
+        if (getProduction() == Production.CLOSE_STMT_763)
             return (Token)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTCloseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_STMT_756)
+        if (getProduction() == Production.CLOSE_STMT_763)
             return (ASTCloseSpecListNode)getChild(3);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTCloseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_STMT_756)
+        if (getProduction() == Production.CLOSE_STMT_763)
             return (Token)getChild(4);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTCloseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_STMT_756)
+        if (getProduction() == Production.CLOSE_STMT_763)
             return (Token)getChild(5);
         else
             return null;

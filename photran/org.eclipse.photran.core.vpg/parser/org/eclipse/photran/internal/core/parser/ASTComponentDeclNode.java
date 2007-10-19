@@ -47,11 +47,7 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
-            return (ASTComponentNameNode)getChild(0);
-        else if (getProduction() == Production.COMPONENT_DECL_201)
-            return (ASTComponentNameNode)getChild(0);
-        else if (getProduction() == Production.COMPONENT_DECL_202)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (ASTComponentNameNode)getChild(0);
         else if (getProduction() == Production.COMPONENT_DECL_203)
             return (ASTComponentNameNode)getChild(0);
@@ -63,6 +59,10 @@ public class ASTComponentDeclNode extends InteriorNode
             return (ASTComponentNameNode)getChild(0);
         else if (getProduction() == Production.COMPONENT_DECL_207)
             return (ASTComponentNameNode)getChild(0);
+        else if (getProduction() == Production.COMPONENT_DECL_208)
+            return (ASTComponentNameNode)getChild(0);
+        else if (getProduction() == Production.COMPONENT_DECL_209)
+            return (ASTComponentNameNode)getChild(0);
         else
             return null;
     }
@@ -71,13 +71,13 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_201)
+        else if (getProduction() == Production.COMPONENT_DECL_203)
             return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_204)
+        else if (getProduction() == Production.COMPONENT_DECL_206)
             return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_205)
+        else if (getProduction() == Production.COMPONENT_DECL_207)
             return (Token)getChild(1);
         else
             return null;
@@ -87,13 +87,13 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (ASTComponentArraySpecNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_201)
+        else if (getProduction() == Production.COMPONENT_DECL_203)
             return (ASTComponentArraySpecNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_204)
+        else if (getProduction() == Production.COMPONENT_DECL_206)
             return (ASTComponentArraySpecNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_205)
+        else if (getProduction() == Production.COMPONENT_DECL_207)
             return (ASTComponentArraySpecNode)getChild(2);
         else
             return null;
@@ -103,13 +103,13 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (Token)getChild(3);
-        else if (getProduction() == Production.COMPONENT_DECL_201)
+        else if (getProduction() == Production.COMPONENT_DECL_203)
             return (Token)getChild(3);
-        else if (getProduction() == Production.COMPONENT_DECL_204)
+        else if (getProduction() == Production.COMPONENT_DECL_206)
             return (Token)getChild(3);
-        else if (getProduction() == Production.COMPONENT_DECL_205)
+        else if (getProduction() == Production.COMPONENT_DECL_207)
             return (Token)getChild(3);
         else
             return null;
@@ -119,13 +119,13 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (Token)getChild(4);
-        else if (getProduction() == Production.COMPONENT_DECL_202)
-            return (Token)getChild(1);
         else if (getProduction() == Production.COMPONENT_DECL_204)
-            return (Token)getChild(4);
+            return (Token)getChild(1);
         else if (getProduction() == Production.COMPONENT_DECL_206)
+            return (Token)getChild(4);
+        else if (getProduction() == Production.COMPONENT_DECL_208)
             return (Token)getChild(1);
         else
             return null;
@@ -135,13 +135,13 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (ASTCharLengthNode)getChild(5);
-        else if (getProduction() == Production.COMPONENT_DECL_202)
-            return (ASTCharLengthNode)getChild(2);
         else if (getProduction() == Production.COMPONENT_DECL_204)
-            return (ASTCharLengthNode)getChild(5);
+            return (ASTCharLengthNode)getChild(2);
         else if (getProduction() == Production.COMPONENT_DECL_206)
+            return (ASTCharLengthNode)getChild(5);
+        else if (getProduction() == Production.COMPONENT_DECL_208)
             return (ASTCharLengthNode)getChild(2);
         else
             return null;
@@ -151,13 +151,13 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_200)
+        if (getProduction() == Production.COMPONENT_DECL_202)
             return (ASTComponentInitializationNode)getChild(6);
-        else if (getProduction() == Production.COMPONENT_DECL_201)
-            return (ASTComponentInitializationNode)getChild(4);
-        else if (getProduction() == Production.COMPONENT_DECL_202)
-            return (ASTComponentInitializationNode)getChild(3);
         else if (getProduction() == Production.COMPONENT_DECL_203)
+            return (ASTComponentInitializationNode)getChild(4);
+        else if (getProduction() == Production.COMPONENT_DECL_204)
+            return (ASTComponentInitializationNode)getChild(3);
+        else if (getProduction() == Production.COMPONENT_DECL_205)
             return (ASTComponentInitializationNode)getChild(1);
         else
             return null;

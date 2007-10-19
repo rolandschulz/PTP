@@ -47,7 +47,7 @@ public class ASTFunctionParNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PAR_981)
+        if (getProduction() == Production.FUNCTION_PAR_988)
             return (ASTDummyArgNameNode)getChild(0);
         else
             return null;

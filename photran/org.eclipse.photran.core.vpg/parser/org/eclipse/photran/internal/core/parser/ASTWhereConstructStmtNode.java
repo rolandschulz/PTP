@@ -47,9 +47,9 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (ASTNameNode)getChild(1);
         else
             return null;
@@ -69,7 +69,7 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (Token)getChild(2);
         else
             return null;
@@ -79,9 +79,9 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (Token)getChild(3);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
             return (Token)getChild(1);
         else
             return null;
@@ -91,9 +91,9 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (Token)getChild(4);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
             return (Token)getChild(2);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (ASTMaskExprNode)getChild(5);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
             return (ASTMaskExprNode)getChild(3);
         else
             return null;
@@ -115,9 +115,9 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (Token)getChild(6);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
             return (Token)getChild(4);
         else
             return null;
@@ -127,9 +127,9 @@ public class ASTWhereConstructStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_612)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
             return (Token)getChild(7);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
             return (Token)getChild(5);
         else
             return null;

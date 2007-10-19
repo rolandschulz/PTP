@@ -47,7 +47,7 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_275)
+        if (getProduction() == Production.CHAR_SELECTOR_277)
             return (ASTLengthSelectorNode)getChild(0);
         else
             return null;
@@ -57,15 +57,15 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.CHAR_SELECTOR_278)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (Token)getChild(0);
         else if (getProduction() == Production.CHAR_SELECTOR_279)
             return (Token)getChild(0);
         else if (getProduction() == Production.CHAR_SELECTOR_280)
+            return (Token)getChild(0);
+        else if (getProduction() == Production.CHAR_SELECTOR_281)
+            return (Token)getChild(0);
+        else if (getProduction() == Production.CHAR_SELECTOR_282)
             return (Token)getChild(0);
         else
             return null;
@@ -75,11 +75,11 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (Token)getChild(1);
         else if (getProduction() == Production.CHAR_SELECTOR_279)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.CHAR_SELECTOR_281)
             return (Token)getChild(1);
         else
             return null;
@@ -89,13 +89,13 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
-            return (ASTCharLenParamValueNode)getChild(2);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (ASTCharLenParamValueNode)getChild(2);
         else if (getProduction() == Production.CHAR_SELECTOR_279)
             return (ASTCharLenParamValueNode)getChild(2);
-        else if (getProduction() == Production.CHAR_SELECTOR_280)
+        else if (getProduction() == Production.CHAR_SELECTOR_281)
+            return (ASTCharLenParamValueNode)getChild(2);
+        else if (getProduction() == Production.CHAR_SELECTOR_282)
             return (ASTCharLenParamValueNode)getChild(1);
         else
             return null;
@@ -105,9 +105,9 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (Token)getChild(3);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
+        else if (getProduction() == Production.CHAR_SELECTOR_279)
             return (Token)getChild(3);
         else
             return null;
@@ -117,9 +117,9 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (Token)getChild(4);
-        else if (getProduction() == Production.CHAR_SELECTOR_278)
+        else if (getProduction() == Production.CHAR_SELECTOR_280)
             return (Token)getChild(1);
         else
             return null;
@@ -129,11 +129,11 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (ASTExprNode)getChild(5);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
+        else if (getProduction() == Production.CHAR_SELECTOR_279)
             return (ASTExprNode)getChild(4);
-        else if (getProduction() == Production.CHAR_SELECTOR_278)
+        else if (getProduction() == Production.CHAR_SELECTOR_280)
             return (ASTExprNode)getChild(2);
         else
             return null;
@@ -143,15 +143,15 @@ public class ASTCharSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_276)
+        if (getProduction() == Production.CHAR_SELECTOR_278)
             return (Token)getChild(6);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (Token)getChild(3);
         else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (Token)getChild(3);
+            return (Token)getChild(5);
         else if (getProduction() == Production.CHAR_SELECTOR_280)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.CHAR_SELECTOR_281)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.CHAR_SELECTOR_282)
             return (Token)getChild(2);
         else
             return null;

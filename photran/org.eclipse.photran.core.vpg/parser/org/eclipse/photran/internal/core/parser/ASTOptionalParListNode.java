@@ -99,9 +99,9 @@ public class ASTOptionalParListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOptionalParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_321)
+        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_323)
             return (ASTOptionalParNode)node.getChild(0);
-        else if (node.getProduction() == Production.OPTIONAL_PAR_LIST_322)
+        else if (node.getProduction() == Production.OPTIONAL_PAR_LIST_324)
             return (ASTOptionalParNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTOptionalParListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.OPTIONAL_PAR_LIST_322)
+        if (getProduction() == Production.OPTIONAL_PAR_LIST_324)
             return (ASTOptionalParListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTOptionalParListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOptionalParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_322)
+        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_324)
             return (Token)node.getChild(1);
         else
             return null;

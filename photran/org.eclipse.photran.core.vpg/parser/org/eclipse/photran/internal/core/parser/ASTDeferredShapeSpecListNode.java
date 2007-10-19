@@ -99,9 +99,9 @@ public class ASTDeferredShapeSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDeferredShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_307)
+        if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_309)
             return (ASTDeferredShapeSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_308)
+        else if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_310)
             return (ASTDeferredShapeSpecNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTDeferredShapeSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_308)
+        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_310)
             return (ASTDeferredShapeSpecListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTDeferredShapeSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDeferredShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_308)
+        if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_310)
             return (Token)node.getChild(1);
         else
             return null;

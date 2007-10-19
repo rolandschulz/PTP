@@ -47,13 +47,13 @@ public class ASTAssumedSizeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310)
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
             return (Token)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
-            return (Token)getChild(2);
         else if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_314)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
             return (Token)getChild(4);
         else
             return null;
@@ -63,9 +63,9 @@ public class ASTAssumedSizeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
             return (ASTLowerBoundNode)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
             return (ASTLowerBoundNode)getChild(2);
         else
             return null;
@@ -75,9 +75,9 @@ public class ASTAssumedSizeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
             return (Token)getChild(3);
         else
             return null;
@@ -87,9 +87,9 @@ public class ASTAssumedSizeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_314)
             return (ASTExplicitShapeSpecListNode)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
             return (ASTExplicitShapeSpecListNode)getChild(0);
         else
             return null;
@@ -99,9 +99,9 @@ public class ASTAssumedSizeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_314)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
             return (Token)getChild(1);
         else
             return null;

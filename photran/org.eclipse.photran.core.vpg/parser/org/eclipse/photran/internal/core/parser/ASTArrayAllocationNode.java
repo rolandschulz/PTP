@@ -47,9 +47,9 @@ public class ASTArrayAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_348)
+        if (getProduction() == Production.ARRAY_ALLOCATION_350)
             return (ASTArrayNameNode)getChild(0);
-        else if (getProduction() == Production.ARRAY_ALLOCATION_349)
+        else if (getProduction() == Production.ARRAY_ALLOCATION_351)
             return (ASTArrayNameNode)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTArrayAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_349)
+        if (getProduction() == Production.ARRAY_ALLOCATION_351)
             return (Token)getChild(1);
         else
             return null;
@@ -69,7 +69,7 @@ public class ASTArrayAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_349)
+        if (getProduction() == Production.ARRAY_ALLOCATION_351)
             return (ASTDeferredShapeSpecListNode)getChild(2);
         else
             return null;
@@ -79,7 +79,7 @@ public class ASTArrayAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_349)
+        if (getProduction() == Production.ARRAY_ALLOCATION_351)
             return (Token)getChild(3);
         else
             return null;

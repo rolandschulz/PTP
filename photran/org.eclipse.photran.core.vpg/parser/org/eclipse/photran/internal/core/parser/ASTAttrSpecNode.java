@@ -47,7 +47,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_247)
+        if (getProduction() == Production.ATTR_SPEC_249)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_248)
+        if (getProduction() == Production.ATTR_SPEC_250)
             return (ASTAccessSpecNode)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_249)
+        if (getProduction() == Production.ATTR_SPEC_251)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_250)
+        if (getProduction() == Production.ATTR_SPEC_252)
             return (Token)getChild(0);
         else
             return null;
@@ -87,9 +87,9 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_250)
+        if (getProduction() == Production.ATTR_SPEC_252)
             return (Token)getChild(1);
-        else if (getProduction() == Production.ATTR_SPEC_252)
+        else if (getProduction() == Production.ATTR_SPEC_254)
             return (Token)getChild(1);
         else
             return null;
@@ -99,7 +99,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_250)
+        if (getProduction() == Production.ATTR_SPEC_252)
             return (ASTArraySpecNode)getChild(2);
         else
             return null;
@@ -109,9 +109,9 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_250)
+        if (getProduction() == Production.ATTR_SPEC_252)
             return (Token)getChild(3);
-        else if (getProduction() == Production.ATTR_SPEC_252)
+        else if (getProduction() == Production.ATTR_SPEC_254)
             return (Token)getChild(3);
         else
             return null;
@@ -121,7 +121,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_251)
+        if (getProduction() == Production.ATTR_SPEC_253)
             return (Token)getChild(0);
         else
             return null;
@@ -131,7 +131,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_252)
+        if (getProduction() == Production.ATTR_SPEC_254)
             return (Token)getChild(0);
         else
             return null;
@@ -141,7 +141,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_252)
+        if (getProduction() == Production.ATTR_SPEC_254)
             return (ASTIntentSpecNode)getChild(2);
         else
             return null;
@@ -151,7 +151,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_253)
+        if (getProduction() == Production.ATTR_SPEC_255)
             return (Token)getChild(0);
         else
             return null;
@@ -161,7 +161,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_254)
+        if (getProduction() == Production.ATTR_SPEC_256)
             return (Token)getChild(0);
         else
             return null;
@@ -171,7 +171,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_255)
+        if (getProduction() == Production.ATTR_SPEC_257)
             return (Token)getChild(0);
         else
             return null;
@@ -181,7 +181,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_256)
+        if (getProduction() == Production.ATTR_SPEC_258)
             return (Token)getChild(0);
         else
             return null;
@@ -191,7 +191,7 @@ public class ASTAttrSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_257)
+        if (getProduction() == Production.ATTR_SPEC_259)
             return (Token)getChild(0);
         else
             return null;

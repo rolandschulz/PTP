@@ -47,9 +47,9 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_635)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
             return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (ASTNameNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_635)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
             return (Token)getChild(1);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_635)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
             return (ASTSubscriptNode)getChild(2);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (ASTSubscriptNode)getChild(2);
         else
             return null;
@@ -83,9 +83,9 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_635)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
             return (Token)getChild(3);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (Token)getChild(3);
         else
             return null;
@@ -95,9 +95,9 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_635)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
             return (ASTSubscriptNode)getChild(4);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (ASTSubscriptNode)getChild(4);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (Token)getChild(5);
         else
             return null;
@@ -117,7 +117,7 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_636)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
             return (ASTExprNode)getChild(6);
         else
             return null;

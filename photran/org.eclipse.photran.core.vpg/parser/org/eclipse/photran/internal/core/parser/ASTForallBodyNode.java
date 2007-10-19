@@ -47,9 +47,9 @@ public class ASTForallBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_628)
+        if (getProduction() == Production.FORALL_BODY_635)
             return (ASTForallBodyConstructNode)getChild(0);
-        else if (getProduction() == Production.FORALL_BODY_629)
+        else if (getProduction() == Production.FORALL_BODY_636)
             return (ASTForallBodyConstructNode)getChild(1);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTForallBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_BODY_629)
+        if (getProduction() == Production.FORALL_BODY_636)
             return (ASTForallBodyNode)getChild(0);
         else
             return null;

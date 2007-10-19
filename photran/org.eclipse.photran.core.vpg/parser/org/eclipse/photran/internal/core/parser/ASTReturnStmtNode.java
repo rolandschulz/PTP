@@ -47,9 +47,9 @@ public class ASTReturnStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RETURN_STMT_1011)
+        if (getProduction() == Production.RETURN_STMT_1018)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.RETURN_STMT_1012)
+        else if (getProduction() == Production.RETURN_STMT_1019)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTReturnStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RETURN_STMT_1011)
+        if (getProduction() == Production.RETURN_STMT_1018)
             return (Token)getChild(1);
-        else if (getProduction() == Production.RETURN_STMT_1012)
+        else if (getProduction() == Production.RETURN_STMT_1019)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTReturnStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RETURN_STMT_1011)
+        if (getProduction() == Production.RETURN_STMT_1018)
             return (Token)getChild(2);
-        else if (getProduction() == Production.RETURN_STMT_1012)
+        else if (getProduction() == Production.RETURN_STMT_1019)
             return (Token)getChild(3);
         else
             return null;
@@ -83,7 +83,7 @@ public class ASTReturnStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RETURN_STMT_1012)
+        if (getProduction() == Production.RETURN_STMT_1019)
             return (ASTExprNode)getChild(2);
         else
             return null;

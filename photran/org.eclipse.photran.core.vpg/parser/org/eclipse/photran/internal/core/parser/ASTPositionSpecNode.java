@@ -47,7 +47,7 @@ public class ASTPositionSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_832)
+        if (getProduction() == Production.POSITION_SPEC_839)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTPositionSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_832)
+        if (getProduction() == Production.POSITION_SPEC_839)
             return (ASTUnitIdentifierNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTPositionSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_833)
+        if (getProduction() == Production.POSITION_SPEC_840)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTPositionSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_833)
+        if (getProduction() == Production.POSITION_SPEC_840)
             return (ASTLblRefNode)getChild(1);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTPositionSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_834)
+        if (getProduction() == Production.POSITION_SPEC_841)
             return (Token)getChild(0);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTPositionSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_834)
+        if (getProduction() == Production.POSITION_SPEC_841)
             return (ASTScalarVariableNode)getChild(1);
         else
             return null;

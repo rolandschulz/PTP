@@ -99,15 +99,15 @@ public class ASTFmtSpecNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_867)
+        if (node.getProduction() == Production.FMT_SPEC_874)
             return (ASTFormateditNode)node.getChild(0);
-        else if (node.getProduction() == Production.FMT_SPEC_869)
+        else if (node.getProduction() == Production.FMT_SPEC_876)
             return (ASTFormateditNode)node.getChild(1);
-        else if (node.getProduction() == Production.FMT_SPEC_871)
+        else if (node.getProduction() == Production.FMT_SPEC_878)
             return (ASTFormateditNode)node.getChild(2);
-        else if (node.getProduction() == Production.FMT_SPEC_872)
+        else if (node.getProduction() == Production.FMT_SPEC_879)
             return (ASTFormateditNode)node.getChild(2);
-        else if (node.getProduction() == Production.FMT_SPEC_874)
+        else if (node.getProduction() == Production.FMT_SPEC_881)
             return (ASTFormateditNode)node.getChild(3);
         else
             return null;
@@ -118,17 +118,17 @@ public class ASTFmtSpecNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_868)
+        if (node.getProduction() == Production.FMT_SPEC_875)
             return (ASTFormatsepNode)node.getChild(0);
-        else if (node.getProduction() == Production.FMT_SPEC_869)
+        else if (node.getProduction() == Production.FMT_SPEC_876)
             return (ASTFormatsepNode)node.getChild(0);
-        else if (node.getProduction() == Production.FMT_SPEC_870)
+        else if (node.getProduction() == Production.FMT_SPEC_877)
             return (ASTFormatsepNode)node.getChild(1);
-        else if (node.getProduction() == Production.FMT_SPEC_871)
+        else if (node.getProduction() == Production.FMT_SPEC_878)
             return (ASTFormatsepNode)node.getChild(1);
-        else if (node.getProduction() == Production.FMT_SPEC_873)
+        else if (node.getProduction() == Production.FMT_SPEC_880)
             return (ASTFormatsepNode)node.getChild(2);
-        else if (node.getProduction() == Production.FMT_SPEC_874)
+        else if (node.getProduction() == Production.FMT_SPEC_881)
             return (ASTFormatsepNode)node.getChild(2);
         else
             return null;
@@ -138,15 +138,15 @@ public class ASTFmtSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FMT_SPEC_870)
+        if (getProduction() == Production.FMT_SPEC_877)
             return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_871)
+        else if (getProduction() == Production.FMT_SPEC_878)
             return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_872)
+        else if (getProduction() == Production.FMT_SPEC_879)
             return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_873)
+        else if (getProduction() == Production.FMT_SPEC_880)
             return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_874)
+        else if (getProduction() == Production.FMT_SPEC_881)
             return (ASTFmtSpecNode)getChild(0);
         else
             return null;
@@ -157,11 +157,11 @@ public class ASTFmtSpecNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_872)
+        if (node.getProduction() == Production.FMT_SPEC_879)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.FMT_SPEC_873)
+        else if (node.getProduction() == Production.FMT_SPEC_880)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.FMT_SPEC_874)
+        else if (node.getProduction() == Production.FMT_SPEC_881)
             return (Token)node.getChild(1);
         else
             return null;

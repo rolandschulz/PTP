@@ -47,7 +47,7 @@ public class ASTBlockDataNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_NAME_1020)
+        if (getProduction() == Production.BLOCK_DATA_NAME_1027)
             return (Token)getChild(0);
         else
             return null;

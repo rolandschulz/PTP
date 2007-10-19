@@ -47,7 +47,7 @@ public class ASTLblDefNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LBL_DEF_1042)
+        if (getProduction() == Production.LBL_DEF_1049)
             return (ASTLabelNode)getChild(0);
         else
             return null;

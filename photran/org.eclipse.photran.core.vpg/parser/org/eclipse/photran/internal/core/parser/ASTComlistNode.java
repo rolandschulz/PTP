@@ -99,15 +99,15 @@ public class ASTComlistNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTComlistNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.COMLIST_410)
+        if (node.getProduction() == Production.COMLIST_412)
             return (ASTCommonBlockObjectNode)node.getChild(0);
-        else if (node.getProduction() == Production.COMLIST_411)
-            return (ASTCommonBlockObjectNode)node.getChild(1);
-        else if (node.getProduction() == Production.COMLIST_412)
-            return (ASTCommonBlockObjectNode)node.getChild(2);
         else if (node.getProduction() == Production.COMLIST_413)
-            return (ASTCommonBlockObjectNode)node.getChild(2);
+            return (ASTCommonBlockObjectNode)node.getChild(1);
         else if (node.getProduction() == Production.COMLIST_414)
+            return (ASTCommonBlockObjectNode)node.getChild(2);
+        else if (node.getProduction() == Production.COMLIST_415)
+            return (ASTCommonBlockObjectNode)node.getChild(2);
+        else if (node.getProduction() == Production.COMLIST_416)
             return (ASTCommonBlockObjectNode)node.getChild(3);
         else
             return null;
@@ -118,11 +118,11 @@ public class ASTComlistNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTComlistNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.COMLIST_411)
+        if (node.getProduction() == Production.COMLIST_413)
             return (ASTComblockNode)node.getChild(0);
-        else if (node.getProduction() == Production.COMLIST_413)
+        else if (node.getProduction() == Production.COMLIST_415)
             return (ASTComblockNode)node.getChild(1);
-        else if (node.getProduction() == Production.COMLIST_414)
+        else if (node.getProduction() == Production.COMLIST_416)
             return (ASTComblockNode)node.getChild(2);
         else
             return null;
@@ -132,11 +132,11 @@ public class ASTComlistNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMLIST_412)
+        if (getProduction() == Production.COMLIST_414)
             return (ASTComlistNode)getChild(0);
-        else if (getProduction() == Production.COMLIST_413)
+        else if (getProduction() == Production.COMLIST_415)
             return (ASTComlistNode)getChild(0);
-        else if (getProduction() == Production.COMLIST_414)
+        else if (getProduction() == Production.COMLIST_416)
             return (ASTComlistNode)getChild(0);
         else
             return null;
@@ -147,9 +147,9 @@ public class ASTComlistNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTComlistNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.COMLIST_412)
+        if (node.getProduction() == Production.COMLIST_414)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.COMLIST_414)
+        else if (node.getProduction() == Production.COMLIST_416)
             return (Token)node.getChild(1);
         else
             return null;

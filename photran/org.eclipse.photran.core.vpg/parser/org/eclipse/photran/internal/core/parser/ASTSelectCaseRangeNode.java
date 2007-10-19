@@ -47,7 +47,7 @@ public class ASTSelectCaseRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_RANGE_676)
+        if (getProduction() == Production.SELECT_CASE_RANGE_683)
             return (ASTSelectCaseBodyNode)getChild(0);
         else
             return null;
@@ -57,9 +57,9 @@ public class ASTSelectCaseRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_RANGE_676)
+        if (getProduction() == Production.SELECT_CASE_RANGE_683)
             return (ASTEndSelectStmtNode)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_RANGE_677)
+        else if (getProduction() == Production.SELECT_CASE_RANGE_684)
             return (ASTEndSelectStmtNode)getChild(0);
         else
             return null;

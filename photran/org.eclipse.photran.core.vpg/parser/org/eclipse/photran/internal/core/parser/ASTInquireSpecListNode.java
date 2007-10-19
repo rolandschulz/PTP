@@ -99,7 +99,7 @@ public class ASTInquireSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInquireSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_837)
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_844)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
@@ -110,9 +110,9 @@ public class ASTInquireSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInquireSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_838)
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_845)
             return (ASTInquireSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.INQUIRE_SPEC_LIST_839)
+        else if (node.getProduction() == Production.INQUIRE_SPEC_LIST_846)
             return (ASTInquireSpecNode)node.getChild(2);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTInquireSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_LIST_839)
+        if (getProduction() == Production.INQUIRE_SPEC_LIST_846)
             return (ASTInquireSpecListNode)getChild(0);
         else
             return null;
@@ -133,7 +133,7 @@ public class ASTInquireSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInquireSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_839)
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_846)
             return (Token)node.getChild(1);
         else
             return null;

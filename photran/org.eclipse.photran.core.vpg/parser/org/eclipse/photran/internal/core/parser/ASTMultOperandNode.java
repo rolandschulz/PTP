@@ -47,9 +47,9 @@ public class ASTMultOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MULT_OPERAND_521)
+        if (getProduction() == Production.MULT_OPERAND_523)
             return (ASTLevel1ExprNode)getChild(0);
-        else if (getProduction() == Production.MULT_OPERAND_522)
+        else if (getProduction() == Production.MULT_OPERAND_524)
             return (ASTLevel1ExprNode)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTMultOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MULT_OPERAND_522)
+        if (getProduction() == Production.MULT_OPERAND_524)
             return (ASTPowerOpNode)getChild(1);
         else
             return null;
@@ -69,7 +69,7 @@ public class ASTMultOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MULT_OPERAND_522)
+        if (getProduction() == Production.MULT_OPERAND_524)
             return (ASTMultOperandNode)getChild(2);
         else
             return null;

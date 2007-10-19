@@ -47,7 +47,7 @@ public class ASTIntentParNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTENT_PAR_318)
+        if (getProduction() == Production.INTENT_PAR_320)
             return (ASTDummyArgNameNode)getChild(0);
         else
             return null;

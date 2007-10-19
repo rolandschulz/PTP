@@ -47,7 +47,7 @@ public class ASTCommonBlockObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMON_BLOCK_OBJECT_417)
+        if (getProduction() == Production.COMMON_BLOCK_OBJECT_419)
             return (ASTVariableNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCommonBlockObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMON_BLOCK_OBJECT_418)
+        if (getProduction() == Production.COMMON_BLOCK_OBJECT_420)
             return (ASTArrayDeclaratorNode)getChild(0);
         else
             return null;

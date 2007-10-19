@@ -47,7 +47,7 @@ public class ASTMaskedElsewhereConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_CONSTRUCT_606)
+        if (getProduction() == Production.MASKED_ELSEWHERE_CONSTRUCT_609)
             return (ASTMaskedElsewhereStmtNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTMaskedElsewhereConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASKED_ELSEWHERE_CONSTRUCT_606)
+        if (getProduction() == Production.MASKED_ELSEWHERE_CONSTRUCT_609)
             return (ASTWhereRangeNode)getChild(1);
         else
             return null;

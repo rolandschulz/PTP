@@ -47,21 +47,21 @@ public class ASTSubscriptTripletNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_446)
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_448)
             return (Token)getChild(0);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_447)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_448)
-            return (Token)getChild(1);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
-            return (Token)getChild(1);
+            return (Token)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
             return (Token)getChild(1);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
             return (Token)getChild(1);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (Token)getChild(0);
+            return (Token)getChild(1);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
+            return (Token)getChild(0);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_455)
             return (Token)getChild(0);
         else
             return null;
@@ -71,19 +71,19 @@ public class ASTSubscriptTripletNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_447)
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
             return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_448)
-            return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
-            return (ASTExprNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
             return (ASTExprNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
             return (ASTExprNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (ASTExprNode)getChild(1);
+            return (ASTExprNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
+            return (ASTExprNode)getChild(0);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
+            return (ASTExprNode)getChild(1);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_455)
             return (ASTExprNode)getChild(2);
         else
             return null;
@@ -93,13 +93,13 @@ public class ASTSubscriptTripletNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
             return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
-            return (ASTExprNode)getChild(3);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
+            return (ASTExprNode)getChild(2);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
+            return (ASTExprNode)getChild(3);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
             return (ASTExprNode)getChild(3);
         else
             return null;
@@ -109,13 +109,13 @@ public class ASTSubscriptTripletNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
             return (Token)getChild(3);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (Token)getChild(2);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_455)
             return (Token)getChild(1);
         else
             return null;
@@ -125,7 +125,7 @@ public class ASTSubscriptTripletNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
             return (ASTExprNode)getChild(4);
         else
             return null;

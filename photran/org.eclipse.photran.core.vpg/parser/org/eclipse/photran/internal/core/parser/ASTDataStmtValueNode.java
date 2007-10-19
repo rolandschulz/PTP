@@ -47,11 +47,11 @@ public class ASTDataStmtValueNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_VALUE_386)
+        if (getProduction() == Production.DATA_STMT_VALUE_388)
             return (ASTDataStmtConstantNode)getChild(0);
-        else if (getProduction() == Production.DATA_STMT_VALUE_387)
+        else if (getProduction() == Production.DATA_STMT_VALUE_389)
             return (ASTDataStmtConstantNode)getChild(2);
-        else if (getProduction() == Production.DATA_STMT_VALUE_388)
+        else if (getProduction() == Production.DATA_STMT_VALUE_390)
             return (ASTDataStmtConstantNode)getChild(2);
         else
             return null;
@@ -61,7 +61,7 @@ public class ASTDataStmtValueNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_VALUE_387)
+        if (getProduction() == Production.DATA_STMT_VALUE_389)
             return (Token)getChild(0);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTDataStmtValueNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_VALUE_387)
+        if (getProduction() == Production.DATA_STMT_VALUE_389)
             return (Token)getChild(1);
-        else if (getProduction() == Production.DATA_STMT_VALUE_388)
+        else if (getProduction() == Production.DATA_STMT_VALUE_390)
             return (Token)getChild(1);
         else
             return null;
@@ -83,7 +83,7 @@ public class ASTDataStmtValueNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_VALUE_388)
+        if (getProduction() == Production.DATA_STMT_VALUE_390)
             return (ASTNamedConstantUseNode)getChild(0);
         else
             return null;

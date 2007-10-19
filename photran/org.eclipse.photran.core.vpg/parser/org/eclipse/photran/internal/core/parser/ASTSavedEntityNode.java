@@ -47,7 +47,7 @@ public class ASTSavedEntityNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVED_ENTITY_336)
+        if (getProduction() == Production.SAVED_ENTITY_338)
             return (ASTVariableNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTSavedEntityNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVED_ENTITY_337)
+        if (getProduction() == Production.SAVED_ENTITY_339)
             return (ASTSavedCommonBlockNode)getChild(0);
         else
             return null;

@@ -47,11 +47,11 @@ public class ASTUFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFEXPR_533)
+        if (getProduction() == Production.UFEXPR_535)
             return (ASTUFTermNode)getChild(0);
-        else if (getProduction() == Production.UFEXPR_534)
+        else if (getProduction() == Production.UFEXPR_536)
             return (ASTUFTermNode)getChild(1);
-        else if (getProduction() == Production.UFEXPR_535)
+        else if (getProduction() == Production.UFEXPR_537)
             return (ASTUFTermNode)getChild(2);
         else
             return null;
@@ -61,7 +61,7 @@ public class ASTUFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFEXPR_534)
+        if (getProduction() == Production.UFEXPR_536)
             return (ASTSignNode)getChild(0);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTUFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFEXPR_535)
+        if (getProduction() == Production.UFEXPR_537)
             return (ASTUFExprNode)getChild(0);
         else
             return null;
@@ -81,7 +81,7 @@ public class ASTUFExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UFEXPR_535)
+        if (getProduction() == Production.UFEXPR_537)
             return (ASTAddOpNode)getChild(1);
         else
             return null;

@@ -47,7 +47,7 @@ public class ASTIntrinsicProcedureNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTRINSIC_PROCEDURE_NAME_1030)
+        if (getProduction() == Production.INTRINSIC_PROCEDURE_NAME_1037)
             return (Token)getChild(0);
         else
             return null;

@@ -47,9 +47,9 @@ public class ASTRdUnitIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_770)
+        if (getProduction() == Production.RD_UNIT_ID_777)
             return (Token)getChild(0);
-        else if (getProduction() == Production.RD_UNIT_ID_771)
+        else if (getProduction() == Production.RD_UNIT_ID_778)
             return (Token)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTRdUnitIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_770)
+        if (getProduction() == Production.RD_UNIT_ID_777)
             return (ASTUFExprNode)getChild(1);
         else
             return null;
@@ -69,9 +69,9 @@ public class ASTRdUnitIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_770)
+        if (getProduction() == Production.RD_UNIT_ID_777)
             return (Token)getChild(2);
-        else if (getProduction() == Production.RD_UNIT_ID_771)
+        else if (getProduction() == Production.RD_UNIT_ID_778)
             return (Token)getChild(2);
         else
             return null;
@@ -81,7 +81,7 @@ public class ASTRdUnitIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_771)
+        if (getProduction() == Production.RD_UNIT_ID_778)
             return (Token)getChild(1);
         else
             return null;

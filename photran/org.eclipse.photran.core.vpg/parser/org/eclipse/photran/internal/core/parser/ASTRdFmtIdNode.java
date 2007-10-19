@@ -47,7 +47,7 @@ public class ASTRdFmtIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_776)
+        if (getProduction() == Production.RD_FMT_ID_783)
             return (ASTLblRefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTRdFmtIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_777)
+        if (getProduction() == Production.RD_FMT_ID_784)
             return (Token)getChild(0);
         else
             return null;
@@ -67,9 +67,9 @@ public class ASTRdFmtIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_778)
+        if (getProduction() == Production.RD_FMT_ID_785)
             return (ASTCOperandNode)getChild(0);
-        else if (getProduction() == Production.RD_FMT_ID_779)
+        else if (getProduction() == Production.RD_FMT_ID_786)
             return (ASTCOperandNode)getChild(0);
         else
             return null;
@@ -79,9 +79,9 @@ public class ASTRdFmtIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_779)
+        if (getProduction() == Production.RD_FMT_ID_786)
             return (ASTConcatOpNode)getChild(1);
-        else if (getProduction() == Production.RD_FMT_ID_780)
+        else if (getProduction() == Production.RD_FMT_ID_787)
             return (ASTConcatOpNode)getChild(1);
         else
             return null;
@@ -91,9 +91,9 @@ public class ASTRdFmtIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_779)
+        if (getProduction() == Production.RD_FMT_ID_786)
             return (ASTCPrimaryNode)getChild(2);
-        else if (getProduction() == Production.RD_FMT_ID_780)
+        else if (getProduction() == Production.RD_FMT_ID_787)
             return (ASTCPrimaryNode)getChild(2);
         else
             return null;
@@ -103,7 +103,7 @@ public class ASTRdFmtIdNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_780)
+        if (getProduction() == Production.RD_FMT_ID_787)
             return (ASTRdFmtIdExprNode)getChild(0);
         else
             return null;

@@ -99,9 +99,9 @@ public class ASTSFDummyArgNameListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDummyArgNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1017)
+        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1024)
             return (ASTSFDummyArgNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1018)
+        else if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1025)
             return (ASTSFDummyArgNameNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTSFDummyArgNameListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1018)
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1025)
             return (ASTSFDummyArgNameListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTSFDummyArgNameListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDummyArgNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1018)
+        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1025)
             return (Token)node.getChild(1);
         else
             return null;

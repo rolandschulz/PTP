@@ -47,11 +47,11 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_865)
+        if (getProduction() == Production.FORMAT_STMT_872)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FORMAT_STMT_866)
+        else if (getProduction() == Production.FORMAT_STMT_873)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FORMAT_STMT_ERROR_0)
+        else if (getProduction() == Production.FORMAT_STMT_ERROR_16)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -61,11 +61,11 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_865)
+        if (getProduction() == Production.FORMAT_STMT_872)
             return (Token)getChild(1);
-        else if (getProduction() == Production.FORMAT_STMT_866)
+        else if (getProduction() == Production.FORMAT_STMT_873)
             return (Token)getChild(1);
-        else if (getProduction() == Production.FORMAT_STMT_ERROR_0)
+        else if (getProduction() == Production.FORMAT_STMT_ERROR_16)
             return (Token)getChild(1);
         else
             return null;
@@ -75,9 +75,9 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_865)
+        if (getProduction() == Production.FORMAT_STMT_872)
             return (Token)getChild(2);
-        else if (getProduction() == Production.FORMAT_STMT_866)
+        else if (getProduction() == Production.FORMAT_STMT_873)
             return (Token)getChild(2);
         else
             return null;
@@ -87,9 +87,9 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_865)
+        if (getProduction() == Production.FORMAT_STMT_872)
             return (Token)getChild(3);
-        else if (getProduction() == Production.FORMAT_STMT_866)
+        else if (getProduction() == Production.FORMAT_STMT_873)
             return (Token)getChild(4);
         else
             return null;
@@ -99,9 +99,9 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_865)
+        if (getProduction() == Production.FORMAT_STMT_872)
             return (Token)getChild(4);
-        else if (getProduction() == Production.FORMAT_STMT_866)
+        else if (getProduction() == Production.FORMAT_STMT_873)
             return (Token)getChild(5);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_866)
+        if (getProduction() == Production.FORMAT_STMT_873)
             return (ASTFmtSpecNode)getChild(3);
         else
             return null;

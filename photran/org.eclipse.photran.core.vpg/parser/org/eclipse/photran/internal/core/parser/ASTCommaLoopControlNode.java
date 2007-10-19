@@ -47,7 +47,7 @@ public class ASTCommaLoopControlNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMA_LOOP_CONTROL_710)
+        if (getProduction() == Production.COMMA_LOOP_CONTROL_717)
             return (Token)getChild(0);
         else
             return null;
@@ -57,9 +57,9 @@ public class ASTCommaLoopControlNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMA_LOOP_CONTROL_710)
+        if (getProduction() == Production.COMMA_LOOP_CONTROL_717)
             return (ASTLoopControlNode)getChild(1);
-        else if (getProduction() == Production.COMMA_LOOP_CONTROL_711)
+        else if (getProduction() == Production.COMMA_LOOP_CONTROL_718)
             return (ASTLoopControlNode)getChild(0);
         else
             return null;

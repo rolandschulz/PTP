@@ -47,9 +47,9 @@ public class ASTImplicitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_391)
+        if (getProduction() == Production.IMPLICIT_STMT_393)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.IMPLICIT_STMT_392)
+        else if (getProduction() == Production.IMPLICIT_STMT_394)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTImplicitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_391)
+        if (getProduction() == Production.IMPLICIT_STMT_393)
             return (Token)getChild(1);
-        else if (getProduction() == Production.IMPLICIT_STMT_392)
+        else if (getProduction() == Production.IMPLICIT_STMT_394)
             return (Token)getChild(1);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTImplicitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_391)
+        if (getProduction() == Production.IMPLICIT_STMT_393)
             return (ASTImplicitSpecListNode)getChild(2);
         else
             return null;
@@ -81,9 +81,9 @@ public class ASTImplicitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_391)
+        if (getProduction() == Production.IMPLICIT_STMT_393)
             return (Token)getChild(3);
-        else if (getProduction() == Production.IMPLICIT_STMT_392)
+        else if (getProduction() == Production.IMPLICIT_STMT_394)
             return (Token)getChild(3);
         else
             return null;
@@ -93,7 +93,7 @@ public class ASTImplicitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_392)
+        if (getProduction() == Production.IMPLICIT_STMT_394)
             return (Token)getChild(2);
         else
             return null;

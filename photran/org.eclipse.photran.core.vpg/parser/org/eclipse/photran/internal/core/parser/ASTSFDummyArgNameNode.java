@@ -47,7 +47,7 @@ public class ASTSFDummyArgNameNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFDUMMY_ARG_NAME_1035)
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_1042)
             return (ASTNameNode)getChild(0);
         else
             return null;

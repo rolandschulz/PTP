@@ -47,7 +47,7 @@ public class ASTLengthSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LENGTH_SELECTOR_281)
+        if (getProduction() == Production.LENGTH_SELECTOR_283)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTLengthSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LENGTH_SELECTOR_281)
+        if (getProduction() == Production.LENGTH_SELECTOR_283)
             return (ASTCharLengthNode)getChild(1);
         else
             return null;

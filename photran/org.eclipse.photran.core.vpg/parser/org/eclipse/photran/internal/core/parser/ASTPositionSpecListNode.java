@@ -99,7 +99,7 @@ public class ASTPositionSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPositionSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POSITION_SPEC_LIST_829)
+        if (node.getProduction() == Production.POSITION_SPEC_LIST_836)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
@@ -110,9 +110,9 @@ public class ASTPositionSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPositionSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POSITION_SPEC_LIST_829)
+        if (node.getProduction() == Production.POSITION_SPEC_LIST_836)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.POSITION_SPEC_LIST_831)
+        else if (node.getProduction() == Production.POSITION_SPEC_LIST_838)
             return (Token)node.getChild(1);
         else
             return null;
@@ -123,11 +123,11 @@ public class ASTPositionSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPositionSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POSITION_SPEC_LIST_829)
+        if (node.getProduction() == Production.POSITION_SPEC_LIST_836)
             return (ASTPositionSpecNode)node.getChild(2);
-        else if (node.getProduction() == Production.POSITION_SPEC_LIST_830)
+        else if (node.getProduction() == Production.POSITION_SPEC_LIST_837)
             return (ASTPositionSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.POSITION_SPEC_LIST_831)
+        else if (node.getProduction() == Production.POSITION_SPEC_LIST_838)
             return (ASTPositionSpecNode)node.getChild(2);
         else
             return null;
@@ -137,7 +137,7 @@ public class ASTPositionSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POSITION_SPEC_LIST_831)
+        if (getProduction() == Production.POSITION_SPEC_LIST_838)
             return (ASTPositionSpecListNode)getChild(0);
         else
             return null;

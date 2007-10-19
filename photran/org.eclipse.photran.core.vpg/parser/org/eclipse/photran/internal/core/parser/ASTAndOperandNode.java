@@ -47,9 +47,9 @@ public class ASTAndOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.AND_OPERAND_542)
+        if (getProduction() == Production.AND_OPERAND_544)
             return (ASTLevel4ExprNode)getChild(0);
-        else if (getProduction() == Production.AND_OPERAND_543)
+        else if (getProduction() == Production.AND_OPERAND_545)
             return (ASTLevel4ExprNode)getChild(1);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTAndOperandNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.AND_OPERAND_543)
+        if (getProduction() == Production.AND_OPERAND_545)
             return (ASTNotOpNode)getChild(0);
         else
             return null;

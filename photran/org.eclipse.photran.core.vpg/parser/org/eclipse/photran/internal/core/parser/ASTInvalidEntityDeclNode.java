@@ -15,11 +15,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInvalidEntityDeclNode extends InteriorNode
+public class ASTInvalidEntityDeclNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTInvalidEntityDeclNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
-         super(production);
+         super(production, discardedSymbols);
          
          for (Object o : childNodes)
              addChild((CSTNode)o);
@@ -47,9 +47,11 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
             return (ASTObjectNameNode)getChild(0);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
+            return (ASTObjectNameNode)getChild(0);
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_ERROR_0)
             return (ASTObjectNameNode)getChild(0);
         else
             return null;
@@ -59,9 +61,9 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
             return (Token)getChild(1);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
             return (Token)getChild(1);
         else
             return null;
@@ -71,9 +73,9 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
             return (ASTCharLengthNode)getChild(2);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
             return (ASTCharLengthNode)getChild(2);
         else
             return null;
@@ -83,9 +85,9 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
             return (Token)getChild(3);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
             return (Token)getChild(3);
         else
             return null;
@@ -95,9 +97,9 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
             return (ASTArraySpecNode)getChild(4);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
             return (ASTArraySpecNode)getChild(4);
         else
             return null;
@@ -107,9 +109,9 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
             return (Token)getChild(5);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
             return (Token)getChild(5);
         else
             return null;
@@ -119,7 +121,7 @@ public class ASTInvalidEntityDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_272)
             return (ASTInitializationNode)getChild(6);
         else
             return null;

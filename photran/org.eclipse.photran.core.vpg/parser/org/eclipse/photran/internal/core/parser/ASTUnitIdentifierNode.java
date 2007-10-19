@@ -47,7 +47,7 @@ public class ASTUnitIdentifierNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UNIT_IDENTIFIER_737)
+        if (getProduction() == Production.UNIT_IDENTIFIER_744)
             return (ASTUFExprNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTUnitIdentifierNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UNIT_IDENTIFIER_738)
+        if (getProduction() == Production.UNIT_IDENTIFIER_745)
             return (Token)getChild(0);
         else
             return null;

@@ -47,7 +47,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_760)
+        if (getProduction() == Production.CLOSE_SPEC_767)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_760)
+        if (getProduction() == Production.CLOSE_SPEC_767)
             return (ASTUnitIdentifierNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_761)
+        if (getProduction() == Production.CLOSE_SPEC_768)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_761)
+        if (getProduction() == Production.CLOSE_SPEC_768)
             return (ASTLblRefNode)getChild(1);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_762)
+        if (getProduction() == Production.CLOSE_SPEC_769)
             return (Token)getChild(0);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_762)
+        if (getProduction() == Production.CLOSE_SPEC_769)
             return (ASTCExprNode)getChild(1);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_763)
+        if (getProduction() == Production.CLOSE_SPEC_770)
             return (Token)getChild(0);
         else
             return null;
@@ -117,7 +117,7 @@ public class ASTCloseSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_763)
+        if (getProduction() == Production.CLOSE_SPEC_770)
             return (ASTScalarVariableNode)getChild(1);
         else
             return null;

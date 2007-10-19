@@ -47,9 +47,9 @@ public class ASTAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATION_458)
+        if (getProduction() == Production.ALLOCATION_460)
             return (ASTAllocateObjectNode)getChild(0);
-        else if (getProduction() == Production.ALLOCATION_459)
+        else if (getProduction() == Production.ALLOCATION_461)
             return (ASTAllocateObjectNode)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATION_459)
+        if (getProduction() == Production.ALLOCATION_461)
             return (ASTAllocatedShapeNode)getChild(1);
         else
             return null;

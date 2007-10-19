@@ -99,9 +99,9 @@ public class ASTEquivalenceSetListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTEquivalenceSetListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EQUIVALENCE_SET_LIST_403)
+        if (node.getProduction() == Production.EQUIVALENCE_SET_LIST_405)
             return (ASTEquivalenceSetNode)node.getChild(0);
-        else if (node.getProduction() == Production.EQUIVALENCE_SET_LIST_404)
+        else if (node.getProduction() == Production.EQUIVALENCE_SET_LIST_406)
             return (ASTEquivalenceSetNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTEquivalenceSetListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_SET_LIST_404)
+        if (getProduction() == Production.EQUIVALENCE_SET_LIST_406)
             return (ASTEquivalenceSetListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTEquivalenceSetListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTEquivalenceSetListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EQUIVALENCE_SET_LIST_404)
+        if (node.getProduction() == Production.EQUIVALENCE_SET_LIST_406)
             return (Token)node.getChild(1);
         else
             return null;

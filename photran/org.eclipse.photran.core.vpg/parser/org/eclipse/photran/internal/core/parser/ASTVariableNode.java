@@ -47,11 +47,11 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_419)
+        if (getProduction() == Production.VARIABLE_421)
             return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.VARIABLE_420)
+        else if (getProduction() == Production.VARIABLE_422)
             return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.VARIABLE_421)
+        else if (getProduction() == Production.VARIABLE_423)
             return (ASTDataRefNode)getChild(0);
         else
             return null;
@@ -61,9 +61,9 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_420)
+        if (getProduction() == Production.VARIABLE_422)
             return (Token)getChild(1);
-        else if (getProduction() == Production.VARIABLE_421)
+        else if (getProduction() == Production.VARIABLE_423)
             return (Token)getChild(1);
         else
             return null;
@@ -73,9 +73,9 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_420)
+        if (getProduction() == Production.VARIABLE_422)
             return (ASTSectionSubscriptListNode)getChild(2);
-        else if (getProduction() == Production.VARIABLE_421)
+        else if (getProduction() == Production.VARIABLE_423)
             return (ASTSectionSubscriptListNode)getChild(2);
         else
             return null;
@@ -85,9 +85,9 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_420)
+        if (getProduction() == Production.VARIABLE_422)
             return (Token)getChild(3);
-        else if (getProduction() == Production.VARIABLE_421)
+        else if (getProduction() == Production.VARIABLE_423)
             return (Token)getChild(3);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_421)
+        if (getProduction() == Production.VARIABLE_423)
             return (ASTSubstringRangeNode)getChild(4);
         else
             return null;
@@ -107,7 +107,7 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_422)
+        if (getProduction() == Production.VARIABLE_424)
             return (ASTSubstrConstNode)getChild(0);
         else
             return null;

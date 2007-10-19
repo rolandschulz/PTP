@@ -27,8 +27,7 @@ import org.eclipse.swt.graphics.RGB;
  * 
  * @author Jeff Overbey
  * 
- * FIXME: Jeff: Make sure we call
- * <code>FortranPreferences.initializeDefaults(getPluginPreferences());</code>
+ * TODO: Jeff: Make sure we call <code>FortranPreferences.initializeDefaults(getPluginPreferences());</code>
  */
 public final class FortranPreferences
 {

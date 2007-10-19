@@ -99,9 +99,9 @@ public class ASTRenameListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRenameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RENAME_LIST_904)
+        if (node.getProduction() == Production.RENAME_LIST_911)
             return (ASTRenameNode)node.getChild(0);
-        else if (node.getProduction() == Production.RENAME_LIST_905)
+        else if (node.getProduction() == Production.RENAME_LIST_912)
             return (ASTRenameNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTRenameListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_LIST_905)
+        if (getProduction() == Production.RENAME_LIST_912)
             return (ASTRenameListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTRenameListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRenameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RENAME_LIST_905)
+        if (node.getProduction() == Production.RENAME_LIST_912)
             return (Token)node.getChild(1);
         else
             return null;

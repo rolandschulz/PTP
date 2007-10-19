@@ -15,11 +15,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSelectCaseStmtNode extends InteriorNode
+public class ASTSelectCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTSelectCaseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
-         super(production);
+         super(production, discardedSymbols);
          
          for (Object o : childNodes)
              addChild((CSTNode)o);
@@ -47,13 +47,21 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SELECT_CASE_STMT_683)
+        else if (getProduction() == Production.SELECT_CASE_STMT_690)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -63,9 +71,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
+            return (ASTNameNode)getChild(1);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
+            return (ASTNameNode)getChild(1);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
             return (ASTNameNode)getChild(1);
         else
             return null;
@@ -75,9 +87,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
             return (Token)getChild(2);
         else
             return null;
@@ -87,9 +103,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (Token)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_683)
+        else if (getProduction() == Production.SELECT_CASE_STMT_690)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12)
             return (Token)getChild(1);
         else
             return null;
@@ -99,13 +119,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_683)
+        else if (getProduction() == Production.SELECT_CASE_STMT_690)
             return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (Token)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
             return (Token)getChild(3);
         else
             return null;
@@ -115,13 +135,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (ASTExprNode)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_683)
+        else if (getProduction() == Production.SELECT_CASE_STMT_690)
             return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (ASTExprNode)getChild(6);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
             return (ASTExprNode)getChild(4);
         else
             return null;
@@ -131,13 +151,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (Token)getChild(6);
-        else if (getProduction() == Production.SELECT_CASE_STMT_683)
+        else if (getProduction() == Production.SELECT_CASE_STMT_690)
             return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (Token)getChild(7);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
             return (Token)getChild(5);
         else
             return null;
@@ -147,13 +167,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_682)
+        if (getProduction() == Production.SELECT_CASE_STMT_689)
             return (Token)getChild(7);
-        else if (getProduction() == Production.SELECT_CASE_STMT_683)
+        else if (getProduction() == Production.SELECT_CASE_STMT_690)
             return (Token)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+        else if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (Token)getChild(8);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
             return (Token)getChild(6);
         else
             return null;
@@ -163,9 +183,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_684)
+        if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (Token)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
             return (Token)getChild(1);
         else
             return null;
@@ -175,9 +199,13 @@ public class ASTSelectCaseStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_684)
+        if (getProduction() == Production.SELECT_CASE_STMT_691)
             return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+        else if (getProduction() == Production.SELECT_CASE_STMT_692)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
+            return (Token)getChild(4);
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
             return (Token)getChild(2);
         else
             return null;

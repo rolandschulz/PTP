@@ -47,7 +47,7 @@ public class ASTFunctionInterfaceRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_938)
+        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_945)
             return (ASTSubprogramInterfaceBodyNode)getChild(0);
         else
             return null;
@@ -57,9 +57,9 @@ public class ASTFunctionInterfaceRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_938)
+        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_945)
             return (ASTEndFunctionStmtNode)getChild(1);
-        else if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_939)
+        else if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_946)
             return (ASTEndFunctionStmtNode)getChild(0);
         else
             return null;

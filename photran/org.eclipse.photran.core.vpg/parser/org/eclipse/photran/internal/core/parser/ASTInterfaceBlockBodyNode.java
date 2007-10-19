@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTInterfaceBlockBodyNode extends InteriorNode implements Iterable<ASTInterfaceSpecificationNode>
+public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable<ASTInterfaceSpecificationNode>
 {
     protected int count = -1;
 
@@ -117,8 +117,9 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements Iterable<
 
             public ASTInterfaceSpecificationNode next()
             {
-                ASTInterfaceSpecificationNode result = (ASTInterfaceSpecificationNode)node.getChild(1);
-                node = (ASTInterfaceBlockBodyNode)node.parent;
+                int child = (index == 0 ? 0 : 1);
+                ASTInterfaceSpecificationNode result = (ASTInterfaceSpecificationNode)node.getChild(child);
+                node = (index == listSize-1 ? null : (ASTInterfaceBlockBodyNode)node.parent);
                 index++;
                 return result;
             }
@@ -135,9 +136,9 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements Iterable<
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInterfaceBlockBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_925)
+        if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_932)
             return (ASTInterfaceSpecificationNode)node.getChild(0);
-        else if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_926)
+        else if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_933)
             return (ASTInterfaceSpecificationNode)node.getChild(1);
         else
             return null;
@@ -147,7 +148,7 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements Iterable<
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BLOCK_BODY_926)
+        if (getProduction() == Production.INTERFACE_BLOCK_BODY_933)
             return (ASTInterfaceBlockBodyNode)getChild(0);
         else
             return null;

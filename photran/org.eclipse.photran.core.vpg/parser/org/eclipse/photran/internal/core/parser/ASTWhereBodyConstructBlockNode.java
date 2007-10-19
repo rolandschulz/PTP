@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTWhereBodyConstructBlockNode extends InteriorNode implements Iterable<ASTWhereBodyConstructNode>
+public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Iterable<ASTWhereBodyConstructNode>
 {
     protected int count = -1;
 
@@ -117,8 +117,9 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements Iter
 
             public ASTWhereBodyConstructNode next()
             {
-                ASTWhereBodyConstructNode result = (ASTWhereBodyConstructNode)node.getChild(1);
-                node = (ASTWhereBodyConstructBlockNode)node.parent;
+                int child = (index == 0 ? 0 : 1);
+                ASTWhereBodyConstructNode result = (ASTWhereBodyConstructNode)node.getChild(child);
+                node = (index == listSize-1 ? null : (ASTWhereBodyConstructBlockNode)node.parent);
                 index++;
                 return result;
             }
@@ -135,9 +136,9 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements Iter
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTWhereBodyConstructBlockNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_610)
+        if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_613)
             return (ASTWhereBodyConstructNode)node.getChild(0);
-        else if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_611)
+        else if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_614)
             return (ASTWhereBodyConstructNode)node.getChild(1);
         else
             return null;
@@ -147,7 +148,7 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements Iter
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_611)
+        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_614)
             return (ASTWhereBodyConstructBlockNode)getChild(0);
         else
             return null;

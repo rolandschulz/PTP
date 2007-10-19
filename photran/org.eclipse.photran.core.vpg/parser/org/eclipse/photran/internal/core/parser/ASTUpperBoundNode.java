@@ -47,7 +47,7 @@ public class ASTUpperBoundNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UPPER_BOUND_304)
+        if (getProduction() == Production.UPPER_BOUND_306)
             return (ASTExprNode)getChild(0);
         else
             return null;

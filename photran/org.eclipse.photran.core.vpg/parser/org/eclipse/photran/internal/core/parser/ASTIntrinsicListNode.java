@@ -99,9 +99,9 @@ public class ASTIntrinsicListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTIntrinsicListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTRINSIC_LIST_956)
+        if (node.getProduction() == Production.INTRINSIC_LIST_963)
             return (ASTIntrinsicProcedureNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.INTRINSIC_LIST_957)
+        else if (node.getProduction() == Production.INTRINSIC_LIST_964)
             return (ASTIntrinsicProcedureNameNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTIntrinsicListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTRINSIC_LIST_957)
+        if (getProduction() == Production.INTRINSIC_LIST_964)
             return (ASTIntrinsicListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTIntrinsicListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTIntrinsicListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTRINSIC_LIST_957)
+        if (node.getProduction() == Production.INTRINSIC_LIST_964)
             return (Token)node.getChild(1);
         else
             return null;

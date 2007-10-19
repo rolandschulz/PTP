@@ -15,11 +15,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTIfThenStmtNode extends InteriorNode
+public class ASTIfThenStmtNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTIfThenStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
-         super(production);
+         super(production, discardedSymbols);
          
          for (Object o : childNodes)
              addChild((CSTNode)o);
@@ -47,9 +47,13 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.IF_THEN_STMT_ERROR_5)
+            return (ASTLblDefNode)getChild(0);
+        else if (getProduction() == Production.IF_THEN_STMT_ERROR_6)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +63,13 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (Token)getChild(1);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
+            return (Token)getChild(3);
+        else if (getProduction() == Production.IF_THEN_STMT_ERROR_5)
+            return (Token)getChild(1);
+        else if (getProduction() == Production.IF_THEN_STMT_ERROR_6)
             return (Token)getChild(3);
         else
             return null;
@@ -71,9 +79,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (Token)getChild(2);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
             return (Token)getChild(4);
         else
             return null;
@@ -83,9 +91,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
             return (ASTExprNode)getChild(5);
         else
             return null;
@@ -95,9 +103,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (Token)getChild(4);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
             return (Token)getChild(6);
         else
             return null;
@@ -107,9 +115,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (Token)getChild(5);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
             return (Token)getChild(7);
         else
             return null;
@@ -119,9 +127,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_662)
+        if (getProduction() == Production.IF_THEN_STMT_669)
             return (Token)getChild(6);
-        else if (getProduction() == Production.IF_THEN_STMT_663)
+        else if (getProduction() == Production.IF_THEN_STMT_670)
             return (Token)getChild(8);
         else
             return null;
@@ -131,7 +139,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_663)
+        if (getProduction() == Production.IF_THEN_STMT_670)
+            return (ASTNameNode)getChild(1);
+        else if (getProduction() == Production.IF_THEN_STMT_ERROR_6)
             return (ASTNameNode)getChild(1);
         else
             return null;
@@ -141,7 +151,9 @@ public class ASTIfThenStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_THEN_STMT_663)
+        if (getProduction() == Production.IF_THEN_STMT_670)
+            return (Token)getChild(2);
+        else if (getProduction() == Production.IF_THEN_STMT_ERROR_6)
             return (Token)getChild(2);
         else
             return null;

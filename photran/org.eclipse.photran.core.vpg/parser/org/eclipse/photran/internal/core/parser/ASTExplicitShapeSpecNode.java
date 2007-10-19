@@ -47,7 +47,7 @@ public class ASTExplicitShapeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_301)
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_303)
             return (ASTLowerBoundNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTExplicitShapeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_301)
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_303)
             return (Token)getChild(1);
         else
             return null;
@@ -67,9 +67,9 @@ public class ASTExplicitShapeSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_301)
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_303)
             return (ASTUpperBoundNode)getChild(2);
-        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_302)
+        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_304)
             return (ASTUpperBoundNode)getChild(0);
         else
             return null;

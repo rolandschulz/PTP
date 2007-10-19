@@ -47,7 +47,7 @@ public class ASTBlockDoConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DO_CONSTRUCT_701)
+        if (getProduction() == Production.BLOCK_DO_CONSTRUCT_708)
             return (ASTLabelDoStmtNode)getChild(0);
         else
             return null;

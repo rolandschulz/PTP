@@ -99,9 +99,9 @@ public class ASTSFDataRefNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDATA_REF_431)
+        if (node.getProduction() == Production.SFDATA_REF_433)
             return (ASTNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFDATA_REF_432)
+        else if (node.getProduction() == Production.SFDATA_REF_434)
             return (ASTNameNode)node.getChild(0);
         else
             return null;
@@ -112,11 +112,11 @@ public class ASTSFDataRefNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDATA_REF_431)
+        if (node.getProduction() == Production.SFDATA_REF_433)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.SFDATA_REF_433)
+        else if (node.getProduction() == Production.SFDATA_REF_435)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.SFDATA_REF_434)
+        else if (node.getProduction() == Production.SFDATA_REF_436)
             return (Token)node.getChild(4);
         else
             return null;
@@ -127,11 +127,11 @@ public class ASTSFDataRefNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDATA_REF_431)
+        if (node.getProduction() == Production.SFDATA_REF_433)
             return (ASTNameNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFDATA_REF_433)
+        else if (node.getProduction() == Production.SFDATA_REF_435)
             return (ASTNameNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFDATA_REF_434)
+        else if (node.getProduction() == Production.SFDATA_REF_436)
             return (ASTNameNode)node.getChild(5);
         else
             return null;
@@ -142,9 +142,9 @@ public class ASTSFDataRefNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDATA_REF_432)
+        if (node.getProduction() == Production.SFDATA_REF_434)
             return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.SFDATA_REF_434)
+        else if (node.getProduction() == Production.SFDATA_REF_436)
             return (Token)node.getChild(1);
         else
             return null;
@@ -155,9 +155,9 @@ public class ASTSFDataRefNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDATA_REF_432)
+        if (node.getProduction() == Production.SFDATA_REF_434)
             return (ASTSectionSubscriptListNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFDATA_REF_434)
+        else if (node.getProduction() == Production.SFDATA_REF_436)
             return (ASTSectionSubscriptListNode)node.getChild(2);
         else
             return null;
@@ -168,9 +168,9 @@ public class ASTSFDataRefNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDATA_REF_432)
+        if (node.getProduction() == Production.SFDATA_REF_434)
             return (Token)node.getChild(3);
-        else if (node.getProduction() == Production.SFDATA_REF_434)
+        else if (node.getProduction() == Production.SFDATA_REF_436)
             return (Token)node.getChild(3);
         else
             return null;
@@ -180,9 +180,9 @@ public class ASTSFDataRefNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFDATA_REF_433)
+        if (getProduction() == Production.SFDATA_REF_435)
             return (ASTSFDataRefNode)getChild(0);
-        else if (getProduction() == Production.SFDATA_REF_434)
+        else if (getProduction() == Production.SFDATA_REF_436)
             return (ASTSFDataRefNode)getChild(0);
         else
             return null;

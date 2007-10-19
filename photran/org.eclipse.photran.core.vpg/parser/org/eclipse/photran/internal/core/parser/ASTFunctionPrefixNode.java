@@ -47,9 +47,9 @@ public class ASTFunctionPrefixNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PREFIX_982)
+        if (getProduction() == Production.FUNCTION_PREFIX_989)
             return (Token)getChild(0);
-        else if (getProduction() == Production.FUNCTION_PREFIX_983)
+        else if (getProduction() == Production.FUNCTION_PREFIX_990)
             return (Token)getChild(1);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTFunctionPrefixNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PREFIX_983)
+        if (getProduction() == Production.FUNCTION_PREFIX_990)
             return (ASTPrefixSpecListNode)getChild(0);
         else
             return null;

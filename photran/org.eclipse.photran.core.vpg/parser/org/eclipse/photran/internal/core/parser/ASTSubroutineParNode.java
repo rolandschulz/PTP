@@ -47,7 +47,7 @@ public class ASTSubroutineParNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_PAR_1002)
+        if (getProduction() == Production.SUBROUTINE_PAR_1009)
             return (ASTDummyArgNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTSubroutineParNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_PAR_1003)
+        if (getProduction() == Production.SUBROUTINE_PAR_1010)
             return (Token)getChild(0);
         else
             return null;

@@ -47,9 +47,9 @@ public class ASTForallHeaderNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_HEADER_632)
+        if (getProduction() == Production.FORALL_HEADER_639)
             return (Token)getChild(0);
-        else if (getProduction() == Production.FORALL_HEADER_633)
+        else if (getProduction() == Production.FORALL_HEADER_640)
             return (Token)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTForallHeaderNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_HEADER_632)
+        if (getProduction() == Production.FORALL_HEADER_639)
             return (ASTForallTripletSpecListNode)getChild(1);
-        else if (getProduction() == Production.FORALL_HEADER_633)
+        else if (getProduction() == Production.FORALL_HEADER_640)
             return (ASTForallTripletSpecListNode)getChild(1);
         else
             return null;
@@ -71,9 +71,9 @@ public class ASTForallHeaderNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_HEADER_632)
+        if (getProduction() == Production.FORALL_HEADER_639)
             return (Token)getChild(2);
-        else if (getProduction() == Production.FORALL_HEADER_633)
+        else if (getProduction() == Production.FORALL_HEADER_640)
             return (Token)getChild(4);
         else
             return null;
@@ -83,7 +83,7 @@ public class ASTForallHeaderNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_HEADER_633)
+        if (getProduction() == Production.FORALL_HEADER_640)
             return (Token)getChild(2);
         else
             return null;
@@ -93,7 +93,7 @@ public class ASTForallHeaderNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_HEADER_633)
+        if (getProduction() == Production.FORALL_HEADER_640)
             return (ASTScalarMaskExprNode)getChild(3);
         else
             return null;

@@ -47,9 +47,9 @@ public class ASTLevel3ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_3_EXPR_536)
+        if (getProduction() == Production.LEVEL_3_EXPR_538)
             return (ASTLevel2ExprNode)getChild(0);
-        else if (getProduction() == Production.LEVEL_3_EXPR_537)
+        else if (getProduction() == Production.LEVEL_3_EXPR_539)
             return (ASTLevel2ExprNode)getChild(2);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTLevel3ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_3_EXPR_537)
+        if (getProduction() == Production.LEVEL_3_EXPR_539)
             return (ASTLevel3ExprNode)getChild(0);
         else
             return null;
@@ -69,7 +69,7 @@ public class ASTLevel3ExprNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LEVEL_3_EXPR_537)
+        if (getProduction() == Production.LEVEL_3_EXPR_539)
             return (ASTConcatOpNode)getChild(1);
         else
             return null;

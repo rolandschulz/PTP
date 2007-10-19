@@ -47,15 +47,15 @@ public class ASTEndProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_PROGRAM_STMT_889)
+        if (getProduction() == Production.END_PROGRAM_STMT_896)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_PROGRAM_STMT_890)
+        else if (getProduction() == Production.END_PROGRAM_STMT_897)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_PROGRAM_STMT_891)
+        else if (getProduction() == Production.END_PROGRAM_STMT_898)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_PROGRAM_STMT_892)
+        else if (getProduction() == Production.END_PROGRAM_STMT_899)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_PROGRAM_STMT_893)
+        else if (getProduction() == Production.END_PROGRAM_STMT_900)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -65,11 +65,11 @@ public class ASTEndProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_PROGRAM_STMT_889)
+        if (getProduction() == Production.END_PROGRAM_STMT_896)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_PROGRAM_STMT_892)
+        else if (getProduction() == Production.END_PROGRAM_STMT_899)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_PROGRAM_STMT_893)
+        else if (getProduction() == Production.END_PROGRAM_STMT_900)
             return (Token)getChild(1);
         else
             return null;
@@ -79,15 +79,15 @@ public class ASTEndProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_PROGRAM_STMT_889)
+        if (getProduction() == Production.END_PROGRAM_STMT_896)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_PROGRAM_STMT_890)
+        else if (getProduction() == Production.END_PROGRAM_STMT_897)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_PROGRAM_STMT_891)
+        else if (getProduction() == Production.END_PROGRAM_STMT_898)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_PROGRAM_STMT_892)
+        else if (getProduction() == Production.END_PROGRAM_STMT_899)
             return (Token)getChild(3);
-        else if (getProduction() == Production.END_PROGRAM_STMT_893)
+        else if (getProduction() == Production.END_PROGRAM_STMT_900)
             return (Token)getChild(4);
         else
             return null;
@@ -97,9 +97,9 @@ public class ASTEndProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_PROGRAM_STMT_890)
+        if (getProduction() == Production.END_PROGRAM_STMT_897)
             return (Token)getChild(1);
-        else if (getProduction() == Production.END_PROGRAM_STMT_891)
+        else if (getProduction() == Production.END_PROGRAM_STMT_898)
             return (Token)getChild(1);
         else
             return null;
@@ -109,9 +109,9 @@ public class ASTEndProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_PROGRAM_STMT_891)
+        if (getProduction() == Production.END_PROGRAM_STMT_898)
             return (ASTEndNameNode)getChild(2);
-        else if (getProduction() == Production.END_PROGRAM_STMT_893)
+        else if (getProduction() == Production.END_PROGRAM_STMT_900)
             return (ASTEndNameNode)getChild(3);
         else
             return null;
@@ -121,9 +121,9 @@ public class ASTEndProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_PROGRAM_STMT_892)
+        if (getProduction() == Production.END_PROGRAM_STMT_899)
             return (Token)getChild(2);
-        else if (getProduction() == Production.END_PROGRAM_STMT_893)
+        else if (getProduction() == Production.END_PROGRAM_STMT_900)
             return (Token)getChild(2);
         else
             return null;

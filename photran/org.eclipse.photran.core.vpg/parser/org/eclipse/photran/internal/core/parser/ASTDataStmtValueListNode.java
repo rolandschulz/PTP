@@ -99,9 +99,9 @@ public class ASTDataStmtValueListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDataStmtValueListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_STMT_VALUE_LIST_384)
+        if (node.getProduction() == Production.DATA_STMT_VALUE_LIST_386)
             return (ASTDataStmtValueNode)node.getChild(0);
-        else if (node.getProduction() == Production.DATA_STMT_VALUE_LIST_385)
+        else if (node.getProduction() == Production.DATA_STMT_VALUE_LIST_387)
             return (ASTDataStmtValueNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTDataStmtValueListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_VALUE_LIST_385)
+        if (getProduction() == Production.DATA_STMT_VALUE_LIST_387)
             return (ASTDataStmtValueListNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTDataStmtValueListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDataStmtValueListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_STMT_VALUE_LIST_385)
+        if (node.getProduction() == Production.DATA_STMT_VALUE_LIST_387)
             return (Token)node.getChild(1);
         else
             return null;

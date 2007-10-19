@@ -47,9 +47,9 @@ public class ASTDimensionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DIMENSION_STMT_339)
+        if (getProduction() == Production.DIMENSION_STMT_341)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.DIMENSION_STMT_340)
+        else if (getProduction() == Production.DIMENSION_STMT_342)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTDimensionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DIMENSION_STMT_339)
+        if (getProduction() == Production.DIMENSION_STMT_341)
             return (Token)getChild(1);
-        else if (getProduction() == Production.DIMENSION_STMT_340)
+        else if (getProduction() == Production.DIMENSION_STMT_342)
             return (Token)getChild(1);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTDimensionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DIMENSION_STMT_339)
+        if (getProduction() == Production.DIMENSION_STMT_341)
             return (Token)getChild(2);
         else
             return null;
@@ -81,7 +81,7 @@ public class ASTDimensionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DIMENSION_STMT_339)
+        if (getProduction() == Production.DIMENSION_STMT_341)
             return (Token)getChild(3);
         else
             return null;
@@ -91,9 +91,9 @@ public class ASTDimensionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DIMENSION_STMT_339)
+        if (getProduction() == Production.DIMENSION_STMT_341)
             return (ASTArrayDeclaratorListNode)getChild(4);
-        else if (getProduction() == Production.DIMENSION_STMT_340)
+        else if (getProduction() == Production.DIMENSION_STMT_342)
             return (ASTArrayDeclaratorListNode)getChild(2);
         else
             return null;
@@ -103,9 +103,9 @@ public class ASTDimensionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DIMENSION_STMT_339)
+        if (getProduction() == Production.DIMENSION_STMT_341)
             return (Token)getChild(5);
-        else if (getProduction() == Production.DIMENSION_STMT_340)
+        else if (getProduction() == Production.DIMENSION_STMT_342)
             return (Token)getChild(3);
         else
             return null;

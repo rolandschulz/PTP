@@ -47,8 +47,48 @@ public class ASTTargetNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_597)
+        if (getProduction() == Production.TARGET_599)
             return (ASTExprNode)getChild(0);
+        else
+            return null;
+    }
+
+    public boolean hasExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.TARGET_599)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public boolean isNull()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.TARGET_600)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getTLparen()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.TARGET_600)
+            return (Token)getChild(1);
+        else
+            return null;
+    }
+
+    public Token getTRparen()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.TARGET_600)
+            return (Token)getChild(2);
         else
             return null;
     }

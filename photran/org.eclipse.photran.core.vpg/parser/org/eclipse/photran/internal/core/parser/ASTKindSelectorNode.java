@@ -47,9 +47,9 @@ public class ASTKindSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.KIND_SELECTOR_273)
+        if (getProduction() == Production.KIND_SELECTOR_275)
             return (Token)getChild(0);
-        else if (getProduction() == Production.KIND_SELECTOR_274)
+        else if (getProduction() == Production.KIND_SELECTOR_276)
             return (Token)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTKindSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.KIND_SELECTOR_273)
+        if (getProduction() == Production.KIND_SELECTOR_275)
             return (Token)getChild(1);
         else
             return null;
@@ -69,9 +69,9 @@ public class ASTKindSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.KIND_SELECTOR_273)
+        if (getProduction() == Production.KIND_SELECTOR_275)
             return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.KIND_SELECTOR_274)
+        else if (getProduction() == Production.KIND_SELECTOR_276)
             return (ASTExprNode)getChild(1);
         else
             return null;
@@ -81,9 +81,9 @@ public class ASTKindSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.KIND_SELECTOR_273)
+        if (getProduction() == Production.KIND_SELECTOR_275)
             return (Token)getChild(3);
-        else if (getProduction() == Production.KIND_SELECTOR_274)
+        else if (getProduction() == Production.KIND_SELECTOR_276)
             return (Token)getChild(2);
         else
             return null;

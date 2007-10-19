@@ -47,7 +47,7 @@ public class ASTVariableCommaNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_COMMA_1053)
+        if (getProduction() == Production.VARIABLE_COMMA_1060)
             return (ASTVariableNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTVariableCommaNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_COMMA_1053)
+        if (getProduction() == Production.VARIABLE_COMMA_1060)
             return (Token)getChild(1);
         else
             return null;

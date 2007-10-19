@@ -47,7 +47,7 @@ public class ASTStmtFunctionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1014)
+        if (getProduction() == Production.STMT_FUNCTION_STMT_1021)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTStmtFunctionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1014)
+        if (getProduction() == Production.STMT_FUNCTION_STMT_1021)
             return (ASTNameNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTStmtFunctionStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1014)
+        if (getProduction() == Production.STMT_FUNCTION_STMT_1021)
             return (ASTStmtFunctionRangeNode)getChild(2);
         else
             return null;

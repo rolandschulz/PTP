@@ -47,21 +47,21 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_702)
+        if (getProduction() == Production.LABEL_DO_STMT_709)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_703)
+        else if (getProduction() == Production.LABEL_DO_STMT_710)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
+        else if (getProduction() == Production.LABEL_DO_STMT_711)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
+        else if (getProduction() == Production.LABEL_DO_STMT_712)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
+        else if (getProduction() == Production.LABEL_DO_STMT_713)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
+        else if (getProduction() == Production.LABEL_DO_STMT_714)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
+        else if (getProduction() == Production.LABEL_DO_STMT_715)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
+        else if (getProduction() == Production.LABEL_DO_STMT_716)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -71,21 +71,21 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_702)
+        if (getProduction() == Production.LABEL_DO_STMT_709)
             return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_703)
+        else if (getProduction() == Production.LABEL_DO_STMT_710)
             return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
+        else if (getProduction() == Production.LABEL_DO_STMT_711)
             return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
+        else if (getProduction() == Production.LABEL_DO_STMT_712)
             return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
+        else if (getProduction() == Production.LABEL_DO_STMT_713)
             return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
+        else if (getProduction() == Production.LABEL_DO_STMT_714)
             return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
+        else if (getProduction() == Production.LABEL_DO_STMT_715)
             return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
+        else if (getProduction() == Production.LABEL_DO_STMT_716)
             return (Token)getChild(3);
         else
             return null;
@@ -95,13 +95,13 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_702)
+        if (getProduction() == Production.LABEL_DO_STMT_709)
             return (ASTLblRefNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_703)
+        else if (getProduction() == Production.LABEL_DO_STMT_710)
             return (ASTLblRefNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
+        else if (getProduction() == Production.LABEL_DO_STMT_713)
             return (ASTLblRefNode)getChild(4);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
+        else if (getProduction() == Production.LABEL_DO_STMT_714)
             return (ASTLblRefNode)getChild(4);
         else
             return null;
@@ -111,13 +111,13 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_702)
+        if (getProduction() == Production.LABEL_DO_STMT_709)
             return (ASTCommaLoopControlNode)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
+        else if (getProduction() == Production.LABEL_DO_STMT_711)
             return (ASTCommaLoopControlNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
+        else if (getProduction() == Production.LABEL_DO_STMT_713)
             return (ASTCommaLoopControlNode)getChild(5);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
+        else if (getProduction() == Production.LABEL_DO_STMT_715)
             return (ASTCommaLoopControlNode)getChild(4);
         else
             return null;
@@ -127,21 +127,21 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_702)
+        if (getProduction() == Production.LABEL_DO_STMT_709)
             return (Token)getChild(4);
-        else if (getProduction() == Production.LABEL_DO_STMT_703)
+        else if (getProduction() == Production.LABEL_DO_STMT_710)
             return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
+        else if (getProduction() == Production.LABEL_DO_STMT_711)
             return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
+        else if (getProduction() == Production.LABEL_DO_STMT_712)
             return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
+        else if (getProduction() == Production.LABEL_DO_STMT_713)
             return (Token)getChild(6);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
+        else if (getProduction() == Production.LABEL_DO_STMT_714)
             return (Token)getChild(5);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
+        else if (getProduction() == Production.LABEL_DO_STMT_715)
             return (Token)getChild(5);
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
+        else if (getProduction() == Production.LABEL_DO_STMT_716)
             return (Token)getChild(4);
         else
             return null;
@@ -151,13 +151,13 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_706)
+        if (getProduction() == Production.LABEL_DO_STMT_713)
             return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
+        else if (getProduction() == Production.LABEL_DO_STMT_714)
             return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
+        else if (getProduction() == Production.LABEL_DO_STMT_715)
             return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
+        else if (getProduction() == Production.LABEL_DO_STMT_716)
             return (ASTNameNode)getChild(1);
         else
             return null;
@@ -167,13 +167,13 @@ public class ASTLabelDoStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_706)
+        if (getProduction() == Production.LABEL_DO_STMT_713)
             return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
+        else if (getProduction() == Production.LABEL_DO_STMT_714)
             return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
+        else if (getProduction() == Production.LABEL_DO_STMT_715)
             return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
+        else if (getProduction() == Production.LABEL_DO_STMT_716)
             return (Token)getChild(2);
         else
             return null;

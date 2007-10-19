@@ -194,7 +194,7 @@ public abstract class ScopingNode extends InteriorNode
 
     public PhotranTokenRef getRepresentativeToken()
     {
-    	// FIXME: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+    	// TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
     	// AND DYNAMICALLY DISPATCHED TO!
     	
     	if (this instanceof ASTExecutableProgramNode)
@@ -277,7 +277,7 @@ public abstract class ScopingNode extends InteriorNode
 
     public InteriorNode getHeaderStmt()
 	{
-    	// FIXME: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+    	// TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
     	// AND DYNAMICALLY DISPATCHED TO!
     	
     	if (this instanceof ASTExecutableProgramNode)

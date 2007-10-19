@@ -47,7 +47,7 @@ public class ASTEquivalenceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_STMT_402)
+        if (getProduction() == Production.EQUIVALENCE_STMT_404)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTEquivalenceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_STMT_402)
+        if (getProduction() == Production.EQUIVALENCE_STMT_404)
             return (Token)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTEquivalenceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_STMT_402)
+        if (getProduction() == Production.EQUIVALENCE_STMT_404)
             return (ASTEquivalenceSetListNode)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTEquivalenceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_STMT_402)
+        if (getProduction() == Production.EQUIVALENCE_STMT_404)
             return (Token)getChild(3);
         else
             return null;

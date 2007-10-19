@@ -47,7 +47,7 @@ public class ASTInputItemNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INPUT_ITEM_806)
+        if (getProduction() == Production.INPUT_ITEM_813)
             return (ASTVariableNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTInputItemNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INPUT_ITEM_807)
+        if (getProduction() == Production.INPUT_ITEM_814)
             return (ASTInputImpliedDoNode)getChild(0);
         else
             return null;

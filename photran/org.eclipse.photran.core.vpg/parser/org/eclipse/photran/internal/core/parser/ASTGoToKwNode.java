@@ -47,7 +47,7 @@ public class ASTGoToKwNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GO_TO_KW_724)
+        if (getProduction() == Production.GO_TO_KW_731)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTGoToKwNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GO_TO_KW_725)
+        if (getProduction() == Production.GO_TO_KW_732)
             return (Token)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTGoToKwNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GO_TO_KW_725)
+        if (getProduction() == Production.GO_TO_KW_732)
             return (Token)getChild(1);
         else
             return null;

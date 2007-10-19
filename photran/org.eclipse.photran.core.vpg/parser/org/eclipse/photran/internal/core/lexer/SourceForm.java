@@ -42,7 +42,7 @@ public abstract class SourceForm
         }
     };
     
-    // FIXME: JEFF: Automatically detect lexer type from filename extension
+    // TODO: JEFF: Automatically detect lexer type from filename extension
     public static final SourceForm AUTO_DETECT_SOURCE_FORM = UNPREPROCESSED_FREE_FORM;
 
     public static SourceForm preprocessedFreeForm(final IncludeLoaderCallback callback)

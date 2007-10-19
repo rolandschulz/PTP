@@ -47,9 +47,9 @@ public class ASTSFFactorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFFACTOR_585)
+        if (getProduction() == Production.SFFACTOR_587)
             return (ASTSFPrimaryNode)getChild(0);
-        else if (getProduction() == Production.SFFACTOR_586)
+        else if (getProduction() == Production.SFFACTOR_588)
             return (ASTSFPrimaryNode)getChild(0);
         else
             return null;
@@ -59,7 +59,7 @@ public class ASTSFFactorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFFACTOR_586)
+        if (getProduction() == Production.SFFACTOR_588)
             return (ASTPowerOpNode)getChild(1);
         else
             return null;
@@ -69,7 +69,7 @@ public class ASTSFFactorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFFACTOR_586)
+        if (getProduction() == Production.SFFACTOR_588)
             return (ASTMultOperandNode)getChild(2);
         else
             return null;

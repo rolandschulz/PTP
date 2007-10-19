@@ -47,7 +47,7 @@ public class ASTGenericSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_948)
+        if (getProduction() == Production.GENERIC_SPEC_955)
             return (Token)getChild(0);
         else
             return null;
@@ -57,9 +57,9 @@ public class ASTGenericSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_948)
+        if (getProduction() == Production.GENERIC_SPEC_955)
             return (Token)getChild(1);
-        else if (getProduction() == Production.GENERIC_SPEC_949)
+        else if (getProduction() == Production.GENERIC_SPEC_956)
             return (Token)getChild(1);
         else
             return null;
@@ -69,7 +69,7 @@ public class ASTGenericSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_948)
+        if (getProduction() == Production.GENERIC_SPEC_955)
             return (ASTDefinedOperatorNode)getChild(2);
         else
             return null;
@@ -79,9 +79,9 @@ public class ASTGenericSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_948)
+        if (getProduction() == Production.GENERIC_SPEC_955)
             return (Token)getChild(3);
-        else if (getProduction() == Production.GENERIC_SPEC_949)
+        else if (getProduction() == Production.GENERIC_SPEC_956)
             return (Token)getChild(3);
         else
             return null;
@@ -91,7 +91,7 @@ public class ASTGenericSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_949)
+        if (getProduction() == Production.GENERIC_SPEC_956)
             return (Token)getChild(0);
         else
             return null;
@@ -101,7 +101,7 @@ public class ASTGenericSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_949)
+        if (getProduction() == Production.GENERIC_SPEC_956)
             return (Token)getChild(2);
         else
             return null;

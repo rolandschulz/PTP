@@ -47,7 +47,7 @@ public class ASTFormatIdentifierNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_801)
+        if (getProduction() == Production.FORMAT_IDENTIFIER_808)
             return (ASTLblRefNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTFormatIdentifierNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_802)
+        if (getProduction() == Production.FORMAT_IDENTIFIER_809)
             return (ASTCExprNode)getChild(0);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTFormatIdentifierNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_803)
+        if (getProduction() == Production.FORMAT_IDENTIFIER_810)
             return (Token)getChild(0);
         else
             return null;

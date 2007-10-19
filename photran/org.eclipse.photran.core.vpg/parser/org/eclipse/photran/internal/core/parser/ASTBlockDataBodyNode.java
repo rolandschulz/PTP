@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTBlockDataBodyNode extends InteriorNode implements Iterable<ASTBlockDataBodyConstructNode>
+public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<ASTBlockDataBodyConstructNode>
 {
     protected int count = -1;
 
@@ -117,8 +117,9 @@ public class ASTBlockDataBodyNode extends InteriorNode implements Iterable<ASTBl
 
             public ASTBlockDataBodyConstructNode next()
             {
-                ASTBlockDataBodyConstructNode result = (ASTBlockDataBodyConstructNode)node.getChild(1);
-                node = (ASTBlockDataBodyNode)node.parent;
+                int child = (index == 0 ? 0 : 1);
+                ASTBlockDataBodyConstructNode result = (ASTBlockDataBodyConstructNode)node.getChild(child);
+                node = (index == listSize-1 ? null : (ASTBlockDataBodyNode)node.parent);
                 index++;
                 return result;
             }

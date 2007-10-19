@@ -47,9 +47,9 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_827)
+        if (getProduction() == Production.REWIND_STMT_834)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.REWIND_STMT_828)
+        else if (getProduction() == Production.REWIND_STMT_835)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_827)
+        if (getProduction() == Production.REWIND_STMT_834)
             return (Token)getChild(1);
-        else if (getProduction() == Production.REWIND_STMT_828)
+        else if (getProduction() == Production.REWIND_STMT_835)
             return (Token)getChild(1);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_827)
+        if (getProduction() == Production.REWIND_STMT_834)
             return (ASTUnitIdentifierNode)getChild(2);
         else
             return null;
@@ -81,9 +81,9 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_827)
+        if (getProduction() == Production.REWIND_STMT_834)
             return (Token)getChild(3);
-        else if (getProduction() == Production.REWIND_STMT_828)
+        else if (getProduction() == Production.REWIND_STMT_835)
             return (Token)getChild(5);
         else
             return null;
@@ -93,7 +93,7 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_828)
+        if (getProduction() == Production.REWIND_STMT_835)
             return (Token)getChild(2);
         else
             return null;
@@ -103,7 +103,7 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_828)
+        if (getProduction() == Production.REWIND_STMT_835)
             return (ASTPositionSpecListNode)getChild(3);
         else
             return null;
@@ -113,7 +113,7 @@ public class ASTRewindStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.REWIND_STMT_828)
+        if (getProduction() == Production.REWIND_STMT_835)
             return (Token)getChild(4);
         else
             return null;

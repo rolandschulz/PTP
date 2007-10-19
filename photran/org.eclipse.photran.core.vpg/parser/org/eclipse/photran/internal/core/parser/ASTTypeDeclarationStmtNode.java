@@ -47,11 +47,11 @@ public class ASTTypeDeclarationStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TYPE_DECLARATION_STMT_229)
+        if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_230)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_232)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_233)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -61,11 +61,11 @@ public class ASTTypeDeclarationStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TYPE_DECLARATION_STMT_229)
+        if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
             return (ASTTypeSpecNode)getChild(1);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_230)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_232)
             return (ASTTypeSpecNode)getChild(1);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_233)
             return (ASTTypeSpecNode)getChild(1);
         else
             return null;
@@ -75,7 +75,7 @@ public class ASTTypeDeclarationStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TYPE_DECLARATION_STMT_229)
+        if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
             return (ASTAttrSpecSeqNode)getChild(2);
         else
             return null;
@@ -85,11 +85,11 @@ public class ASTTypeDeclarationStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TYPE_DECLARATION_STMT_229)
+        if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
             return (ASTEntityDeclListNode)getChild(5);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_230)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_232)
             return (ASTEntityDeclListNode)getChild(4);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_233)
             return (ASTEntityDeclListNode)getChild(2);
         else
             return null;
@@ -99,11 +99,11 @@ public class ASTTypeDeclarationStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TYPE_DECLARATION_STMT_229)
+        if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
             return (Token)getChild(6);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_230)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_232)
             return (Token)getChild(5);
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_231)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_233)
             return (Token)getChild(3);
         else
             return null;
@@ -111,13 +111,13 @@ public class ASTTypeDeclarationStmtNode extends InteriorNode
 
     @Override protected boolean shouldVisitChild(int index)
     {
-        if (getProduction() == Production.TYPE_DECLARATION_STMT_229 && index == 3)
+        if (getProduction() == Production.TYPE_DECLARATION_STMT_231 && index == 3)
             return false;
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_229 && index == 4)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_231 && index == 4)
             return false;
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_230 && index == 2)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_232 && index == 2)
             return false;
-        else if (getProduction() == Production.TYPE_DECLARATION_STMT_230 && index == 3)
+        else if (getProduction() == Production.TYPE_DECLARATION_STMT_232 && index == 3)
             return false;
         else
             return true;

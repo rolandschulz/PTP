@@ -47,13 +47,13 @@ public class ASTFormateditNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATEDIT_875)
+        if (getProduction() == Production.FORMATEDIT_882)
             return (ASTEditElementNode)getChild(0);
-        else if (getProduction() == Production.FORMATEDIT_876)
+        else if (getProduction() == Production.FORMATEDIT_883)
             return (ASTEditElementNode)getChild(1);
-        else if (getProduction() == Production.FORMATEDIT_879)
+        else if (getProduction() == Production.FORMATEDIT_886)
             return (ASTEditElementNode)getChild(1);
-        else if (getProduction() == Production.FORMATEDIT_880)
+        else if (getProduction() == Production.FORMATEDIT_887)
             return (ASTEditElementNode)getChild(2);
         else
             return null;
@@ -63,9 +63,9 @@ public class ASTFormateditNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATEDIT_876)
+        if (getProduction() == Production.FORMATEDIT_883)
             return (Token)getChild(0);
-        else if (getProduction() == Production.FORMATEDIT_880)
+        else if (getProduction() == Production.FORMATEDIT_887)
             return (Token)getChild(1);
         else
             return null;
@@ -75,7 +75,7 @@ public class ASTFormateditNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATEDIT_877)
+        if (getProduction() == Production.FORMATEDIT_884)
             return (Token)getChild(0);
         else
             return null;
@@ -85,11 +85,11 @@ public class ASTFormateditNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATEDIT_878)
+        if (getProduction() == Production.FORMATEDIT_885)
             return (Token)getChild(0);
-        else if (getProduction() == Production.FORMATEDIT_879)
+        else if (getProduction() == Production.FORMATEDIT_886)
             return (Token)getChild(0);
-        else if (getProduction() == Production.FORMATEDIT_880)
+        else if (getProduction() == Production.FORMATEDIT_887)
             return (Token)getChild(0);
         else
             return null;

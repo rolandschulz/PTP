@@ -47,9 +47,9 @@ public class ASTComblockNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMBLOCK_415)
+        if (getProduction() == Production.COMBLOCK_417)
             return (Token)getChild(0);
-        else if (getProduction() == Production.COMBLOCK_416)
+        else if (getProduction() == Production.COMBLOCK_418)
             return (Token)getChild(0);
         else
             return null;
@@ -59,9 +59,9 @@ public class ASTComblockNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMBLOCK_415)
+        if (getProduction() == Production.COMBLOCK_417)
             return (Token)getChild(1);
-        else if (getProduction() == Production.COMBLOCK_416)
+        else if (getProduction() == Production.COMBLOCK_418)
             return (Token)getChild(2);
         else
             return null;
@@ -71,7 +71,7 @@ public class ASTComblockNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMBLOCK_416)
+        if (getProduction() == Production.COMBLOCK_418)
             return (ASTCommonBlockNameNode)getChild(1);
         else
             return null;

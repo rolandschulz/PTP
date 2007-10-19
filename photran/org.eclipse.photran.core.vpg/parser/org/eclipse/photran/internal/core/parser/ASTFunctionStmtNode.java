@@ -47,15 +47,15 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_975)
+        if (getProduction() == Production.FUNCTION_STMT_982)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_STMT_976)
+        else if (getProduction() == Production.FUNCTION_STMT_983)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_STMT_977)
+        else if (getProduction() == Production.FUNCTION_STMT_984)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_STMT_ERROR_1)
+        else if (getProduction() == Production.FUNCTION_STMT_ERROR_17)
             return (ASTLblDefNode)getChild(0);
         else
             return null;
@@ -65,15 +65,15 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_975)
+        if (getProduction() == Production.FUNCTION_STMT_982)
             return (ASTFunctionPrefixNode)getChild(1);
-        else if (getProduction() == Production.FUNCTION_STMT_976)
+        else if (getProduction() == Production.FUNCTION_STMT_983)
             return (ASTFunctionPrefixNode)getChild(1);
-        else if (getProduction() == Production.FUNCTION_STMT_977)
+        else if (getProduction() == Production.FUNCTION_STMT_984)
             return (ASTFunctionPrefixNode)getChild(1);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (ASTFunctionPrefixNode)getChild(1);
-        else if (getProduction() == Production.FUNCTION_STMT_ERROR_1)
+        else if (getProduction() == Production.FUNCTION_STMT_ERROR_17)
             return (ASTFunctionPrefixNode)getChild(1);
         else
             return null;
@@ -83,15 +83,15 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_975)
+        if (getProduction() == Production.FUNCTION_STMT_982)
             return (ASTFunctionNameNode)getChild(2);
-        else if (getProduction() == Production.FUNCTION_STMT_976)
+        else if (getProduction() == Production.FUNCTION_STMT_983)
             return (ASTFunctionNameNode)getChild(2);
-        else if (getProduction() == Production.FUNCTION_STMT_977)
+        else if (getProduction() == Production.FUNCTION_STMT_984)
             return (ASTFunctionNameNode)getChild(2);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (ASTFunctionNameNode)getChild(2);
-        else if (getProduction() == Production.FUNCTION_STMT_ERROR_1)
+        else if (getProduction() == Production.FUNCTION_STMT_ERROR_17)
             return (ASTFunctionNameNode)getChild(2);
         else
             return null;
@@ -101,13 +101,13 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_975)
+        if (getProduction() == Production.FUNCTION_STMT_982)
             return (Token)getChild(3);
-        else if (getProduction() == Production.FUNCTION_STMT_976)
+        else if (getProduction() == Production.FUNCTION_STMT_983)
             return (Token)getChild(3);
-        else if (getProduction() == Production.FUNCTION_STMT_977)
+        else if (getProduction() == Production.FUNCTION_STMT_984)
             return (Token)getChild(3);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (Token)getChild(3);
         else
             return null;
@@ -117,13 +117,13 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_975)
+        if (getProduction() == Production.FUNCTION_STMT_982)
             return (Token)getChild(4);
-        else if (getProduction() == Production.FUNCTION_STMT_976)
+        else if (getProduction() == Production.FUNCTION_STMT_983)
             return (Token)getChild(4);
-        else if (getProduction() == Production.FUNCTION_STMT_977)
+        else if (getProduction() == Production.FUNCTION_STMT_984)
             return (Token)getChild(5);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (Token)getChild(5);
         else
             return null;
@@ -133,13 +133,13 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_975)
+        if (getProduction() == Production.FUNCTION_STMT_982)
             return (Token)getChild(5);
-        else if (getProduction() == Production.FUNCTION_STMT_976)
+        else if (getProduction() == Production.FUNCTION_STMT_983)
             return (Token)getChild(9);
-        else if (getProduction() == Production.FUNCTION_STMT_977)
+        else if (getProduction() == Production.FUNCTION_STMT_984)
             return (Token)getChild(6);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (Token)getChild(10);
         else
             return null;
@@ -149,9 +149,9 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_976)
+        if (getProduction() == Production.FUNCTION_STMT_983)
             return (Token)getChild(5);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (Token)getChild(6);
         else
             return null;
@@ -161,9 +161,9 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_976)
+        if (getProduction() == Production.FUNCTION_STMT_983)
             return (Token)getChild(6);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (Token)getChild(7);
         else
             return null;
@@ -173,9 +173,9 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_976)
+        if (getProduction() == Production.FUNCTION_STMT_983)
             return (ASTNameNode)getChild(7);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (ASTNameNode)getChild(8);
         else
             return null;
@@ -185,9 +185,9 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_976)
+        if (getProduction() == Production.FUNCTION_STMT_983)
             return (Token)getChild(8);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (Token)getChild(9);
         else
             return null;
@@ -197,9 +197,9 @@ public class ASTFunctionStmtNode extends InteriorNodeWithErrorRecoverySymbols
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_STMT_977)
+        if (getProduction() == Production.FUNCTION_STMT_984)
             return (ASTFunctionParsNode)getChild(4);
-        else if (getProduction() == Production.FUNCTION_STMT_978)
+        else if (getProduction() == Production.FUNCTION_STMT_985)
             return (ASTFunctionParsNode)getChild(4);
         else
             return null;

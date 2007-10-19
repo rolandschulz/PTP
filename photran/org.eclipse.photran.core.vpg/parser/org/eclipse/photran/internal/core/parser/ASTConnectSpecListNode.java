@@ -99,7 +99,7 @@ public class ASTConnectSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTConnectSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CONNECT_SPEC_LIST_740)
+        if (node.getProduction() == Production.CONNECT_SPEC_LIST_747)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
@@ -110,9 +110,9 @@ public class ASTConnectSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTConnectSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CONNECT_SPEC_LIST_741)
+        if (node.getProduction() == Production.CONNECT_SPEC_LIST_748)
             return (ASTConnectSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.CONNECT_SPEC_LIST_742)
+        else if (node.getProduction() == Production.CONNECT_SPEC_LIST_749)
             return (ASTConnectSpecNode)node.getChild(2);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTConnectSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_LIST_742)
+        if (getProduction() == Production.CONNECT_SPEC_LIST_749)
             return (ASTConnectSpecListNode)getChild(0);
         else
             return null;
@@ -133,7 +133,7 @@ public class ASTConnectSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTConnectSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CONNECT_SPEC_LIST_742)
+        if (node.getProduction() == Production.CONNECT_SPEC_LIST_749)
             return (Token)node.getChild(1);
         else
             return null;

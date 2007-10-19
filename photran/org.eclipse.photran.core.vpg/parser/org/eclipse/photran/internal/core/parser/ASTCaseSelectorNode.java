@@ -47,7 +47,7 @@ public class ASTCaseSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_692)
+        if (getProduction() == Production.CASE_SELECTOR_699)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTCaseSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_692)
+        if (getProduction() == Production.CASE_SELECTOR_699)
             return (ASTCaseValueRangeListNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTCaseSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_692)
+        if (getProduction() == Production.CASE_SELECTOR_699)
             return (Token)getChild(2);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTCaseSelectorNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_693)
+        if (getProduction() == Production.CASE_SELECTOR_700)
             return (Token)getChild(0);
         else
             return null;

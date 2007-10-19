@@ -47,7 +47,7 @@ public class ASTInterfaceBlockNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BLOCK_923)
+        if (getProduction() == Production.INTERFACE_BLOCK_930)
             return (ASTInterfaceStmtNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTInterfaceBlockNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BLOCK_923)
+        if (getProduction() == Production.INTERFACE_BLOCK_930)
             return (ASTInterfaceRangeNode)getChild(1);
         else
             return null;

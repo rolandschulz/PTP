@@ -464,6 +464,9 @@
 <ComponentAttrSpec> ::=
   | T_POINTER
   | T_DIMENSION T_LPAREN <ComponentArraySpec> T_RPAREN
+# JO -- Added these
+  | T_ALLOCATABLE
+  | <AccessSpec>
 
 # R427
 <ComponentArraySpec> ::=
@@ -590,9 +593,11 @@
   | <ObjectName> T_LPAREN <ArraySpec> T_RPAREN T_ASTERISK <CharLength> <Initialization>
   | <InvalidEntityDecl>
 
+# JO -- Added error production
 <InvalidEntityDecl> ::=
   | <ObjectName> T_ASTERISK <CharLength> T_LPAREN <ArraySpec> T_RPAREN
   | <ObjectName> T_ASTERISK <CharLength> T_LPAREN <ArraySpec> T_RPAREN <Initialization>
+  | <ObjectName> (error) T_EOS
 
 # R505
 <Initialization> ::=
@@ -809,8 +814,10 @@
 <NamedConstantDef> ::= <NamedConstant> T_EQUALS <Expr>
 
 # R532
+# JO -- Added error production
 <DataStmt> ::=
-  <LblDef> T_DATA <Datalist> T_EOS
+  | <LblDef> T_DATA <Datalist> T_EOS
+  | <LblDef> T_DATA (error) T_EOS
 
 <Datalist> ::=
   |                      <DataStmtSet>
@@ -1239,7 +1246,7 @@
 
 # R725-R734 chain rule deleted
 
-# R735 - JO - Macro substituted
+# R735 - JO - Macro substituted; added error production
 <AssignmentStmt> ::=
   | <LblDef> <Name>                                                                                                                                T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFExprList>         T_RPAREN                                                                                         T_EQUALS <Expr> T_EOS
@@ -1257,6 +1264,8 @@
   | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <DataRef>                                                           T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <DataRef> T_LPAREN <SectionSubscriptList> T_RPAREN                  T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <DataRef> T_LPAREN <SectionSubscriptList> T_RPAREN <SubstringRange> T_EQUALS <Expr> T_EOS
+
+  | <LblDef> <Name> (error) T_EOS
 
 <SFExprList> ::=
   | T_COLON
@@ -1311,7 +1320,10 @@
   | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <DataRef> T_EQGREATERTHAN <Target> T_EOS
 
 # R737
-<Target> ::= <Expr>
+# JO - Added NULL() target
+<Target> ::=
+  | *:<Expr>
+  | isNull+:T_NULL T_LPAREN T_RPAREN
 
 # R738
 <WhereStmt> ::=
@@ -1361,13 +1373,17 @@
 
 # R744
 <MaskedElsewhereStmt> ::=
-  | <LblDef> T_ELSEWHERE T_LPAREN <MaskExpr> T_RPAREN           T_EOS
-  | <LblDef> T_ELSEWHERE T_LPAREN <MaskExpr> T_RPAREN <EndName> T_EOS
+  | <LblDef> T_ELSEWHERE    T_LPAREN <MaskExpr> T_RPAREN           T_EOS
+  | <LblDef> T_ELSEWHERE    T_LPAREN <MaskExpr> T_RPAREN <EndName> T_EOS
+  | <LblDef> T_ELSE T_WHERE T_LPAREN <MaskExpr> T_RPAREN           T_EOS
+  | <LblDef> T_ELSE T_WHERE T_LPAREN <MaskExpr> T_RPAREN <EndName> T_EOS
 
 # R745
 <ElsewhereStmt> ::=
-  | <LblDef> T_ELSEWHERE           T_EOS
-  | <LblDef> T_ELSEWHERE <EndName> T_EOS
+  | <LblDef> T_ELSEWHERE              T_EOS
+  | <LblDef> T_ELSEWHERE <EndName>    T_EOS
+  | <LblDef> T_ELSE T_WHERE           T_EOS
+  | <LblDef> T_ELSE T_WHERE <EndName> T_EOS
 
 # R746
 <EndWhereStmt> ::=
@@ -1386,9 +1402,12 @@
   | <ForallBody> <ForallBodyConstruct>
 
 # R748
+# JO -- Added error productions
 <ForallConstructStmt> ::=
   | <LblDef>                T_FORALL <ForallHeader> T_EOS
   | <LblDef> <Name> T_COLON T_FORALL <ForallHeader> T_EOS
+  | <LblDef>                T_FORALL (error) T_EOS
+  | <LblDef> <Name> T_COLON T_FORALL (error) T_EOS
 
 # R749
 <ForallHeader> ::=
@@ -1458,21 +1477,29 @@
   | <ConditionalBody> <ExecutionPartConstruct>
 
 # R803
+# JO -- Added error production
 <IfThenStmt> ::=
   | <LblDef>                T_IF T_LPAREN <Expr> T_RPAREN T_THEN T_EOS
   | <LblDef> <Name> T_COLON T_IF T_LPAREN <Expr> T_RPAREN T_THEN T_EOS
+  | <LblDef>                T_IF (error) T_THEN
+  | <LblDef> <Name> T_COLON T_IF (error) T_THEN
 
 # R804
+# JO -- Added error production
 <ElseIfStmt> ::=
   | <LblDef> T_ELSEIF    T_LPAREN <Expr> T_RPAREN T_THEN           T_EOS
   | <LblDef> T_ELSEIF    T_LPAREN <Expr> T_RPAREN T_THEN <EndName> T_EOS
   | <LblDef> T_ELSE T_IF T_LPAREN <Expr> T_RPAREN T_THEN           T_EOS
   | <LblDef> T_ELSE T_IF T_LPAREN <Expr> T_RPAREN T_THEN <EndName> T_EOS
+  | <LblDef> T_ELSEIF    (error) T_EOS
+  | <LblDef> T_ELSE T_IF (error) T_EOS
 
 # R805
+# JO -- Added error production
 <ElseStmt> ::=
   | <LblDef> T_ELSE           T_EOS
   | <LblDef> T_ELSE <EndName> T_EOS
+  | <LblDef> T_ELSE  (error)  T_EOS
 
 # R806
 <EndIfStmt> ::=
@@ -1482,8 +1509,10 @@
   | <LblDef> T_END T_IF <EndName> T_EOS
 
 # R807
+# JO -- Added error production
 <IfStmt> ::=
-  <LblDef> T_IF T_LPAREN <Expr> T_RPAREN <ActionStmt>
+  | <LblDef> T_IF T_LPAREN <Expr> T_RPAREN <ActionStmt>
+  | <LblDef> T_IF (error) T_EOS
 
 # R808
 <CaseConstruct> ::=
@@ -1503,16 +1532,23 @@
 
 
 # R809 chain rule eliminated
+# JO -- Added error production
 <SelectCaseStmt> ::=
   | <LblDef> <Name> T_COLON T_SELECTCASE    T_LPAREN <Expr> T_RPAREN T_EOS
   | <LblDef>                T_SELECTCASE    T_LPAREN <Expr> T_RPAREN T_EOS
   | <LblDef> <Name> T_COLON T_SELECT T_CASE T_LPAREN <Expr> T_RPAREN T_EOS
   | <LblDef>                T_SELECT T_CASE T_LPAREN <Expr> T_RPAREN T_EOS
+  | <LblDef> <Name> T_COLON T_SELECTCASE    (error) T_EOS
+  | <LblDef>                T_SELECTCASE    (error)  T_EOS
+  | <LblDef> <Name> T_COLON T_SELECT T_CASE (error)  T_EOS
+  | <LblDef>                T_SELECT T_CASE (error)  T_EOS
 
 # R810
+# JO -- Added error production
 <CaseStmt> ::=
   | <LblDef> T_CASE <CaseSelector>        T_EOS
   | <LblDef> T_CASE <CaseSelector> <Name> T_EOS
+  | <LblDef> T_CASE (error) T_EOS
 
 # R811
 <EndSelectStmt> ::=

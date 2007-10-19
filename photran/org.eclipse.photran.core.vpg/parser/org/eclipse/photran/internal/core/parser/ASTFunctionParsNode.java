@@ -99,9 +99,9 @@ public class ASTFunctionParsNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFunctionParsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_PARS_979)
+        if (node.getProduction() == Production.FUNCTION_PARS_986)
             return (ASTFunctionParNode)node.getChild(0);
-        else if (node.getProduction() == Production.FUNCTION_PARS_980)
+        else if (node.getProduction() == Production.FUNCTION_PARS_987)
             return (ASTFunctionParNode)node.getChild(2);
         else
             return null;
@@ -111,7 +111,7 @@ public class ASTFunctionParsNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PARS_980)
+        if (getProduction() == Production.FUNCTION_PARS_987)
             return (ASTFunctionParsNode)getChild(0);
         else
             return null;
@@ -122,7 +122,7 @@ public class ASTFunctionParsNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFunctionParsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_PARS_980)
+        if (node.getProduction() == Production.FUNCTION_PARS_987)
             return (Token)node.getChild(1);
         else
             return null;

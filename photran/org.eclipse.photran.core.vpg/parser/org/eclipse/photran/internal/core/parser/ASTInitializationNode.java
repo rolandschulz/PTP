@@ -47,7 +47,7 @@ public class ASTInitializationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INITIALIZATION_271)
+        if (getProduction() == Production.INITIALIZATION_273)
             return (Token)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTInitializationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INITIALIZATION_271)
+        if (getProduction() == Production.INITIALIZATION_273)
             return (ASTExprNode)getChild(1);
         else
             return null;
@@ -67,7 +67,7 @@ public class ASTInitializationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INITIALIZATION_272)
+        if (getProduction() == Production.INITIALIZATION_274)
             return (Token)getChild(0);
         else
             return null;
@@ -77,7 +77,7 @@ public class ASTInitializationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INITIALIZATION_272)
+        if (getProduction() == Production.INITIALIZATION_274)
             return (Token)getChild(1);
         else
             return null;
@@ -87,7 +87,7 @@ public class ASTInitializationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INITIALIZATION_272)
+        if (getProduction() == Production.INITIALIZATION_274)
             return (Token)getChild(2);
         else
             return null;
@@ -97,7 +97,7 @@ public class ASTInitializationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INITIALIZATION_272)
+        if (getProduction() == Production.INITIALIZATION_274)
             return (Token)getChild(3);
         else
             return null;

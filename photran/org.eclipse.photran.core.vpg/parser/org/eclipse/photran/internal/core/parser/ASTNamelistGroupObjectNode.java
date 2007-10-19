@@ -47,7 +47,7 @@ public class ASTNamelistGroupObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_GROUP_OBJECT_401)
+        if (getProduction() == Production.NAMELIST_GROUP_OBJECT_403)
             return (ASTVariableNameNode)getChild(0);
         else
             return null;
