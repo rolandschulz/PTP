@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.photran.vpg_feature"
+      label="Photran Analysis &amp; Refactoring Feature"
+      version="4.0.0"
+      provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
+      os="linux,macosx,solaris,win32"
+      nl="en_US">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <plugin
+         id="org.eclipse.photran.core.vpg"
+         download-size="0"
+         install-size="0"
+         version="4.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.ui.vpg"
+         download-size="0"
+         install-size="0"
+         version="4.0.0"
+         unpack="false"/>
+
+</feature>
