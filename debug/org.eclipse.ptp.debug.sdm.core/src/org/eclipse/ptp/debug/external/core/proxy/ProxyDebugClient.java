@@ -152,6 +152,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDeleteBreakpointCommand(encodeBitSet(procs), bpid);
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugEnableBreakpoint(BitList procs, int bpid) throws IOException {
@@ -163,6 +164,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugDisableBreakpoint(BitList procs, int bpid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDisableBreakpointCommand(encodeBitSet(procs), bpid);
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugConditionBreakpoint(BitList procs, int bpid, String expr) throws IOException {
@@ -174,6 +176,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugBreakpointAfter(BitList procs, int bpid, int icount) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugBreakpointAfterCommand(encodeBitSet(procs), bpid, icount);
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugStackInfoDepth(BitList procs) throws IOException {
@@ -185,6 +188,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugGo(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugGoCommand(encodeBitSet(procs));
 		sendCommand(cmd);
+		cmd.completed();
 	}
 	
 	public void debugStep(BitList procs, int count, int type) throws IOException {
@@ -196,6 +200,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugTerminate(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugTerminateCommand(encodeBitSet(procs));
 		sendCommand(cmd);
+		cmd.completed();
 	}
 	
 	public void debugInterrupt(BitList procs) throws IOException {
@@ -207,6 +212,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugListStackframes(BitList procs, int low, int high) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListStackframesCommand(encodeBitSet(procs), low, high);
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugSetCurrentStackframe(BitList procs, int level) throws IOException {
@@ -218,6 +224,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugEvaluateExpression(BitList procs, String expr) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(encodeBitSet(procs), expr);
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugGetType(BitList procs, String expr) throws IOException {
@@ -229,6 +236,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugListLocalVariables(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListLocalVariablesCommand(encodeBitSet(procs));
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugListArguments(BitList procs, int low, int high) throws IOException {
@@ -240,6 +248,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugListGlobalVariables(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListGlobalVariablesCommand(encodeBitSet(procs));
 		sendCommand(cmd);
+		cmd.completed();
 	}
 
 	public void debugListInfoThreads(BitList procs) throws IOException {
@@ -251,6 +260,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugSetThreadSelect(BitList procs, int threadNum) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetThreadSelectCommand(encodeBitSet(procs), threadNum);
 		sendCommand(cmd);
+		cmd.completed();
 	}
 	
 	public void setDataReadMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, int rows, int cols, Character asChar) throws IOException {
