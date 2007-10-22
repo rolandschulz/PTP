@@ -766,12 +766,13 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	 		return DBGRES_ERR;
 	 	}
 	}
-
+/***
+ * Working dir is not important in debugging
 	if (*work_dir != '\0' && chdir(work_dir) < 0) {
 		DbgSetError(DBGERR_CHDIR, work_dir);
 		return DBGRES_ERR;
 	}
-
+***/
 	if (path != NULL)
 		asprintf(&prog_path, "%s/%s", path, prog);
 	else
@@ -2804,7 +2805,7 @@ GetMIVarDetails(char *name)
 	MICommandFree(cmd);
 	return mivar;
 }
-
+/*
 static int 
 GDBGetAIFType(char* name)
 {
@@ -2847,6 +2848,7 @@ GDBGetAIFType(char* name)
 	MIVarFree(mivar);
 	return DBGRES_OK;
 }
+*/
 
 static int
 GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
