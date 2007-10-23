@@ -301,7 +301,7 @@ proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, cha
 	proxy_msg_add_string(m, rm_id);	
 	proxy_msg_add_int(m, 1); /* 1 new queue */
 	proxy_msg_add_string(m, queue_id);
-	proxy_msg_add_int(m, 1); /* 2 attributes */
+	proxy_msg_add_int(m, 2); /* 2 attributes */
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_msg_add_keyval_string(m, QUEUE_STATE_ATTR, state);
 	
