@@ -144,6 +144,8 @@ MIGetStackListFramesInfo(MICommand *cmd)
 			}
 		}
 	}
+	if (frames == NULL)
+		frames = NewList();
 	return frames;
 }
 
@@ -166,6 +168,8 @@ MIFrameInfoParse(List *results)
 			}
 		}
 	}
+	if (frames == NULL)
+		frames = NewList();
 	return frames;
 }
 
