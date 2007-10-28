@@ -700,6 +700,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/**
+	 * Create an attribute manager given an array of key/value strings. Each key/value string
+	 * must be in the form "key=value", where "key" is a string containing at least one character,
+	 * and "value" is a string containing zero or more characters. The "key" string cannot contain 
+	 * an '=' character. There is no white space allowed between the end of the "key" string, the '=', 
+	 * and the start of the "value" string, unless that white space is part of those strings.
+	 * 
 	 * @param kvs
 	 * @param start
 	 * @param end
@@ -709,12 +715,17 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		AttributeManager mgr = new AttributeManager();
 		
 		for (int i = start; i <= end; i++) {
-			String[] kv = kvs[i].split("=");
-			if (kv.length == 2) {
+			String kv = kvs[i];
+			int sep = kv.indexOf('=');
+			if (sep > 0) {
 				try {
-					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(kv[0]);
+					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(kv.substring(0, sep));
 					if(attrDef != null) {
-						IAttribute<?,?,?> attr = attrDef.create(kv[1]);
+						String value = "";
+						if (sep < kv.length() - 1) {
+							value = kv.substring(sep+1);
+						}
+						IAttribute<?,?,?> attr = attrDef.create(value);
 						mgr.addAttribute(attr);
 					} else {
 						System.out.println("AbstractProxyRuntimSystem: unknown attribute definition");
