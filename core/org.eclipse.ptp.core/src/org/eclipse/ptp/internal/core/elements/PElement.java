@@ -53,8 +53,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @see org.eclipse.ptp.core.elements.IPElement#addAttribute(org.eclipse.ptp.core.attributes.IAttribute)
 	 */
 	public void addAttribute(IAttribute<?,?,?> attrib) {
-		attributeValues.addAttribute(attrib);
-		doAddAttributeHook(attributeValues.getMap());
+		addAttributes(new IAttribute<?,?,?>[]{attrib});
 	}
 	
 	/* (non-Javadoc)
@@ -62,7 +61,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public void addAttributes(IAttribute<?,?,?>[] attribs) {
 		attributeValues.addAttributes(attribs);
-		doAddAttributeHook(attributeValues.getMap());
+		doAddAttributeHook(new AttributeManager(attribs).getMap());
 	}
 
 	/* (non-Javadoc)
