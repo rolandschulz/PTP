@@ -699,10 +699,10 @@ iof_to_event(int jobid, int type, int procid, const unsigned char *data, int len
  */
 static void 
 iof_callback(
-    orte_process_name_t* src_name,
+    orte_process_name_t *src_name,
     orte_iof_base_tag_t src_tag,
-    void* cbdata,
-    const unsigned char* data,
+    void *cbdata,
+    const unsigned char *data,
     size_t count)
 {
 	iof_to_event((int)src_name->jobid, JOBID_ORTE, (int)src_name->vpid, data, count);
@@ -714,10 +714,10 @@ iof_callback(
  */
 static void 
 iof_debug_callback(
-    orte_process_name_t* src_name,
+    orte_process_name_t *src_name,
     orte_iof_base_tag_t src_tag,
-    void* cbdata,
-    const unsigned char* data,
+    void *cbdata,
+    const unsigned char *data,
     size_t count)
 {
 	iof_to_event((int)src_name->jobid, JOBID_DEBUG, (int)src_name->vpid, data, count);
@@ -741,6 +741,7 @@ orte_start_iof(ptp_job *job)
 {
 	int						rc;
 	orte_process_name_t *	name;
+	void (*callback)(orte_process_name_t *, orte_iof_base_tag_t, void *, const unsigned char *, size_t);
 	
 	if (!job->iof) {
 		/* register the IO forwarding callback */
@@ -750,11 +751,17 @@ orte_start_iof(ptp_job *job)
 	    }
 	    	
 		fprintf(stderr, "registering IO forwarding - name = '%s'\n", (char *)name); fflush(stderr);
+		
+		if (!job->debug) {
+			callback = iof_callback;
+		} else {
+			callback = iof_debug_callback;
+		}
 	            	
-		if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
+		if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, callback, NULL))) {                
 			opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
 	    }
-		if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
+		if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, callback, NULL))) {                
 	    	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
 		}
 		
