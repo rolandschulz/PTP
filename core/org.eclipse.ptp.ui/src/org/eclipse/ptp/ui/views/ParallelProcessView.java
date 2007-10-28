@@ -48,7 +48,7 @@ import org.eclipse.ui.texteditor.IStatusField;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 /**
- * 
+ * View for displaying details about an individual process
  */
 public class ParallelProcessView extends AbstractTextEditor implements IProcessListener {
 	private Label rankLabel = null;
@@ -118,6 +118,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		Object obj = getEditorInput().getAdapter(IPProcess.class);
 		if (obj instanceof IPProcess) {
 			process = (IPProcess) obj;
+			process.addElementListener(this);
 		}
 	}
 	
@@ -125,6 +126,9 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 * 
 	 */
 	public void close() {
+		if (process != null) {
+			process.removeElementListener(this);
+		}
 		getSite().getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (toolkit != null) {
@@ -148,7 +152,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
-	 * 
+	 * Add the process details to the view
 	 */
 	protected void detailsSection() {
 		Section detailsSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR);
@@ -179,7 +183,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
-	 * 
+	 * Add the process output section to the view
 	 */
 	protected void outputSection() {
 		Section outputSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR | Section.TWISTIE);
@@ -196,6 +200,8 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
+	 * Convenience method to create a container
+	 * 
 	 * @param parent
 	 * @param toolkit
 	 * @param columns
@@ -212,7 +218,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
-	 * 
+	 * Initialize the view
 	 */
 	public void initialText() {
 		rankLabel.setText("Index: N/A");
@@ -268,6 +274,8 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
+	 * Convenience method to create a grid layout
+	 * 
 	 * @param columns
 	 * @param isEqual
 	 * @param mh
@@ -284,6 +292,8 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
+	 * Convenience method to create a GridData object
+	 * 
 	 * @param style
 	 * @param space
 	 * @return
@@ -296,18 +306,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			gd = new GridData(style);
 		gd.horizontalSpan = space;
 		return gd;
-	}
-	
-	/**
-	 * @param comp
-	 * @param colSpan
-	 */
-	protected void createVerticalSpacer(Composite comp, int colSpan) {
-		Label label = new Label(comp, SWT.NONE);
-		GridData gd = new GridData();
-		gd.horizontalSpan = colSpan;
-		label.setLayoutData(gd);
-		label.setFont(comp.getFont());
 	}
 	
 	/* (non-Javadoc)
