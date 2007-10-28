@@ -127,11 +127,13 @@ struct ptp_process {
 typedef struct ptp_process	ptp_process;
 
 struct ptp_job {
-	int 			ptp_jobid;		// job ID as known by PTP */
-	int				debug_jobid;	// job ID of debugger or -1 if not a debug job
-	int 			orte_jobid;		// job ID that will be used by program when it starts
-	int				num_procs;		// number of procs requested for program (debugger uses num_procs+1)
-	int				terminating;	// job termination has been requested
+	int 			ptp_jobid;		/* job ID as known by PTP */
+	int				debug_jobid;	/* job ID of debugger or -1 if not a debug job */
+	int 			orte_jobid;		/* job ID that will be used by program when it starts */
+	int				num_procs;		/* number of procs requested for program (debugger uses num_procs+1) */
+	bool			debug;			/* job is debug job */
+	bool			terminating;	/* job termination has been requested */
+	bool			iof;			/* job has i/o forwarding */
 	ptp_process **	procs;
 };
 typedef struct ptp_job ptp_job;
@@ -139,11 +141,10 @@ typedef struct ptp_job ptp_job;
 int do_orte_init(int, char *universe_name);
 static void	get_proc_info(ptp_job *);
 static int get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_node);
+static void do_state_callback(ptp_job *job, orte_proc_state_t state);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
-static void orte_job_record_start(orte_jobid_t jobid);
-static void orte_job_record_end(orte_jobid_t jobid);
-static int orte_job_record_started(orte_jobid_t jobid);
+static void orte_start_iof(ptp_job *job);
 
 #ifdef HAVE_SYS_BPROC_H
 int subscribe_bproc(void);
@@ -324,14 +325,16 @@ get_jobid(ptp_job *j, int which)
  * debug jobs, keep the debug jobid as well.
  */
 static ptp_job *
-new_job(int num_procs, int ptp_jobid, int orte_jobid, int debug_jobid)
+new_job(int num_procs, bool debug, int ptp_jobid, int orte_jobid, int debug_jobid)
 {
 	ptp_job *	j = (ptp_job *)malloc(sizeof(ptp_job));
 	j->ptp_jobid = ptp_jobid;
     j->orte_jobid = orte_jobid;
     j->debug_jobid = debug_jobid;
     j->num_procs = num_procs;
+    j->debug = debug;
     j->terminating = false;
+    j->iof = false;
     j->procs = (ptp_process **)malloc(sizeof(ptp_process *) * num_procs);
     memset(j->procs, 0, sizeof(ptp_process *) * num_procs);
     AddToList(gJobList, (void *)j);
@@ -356,17 +359,10 @@ free_job(ptp_job *j)
  * lookup the job using the debug jobid.
  */
 static void
-remove_job(int jobid, int which)
+remove_job(ptp_job *job)
 {
-	ptp_job *	j;
-	
-	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL; ) {
-		if (get_jobid(j, which) == jobid) {
-			RemoveFromList(gJobList, (void *)j);
-			free_job(j);
-			break;
-		}
-	}
+	RemoveFromList(gJobList, (void *)job);
+	free_job(job);
 }
 
 /*
@@ -669,11 +665,37 @@ ORTECheckErrorCode(int trans_id, int type, int rc)
 }
 
 /*
- * This callback is invoked when there is I/O available from a
- * process. It gets forwarded to Eclipse.
+ * Process data from an I/O forwarding callback an send to Eclipse as
+ * a process attribute change event.
  * 
- * This needs to be modified to avoid flooding Eclipse with
+ * TODO: This needs to be modified to avoid flooding Eclipse with
  * events.
+ */
+static void
+iof_to_event(int jobid, int type, int procid, const unsigned char *data, int len)
+{
+	char *			line;
+	ptp_process *	p;
+	
+	if (len > 0) {
+		ptp_job *	j = find_job(jobid, type);
+		if (j != NULL && procid < j->num_procs) {
+	        line = (char *)malloc(len+1);
+	        strncpy((char*)line, (char*)data, len);
+	        if (line[len-1] == '\n') line[len-1] = '\0';
+	        line[len] = '\0';
+	        p = find_process(j, procid);
+	        if (p != NULL) {
+	        	sendProcessOutputEvent(gTransID, p->id, line);
+	        }
+	        free(line);
+		}
+	}
+}
+
+/*
+ * This callback is invoked when there is I/O available from a
+ * process.
  */
 static void 
 iof_callback(
@@ -683,118 +705,86 @@ iof_callback(
     const unsigned char* data,
     size_t count)
 {
-	char *			line;
-	ptp_process *	p;
-	
-    if(count > 0) {
-    	ptp_job *	j = find_job((int)src_name->jobid, JOBID_ORTE);
-    	if (j != NULL) {
-	        line = (char *)malloc(count+1);
-	        strncpy((char*)line, (char*)data, count);
-	        if (line[count-1] == '\n') line[count-1] = '\0';
-	        line[count] = '\0';
-	        p = find_process(j, (int)src_name->vpid);
-	        if (p != NULL)
-	        	sendProcessOutputEvent(gTransID, p->id, line);
-	        free(line);
-    	}
-    }
+	iof_to_event((int)src_name->jobid, JOBID_ORTE, (int)src_name->vpid, data, count);
 }
 
-struct orte_job_record {
-	struct orte_job_record *next;
-	orte_jobid_t jobid;
-};
-
-struct orte_job_record *head = NULL;
-
-static int 
-orte_job_record_started(orte_jobid_t jobid)
+/*
+ * This callback is invoked when there is I/O available from a
+ * process being debugged.
+ */
+static void 
+iof_debug_callback(
+    orte_process_name_t* src_name,
+    orte_iof_base_tag_t src_tag,
+    void* cbdata,
+    const unsigned char* data,
+    size_t count)
 {
-	struct orte_job_record *cur = NULL;
-	if(head == NULL) return 0;
-	
-	cur = head;
-	
-	while(cur != NULL) {
-		if(cur->jobid == jobid) return 1;
-		cur = cur->next;
-	}
-	
-	return 0; /* guess we didn't find it and we're at the end */
+	iof_to_event((int)src_name->jobid, JOBID_DEBUG, (int)src_name->vpid, data, count);
 }
 
+/*
+ * Start I/O forwarding on the job. There are three cases that need to be dealt with:
+ * 
+ * 1. A normal application. In this case, the I/O forwarding is registered with the
+ * ORTE job id for the application.
+ * 
+ * 2. The debugger starts each application process. In this case, each debug process must
+ * manage the I/O for the application process. The I/O forwarding is registered with
+ * the debugger job id.
+ * 
+ * 3. The debugger attaches to the application. This case is treated the same as (1). This case
+ * is not currently supported by ORTE.
+ */
 static void
-orte_job_record_start(orte_jobid_t jobid)
+orte_start_iof(ptp_job *job)
 {
-	struct orte_job_record *cur = NULL;
-	struct orte_job_record *tmp = NULL;
-	int	rc;
+	int						rc;
 	orte_process_name_t *	name;
 	
-	/* if this is the first, we need to set it up */
-	if(head == NULL) {
-		head = (struct orte_job_record *)malloc(sizeof(struct orte_job_record));
-		head->next = NULL;
-	}
-	cur = head;
-	/* run to the end */
-	while(cur->next != NULL) cur = cur->next;
-	/* now we know 'cur' is the tail */
-	tmp = (struct orte_job_record*)malloc(sizeof(struct orte_job_record));
-	cur->next = tmp;
-	tmp->next = NULL;
-	tmp->jobid = jobid;
-	
-	/* register the IO forwarding callback */
-	if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-		ORTE_ERROR_LOG(rc);
-        	return;
-    	}
-    	
-	fprintf(stderr, "registering IO forwarding - name = '%s'\n", (char *)name); fflush(stderr);
-            	
-	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
-		opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
-    	}
-    	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
-        	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
-    	}
-}
-
-static void
-orte_job_record_end(orte_jobid_t jobid)
-{
-	struct orte_job_record *cur = NULL;
-	struct orte_job_record *prev = NULL;
-	int	rc;
-	orte_process_name_t *	name;
-	if(head == NULL) return; /* umm, we have nothing */
-	
-	cur = head;
-	while(cur != NULL) {
-		if(cur->jobid == jobid) {
-			/* ok we found it, we need to move the pointer behind us */
-			prev->next = cur->next; /* parent's next is our next */
-			/* now free cur */
-			free(cur);
-			
-			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-             	ORTE_ERROR_LOG(rc);
-                	return;
-            }
-			fprintf(stderr, "unregistering IO forwarding - name = %s\n", (char *)name); fflush(stderr);
-            if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT))) {                
-				opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
-			}
-			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
-				opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
-			}
-			
-			return;
+	if (!job->iof) {
+		/* register the IO forwarding callback */
+		if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, job->orte_jobid, 0))) {
+			ORTE_ERROR_LOG(rc);
+	        return;
+	    }
+	    	
+		fprintf(stderr, "registering IO forwarding - name = '%s'\n", (char *)name); fflush(stderr);
+	            	
+		if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
+			opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+	    }
+		if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
+	    	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
 		}
-		prev = cur;
-		cur = cur->next;
+		
+		job->iof = true;
+	}
+}
+
+/*
+ * Stop I/O forwarding for the job.
+ */
+static void
+orte_stop_iof(ptp_job *job)
+{
+	int						rc;
+	orte_process_name_t *	name;
+
+	if (job->iof) {
+		if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, job->orte_jobid, 0))) {
+	     	ORTE_ERROR_LOG(rc);
+	        	return;
+	    }
+		fprintf(stderr, "unregistering IO forwarding - name = %s\n", (char *)name); fflush(stderr);
+	    if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT))) {                
+			opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+		}
+		if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
+			opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+		}
+		
+		job->iof = false;
 	}
 }
 
@@ -804,9 +794,8 @@ orte_job_record_end(orte_jobid_t jobid)
  * icons can be updated appropriately.
  */
 static void
-job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
+job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
-	char *		state;
 	ptp_job *	j = find_job(jobid, JOBID_ORTE);
 	
 	if (j == NULL) {
@@ -814,18 +803,18 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 		return;
 	}
 	
-	fprintf(stderr, "JOB STATE CALLBACK: %d\n", proc_state); fflush(stderr);
+	do_state_callback(j, state);
+}
+
+static void
+do_state_callback(ptp_job *job, orte_proc_state_t state) 
+{
+	fprintf(stderr, "STATE CALLBACK: %d\n", state); fflush(stderr);
 		
-	/* not sure yet how we want to handle this callback, what events
-	 * we want to generate, but here are the states that I know of
-	 * that a job can go through.  I've watched ORTE call this callback
-	 * with each of these states.  We'll want to come in here and
-	 * generate events where appropriate */
-	
-	switch (proc_state) {
+	switch (state) {
 #if !ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_LAUNCHED:
-			get_proc_info(j);
+			get_proc_info(job);
 			/* drop through... */
 #endif /* !ORTE_VERSION_1_0 */
 			
@@ -835,36 +824,36 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 		case ORTE_JOB_STATE_AT_STG2:
 #endif /* ORTE_VERSION_1_0 */
 		case ORTE_JOB_STATE_RUNNING:
-			state = JOB_STATE_RUNNING;
-			sendProcessStateChangeEvent(gTransID, j, PROC_STATE_RUNNING);
-			sendJobStateChangeEvent(gTransID, j->ptp_jobid, state);
+			if (!job->debug) {
+				sendProcessStateChangeEvent(gTransID, job, PROC_STATE_RUNNING);
+			}
+			sendJobStateChangeEvent(gTransID, job->ptp_jobid, JOB_STATE_RUNNING);
 			break;
 			
 		case ORTE_JOB_STATE_TERMINATED:
-			if (orte_job_record_started(jobid)) {
-				orte_job_record_end(jobid);
+			orte_stop_iof(job);
+			if (!job->debug) {
+				ORTE_TERMINATE_ORTEDS(job->orte_jobid);
+				sendProcessStateChangeEvent(gTransID, job, PROC_STATE_EXITED);
 			}
-			ORTE_TERMINATE_ORTEDS(jobid);
-			sendProcessStateChangeEvent(gTransID, j, PROC_STATE_EXITED);
-			sendJobStateChangeEvent(gTransID, j->ptp_jobid, JOB_STATE_TERMINATED);
-			remove_job(jobid, JOBID_ORTE);
+			sendJobStateChangeEvent(gTransID, job->ptp_jobid, JOB_STATE_TERMINATED);
+			remove_job(job);
 			break;
 			
 		case ORTE_JOB_STATE_ABORTED:
-			if (orte_job_record_started(jobid)) {
-				orte_job_record_end(jobid);
+			orte_stop_iof(job);
+			if (!job->debug) {
+				ORTE_TERMINATE_ORTEDS(job->orte_jobid);
+				sendProcessStateChangeEvent(gTransID, job, PROC_STATE_ERROR);
 			}
-			ORTE_TERMINATE_ORTEDS(jobid);
-			sendProcessStateChangeEvent(gTransID, j, PROC_STATE_ERROR);
-			sendJobStateChangeEvent(gTransID, j->ptp_jobid, JOB_STATE_TERMINATED);
-			remove_job(jobid, JOBID_ORTE);
+			sendJobStateChangeEvent(gTransID, job->ptp_jobid, JOB_STATE_TERMINATED);
+			remove_job(job);
 			break;
 
 #if !ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_FAILED_TO_START:
-			state = JOB_STATE_ERROR;
-			sendJobStateChangeEvent(gTransID, j->ptp_jobid, state);
-			remove_job(jobid, JOBID_ORTE);
+			sendJobStateChangeEvent(gTransID, job->ptp_jobid, JOB_STATE_ERROR);
+			remove_job(job);
 			break;
 #endif /* !ORTE_VERSION_1_0 */
 			
@@ -1090,11 +1079,10 @@ get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_no
 
 /*
  * If we're under debug control, let the debugger handle process state update. 
- * We still want to wire up stdio though.
  * 
- * Note: this will only be used if the debugger allows the program to
- * reach MPI_Init(), which may not ever happen. Don't rely this to do anything
- * for any type of job.
+ * Note: this will only be called if the debugger allows the program to
+ * reach MPI_Init(), which may never happen (e.g. if it's not an MPI program). 
+ * Don't rely this to do anything for arbitrary jobs.
  * 
  * Note also: the debugger manages process state updates so we don't need
  * to send events back to the runtime.
@@ -1102,12 +1090,10 @@ get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_no
 static void
 debug_app_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
+	/* this is what it has before, untouched */
 	switch(state) {
 		case ORTE_PROC_STATE_TERMINATED:
 		case ORTE_PROC_STATE_ABORTED:
-			if (orte_job_record_started(jobid)) {
-				orte_job_record_end(jobid);
-			}
 			break;
 	}
 }
@@ -1119,105 +1105,14 @@ debug_app_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 static void
 debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
-	int				app_jobid;
-	char *			job_state;
 	ptp_job	*		j;
 	
 	if ((j = find_job(jobid, JOBID_DEBUG)) == NULL)
 		return;
 	
-	app_jobid = j->ptp_jobid;
-	
-	switch(state) {
-#if !ORTE_VERSION_1_0
-		case ORTE_JOB_STATE_AT_STG2:
-#endif /* !ORTE_VERSION_1_0 */
-		case ORTE_JOB_STATE_RUNNING:
-			job_state = JOB_STATE_RUNNING;
-			break;
-		case ORTE_PROC_STATE_TERMINATED:
-		case ORTE_PROC_STATE_ABORTED:
-			job_state = JOB_STATE_TERMINATED;
-           	remove_job(jobid, JOBID_DEBUG);
-    		break;
-    	default:
-    		return;
-	}
-	
-	sendJobStateChangeEvent(gTransID, app_jobid, job_state);
+	do_state_callback(j, state);
 }
 
-/*
- * Debug spawner. To spawn a debug job, two process allocations must be made. 
- * This first is for the application and the second for the debugger (which is
- * an MPI program). We then launch the debugger, and let it deal with starting
- * the application processes.
- * 
- * This will need to be modified to support attaching.
- */
-static int
-debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* app_jobid, orte_jobid_t* debug_jobid)
-{
-	int						i;
-	int						rc;
-	orte_jobid_t			jid1;
-	orte_jobid_t			jid2;
-	orte_app_context_t *	debug_context;
-
-	rc = ORTE_ALLOCATE_JOB(app_context, num_context, &jid1, debug_app_job_state_callback);
-	if (rc != ORTE_SUCCESS) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	debug_context = OBJ_NEW(orte_app_context_t);
-	debug_context->num_procs = app_context[0]->num_procs + 1;
-	debug_context->app = debug_path;
-	debug_context->cwd = strdup(app_context[0]->cwd);
-	/* no special environment variables */
-#if ORTE_VERSION_1_0
-	debug_context->num_env = 0;
-#endif /* ORTE_VERSION_1_0 */
-	debug_context->env = NULL;
-	/* no special mapping of processes to nodes */
-	debug_context->num_map = 0;
-	debug_context->map_data = NULL;
-	/* setup argv */
-	debug_context->argv = (char **)malloc((argc+2) * sizeof(char *));
-	for (i = 0; i < argc; i++) {
-		debug_context->argv[i] = strdup(argv[i]);
-	}
-	asprintf(&debug_context->argv[i++], "--jobid=%d", jid1);
-	debug_context->argv[i++] = NULL;
-#if ORTE_VERSION_1_0
-	debug_context->argc = i;
-#endif /* ORTE_VERSION_1_0 */
-
-	rc = ORTE_ALLOCATE_JOB(&debug_context, 1, &jid2, debug_job_state_callback);
-	if (rc != ORTE_SUCCESS) {
-		OBJ_RELEASE(debug_context);
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	fprintf(stderr, "About to launch debugger: %s on %d procs\n", debug_path, debug_context->num_procs);
-	
-	/*
-	 * launch the debugger
-	 */
-	if (ORTE_SUCCESS != (rc = ORTE_LAUNCH_JOB(jid2))) {
-		OBJ_RELEASE(debug_context);
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	*app_jobid = jid1;
-	*debug_jobid = jid2;
-    
-    OBJ_RELEASE(debug_context);
-    
-	return ORTE_SUCCESS;
-}
 
 int
 do_orte_init(int trans_id, char *universe_name)
@@ -1817,10 +1712,11 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	char *					debug_full_path;
 	char **					debug_args;
 	char **					env = NULL;
-	orte_app_context_t *	apps;
-	orte_jobid_t			ortejobid = ORTE_JOBID_MAX;
+	orte_app_context_t *	app_context;
+	orte_app_context_t *	debug_context;
+	orte_jobid_t			app_jobid = ORTE_JOBID_MAX;
 	orte_jobid_t			debug_jobid = -1;
-	ptp_job *				j;
+	ptp_job *				job;
 
 	fprintf(stderr, "  ORTE_SubmitJob (%d):\n", trans_id);
 
@@ -1946,68 +1842,137 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 
 	/* format the app_context_t struct */
-	apps = OBJ_NEW(orte_app_context_t);
-	apps->num_procs = num_procs;
-	apps->app = full_path;
-	apps->cwd = strdup(cwd);
+	app_context = OBJ_NEW(orte_app_context_t);
+	app_context->num_procs = num_procs;
+	app_context->app = full_path;
+	app_context->cwd = strdup(cwd);
 	/* no special environment variables */
 #if ORTE_VERSION_1_0
-	apps->num_env = num_env;
+	app_context->num_env = num_env;
 #endif /* ORTE_VERSION_1_0 */
-	apps->env = env;
+	app_context->env = env;
 	/* no special mapping of processes to nodes */
-	apps->num_map = 0;
-	apps->map_data = NULL;
+	app_context->num_map = 0;
+	app_context->map_data = NULL;
 	/* setup argv */
-	apps->argv = (char **)malloc((num_args + 2) * sizeof(char *));
-	apps->argv[0] = strdup(full_path);
+	app_context->argv = (char **)malloc((num_args + 2) * sizeof(char *));
+	app_context->argv[0] = strdup(full_path);
 	if (num_args > 0) {
 		for (i = 0, a = 1; i < nargs; i++) {
 			if (strncmp(args[i], JOB_PROG_ARGS_ATTR, strlen(JOB_PROG_ARGS_ATTR)) == 0)
-				apps->argv[a++] = strdup(args[i] + strlen(JOB_PROG_ARGS_ATTR) + 1);
+				app_context->argv[a++] = strdup(args[i] + strlen(JOB_PROG_ARGS_ATTR) + 1);
 		}
 	}
-	apps->argv[num_args+1] = NULL;
+	app_context->argv[num_args+1] = NULL;
 #if ORTE_VERSION_1_0
-	apps->argc = num_args + 1;
+	app_context->argc = num_args + 1;
 #endif /* ORTE_VERSION_1_0 */
 
-	fprintf(stderr, "%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , (int)apps->num_procs, apps->app);
-	fprintf(stderr, "\tprogram name '%s'\n", apps->argv[0]);
+	fprintf(stderr, "%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , 
+			(int)app_context->num_procs, app_context->app);
+	fprintf(stderr, "\tprogram name '%s'\n", app_context->argv[0]);
 	fflush(stderr);
 	
-	/* calls the ORTE spawn function with the app to spawn.  Return the
-	 * jobid assigned by the registry/ORTE.  Passes a callback function
-	 * that ORTE will call with state change on this job */
+	/*
+	 * To spawn a debug job, two process allocations must be made. This first is for the 
+	 * application and the second for the debugger (which is an MPI program). We then launch 
+	 * the debugger, and let it deal with starting the application processes.
+	 * 
+	 * This will need to be modified to support attaching.
+	 */
+
 	if (debug) {
-		rc = debug_spawn(debug_full_path, debug_argc, debug_args, &apps, 1, &ortejobid, &debug_jobid);
-		free(debug_args);
+		/*
+		 * If this is a debug job then we provide a dummy job state callback handler for the
+		 * application. In this case, main job state callback handler will reflect the state of
+		 * the debugger rather than the application, so process state must be managed by the
+		 * debugger.
+		 */
+		rc = ORTE_ALLOCATE_JOB(&app_context, 1, &app_jobid, debug_app_job_state_callback);
+		if (rc != ORTE_SUCCESS) {
+			sendJobSubErrorEvent(trans_id, jobsubid, (char *)ORTE_ERROR_NAME(rc));
+			OBJ_RELEASE(app_context);
+			ORTE_ERROR_LOG(rc);
+			return rc;
+		}
+
+		debug_context = OBJ_NEW(orte_app_context_t);
+		debug_context->num_procs = app_context->num_procs + 1;
+		debug_context->app = debug_full_path;
+		debug_context->cwd = strdup(app_context->cwd);
+		/* no special environment variables */
+	#if ORTE_VERSION_1_0
+		debug_context->num_env = 0;
+	#endif /* ORTE_VERSION_1_0 */
+		debug_context->env = NULL;
+		/* no special mapping of processes to nodes */
+		debug_context->num_map = 0;
+		debug_context->map_data = NULL;
+		/* setup argv */
+		debug_context->argv = (char **)malloc((debug_argc+2) * sizeof(char *));
+		for (i = 0; i < debug_argc; i++) {
+			debug_context->argv[i] = strdup(debug_args[i]);
+		}
+		asprintf(&debug_context->argv[i++], "--jobid=%d", app_jobid);
+		debug_context->argv[i++] = NULL;
+	#if ORTE_VERSION_1_0
+		debug_context->argc = i;
+	#endif /* ORTE_VERSION_1_0 */
+	
+		rc = ORTE_ALLOCATE_JOB(&debug_context, 1, &debug_jobid, debug_job_state_callback);
+		if (rc != ORTE_SUCCESS) {
+			sendJobSubErrorEvent(trans_id, jobsubid, (char *)ORTE_ERROR_NAME(rc));
+			OBJ_RELEASE(app_context);
+			OBJ_RELEASE(debug_context);
+			ORTE_ERROR_LOG(rc);
+			return rc;
+		}
+
+		fprintf(stderr, "About to launch debugger: %s on %d procs\n", debug_full_path, debug_context->num_procs);
 	} else {
-		rc = ORTE_SPAWN(&apps, 1, &ortejobid, job_state_callback);
+		rc = ORTE_ALLOCATE_JOB(&app_context, 1, &app_jobid, job_state_callback);
+		if (rc != ORTE_SUCCESS) {
+			sendJobSubErrorEvent(trans_id, jobsubid, (char *)ORTE_ERROR_NAME(rc));
+			OBJ_RELEASE(app_context);
+			ORTE_ERROR_LOG(rc);
+			return rc;
+		}
 	}
 	
-	fprintf(stderr, "SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stderr);
+	/*
+	 * Now the allocations are completed, we can create the job
+	 */
 	
-	OBJ_RELEASE(apps);
+    job = new_job(num_procs, debug, ptpid, app_jobid, debug_jobid);
+	
+	/*
+	 * launch the application/debugger and free contexts
+	 */
+	if (debug) {
+		rc = ORTE_LAUNCH_JOB(job->debug_jobid);
+		OBJ_RELEASE(debug_context);
+	} else {
+		rc = ORTE_LAUNCH_JOB(job->orte_jobid);
+	}
+	OBJ_RELEASE(app_context);
 	
 	if (rc != ORTE_SUCCESS) {
 		sendJobSubErrorEvent(trans_id, jobsubid, (char *)ORTE_ERROR_NAME(rc));
+		remove_job(job);
 		return PROXY_RES_OK;
 	}
 
-	fprintf(stderr, "NEW JOB (%s,%d,%d)\n", jobsubid, ptpid, (int)ortejobid); fflush(stderr);
+	fprintf(stderr, "NEW JOB (%s,%d,%d,%d)\n", jobsubid, ptpid, (int)app_jobid, (int)debug_jobid); fflush(stderr);
 
 	/*
 	 * Send ok for job submission.
 	 */	
 	sendOKEvent(trans_id);
 	
-    j = new_job(num_procs, ptpid, ortejobid, debug_jobid);
-	
 	/*
 	 * Send new job event
 	 */
-	asprintf(&name, ORTE_JOB_NAME_FMT, ortejobid);
+	asprintf(&name, ORTE_JOB_NAME_FMT, job->orte_jobid);
 	sendNewJobEvent(gTransID, ptpid, name, jobsubid, JOB_STATE_INIT);
 	free(name);
 	
@@ -2015,12 +1980,10 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	 * Start I/O forwarding. Don't start it before we have
 	 * sent the new process events!
 	 */
-	if (!orte_job_record_started(ortejobid)) {
-		orte_job_record_start(ortejobid);
-	}
+	orte_start_iof(job);
 
 #if ORTE_VERSION_1_0
-	subscribe_job(ortejobid);
+	subscribe_job(app_jobid);
 #else /* ORTE_VERSION_1_0 */
 	/*
 	 * If this is a debug job then the debugger will manage
@@ -2031,7 +1994,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	 * process change events are generated as a result of processes
 	 * writing to stdout.
 	 */
-	get_proc_info(j);
+	get_proc_info(job);
 #endif /* ORTE_VERSION_1_0 */
 	
 	return PROXY_RES_OK;
@@ -2067,7 +2030,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 		
 		j->terminating = true;
 		
-		if (j->debug_jobid < 0)
+		if (!j->debug)
 			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
 		else
 			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
