@@ -35,6 +35,7 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataExpValueEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugErrorEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventFactory;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugExitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
@@ -71,6 +72,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	protected final ReentrantLock		waitLock = new ReentrantLock();
 	protected final Condition			waitCondition = waitLock.newCondition();
 	protected volatile DebugProxyState	state;
+	protected IProxyDebugEventFactory	factory;
 	
 	protected enum DebugProxyState {
 		DISCONNECTED,
@@ -80,7 +82,9 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 	
 	public AbstractProxyDebugClient() {
-		super(new ProxyDebugEventFactory());
+		super();
+		this.factory = new ProxyDebugEventFactory();
+		super.setEventFactory(factory);
 		super.addProxyEventListener(this);
 		state = DebugProxyState.DISCONNECTED;
 	}

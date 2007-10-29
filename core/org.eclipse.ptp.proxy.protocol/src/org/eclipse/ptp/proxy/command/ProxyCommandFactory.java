@@ -21,6 +21,9 @@ import org.eclipse.ptp.internal.proxy.command.ProxyQuitCommand;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProxyCommandFactory extends AbstractProxyCommandFactory {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.command.AbstractProxyCommandFactory#toCommand(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	 */
 	public IProxyCommand toCommand(ProxyPacket packet) {
 		IProxyCommand evt = null;
 

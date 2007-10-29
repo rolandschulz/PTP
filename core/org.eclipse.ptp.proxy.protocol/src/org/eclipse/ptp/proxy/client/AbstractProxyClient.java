@@ -73,10 +73,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 
 	private SessionState state = SessionState.SHUTDOWN;
-
-	public AbstractProxyClient(IProxyEventFactory factory) {
-		proxyEventFactory = factory;
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#addProxyEventListener(org.eclipse.ptp.proxy.client.event.IProxyEventListener)
@@ -100,7 +96,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			return state == SessionState.RUNNING;
 		}
 	}
-
+	
 	/**
 	 * Test if proxy has shut down
 	 * 
@@ -111,7 +107,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			return state == SessionState.SHUTDOWN;
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#newTransactionID()
 	 */
@@ -125,7 +121,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public void removeProxyEventListener(IProxyEventListener listener) {
 		listeners.remove(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sendCommand(java.lang.String)
 	 */
@@ -133,7 +129,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		ProxyPacket packet = new ProxyPacket(cmd);
 		packet.send(sessOutput);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionConnect()
 	 */
@@ -147,7 +143,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public void sessionCreate() throws IOException {
 		sessionCreate(0);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionCreate(int)
 	 */
@@ -214,7 +210,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		};
 		acceptThread.start();
 	}
-	
+
 	/**
 	 * Create a proxy session that will read from InputStream and write to OutputStream
 	 * 
@@ -232,7 +228,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		fireProxyConnectedEvent(new ProxyConnectedEvent());
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionFinish()
 	 */
@@ -277,7 +273,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			}
 		}
 	}
-	
+
 	/**
 	 * Start a thread to process events from the proxy by repeatedly calling sessionProgress(). 
 	 * The thread is guaranteed to produce a ProxyDisconnectedEvent when it exits.
@@ -336,6 +332,15 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			state = SessionState.RUNNING;
 		}
 		eventThread.start();
+	}
+	
+	/**
+	 * Set the factory used to decode events
+	 * 
+	 * @param factory
+	 */
+	public void setEventFactory(IProxyEventFactory factory) {
+		this.proxyEventFactory = factory;
 	}
 	
 	/**

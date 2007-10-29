@@ -23,6 +23,9 @@ import org.eclipse.ptp.internal.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProxyEventFactory extends AbstractProxyEventFactory {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.event.AbstractProxyEventFactory#toEvent(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	 */
 	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyEvent evt = null;
 
@@ -41,5 +44,18 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 		}
 
 		return evt;
+	}
+	
+	public static IProxyOKEvent newOKEvent(int transID) {
+		return new ProxyOKEvent(transID);
+	}
+	
+	public static IProxyErrorEvent newErrorEvent(int transID, int code, String message) {
+		String[] args = new String[] {
+				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code, 
+				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message
+		};
+		
+		return new ProxyErrorEvent(transID, args);
 	}
 }

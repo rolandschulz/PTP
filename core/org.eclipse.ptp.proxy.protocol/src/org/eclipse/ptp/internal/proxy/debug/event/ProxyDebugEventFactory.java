@@ -30,11 +30,12 @@ import org.eclipse.ptp.proxy.debug.client.ProxyDebugMemoryInfo;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugSignal;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventFactory;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
-public class ProxyDebugEventFactory extends ProxyEventFactory {
+public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyDebugEventFactory {
 	
 	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyDebugEvent	evt = null;
