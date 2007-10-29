@@ -31,6 +31,7 @@ public abstract class AbstractProxyDebugSuspendEvent extends AbstractProxyDebugE
 		super(EVENT_DBG_SUSPEND, transID, set);
 		this.frame = frame;
 		this.thread_id = tid;
+		this.depth = depth;
 		this.changed_vars = vars;
 	}
 	
