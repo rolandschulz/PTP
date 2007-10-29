@@ -20,9 +20,29 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeJobChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeMachineChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewJobEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewMachineEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewNodeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewProcessEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewQueueEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNodeChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeProcessChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveAllEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveJobEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveQueueEvent;
 
-public class ProxyRuntimeEventFactory extends ProxyEventFactory {
+public class ProxyRuntimeEventFactory extends ProxyEventFactory implements IProxyRuntimeEventFactory {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.event.ProxyEventFactory#toEvent(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	 */
 	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyRuntimeEvent	evt = null;
 
@@ -103,4 +123,117 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory {
 
 		return evt;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeAttributeDefEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeAttributeDefEvent newProxyRuntimeAttributeDefEvent(int transID, String[] args) {
+		return new ProxyRuntimeAttributeDefEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeNewJobEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeNewJobEvent newProxyRuntimeNewJobEvent(int transID, String[] args) {
+		return new ProxyRuntimeNewJobEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeNewMachineEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeNewMachineEvent newProxyRuntimeNewMachineEvent(int transID, String[] args) {
+		return new ProxyRuntimeNewMachineEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeNewNodeEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeNewNodeEvent newProxyRuntimeNewNodeEvent(int transID, String[] args) {
+		return new ProxyRuntimeNewNodeEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeNewProcessEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeNewProcessEvent newProxyRuntimeNewProcessEvent(int transID, String[] args) {
+		return new ProxyRuntimeNewProcessEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeNewQueueEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeNewQueueEvent newProxyRuntimeNewQueueEvent(int transID, String[] args) {
+		return new ProxyRuntimeNewQueueEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeJobChangeEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(int transID, String[] args) {
+		return new ProxyRuntimeJobChangeEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeMachineChangeEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(int transID, String[] args) {
+		return new ProxyRuntimeMachineChangeEvent(transID, args);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeNodeChangeEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeNodeChangeEvent newProxyRuntimeNodeChangeEvent(int transID, String[] args) {
+		return new ProxyRuntimeNodeChangeEvent(transID, args);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeProcessChangeEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeProcessChangeEvent newProxyRuntimeProcessChangeEvent(int transID, String[] args) {
+		return new ProxyRuntimeProcessChangeEvent(transID, args);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeRemoveAllEventt(int, java.lang.String[])
+	 */
+	public IProxyRuntimeRemoveAllEvent newProxyRuntimeRemoveAllEventt(int transID, String[] args) {
+		return new ProxyRuntimeRemoveAllEvent(transID, args);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeRemoveJobEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeRemoveJobEvent newProxyRuntimeRemoveJobEvent(int transID, String[] args) {
+		return new ProxyRuntimeRemoveJobEvent(transID, args);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeRemoveMachineEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeRemoveMachineEvent newProxyRuntimeRemoveMachineEvent(int transID, String[] args) {
+		return new ProxyRuntimeRemoveMachineEvent(transID, args);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeRemoveNodeEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeRemoveNodeEvent newProxyRuntimeRemoveNodeEvent(int transID, String[] args) {
+		return new ProxyRuntimeRemoveNodeEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeRemoveProcessEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeRemoveProcessEvent newProxyRuntimeRemoveProcessEvent(int transID, String[] args) {
+		return new ProxyRuntimeRemoveProcessEvent(transID, args);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#newProxyRuntimeRemoveQueueEvent(int, java.lang.String[])
+	 */
+	public IProxyRuntimeRemoveQueueEvent newProxyRuntimeRemoveQueueEvent(int transID, String[] args) {
+		return new ProxyRuntimeRemoveQueueEvent(transID, args);
+	}
+
 }
