@@ -138,7 +138,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 * a default one.
 		 */
 		if (!loading || localAddr.equals("")) {
-			localAddr = localAddrCombo.getItem(localAddrCombo.getSelectionIndex());
+			localAddr = localAddrCombo.getText();
 		}
 
 		/*
@@ -331,7 +331,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
 		
-		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		localAddrCombo.setLayoutData(gd);
@@ -652,7 +652,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * Initialize the contents of the local address selection combo. Host names are obtained by
 	 * performing a reverse lookup on the IP addresses of each network interface. If DNS is configured
 	 * correctly, this should add the fully qualified domain name, otherwise it will probably be
-	 * the IP address.
+	 * the IP address. We also add the configuration address to the combo in case it was specified manually.
 	 */
 	public void initializeLocalHostCombo() {
 		Set<String> addrs = new TreeSet<String>();
@@ -675,7 +675,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		localAddrCombo.removeAll();
 		int index = 0;
-		int selection = 0;
+		int selection = -1;
 		for (String addr : addrs) {
 			localAddrCombo.add(addr);
 			if ((localAddr.equals("") && addr.equals("localhost"))
@@ -683,6 +683,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				selection = index;
 			}
 			index++;
+		}
+		/*
+		 * localAddr is not in the list, so add it and make
+		 * it the current selection
+		 */
+		if (selection < 0) {
+			localAddrCombo.add(localAddr);
+			selection = localAddrCombo.getItemCount()-1;
 		}
 		localAddrCombo.select(selection);
 	}
