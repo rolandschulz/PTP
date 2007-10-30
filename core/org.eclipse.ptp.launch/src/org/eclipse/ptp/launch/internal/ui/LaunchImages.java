@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
@@ -40,7 +41,7 @@ public class LaunchImages {
 	
 	// The plugin registry
 	private static ImageRegistry imageRegistry = null;
-	private static HashMap avoidSWTErrorMap = null;
+	private static HashMap<String,ImageDescriptor> avoidSWTErrorMap = null;
 
 	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif";
 	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif";
@@ -67,8 +68,7 @@ public class LaunchImages {
 	private static ImageRegistry getImageRegistry() {
 		if (imageRegistry == null) {
 			imageRegistry = new ImageRegistry();
-			for (Iterator iter = avoidSWTErrorMap.keySet().iterator(); iter.hasNext();) {
-				String key = (String) iter.next();
+			for (String key : avoidSWTErrorMap.keySet()) {
 				imageRegistry.put(key, (ImageDescriptor) avoidSWTErrorMap.get(key));
 			}
 			avoidSWTErrorMap = null;
@@ -80,21 +80,13 @@ public class LaunchImages {
 		try {
 			ImageDescriptor result = ImageDescriptor.createFromURL(makeIconFileURL(name.substring(NAME_PREFIX_LENGTH)));
 			if (avoidSWTErrorMap == null) {
-				avoidSWTErrorMap = new HashMap(); 
+				avoidSWTErrorMap = new HashMap<String,ImageDescriptor>(); 
 			}
 			avoidSWTErrorMap.put(name, result);
 			if (imageRegistry != null) {
 			    System.out.println("Internal Error: Image registry already defined");
 			}
 			return result;
-		} catch (MalformedURLException e) {
-			return ImageDescriptor.getMissingImageDescriptor();
-		}
-	}
-	
-	private static ImageDescriptor create(String name) {
-		try {
-			return ImageDescriptor.createFromURL(makeIconFileURL(name));
 		} catch (MalformedURLException e) {
 			return ImageDescriptor.getMissingImageDescriptor();
 		}
