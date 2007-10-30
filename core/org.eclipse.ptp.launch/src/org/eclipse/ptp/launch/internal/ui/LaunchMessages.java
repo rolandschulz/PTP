@@ -22,8 +22,6 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.ptp.launch.PTPLaunchPlugin;
-
 public class LaunchMessages {
     private static final String BUNDLE_NAME = "org.eclipse.ptp.launch.internal.ui.LaunchMessages";
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
@@ -45,10 +43,10 @@ public class LaunchMessages {
 	}
 
 	public static String getFormattedResourceString(String key, String arg) {
-		return MessageFormat.format(getResourceString(key), new String[]{arg});
+		return MessageFormat.format(getResourceString(key), new Object[]{arg});
 	}
 
-	public static String getFormattedResourceString(String key, String[] args) {
+	public static String getFormattedResourceString(String key, Object[] args) {
 		return MessageFormat.format(getResourceString(key), args);
 	}
 }
