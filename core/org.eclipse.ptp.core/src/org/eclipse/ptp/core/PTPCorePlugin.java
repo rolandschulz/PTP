@@ -59,6 +59,11 @@ public class PTPCorePlugin extends Plugin {
 		}
 	}
 
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 */
 	public static String getUniqueIdentifier() {
 		if (getDefault() == null) {
 			// If the default instance is not yet initialized,
@@ -69,21 +74,40 @@ public class PTPCorePlugin extends Plugin {
 		return getDefault().getBundle().getSymbolicName();
 	}
 
+	/**
+	 * Create log entry from an IStatus
+	 * 
+	 * @param status
+	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
 
+	/**
+	 * Create log entry from a string
+	 * 
+	 * @param msg
+	 */
 	public static void log(String msg) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
 	}
 
+	/**
+	 * Create log entry from a Throwable
+	 * 
+	 * @param e
+	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
 	}
 
-	// Resource bundle.
+	/*
+	 * Resource bundle
+	 */
 	private ResourceBundle resourceBundle;
-
+	/*
+	 * ModelManager for this Eclipse session
+	 */
 	private ModelManager modelManager;
 	
 	/**
@@ -100,15 +124,22 @@ public class PTPCorePlugin extends Plugin {
 		}
 	}
 	
+	/**
+	 * Get the model manager
+	 * 
+	 * @return the model manager
+	 */
 	public IModelManager getModelManager() {
 		return modelManager;
 	}
 	
 	/**
-	 * @return Returns the modelManager.
+	 * Get the presentation manager. This is now the model manager.
+	 * 
+	 * @return the presentation manager
 	 */
 	public IModelPresentation getModelPresentation() {
-		return modelManager;
+		return getModelManager();
 	}
 
 	/**
@@ -126,46 +157,47 @@ public class PTPCorePlugin extends Plugin {
 		return getModelPresentation().getUniverse();
 	}
 
+	/**
+	 * Locate the fragment for our architecture. This should really be phased out, since
+	 * there is now no guarantee that there will be local executables for the proxy
+	 * server or debugger.
+	 * 
+	 * @param fragment
+	 * @param file
+	 * @return path to "bin" directory in fragment
+	 */
 	public String locateFragmentFile(String fragment, String file) {		
 		Bundle[] frags = Platform.getFragments(Platform.getBundle(PTPCorePlugin.PLUGIN_ID));
-		String os = Platform.getOS();
-		String arch = Platform.getOSArch();
-		String frag_os_arch = fragment+"."+os+"."+arch;
-		System.out.println("OS = '"+os+"', Architecture = '"+arch+"', OS_ARCH combo = '"+frag_os_arch+"'");
-		String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
-		System.out.println("PTP Version = "+ptp_version);
 		
-		System.out.println("All Found Fragments:");
-		for(int i=0; i<frags.length; i++) {
-			System.out.println("\t"+frags[i].toString());
-		}
-		
-		for(int i=0; i<frags.length; i++) {
-			Bundle frag = frags[i];
-			URL path = frag.getEntry("/");
-			try {
-				URL local_path = FileLocator.toFileURL(path);
-				String str_path = local_path.getPath();
-				System.out.println("Testing fragment "+(i+1)+" with this OS/arch - path: '"+str_path+"'");
-				
-				/* 
-				 * Check each fragment that matches our os and arch for a bin directory.
-				 */
-
-				int idx = str_path.indexOf(frag_os_arch);
-				if(idx > 0) {
-					/* found it!  This is the right fragment for our OS & arch */
-					System.out.println("\tCorrect fragment for our OS & arch");
-					String file_path = str_path + "bin/"+file;
-					System.out.println("\tSearching for file in '"+file_path+"'");
-					File f = new File(file_path);
-					if(f.exists()) {
-						System.out.println("\t\t**** FOUND IT!");
-						return file_path;
+		if (frags != null) {
+			String os = Platform.getOS();
+			String arch = Platform.getOSArch();
+			String frag_os_arch = fragment+"."+os+"."+arch;
+			
+			for (int i=0; i<frags.length; i++) {
+				Bundle frag = frags[i];
+				URL path = frag.getEntry("/");
+				try {
+					URL local_path = FileLocator.toFileURL(path);
+					String str_path = local_path.getPath();
+					
+					/* 
+					 * Check each fragment that matches our os and arch for a bin directory.
+					 */
+	
+					int idx = str_path.indexOf(frag_os_arch);
+					if (idx > 0) {
+						/* found it!  This is the right fragment for our OS & arch */
+						String file_path = str_path + "bin/"+file;
+						File f = new File(file_path);
+						if (f.exists()) {
+							return file_path;
+						}
 					}
+	
+				} catch(Exception e) { 
 				}
-
-			} catch(Exception e) { }
+			}
 		}
 		
 		/* guess we never found it.... */
