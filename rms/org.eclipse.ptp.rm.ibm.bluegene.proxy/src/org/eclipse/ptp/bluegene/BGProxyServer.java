@@ -13,7 +13,7 @@ package org.eclipse.ptp.bluegene;
 
 import java.io.IOException;
 
-import org.eclipse.ptp.bluegene.db2.BGCommands;
+import org.eclipse.ptp.bluegene.db.BGCommands;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
