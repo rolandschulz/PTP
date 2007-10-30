@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate">
+      <control
+            class="org.eclipse.ptp.remotetools.environment.generichost.core.Environment"
+            name="Generic Host"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
+            class="org.eclipse.ptp.remotetools.environment.generichost.preferences.ui.PreferencePage"
+            id="com.ibm.celldt.preferences.ui.CellPreferencePage.EnvironmentPreferencePage.GenericHostPreferencePage"
+            name="Generic Host"/>      
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.remotetools.environment.generichost.preferences.ui.PreferenceInitializer"/>
+   </extension>
+</plugin>

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Remote Tools Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.remotetools.core
+Bundle-Version: 2.1.7
+Bundle-Activator: org.eclipse.ptp.remotetools.RemotetoolsPlugin
+Bundle-Vendor: IBM
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ com.jcraft.jsch,
+ org.eclipse.ptp.remotetools.utils
+Eclipse-AutoStart: true
+Export-Package: org.eclipse.ptp.remotetools,
+ org.eclipse.ptp.remotetools.core,
+ org.eclipse.ptp.remotetools.exception
+Bundle-ClassPath: jsch-0.1.28.jar,
+ .

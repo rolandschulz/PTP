@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Remote Tools UI Target Environments Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.remotetools.environment.ui;singleton:=true
+Bundle-Version: 1.3.2
+Bundle-Activator: org.eclipse.ptp.remotetools.environment.ui.UIEnvironmentPlugin
+Bundle-Vendor: IBM
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ptp.remotetools.environment.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui
+Eclipse-AutoStart: true
+Export-Package: org.eclipse.ptp.remotetools.environment.ui,
+ org.eclipse.ptp.remotetools.environment.ui.views

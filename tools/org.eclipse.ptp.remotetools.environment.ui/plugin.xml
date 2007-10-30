@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Remote Environments"
+            id="org.eclipse.ptp.remotetools.remoteenvironments">
+      </category>
+      <view
+            name="Remote Environments"
+            icon="icons/iprocess.gif"
+            category="org.eclipse.ptp.remotetools.remoteenvironments"
+            class="org.eclipse.ptp.remotetools.environment.ui.views.RemoteToolsEnvironmentView"
+            id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.cdt.ui.CPerspective">
+         <view
+               id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
+               ratio="0.5"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               showTitle="true"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>

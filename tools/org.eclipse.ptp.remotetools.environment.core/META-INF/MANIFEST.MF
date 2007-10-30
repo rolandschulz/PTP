@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Target Environments Core Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.remotetools.environment.core;singleton:=true
+Bundle-Version: 1.3.3
+Bundle-Activator: org.eclipse.ptp.remotetools.environment.EnvironmentPlugin
+Bundle-Vendor: IBM
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.remotetools.core,
+ org.eclipse.ptp.remotetools.utils
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.remotetools.environment,
+ org.eclipse.ptp.remotetools.environment.control,
+ org.eclipse.ptp.remotetools.environment.core,
+ org.eclipse.ptp.remotetools.environment.extension,
+ org.eclipse.ptp.remotetools.environment.wizard
