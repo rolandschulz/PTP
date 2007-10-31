@@ -10,224 +10,184 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.internal.ui;
 
-import java.util.Observable;
-import java.util.Observer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.core.launch.IPTPRemoteLaunchConfigurationConstants;
+import org.eclipse.rse.core.RSECorePlugin;
+import org.eclipse.rse.core.model.IHost;
+import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
+import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
  * The dynamic tab for gdb-based debugger implementations.
  */
-public class SDMPage extends AbstractLaunchConfigurationTab implements Observer {
-
-	protected Text fExePathText;
-	protected Button fExePathButton = null;
-	protected Text fCWDText;
-	protected Button fCWDButton = null;
+public class SDMPage extends AbstractLaunchConfigurationTab {
+	protected Text fRMDebuggerText = null;
+	protected Button fRMDebuggerButton = null;
 	
-	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
+	private String remoteHost = null;
+	protected static final String EMPTY_STRING = "";
 
-	private boolean fIsInitializing = false;
+	private String errMsg = null;
 	
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		comp.setLayout(new GridLayout());
-		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		comp.setLayout(new GridLayout(2, false));
+		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		Composite subComp = ControlFactory.createCompositeEx(comp, 2, GridData.FILL_HORIZONTAL);
-		((GridLayout)subComp.getLayout()).makeColumnsEqualWidth = false;
-
-		fExePathButton = createCheckButton(subComp, ExternalDebugUIMessages.getString("SDMDebuggerPage.2"));
-		fExePathButton.addSelectionListener(new SelectionListener() {
-		    public void widgetDefaultSelected(SelectionEvent e) {
-	            handleExePathButtonSelected();
-	    		if (!isInitializing())
-	    			updateLaunchConfigurationDialog();
-		    }
+		fRMDebuggerText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		fRMDebuggerText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fRMDebuggerButton = createPushButton(comp, ExternalDebugUIMessages.getString("SDMDebuggerPage.remotedebugger"), null);
+		fRMDebuggerButton.addSelectionListener(new SelectionAdapter() {
 		    public void widgetSelected(SelectionEvent e) {
-	            handleExePathButtonSelected();
-	    		if (!isInitializing())
-	    			updateLaunchConfigurationDialog();
+				String file = browseRemoteFile();
+				if (file != null) {
+					fRMDebuggerText.setText(file);
+			    	updateLaunchConfigurationDialog();
+				}
 		    }
 		});
-		fExePathText = ControlFactory.createTextField(subComp, SWT.SINGLE | SWT.BORDER);
-		fExePathText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent evt) {
-				if (!isInitializing())
-					updateLaunchConfigurationDialog();
-			}
-		});
-		
-		fCWDButton = createCheckButton(subComp, ExternalDebugUIMessages.getString("SDMDebuggerPage.3"));
-		fCWDButton.addSelectionListener(new SelectionListener() {
-		    public void widgetDefaultSelected(SelectionEvent e) {
-	            handleCWDButtonSelected();
-	    		if (!isInitializing())
-	    			updateLaunchConfigurationDialog();
-		    }
-		    public void widgetSelected(SelectionEvent e) {
-	            handleCWDButtonSelected();
-	    		if (!isInitializing())
-	    			updateLaunchConfigurationDialog();
-		    }
-		});
-		fCWDText = ControlFactory.createTextField(subComp, SWT.SINGLE | SWT.BORDER);
-		fCWDText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent evt) {
-				if (!isInitializing())
-					updateLaunchConfigurationDialog();
-			}
-		});
-		
 		setControl(parent);
 	}
-
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
-	}
-
-	public boolean isValid(ILaunchConfiguration launchConfig) {
-		setErrorMessage(null);
-		setMessage(null);
-		return true;
-	}
-
-	public void initializeFrom(ILaunchConfiguration configuration) {
-		setInitializing(true);
-		try {
-			String exe = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
-			if (exe == null) {
-				fExePathText.setText(EMPTY_STRING);
-				fExePathButton.setSelection(false);
-			} else {
-				fExePathText.setText(exe);
-				fExePathButton.setSelection(true);
-			}
-			handleExePathButtonSelected();	
-			
-			String cwd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
-			if (cwd == null) {
-				fCWDText.setText(EMPTY_STRING);
-				fCWDButton.setSelection(false);
-			} else {
-				fCWDText.setText(cwd);
-				fCWDButton.setSelection(true);
-			}
-			handleCWDButtonSelected();	
-		}
-		catch(CoreException e) {
-	           setErrorMessage("Exception occurred reading configuration");
-		}
-		setInitializing(false); 
-	}
-
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		String exe = null;
-		if (fExePathButton.getSelection()) {
-			exe = getFieldContent(fExePathText.getText());
-		}
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, exe);
-		
-		String cwd = null;
-		if (fCWDButton.getSelection()) {
-			cwd = getFieldContent(fCWDText.getText());
-		}
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, cwd);
-	}
-
-	public String getName() {
-		return ExternalDebugUIMessages.getString("SDMDebuggerPage.1");
-	}
-
-	/**
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getShell()
-	 */
-	protected Shell getShell() {
-		return super.getShell();
-	}
-
-	/**
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#updateLaunchConfigurationDialog()
-	 */
-	protected void updateLaunchConfigurationDialog() {
-		super.updateLaunchConfigurationDialog();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-	 */
-	public void update(Observable o, Object arg) {
-		if (!isInitializing())
-			updateLaunchConfigurationDialog();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#dispose()
-	 */
-	public void dispose() {
-		super.dispose();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#activated(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
-	 */
-	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
-		// Override the default behavior
-	}
-
-	protected boolean isInitializing() {
-		return fIsInitializing;
-	}
-
-	private void setInitializing(boolean isInitializing) {
-		fIsInitializing = isInitializing;
-	}
-
-	/**
-	 * The default check box has been toggled.
-	 */
-	protected void handleExePathButtonSelected() {
-		if (fExePathButton.getSelection()) {
-			fExePathText.setEnabled(true);
-		} else {
-			fExePathText.setEnabled(false);
-		}
-	}
-
-	/**
-	 * The default check box has been toggled.
-	 */
-	protected void handleCWDButtonSelected() {
-		if (fCWDButton.getSelection()) {
-			fCWDText.setEnabled(true);
-		} else {
-			fCWDText.setEnabled(false);
+	private void enableRemoteSection(boolean enabled) {
+		fRMDebuggerText.setEnabled(enabled);
+		fRMDebuggerButton.setEnabled(enabled);
+		if (!enabled) {
+			fRMDebuggerText.setText(EMPTY_STRING);
 		}
 	}
 	
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+	}
+	private String browseRemoteFile() {
+		IHost host = getHost(remoteHost);
+		if (host != null) {
+			SystemRemoteFileDialog dialog = new SystemRemoteFileDialog(getShell(), "Select remote debugger...", host);
+			dialog.setBlockOnOpen(true);
+			if (dialog.open() == Window.OK) {
+				Object rmObj = dialog.getSelectedObject();
+				if (rmObj instanceof IRemoteFile) {
+					return ((IRemoteFile)rmObj).getAbsolutePath();
+				}
+			}
+		}
+		return null;
+	}
+	/*
+	private String browseRemoteDirectory() {
+		IHost host = getHost(getRemoteConnection().getHostname());
+		if (host != null) {
+			SystemRemoteFolderDialog dialog = new SystemRemoteFolderDialog(getShell(), "Select remote working directory", host);
+			//dialog.setPreSelection(selection)
+			dialog.setBlockOnOpen(true);
+			if (dialog.open() == Window.OK) {
+				Object rmObj = dialog.getSelectedObject();
+				if (rmObj instanceof IRemoteFile) {
+					return ((IRemoteFile)rmObj).getAbsolutePath();
+				}
+			}
+		}
+		return null;
+	}
+	*/
+	/*
+	private IResourceManager getResourceManager() {
+		try {
+			IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+			if (universe != null) {
+				String rmID = configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME, (String)null);
+				if (rmID != null) {
+					for (IResourceManager resMgr : universe.getResourceManagers()) {
+						if (resMgr.getUniqueName().equals(rmID)) {
+							return resMgr;
+						}
+					}
+				}
+			}
+		}
+		catch (CoreException e) {}
+		return null;
+	}
+	private IRemoteConnection getRemoteConnection() {
+		if (rmConnection == null) {
+			IResourceManager rmMgr = getResourceManager();
+			if (rmMgr != null) {
+				if (rmMgr instanceof IResourceManagerControl) {
+					IResourceManagerConfiguration rmConfig = ((IResourceManagerControl)rmMgr).getConfiguration();
+					if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+						String remoteID = ((AbstractRemoteResourceManagerConfiguration)rmConfig).getRemoteServicesId();
+						IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteID);
+						if (remoteServices != null) {
+							rmConnection = remoteServices.getConnectionManager().getConnection(((AbstractRemoteResourceManagerConfiguration)rmConfig).getConnectionName());
+						}
+					}
+				}
+			}
+		}
+		return rmConnection;
+	}
+	*/
+	private IHost getHost(String hostname) {
+		if (hostname == null)
+			return null;
+		IHost[] hosts = RSECorePlugin.getDefault().getSystemRegistry().getHosts();
+		for (IHost host : hosts) {
+			if (host.getAliasName().equals(hostname)) {
+				return host;
+			}
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public boolean isValid(ILaunchConfiguration launchConfig) {
+		if (remoteHost != null) {
+			if (getFieldContent(fRMDebuggerText.getText()) == null) {
+				errMsg = "No remote debugger found";
+			}
+			else
+				errMsg = null;
+		}
+		setErrorMessage(errMsg);
+		return (errMsg == null);
+	}
+	public void initializeFrom(ILaunchConfiguration configuration) {
+		try {
+			remoteHost = configuration.getAttribute(IPTPRemoteLaunchConfigurationConstants.ATTR_REMOTE_CONNECTION, (String)null);
+			enableRemoteSection(remoteHost != null);
+			fRMDebuggerText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
+		}
+		catch(CoreException e) {
+			errMsg = "Exception occurred reading configuration";
+		}
+	}
+
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		if (remoteHost != null) {
+			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerText.getText()));
+		}
+	}
+	public String getName() {
+		return ExternalDebugUIMessages.getString("SDMDebuggerPage.debuggname");
+	}
     protected String getFieldContent(String text) {
         if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
             return null;
-        
         return text;
     }
 }

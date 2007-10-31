@@ -8,7 +8,7 @@
             name="%SDM.name"
             modes="run"
             cpu="*"
-            class="org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger"
+            class="org.eclipse.ptp.debug.external.core.PTPDebugger"
             id="org.eclipse.ptp.debug.external.sdm">
       </debugger>
       <debugger

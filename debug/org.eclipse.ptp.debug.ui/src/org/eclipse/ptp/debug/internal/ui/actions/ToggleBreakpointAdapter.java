@@ -31,9 +31,9 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -65,10 +65,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
-		/**	FIXME
-		 * 	problem on 3.3 RC4 - AbstractRulerActionDelegate.run called twice, previously version double click action cannot fire this action.run
-		 */  
-		if (!PTPDebugUIPlugin.isPTPDebugPerspective())
+		if (!PTPDebugUIPlugin.isPTPPerspective())
 			return;
 		
 		String errorMessage = null;
@@ -95,32 +92,28 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 							errorMessage = ActionMessages.getString("ToggleBreakpointAdapter.Invalid_line_1");
 						}
 						else {
-							String jid = uiDebugManager.getCurrentJobId();
-							String jobName = "";
-							if (!PTPDebugUIPlugin.isPTPDebugPerspective() || uiDebugManager.isNoJob(jid) || uiDebugManager.isJobStop(jid)) {
-								jid = IPBreakpoint.GLOBAL;
-								jobName = IPBreakpoint.GLOBAL;
-							}
-							else 
-								jobName = uiDebugManager.getName(jid);
-							
+							IPJob job = uiDebugManager.getJob();
 							String sid = uiDebugManager.getCurrentSetId();
 							sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
 							String sourceHandle = getSourceHandle(input);
-							IPLineBreakpoint[] breakpoints = PTPDebugCorePlugin.getDebugModel().lineBreakpointsExists(sourceHandle, resource, lineNumber);
-							if (jid.equals(IPBreakpoint.GLOBAL) && breakpoints.length > 0)//remove all breakpoints if found any breakpoints in none job selected mode
-								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
-							else if (breakpoints.length > 0) {//remove breakpoint if found any breakpoint in current job
-								IPLineBreakpoint breakpoint = PTPDebugCorePlugin.getDebugModel().lineBreakpointExists(breakpoints, jid);
+							IPLineBreakpoint[] breakpoints = PDebugModel.lineBreakpointsExists(sourceHandle, resource, lineNumber);
+							if (breakpoints.length > 0) {// remove breakpoint if found any breakpoint in current job
+								IPLineBreakpoint breakpoint = PDebugModel.lineBreakpointExists(breakpoints, job);
 								if (breakpoint != null) {
-									if (!breakpoint.isGlobal())//remove breakpoint when it is not in none job selected mode
-										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
+									if (breakpoint.isGlobal()) {
+										if (job == null) {
+											DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);												
+										}
+									}
+									else {
+										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);	
+									}
 								}
 								else // create a new breakpoint
-									PTPDebugCorePlugin.getDebugModel().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
+									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job);
 							}
 							else // no breakpoint found and create a new one
-								PTPDebugCorePlugin.getDebugModel().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
+								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job);
 							return;
 						}
 					}

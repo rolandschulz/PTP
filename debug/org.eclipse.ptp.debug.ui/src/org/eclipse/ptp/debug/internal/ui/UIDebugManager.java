@@ -26,42 +26,31 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.debug.ui.AbstractDebugView;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.DebugJobStorage;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.ProcessInputStream;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.model.DebugElement;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.OutputConsole;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
@@ -70,21 +59,16 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * 
  */
 public class UIDebugManager extends JobManager implements IBreakpointListener {
-	//private final static int REG_TYPE = 1;
-	//private final static int UNREG_TYPE = 2;
 	private DebugJobStorage consoleStorage = new DebugJobStorage("Console");
-	private PJobVariableManager jobMgr = new PJobVariableManager();	
+	private PVariableManager jobMgr = new PVariableManager();
 	private PAnnotationManager annotationMgr = null;
-	private PCDIDebugModel debugModel = null;
+	private PDebugModel debugModel = null;
+	private IPSession currentSession = null;
 
 	private boolean prefAutoUpdateVarOnSuspend = false;
 	private boolean prefAutoUpdateVarOnChange = false;
 	private boolean prefRegisterProc0 = true;
 	
-	private final int STEP_INTO = 1;
-	private final int STEP_OVER = 2;
-	private final int STEP_RETURN = 3;
-		
 	private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent event) {
 			String preferenceType = event.getProperty();
@@ -98,6 +82,14 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			else if (preferenceType.equals(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE)) {
 				prefAutoUpdateVarOnChange = new Boolean(value).booleanValue();
 			}
+			else if (preferenceType.equals(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)) {
+				for (IPJob job : getJobs()) {
+					IPSession session = getDebugSession(job);
+					if (session != null) {
+						session.getPDISession().setRequestTimeout(new Integer(value).longValue());
+					}
+				}
+			}
 		}
 	};
 	public boolean isAutoUpdateVarOnSuspend() {
@@ -106,13 +98,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public boolean isAutoUpdateVarOnChange() {
 		return prefAutoUpdateVarOnChange;
 	}
-	public boolean isRegProc0() {
+	public boolean isEnabledDefaultRegister() {
 		return prefRegisterProc0;
 	}
-
-	/** Constructor
-	 * 
-	 */
+	
 	public UIDebugManager() {
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
@@ -120,21 +109,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		annotationMgr = new PAnnotationManager(this);
 		settingPreference();
 	}
-	public PJobVariableManager getJobVariableManager() {
-		return jobMgr;
-	}
-	/** Initial preference settings
-	 * 
-	 */
-	private void settingPreference() {
-		IPreferenceStore prefStore = PTPDebugUIPlugin.getDefault().getPreferenceStore();
-		prefRegisterProc0 = prefStore.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0);
-		prefAutoUpdateVarOnSuspend = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
-		prefAutoUpdateVarOnChange = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#shutdown()
-	 */
 	public void shutdown() {
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
@@ -142,8 +116,17 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		jobMgr.shutdown();
 		super.shutdown();
 	}
-	protected IElement createElement(IElementSet set, String key, String task_id) {
-		return new DebugElement(set, key, task_id);
+	public PVariableManager getJobVariableManager() {
+		return jobMgr;
+	}
+	/**
+	 * Initial preference settings
+	 */
+	private void settingPreference() {
+		IPreferenceStore prefStore = PTPDebugUIPlugin.getDefault().getPreferenceStore();
+		prefRegisterProc0 = prefStore.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0);
+		prefAutoUpdateVarOnSuspend = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
+		prefAutoUpdateVarOnChange = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);
 	}
 	public String getCurrentJobId() {
 		IPJob job = getJob();
@@ -152,32 +135,20 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		return IManager.EMPTY_ID;
 	}
-	/** Get value text for tooltip
+	/**
+	 * Get value text for tooltip
 	 * @param taskID
 	 * @return
 	 */
-	public String getValueText(String taskIDStr) {
-		try {
-			int taskID = Integer.parseInt(taskIDStr);
-			return getJobVariableManager().getResultDisplay(getCurrentJobId(), taskID);
-		} catch (NumberFormatException e) {
-			return "";
-		}
+	public String getValueText(int taskID) {
+		IPJob job = getJob();
+		if (job == null)
+			return "No job found";
+		
+		return getJobVariableManager().getValue(getJob(), taskID);
 	}
-	
-	/** Register process 0 if default registeris true 
-	 * @param session
-	 */
-	public void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
-		if (prefRegisterProc0) {
-			IPProcess proc = session.getJob().getProcessByIndex("0");
-			if (proc != null) {
-				addConsoleWindow(session.getJob(), proc);
-				registerProcess(session, session.createBitList(0), true);
-			}
-		}
-	}
-	/** Is Job in debug mode
+	/**
+	 * Is Job in debug mode
 	 * @param job_id Job ID
 	 * @return true if given job in debug mode
 	 */
@@ -186,7 +157,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			return false;
 		return isDebugMode(findJobById(job_id));
 	}
-	/** Is job in debug mode
+	/**
+	 * Is job in debug mode
 	 * @param job
 	 * @return true if given job in debug mode
 	 */
@@ -195,14 +167,16 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			return false;
 		return job.isDebug();
 	}
-	/** Is job running
+	/**
+	 * Is job running
 	 * @param job
 	 * @return true if job is running
 	 */
 	public boolean isRunning(IPJob job) {
 		return (job != null && !job.isTerminated());
 	}
-	/** Is job running
+	/**
+	 * Is job running
 	 * @param job_id job ID
 	 * @return true if job is running
 	 */
@@ -211,58 +185,71 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			return false;
 		return isRunning(findJobById(job_id));
 	}
-	// change job
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.ui.AbstractUIManager#fireJobChangedEvent(int, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.ui.managers.AbstractUIManager#fireJobChangedEvent(int, java.lang.String, java.lang.String)
 	 */
 	public void fireJobChangedEvent(int type, String cur_jid, String pre_jid) {
+		//TODO ?? updateBreakpointMarker
 		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
-		try {
-			removeAllRegisterElements(pre_jid);
-		} catch (CoreException e) {
-			PTPDebugUIPlugin.log(e);
-		}
+		removeAllRegisterElements(pre_jid);
 		super.fireJobChangedEvent(type, cur_jid, pre_jid);
 	}
-	/** Get debug session
+	public IPSession getCurrentSession() {
+		if (currentSession == null)
+			currentSession = getDebugSession(getJob());
+		return currentSession;
+	}
+	public void setJob(IPJob job) {
+		currentSession = getDebugSession(job);
+		super.setJob(job);
+	}
+
+	/**
+	 * Get debug session
 	 * @param job_id Job ID
 	 * @return
 	 */
-	public IPCDISession getDebugSession(String job_id) {
+	public IPSession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
 			return null;
-		return debugModel.getPCDISession(job_id);
-		//return getDebugSession(findJobById(job_id));
+		return getDebugSession(findJobById(job_id));
 	}
-	/** Get debug session
+	/**
+	 * Get debug session
 	 * @param job
 	 * @return
 	 */
-	public IPCDISession getDebugSession(IPJob job) {
+	public IPSession getDebugSession(IPJob job) {
 		if (job == null)
 			return null;
-		return debugModel.getPCDISession(job.getID());
+		return debugModel.getSession(job);
 	}
-	/** Convert string to integer
+	/**
+	 * Convert string to integer
 	 * @param id
 	 * @return
 	 */
 	public int convertToInt(String id) {
 		return Integer.parseInt(id);
 	}
-	/** Add process to console window if it is register into Debug View
+	/***************************************************************************************************************************************************************************************************
+	 * Console window
+	 **************************************************************************************************************************************************************************************************/
+	/**
+	 * Add process to console window if it is register into Debug View
 	 * @param proc
 	 */
-	private void addConsoleWindow(IPJob job, IPProcess proc) {
+	public void addConsoleWindow(IPJob job, IPProcess proc) {
 		if (consoleStorage.getValue(job.getID(), proc.getID()) == null) {
 			OutputConsole outputConsole = new OutputConsole(proc.getName(), new ProcessInputStream(proc));
 			consoleStorage.addValue(job.getID(), proc.getID(), outputConsole);
 		}
 	}
-	/** Remove process from console list and close its output
+	/**
+	 * Remove process from console list and close its output
 	 * @param proc
 	 */
-	private void removeConsoleWindow(IPJob job, IPProcess proc) {
+	public void removeConsoleWindow(IPJob job, IPProcess proc) {
 		OutputConsole outputConsole = (OutputConsole) consoleStorage.removeValue(job.getID(), proc.getID());
 		if (outputConsole != null) {
 			outputConsole.kill();
@@ -279,102 +266,99 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
 	 **************************************************************************************************************************************************************************************************/
-	/** Register process
-	 * @param session
-	 * @param proc
-	 * @param isChanged
+	/** 
+	 * Remove all register elements
+	 * @param job_id job ID
 	 */
-	public void registerProcess(IPCDISession session, BitList tasks, boolean isChanged) {
-		if (!tasks.isEmpty()) {
-			session.registerTargets(tasks, isChanged);
-		}
-	}
-	/** Unregister process
-	 * @param session
-	 * @param proc
-	 * @param isChanged
-	 */
-	public void unregisterProcess(IPCDISession session, BitList tasks, boolean isChanged) {
-		if (!tasks.isEmpty()) {
-			session.unregisterTargets(tasks, isChanged);
-		}
-	}
-	/** Unregister elements
-	 * @param elements
-	 * @throws CoreException
-	 */
-	public void unregisterElements(final IElement[] elements) throws CoreException {
-		WorkbenchJob uiJob = new WorkbenchJob("Unregistering elements...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPJob job = getJob();
-				if (job == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null);
-				IPCDISession session = getDebugSession(job);
-				if (session == null)
+	public void removeAllRegisterElements(final String job_id){
+		new UIDebugWorkbenchJob(false, "Removing registered processes", findJobById(job_id), new IDebugProgressMonitor() {
+			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
+				if (job == null || session == null)
 					return Status.CANCEL_STATUS;
-				//return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-		
-				BitList tasks = session.createEmptyBitList();
+				
+				session.deleteDebugTargets(false);
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		});
+	}
+	/** 
+	 * Update register and unregister elements
+	 * @param curSet
+	 * @param preSet
+	 * @param job_id
+	 */
+	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) {
+		new UIDebugWorkbenchJob(false, "Updating registered/unregistered processes", findJobById(job_id), new IDebugProgressMonitor() {
+			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
+				if (job == null || session == null)
+					return Status.CANCEL_STATUS;
+				
+				session.reloadDebugTargets(debugModel.getTasks(session, curSet.getID()), true, false);
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		});
+	}
+	/**
+	 * Unregister elements
+	 * @param elements
+	 */
+	public void unregisterElements(final IElement[] elements) {
+		new UIDebugWorkbenchJob(false, "Unregistered elements", getJob(), new IDebugProgressMonitor() {
+			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
+				if (job == null || session == null)
+					return Status.CANCEL_STATUS;
+				
+				BitList tasks = session.getTasks(-1);
 				for (IElement element : elements) {
-					// only unregister some registered elements
 					if (element.isRegistered()) {
-						IPProcess proc = findProcess(job, element.getName());
-						if (proc != null) {
-							removeConsoleWindow(job, proc);
-							try {
-								tasks.set(Integer.parseInt(element.getName()));
-							} catch (NumberFormatException e) {
-								// The element name had better be the process number
-							}
+						// only unregister some registered elements
+						try {
+							tasks.set(Integer.parseInt(element.getName()));
+						} catch (NumberFormatException e) {
+							// The element name had better be the process number
+							PTPDebugCorePlugin.log(e);
 						}
 					}
 				}
-				unregisterProcess(session, tasks, true);
+				unregisterTasks(session, tasks);
 				return Status.OK_STATUS;
 			}
-		};
-		uiJob.setSystem(false);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+		});
 	}
-	/** Register elements
+	/** 
+	 * Register elements
 	 * @param elements
-	 * @throws CoreException
 	 */
-	public void registerElements(final IElement[] elements) throws CoreException {
-		WorkbenchJob uiJob = new WorkbenchJob("registering elements...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPJob job = getJob();
-				if (job == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null);
-		
-				IPCDISession session = getDebugSession(job);
-				if (session == null)
+	public void registerElements(final IElement[] elements) {
+		new UIDebugWorkbenchJob(false, "Registered elements", getJob(), new IDebugProgressMonitor() {
+			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
+				if (job == null || session == null)
 					return Status.CANCEL_STATUS;
-				//return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-				
-				BitList tasks = session.createEmptyBitList();
+
+				BitList tasks = session.getTasks(-1);
 				for (IElement element : elements) {
 					// only register some unregistered elements
 					if (!element.isRegistered()) {
-						IPProcess proc = findProcess(job, element.getName());
-						if (proc != null && !proc.isTerminated()) {
-							addConsoleWindow(job, proc);
-							try {
-								tasks.set(Integer.parseInt(element.getName()));
-							} catch (NumberFormatException e) {
-								// The element name had better be the process number
-							}
+						try {
+							tasks.set(Integer.parseInt(element.getName()));
+						} catch (NumberFormatException e) {
+							// The element name had better be the process number
+							PTPDebugCorePlugin.log(e);
 						}
 					}
 				}
-				registerProcess(session, tasks, true);
+				registerTasks(session, tasks);
 				return Status.OK_STATUS;
 			}
-		};
-		uiJob.setSystem(false);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+		});
+	}
+	public void unregisterTasks(IPSession session, BitList tasks) {
+		session.deleteDebugTarget(tasks, true, true);
+	}
+	public void registerTasks(IPSession session, BitList tasks) {
+		session.createDebugTarget(tasks, true, true);
 	}
 	/***************************************************************************************************************************************************************************************************
 	 * Breakpoint
@@ -386,18 +370,17 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (PTPDebugUIPlugin.isPTPDebugPerspective()) {
 			if (breakpoint instanceof ICLineBreakpoint) {
 				//delete c breakpoint if the ptp debug perspective is active
-				WorkbenchJob uiJob = new WorkbenchJob("Removing CLine breakpoint...") {
+				WorkbenchJob uiJob = new WorkbenchJob("Removing C-Line breakpoint...") {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
 							DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 						} catch (CoreException e) {
-							PTPDebugUIPlugin.log(e.getStatus());
+							return e.getStatus();
 						}
 						return Status.OK_STATUS;
 					}
 				};
 				uiJob.setSystem(true);
-				uiJob.setPriority(Job.DECORATE);
 				uiJob.schedule();
 			}
 		}
@@ -413,14 +396,15 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/***************************************************************************************************************************************************************************************************
 	 * Element Set
 	 **************************************************************************************************************************************************************************************************/
-	/** Update breakpoint marker
+	/**
+	 * Update breakpoint marker
 	 * @param cur_sid current set ID
 	 */
 	public void updateBreakpointMarker(final String cur_sid) {
 		WorkbenchJob uiJob = new WorkbenchJob("Updating breakpoint marker...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
-					debugModel.updatePBreakpoints(cur_sid,  monitor);
+					PDebugModel.updatePBreakpoints(cur_sid,  monitor);
 				} catch (CoreException e) {
 					return e.getStatus();
 				}
@@ -428,460 +412,217 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			}
 		};
 		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
-	/** Remove all register elements
-	 * @param job_id job ID
-	 * @throws CoreException
-	 */
-	public synchronized void removeAllRegisterElements(final String job_id) throws CoreException {
-		final IElementHandler elementHandler = getElementHandler(job_id);
-		if (elementHandler == null)
-			return;
-		WorkbenchJob uiJob = new WorkbenchJob("Removing registered processes") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPJob job = findJobById(job_id);
-				if (job == null)
-					return Status.CANCEL_STATUS;
-
-				IPCDISession session = getDebugSession(job);
-				if (session == null)
-					return Status.CANCEL_STATUS;
-
-				BitList tasks = session.createEmptyBitList();
-				IElement[] registerElements = elementHandler.getRegisteredElements();
-				monitor.beginTask("Removing registering processes....", registerElements.length);
-				for (IElement registerElement : registerElements) {
-					IPProcess proc = findProcess(job, registerElement.getName());
-					if (proc != null) {
-						removeConsoleWindow(job, proc);
-						try {
-							tasks.set(Integer.parseInt(registerElement.getName()));
-						} catch (NumberFormatException e) {
-							// The element name had better be the process number
-						}
-					}
-					monitor.worked(1);
-				}
-				unregisterProcess(session, tasks, false);
-				monitor.done();
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setPriority(Job.INTERACTIVE);
-		PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
-		uiJob.schedule();
-	}
-	/** Update register and unregister elements
-	 * @param curSet
-	 * @param preSet
-	 * @param job_id
-	 * @throws CoreException
-	 */
-	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("Updating registered/unregistered processes") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				final IElementHandler elementHandler = getElementHandler(job_id);
-				if (elementHandler == null)
-					return Status.CANCEL_STATUS;
-
-				IPJob job = findJobById(job_id);
-				if (job == null)
-					return Status.CANCEL_STATUS;
-
-				IPCDISession session = getDebugSession(job);
-				if (session == null)
-					return Status.CANCEL_STATUS;
-				
-				BitList regTasks = session.createEmptyBitList();
-				BitList unregTasks = session.createEmptyBitList();
-				
-				IElement[] registerElements = elementHandler.getRegisteredElements();
-				monitor.beginTask("Registering process....", registerElements.length);
-				for (IElement registerElement : registerElements) {
-					if (curSet.contains(registerElement.getID())) {//check whether the current set contains the registered process or not
-						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElement.getID()))) {
-							IPProcess proc = findProcess(job, registerElement.getName());
-							if (proc != null) {
-								addConsoleWindow(job, proc);
-								try {
-									regTasks.set(Integer.parseInt(registerElement.getName()));
-								} catch (NumberFormatException e) {
-									// The element name had better be the process number
-								}
-							}
-						}
-					} else { //if not unregister it
-						IPProcess proc = findProcess(job, registerElement.getName());
-						if (proc != null) {
-							removeConsoleWindow(job, proc);
-							try {
-								unregTasks.set(Integer.parseInt(registerElement.getName()));
-							} catch (NumberFormatException e) {
-								// The element name had better be the process number
-							}
-						}
-					}
-					monitor.worked(1);
-				}
-				registerProcess(session, regTasks, false);
-				unregisterProcess(session, unregTasks, false);
-				monitor.done();
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setPriority(Job.INTERACTIVE);
-		PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
-		uiJob.schedule();
+	private BitList convertElementsToBitList(IPSession session, IElement[] elements) {
+		BitList tasks = session.getTasks(-1);
+		for (IElement element : elements) {
+			tasks.set(convertToInt(element.getName()));
+		}
+		return tasks;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.ui.AbstractUIManager#fireSetEvent(int, org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public synchronized void fireSetEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set) {
-		switch (eventType) {
-		case CREATE_SET_TYPE:
-			BitList created_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
-			for (IElement element : elements) {
-				created_tasks.set(convertToInt(element.getName()));
-			}
-			debugModel.createSet(getCurrentJobId(), cur_set.getName(), created_tasks);
-			break;
-		case DELETE_SET_TYPE:
-			debugModel.deletePBreakpoint(getCurrentJobId(), cur_set.getName());
-			debugModel.deleteSet(getCurrentJobId(), cur_set.getName());
-			String cur_job_id = getCurrentJobId();
-			if (cur_job_id != null && cur_job_id.length() > 0) {
-				getJobVariableManager().deleteSet(cur_job_id, cur_set.getName());
-			}		
-			break;
-		case CHANGE_SET_TYPE:
-			if (cur_set == null) {
+		IPSession session = getDebugSession(getJob());
+		if (session != null) {
+			switch (eventType) {
+			case CREATE_SET_TYPE:
+				BitList cTasks = convertElementsToBitList(session, elements);
+				debugModel.createSet(session, cur_set.getName(), cTasks);
+				break;
+			case DELETE_SET_TYPE:
+				debugModel.deleteSet(session, cur_set.getName());
+				break;
+			case CHANGE_SET_TYPE:
+				if (cur_set != null) {
+					annotationMgr.updateAnnotation(cur_set, pre_set);
+					updateBreakpointMarker(cur_set.getName());
+					updateRegisterUnRegisterElements(cur_set, pre_set, getCurrentJobId());
+				}
+				break;
+			case ADD_ELEMENT_TYPE:
+				BitList aTasks = convertElementsToBitList(session, elements);
+				debugModel.addTasks(session, cur_set.getName(), aTasks);
+				break;
+			case REMOVE_ELEMENT_TYPE:
+				BitList rTasks = convertElementsToBitList(session, elements);
+				debugModel.removeTasks(session, cur_set.getName(), rTasks);
 				break;
 			}
-			annotationMgr.updateAnnotation(cur_set, pre_set);
-			updateBreakpointMarker(cur_set.getName());
-			updateRegisterUnRegisterElements(cur_set, pre_set, getCurrentJobId());
-			updateVariableValueOnChange();
-			break;
-		case ADD_ELEMENT_TYPE:
-			BitList added_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
-			for (IElement element : elements) {
-				added_tasks.set(convertToInt(element.getName()));
-			}
-			debugModel.addTasks(getCurrentJobId(), cur_set.getName(), added_tasks);
-			break;
-		case REMOVE_ELEMENT_TYPE:
-			BitList removed_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
-			for (IElement element : elements) {
-				removed_tasks.set(convertToInt(element.getName()));
-			}
-			debugModel.removeTasks(getCurrentJobId(), cur_set.getName(), removed_tasks);
-			break;
+			super.fireSetEvent(eventType, elements, cur_set, pre_set);
 		}
-		super.fireSetEvent(eventType, elements, cur_set, pre_set);
 	}
 	/***************************************************************************************************************************************************************************************************
 	 * debug actions
 	 **************************************************************************************************************************************************************************************************/
-	/** Get tasks from given set
+	/** 
+	 * Get tasks from given set
 	 * @param job_id job ID
 	 * @param set_id set ID
 	 * @return
 	 * @throws CoreException
 	 */
-	public BitList getTasks(String job_id, String set_id) throws CoreException {
-		return debugModel.getTasks(job_id, set_id);
+	public BitList getTasks(IPSession session, String set_id) throws CoreException {
+		return debugModel.getTasks(session, set_id);
 	}
-	/** Resume debugger
+	public BitList getTasks(String job_id, String set_id) throws CoreException {
+		IPSession session = getDebugSession(job_id);
+		if (session == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+		return getTasks(session, set_id);
+	}
+	public BitList getTasks(String set_id) throws CoreException {
+		return getTasks(getCurrentJobId(), set_id);
+	}
+	/** 
+	 * Resume debugger
 	 */
-	public void resume() {
+	public void resume() throws CoreException {
 		resume(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Resume debugger
+	/** 
+	 * Resume debugger
 	 * @param job_id job ID
 	 * @param set_id set ID
 	 */
-	public void resume(final String job_id, final String set_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("PTP Resume...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPCDISession session = getDebugSession(job_id);
-				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-				try {
-					session.resume(getTasks(job_id, set_id));
-				} catch (CoreException e) {
-					return e.getStatus();
-				} catch (PCDIException e) {
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+	public void resume(final String job_id, final String set_id) throws CoreException {
+		IPSession session = getDebugSession(job_id);
+		if (session == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+		try {
+			session.getPDISession().resume(getTasks(session, set_id), false);
+		} catch (PDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
-	/** Suspend debugger
+	/** 
+	 * Suspend debugger
 	 */
-	public void suspend() {
+	public void suspend() throws CoreException {
 		suspend(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Suspend debugger
+	/** 
+	 * Suspend debugger
 	 * @param job_id
 	 * @param set_id
 	 */
-	public void suspend(final String job_id, final String set_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("PTP Suspend...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPCDISession session = getDebugSession(job_id);
-				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-				try {
-					session.suspend(getTasks(job_id, set_id));
-				} catch (CoreException e) {
-					return e.getStatus();
-				} catch (PCDIException e) {
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+	public void suspend(final String job_id, final String set_id) throws CoreException {
+		IPSession session = getDebugSession(job_id);
+		if (session == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+		try {
+			session.getPDISession().suspend(getTasks(session, set_id));
+		} catch (PDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
-	/** Terminate debugger
+	/** 
+	 * Terminate debugger
 	 */
-	public void terminate() {
+	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Terminate debugger
+	/** 
+	 * Terminate debugger
 	 * @param job_id
 	 * @param set_id
 	 */
-	public void terminate(final String job_id, final String set_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("PTP Terminate...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPJob job = findJobById(job_id);
-				if (isDebugMode(job)) {
-					IPCDISession session = getDebugSession(job);
-					if (session == null)
-						return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-					try {
-						session.stop(getTasks(job_id, set_id));
-					} catch (CoreException e) {
-						return e.getStatus();
-					} catch (PCDIException e) {
-						return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
-					}
-				} else {
-					try {
-						terminateJob();
-					} catch (CoreException e) {
-						return e.getStatus();
-					}
-				}
-				return Status.OK_STATUS;
+	public void terminate(final String job_id, final String set_id) throws CoreException {
+		IPJob job = findJobById(job_id);
+		if (isDebugMode(job)) {
+			IPSession session = getDebugSession(job);
+			if (session == null)
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			try {
+				session.getPDISession().terminate(getTasks(session, set_id));
+			} catch (PDIException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+		}
 	}
-	/** Step into debugger
+	/** 
+	 * Step into debugger
 	 */
-	public void stepInto() {
+	public void stepInto() throws CoreException {
 		stepInto(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Step into debugger
+	/** 
+	 * Step into debugger
 	 * @param job_id
 	 * @param set_id
 	 */
-	public void stepInto(final String job_id, final String set_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("PTP Step into...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPCDISession session = getDebugSession(job_id);
-				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-				try {
-					BitList tasks = getTasks(job_id, set_id);
-					filterRunningTasks(tasks, STEP_INTO);
-					session.steppingInto(tasks);
-				} catch (CoreException e) {
-					return e.getStatus();
-				} catch (PCDIException e) {
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+	public void stepInto(final String job_id, final String set_id) throws CoreException {
+		IPSession session = getDebugSession(job_id);
+		if (session == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+		try {
+			BitList tasks = getTasks(session, set_id);
+			//filterRunningTasks(tasks, STEP_INTO);
+			session.getPDISession().stepInto(tasks, 1);
+		} catch (PDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
-	/** Step over debugger
+	/** 
+	 * Step over debugger
 	 */
-	public void stepOver() {
+	public void stepOver() throws CoreException {
 		stepOver(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Step over debugger
+	/** 
+	 * Step over debugger
 	 * @param job_id
 	 * @param set_id
 	 */
-	public void stepOver(final String job_id, final String set_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("PTP Step over...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPCDISession session = getDebugSession(job_id);
-				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-				try {
-					BitList tasks = getTasks(job_id, set_id);
-					filterRunningTasks(tasks, STEP_OVER);
-					session.steppingOver(tasks);
-				} catch (CoreException e) {
-					return e.getStatus();
-				} catch (PCDIException e) {
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
+	public void stepOver(final String job_id, final String set_id) throws CoreException {
+		IPSession session = getDebugSession(job_id);
+		if (session == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+		try {
+			BitList tasks = getTasks(session, set_id);
+			//filterRunningTasks(tasks, STEP_OVER);
+			session.getPDISession().stepOver(tasks, 1);
+		} catch (PDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
-	/** Step return debugger
+	/** 
+	 * Step return debugger
 	 */
-	public void stepReturn(BitList tasks) {
-		stepReturn(tasks, getCurrentJobId(), getCurrentSetId());
+	public void stepReturn() throws CoreException {
+		stepReturn(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Step return debugger
+	/** 
+	 * Step return debugger
 	 * @param job_id
 	 * @param set_id
 	 * @throws CoreException
 	 */
-	public void stepReturn(final BitList tasks, final String job_id, final String set_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("PTP Step over...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (tasks == null) {
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No task selected", null);
-				}
-				IPCDISession session = getDebugSession(job_id);
-				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
-				try {
-					//BitList tasks = getTasks(job_id, set_id);
-					filterRunningTasks(tasks, STEP_RETURN);
-					session.steppingReturn(tasks);
-				} catch (PCDIException e) {
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();
-	}
-	public BitList[] filterStepReturnTasks(BitList tasks) {
-		return filterStepReturnTasks(tasks, getCurrentJobId());
-	}
-	public BitList[] filterStepReturnTasks(BitList tasks, String job_id) {
-		IPCDISession session = getDebugSession(job_id);
+	public void stepReturn(final String job_id, final String set_id) throws CoreException {
+		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			return new BitList[0];
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			return session.getStepReturnTasks(tasks);
-		} catch (PCDIException e) {
-			return new BitList[0];
+			BitList tasks = getTasks(session, set_id);
+			//filterRunningTasks(tasks, STEP_RETURN);
+			session.getPDISession().stepReturn(tasks, 0);
+		} catch (PDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
-			debugModel.deletePBreakpoint(job.getID());
-			debugModel.deleteJob(job);
 			debugModel.shutdownSession(job);
 			removeConsoleWindows(job);
 		}
 		super.removeJob(job);
 	}
-	/**********************************************************
-	 * Variable methods
-	 **********************************************************/
-	public void updateVariableValueOnSuspend(BitList tasks) {
-		updateVariableValue(isAutoUpdateVarOnSuspend(), tasks);
-	}
-	public void updateVariableValueOnChange() {
-		updateVariableValue(isAutoUpdateVarOnChange(), null);
-	}
-	public void updateVariableValue(boolean force, BitList tasks) {
-		cleanVariableValue(tasks);
-		if (force) {
-			updateVariableValue(tasks);
-		}
-	}
-	public void cleanVariableValue(BitList tasks) {
-		String jid = getCurrentJobId();
-		String sid = getCurrentSetId();
-		if (tasks == null) {
-			tasks = debugModel.getTasks(jid, sid);
-		}
-		getJobVariableManager().cleanupJobVariableValues(jid, tasks);
-	}
-	public void updateVariableValue(BitList tasks) {
-		String jid = getCurrentJobId();
-		String sid = getCurrentSetId();
-		if (tasks == null) {
-			tasks = debugModel.getTasks(jid, sid);
-		}
-		updateVariableValue(jid, sid, tasks);
-	}
-	public void updateVariableValue(final String jid, final String sid, final BitList tasks) {
-		if (jid != null) {
-			Job uiJob = new Job("Updating variables...") {
-				protected IStatus run(IProgressMonitor monitor) {
-					try {
-						getJobVariableManager().updateJobVariableValues(jid, sid, tasks, monitor);
-					} catch (CoreException e) {
-						return e.getStatus();
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			uiJob.setPriority(Job.INTERACTIVE);
-			PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
-			uiJob.schedule();
-		}
-	}
-	public Object getDebugObject(IPJob job, int task_id) {
-		IPCDISession session = getDebugSession(job); 
-		if (session != null) {
-			IPDebugTarget debugTarget = session.getLaunch().getDebugTarget(task_id);
-			if (debugTarget != null) {
-				try {
-					IThread[] threads = debugTarget.getThreads();
-					for (int i=0; i<threads.length; i++) {
-						IStackFrame frame = threads[i].getTopStackFrame();
-						if (frame != null)
-							return frame;
-					}
-					if (threads.length > 0) {
-						return threads[0];
-					}
-				} catch (DebugException e) {
-					return debugTarget;
-				}
-				return debugTarget;
-			}
-		}
-		return null;
-	}
-	public int getSelectedRegisteredTasks(Object obj) {
+	public BitList getSelectedRegisteredTasks(Object obj) {
 		IDebugTarget target = null;
 		if (obj instanceof IStackFrame) {
 			target = ((IStackFrame)obj).getDebugTarget();
@@ -894,44 +635,56 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		
 		if (target instanceof IPDebugTarget) {
-			 return ((IPDebugTarget)target).getTargetID();
+			 return ((IPDebugTarget)target).getTasks();
 		}
-		return -1;
+		return null;
 	}
-	//For make sure the task in current set is not registered and is not focus on and it is not stepping, otherwise remove this task
-	public void filterRunningTasks(BitList tasks, int step) {
-		Viewer viewer = null;
-		IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
-		if (part != null && part instanceof AbstractDebugView) {
-			viewer = ((AbstractDebugView)part).getViewer();
+
+	interface IDebugProgressMonitor {
+		IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor);
+	};
+	class UIDebugWorkbenchJob extends WorkbenchJob {
+		private IPJob job = null;
+		private IPSession session = null;
+		private IDebugProgressMonitor debugMonitor = null;
+		public UIDebugWorkbenchJob(boolean runInDialog, String name, IPJob job, IDebugProgressMonitor debugMonitor) {
+			super(name);
+			this.job = job;
+			this.debugMonitor = debugMonitor;
+			if (runInDialog)
+				PlatformUI.getWorkbench().getProgressService().showInDialog(null, this);
+			schedule();
 		}
-		if (viewer != null) {
-			ISelection selection = viewer.getSelection();
-			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				if (obj instanceof IStep && obj instanceof IPDebugElement) {
-					int taskID = ((IPDebugTarget)((IPDebugElement)obj).getDebugTarget()).getTargetID();
-					if (tasks.get(taskID)) {
-						switch (step) {
-						case STEP_INTO:
-							if (!((IStep)obj).canStepInto()) {
-								tasks.clear(taskID);
-							}
-							break;
-						case STEP_OVER:
-							if (!((IStep)obj).canStepOver()) {
-								tasks.clear(taskID);
-							}
-							break;
-						case STEP_RETURN:
-							if (!((IStep)obj).canStepReturn()) {
-								tasks.clear(taskID);
-							}
-							break;
-						}
-					}
-				}
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			return debugMonitor.runDebugJob(job, session, monitor);
+		}
+	    public boolean shouldRun() {
+	    	session = getDebugSession(job);
+	    	if (session == null)
+	    		return false;
+	    	if (!session.isReady())
+	    		return false;
+	    	return super.shouldRun();
+	    }
+	}
+	/*
+	public int getStatus(IElement element, int index) {
+		IPSession session = getCurrentSession();
+		if (session != null) {
+			if (session.getPDISession().getTaskManager().getSuspendedTasks().get(index)) {
+				return ProcessAttributes.State.SUSPENDED.ordinal();
 			}
+			if (session.getPDISession().getTaskManager().getTerminatedTasks().get(index)) {
+				IPProcess proc = session.getJob().getProcessByIndex(index);
+				if (proc != null) {
+					if (!proc.getState().equals(ProcessAttributes.State.ERROR))
+						return ProcessAttributes.State.EXITED_SIGNALLED.ordinal();
+				}
+				return ProcessAttributes.State.ERROR.ordinal();
+			}
+			return ProcessAttributes.State.RUNNING.ordinal();
 		}
+		return ProcessAttributes.State.UNKNOWN.ordinal();
 	}
+	*/
 }

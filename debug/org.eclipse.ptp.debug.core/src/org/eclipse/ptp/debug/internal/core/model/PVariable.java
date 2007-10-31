@@ -19,41 +19,42 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
+
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
-import org.eclipse.ptp.debug.core.model.IPType;
 import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
+import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
+import org.eclipse.ptp.debug.core.pdi.IPDIVariableInfo;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
 
 /**
  * @author Clement chu
  *
  */
-public abstract class PVariable extends AbstractPVariable implements IPCDIEventListener {
+public abstract class PVariable extends AbstractPVariable implements IPDIEventListener {
 	interface IInternalVariable {
 		IInternalVariable createShadow(int start, int length) throws DebugException;
 		IInternalVariable createShadow(String type) throws DebugException;
-		PType getType() throws DebugException;
 		String getQualifiedName() throws DebugException;
 		IPValue getValue() throws DebugException;
 		void setValue(String expression) throws DebugException;
 		boolean isChanged();
 		void setChanged(boolean changed);
 		void dispose(boolean destroy);
-		boolean isSameDescriptor(IPCDIVariableDescriptor desc);
-		boolean isSameVariable(IPCDIVariable cdiVar);
+		boolean isSameDescriptor(IPDIVariableDescriptor desc);
+		boolean isSameVariable(IPDIVariable pdiVar);
 		void resetValue();
 		boolean isEditable() throws DebugException;
 		boolean isArgument();
@@ -69,30 +70,24 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 	private PVariableFormat fFormat = PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT));
 	private boolean fIsDisposed = false;
 
-	protected PVariable(PDebugElement parent, IPCDIVariableDescriptor cdiVariableObject) {
+	protected PVariable(PDebugElement parent, IPDIVariableDescriptor pdiVariableObject) {
 		super(parent);
-		if (cdiVariableObject != null) {
-			setName(cdiVariableObject.getName());
-			createOriginal(cdiVariableObject);
+		if (pdiVariableObject != null) {
+			setName(pdiVariableObject.getName());
+			createOriginal(pdiVariableObject);
 		}
 		fIsEnabled = (parent instanceof AbstractPValue) ? ((AbstractPValue) parent).getParentVariable().isEnabled() : !isBookkeepingEnabled();
-		getCDISession().getEventManager().addEventListener(this);
+		getPDISession().getEventManager().addEventListener(this);
 	}
-	protected PVariable(PDebugElement parent, IPCDIVariableDescriptor cdiVariableObject, String errorMessage) {
+	protected PVariable(PDebugElement parent, IPDIVariableDescriptor pdiVariableObject, String errorMessage) {
 		super(parent);
-		if (cdiVariableObject != null) {
-			setName(cdiVariableObject.getName());
-			createOriginal(cdiVariableObject);
+		if (pdiVariableObject != null) {
+			setName(pdiVariableObject.getName());
+			createOriginal(pdiVariableObject);
 		}
 		fIsEnabled = !isBookkeepingEnabled();
-		setStatus(IPDebugElementStatus.ERROR, MessageFormat.format(CoreModelMessages.getString("PVariable.1"), new String[] { errorMessage })); //$NON-NLS-1$
-		getCDISession().getEventManager().addEventListener(this);
-	}
-	public IPType getType() throws DebugException {
-		if (isDisposed())
-			return null;
-		IInternalVariable iv = getCurrentInternalVariable();
-		return (iv != null) ? iv.getType() : null;		
+		setStatus(IPDebugElementStatus.ERROR, MessageFormat.format(CoreModelMessages.getString("PVariable.1"), new Object[] { errorMessage }));
+		getPDISession().getEventManager().addEventListener(this);
 	}
 	public boolean isEnabled() {
 		return fIsEnabled;
@@ -114,7 +109,7 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		IInternalVariable iv = getOriginal();
 		return (iv != null) ? iv.isArgument() : false;
 	}
-	public IValue getValue() throws DebugException {
+	public IPValue getValue() throws DebugException {
 		if (!isDisposed() && isEnabled()) {
 			IInternalVariable iv = getCurrentInternalVariable();
 			if (iv != null) {
@@ -131,8 +126,8 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		return fName;
 	}
 	public String getReferenceTypeName() throws DebugException {
-		IPType type = getType();
-		return (type != null) ? type.getName() : "";
+		IAIF aif = getAIF();
+		return (aif != null) ? aif.getType().toString() : "";
 	}
 	public boolean hasValueChanged() throws DebugException {
 		if (isDisposed())
@@ -151,13 +146,11 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		resetValue();
 	}
 	public boolean canCastToArray() {
-		IPType type;
 		try {
-			type = getType();
-			return (getOriginal() != null && isEnabled() && type.isPointer());
+			return (getOriginal() != null && isEnabled() && (getAIF().getType() instanceof IAIFTypePointer));
 		} catch (DebugException e) {
+			return false;
 		}
-		return false;
 	}
 	public void castToArray(int startIndex, int length) throws DebugException {
 		IInternalVariable current = getCurrentInternalVariable();
@@ -166,8 +159,6 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 			if (getShadow() != null)
 				getShadow().dispose(true);
 			setShadow(newVar);
-			// If casting of variable to a type or array causes an error, the status
-			// of the variable is set to "error" and it can't be reset by subsequent castings.
 			resetValue();
 		}
 	}
@@ -185,8 +176,8 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		try {
 			return getCurrentInternalVariable().isEditable();
 		} catch (DebugException e) {
+			return false;
 		}
-		return false;
 	}
 	public boolean verifyValue(String expression) throws DebugException {
 		return true;
@@ -197,26 +188,6 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 	public boolean canCast() {
 		return (getOriginal() != null && isEnabled());
 	}
-	public String getCurrentType() {
-		String typeName = "";
-		try {
-			typeName = getReferenceTypeName();
-		} catch (DebugException e) {
-		}
-		return typeName;
-	}
-	public void cast(String type) throws DebugException {
-		IInternalVariable current = getCurrentInternalVariable();
-		if (current != null) {
-			IInternalVariable newVar = current.createShadow(type);
-			if (getShadow() != null)
-				getShadow().dispose(true);
-			setShadow(newVar);
-			// If casting of variable to a type or array causes an error, the status
-			// of the variable is set to "error" and it can't be reset by subsequent castings.
-			resetValue();
-		}
-	}
 	public void restoreOriginal() throws DebugException {
 		IInternalVariable oldVar = getShadow();
 		setShadow(null);
@@ -225,35 +196,26 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		IInternalVariable iv = getOriginal();
 		if (iv != null)
 			iv.invalidateValue();
-		// If casting of variable to a type or array causes an error, the status
-		// of the variable is set to "error" and it can't be reset by subsequent castings.
 		resetValue();
 	}
 	public boolean isCasted() {
 		return (getShadow() != null);
 	}
-	public void handleDebugEvents(IPCDIEvent[] events) {
-		IInternalVariable iv = getCurrentInternalVariable();
-		if (iv == null)
-			return;
+	public void handleDebugEvents(IPDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
-			IPCDIEvent event = events[i];
-			IPCDIObject source = event.getSource(getCDITarget().getTargetID());
-			if (source == null)
+			IPDIEvent event = events[i];
+			if (!event.contains(getTasks()))
 				continue;
-			IPCDITarget target = source.getTarget();
-			if (target.equals(getCDITarget())) {
-				if (event instanceof IPCDIChangedEvent) {
-					if (source instanceof IPCDIVariable && iv.isSameVariable((IPCDIVariable) source)) {
-						handleChangedEvent((IPCDIChangedEvent) event);
-					}
-				} else if (event instanceof IPCDIResumedEvent) {
-					handleResumedEvent((IPCDIResumedEvent) event);
-				}
+			
+			if (event instanceof IPDIChangedEvent) {
+				handleChangedEvent((IPDIChangedEvent) event);
+			}
+			else if (event instanceof IPDIResumedEvent) {
+				handleResumedEvent((IPDIResumedEvent)event);
 			}
 		}
 	}
-	private void handleResumedEvent(IPCDIResumedEvent event) {
+	private void handleResumedEvent(IPDIResumedEvent event) {
 		boolean changed = false;
 		if (hasErrors()) {
 			resetStatus();
@@ -265,11 +227,16 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		if (changed)
 			fireChangeEvent(DebugEvent.STATE);
 	}
-	private void handleChangedEvent(IPCDIChangedEvent event) {
-		IInternalVariable iv = getCurrentInternalVariable();
-		if (iv != null) {
-			iv.setChanged(true);
-			fireChangeEvent(DebugEvent.STATE);
+	private void handleChangedEvent(IPDIChangedEvent event) {
+		IPDISessionObject reason = event.getReason();
+		if (reason instanceof IPDIVariableInfo) {
+			IInternalVariable iv = getCurrentInternalVariable();
+			if (iv != null) {
+				if (iv.isSameVariable(((IPDIVariableInfo)reason).getVariable())) {
+					iv.setChanged(true);
+					fireChangeEvent(DebugEvent.STATE);
+				}
+			}
 		}
 	}
 	private IInternalVariable getCurrentInternalVariable() {
@@ -291,12 +258,9 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 	}
 	protected boolean isBookkeepingEnabled() {
 		boolean result = false;
-		// try {
-		// result = getLaunch().getLaunchConfiguration().getAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, false);
-		// } catch( CoreException e ) {}
 		return result;
 	}
-	abstract protected void createOriginal(IPCDIVariableDescriptor vo);
+	abstract protected void createOriginal(IPDIVariableDescriptor vo);
 	protected boolean hasErrors() {
 		return !isOK();
 	}
@@ -318,7 +282,6 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		return oldExpression;
 	}
 	public void dispose() {
-		//TODO whether Hack: do not destroy local variables
 		internalDispose(false);
 		setDisposed(true);
 	}
@@ -335,7 +298,7 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		}
 		return false;
 	}
-	protected boolean sameVariable(IPCDIVariableDescriptor vo) {
+	protected boolean sameVariable(IPDIVariableDescriptor vo) {
 		IInternalVariable iv = getOriginal();
 		return (iv != null && iv.isSameDescriptor(vo));
 	}
@@ -353,7 +316,7 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 			iv.preserve();
 	}
 	protected void internalDispose(boolean destroy) {
-		getCDISession().getEventManager().removeEventListener(this);
+		getPDISession().getEventManager().removeEventListener(this);
 		IInternalVariable iv = getOriginal();
 		if (iv != null)
 			iv.dispose(destroy);

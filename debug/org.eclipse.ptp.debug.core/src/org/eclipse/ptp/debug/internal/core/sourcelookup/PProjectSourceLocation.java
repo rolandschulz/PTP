@@ -25,11 +25,12 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.eclipse.cdt.debug.core.CDebugUtils;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -41,6 +42,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.IProjectSourceLocation;
@@ -170,7 +172,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 			document.appendChild(node);
 			node.setAttribute(ATTR_PROJECT, getProject().getName());
 			node.setAttribute(ATTR_GENERIC, new Boolean(isGeneric()).toString());
-			return CDebugUtils.serializeDocument(document);
+			return PDebugUtils.serializeDocument(document);
 		} catch (ParserConfigurationException e) {
 			ex = e;
 		} catch (IOException e) {
@@ -178,7 +180,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		} catch (TransformerException e) {
 			ex = e;
 		}
-		abort(MessageFormat.format(InternalSourceLookupMessages.getString("PProjectSourceLocation.0"), new String[] { getProject().getName() }), ex);
+		abort(MessageFormat.format(InternalSourceLookupMessages.getString("PProjectSourceLocation.0"), new Object[] { getProject().getName() }), ex);
 		// execution will not reach here
 		return null;
 	}

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
 import java.text.MessageFormat;
+
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
@@ -143,7 +144,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		commandTimeoutField.setValidRange(IPDebugConstants.MIN_REQUEST_TIMEOUT, IPDebugConstants.MAX_REQUEST_TIMEOUT);
 		String minValue = Integer.toString(IPDebugConstants.MIN_REQUEST_TIMEOUT);
 		String maxValue = Integer.toString(IPDebugConstants.MAX_REQUEST_TIMEOUT);
-		commandTimeoutField.setErrorMessage(MessageFormat.format(PreferenceMessages.getString("PDebugPreferencePage.timeoutError"), new String[] { minValue, maxValue }));
+		commandTimeoutField.setErrorMessage(MessageFormat.format(PreferenceMessages.getString("PDebugPreferencePage.timeoutError"), new Object[] { minValue, maxValue }));
 		commandTimeoutField.setEmptyStringAllowed(false);
 		commandTimeoutField.setPropertyChangeListener(listener);
 		commandTimeoutField.load();

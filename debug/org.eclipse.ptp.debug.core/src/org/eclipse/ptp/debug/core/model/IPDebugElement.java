@@ -19,14 +19,15 @@
 package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.ptp.debug.core.IPSession;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPDebugElement extends IDebugElement {
-	public PDebugElementState getState();
-	public Object getCurrentStateInfo();
+	PDebugElementState getState();
+	Object getCurrentStateInfo();
+	IPSession getSession();
+	int getID();
 }
-
-

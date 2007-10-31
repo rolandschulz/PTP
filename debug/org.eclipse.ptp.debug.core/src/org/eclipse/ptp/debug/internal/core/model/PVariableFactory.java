@@ -19,27 +19,25 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
-import org.eclipse.cdt.core.IBinaryParser.ISymbol;
-import org.eclipse.cdt.core.model.IBinaryModule;
-import org.eclipse.cdt.core.model.ICElement;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
-import org.eclipse.ptp.debug.core.model.IGlobalVariableDescriptor;
+import org.eclipse.ptp.debug.core.model.IPGlobalVariableDescriptor;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 
 /**
  * @author Clement chu
  * 
  */
 public class PVariableFactory {
-	public static PVariable createLocalVariable(PDebugElement parent, IPCDIVariableDescriptor cdiVariableObject) {
-		return new PLocalVariable(parent, cdiVariableObject);
+	public static PVariable createLocalVariable(PDebugElement parent, IPDIVariableDescriptor pdiVariableObject) {
+		return new PLocalVariable(parent, pdiVariableObject);
 	}
-	public static PVariable createLocalVariableWithError(PDebugElement parent, IPCDIVariableDescriptor cdiVariableObject, String message) {
-		return new PLocalVariable(parent, cdiVariableObject, message);
+	public static PVariable createLocalVariableWithError(PDebugElement parent, IPDIVariableDescriptor pdiVariableObject, String message) {
+		return new PLocalVariable(parent, pdiVariableObject, message);
 	}
-	public static IGlobalVariableDescriptor createGlobalVariableDescriptor(final String name, final IPath path) {
-		return new IGlobalVariableDescriptor() {
+	public static IPGlobalVariableDescriptor createGlobalVariableDescriptor(final String name, final IPath path) {
+		return new IPGlobalVariableDescriptor() {
 			public String getName() {
 				return name;
 			}
@@ -47,28 +45,17 @@ public class PVariableFactory {
 				return (path != null) ? path : new Path("");
 			}
 			public String toString() {
-				return MessageFormat.format("{0}::{1}", new String[] { getPath().toOSString(), getName() });
+				return MessageFormat.format("{0}::{1}", new Object[] { getPath().toOSString(), getName() });
 			}
 			public boolean equals(Object obj) {
-				if (!(obj instanceof IGlobalVariableDescriptor))
+				if (!(obj instanceof IPGlobalVariableDescriptor))
 					return false;
-				IGlobalVariableDescriptor d = (IGlobalVariableDescriptor) obj;
+				IPGlobalVariableDescriptor d = (IPGlobalVariableDescriptor) obj;
 				return (getName().compareTo(d.getName()) == 0 && getPath().equals(d.getPath()));
 			}
 		};
 	}
-	public static IGlobalVariableDescriptor createGlobalVariableDescriptor(final org.eclipse.cdt.core.model.IVariable var) {
-		IPath path = new Path("");
-		ICElement parent = var.getParent();
-		if (parent instanceof IBinaryModule) {
-			path = ((IBinaryModule) parent).getPath();
-		}
-		return createGlobalVariableDescriptor(var.getElementName(), path);
-	}
-	public static IGlobalVariableDescriptor createGlobalVariableDescriptor(ISymbol symbol) {
-		return createGlobalVariableDescriptor(symbol.getName(), symbol.getFilename());
-	}
-	public static PGlobalVariable createGlobalVariable(PDebugElement parent, IGlobalVariableDescriptor descriptor, IPCDIVariableDescriptor cdiVariableObject) {
-		return new PGlobalVariable(parent, descriptor, cdiVariableObject);
+	public static PGlobalVariable createGlobalVariable(PDebugElement parent, IPGlobalVariableDescriptor descriptor, IPDIVariableDescriptor pdiVariableObject) {
+		return new PGlobalVariable(parent, descriptor, pdiVariableObject);
 	}
 }

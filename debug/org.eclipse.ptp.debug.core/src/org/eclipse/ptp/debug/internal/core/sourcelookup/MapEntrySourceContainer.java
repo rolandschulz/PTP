@@ -68,7 +68,7 @@ public class MapEntrySourceContainer extends AbstractSourceContainer {
 		return EMPTY;
 	}
 	public String getName() {
-		return MessageFormat.format("{0} - {1}", new String[] { getBackendPath().toOSString(), getLocalPath().toOSString() });
+		return MessageFormat.format("{0} - {1}", new Object[] { getBackendPath().toOSString(), getLocalPath().toOSString() });
 	}
 	public ISourceContainerType getType() {
 		return getSourceContainerType(TYPE_ID);

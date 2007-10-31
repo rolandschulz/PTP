@@ -19,22 +19,18 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariableDescriptor;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
-import org.eclipse.ptp.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
-import org.eclipse.ptp.debug.core.model.IPType;
+import org.eclipse.ptp.debug.core.model.IPGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPValue;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIArgumentDescriptor;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIGlobalVariableDescriptor;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 
 /**
  * @author Clement chu
@@ -43,23 +39,23 @@ import org.eclipse.ptp.debug.core.model.IPValue;
 public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 	private class InternalVariable implements IInternalVariable {
 		private PVariable fVariable;
-		private IPCDIVariableDescriptor fCDIVariableObject;
-		private IPCDIVariable fCDIVariable;
-		private PType fType;
+		private IPDIVariableDescriptor fPDIVariableObject;
+		private IPDIVariable fPDIVariable;
 		private String fQualifiedName;
 		private IPValue fValue = PValueFactory.NULL_VALUE;
 		private boolean fChanged = false;
 
-		InternalVariable(PVariable var, IPCDIVariableDescriptor varObject) {
+		InternalVariable(PVariable var, IPDIVariableDescriptor varObject) {
 			setVariable(var);
-			setCDIVariableObject(varObject);
-			setCDIVariable((varObject instanceof IPCDIVariable) ? (IPCDIVariable) varObject : null);
+			setPDIVariableObject(varObject);
+			setPDIVariable((varObject instanceof IPDIVariable) ? (IPDIVariable) varObject : null);
 		}
 		public IInternalVariable createShadow(int start, int length) throws DebugException {
 			IInternalVariable iv = null;
 			try {
-				iv = new InternalVariable(getVariable(), getCDIVariableObject().getVariableDescriptorAsArray(start, length));
-			} catch (PCDIException e) {
+				iv = new InternalVariable(getVariable(), getPDIVariableObject().getVariableDescriptorAsArray(start, length));
+			}
+			catch (PDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
@@ -67,127 +63,101 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 		public IInternalVariable createShadow(String type) throws DebugException {
 			IInternalVariable iv = null;
 			try {
-				iv = new InternalVariable(getVariable(), getCDIVariableObject().getVariableDescriptorAsType(type));
-			} catch (PCDIException e) {
+				iv = new InternalVariable(getVariable(), getPDIVariableObject().getVariableDescriptorAsType(type));
+			} catch (PDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
 		}
-		private synchronized IPCDIVariable getCDIVariable() throws DebugException {
-			if (fCDIVariable == null) {
+		private synchronized IPDIVariable getPDIVariable() throws DebugException {
+			if (fPDIVariable == null) {
 				try {
-					fCDIVariable = getCDITarget().createGlobalVariable((IPCDIGlobalVariableDescriptor) getCDIVariableObject());
-				} catch (PCDIException e) {
+					fPDIVariable = getPDITarget().createGlobalVariable((IPDIGlobalVariableDescriptor) getPDIVariableObject());
+				} catch (PDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
-			return fCDIVariable;
+			return fPDIVariable;
 		}
-		private void setCDIVariable(IPCDIVariable variable) {
-			fCDIVariable = variable;
+		private void setPDIVariable(IPDIVariable variable) {
+			fPDIVariable = variable;
 		}
-		private IPCDIVariableDescriptor getCDIVariableObject() {
-			if (fCDIVariable != null) {
-				return fCDIVariable;
+		private IPDIVariableDescriptor getPDIVariableObject() {
+			if (fPDIVariable != null) {
+				return fPDIVariable;
 			}
-			return fCDIVariableObject;
+			return fPDIVariableObject;
 		}
-		private void setCDIVariableObject(IPCDIVariableDescriptor variableObject) {
-			fCDIVariableObject = variableObject;
+		private void setPDIVariableObject(IPDIVariableDescriptor variableObject) {
+			fPDIVariableObject = variableObject;
 		}
 		public String getQualifiedName() throws DebugException {
 			if (fQualifiedName == null) {
 				try {
-					fQualifiedName = (fCDIVariableObject != null) ? fCDIVariableObject.getQualifiedName() : null;
-				} catch (PCDIException e) {
+					fQualifiedName = (fPDIVariableObject != null) ? fPDIVariableObject.getQualifiedName() : null;
+				} catch (PDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
 			return fQualifiedName;
 		}
-		public PType getType() throws DebugException {
-			if (fType == null) {
-				IPCDIVariableDescriptor varObject = getCDIVariableObject();
-				if (varObject != null) {
-					synchronized (this) {
-						if (fType == null) {
-							try {
-								fType = new PType(varObject.getType());
-							} catch (PCDIException e) {
-								requestFailed(e.getMessage(), null);								
-							}
-						}
-					}
-				}
-			}
-			return fType;
-		}
 		private synchronized void invalidate(boolean destroy) {
 			try {
-				if (destroy && fCDIVariable != null)
-					fCDIVariable.dispose();
-			} catch (PCDIException e) {
+				if (destroy && fPDIVariable != null)
+					fPDIVariable.dispose();
+			} catch (PDIException e) {
 				logError(e.getMessage());
 			}
 			invalidateValue();
-			setCDIVariable(null);
-			if (fType != null)
-				fType.dispose();
-			fType = null;
+			setPDIVariable(null);
 		}
 		public void dispose(boolean destroy) {
 			invalidate(destroy);
 		}
-		public boolean isSameVariable(IPCDIVariable cdiVar) {
-			return (fCDIVariable != null) ? fCDIVariable.equals(cdiVar) : false;
+		public boolean isSameVariable(IPDIVariable pdiVar) {
+			return (fPDIVariable != null) ? fPDIVariable.equals(pdiVar) : false;
 		}
 		public int sizeof() {
-			if (getCDIVariableObject() != null) {
+			if (getPDIVariableObject() != null) {
 				try {
-					return getCDIVariableObject().sizeof();
-				} catch (PCDIException e) {
+					return getPDIVariableObject().sizeof();
+				}
+				catch (PDIException e) {
 				}
 			}
 			return 0;
 		}
 		public boolean isArgument() {
-			return (getCDIVariableObject() instanceof IPCDIArgumentDescriptor);
+			return (getPDIVariableObject() instanceof IPDIArgumentDescriptor);
 		}
 		public void setValue(String expression) throws DebugException {
-			IPCDIVariable cdiVariable = null;
+			IPDIVariable pdiVariable = null;
 			try {
-				cdiVariable = getCDIVariable();
-				if (cdiVariable != null)
-					cdiVariable.setValue(expression);
+				pdiVariable = getPDIVariable();
+				if (pdiVariable != null)
+					pdiVariable.setValue(expression);
 				else
 					requestFailed(CoreModelMessages.getString("PModificationVariable.0"), null);
-			} catch (PCDIException e) {
+			}
+			catch (PDIException e) {
 				targetRequestFailed(e.getMessage(), null);
 			}
 		}
 		public synchronized IPValue getValue() throws DebugException {
 			if (fValue.equals(PValueFactory.NULL_VALUE)) {
-				IPCDIVariable var = getCDIVariable();
+				IPDIVariable var = getPDIVariable();
 				if (var != null) {
-					try {  
-						IAIFValue aifValue = var.getValue();
-						if (aifValue != null) {
-							IAIFType aifType = aifValue.getType();
-							if (aifValue instanceof IAIFValueArray && aifType != null) {
-								IPType type = new PType(aifType);
-								if (type.isArray()) {
-									int[] dims = type.getArrayDimensions();
-									if (dims.length > 0 && dims[0] > 0)
-										fValue = PValueFactory.createIndexedValue(getVariable(), var, 0, dims[0] );
-								}
-							}
-							else {
-								fValue = PValueFactory.createValue( getVariable(), var);
-							}
-							//if (getCDITarget().getConfiguration() instanceof IPCDITargetConfiguration2 && ((IPCDITargetConfiguration2)getCDITarget().getConfiguration()).supportsRuntimeTypeIdentification())
-								//fType = null; // When the debugger supports RTTI getting a new value may also mean a new type.
+					try {
+						IAIF aif = var.getAIF();
+						if (aif != null && aif.getType() instanceof IAIFTypeArray) {
+							int[] dims = ((IAIFTypeArray)aif.getType()).getDimensionDetails();
+							if (dims.length > 0 && dims[0] > 0)
+								fValue = PValueFactory.createIndexedValue(getVariable(), var, 0, dims[0]);
 						}
-					} catch (PCDIException e) {
+						else {
+							fValue = PValueFactory.createValue(getVariable(), var);
+						}
+					} catch (PDIException e) {
 						requestFailed(e.getMessage(), e);
 					}
 				}
@@ -198,8 +168,8 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (fValue instanceof AbstractPValue) {
 				((AbstractPValue) fValue).dispose();
 				fValue = PValueFactory.NULL_VALUE;
-				if (fCDIVariable != null)
-					fCDIVariable.resetValue();
+				if (fPDIVariable != null)
+					fPDIVariable.resetValue();
 			}
 		}
 		public boolean isChanged() {
@@ -232,65 +202,65 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 		}
 		public boolean isEditable() throws DebugException {
-			IPCDIVariable var = getCDIVariable();
+			IPDIVariable var = getPDIVariable();
 			if (var != null) {
 				try {
 					return var.isEditable();
-				} catch (PCDIException e) {
+				}
+				catch (PDIException e) {
 				}
 			}
 			return false;
 		}
 		public boolean equals(Object obj) {
 			if (obj instanceof InternalVariable) {
-				return getCDIVariableObject().equals(((InternalVariable) obj).getCDIVariableObject());
+				return getPDIVariableObject().equals(((InternalVariable) obj).getPDIVariableObject());
 			}
 			return false;
 		}
-		public boolean isSameDescriptor(IPCDIVariableDescriptor desc) {
-			return getCDIVariableObject().equals(desc);
+		public boolean isSameDescriptor(IPDIVariableDescriptor desc) {
+			return getPDIVariableObject().equals(desc);
 		}
 	}
+	private IPGlobalVariableDescriptor fDescriptor;
 
-	private IGlobalVariableDescriptor fDescriptor;
-
-	protected PGlobalVariable(PDebugElement parent, IGlobalVariableDescriptor descriptor, IPCDIVariableDescriptor cdiVariableObject) {
-		super(parent, cdiVariableObject);
+	protected PGlobalVariable(PDebugElement parent, IPGlobalVariableDescriptor descriptor, IPDIVariableDescriptor pdiVariableObject) {
+		super(parent, pdiVariableObject);
 		fDescriptor = descriptor;
 	}
-	protected PGlobalVariable(PDebugElement parent, IGlobalVariableDescriptor descriptor, IPCDIVariableDescriptor cdiVariableObject, String message) {
-		super(parent, cdiVariableObject, message);
+	protected PGlobalVariable(PDebugElement parent, IPGlobalVariableDescriptor descriptor, IPDIVariableDescriptor pdiVariableObject, String message) {
+		super(parent, pdiVariableObject, message);
 		fDescriptor = descriptor;
 	}
 	public boolean canEnableDisable() {
 		return true;
 	}
-	public void handleDebugEvents(IPCDIEvent[] events) {
+	public void handleDebugEvents(IPDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
-			IPCDIEvent event = events[i];
-			if (event instanceof IPCDIResumedEvent) {
-				IPCDIObject source = event.getSource(getCDITarget().getTargetID());
-				if (source != null) {
-					IPCDITarget cdiTarget = source.getTarget();
-					if (getCDITarget().equals(cdiTarget)) {
-						setChanged(false);
-					}
-				}
+			IPDIEvent event = events[i];
+			if (!event.contains(getTasks()))
+				continue;
+
+			if (event instanceof IPDIResumedEvent) {
+				setChanged(false);
 			}
 		}
 		super.handleDebugEvents(events);
 	}
-	public IGlobalVariableDescriptor getDescriptor() {
+	public IPGlobalVariableDescriptor getDescriptor() {
 		return fDescriptor;
 	}
 	public void dispose() {
 		internalDispose(true);
 		setDisposed(true);
 	}
-	protected void createOriginal(IPCDIVariableDescriptor vo) {
+	protected void createOriginal(IPDIVariableDescriptor vo) {
 		if (vo != null) {
 			setName(vo.getName());
 			setOriginal(new InternalVariable(this, vo));
 		}
+	}
+	public IAIF getAIF() throws DebugException {
+		return getValue().getAIF();
 	}
 }

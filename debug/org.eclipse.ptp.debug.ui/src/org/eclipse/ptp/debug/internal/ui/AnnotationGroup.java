@@ -37,37 +37,49 @@ public class AnnotationGroup {
 	 * @return true if contains
 	 */
 	public boolean contains(PInstructionPointerAnnotation2 annotation) {
-		return annotationList.contains(annotation);
+		synchronized (annotationList) {
+			return annotationList.contains(annotation);
+		}
 	}
 	/** Add a new annotation to the list
 	 * @param annotation
 	 */
 	public void addAnnotation(PInstructionPointerAnnotation2 annotation) {
-		if (!contains(annotation))
-			annotationList.add(annotation);
+		synchronized (annotationList) {
+			if (!contains(annotation))
+				annotationList.add(annotation);
+		}
 	}
 	/** Remove annotations from the list
 	 * @param removedAnnotations list of annotations
 	 */
 	public void removeAnnotations(Collection<PInstructionPointerAnnotation2> removedAnnotations) {
-		annotationList.removeAll(removedAnnotations);
+		synchronized (annotationList) {
+			annotationList.removeAll(removedAnnotations);
+		}
 	}
 	/** Remove annotation from the list
 	 * @param annotation
 	 */
 	public void removeAnnotation(PInstructionPointerAnnotation2 annotation) {
-		if (contains(annotation))
-			annotationList.remove(annotation);
+		synchronized (annotationList) {
+			if (contains(annotation))
+				annotationList.remove(annotation);
+		}
 	}
 	public PInstructionPointerAnnotation2[] getAnnotations() {
-		return annotationList.toArray(new PInstructionPointerAnnotation2[0]);
+		synchronized (annotationList) {
+			return annotationList.toArray(new PInstructionPointerAnnotation2[0]);
+		}
 	}
 	/** Remove all annotations
 	 * 
 	 */
 	public void removeAnnotations() {
-		throwAllAnnotations();
-		annotationList.clear();
+		synchronized (annotationList) {
+			throwAllAnnotations();
+			annotationList.clear();
+		}
 	}
 	/** Total annotations
 	 * @return total annotations
@@ -85,21 +97,27 @@ public class AnnotationGroup {
 	 * 
 	 */
 	public void throwAllAnnotations() {
-		for (PInstructionPointerAnnotation2 annotation : getAnnotations()) {
-			annotation.removeAnnotation();
+		synchronized (annotationList) {
+			for (PInstructionPointerAnnotation2 annotation : getAnnotations()) {
+				annotation.removeAnnotation();
+			}
 		}
 	}
 	/** Retrieve all markers
 	 * 
 	 */
 	public void retrieveAllAnnontations() {
-		for (PInstructionPointerAnnotation2 annotation : getAnnotations()) {
-			String type = annotation.getType();
-			if (type.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
-				type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;
+		synchronized (annotationList) {
+			for (PInstructionPointerAnnotation2 annotation : getAnnotations()) {
+				String type = annotation.getType();
+				if (type.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
+					type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;
 				
-			annotation.addAnnotationToModel();
-			annotation.setMessage(!type.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT));
+				if (annotation.isMarkDeleted()) {
+					annotation.addAnnotationToModel();
+					annotation.setMessage(!type.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT));
+				}
+			}
 		}
 	}
 }

@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.core.breakpoint;
 
 import java.text.MessageFormat;
 import java.util.Map;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
@@ -31,16 +32,13 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.core.pLineBreakpointMarker";
 	
 	public PLineBreakpoint() {
-	}
-	
-	public PLineBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+	}	
+	public PLineBreakpoint(IResource resource, Map<?,?> attributes, boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, add);
 	}
-
 	public static String getMarkerType() {
 		return P_LINE_BREAKPOINT;
 	}
-
 	protected String getMarkerMessage() throws CoreException {
 		String fileName = ensureMarker().getResource().getName();
 		if (fileName != null && fileName.length() > 0) {

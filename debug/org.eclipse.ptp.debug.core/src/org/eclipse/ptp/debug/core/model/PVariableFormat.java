@@ -19,20 +19,20 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
- * @author Clement chu
- * 
+ * @author clement
+ *
  */
 public class PVariableFormat {
-	private final String fName;
-
+	private final String name;
+	
 	private PVariableFormat(String name) {
-		this.fName = name;
+		this.name = name;
 	}
 	public String toString() {
-		return this.fName;
+		return name;
 	}
 	public static PVariableFormat getFormat(int code) {
-		switch (code) {
+		switch(code) {
 		case 0:
 			return NATURAL;
 		case 1:
@@ -44,13 +44,12 @@ public class PVariableFormat {
 		case 4:
 			return HEXADECIMAL;
 		default:
-			return NATURAL;
+			return DECIMAL;
 		}
 	}
-
 	public static final PVariableFormat NATURAL = new PVariableFormat("natural");
 	public static final PVariableFormat DECIMAL = new PVariableFormat("decimal");
 	public static final PVariableFormat BINARY = new PVariableFormat("binary");
 	public static final PVariableFormat OCTAL = new PVariableFormat("octal");
-	public static final PVariableFormat HEXADECIMAL = new PVariableFormat("hexadecimal");
+	public static final PVariableFormat HEXADECIMAL = new PVariableFormat("dexadecimal");
 }

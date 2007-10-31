@@ -116,10 +116,10 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
     	}
     }
     
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
-	 */
-	public void handleEvent(IProcessChangeEvent e) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+     */
+    public void handleEvent(IProcessChangeEvent e) {
 		IAttribute<?,?,?> attr = e.getAttributes().get(ProcessAttributes.getStateAttributeDefinition());
 		if (attr != null) {
 			ProcessAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
@@ -127,10 +127,9 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 				close();
 			}
 		} 
-		
 		attr = e.getAttributes().get(ProcessAttributes.getStdoutAttributeDefinition());
 		if (attr != null) {
-			addInput(attr.getValueAsString());
+			addInput(attr.getValueAsString() + "\n");
 		}
 	}
 }

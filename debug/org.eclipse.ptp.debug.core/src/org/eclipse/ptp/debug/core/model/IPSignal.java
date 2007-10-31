@@ -63,7 +63,7 @@ public interface IPSignal extends IPDebugElement {
 	 * @param enable the flag value to set
 	 * @throws DebugException if this method fails.
 	 */
-	public void setPassEnabled( boolean enable ) throws DebugException;
+	public void setPassEnabled(boolean enable) throws DebugException;
 	
 	/**
 	 * Enables/disables the "stop" flag of this signal.
@@ -71,7 +71,7 @@ public interface IPSignal extends IPDebugElement {
 	 * @param enable the flag value to set
 	 * @throws DebugException if this method fails.
 	 */
-	public void setStopEnabled( boolean enable ) throws DebugException;
+	public void setStopEnabled(boolean enable) throws DebugException;
 
 	/**
 	 * Resumes execution, but immediately gives the target this signal.

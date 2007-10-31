@@ -18,16 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
-import java.io.File;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
-import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
 
@@ -71,21 +67,19 @@ public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
 		} else if (object instanceof String) {
 			name = (String) object;
 		}
-		// Workaround. See bug #91808.
-		if (name != null) {
-			File file = new File(name);
-			if (file.isAbsolute() && file.exists()) {
-				return findSourceElementByFile(file);
-			}
-		}
-		return super.findSourceElements(object);
+		Object[] foundElements = super.findSourceElements(object);
+		if (foundElements.length == 0 && (object instanceof IDebugElement))
+			foundElements = new Object[] { new PSourceNotFoundElement((IDebugElement)object) };
+		return foundElements;
 	}
+	/*
 	private Object[] findSourceElementByFile(File file) {
 		IFile[] wfiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(file.getPath()));
 		if (wfiles.length > 0)
 			return wfiles;
 		return new LocalFileStorage[] { new LocalFileStorage(file) };
 	}
+	*/
 	public void dispose() {
 		fListeners.clear();
 		super.dispose();

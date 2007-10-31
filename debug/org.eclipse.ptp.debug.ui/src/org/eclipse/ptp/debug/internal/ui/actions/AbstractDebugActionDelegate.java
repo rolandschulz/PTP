@@ -188,7 +188,7 @@ public abstract class AbstractDebugActionDelegate implements IWorkbenchWindowAct
 		final MultiStatus status = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, getStatusMessage(), null);
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
-				Iterator selectionIter = selection.iterator();
+				Iterator<?> selectionIter = selection.iterator();
 				while (selectionIter.hasNext()) {
 					Object element = selectionIter.next();
 					try {
@@ -388,7 +388,7 @@ public abstract class AbstractDebugActionDelegate implements IWorkbenchWindowAct
 		if (selection.size() == 0) {
 			return false;
 		}
-		Iterator itr = selection.iterator();
+		Iterator<?> itr = selection.iterator();
 		while (itr.hasNext()) {
 			Object element = itr.next();
 			if (!isEnabledFor(element)) {

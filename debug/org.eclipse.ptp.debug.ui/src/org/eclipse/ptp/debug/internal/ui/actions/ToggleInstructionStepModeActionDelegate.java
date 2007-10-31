@@ -154,8 +154,7 @@ public class ToggleInstructionStepModeActionDelegate extends ActionDelegate impl
 		}
 		return null;
 	}
-
-	private IViewPart getView() {
+	public IViewPart getView() {
 		return fView;
 	}
 }

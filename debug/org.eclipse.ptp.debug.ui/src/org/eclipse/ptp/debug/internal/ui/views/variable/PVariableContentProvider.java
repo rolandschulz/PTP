@@ -20,19 +20,18 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager;
+import org.eclipse.ptp.debug.internal.ui.PVariableManager;
 
 /**
  * @author Clement chu
  */
 public class PVariableContentProvider implements IStructuredContentProvider {
 	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof PJobVariableManager) {
-			return ((PJobVariableManager)inputElement).getVariableStorage().getJobValueCollection().toArray();
+		if (inputElement instanceof PVariableManager) {
+			return ((PVariableManager)inputElement).getPVariableInfo();
 		}
 		return new Object[0];
 	}
-
 	public void dispose() {}
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 }

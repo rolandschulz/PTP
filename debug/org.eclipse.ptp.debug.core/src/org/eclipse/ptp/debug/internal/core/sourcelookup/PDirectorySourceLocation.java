@@ -126,7 +126,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 				Object result = findFileByAbsolutePath(folders[i], name);
 				if (result instanceof List) {
 					if (searchForDuplicateFiles())
-						list.addAll((List)result);
+						list.addAll((List<?>)result);
 					else
 						return list.getFirst();
 				} else if (result != null) {
@@ -156,7 +156,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 		}
 		// Try for a file in another workspace project
 		IFile[] wsFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(filePath);
-		LinkedList list = new LinkedList();
+		LinkedList<IFile> list = new LinkedList<IFile>();
 		for (int j = 0; j < wsFiles.length; ++j)
 			if (wsFiles[j].exists()) {
 				if (!searchForDuplicateFiles())
@@ -174,12 +174,12 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 	private Object findFileByRelativePath(String fileName) {
 		File[] folders = getFolders();
 		if (folders != null) {
-			LinkedList list = new LinkedList();
+			LinkedList<Object> list = new LinkedList<Object>();
 			for (int i = 0; i < folders.length; ++i) {
 				Object result = findFileByRelativePath(folders[i], fileName);
 				if (result instanceof List) {
 					if (searchForDuplicateFiles())
-						list.addAll((List) result);
+						list.addAll((List<?>) result);
 					else
 						return list.getFirst();
 				} else if (result != null) {
@@ -201,7 +201,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 		if (file.exists() && file.isFile()) {
 			path = new Path(file.getAbsolutePath());
 			IFile[] wsFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path);
-			LinkedList list = new LinkedList();
+			LinkedList<IFile> list = new LinkedList<IFile>();
 			for (int j = 0; j < wsFiles.length; ++j)
 				if (wsFiles[j].exists()) {
 					if (!searchForDuplicateFiles())
@@ -236,7 +236,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 		} catch (TransformerException e) {
 			ex = e;
 		}
-		abort(MessageFormat.format(InternalSourceLookupMessages.getString("PDirectorySourceLocation.0"), new String[] { getDirectory().toOSString() }), ex);
+		abort(MessageFormat.format(InternalSourceLookupMessages.getString("PDirectorySourceLocation.0"), new Object[] { getDirectory().toOSString() }), ex);
 		// execution will not reach here
 		return null;
 	}
@@ -256,7 +256,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 				if (path.isValidPath(dir) && path.toFile().isDirectory() && path.toFile().exists()) {
 					setDirectory(path);
 				} else {
-					abort(MessageFormat.format(InternalSourceLookupMessages.getString("PDirectorySourceLocation.2"), new String[] { dir }), null);
+					abort(MessageFormat.format(InternalSourceLookupMessages.getString("PDirectorySourceLocation.2"), new Object[] { dir }), null);
 				}
 			}
 			dir = root.getAttribute(ATTR_ASSOCIATION);
@@ -335,7 +335,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 	}
 	private void initializeFolders() {
 		if (getDirectory() != null) {
-			ArrayList list = new ArrayList();
+			ArrayList<File> list = new ArrayList<File>();
 			File root = getDirectory().toFile();
 			list.add(root);
 			if (searchSubfolders())
@@ -343,8 +343,8 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 			fFolders = (File[]) list.toArray(new File[list.size()]);
 		}
 	}
-	private List getFileFolders(File file) {
-		ArrayList list = new ArrayList();
+	private List<File> getFileFolders(File file) {
+		ArrayList<File> list = new ArrayList<File>();
 		File[] folders = file.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				return pathname.isDirectory();

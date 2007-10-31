@@ -18,10 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.ptp.debug.core.aif.AIFException;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat;
 
 /**
  * @author clement CHU
@@ -30,19 +32,24 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 public class PFloatingPointValue extends PValue {
 	private Number fFloatingPointValue;
 
-	public PFloatingPointValue(PVariable parent, IPCDIVariable variable) {
+	public PFloatingPointValue(PVariable parent, IPDIVariable variable) {
 		super(parent, variable);
 	}
-	public Number getFloatingPointValue() throws AIFException {
+	public Number getFloatingPointValue() throws DebugException, AIFException {
 		if (fFloatingPointValue == null) {
-			IAIFValue aifValue = getUnderlyingValue();
-			if (aifValue instanceof IAIFValueFloat) {
-				IAIFValueFloat floatValue = (IAIFValueFloat)aifValue;
-				if (floatValue.isDouble()) {
-					fFloatingPointValue = new Double(floatValue.doubleValue());
-				}
-				else if (floatValue.isFloat()) {
-					fFloatingPointValue = new Float(floatValue.floatValue());
+			IAIF aif = getAIF();
+			if (aif != null) {
+				if (aif.getType() instanceof IAIFTypeFloat) {
+					IAIFValueFloat floatValue = (IAIFValueFloat)aif.getValue();
+					if (floatValue.isDouble()) {
+						fFloatingPointValue = new Double(floatValue.doubleValue());
+					}
+					else if (floatValue.isFloat()) {
+						fFloatingPointValue = new Float(floatValue.floatValue());
+					}
+					else {
+						targetRequestFailed("Unknown floating point value", null);
+					}
 				}
 			}
 		}

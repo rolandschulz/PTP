@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
+import org.eclipse.ptp.debug.internal.ui.PVariableManager.PVariableInfo;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -28,8 +28,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class PVariableLabelProvider extends LabelProvider implements ITableLabelProvider, ICheckProvider {
 	public boolean isCheck(Object element) {
-		if (element instanceof JobVariable) {
-			return ((JobVariable)element).isEnable();
+		if (element instanceof PVariableInfo) {
+			return ((PVariableInfo)element).isEnabled();
 		}
 		return false;
 	}
@@ -37,22 +37,13 @@ public class PVariableLabelProvider extends LabelProvider implements ITableLabel
 		return null;
 	}
 	public String getColumnText(Object element, int columnIndex) {
-		if (element instanceof JobVariable) {
-			JobVariable jVar = (JobVariable)element;
+		if (element instanceof PVariableInfo) {
+			PVariableInfo jVar = (PVariableInfo)element;
 			switch(columnIndex) {
 			case 1:
-				return jVar.getVar();
+				return jVar.getName();
 			case 2:
 				return jVar.getJob().getName();
-			case 3:
-				String[] sets = jVar.getSets();
-				String setsText = "";
-				for (int i=0; i<sets.length; i++) {
-					setsText += sets[i];
-					if (i < sets.length - 1)
-						setsText += ",";
-				}
-				return setsText;
 			}
 		}
 		return null;

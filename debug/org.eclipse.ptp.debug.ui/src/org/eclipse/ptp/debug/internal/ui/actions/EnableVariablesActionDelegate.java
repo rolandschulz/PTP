@@ -86,10 +86,9 @@ public class EnableVariablesActionDelegate implements IViewActionDelegate {
 		final int size = selection.size();
 		if (size == 0)
 			return;
-		final Iterator it = selection.iterator();
+		final Iterator<?> it = selection.iterator();
 		final MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, ActionMessages.getString("EnableVariablesActionDelegate.0"), null);
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-
 			public void run() {
 				while(it.hasNext()) {
 					IEnableDisableTarget target = getEnableDisableTarget(it.next());
@@ -127,7 +126,7 @@ public class EnableVariablesActionDelegate implements IViewActionDelegate {
 		Object o = sel.getFirstElement();
 		if (getEnableDisableTarget(o) == null)
 			return;
-		Iterator it = sel.iterator();
+		Iterator<?> it = sel.iterator();
 		boolean allEnabled = true;
 		boolean allDisabled = true;
 		while(it.hasNext()) {

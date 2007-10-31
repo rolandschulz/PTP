@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.core.breakpoint;
 
 import java.text.MessageFormat;
 import java.util.Map;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
@@ -33,10 +34,9 @@ public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFun
 
 	public PFunctionBreakpoint() {
 	}
-	public PFunctionBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+	public PFunctionBreakpoint(IResource resource, Map<?,?> attributes, boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, add);
 	}
-
 	public static String getMarkerType() {
 		return P_FUNCTION_BREAKPOINT;
 	}
@@ -45,6 +45,6 @@ public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFun
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new String[] { fileName, getFunction(), getConditionText() });
+		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new Object[] { fileName, getFunction(), getConditionText() });
 	}
 }

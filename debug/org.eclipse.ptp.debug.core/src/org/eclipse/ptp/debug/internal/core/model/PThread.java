@@ -23,70 +23,76 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.model.IJumpToAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToLine;
-import org.eclipse.cdt.debug.core.model.IRestart;
-import org.eclipse.cdt.debug.core.model.IRunToAddress;
-import org.eclipse.cdt.debug.core.model.IRunToLine;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
-import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointManager;
-import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
-import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
-import org.eclipse.ptp.debug.core.cdi.IPCDISignalReceived;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
+import org.eclipse.ptp.debug.core.model.IJumpToAddress;
+import org.eclipse.ptp.debug.core.model.IJumpToLine;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDummyStackFrame;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPThread;
+import org.eclipse.ptp.debug.core.model.IRestart;
 import org.eclipse.ptp.debug.core.model.IResumeWithoutSignal;
+import org.eclipse.ptp.debug.core.model.IRunToAddress;
+import org.eclipse.ptp.debug.core.model.IRunToLine;
 import org.eclipse.ptp.debug.core.model.PDebugElementState;
+import org.eclipse.ptp.debug.core.pdi.IPDIBreakpointInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDIEndSteppingRangeInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDIFunctionFinishedInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDILocationReachedInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
+import org.eclipse.ptp.debug.core.pdi.IPDISharedLibraryInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDISignalInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDIWatchpointScopeInfo;
+import org.eclipse.ptp.debug.core.pdi.IPDIWatchpointTriggerInfo;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIDestroyedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIDisconnectedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDISuspendedEvent;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
+import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
+import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
  *
  */
-public class PThread extends PDebugElement implements IPThread, IRestart, IResumeWithoutSignal, IPCDIEventListener {
+public class PThread extends PDebugElement implements IPThread, IRestart, IResumeWithoutSignal, IPDIEventListener {
 	private final static int MAX_STACK_DEPTH = 100;
-	private IPCDIThread fCDIThread;
+	private IPDIThread pdiThread;
 	private ArrayList<IStackFrame> fStackFrames;
 	private boolean fRefreshChildren = true;
-	private IPCDITargetConfiguration fConfig;
 	private boolean fIsCurrent = false;
 	private int fLastStackDepth = 0;
 	private boolean fDisposed = false;
+	private PDebugTarget fDebugTarget = null;
 
-	public PThread(PDebugTarget target, IPCDIThread cdiThread) {
-		super(target);
-		setCDIThread(cdiThread);
-		if (cdiThread.isSuspended()) {
+	public PThread(PDebugTarget target, IPDIThread pdiThread) {
+		super((PSession)target.getSession(), target.getTasks());
+		this.fDebugTarget = target;
+		this.pdiThread = pdiThread;
+		if (target.getPDISession().isSuspended(target.getTasks())) {
 			setState(PDebugElementState.SUSPENDED);
 			setCurrent(true);
 		}
 		else {
 			setState(PDebugElementState.RESUMED);
 		}
-		fConfig = (IPCDITargetConfiguration)getCDITarget().getConfiguration();
 		initialize();
-		getCDISession().getEventManager().addEventListener(this);
+		getPDISession().getEventManager().addEventListener(this);
+	}
+	public PDebugTarget getDebugTarget() {
+		return fDebugTarget;
 	}
 	protected void initialize() {
 		fStackFrames = new ArrayList<IStackFrame>();
@@ -103,6 +109,8 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	}
 	public boolean hasStackFrames() throws DebugException {
 		// Always return true to postpone the stack frames request
+		if (getState().equals(PDebugElementState.RESUMED))
+			return false;		
 		return true;
 	}
 	protected synchronized List<IStackFrame> computeStackFrames(boolean refreshChildren) throws DebugException {
@@ -117,33 +125,43 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 					}
 				}
 				int depth = getStackDepth();
-				IPCDIStackFrame[] frames = (depth != 0) ? getCDIStackFrames(0, (depth > getMaxStackDepth()) ? getMaxStackDepth() : depth) : new IPCDIStackFrame[0];
+				if (depth >= getMaxStackDepth())
+					depth = getMaxStackDepth() - 1;
+				
+				IPDIStackFrame[] frames = (depth != 0) ? getPDIStackFrames(0, depth - 1) : new IPDIStackFrame[0];
+				depth = frames.length;
+				
 				if (fStackFrames.isEmpty()) {
 					if (frames.length > 0) {
-						addStackFrames(frames, 0, frames.length);
+						addStackFrames(frames, 0, frames.length, false);
 					}
-				} else if (depth < getLastStackDepth()) {
-					disposeStackFrames(0, getLastStackDepth() - depth);
-					if (frames.length > 0) {
-						updateStackFrames(frames, 0, fStackFrames, fStackFrames.size());
-						if (fStackFrames.size() < frames.length) {
-							addStackFrames(frames, fStackFrames.size(), frames.length - fStackFrames.size());
+				} else {
+					int diff = depth - getLastStackDepth();
+					int offset = (diff > 0) ? frames.length - diff : 0;
+					int length = (diff > 0) ? diff : -diff;
+					if (!compareStackFrames(frames, fStackFrames, offset, length)) {
+						disposeStackFrames(0, fStackFrames.size());
+						addStackFrames(frames, 0, frames.length, false);						
+					}
+					if (diff < 0) {
+						// stepping out of the last frame
+						disposeStackFrames(0, getLastStackDepth() - depth);
+						if (frames.length > 0) {
+							updateStackFrames(frames, 0, fStackFrames, fStackFrames.size());
+							if (fStackFrames.size() < frames.length) {
+								addStackFrames(frames, fStackFrames.size(), frames.length - fStackFrames.size(), true);
+							}
 						}
 					}
-				} else if (depth > getLastStackDepth()) {
-					disposeStackFrames(frames.length - depth + getLastStackDepth(), depth - getLastStackDepth());
-					addStackFrames(frames, 0, depth - getLastStackDepth());
-					updateStackFrames(frames, depth - getLastStackDepth(), fStackFrames, frames.length - depth + getLastStackDepth());
-				} else { // depth == getLastStackDepth()
-					if (depth != 0) {
-						// same number of frames - if top frames are in different
-						// function, replace all frames
-						IPCDIStackFrame newTopFrame = (frames.length > 0) ? frames[0] : null;
-						IPCDIStackFrame oldTopFrame = (fStackFrames.size() > 0) ? ((PStackFrame) fStackFrames.get(0)).getLastCDIStackFrame() : null;
-						if (!PStackFrame.equalFrame(newTopFrame, oldTopFrame)) {
-							disposeStackFrames(0, fStackFrames.size());
-							addStackFrames(frames, 0, frames.length);
-						} else {// we are in the same frame
+					else if (diff > 0) {
+						// stepping into a new frame
+						disposeStackFrames(frames.length - depth + getLastStackDepth(), depth - getLastStackDepth());
+						addStackFrames(frames, 0, depth - getLastStackDepth(), false );
+						updateStackFrames(frames, depth - getLastStackDepth(), fStackFrames, frames.length - depth + getLastStackDepth());
+					}
+					else { // diff == 0
+						if (depth != 0) {
+							// we are in the same frame
 							updateStackFrames(frames, 0, fStackFrames, frames.length);
 						}
 					}
@@ -157,29 +175,42 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 		return fStackFrames;
 	}
-	protected IPCDIStackFrame[] getCDIStackFrames() throws DebugException {
-		return new IPCDIStackFrame[0];
+	private boolean compareStackFrames(IPDIStackFrame[] newFrames, List<IStackFrame> oldFrames, int offset, int length ) {
+		int index = offset;
+		Iterator<IStackFrame> it = oldFrames.iterator();
+		while (it.hasNext() && index < newFrames.length) {
+			PStackFrame frame = (PStackFrame)it.next();
+			if (!frame.getPDIStackFrame().equals(newFrames[index++]))
+				return false;
+		}
+		return true;
+	}	
+	protected IPDIStackFrame[] getPDIStackFrames() throws DebugException {
+		return new IPDIStackFrame[0];
 	}
-	protected IPCDIStackFrame[] getCDIStackFrames(int lowFrame, int highFrame) throws DebugException {
+	protected IPDIStackFrame[] getPDIStackFrames(int lowFrame, int highFrame) throws DebugException {
 		try {
-			return getCDIThread().getStackFrames(lowFrame, highFrame);
-		} catch (PCDIException e) {
-			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.0"), new String[] { e.getMessage() }));
+			return getPDIThread().getStackFrames(lowFrame, highFrame);
+		} catch (PDIException e) {
+			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.0"), new Object[] { e.getMessage() }));
 			targetRequestFailed(e.getMessage(), null);
 		}
-		return new IPCDIStackFrame[0];
+		return new IPDIStackFrame[0];
 	}
-	protected void updateStackFrames(IPCDIStackFrame[] newFrames, int offset, List oldFrames, int length) throws DebugException {
+	protected void updateStackFrames(IPDIStackFrame[] newFrames, int offset, List<IStackFrame> oldFrames, int length) throws DebugException {
 		for (int i = 0; i < length; i++) {
 			PStackFrame frame = (PStackFrame) oldFrames.get(offset);
-			frame.setCDIStackFrame(newFrames[offset]);
+			frame.setPDIStackFrame(newFrames[offset]);
 			offset++;
 		}
 	}
-	protected void addStackFrames(IPCDIStackFrame[] newFrames, int startIndex, int length) {
+	protected void addStackFrames(IPDIStackFrame[] newFrames, int startIndex, int length, boolean append) {
 		if (newFrames.length >= startIndex + length) {
 			for (int i = 0; i < length; ++i) {
-				fStackFrames.add(i, new PStackFrame(this, newFrames[startIndex + i]));
+				if (append)
+					fStackFrames.add(new PStackFrame(this, newFrames[startIndex + i]));
+				else
+					fStackFrames.add(i, new PStackFrame(this, newFrames[startIndex + i]));
 			}
 		}
 	}
@@ -189,7 +220,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	public List<IStackFrame> computeNewStackFrames() throws DebugException {
 		return computeStackFrames(true);
 	}
-	protected List<IStackFrame> createAllStackFrames(int depth, IPCDIStackFrame[] frames) throws DebugException {
+	protected List<IStackFrame> createAllStackFrames(int depth, IPDIStackFrame[] frames) throws DebugException {
 		List<IStackFrame> list = new ArrayList<IStackFrame>(frames.length);
 		for (int i = 0; i < frames.length; ++i) {
 			list.add(new PStackFrame(this, frames[i]));
@@ -203,60 +234,34 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return 0;
 	}
 	public IStackFrame getTopStackFrame() throws DebugException {
-		List c = computeStackFrames();
+		List<IStackFrame> c = computeStackFrames();
 		return (c.isEmpty()) ? null : (IStackFrame) c.get(0);
 	}
 	public String getName() throws DebugException {
-		if (getCDIThread() == null)
-			return "";
-		return getCDIThread().toString();
+		return getPDIThread().toString();
 	}
 	public IBreakpoint[] getBreakpoints() {
 		List<IBreakpoint> list = new ArrayList<IBreakpoint>(1);
 		if (isSuspended()) {
 			IBreakpoint bkpt = null;
-			IPCDIBreakpointManager bManager = getCDISession().getBreakpointManager();
-			 if (getCurrentStateInfo() instanceof IPCDIBreakpointHit) {
-				 bkpt = bManager.findBreakpoint(((IPCDIBreakpointHit)getCurrentStateInfo()).getBreakpoint()); 				 
+			PBreakpointManager bMgr = fSession.getBreakpointManager();
+			 if (getCurrentStateInfo() instanceof IPDIBreakpointInfo) {
+				 bkpt = bMgr.getBreakpoint(((IPDIBreakpointInfo)getCurrentStateInfo()).getBreakpoint()); 				 
 			 }
-			 //FIXME
-			 //else if (getCurrentStateInfo() instanceof IPCDIWatchpointTrigger) {
-			 //bkpt = bManager.getBreakpoint(((ICDIWatchpointTrigger)getCurrentStateInfo()).getWatchpoint());
-			 //}
+			 else if (getCurrentStateInfo() instanceof IPDIWatchpointTriggerInfo) {
+				 bkpt = bMgr.getBreakpoint(((IPDIWatchpointTriggerInfo)getCurrentStateInfo()).getWatchpoint());
+			 }
 			 if (bkpt != null)
 				list.add(bkpt);
 		}
 		return (IBreakpoint[]) list.toArray(new IBreakpoint[list.size()]);
 	}
-	public void handleDebugEvents(IPCDIEvent[] events) {
-		if (isDisposed())
-			return;
-		for (int i = 0; i < events.length; i++) {
-			IPCDIEvent event = events[i];
-			if (!event.containTask(getCDITarget().getTargetID()))
-				return;
-			IPCDIObject source = event.getSource(getCDITarget().getTargetID());
-			if (source instanceof IPCDIThread && source.equals(getCDIThread())) {
-				if (event instanceof IPCDISuspendedEvent) {
-					handleSuspendedEvent((IPCDISuspendedEvent) event);
-				} else if (event instanceof IPCDIResumedEvent) {
-					handleResumedEvent((IPCDIResumedEvent) event);
-				} else if (event instanceof IPCDIDestroyedEvent) {
-					handleTerminatedEvent((IPCDIDestroyedEvent) event);
-				} else if (event instanceof IPCDIDisconnectedEvent) {
-					handleDisconnectedEvent((IPCDIDisconnectedEvent) event);
-				} else if (event instanceof IPCDIChangedEvent) {
-					handleChangedEvent((IPCDIChangedEvent) event);
-				}
-			}
-		}
-	}
 	public boolean canResume() {
-		return (fConfig.supportsResume() && isSuspended());
+		return isSuspended();
 	}
 	public boolean canSuspend() {
 		PDebugElementState state = getState();
-		return (fConfig.supportsSuspend() && (state.equals(PDebugElementState.RESUMED) || state.equals(PDebugElementState.STEPPED)));
+		return (state.equals(PDebugElementState.RESUMED) || state.equals(PDebugElementState.STEPPED));
 	}
 	public boolean isSuspended() {
 		return getState().equals(PDebugElementState.SUSPENDED);
@@ -267,8 +272,8 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		PDebugElementState oldState = getState();
 		setState(PDebugElementState.RESUMING);
 		try {
-			getCDIThread().resume(false);
-		} catch (PCDIException e) {
+			getPDISession().resume(getTasks(), false);
+		} catch (PDIException e) {
 			setState(oldState);
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -279,8 +284,8 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		PDebugElementState oldState = getState();
 		setState(PDebugElementState.SUSPENDING);
 		try {
-			getCDIThread().suspend();
-		} catch (CDIException e) {
+			getPDISession().suspend(getTasks());
+		} catch (PDIException e) {
 			setState(oldState);
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -292,13 +297,13 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return canStep();
 	}
 	public boolean canStepReturn() {
-		if (!fConfig.supportsStepping() || !canResume()) {
+		if (!canResume()) {
 			return false;
 		}
 		return (fStackFrames.size() > 1);
 	}
 	protected boolean canStep() {
-		if (!fConfig.supportsStepping() || !isSuspended()) {
+		if (!isSuspended()) {
 			return false;
 		}
 		return !fStackFrames.isEmpty();
@@ -313,11 +318,11 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		setState(PDebugElementState.STEPPING);
 		try {
 			if (!isInstructionsteppingEnabled()) {
-				getCDIThread().stepInto(1);
+				getPDISession().stepInto(getTasks(), 1);
 			} else {
-				getCDIThread().stepIntoInstruction(1);
+				getPDISession().stepIntoInstruction(getTasks(), 1);
 			}
-		} catch (CDIException e) {
+		} catch (PDIException e) {
 			setState(oldState);
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -329,11 +334,11 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		setState(PDebugElementState.STEPPING);
 		try {
 			if (!isInstructionsteppingEnabled()) {
-				getCDIThread().stepOver(1);
+				getPDISession().stepOver(getTasks(), 1);
 			} else {
-				getCDIThread().stepOverInstruction(1);
+				getPDISession().stepOverInstruction(getTasks(), 1);
 			}
-		} catch (CDIException e) {
+		} catch (PDIException e) {
 			setState(oldState);
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -363,24 +368,21 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	public void terminate() throws DebugException {
 		getDebugTarget().terminate();
 	}
-	protected void setCDIThread(IPCDIThread cdiThread) {
-		fCDIThread = cdiThread;
-	}
-	protected IPCDIThread getCDIThread() {
-		return fCDIThread;
+	protected IPDIThread getPDIThread() {
+		return pdiThread;
 	}
 	protected synchronized void preserveStackFrames() {
-		Iterator it = fStackFrames.iterator();
+		Iterator<IStackFrame> it = fStackFrames.iterator();
 		while (it.hasNext()) {
-			PStackFrame frame = (PStackFrame) (((IAdaptable) it.next()).getAdapter(PStackFrame.class));
-			if (frame != null) {
-				frame.preserve();
+			IPStackFrame frame = (IPStackFrame) (((IAdaptable) it.next()).getAdapter(IPStackFrame.class));
+			if (frame instanceof PStackFrame) {
+				((PStackFrame)frame).preserve();
 			}
 		}
 		setRefreshChildren(true);
 	}
 	protected synchronized void disposeStackFrames() {
-		Iterator it = fStackFrames.iterator();
+		Iterator<IStackFrame> it = fStackFrames.iterator();
 		while (it.hasNext()) {
 			Object obj = it.next();
 			if (obj instanceof PStackFrame) {
@@ -394,12 +396,12 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	}
 	protected void disposeStackFrames(int index, int length) {
 		List<IStackFrame> removeList = new ArrayList<IStackFrame>(length);
-		Iterator it = fStackFrames.iterator();
+		Iterator<IStackFrame> it = fStackFrames.iterator();
 		int counter = 0;
 		while (it.hasNext()) {
-			PStackFrame frame = (PStackFrame) (((IAdaptable) it.next()).getAdapter(PStackFrame.class));
-			if (frame != null && counter >= index && counter < index + length) {
-				frame.dispose();
+			IPStackFrame frame = (IPStackFrame) (((IAdaptable) it.next()).getAdapter(IPStackFrame.class));
+			if (frame instanceof PStackFrame && counter >= index && counter < index + length) {
+				((PStackFrame)frame).dispose();
 				removeList.add(frame);
 			}
 			++counter;
@@ -410,39 +412,89 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		setState(PDebugElementState.TERMINATED);
 		dispose();
 	}
-	private void handleSuspendedEvent(IPCDISuspendedEvent event) {
+	/******************************************************
+	 * EVENT
+	 ******************************************************/
+	public synchronized void handleDebugEvents(IPDIEvent[] events) {
+		/*
+		 * FIXME Not support thread, always fire event by target
+		if (isDisposed())
+			return;
+		for (int i = 0; i < events.length; i++) {
+			IPDIEvent event = events[i];
+			if (!event.contains(getPDITarget().getTasks()))
+				continue;
+			
+			if (event instanceof IPDISuspendedEvent) {
+				handleSuspendedEvent((IPDISuspendedEvent)event);
+			}
+			else if (event instanceof IPDIResumedEvent) {
+				handleResumedEvent((IPDIResumedEvent)event);
+			}
+			else if (event instanceof IPDIDestroyedEvent) {
+				handleTerminatedEvent((IPDIDestroyedEvent)event);
+			}
+			else if (event instanceof IPDIDisconnectedEvent) {
+				handleDisconnectedEvent((IPDIDisconnectedEvent)event);
+			}
+			else if (event instanceof IPDIChangedEvent) {
+				handleChangedEvent((IPDIChangedEvent)event);
+			}
+		}
+		*/
+	}
+	private void handleSuspendedEvent(IPDISuspendedEvent event) {
 		if (!(getState().equals(PDebugElementState.RESUMED) || getState().equals(PDebugElementState.STEPPED) || getState().equals(PDebugElementState.SUSPENDING)))
 			return;
 		setState(PDebugElementState.SUSPENDED);
-		IPCDISessionObject reason = event.getReason();
+		IPDISessionObject reason = event.getReason();
 		setCurrentStateInfo(reason);
-		if (reason instanceof IPCDIEndSteppingRange) {
-			handleEndSteppingRange((IPCDIEndSteppingRange) reason);
-		} else if (reason instanceof IPCDIBreakpoint) {
-			handleBreakpointHit((IPCDIBreakpoint) reason);
-		} else if (reason instanceof IPCDISignalReceived) {
-			handleSuspendedBySignal((IPCDISignalReceived) reason);
-		} else {
+		if (reason instanceof IPDIBreakpointInfo) {
+			handleBreakpointHit((IPDIBreakpointInfo)reason);
+		}
+		else if (reason instanceof IPDIEndSteppingRangeInfo) {
+			handleEndSteppingRange((IPDIEndSteppingRangeInfo)reason);
+		}
+		else if (reason instanceof IPDIFunctionFinishedInfo) {
+			
+		}
+		else if (reason instanceof IPDILocationReachedInfo) {
+			
+		}
+		else if (reason instanceof IPDISignalInfo) {
+			handleSuspendedBySignal((IPDISignalInfo)reason);
+		}
+		else if (reason instanceof IPDISharedLibraryInfo) {
+			
+		}
+		else if (reason instanceof IPDIWatchpointScopeInfo) {
+			
+		}
+		else if (reason instanceof IPDIWatchpointTriggerInfo) {
+			
+		}
+		else {
 			// fireSuspendEvent( DebugEvent.CLIENT_REQUEST );
 			// Temporary fix for bug 56520
 			fireSuspendEvent(DebugEvent.BREAKPOINT);
 		}
 	}
-	private void handleResumedEvent(IPCDIResumedEvent event) {
+	private void handleResumedEvent(IPDIResumedEvent event) {
 		PDebugElementState state = PDebugElementState.RESUMED;
 		int detail = DebugEvent.RESUME;
-		if (isCurrent() && event.getType() != IPCDIResumedEvent.CONTINUE) {
+		syncWithBackend();
+		if (isCurrent() && event.getType() != IPDIResumedEvent.CONTINUE) {
 			preserveStackFrames();
 			switch (event.getType()) {
-			case IPCDIResumedEvent.STEP_INTO:
-			case IPCDIResumedEvent.STEP_INTO_INSTRUCTION:
+			case IPDIResumedEvent.STEP_INTO:
+			case IPDIResumedEvent.STEP_INTO_INSTRUCTION:
 				detail = DebugEvent.STEP_INTO;
 				break;
-			case IPCDIResumedEvent.STEP_OVER:
-			case IPCDIResumedEvent.STEP_OVER_INSTRUCTION:
+			case IPDIResumedEvent.STEP_OVER:
+			case IPDIResumedEvent.STEP_OVER_INSTRUCTION:
 				detail = DebugEvent.STEP_OVER;
 				break;
-			case IPCDIResumedEvent.STEP_RETURN:
+			case IPDIResumedEvent.STEP_RETURN:
 				detail = DebugEvent.STEP_RETURN;
 				break;
 			}
@@ -456,28 +508,76 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		setCurrentStateInfo(null);
 		fireResumeEvent(detail);
 	}
-	private void handleEndSteppingRange(IPCDIEndSteppingRange endSteppingRange) {
+	private void handleTerminatedEvent(IPDIDestroyedEvent event) {
+		setState(PDebugElementState.TERMINATED);
+		setCurrentStateInfo(null);
+		terminated();
+	}
+	private void handleDisconnectedEvent(IPDIDisconnectedEvent event) {
+		setState(PDebugElementState.TERMINATED);
+		setCurrentStateInfo(null);
+		terminated();
+	}
+	private void handleChangedEvent(IPDIChangedEvent event) {}
+	private void handleEndSteppingRange(IPDIEndSteppingRangeInfo info) {
 		fireSuspendEvent(DebugEvent.STEP_END);
 	}
-	private void handleBreakpointHit(IPCDIBreakpoint breakpoint) {
+	private void handleBreakpointHit(IPDIBreakpointInfo info) {
 		fireSuspendEvent(DebugEvent.BREAKPOINT);
 	}
-	private void handleSuspendedBySignal(IPCDISignalReceived signal) {
+	private void handleSuspendedBySignal(IPDISignalInfo info) {
 		fireSuspendEvent(DebugEvent.UNSPECIFIED);
 	}
-	private void handleTerminatedEvent(IPCDIDestroyedEvent event) {
-		setState(PDebugElementState.TERMINATED);
-		setCurrentStateInfo(null);
-		terminated();
+	private void syncWithBackend() {
+		IPDIThread pdiThread = getPDIThread();
+		IPDIThread currentThread = null;
+		try {
+			currentThread = pdiThread.getTarget().getCurrentThread();
+		}
+		catch(PDIException e) {
+			// ignore
+		}
+		setCurrent(pdiThread.equals(currentThread));
 	}
-	private void handleDisconnectedEvent(IPCDIDisconnectedEvent event) {
-		setState(PDebugElementState.TERMINATED);
+	protected void suspendByTarget(IPDISessionObject reason, IPDIThread suspensionThread) {
+		setState(PDebugElementState.SUSPENDED);
 		setCurrentStateInfo(null);
-		terminated();
-	}
-	private void handleChangedEvent(IPCDIChangedEvent event) {}
+		if (getPDIThread().equals(suspensionThread)) {
+			setCurrent(true);
+			setCurrentStateInfo(reason);
+			if (reason instanceof IPDIBreakpointInfo) {
+				handleBreakpointHit((IPDIBreakpointInfo)reason);
+			}
+			else if (reason instanceof IPDIEndSteppingRangeInfo) {
+				handleEndSteppingRange((IPDIEndSteppingRangeInfo)reason);
+			}
+			else if (reason instanceof IPDIFunctionFinishedInfo) {
+				
+			}
+			else if (reason instanceof IPDILocationReachedInfo) {
+				
+			}
+			else if (reason instanceof IPDISignalInfo) {
+				handleSuspendedBySignal((IPDISignalInfo) reason);
+			}
+			else if (reason instanceof IPDISharedLibraryInfo) {
+				
+			}
+			else if (reason instanceof IPDIWatchpointScopeInfo) {
+				
+			}
+			else if (reason instanceof IPDIWatchpointTriggerInfo) {
+				
+			}
+			else {
+				// fireSuspendEvent( DebugEvent.CLIENT_REQUEST );
+				// Temporary fix for bug 56520
+				fireSuspendEvent(DebugEvent.BREAKPOINT);
+			}
+		}
+	}	
 	protected void cleanup() {
-		getCDISession().getEventManager().removeEventListener(this);
+		getPDISession().getEventManager().removeEventListener(this);
 		disposeStackFrames();
 	}
 	private void setRefreshChildren(boolean refresh) {
@@ -503,9 +603,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	protected int getStackDepth() throws DebugException {
 		int depth = 0;
 		try {
-			depth = getCDIThread().getStackFrameCount();
-		} catch (PCDIException e) {
-			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.1"), new String[] { e.getMessage() }));
+			depth = getPDIThread().getStackFrameCount();
+		} catch (PDIException e) {
+			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.1"), new Object[] { e.getMessage() }));
 		}
 		return depth;
 	}
@@ -564,6 +664,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return result;
 	}
 	protected void resumedByTarget(int detail, List<DebugEvent> events) {
+		syncWithBackend();
 		if (isCurrent() && detail != DebugEvent.CLIENT_REQUEST && detail != DebugEvent.UNSPECIFIED) {
 			setState(PDebugElementState.STEPPED);
 			preserveStackFrames();
@@ -571,31 +672,12 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		} else {
 			setState(PDebugElementState.RESUMED);
 			disposeStackFrames();
-			events.add(createChangeEvent(DebugEvent.CONTENT));
+			events.add(createChangeEvent(DebugEvent.CLIENT_REQUEST));
 		}
 		setCurrent(false);
 		setCurrentStateInfo(null);
 	}
 	protected boolean isInstructionsteppingEnabled() {
 		return ((PDebugTarget) getDebugTarget()).isInstructionSteppingEnabled();
-	}
-	protected void suspendByTarget(IPCDISessionObject reason, IPCDIThread suspensionThread) {
-		setState(PDebugElementState.SUSPENDED);
-		setCurrentStateInfo(null);
-		if (getCDIThread().equals(suspensionThread)) {
-			setCurrent(true);
-			setCurrentStateInfo(reason);
-			if (reason instanceof IPCDIEndSteppingRange) {
-				handleEndSteppingRange((IPCDIEndSteppingRange) reason);
-			} else if (reason instanceof IPCDIBreakpoint) {
-				handleBreakpointHit((IPCDIBreakpoint) reason);
-			} else if (reason instanceof IPCDISignalReceived) {
-				handleSuspendedBySignal((IPCDISignalReceived) reason);
-			} else {
-				// fireSuspendEvent( DebugEvent.CLIENT_REQUEST );
-				// Temporary fix for bug 56520
-				fireSuspendEvent(DebugEvent.BREAKPOINT);
-			}
-		}
 	}
 }

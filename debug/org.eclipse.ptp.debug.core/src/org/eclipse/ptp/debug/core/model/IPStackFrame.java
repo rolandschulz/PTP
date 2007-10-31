@@ -18,27 +18,25 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToLine;
-import org.eclipse.cdt.debug.core.model.IRunToAddress;
-import org.eclipse.cdt.debug.core.model.IRunToLine;
+import java.math.BigInteger;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJumpToAddress, IPDebugElement, IStackFrame {
-	public IAddress getAddress();
-	public String getFile();
-	public String getFunction();
-	public int getFrameLineNumber();
-	public int getLevel();
-	public IValue evaluateExpression(String expression) throws DebugException;
-	public String evaluateExpressionToString(String expression) throws DebugException;
+	BigInteger getAddress();
+	String getFile();
+	String getFunction();
+	int getFrameLineNumber();
+	int getLevel();
+	IValue evaluateExpression(String expression) throws DebugException;
+	String evaluateExpressionToString(String expression) throws DebugException;
 	boolean canEvaluate();
-	public int getTargetID();
+	IPDIThread getPDIThread();
 }

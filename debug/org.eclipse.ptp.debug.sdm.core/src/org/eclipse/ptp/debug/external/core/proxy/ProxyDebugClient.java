@@ -16,7 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.external.core.proxy;
 
 import java.io.IOException;
@@ -72,7 +71,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		String[] parts = str.split(":");
 		int len = Integer.parseInt(parts[0], 16); // Skip trailing NULL
 		return new BitList(len, parts[1]);
-	}
+	}	
 	
 	/**
 	 * Convert a BitList to it's proxy representation
@@ -84,7 +83,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		String lenStr = Integer.toHexString(set.size());
 		return lenStr + ":" + set.toString();
 	}
-	
+
 	/**
 	 * Wait for the debugger to connect. We will receive a connected event
 	 * when the debug server actually connects, or a timeout event if the server
@@ -124,7 +123,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 			monitor.done();
 		}
 	}
-
+	
 	public void debugStartSession(String prog, String path, String dir, String[] args) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugStartSessionCommand(prog, path, dir, args);
 		sendCommand(cmd);
@@ -221,12 +220,6 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		cmd.completed();
 	}
 
-	public void debugEvaluateExpression(BitList procs, String expr) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(encodeBitSet(procs), expr);
-		sendCommand(cmd);
-		cmd.completed();
-	}
-
 	public void debugGetType(BitList procs, String expr) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugGetTypeCommand(encodeBitSet(procs), expr);
 		sendCommand(cmd);
@@ -256,7 +249,6 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
 	public void debugSetThreadSelect(BitList procs, int threadNum) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetThreadSelectCommand(encodeBitSet(procs), threadNum);
 		sendCommand(cmd);
@@ -293,12 +285,6 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		cmd.completed();
 	}
 
-	public void debugDataEvaluateExpression(BitList procs, String expr) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(encodeBitSet(procs), expr);
-		sendCommand(cmd);
-		cmd.completed();
-	}
-	
 	public void debugGetPartialAIF(BitList procs, String name, String key, boolean listChildren, boolean express) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugGetPartialAIFCommand(encodeBitSet(procs), name, key, listChildren, express);
 		sendCommand(cmd);
@@ -307,6 +293,17 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	
 	public void debugVariableDelete(BitList procs, String name) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugVariableDeleteCommand(encodeBitSet(procs), name);
+		sendCommand(cmd);
+		cmd.completed();
+	}
+	//TODO missing Data Evaluate Expression or Evaluate Expression Command
+	public void debugDataEvaluateExpression(BitList procs, String expr) throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(encodeBitSet(procs), expr);
+		sendCommand(cmd);
+		cmd.completed();
+	}
+	public void debugEvaluateExpression(BitList procs, String expr) throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(encodeBitSet(procs), expr);
 		sendCommand(cmd);
 		cmd.completed();
 	}

@@ -21,6 +21,10 @@ package org.eclipse.ptp.debug.internal.core.model;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPValue;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueArray;
+import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
@@ -30,7 +34,7 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 	private AbstractPVariable fParent = null;
 
 	public AbstractPValue(AbstractPVariable parent) {
-		super((PDebugTarget) parent.getDebugTarget());
+		super((PSession)parent.getSession(), parent.getTasks());
 		fParent = parent;
 	}
 	public AbstractPVariable getParentVariable() {
@@ -42,9 +46,21 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 		if (parent != null) {
 			if (frame != null && frame.canEvaluate()) {
 				try {
-					valueString = frame.evaluateExpressionToString(parent.getExpressionString());
+					IAIFValue value = parent.getAIF().getValue();
+					if (value instanceof IAIFValueArray) {
+						//TODO if value is array, show nothing.  Prevent no value for partial aif
+						valueString = "";
+					}
+					else {
+						valueString = value.getValueString();
+						if (valueString == null || valueString.length() == 0)
+							valueString = frame.evaluateExpressionToString(parent.getExpressionString());
+					}
 				}
-				catch( DebugException e ) {
+				catch (AIFException e) {
+					valueString = e.getMessage();
+				}
+				catch (DebugException e) {
 					valueString = e.getMessage();
 				}
 			}

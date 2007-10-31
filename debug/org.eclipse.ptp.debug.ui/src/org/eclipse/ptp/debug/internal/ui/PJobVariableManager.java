@@ -19,22 +19,24 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.DebugJobStorage;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.aif.AIFException;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.ICommandResult;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIGetAIFRequest;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
+ * @deprecated replace with PVariableManager
  * @author Clement chu
  */
 public final class PJobVariableManager {
@@ -166,18 +168,35 @@ public final class PJobVariableManager {
 			//only update when current set id contain in VariableInfo
 			String[] vars = getVariables(job_id, set_id, true);
 			if (vars.length > 0) {
-				PCDIDebugModel debugModel = PTPDebugCorePlugin.getDebugModel();
-				IPCDISession session = debugModel.getPCDISession(job_id);
+				IPSession session = PTPDebugUIPlugin.getUIDebugManager().getDebugSession(job_id);				
 				if (session != null) {
 					//get suspended tasks only in given job and given set
-					BitList suspend_tasks = session.getDebugger().filterRunningTasks(tasks);
-
+					BitList suspend_tasks = session.getPDISession().getTaskManager().getSuspendedTasks(tasks);
 					monitor.beginTask("Updating variables value...", (suspend_tasks.cardinality() * vars.length + 1));
 					monitor.worked(1);
 					for (int i=0; i<vars.length; i++) {
 						if (monitor.isCanceled())
 							break;
 						
+						IPDIGetAIFRequest request = session.getPDISession().getRequestFactory().getAIFRequest(suspend_tasks, vars[i]);
+						try {
+							session.getPDISession().getEventRequestManager().addEventRequest(request);
+							Map<BitList, Object> map = request.getResultMap(suspend_tasks);
+							for (Iterator<BitList> it = map.keySet().iterator(); it.hasNext();) {
+								BitList sTasks = it.next();
+								Object value = map.get(sTasks);
+								if (value instanceof IAIF) {
+									storeProcessValue(procVal, sTasks, vars[i], ((IAIF)value).getValue().getValueString());
+									monitor.worked(1);
+								}
+							}
+						}
+						catch (PDIException e) {
+							storeProcessValue(procVal, suspend_tasks, vars[i], VALUE_ERROR);
+						} catch (AIFException e) {
+							storeProcessValue(procVal, suspend_tasks, vars[i], VALUE_ERROR);
+						}
+						/*
 						try {
 							ICommandResult result = session.getExpressionValue(suspend_tasks, vars[i]);
 							BitList[] rTasks = result.getTasksArray();
@@ -189,11 +208,12 @@ public final class PJobVariableManager {
 									monitor.worked(1);
 								}
 							}
-						} catch (PCDIException e) {
+						} catch (PDIException e) {
 							storeProcessValue(procVal, suspend_tasks, vars[i], VALUE_ERROR);
 						} catch (AIFException e) {
 							storeProcessValue(procVal, suspend_tasks, vars[i], VALUE_ERROR);
 						}
+						*/
 					}
 				}
 			}

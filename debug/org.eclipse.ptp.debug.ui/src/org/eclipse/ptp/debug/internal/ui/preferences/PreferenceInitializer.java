@@ -41,7 +41,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 			store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, debuggerFile);
  
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_HOST, IPDebugConstants.PREF_DEFAULT_DEUBGGER_HOST);
-		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND, IPDebugConstants.DEBUGGER_BACKENDS[IPDebugConstants.PREF_DEFAULT_DEDUGGER_BACKEND_INDEX]);
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE, IPDebugConstants.DEBUGGER_BACKENDS[IPDebugConstants.PREF_DEFAULT_DEDUGGER_BACKEND_INDEX]);
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH, IPDebugConstants.PREF_DEFAULT_DEDUGGER_BACKEND_PATH);
 		
 		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);

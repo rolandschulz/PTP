@@ -20,12 +20,14 @@ package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
- * @author Clement chu
- * 
+ * @author clement
+ *
  */
 public interface IPValue extends IValue, IPDebugElement {
-	IPType getType() throws DebugException;
+	IAIF getAIF() throws DebugException;
 	String evaluateAsExpression(IPStackFrame frame);
 }
+

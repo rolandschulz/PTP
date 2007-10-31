@@ -17,9 +17,11 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
-/**
- * @author Clement chu
- * 
- */
-public interface IPDummyStackFrame {}
 
+/**
+ * @author clement
+ *
+ */
+public interface IPDummyStackFrame {
+
+}

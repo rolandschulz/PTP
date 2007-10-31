@@ -27,7 +27,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.internal.ui.dialogfields.SelectionButtonDialogField;
@@ -63,7 +63,7 @@ public class SignalPropertyPage extends PropertyPage {
 		try {
 			String description = getSignal().getDescription();
 			Label label = new Label(composite, SWT.WRAP);
-			label.setText(MessageFormat.format(PropertyPageMessages.getString("SignalPropertyPage.0"), new String[] { description }));
+			label.setText(MessageFormat.format(PropertyPageMessages.getString("SignalPropertyPage.0"), new Object[] { description }));
 			GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
 			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
@@ -146,8 +146,8 @@ public class SignalPropertyPage extends PropertyPage {
 	}
 
 	protected void failed(String message, Throwable e) {
-		MultiStatus ms = new MultiStatus(PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, message, null);
-		ms.add(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, e.getMessage(), null));
+		MultiStatus ms = new MultiStatus(PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, message, null);
+		ms.add(new Status(IStatus.ERROR, PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, e.getMessage(), null));
 		PDebugUtils.error(ms, getSignal());
 	}
 }

@@ -31,7 +31,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -52,7 +52,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	 * @return null if there is no line breakpoint
 	 */
 	protected IBreakpoint determineBreakpoint() {
-		IBreakpoint[] breakpoints = PTPDebugCorePlugin.getDebugModel().getPBreakpoints();
+		IBreakpoint[] breakpoints = PDebugModel.getPBreakpoints();
 		for(int i = 0; i < breakpoints.length; i++) {
 			IBreakpoint breakpoint = breakpoints[i];
 			if (breakpoint instanceof ILineBreakpoint) {
@@ -153,7 +153,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	private Position getBreakpointPosition(ILineBreakpoint breakpoint) {
 		IAnnotationModel model = getAnnotationModel();
 		if (model != null) {
-			Iterator it = model.getAnnotationIterator();
+			Iterator<?> it = model.getAnnotationIterator();
 			while(it.hasNext()) {
 				Annotation ann = (Annotation)it.next();
 				if (ann instanceof MarkerAnnotation && ((MarkerAnnotation)ann).getMarker().equals( breakpoint.getMarker())) {

@@ -51,14 +51,12 @@ public interface IPDebugConstants {
 	public static final String PLUGIN_ID = PTPDebugCorePlugin.getUniqueIdentifier();
 
 	/**
-	 * The identifier of the default variable format to use in the variables
-	 * view
+	 * The identifier of the default variable format to use in the variables view
 	 */
 	public static final String PREF_DEFAULT_VARIABLE_FORMAT = PLUGIN_ID + "pDebug.default_variable_format";
 	
 	/**
-	 * The identifier of the default expression format to use in the expressions
-	 * views
+	 * The identifier of the default expression format to use in the expressions views
 	 */
 	public static final String PREF_DEFAULT_EXPRESSION_FORMAT = PLUGIN_ID + "pDebug.default_expression_format";
 
@@ -86,7 +84,7 @@ public interface IPDebugConstants {
 	/**
 	 * Debugger backend
 	 */
-	public static final String PREF_PTP_DEBUGGER_BACKEND = PLUGIN_ID + ".pDebug.debugger_backend";
+	public static final String PREF_PTP_DEBUGGER_BACKEND_TYPE = PLUGIN_ID + ".pDebug.debugger_backend";
 	public static final int PREF_DEFAULT_DEDUGGER_BACKEND_INDEX = 0;
 		
 	public static final String[] DEBUGGER_BACKENDS = new String[] {
@@ -106,10 +104,17 @@ public interface IPDebugConstants {
 
 	public static final String PREF_PTP_DEBUG_REGISTER_PROC_0 = PLUGIN_ID + ".pDebug.regPro0";
 	
+	public static final String PREF_DEFAULT_DEBUGGER_TYPE = PLUGIN_ID + ".pDebug.defaultDebugger"; 
+	
 	public static final int DEFAULT_DEBUG_COMM_TIMEOUT = 60000;
 	public static final int MIN_REQUEST_TIMEOUT = 10000;
 	public static final int MAX_REQUEST_TIMEOUT = Integer.MAX_VALUE;	
 
 	public static final String PREF_UPDATE_VARIABLES_ON_SUSPEND = PLUGIN_ID + ".pDebug.update_variables_on_suspend";
 	public static final String PREF_UPDATE_VARIABLES_ON_CHANGE = PLUGIN_ID + ".pDebug.update_variables_on_change";
+
+	public static final String PREF_INSTRUCTION_STEP_MODE_ON = PLUGIN_ID + "pDebug.Disassembly.instructionStepOn";
+	
+	public static final String PREF_DEFAULT_REGISTER_FORMAT = PLUGIN_ID + "pDebug.default_register_format";
+
 }

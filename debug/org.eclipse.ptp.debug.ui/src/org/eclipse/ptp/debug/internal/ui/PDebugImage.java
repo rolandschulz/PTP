@@ -89,7 +89,41 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_BPTCURSET_DI = "bpt_curr_set_disable.gif";
 	public static final String IMG_DEBUG_BPTMULTISET_DI = "bpt_multi_set_disable.gif";
 	public static final String IMG_DEBUG_BPTNOSET_DI = "bpt_no_set_disable.gif";
+	
+	//TODO
+	public static final String IMG_DEBUG_OVRS_WARNING = "no.gif";
+	public static final String IMG_DEBUG_OVRS_ERROR = "no.gif";
+	public static final String IMG_DEBUG_OVRS_ARGUMENT = "no.gif";
+	public static final String IMG_DEBUG_OVRS_GLOBAL = "no.gif";
+	
+	public static final String IMG_DEBUG_SIGNAL = "no.gif";
+	public static final String IMG_DEBUG_REGISTER_GROUP_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_REGISTER_GROUP = "no.gif";
 
+	public static final String IMG_DEBUG_READ_WATCHPOINT_ENABLED = "no.gif";
+	public static final String IMG_DEBUG_WRITE_WATCHPOINT_ENABLED = "no.gif";
+	public static final String IMG_DEBUG_READ_WATCHPOINT_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_WRITE_WATCHPOINT_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_WATCHPOINT_ENABLED = "no.gif";
+	public static final String IMG_DEBUG_WATCHPOINT_DISABLED = "no.gif";
+
+	public static final String IMG_DEBUG_VARIABLE_POINTER = "no.gif";
+	public static final String IMG_DEBUG_VARIABLE_POINTER_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_VARIABLE_AGGREGATE = "no.gif";
+	public static final String IMG_DEBUG_VARIABLE_AGGREGATE_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_VARIABLE_SIMPLE = "no.gif";
+	public static final String IMG_DEBUG_VARIABLE_SIMPLE_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_REGISTER = "no.gif";
+	public static final String IMG_DEBUG_REGISTER_DISABLED = "no.gif";
+	public static final String IMG_DEBUG_EXECUTABLE_WITH_SYMBOLS = "no.gif";
+	public static final String IMG_DEBUG_EXECUTABLE = "no.gif";
+	public static final String IMG_DEBUG_SHARED_LIBRARY_WITH_SYMBOLS = "no.gif";
+	public static final String IMG_DEBUG_SHARED_LIBRARY = "no.gif";
+	//public static final String IMG_DEBUG_ = "no.gif";
+	//public static final String IMG_DEBUG_ = "no.gif";
+	
+	
+	
 	public static final String IMG_DEBUG_OVER_BPT_GLOB_EN = "global_ovr.gif";
 	public static final String IMG_DEBUG_OVER_BPT_GLOB_DI = "global_ovr_disabled.gif";
 	public static final String IMG_DEBUG_OVER_BPT_COND_EN = "conditional_ovr.gif";
@@ -220,6 +254,8 @@ public class PDebugImage {
 		URL url = FileLocator.find(bundle, new Path(basePath + file), null);
 		if (url!=null) {
 			ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+			if (desc == null)
+				desc = ImageDescriptor.getMissingImageDescriptor();
 			registry.put(file, desc);
 		}
 	}
@@ -236,6 +272,9 @@ public class PDebugImage {
 	 */
 	public static ImageDescriptor getDescriptor(String key) {
 		return PTPDebugUIPlugin.getDefault().getImageRegistry().getDescriptor(key);
+	}
+	public static void dispose() {
+		PTPDebugUIPlugin.getDefault().getImageRegistry().dispose();
 	}
 	/*
 	private static ImageRegistry getImageRegistry() {

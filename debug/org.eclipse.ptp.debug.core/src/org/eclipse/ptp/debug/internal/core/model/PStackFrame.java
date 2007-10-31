@@ -27,14 +27,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.core.IAddressFactory;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.model.IJumpToAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToLine;
-import org.eclipse.cdt.debug.core.model.IRestart;
-import org.eclipse.cdt.debug.core.model.IRunToAddress;
-import org.eclipse.cdt.debug.core.model.IRunToLine;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.DebugException;
@@ -45,51 +37,56 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
+import org.eclipse.ptp.debug.core.model.IJumpToAddress;
+import org.eclipse.ptp.debug.core.model.IJumpToLine;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.core.model.IRestart;
 import org.eclipse.ptp.debug.core.model.IResumeWithoutSignal;
+import org.eclipse.ptp.debug.core.model.IRunToAddress;
+import org.eclipse.ptp.debug.core.model.IRunToLine;
+import org.eclipse.ptp.debug.core.pdi.IPDILocation;
+import org.eclipse.ptp.debug.core.pdi.IPDILocator;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
+import org.eclipse.ptp.debug.core.pdi.model.IPDITargetExpression;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
-import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
+import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
  * 
  */
-public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart, IResumeWithoutSignal, IPCDIEventListener {
-	private IPCDIStackFrame fCDIStackFrame;
-	private IPCDIStackFrame fLastCDIStackFrame;
+public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart, IResumeWithoutSignal, IPDIEventListener {
+	private IPDIStackFrame pdiStackFrame;
+	private IPDIStackFrame lastPDIStackFrame;
 	private PThread fThread;
 	private List<IPVariable> fVariables;
 	private boolean fRefreshVariables = true;
 	private List<PExpression> fExpressions;
 	private boolean fIsDisposed = false;
 
-	public PStackFrame(PThread thread, IPCDIStackFrame cdiFrame) {
-		super((PDebugTarget) thread.getDebugTarget());
-		setCDIStackFrame(cdiFrame);
+	public PStackFrame(PThread thread, IPDIStackFrame pdiFrame) {
+		super((PSession)thread.getSession(), thread.getTasks());
+		setPDIStackFrame(pdiFrame);
 		setThread(thread);
-		getCDISession().getEventManager().addEventListener(this);
+		getPDISession().getEventManager().addEventListener(this);
+	}
+	public PDebugTarget getDebugTarget() {
+		return fThread.getDebugTarget();
 	}
 	public IThread getThread() {
 		return fThread;
 	}
-	public int getTargetID() {
-		return getCDITarget().getTargetID();
-	}
 	public IVariable[] getVariables() throws DebugException {
+		if (isDisposed()) {
+			return new IVariable[0];
+		}
 		IPGlobalVariable[] globals = getGlobals();
 		List<IPVariable> vars = getVariables0();
 		List<IPVariable> all = new ArrayList<IPVariable>(globals.length + vars.size());
@@ -104,11 +101,11 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		PThread thread = (PThread) getThread();
 		if (thread.isSuspended()) {
 			if (fVariables == null) {
-				List<IPCDIVariableDescriptor> vars = getAllCDIVariableObjects();
+				List<IPDIVariableDescriptor> vars = getAllPDIVariableObjects();
 				fVariables = new ArrayList<IPVariable>(vars.size());
-				Iterator it = vars.iterator();
+				Iterator<IPDIVariableDescriptor> it = vars.iterator();
 				while (it.hasNext()) {
-					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariableDescriptor) it.next()));
+					fVariables.add(PVariableFactory.createLocalVariable(this, (IPDIVariableDescriptor) it.next()));
 				}
 			} else {
 				if (refreshVariables()) {
@@ -120,12 +117,11 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return (fVariables != null) ? fVariables : Collections.EMPTY_LIST;
 	}
 	protected void updateVariables() throws DebugException {
-		List locals = getAllCDIVariableObjects();
+		List<IPDIVariableDescriptor> locals = getAllPDIVariableObjects();
 		int index = 0;
 		while (index < fVariables.size()) {
-			IPCDIVariableDescriptor varObject = findVariable(locals, (PVariable) fVariables.get(index));
+			IPDIVariableDescriptor varObject = findVariable(locals, (PVariable) fVariables.get(index));
 			if (varObject != null) {
-				//((PVariable) fVariables.get(index)).setAIF(varObject.getAIF());
 				locals.remove(varObject);
 				index++;
 			} else {
@@ -134,15 +130,15 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			}
 		}
 		// add any new locals
-		Iterator newOnes = locals.iterator();
+		Iterator<IPDIVariableDescriptor> newOnes = locals.iterator();
 		while (newOnes.hasNext()) {
-			fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariableDescriptor) newOnes.next()));
+			fVariables.add(PVariableFactory.createLocalVariable(this, (IPDIVariableDescriptor) newOnes.next()));
 		}
 	}
-	protected IPCDIVariableDescriptor findVariable(List list, PVariable var) {
-		Iterator it = list.iterator();
+	protected IPDIVariableDescriptor findVariable(List<IPDIVariableDescriptor> list, PVariable var) {
+		Iterator<IPDIVariableDescriptor> it = list.iterator();
 		while (it.hasNext()) {
-			IPCDIVariableDescriptor newVarObject = (IPCDIVariableDescriptor) it.next();
+			IPDIVariableDescriptor newVarObject = (IPDIVariableDescriptor) it.next();
 			if (var.sameVariable(newVarObject))
 				return newVarObject;
 		}
@@ -155,13 +151,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return getVariables0().size() > 0;
 	}
 	public int getLineNumber() throws DebugException {
-		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		if (isSuspended()) {
-			ISourceLocator locator = ((PDebugTarget) getDebugTarget()).getSourceLocator();
+			ISourceLocator locator = getLaunch().getSourceLocator();
 			if (locator != null && locator instanceof IAdaptable && ((IAdaptable) locator).getAdapter(IPSourceLocator.class) != null)
 				return ((IPSourceLocator) ((IAdaptable) locator).getAdapter(IPSourceLocator.class)).getLineNumber(this);
-			if (getCDIStackFrame() != null && getCDIStackFrame().getLocator() != null)
-				return getCDIStackFrame().getLocator().getLineNumber();
+			if (getPDIStackFrame() != null && getPDIStackFrame().getLocator() != null)
+				return getPDIStackFrame().getLocator().getLineNumber();
 		}
 		return -1;
 	}
@@ -172,7 +167,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return -1;
 	}
 	public String getName() throws DebugException {
-		IPCDILocator locator = (IPCDILocator)getCDIStackFrame().getLocator();
+		IPDILocator locator = (IPDILocator)getPDIStackFrame().getLocator();
 		String func = "";
 		String file = "";
 		String line = "";
@@ -186,7 +181,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		} else {
 			return func;
 		}
-		return MessageFormat.format(CoreModelMessages.getString("PStackFrame.0"), new String[] { func, file, line });
+		return MessageFormat.format(CoreModelMessages.getString("PStackFrame.0"), new Object[] { func, file, line });
 	}
 	public boolean canStepInto() {
 		try {
@@ -209,7 +204,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			if (!exists()) {
 				return false;
 			}
-			List frames = ((PThread) getThread()).computeStackFrames();
+			List<IStackFrame> frames = ((PThread) getThread()).computeStackFrames();
 			if (frames != null && !frames.isEmpty()) {
 				boolean bottomFrame = this.equals(frames.get(frames.size() - 1));
 				return !bottomFrame && getThread().canStepReturn();
@@ -271,26 +266,26 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			getDebugTarget().terminate();
 		}
 	}
-	protected IPCDIStackFrame getCDIStackFrame() {
-		return fCDIStackFrame;
+	protected IPDIStackFrame getPDIStackFrame() {
+		return pdiStackFrame;
 	}
-	protected void setCDIStackFrame(IPCDIStackFrame frame) {
+	protected void setPDIStackFrame(IPDIStackFrame frame) {
 		if (frame != null) {
-			fLastCDIStackFrame = frame;
+			lastPDIStackFrame = frame;
 		} else {
-			fLastCDIStackFrame = fCDIStackFrame;
+			lastPDIStackFrame = pdiStackFrame;
 		}
-		fCDIStackFrame = frame;
+		pdiStackFrame = frame;
 		setRefreshVariables(true);
 	}
-	protected IPCDIStackFrame getLastCDIStackFrame() {
-		return fLastCDIStackFrame;
+	protected IPDIStackFrame getLastPDIStackFrame() {
+		return lastPDIStackFrame;
 	}
-	protected static boolean equalFrame(IPCDIStackFrame frameOne, IPCDIStackFrame frameTwo) {
+	protected static boolean equalFrame(IPDIStackFrame frameOne, IPDIStackFrame frameTwo) {
 		if (frameOne == null || frameTwo == null)
 			return false;
-		IPCDILocator loc1 = (IPCDILocator)frameOne.getLocator();
-		IPCDILocator loc2 = (IPCDILocator)frameTwo.getLocator();
+		IPDILocator loc1 = (IPDILocator)frameOne.getLocator();
+		IPDILocator loc2 = (IPDILocator)frameTwo.getLocator();
 		if (loc1 == null || loc2 == null)
 			return false;
 		if (loc1.getFile() != null && loc1.getFile().length() > 0 && loc2.getFile() != null && loc2.getFile().length() > 0 && loc1.getFile().equals(loc2.getFile())) {
@@ -323,17 +318,14 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		if (adapter == IJumpToAddress.class) {
 			return this;
 		}
-		if (adapter == PStackFrame.class) {
-			return this;
-		}
 		if (adapter == IPStackFrame.class) {
 			return this;
 		}
 		if (adapter == IStackFrame.class) {
 			return this;
 		}
-		if (adapter == IPCDIStackFrame.class) {
-			return getCDIStackFrame();
+		if (adapter == IPDIStackFrame.class) {
+			return getPDIStackFrame();
 		}
 		if (adapter == IMemoryBlockRetrieval.class) {
 			return getDebugTarget().getAdapter(adapter);
@@ -342,14 +334,14 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	}
 	protected void dispose() {
 		setDisposed(true);
-		getCDISession().getEventManager().removeEventListener(this);
+		getPDISession().getEventManager().removeEventListener(this);
 		disposeAllVariables();
 		disposeExpressions();
 	}
 	protected void disposeAllVariables() {
 		if (fVariables == null)
 			return;
-		Iterator it = fVariables.iterator();
+		Iterator<IPVariable> it = fVariables.iterator();
 		while (it.hasNext()) {
 			((PVariable) it.next()).dispose();
 		}
@@ -358,7 +350,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	}
 	protected void disposeExpressions() {
 		if (fExpressions != null) {
-			Iterator it = fExpressions.iterator();
+			Iterator<PExpression> it = fExpressions.iterator();
 			while (it.hasNext()) {
 				((PExpression) it.next()).dispose();
 			}
@@ -366,49 +358,48 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 		fExpressions = null;
 	}
-	protected List<IPCDIVariableDescriptor> getCDILocalVariableObjects() throws DebugException {
-		List<IPCDIVariableDescriptor> list = new ArrayList<IPCDIVariableDescriptor>();
+	protected List<IPDIVariableDescriptor> getPDILocalVariableObjects() throws DebugException {
+		List<IPDIVariableDescriptor> list = new ArrayList<IPDIVariableDescriptor>();
 		try {
-			list.addAll(Arrays.asList(getCDIStackFrame().getLocalVariableDescriptors()));
-		} catch (PCDIException e) {
+			list.addAll(Arrays.asList(getPDIStackFrame().getLocalVariableDescriptors()));
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return list;
 	}
-	protected List<IPCDIVariableDescriptor> getCDIArgumentObjects() throws DebugException {
-		List<IPCDIVariableDescriptor> list = new ArrayList<IPCDIVariableDescriptor>();
+	protected List<IPDIVariableDescriptor> getPDIArgumentObjects() throws DebugException {
+		List<IPDIVariableDescriptor> list = new ArrayList<IPDIVariableDescriptor>();
 		try {
-			list.addAll(Arrays.asList(getCDIStackFrame().getArgumentDescriptors()));
-		} catch (PCDIException e) {
+			list.addAll(Arrays.asList(getPDIStackFrame().getArgumentDescriptors()));
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return list;
 	}
-	protected List<IPCDIVariableDescriptor> getAllCDIVariableObjects() throws DebugException {
-		List<IPCDIVariableDescriptor> list = new ArrayList<IPCDIVariableDescriptor>();
-		list.addAll(getCDIArgumentObjects());
-		list.addAll(getCDILocalVariableObjects());
+	protected List<IPDIVariableDescriptor> getAllPDIVariableObjects() throws DebugException {
+		List<IPDIVariableDescriptor> list = new ArrayList<IPDIVariableDescriptor>();
+		list.addAll(getPDIArgumentObjects());
+		list.addAll(getPDILocalVariableObjects());
 		return list;
 	}
 	protected boolean isTopStackFrame() throws DebugException {
 		IStackFrame tos = getThread().getTopStackFrame();
 		return tos != null && tos.equals(this);
 	}
-	public IAddress getAddress() {
-		IAddressFactory factory = ((PDebugTarget) getDebugTarget()).getAddressFactory();
-		return factory.createAddress(getCDIStackFrame().getLocator().getAddress());
+	public BigInteger getAddress() {
+		return getPDIStackFrame().getLocator().getAddress();
 	}
 	public String getFile() {
-		return getCDIStackFrame().getLocator().getFile();
+		return getPDIStackFrame().getLocator().getFile();
 	}
 	public String getFunction() {
-		return getCDIStackFrame().getLocator().getFunction();
+		return getPDIStackFrame().getLocator().getFunction();
 	}
 	public int getLevel() {
-		return getCDIStackFrame().getLevel();
+		return getPDIStackFrame().getLevel();
 	}
 	public int getFrameLineNumber() {
-		return getCDIStackFrame().getLocator().getLineNumber();
+		return getPDIStackFrame().getLocator().getLineNumber();
 	}
 	protected synchronized void preserve() {
 		preserveVariables();
@@ -417,7 +408,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	private void preserveVariables() {
 		if (fVariables == null)
 			return;
-		Iterator it = fVariables.iterator();
+		Iterator<IPVariable> it = fVariables.iterator();
 		while (it.hasNext()) {
 			AbstractPVariable av = (AbstractPVariable) it.next();
 			av.preserve();
@@ -426,7 +417,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	private void preserveExpressions() {
 		if (fExpressions == null)
 			return;
-		Iterator it = fExpressions.iterator();
+		Iterator<PExpression> it = fExpressions.iterator();
 		while (it.hasNext()) {
 			PExpression exp = (PExpression) it.next();
 			exp.preserve();
@@ -455,10 +446,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 	private IPGlobalVariable[] getGlobals() {
-		PGlobalVariableManager gvm = ((PDebugTarget) getDebugTarget()).getGlobalVariableManager();
-		if (gvm != null) {
-			return gvm.getGlobals();
-		}
+		//TODO Not implement PStackFrame - getGlobals() yet
 		return new IPGlobalVariable[0];
 	}
 	public String toString() {
@@ -470,20 +458,19 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	}
 	public String evaluateExpressionToString(String expression) throws DebugException {
 		try {
-			return getCDITarget().evaluateExpressionToString(getCDIStackFrame(), expression);
-		} catch (PCDIException e) {
+			return getPDITarget().evaluateExpressionToString(getPDIStackFrame(), expression);
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return null;
 	}
 	public boolean canEvaluate() {
-		PDebugTarget target = ((PDebugTarget) getDebugTarget());
-		return target.supportsExpressionEvaluation() && target.isSuspended();
+		return getDebugTarget().isSuspended();
 	}
 	protected void doStepReturn() throws DebugException {
 		try {
-			getCDIStackFrame().stepReturn();
-		} catch (PCDIException e) {
+			getPDISession().stepReturn(getTasks(), 0);
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
@@ -495,7 +482,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			fExpressions = new ArrayList<PExpression>(5);
 		}
 		PExpression expression = null;
-		Iterator it = fExpressions.iterator();
+		Iterator<PExpression> it = fExpressions.iterator();
 		while (it.hasNext()) {
 			expression = (PExpression) it.next();
 			if (expression.getExpressionText().compareTo(expressionText) == 0) {
@@ -503,10 +490,10 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			}
 		}
 		try {
-			IPCDIExpression cdiExpression = (IPCDIExpression)((PDebugTarget) getDebugTarget()).getCDITarget().createExpression(expressionText);
-			expression = new PExpression(this, cdiExpression, null);
+			IPDITargetExpression pdiExpression = getPDISession().getExpressionManager().createExpression(getTasks(), expressionText);
+			expression = new PExpression(this, pdiExpression, null);
 			fExpressions.add(expression);
-		} catch (PCDIException e) {
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return expression;
@@ -533,33 +520,33 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		if (!canRunToLine(fileName, lineNumber))
 			return;
 		if (skipBreakpoints) {
-			((PDebugTarget) getDebugTarget()).skipBreakpoints(true);
+			fSession.getBreakpointManager().skipBreakpoints(true);
 		}
-		IPCDILocation location = (IPCDILocation)getCDITarget().createLineLocation(fileName, lineNumber);
+		IPDILocation location = getPDISession().getBreakpointManager().createLineLocation(fileName, lineNumber);
 		try {
-			getCDIThread().stepUntil(location);
-		} catch (CDIException e) {
+			getPDISession().stepUntil(getTasks(), location);
+		} catch (PDIException e) {
 			if (skipBreakpoints) {
-				((PDebugTarget) getDebugTarget()).skipBreakpoints(false);
+				fSession.getBreakpointManager().skipBreakpoints(false);
 			}
 			targetRequestFailed(e.getMessage(), e);
 		}
 	}
-	public boolean canRunToAddress(IAddress address) {
+	public boolean canRunToAddress(BigInteger address) {
 		return getThread().canResume();
 	}
-	public void runToAddress(IAddress address, boolean skipBreakpoints) throws DebugException {
+	public void runToAddress(BigInteger address, boolean skipBreakpoints) throws DebugException {
 		if (!canRunToAddress(address))
 			return;
 		if (skipBreakpoints) {
-			((PDebugTarget) getDebugTarget()).skipBreakpoints(true);
+			fSession.getBreakpointManager().skipBreakpoints(true);
 		}
-		IPCDILocation location = (IPCDILocation)getCDITarget().createAddressLocation(new BigInteger(address.toString()));
+		IPDILocation location = getPDISession().getBreakpointManager().createAddressLocation(address);
 		try {
-			getCDIThread().stepUntil(location);
-		} catch (CDIException e) {
+			getPDISession().stepUntil(getTasks(), location);
+		} catch (PDIException e) {
 			if (skipBreakpoints) {
-				((PDebugTarget) getDebugTarget()).skipBreakpoints(false);
+				fSession.getBreakpointManager().skipBreakpoints(false);
 			}
 			targetRequestFailed(e.getMessage(), e);
 		}
@@ -578,39 +565,37 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	public void jumpToLine(String fileName, int lineNumber) throws DebugException {
 		if (!canJumpToLine(fileName, lineNumber))
 			return;
-		IPCDILocation location = (IPCDILocation)getCDITarget().createLineLocation(fileName, lineNumber);
+		IPDILocation location = getPDISession().getBreakpointManager().createLineLocation(fileName, lineNumber);
 		try {
-			getCDIThread().resume(location);
-		} catch (PCDIException e) {
+			getPDISession().resume(getTasks(), location);
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), e);
 		}
 	}
-	public boolean canJumpToAddress(IAddress address) {
+	public boolean canJumpToAddress(BigInteger address) {
 		return getThread().canResume();
 	}
-	public void jumpToAddress(IAddress address) throws DebugException {
+	public void jumpToAddress(BigInteger address) throws DebugException {
 		if (!canJumpToAddress(address))
 			return;
-		IPCDILocation location = (IPCDILocation)getCDITarget().createAddressLocation(new BigInteger(address.toString()));
+		
+		IPDILocation location = getPDISession().getBreakpointManager().createAddressLocation(address);
 		try {
-			getCDIThread().resume(location);
-		} catch (PCDIException e) {
+			getPDISession().resume(getTasks(), location);
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), e);
 		}
 	}
-	private IPCDIThread getCDIThread() {
-		return (IPCDIThread)((PThread) getThread()).getCDIThread();
+	public IPDIThread getPDIThread() {
+		return (IPDIThread)((PThread) getThread()).getPDIThread();
 	}
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		PTPDebugCorePlugin.getDefault().getLogger().finer("");
-		return null;
+		return (isDisposed()) ? new IRegisterGroup[0] : fSession.getRegisterManager().getRegisterGroups(getTasks(), this);
 	}
 	public boolean hasRegisterGroups() throws DebugException {
-		PTPDebugCorePlugin.getDefault().getLogger().finer("");
-		return false;
+		return (isDisposed()) ? false : getDebugTarget().fSession.getRegisterManager().getRegisterGroups(getTasks(), this).length > 0;
 	}
 	public IValue evaluateExpression(String expressionText) throws DebugException {
-		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		if (!isDisposed()) {
 			PExpression expression = getExpression(expressionText);
 			if (expression != null) {
@@ -620,5 +605,5 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return null;
 	}
 
-	public void handleDebugEvents(IPCDIEvent[] events) {}
+	public void handleDebugEvents(IPDIEvent[] events) {}
 }

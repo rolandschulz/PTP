@@ -18,10 +18,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.pdi.IPDISession;
+import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
+import org.eclipse.ptp.debug.internal.core.PSetManager;
 
-public interface IPSession {
-	public IPCDISession getPCDISession();
-	public IPJob getJob();
+public interface IPSession extends IAdaptable {
+	boolean isReady();
+	void dispose();
+	IPDISession getPDISession();
+	IPJob getJob();
+	IPLaunch getLaunch();
+	IPDebugTarget findDebugTarget(BitList tasks);
+	BitList getTasks(int id);
+	BitList getTasks();
+
+	void deleteDebugTargets(boolean register);
+	void reloadDebugTargets(BitList tasks, boolean refresh, boolean register);
+	void createDebugTarget(BitList tasks, boolean refresh, boolean register);
+	void deleteDebugTarget(BitList tasks, boolean refresh, boolean register);
+	
+	PSetManager getSetManager();
+	PBreakpointManager getBreakpointManager();
+	
+	void forceStoppedDebugger(ProcessAttributes.State state);
 }

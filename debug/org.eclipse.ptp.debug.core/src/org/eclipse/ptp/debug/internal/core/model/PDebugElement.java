@@ -29,6 +29,7 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -38,40 +39,35 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.PDebugElementState;
+import org.eclipse.ptp.debug.core.pdi.IPDISession;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
+import org.eclipse.ptp.debug.internal.core.PSession;
 
 public abstract class PDebugElement extends PlatformObject implements IPDebugElement, IPDebugElementStatus {
-	private PDebugTarget fDebugTarget;
 	private int fSeverity = IPDebugElementStatus.OK;
 	private String fMessage = null;
 	private PDebugElementState fState = PDebugElementState.UNDEFINED;
 	private PDebugElementState fOldState = PDebugElementState.UNDEFINED;
 	private Object fCurrentStateInfo = null;
+	protected PSession fSession = null;
+	protected BitList tasks = null;
 
-	public PDebugElement(PDebugTarget target) {
-		setDebugTarget(target);
+	public PDebugElement(PSession session, BitList tasks) {
+		fSession = session;
+		this.tasks = tasks;
 	}
 	public String getModelIdentifier() {
-		return PCDIDebugModel.getPluginIdentifier();
-	}
-	public IDebugTarget getDebugTarget() {
-		return fDebugTarget;
-	}
-	public ILaunch getLaunch() {
-		return getDebugTarget().getLaunch();
-	}
-	protected void setDebugTarget(PDebugTarget target) {
-		fDebugTarget = target;
+		return PDebugModel.getPluginIdentifier();
 	}
 	protected void logError(Exception e) {
 		DebugPlugin.log(e);
@@ -115,32 +111,26 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	public DebugEvent createChangeEvent(int detail) {
 		return new DebugEvent(this, DebugEvent.CHANGE, detail);
 	}
-	public IPCDISession getCDISession() {
-		return (IPCDISession)getCDITarget().getSession();
-	}
-	public IPCDITarget getCDITarget() {
-		return (IPCDITarget) getDebugTarget().getAdapter(IPCDITarget.class);
-	}
 	public static void requestFailed(String message, Exception e) throws DebugException {
 		requestFailed(message, e, DebugException.REQUEST_FAILED);
 	}
-	public static void targetRequestFailed(String message, PCDIException e) throws DebugException {
-		requestFailed(MessageFormat.format("Target request failed: {0}.", new String[] { message }), e, DebugException.TARGET_REQUEST_FAILED); //$NON-NLS-1$
+	public static void targetRequestFailed(String message, PDIException e) throws DebugException {
+		requestFailed(MessageFormat.format("Target request failed: {0}.", new Object[] { message }), e, DebugException.TARGET_REQUEST_FAILED);
 	}
 	public static void requestFailed(String message, Throwable e, int code) throws DebugException {
 		throwDebugException(message, code, e);
 	}
 	public static void targetRequestFailed(String message, Throwable e) throws DebugException {
-		throwDebugException(MessageFormat.format("Target request failed: {0}.", new String[] { message }), DebugException.TARGET_REQUEST_FAILED, e); //$NON-NLS-1$
+		throwDebugException(MessageFormat.format("Target request failed: {0}.", new Object[] { message }), DebugException.TARGET_REQUEST_FAILED, e);
 	}
 	public static void notSupported(String message) throws DebugException {
 		throwDebugException(message, DebugException.NOT_SUPPORTED, null);
 	}
 	protected static void throwDebugException(String message, int code, Throwable exception) throws DebugException {
-		throw new DebugException(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), code, message, exception));
+		throw new DebugException(new Status(IStatus.ERROR, PDebugModel.getPluginIdentifier(), code, message, exception));
 	}
 	protected void infoMessage(Throwable e) {
-		IStatus newStatus = new Status(IStatus.INFO, PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e.getMessage(), null);
+		IStatus newStatus = new Status(IStatus.INFO, PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e.getMessage(), null);
 		PDebugUtils.info(newStatus, getDebugTarget());
 	}
 	public Object getAdapter(Class adapter) {
@@ -148,20 +138,16 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 			return this;
 		if (adapter.equals(IPDebugElement.class))
 			return this;
-		if (adapter.equals(PDebugElement.class))
-			return this;
 		if (adapter.equals(IPDebugElementStatus.class))
 			return this;
-		if (adapter.equals(IPCDISession.class))
-			return getCDISession();
+		if (adapter.equals(IPSession.class))
+			return fSession;
 		if (adapter.equals(IPDebugTarget.class))
 			return getDebugTarget();
 		if (adapter.equals(IDebugTarget.class))
 			return getDebugTarget();
-		if (adapter.equals(IMemoryBlockRetrieval.class))
-			return getDebugTarget().getAdapter(adapter);
 		if (adapter.equals(ILaunch.class))
-			return getDebugTarget().getLaunch();
+			return getLaunch();
 
 		return super.getAdapter(adapter);
 	}
@@ -199,5 +185,30 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	}
 	protected void setCurrentStateInfo(Object currentStateInfo) {
 		fCurrentStateInfo = currentStateInfo;
+	}
+	public ILaunch getLaunch() {
+		return fSession.getLaunch();
+	}
+	public BitList getTasks() {
+		return tasks;
+	}
+	public IPSession getSession() {
+		return fSession;
+	}
+	public IPDISession getPDISession() {
+		return fSession.getPDISession();
+	}
+	public IPDITarget getPDITarget() throws PDIException {
+		IPDebugTarget debugTarget = fSession.findDebugTarget(getTasks());
+		if (debugTarget == null)
+			throw new PDIException(getTasks(), "No PDITarget found");
+		return debugTarget.getPDITarget();
+	}
+	public IDebugTarget getDebugTarget() {
+		//return fSession.findDebugTarget(getTasks());
+		return fSession.getLaunch().getDebugTarget(getID());
+	}
+	public int getID() {
+		return tasks.nextSetBit(0);
 	}
 }

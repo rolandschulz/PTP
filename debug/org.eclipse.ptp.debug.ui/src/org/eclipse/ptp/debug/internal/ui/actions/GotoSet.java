@@ -26,7 +26,9 @@ import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
@@ -54,14 +56,14 @@ public class GotoSet implements IViewActionDelegate {
 				try {				
 					String jid = breakpoint.getJobId();
 					if (jid.equals(IPBreakpoint.GLOBAL))
-						jid = "";
+						jid = IManager.EMPTY_ID;
 					
-					pview.changeJob(jid);
+					pview.doChangeJob(jid);
 					IElementHandler elementHandler = pview.getCurrentElementHandler();
 					if (elementHandler != null) {
-						pview.selectSet(elementHandler.getSet(breakpoint.getSetId()));
+						pview.selectSet((IElementSet)elementHandler.getElementByID(breakpoint.getSetId()));
 					}
-					pview.refresh(false);
+					pview.refresh(true);
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.log(e);
 				}

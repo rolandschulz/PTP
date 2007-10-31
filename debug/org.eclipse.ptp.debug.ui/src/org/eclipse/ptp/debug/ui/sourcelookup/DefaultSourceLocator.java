@@ -24,10 +24,10 @@ public class DefaultSourceLocator extends PSourceLookupDirector {
 		// Check if the old source locator includes all referenced projects.
 		// If so, DefaultSpourceContainer should be used.
 		IProject project = csl.getProject();
-		List list = PDebugUtils.getReferencedProjects(project);
-		HashSet names = new HashSet(list.size() + 1);
+		List<IProject> list = PDebugUtils.getReferencedProjects(project);
+		HashSet<String> names = new HashSet<String>(list.size() + 1);
 		names.add(project.getName());
-		Iterator it = list.iterator();
+		Iterator<IProject> it = list.iterator();
 		while (it.hasNext()) {
 			names.add(((IProject) it.next()).getName());
 		}
@@ -41,13 +41,13 @@ public class DefaultSourceLocator extends PSourceLookupDirector {
 			}
 		}
 		// Generate an array of new source containers including DefaultSourceContainer
-		ArrayList locs = new ArrayList(locations.length);
+		List<IPSourceLocation> locs = new ArrayList<IPSourceLocation>(locations.length);
 		for (int i = 0; i < locations.length; ++i) {
 			if (!includesDefault || !(locations[i] instanceof IProjectSourceLocation && names.contains(((IProjectSourceLocation) locations[i]).getProject().getName())))
 				locs.add(locations[i]);
 		}
 		ISourceContainer[] containers = SourceUtils.convertSourceLocations((IPSourceLocation[]) locs.toArray(new IPSourceLocation[locs.size()]));
-		ArrayList cons = new ArrayList(Arrays.asList(containers));
+		List<ISourceContainer> cons = new ArrayList<ISourceContainer>(Arrays.asList(containers));
 		if (includesDefault) {
 			DefaultSourceContainer defaultContainer = new DefaultSourceContainer();
 			defaultContainer.init(this);

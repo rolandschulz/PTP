@@ -22,15 +22,20 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.eclipse.cdt.debug.core.CDebugUtils;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -41,10 +46,14 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
-import org.eclipse.ptp.debug.core.model.IPGlobalVariableManager;
+import org.eclipse.ptp.debug.core.model.IPGlobalVariableDescriptor;
+import org.eclipse.ptp.debug.core.pdi.IPDISession;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.debug.internal.core.model.PVariable;
 import org.eclipse.ptp.debug.internal.core.model.PVariableFactory;
@@ -56,190 +65,275 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * @author Clement chu
- * 
+ * @author clement
+ *
  */
-public class PGlobalVariableManager implements IPGlobalVariableManager {
+public class PGlobalVariableManager implements IAdaptable, IPDIEventListener {
+	private class PGlobalVariableSet {
+		IPGlobalVariableDescriptor[] fInitialDescriptors = new IPGlobalVariableDescriptor[0];
+		ArrayList<IPGlobalVariable> fGlobals;
+		PDebugTarget debugTarget = null;
+		BitList gTasks;
+		
+		PGlobalVariableSet(BitList gTasks, PDebugTarget debugTarget) {
+			this.gTasks = gTasks;
+			this.debugTarget = debugTarget;
+			initialize();
+		}
+		PDebugTarget getDebugTarget() {
+			if (debugTarget == null)
+				debugTarget = session.findDebugTarget(gTasks);
+			return debugTarget;
+		}
+		IPGlobalVariable[] getGlobals() {
+			if (fGlobals == null) {
+				try {
+					addGlobals(getInitialDescriptors());
+				}
+				catch(DebugException e) {
+					DebugPlugin.log(e);
+				}
+			}
+			return (IPGlobalVariable[])fGlobals.toArray(new IPGlobalVariable[fGlobals.size()]);
+		}
+		void addGlobals(IPGlobalVariableDescriptor[] descriptors) throws DebugException {
+			fGlobals = new ArrayList<IPGlobalVariable>(10);
+			MultiStatus ms = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), 0, "", null);
+			ArrayList<IPGlobalVariable> globals = new ArrayList<IPGlobalVariable>(descriptors.length);
+			for (int i = 0; i < descriptors.length; ++i) {
+				try {
+					globals.add(getDebugTarget().createGlobalVariable(descriptors[i]));
+				}
+				catch(DebugException e) {
+					ms.add(e.getStatus());
+				}
+			}
+			if (globals.size() > 0) {
+				synchronized(fGlobals) {
+					fGlobals.addAll(globals);
+				}
+				getDebugTarget().fireChangeEvent(DebugEvent.CONTENT);
+			}
+			if (!ms.isOK()) {
+				throw new DebugException(ms);
+			}
+		}
+		void removeGlobals(IPGlobalVariable[] globals) {
+			synchronized(fGlobals) {
+				fGlobals.removeAll(Arrays.asList(globals));
+			}
+			for (int i = 0; i < globals.length; ++i) {
+				if (globals[i] instanceof PVariable)
+					((PVariable)globals[i]).dispose();
+			}
+			getDebugTarget().fireChangeEvent(DebugEvent.CONTENT);
+		}
+		void removeAllGlobals() {
+			if (fGlobals == null) {
+				return;
+			}
+			IPGlobalVariable[] globals = new IPGlobalVariable[0];
+			synchronized(fGlobals) {
+				globals = (IPGlobalVariable[])fGlobals.toArray(new IPGlobalVariable[fGlobals.size()]);
+				fGlobals.clear();
+			}
+			for (int i = 0; i < globals.length; ++i) {
+				if (globals[i] instanceof PVariable)
+					((PVariable)globals[i]).dispose();
+			}
+			getDebugTarget().fireChangeEvent(DebugEvent.CONTENT);
+		}
+		void dispose() {
+			if (fGlobals != null) {
+				Iterator<IPGlobalVariable> it = fGlobals.iterator();
+				while(it.hasNext()) {
+					((PVariable)it.next()).dispose();
+				}
+				fGlobals.clear();
+				fGlobals = null;
+			}
+		}
+		String getMemento() {
+			Document document = null;
+			try {
+				document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+				Element node = document.createElement(GLOBAL_VARIABLE_LIST);
+				document.appendChild(node);
+				IPGlobalVariable[] globals = getGlobals();
+				for (int i = 0; i < globals.length; ++i) {
+					IPGlobalVariableDescriptor descriptor = globals[i].getDescriptor();
+					Element child = document.createElement(GLOBAL_VARIABLE);
+					child.setAttribute(ATTR_GLOBAL_VARIABLE_NAME, descriptor.getName());
+					child.setAttribute(ATTR_GLOBAL_VARIABLE_PATH, descriptor.getPath().toOSString());
+					node.appendChild(child);
+				}
+				return PDebugUtils.serializeDocument(document);
+			}
+			catch(ParserConfigurationException e) {
+				DebugPlugin.log(e);
+			}
+			catch(IOException e) {
+				DebugPlugin.log(e);
+			}
+			catch(TransformerException e) {
+				DebugPlugin.log(e);
+			}
+			return null;
+		}
+		void initializeFromMemento(String memento) throws CoreException {
+			Exception ex = null;
+			try {
+				Element root = null;
+				DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				StringReader reader = new StringReader(memento);
+				InputSource source = new InputSource(reader);
+				root = parser.parse(source).getDocumentElement();
+				if (root.getNodeName().equalsIgnoreCase(GLOBAL_VARIABLE_LIST)) {
+					List<IPGlobalVariableDescriptor> descriptors = new ArrayList<IPGlobalVariableDescriptor>();
+					NodeList list = root.getChildNodes();
+					int length = list.getLength();
+					for(int i = 0; i < length; ++i) {
+						Node node = list.item(i);
+						short type = node.getNodeType();
+						if (type == Node.ELEMENT_NODE) {
+							Element entry = (Element)node;
+							if (entry.getNodeName().equalsIgnoreCase(GLOBAL_VARIABLE)) {
+								String name = entry.getAttribute(ATTR_GLOBAL_VARIABLE_NAME);
+								String pathString = entry.getAttribute(ATTR_GLOBAL_VARIABLE_PATH);
+								IPath path = new Path(pathString);
+								if (path.isValidPath(pathString)) {
+									descriptors.add(PVariableFactory.createGlobalVariableDescriptor(name, path));
+								}
+							}
+						}
+					}
+					fInitialDescriptors = (IPGlobalVariableDescriptor[])descriptors.toArray(new IPGlobalVariableDescriptor[descriptors.size()]);
+					return;
+				}
+			}
+			catch(ParserConfigurationException e) {
+				ex = e;
+			}
+			catch(SAXException e) {
+				ex = e;
+			}
+			catch(IOException e) {
+				ex = e;
+			}
+			abort(InternalDebugCoreMessages.getString("PGlobalVariableManager.0"), ex);
+		}
+		void initialize() {
+			ILaunchConfiguration config = session.getLaunch().getLaunchConfiguration();
+			try {
+				String memento = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_GLOBAL_VARIABLES, "");
+				if (memento != null && memento.trim().length() != 0)
+					initializeFromMemento(memento);
+			}
+			catch(CoreException e) {
+				DebugPlugin.log(e);
+			}
+		}
+		IPGlobalVariableDescriptor[] getInitialDescriptors() {
+			return fInitialDescriptors;
+		}
+		IPGlobalVariableDescriptor[] getDescriptors() {
+			if (fGlobals == null)
+				return getInitialDescriptors();
+			IPGlobalVariableDescriptor[] result = new IPGlobalVariableDescriptor[fGlobals.size()];
+			Iterator<IPGlobalVariable> it = fGlobals.iterator();
+			for (int i = 0; it.hasNext(); ++i) {
+				result[i] = ((IPGlobalVariable)it.next()).getDescriptor();
+			}
+			return result;
+		}
+	}
 	private static final String GLOBAL_VARIABLE_LIST = "globalVariableList";
 	private static final String GLOBAL_VARIABLE = "globalVariable";
 	private static final String ATTR_GLOBAL_VARIABLE_PATH = "path";
 	private static final String ATTR_GLOBAL_VARIABLE_NAME = "name";
-	private PDebugTarget fDebugTarget;
-	private IGlobalVariableDescriptor[] fInitialDescriptors = new IGlobalVariableDescriptor[0];
-	private ArrayList<IPGlobalVariable> fGlobals;
 
-	public PGlobalVariableManager(PDebugTarget target) {
-		super();
-		setDebugTarget(target);
-		initialize();
+	protected Map<BitList, PGlobalVariableSet> fGlobalVariableSetMap;
+	private PSession session;
+
+	public PGlobalVariableManager(PSession session) {
+		this.session = session;
 	}
-	protected PDebugTarget getDebugTarget() {
-		return fDebugTarget;
+	public void initialize(IProgressMonitor monitor) {
+		fGlobalVariableSetMap = new Hashtable<BitList, PGlobalVariableSet>();
 	}
-	private void setDebugTarget(PDebugTarget debugTarget) {
-		fDebugTarget = debugTarget;
+	protected PSession getSession() {
+		return session;
 	}
-	public IPGlobalVariable[] getGlobals() {
-		if (fGlobals == null) {
-			try {
-				addGlobals(getInitialDescriptors());
-			} catch (DebugException e) {
-				DebugPlugin.log(e);
-			}
-		}
-		return (IPGlobalVariable[]) fGlobals.toArray(new IPGlobalVariable[fGlobals.size()]);
-	}
-	public void addGlobals(IGlobalVariableDescriptor[] descriptors) throws DebugException {
-		fGlobals = new ArrayList<IPGlobalVariable>(10);
-		MultiStatus ms = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), 0, "", null);
-		ArrayList<IPGlobalVariable> globals = new ArrayList<IPGlobalVariable>(descriptors.length);
-		for (int i = 0; i < descriptors.length; ++i) {
-			try {
-				globals.add(getDebugTarget().createGlobalVariable(descriptors[i]));
-			} catch (DebugException e) {
-				ms.add(e.getStatus());
-			}
-		}
-		if (globals.size() > 0) {
-			synchronized (fGlobals) {
-				fGlobals.addAll(globals);
-			}
-			getDebugTarget().fireChangeEvent(DebugEvent.CONTENT);
-		}
-		if (!ms.isOK()) {
-			throw new DebugException(ms);
-		}
-	}
-	public void removeGlobals(IPGlobalVariable[] globals) {
-		synchronized (fGlobals) {
-			fGlobals.removeAll(Arrays.asList(globals));
-		}
-		for (int i = 0; i < globals.length; ++i) {
-			if (globals[i] instanceof PVariable)
-				((PVariable) globals[i]).dispose();
-		}
-		getDebugTarget().fireChangeEvent(DebugEvent.CONTENT);
-	}
-	public void removeAllGlobals() {
-		IPGlobalVariable[] globals = new IPGlobalVariable[0];
-		synchronized (fGlobals) {
-			globals = (IPGlobalVariable[]) fGlobals.toArray(new IPGlobalVariable[fGlobals.size()]);
-			fGlobals.clear();
-		}
-		for (int i = 0; i < globals.length; ++i) {
-			if (globals[i] instanceof PVariable)
-				((PVariable) globals[i]).dispose();
-		}
-		getDebugTarget().fireChangeEvent(DebugEvent.CONTENT);
-	}
-	public void dispose() {
-		if (fGlobals != null) {
-			Iterator it = fGlobals.iterator();
-			while (it.hasNext()) {
-				((PVariable) it.next()).dispose();
-			}
-			fGlobals.clear();
-			fGlobals = null;
-		}
-	}
-	public String getMemento() {
-		Document document = null;
-		try {
-			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-			Element node = document.createElement(GLOBAL_VARIABLE_LIST);
-			document.appendChild(node);
-			IPGlobalVariable[] globals = getGlobals();
-			for (int i = 0; i < globals.length; ++i) {
-				IGlobalVariableDescriptor descriptor = globals[i].getDescriptor();
-				Element child = document.createElement(GLOBAL_VARIABLE);
-				child.setAttribute(ATTR_GLOBAL_VARIABLE_NAME, descriptor.getName());
-				child.setAttribute(ATTR_GLOBAL_VARIABLE_PATH, descriptor.getPath().toOSString());
-				node.appendChild(child);
-			}
-			return CDebugUtils.serializeDocument(document);
-		} catch (ParserConfigurationException e) {
-			DebugPlugin.log(e);
-		} catch (IOException e) {
-			DebugPlugin.log(e);
-		} catch (TransformerException e) {
-			DebugPlugin.log(e);
-		}
+	public Object getAdapter(Class adapter) {
+		if (adapter.equals(IPDISession.class))
+			return getSession();
+		if (adapter.equals(PGlobalVariableManager.class))
+			return this;
 		return null;
 	}
-	private void initializeFromMemento(String memento) throws CoreException {
-		Exception ex = null;
-		try {
-			Element root = null;
-			DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			StringReader reader = new StringReader(memento);
-			InputSource source = new InputSource(reader);
-			root = parser.parse(source).getDocumentElement();
-			if (root.getNodeName().equalsIgnoreCase(GLOBAL_VARIABLE_LIST)) {
-				List<IGlobalVariableDescriptor> descriptors = new ArrayList<IGlobalVariableDescriptor>();
-				NodeList list = root.getChildNodes();
-				int length = list.getLength();
-				for (int i = 0; i < length; ++i) {
-					Node node = list.item(i);
-					short type = node.getNodeType();
-					if (type == Node.ELEMENT_NODE) {
-						Element entry = (Element) node;
-						if (entry.getNodeName().equalsIgnoreCase(GLOBAL_VARIABLE)) {
-							String name = entry.getAttribute(ATTR_GLOBAL_VARIABLE_NAME);
-							String pathString = entry.getAttribute(ATTR_GLOBAL_VARIABLE_PATH);
-							IPath path = new Path(pathString);
-							if (path.isValidPath(pathString)) {
-								descriptors.add(PVariableFactory.createGlobalVariableDescriptor(name, path));
-							}
-						}
+	public void dispose(IProgressMonitor monitor) {
+		DebugPlugin.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				synchronized(fGlobalVariableSetMap) {
+					Iterator<PGlobalVariableSet> it = fGlobalVariableSetMap.values().iterator();
+					while(it.hasNext()) {
+						((PGlobalVariableSet)it.next()).dispose();
 					}
+					fGlobalVariableSetMap.clear();
 				}
-				fInitialDescriptors = (IGlobalVariableDescriptor[]) descriptors.toArray(new IGlobalVariableDescriptor[descriptors.size()]);
-				return;
 			}
-		} catch (ParserConfigurationException e) {
-			ex = e;
-		} catch (SAXException e) {
-			ex = e;
-		} catch (IOException e) {
-			ex = e;
-		}
-		abort(InternalDebugCoreMessages.getString("CGlobalVariableManager.0"), ex);
+		});
 	}
-	private void initialize() {
-		ILaunchConfiguration config = getDebugTarget().getLaunch().getLaunchConfiguration();
-		try {
-			String memento = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_GLOBAL_VARIABLES, "");
-			if (memento != null && memento.trim().length() != 0)
-				initializeFromMemento(memento);
-		} catch (CoreException e) {
-			DebugPlugin.log(e);
+	public PGlobalVariableSet getGlobalVariableSet(BitList qTasks) {
+		synchronized (fGlobalVariableSetMap) {
+			PGlobalVariableSet set = (PGlobalVariableSet)fGlobalVariableSetMap.get(qTasks);
+			if (set == null) {
+				set = new PGlobalVariableSet(qTasks, null);
+				fGlobalVariableSetMap.put(qTasks, set);
+			}
+			return set;
 		}
+	}
+	public IPGlobalVariable[] getGlobals(BitList qTasks) {
+		return getGlobalVariableSet(qTasks).getGlobals();
+	}
+	public void addGlobals(BitList qTasks, IPGlobalVariableDescriptor[] descriptors) throws DebugException {
+		getGlobalVariableSet(qTasks).addGlobals(descriptors);
+	}
+	public void removeGlobals(BitList qTasks, IPGlobalVariable[] globals) {
+		getGlobalVariableSet(qTasks).removeGlobals(globals);
+	}
+	public void removeAllGlobals(BitList qTasks) {
+		getGlobalVariableSet(qTasks).removeAllGlobals();
+	}
+	public void dispose(BitList qTasks) {
+		getGlobalVariableSet(qTasks).dispose();
+	}
+	public String getMemento(BitList qTasks) {
+		return getGlobalVariableSet(qTasks).getMemento();
 	}
 	private void abort(String message, Throwable e) throws CoreException {
 		IStatus s = new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, message, e);
 		throw new CoreException(s);
 	}
-	private IGlobalVariableDescriptor[] getInitialDescriptors() {
-		return fInitialDescriptors;
-	}
-	public void save() {
-		ILaunchConfiguration config = getDebugTarget().getLaunch().getLaunchConfiguration();
+	public void save(BitList qTasks) {
 		try {
+			String memto = getMemento(qTasks);
+			ILaunchConfiguration config = session.getLaunch().getLaunchConfiguration();
 			ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-			wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_GLOBAL_VARIABLES, getMemento());
+			wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_GLOBAL_VARIABLES, memto);
 			wc.doSave();
-		} catch (CoreException e) {
+		}
+		catch(CoreException e) {
 			DebugPlugin.log(e);
 		}
 	}
-	public IGlobalVariableDescriptor[] getDescriptors() {
-		if (fGlobals == null)
-			return getInitialDescriptors();
-		IGlobalVariableDescriptor[] result = new IGlobalVariableDescriptor[fGlobals.size()];
-		Iterator it = fGlobals.iterator();
-		for (int i = 0; it.hasNext(); ++i) {
-			result[i] = ((IPGlobalVariable) it.next()).getDescriptor();
-		}
-		return result;
+	public IPGlobalVariableDescriptor[] getDescriptors(BitList qTasks) {
+		return getGlobalVariableSet(qTasks).getDescriptors();
+	}
+	/****************************************
+	 * IPDIEventListener
+	 ****************************************/
+	public void handleDebugEvents(IPDIEvent[] events) {
 	}
 }

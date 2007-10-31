@@ -33,19 +33,19 @@ import java.util.ResourceBundle;
 
 public class SourceLookupMessages {
 
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.sourcelookup.SourceLookupMessages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.sourcelookup.SourceLookupMessages";
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle( BUNDLE_NAME );
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private SourceLookupMessages() {
 	}
 
-	public static String getString( String key ) {
+	public static String getString(String key) {
 		// TODO Auto-generated method stub
 		try {
-			return RESOURCE_BUNDLE.getString( key );
+			return RESOURCE_BUNDLE.getString(key);
 		}
-		catch( MissingResourceException e ) {
+		catch(MissingResourceException e) {
 			return '!' + key + '!';
 		}
 	}

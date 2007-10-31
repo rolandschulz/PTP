@@ -19,19 +19,18 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
- * @author Clement chu
- * 
+ * @author clement
+ *
  */
 public class PDebugElementState {
-	private final String fName;
-
+	private final String name;
+	
 	private PDebugElementState(String name) {
-		this.fName = name;
+		this.name = name;
 	}
 	public String toString() {
-		return this.fName;
+		return this.name;
 	}
-
 	public static final PDebugElementState UNDEFINED = new PDebugElementState("undefined");
 	public static final PDebugElementState TERMINATING = new PDebugElementState("terminating");
 	public static final PDebugElementState TERMINATED = new PDebugElementState("terminated");
