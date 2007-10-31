@@ -15,9 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
@@ -30,7 +28,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -42,10 +39,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 public class PDebuggerTab extends AbstractPDebuggerTab {
@@ -75,14 +69,12 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		IPDebugConfiguration[] debugConfigs;
 		String configPlatform = getPlatform(config);
 		debugConfigs = PTPDebugCorePlugin.getDefault().getDebugConfigurations();
-		Arrays.sort(debugConfigs, new Comparator() {
-			public int compare(Object o1, Object o2) {
-				IPDebugConfiguration ic1 = (IPDebugConfiguration)o1;
-				IPDebugConfiguration ic2 = (IPDebugConfiguration)o2;
+		Arrays.sort(debugConfigs, new Comparator<IPDebugConfiguration>() {
+			public int compare(IPDebugConfiguration ic1, IPDebugConfiguration ic2) {
 				return ic1.getName().compareTo(ic2.getName());
 			}
 		});
-		List list = new ArrayList();
+		List<IPDebugConfiguration> list = new ArrayList<IPDebugConfiguration>();
 		String mode;
 		if (fAttachMode) {
 			mode = IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH;
@@ -158,7 +150,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		IPDebugConfiguration debugConfig = getDebugConfig();
 		String mode = fAttachMode ? IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH : IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
 		if (!debugConfig.supportsMode(mode)) {
-			setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PDebuggerTab.Mode_not_supported"), new String[]{mode}));
+			setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PDebuggerTab.Mode_not_supported"), new Object[]{mode}));
 			return false;
 		}
 		if (super.isValid(config) == false) {

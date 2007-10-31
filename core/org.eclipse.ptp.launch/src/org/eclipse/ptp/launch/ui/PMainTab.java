@@ -19,6 +19,7 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.text.MessageFormat;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -178,15 +179,15 @@ public class PMainTab extends PLaunchConfigurationTab {
 			if (status.isOK()) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 				if (!project.exists()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_not_exits"), new String[] {name}));
+					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_not_exits"), new Object[] {name}));
 					return false;
 				}
 				if (!project.isOpen()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_is_closed"), new String[] {name}));
+					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_is_closed"), new Object[] {name}));
 					return false;
 				}
 			} else {
-				setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Illegal_project"), new String[]{status.getMessage()}));
+				setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Illegal_project"), new Object[]{status.getMessage()}));
 				return false;
 			}
 		}
