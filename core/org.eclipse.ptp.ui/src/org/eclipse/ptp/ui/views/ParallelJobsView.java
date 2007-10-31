@@ -461,7 +461,7 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	 * @param job
 	 */
 	public void doChangeJob(final IPJob job) {
-		asyncExec(new Runnable() {
+		syncExec(new Runnable() {
 			public void run() {
 				selectJob(job);
 				update();
@@ -793,11 +793,11 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			old.removeChildListener(jobChildListener);
 			old.removeElementListener(jobListener);
 		}
-		getJobManager().setJob(job);
 		if (job != null) {
 			job.addChildListener(jobChildListener);
 			job.addElementListener(jobListener);
 		}
+		getJobManager().setJob(job);
 		updateJobSet();
 	}
 }
