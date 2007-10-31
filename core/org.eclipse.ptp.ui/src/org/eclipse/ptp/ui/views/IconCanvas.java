@@ -750,6 +750,9 @@ public class IconCanvas extends Canvas {
 				case SWT.MouseMove:
 					handleMouseMove(event);
 					break;
+				case SWT.MouseHover:
+					handleMouseHover(event);
+					break;
 				case SWT.Paint:
 					handlePaint(event);
 					break;
@@ -769,7 +772,7 @@ public class IconCanvas extends Canvas {
 		addListener(SWT.MouseUp, listener);
 		addListener(SWT.MouseDoubleClick, listener);
 		addListener(SWT.MouseMove, listener);
-		//addListener(SWT.MouseHover, listener);
+		addListener(SWT.MouseHover, listener);
 		addListener(SWT.Paint, listener);
 		addListener(SWT.Resize, listener);
 		addListener(SWT.FocusOut, listener);
@@ -1822,14 +1825,10 @@ public class IconCanvas extends Canvas {
 		int index = findSelectedIndexByLocation(event.x, event.y, false);
 		if (index > -1) {
 			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
-			if (fInformationControl == null)
-				showToolTip(index, event);
-			
-			enableTooltipTimer();
 		} else {
 			setCursor(null);
-			hideToolTip();
 		}
+		hideToolTip();
 	}
 	/** Hide tooltip
 	 * 
@@ -2005,6 +2004,17 @@ public class IconCanvas extends Canvas {
 		if (index > -1) {
 			fireAction(IIconCanvasActionListener.DOUBLE_CLICK_ACTION, index);
 			redraw(index, index);
+		}
+	}
+	protected void handleMouseHover(Event event) {
+		int index = findSelectedIndexByLocation(event.x, event.y, false);
+		if (index > -1) {
+			if (fInformationControl == null)
+				showToolTip(index, event);
+			
+			enableTooltipTimer();
+		} else {
+			hideToolTip();
 		}
 	}
 	/** Handle mouse move event

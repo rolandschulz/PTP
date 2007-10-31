@@ -571,10 +571,10 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	public void doChangeJob(String job_id) {
 		doChangeJob(((JobManager)manager).findJobById(job_id));
 	}
-	public void doChangeJob(IPJob job) {
-		selectJob(job);
+	public void doChangeJob(final IPJob job) {
 		asyncExec(new Runnable() {
 			public void run() {
+				selectJob(job);
 				update();
 			}
 		});
