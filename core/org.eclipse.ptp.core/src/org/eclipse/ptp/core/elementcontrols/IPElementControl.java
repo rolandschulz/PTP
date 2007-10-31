@@ -30,7 +30,7 @@ import org.eclipse.search.ui.ISearchPageScoreComputer;
  * 
  * @author Nathan DeBardeleben
  */
-public interface IPElementControl extends IPElement/*, ISearchPageScoreComputer*/ {
+public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	// public String NAME_TAG = "";
 
 	/**
