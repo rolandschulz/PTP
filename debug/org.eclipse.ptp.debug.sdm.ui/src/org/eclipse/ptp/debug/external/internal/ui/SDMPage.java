@@ -14,13 +14,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.launch.IPTPRemoteLaunchConfigurationConstants;
-import org.eclipse.rse.core.RSECorePlugin;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,6 +37,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	private String errMsg = null;
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout(2, false));
@@ -52,15 +50,21 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		fRMDebuggerButton = createPushButton(comp, ExternalDebugUIMessages.getString("SDMDebuggerPage.remotedebugger"), null);
 		fRMDebuggerButton.addSelectionListener(new SelectionAdapter() {
 		    public void widgetSelected(SelectionEvent e) {
+				/*
 				String file = browseRemoteFile();
 				if (file != null) {
 					fRMDebuggerText.setText(file);
 			    	updateLaunchConfigurationDialog();
 				}
+				*/
 		    }
 		});
 		setControl(parent);
 	}
+	
+	/**
+	 * @param enabled
+	 */
 	private void enableRemoteSection(boolean enabled) {
 		fRMDebuggerText.setEnabled(enabled);
 		fRMDebuggerButton.setEnabled(enabled);
@@ -69,9 +73,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
 	}
+	
+	/**
+	 * @return
+	 */
+	/*
 	private String browseRemoteFile() {
 		IHost host = getHost(remoteHost);
 		if (host != null) {
@@ -86,6 +98,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 		return null;
 	}
+	*/
 	/*
 	private String browseRemoteDirectory() {
 		IHost host = getHost(getRemoteConnection().getHostname());
@@ -140,6 +153,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		return rmConnection;
 	}
 	*/
+	
+	/**
+	 * @param hostname
+	 * @return
+	 */
+	/*
 	private IHost getHost(String hostname) {
 		if (hostname == null)
 			return null;
@@ -151,6 +170,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 		return null;
 	}
+	*/
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
@@ -166,6 +186,10 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		setErrorMessage(errMsg);
 		return (errMsg == null);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 			remoteHost = configuration.getAttribute(IPTPRemoteLaunchConfigurationConstants.ATTR_REMOTE_CONNECTION, (String)null);
@@ -177,14 +201,26 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (remoteHost != null) {
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerText.getText()));
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+	 */
 	public String getName() {
 		return ExternalDebugUIMessages.getString("SDMDebuggerPage.debuggname");
 	}
+	
+    /**
+     * @param text
+     * @return
+     */
     protected String getFieldContent(String text) {
         if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
             return null;
