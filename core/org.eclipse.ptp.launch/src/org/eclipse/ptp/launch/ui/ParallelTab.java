@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,12 +26,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
@@ -153,45 +152,44 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		parallelComp.setLayoutData(gd);
 
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-		if (universe == null) {
-			return;
+		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe != null) {
+			IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
+			new Label(parallelComp, SWT.NONE).setText("Select resource manager:");
+			
+			resourceManagerCombo = new Combo(parallelComp, SWT.READ_ONLY);
+			for (int i = 0; i < rms.length; i++) {
+				resourceManagerCombo.add(rms[i].getName());
+				resourceManagers.put(i, rms[i]);
+				resourceManagerIndices.put(rms[i], i);
+			}
+			resourceManagerCombo.addSelectionListener(combosListener);
+	 
+			new Label(parallelComp, SWT.NONE).setText("Select queue:");
+			queueCombo = new Combo(parallelComp, SWT.READ_ONLY);
+	
+			final IResourceManager rm = rms.length > 0 ? rms[0] : null;
+			loadQueueCombo(rm);
+			
+			queueCombo.addSelectionListener(combosListener);
+	
+			// The composite that holds the RM's attributes for the launch configuration
+			Group attrGroup = new Group(parallelComp, SWT.SHADOW_ETCHED_IN);
+			attrGroup.setText("Launch Attributes");
+			gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+			gd.horizontalSpan = numColumns;
+			attrGroup.setLayoutData(gd);
+			GridLayout gridLayout = new GridLayout();
+			gridLayout.numColumns = 1;
+			attrGroup.setLayout(gridLayout);
+	
+			final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(attrGroup,
+					numColumns);
+			setLaunchAttrsScrollComposite(scrollComp);
+			
+			resourceManagerCombo.deselectAll();
 		}
-		
-		IResourceManager[] rms = getStartedResourceManagers(universe);
-		new Label(parallelComp, SWT.NONE).setText("Select resource manager:");
-		
-		resourceManagerCombo = new Combo(parallelComp, SWT.READ_ONLY);
-		for (int i = 0; i < rms.length; i++) {
-			resourceManagerCombo.add(rms[i].getName());
-			resourceManagers.put(i, rms[i]);
-			resourceManagerIndices.put(rms[i], i);
-		}
-		resourceManagerCombo.addSelectionListener(combosListener);
- 
-		new Label(parallelComp, SWT.NONE).setText("Select queue:");
-		queueCombo = new Combo(parallelComp, SWT.READ_ONLY);
-
-		final IResourceManager rm = rms.length > 0 ? rms[0] : null;
-		loadQueueCombo(rm);
-		
-		queueCombo.addSelectionListener(combosListener);
-
-		// The composite that holds the RM's attributes for the launch configuration
-		Group attrGroup = new Group(parallelComp, SWT.SHADOW_ETCHED_IN);
-		attrGroup.setText("Launch Attributes");
-		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.horizontalSpan = numColumns;
-		attrGroup.setLayoutData(gd);
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
-		attrGroup.setLayout(gridLayout);
-
-		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(attrGroup,
-				numColumns);
-		setLaunchAttrsScrollComposite(scrollComp);
-		
-		resourceManagerCombo.deselectAll();
  	}
 
 	/**
@@ -231,7 +229,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			loadQueueCombo(rm);
 			
 			IPQueue queue = getQueueFromName(rm, configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.QUEUE_NAME, EMPTY_STRING));
+					IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME, EMPTY_STRING));
 			if (queue != null) {
 				setErrorMessage(LaunchMessages.getResourceString(
 						"ParallelTab.Invalid_Queue"));
@@ -282,7 +280,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			loadQueueCombo(rm);
 			
 			IPQueue queue = getQueueFromName(rm, configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.QUEUE_NAME, EMPTY_STRING));
+					IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME, EMPTY_STRING));
 			if (queue == null) {
 				//TODO setErrorMessage(LaunchMessages.getResourceString(
                 //				"ParallelTab.Invalid_Queue"));
@@ -323,7 +321,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			return;
 		
 		setResourceManagerInConfiguration(configuration, rm);
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME,
 				getQueueNameFromCombo());
 		if (rm != null) {
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
@@ -356,7 +354,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		setResourceManagerInConfiguration(configuration, rm);
 		final IPQueue queue = getQueueDefault(rm);
 		final String queueName = (queue != null ? queue.getName() : "");
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME,
 				queueName);
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 		if (rmDynamicTab == null) {
@@ -428,6 +426,9 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return rmDynamicTab;
 	}
 
+	/**
+	 * @return
+	 */
 	private ScrolledComposite getLaunchAttrsScrollComposite() {
 		return launchAttrsScrollComposite;
 	}
@@ -435,10 +436,17 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	/**
 	 * @return the launchConfiguration
 	 */
+	/**
+	 * @return
+	 */
 	private ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfiguration;
 	}
 
+	/**
+	 * @param rm
+	 * @return
+	 */
 	private IPQueue getQueueDefault(IResourceManager rm) {
 		final IPQueue[] queues = rm.getQueues();
 		if (queues.length == 0) {
@@ -447,6 +455,9 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return queues[0];
 	}
 
+	/**
+	 * @return
+	 */
 	private IPQueue getQueueFromCombo() {
 		if (queueCombo != null) {
 			int i = queueCombo.getSelectionIndex();
@@ -455,6 +466,11 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return null;
 	}
 
+	/**
+	 * @param rm
+	 * @param queueName
+	 * @return
+	 */
 	private IPQueue getQueueFromName(IResourceManager rm, String queueName) {
 		if (rm == null) {
 			return null;
@@ -469,6 +485,9 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return null;
 	}
 
+	/**
+	 * @return
+	 */
 	private String getQueueNameFromCombo() {
 		IPQueue queue = getQueueFromCombo();
 		if (queue == null) {
@@ -477,19 +496,25 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return queue.getName();
 	}
 
+	/**
+	 * @return
+	 */
 	private IResourceManager getResourceManagerDefault() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-		if (universe == null) {
-			return null;
+		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe != null) {
+			IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
+			if (rms.length == 0) {
+				return null;
+			}
+			return rms[0];
 		}
-		
-		IResourceManager[] rms = getStartedResourceManagers(universe);
-		if (rms.length == 0) {
-			return null;
-		}
-		return rms[0];
+		return null;
 	}
 
+	/**
+	 * @return
+	 */
 	private IResourceManager getResourceManagerFromCombo() {
 		if (resourceManagerCombo != null) {
 			int i = resourceManagerCombo.getSelectionIndex();
@@ -499,31 +524,17 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	}
 
 	/**
+	 * Given a launch configuration, find the resource manager that was been selected.
+	 * 
 	 * @param configuration
-	 * @return
+	 * @return resource manager
 	 * @throws CoreException
 	 */
 	private IResourceManager getResourceManagerFromConfiguration(
 			ILaunchConfiguration configuration) throws CoreException {
 		final String rmUniqueName = configuration.getAttribute(
-						IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
-		return getResourceManagerFromUniqueName(rmUniqueName);
-	}
-
-	private IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-		if (universe == null) {
-			return null;
-		}
-		
-		IResourceManager[] rms = getStartedResourceManagers(universe);
-		
-		for (IResourceManager rm : rms) {
-			if (rm.getUniqueName().equals(rmUniqueName)) {
-				return rm;
-			}
-		}
-		return null;
+						IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
+		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
 	}
 	
 	/**
@@ -548,22 +559,6 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			}
 		}
 		return rmDynamicTabs.get(rm);
-	}
-
-	/**
-	 * @param universe
-	 * @return
-	 */
-	private IResourceManager[] getStartedResourceManagers(IPUniverse universe) {
-		IResourceManager[] rms = universe.getResourceManagers();
-		ArrayList<IResourceManager> startedRMs = 
-			new ArrayList<IResourceManager>(rms.length);
-		for (IResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
-				startedRMs.add(rm);
-			}
-		}
-		return startedRMs.toArray(new IResourceManager[startedRMs.size()]);
 	}
 
 	/**
@@ -633,14 +628,23 @@ public class ParallelTab extends PLaunchConfigurationTab {
         updateLaunchConfigurationDialog();
     }
 
+	/**
+	 * @param comp
+	 */
 	private void setLaunchAttrsScrollComposite(ScrolledComposite comp) {
 		this.launchAttrsScrollComposite = comp;
 	}
 
+	/**
+	 * @param configuration
+	 */
 	private void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
 	}
 
+	/**
+	 * @param queue
+	 */
 	private void setQueueComboSelection(IPQueue queue) {
 		final Integer results = queueIndices.get(queue);
 		int i = 0;
@@ -650,6 +654,9 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		queueSelectionChanged();
 	}
 
+	/**
+	 * @param rm
+	 */
 	private void setResourceManagerComboSelection(IResourceManager rm) {
 		final Integer results = resourceManagerIndices.get(rm);
 		int i = 0;
@@ -665,7 +672,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 */
 	private void setResourceManagerInConfiguration(ILaunchConfigurationWorkingCopy configuration,
 			final IResourceManager rm) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME,
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				rm.getUniqueName());
 	}
 
