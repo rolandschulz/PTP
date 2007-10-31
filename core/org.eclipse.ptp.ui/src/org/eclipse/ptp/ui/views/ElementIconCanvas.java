@@ -78,7 +78,8 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	 */
 	public void setElementSet(IElementSet e_set) {
 		this.cur_element_set = e_set;
-		getDisplay().syncExec(new Runnable() {
+		this.selection = null;
+		getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				setTotal(cur_element_set == null ? 0 : cur_element_set.size());
 			}
@@ -97,7 +98,7 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	public IElement getElement(int index) {
 		if (cur_element_set == null)
 			return null;
-		return cur_element_set.getSortedElements()[index];
+		return cur_element_set.getElement(index);
 	}
 	/** Get elements
 	 * @param indexes Element indexes
@@ -107,8 +108,8 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		if (cur_element_set == null)
 			return new IElement[0];
 		List<IElement> selectedElements = new ArrayList<IElement>();
-		for (int i = 0; i < indexes.length; i++) {
-			selectedElements.add(cur_element_set.get(indexes[i]));
+		for (int index : indexes) {
+			selectedElements.add(cur_element_set.getElement(index));
 		}
 		return (IElement[]) selectedElements.toArray(new IElement[0]);
 	}
@@ -116,7 +117,14 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	 * @return selected elements
 	 */
 	public IElement[] getSelectedElements() {
-		return getElements(getSelectedIndexes());
+		if (cur_element_set == null)
+			return new IElement[0];
+		IElement[] elements = new IElement[selectedElements.cardinality()];
+		for (int i = selectedElements.nextSetBit(0), j = 0; i >= 0; i = selectedElements.nextSetBit(i + 1), j++) {
+			elements[j] = cur_element_set.getElement(i);
+		}
+		return elements;
+		//return getElements(getSelectedIndexes());
 	}
 	
     public ISelection getSelection() {
@@ -138,11 +146,14 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
             });
         }
     }
-    public void setCurrentSelection(boolean sendEvent) {
-    	selection = new StructuredSelection(getSelectedElements());
+    public void setCurrentSelection(boolean sendEvent, IElement[] elements) {
+    	selection = new StructuredSelection(elements);
     	if (sendEvent) {
     		setSelection(selection);
     	}
+    }
+    public void setCurrentSelection(boolean sendEvent) {
+    	setCurrentSelection(sendEvent, getSelectedElements());
     }
 	protected void handleMouseUp(Event event) {
 		super.handleMouseUp(event);

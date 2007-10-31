@@ -18,12 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,6 +49,7 @@ import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
@@ -52,6 +59,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
@@ -60,14 +68,11 @@ import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
-import org.eclipse.ptp.internal.ui.actions.RemoveSelectedJobAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -83,19 +88,159 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * @author Clement chu
  * Additional changes Greg Watson
  * 
  */
-public class ParallelJobsView extends AbstractParallelSetView implements 
-	IModelManagerChildListener, IResourceManagerChildListener, 
-	IQueueChildListener, IJobChildListener {
-	// view flag
-	public static final String BOTH_VIEW = "0";
-	public static final String JOB_VIEW = "1";
-	public static final String PRO_VIEW = "2";
+public class ParallelJobsView extends AbstractParallelSetView {
+	private final class MMChildListener implements IModelManagerChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+		 */
+		public void handleEvent(IChangedResourceManagerEvent e) {
+			// Don't need to do anything
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
+		 */
+		public void handleEvent(INewResourceManagerEvent e) {
+			/*
+			 * Add resource manager child listener so we get notified when new
+			 * machines are added to the model.
+			 */
+			final IResourceManager rm = e.getResourceManager();
+	        rm.addChildListener(resourceManagerListener);
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
+		 */
+		public void handleEvent(IRemoveResourceManagerEvent e) {
+			/*
+			 * Removed resource manager child listener when resource manager is removed.
+			 */
+			e.getResourceManager().removeChildListener(resourceManagerListener);
+		}		
+	}
+	private final class RMChildListener implements IResourceManagerChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
+		 */
+		public void handleEvent(IChangedMachineEvent e) {
+			// Don't need to do anything
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+		 */
+		public void handleEvent(IChangedQueueEvent e) {
+			// Can safely ignore
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent)
+		 */
+		public void handleEvent(INewMachineEvent e) {
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
+		 */
+		public void handleEvent(INewQueueEvent e) {
+			for (IPQueue queue : e.getQueues()) {
+				queue.addChildListener(queueChildListener);
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
+		 */
+		public void handleEvent(IRemoveMachineEvent e) {
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+		 */
+		public void handleEvent(IRemoveQueueEvent e) {
+			for (IPQueue queue : e.getQueues()) {
+				queue.removeChildListener(queueChildListener);
+			}
+		}
+	}
+	private final class JobChildListener implements IJobChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
+		 */
+		public void handleEvent(IChangedProcessEvent e) {
+			if (e.getSource() instanceof IPJob) {
+				if (!((IPJob)e.getSource()).isDebug())
+					refresh(true);
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
+		 */
+		public void handleEvent(INewProcessEvent e) {
+			if (e.getSource() instanceof IPJob) {
+				System.err.println("----------------- IJobChildListener - INewProcessEvent: " + this);
+				for (IPProcess proc : e.getProcesses()) {
+					getJobManager().addProcess(proc);
+				}
+				boolean isCurrent = e.getSource().getID().equals(getCurrentID());
+				if (isCurrent) {
+					updateJobSet();
+					changeJobRefresh((IPJob)e.getSource());
+				}
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+		 */
+		public void handleEvent(IRemoveProcessEvent e) {
+			if (e.getSource() instanceof IPJob) {
+				boolean isCurrent = e.getSource().getID().equals(getCurrentID());
+				for (IPProcess proc : e.getProcesses()) {
+					getJobManager().removeProcess(proc);
+				}
+				if (isCurrent) {
+					updateJobSet();
+					changeJobRefresh((IPJob)e.getSource());
+				}
+			}
+		}
+	}
+	private final class QueueChildListener implements IQueueChildListener {
+		public void handleEvent(IChangedJobEvent e) {
+			//refresh(true);
+		}
+		public void handleEvent(INewJobEvent e) {
+			System.err.println("----------------- QueueChildListener - INewJobEvent: " + this);
+			for (IPJob job : e.getJobs()) {
+				getJobManager().createElementHandler(job);
+				changeJobRefresh(job, true);
+			}
+		}
+		public void handleEvent(IRemoveJobEvent e) {
+			System.err.println("----------------- QueueChildListener - IRemoveJobEvent: " + this);
+			for (IPJob job : e.getJobs()) {
+				getJobManager().removeJob(job);
+			}
+			changeJobRefresh(null, true);
+		}
+	}
+	private final class JobListener implements IJobListener {
+		public void handleEvent(IJobChangeEvent e) {
+			System.err.println("----------------- JobListener - IJobChangeEvent: " + this);
+			changeJobRefresh(e.getSource(), true);			
+		}
+	}
+	
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// composite
@@ -106,52 +251,55 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 	// action
 	// protected ParallelAction changeJobViewAction = null;
 	protected ParallelAction terminateAllAction = null;
+	// view flag
+	public static final String BOTH_VIEW = "0";
+	public static final String JOB_VIEW = "1";
+	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
-
-	public ParallelJobsView() {
-		this(PTPUIPlugin.getDefault().getJobManager());
-	}
 	
+	protected JobViewUpdateWorkbenchJob jobViewUpdateJob = new JobViewUpdateWorkbenchJob();
+
+	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
+	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IJobChildListener jobChildListener = new JobChildListener();
+	private final IQueueChildListener queueChildListener = new QueueChildListener();
+	private final IJobListener jobListener = new JobListener();
+
 	/** Constructor
 	 * 
 	 */
 	public ParallelJobsView(IManager manager) {
 		super(manager);
-		
+	}
+	
+	public ParallelJobsView() {
+		this(PTPUIPlugin.getDefault().getJobManager());
+	}
+	
+	public void dispose() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
-		
-		/*
-		 * Add us to any existing RM's and queues. I guess it's possible we could
-		 * miss a RM or queue if a new event arrives while we're doing this, but is 
-		 * it a problem?
-		 */
-		for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
-			for (IPQueue queue : rm.getQueues()) {
-				queue.addChildListener(this);
-			}
-			rm.addChildListener(this);
-		}
-		mm.addListener(this);
-	}
-	
-	/** Change job
-	 * @param job_id Job ID
-	 */
-	public void changeJob(final String job_id) {
-		IPJob job = ((JobManager)manager).findJobById(job_id);
-		changeJobRefresh(job);
-	}
-	
-	public void changeJobRefresh(final IPJob job) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				if (!elementViewComposite.isDisposed()) {
-					changeJob(job);
-					jobTableViewer.refresh(true);
-					jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
+		synchronized (mm) {
+		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+				for (IPQueue queue : rm.getQueues()) {
+					for (IPJob job : queue.getJobs()) {
+						job.removeChildListener(jobChildListener);
+						job.removeElementListener(jobListener);
+					}
+					queue.removeChildListener(queueChildListener);
 				}
-			}
-		});
+		    	rm.removeChildListener(resourceManagerListener);
+		    }
+		    mm.removeListener(modelManagerListener);
+		}
+		elementViewComposite.dispose();
+		super.dispose();
+	}
+	
+	/** Get current view flag
+	 * @return flag of view
+	 */
+	public String getCurrentView() {
+		return current_view;
 	}
 	
 	/** Change view
@@ -174,45 +322,30 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 		}
 	}
 	
-	public void dispose() {
-		PTPCorePlugin.getDefault().getModelManager().removeListener(this);
-		elementViewComposite.dispose();
-		super.dispose();
-	}
-	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
-	public void doubleClick(IElement element) {
-		openProcessViewer(getJobManager().findProcess(element.getID()));
-	}
-	
-	/** Get selected job
-	 * @return selected job
-	 */
-	public IPJob getCheckedJob() {
-		String job_id = getCurrentID();
-		if (!((JobManager)manager).isNoJob(job_id))
-			return ((JobManager)manager).findJobById(job_id);
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
-	 */
-	public synchronized String getCurrentID() {
-		IPJob job = getJobManager().getJob();
-		if (job != null) {
-			return job.getID();
+	protected void initialElement() {
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		/*
+		 * Add us as a child listener to any existing queue
+		 */
+		for (IResourceManager rm : universe.getResourceManagers()) {
+			for (IPQueue queue : rm.getQueues()) {
+				queue.addChildListener(queueChildListener);
+			}
 		}
-		return IManager.EMPTY_ID;
+		
+		manager.initial(universe);
+		changeJobRefresh(null, true);
 	}
 	
-	/** Get current view flag
-	 * @return flag of view
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialView()
 	 */
-	public String getCurrentView() {
-		return current_view;
+	protected void initialView() {
+		initialElement();
+		//update();
 	}
 	
 	/* (non-Javadoc)
@@ -222,16 +355,151 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 		return ParallelImages.procImages[index1][index2];
 	}
 	
-	public IPQueue getQueue() {
-		return getJobManager().getQueue();
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse.swt.widgets.Composite)
+	 */
+	protected void createView(Composite parent) {
+		parent.setLayout(new FillLayout(SWT.VERTICAL));
+		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashForm = new SashForm(parent, SWT.HORIZONTAL);
+		sashForm.setLayout(new FillLayout(SWT.VERTICAL));
+		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+		jobTableViewer = new TableViewer(sashForm, SWT.SINGLE | SWT.BORDER);
+		jobTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+		jobTableViewer.setLabelProvider(new LabelProvider() {
+			public String getText(Object element) {
+				if (element instanceof IPJob) {
+					return ((IPJob) element).getName();
+				}
+				return "";
+			}
+			public Image getImage(Object element) {
+				if (element instanceof IPJob) {
+					IPJob job = (IPJob) element;
+					return ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0];
+				}
+				return null;
+			}
+		});
+		jobTableViewer.setContentProvider(new IStructuredContentProvider() {
+			public void dispose() {}
+			public Object[] getElements(Object inputElement) {
+				if (inputElement instanceof JobManager)
+					return ((JobManager) inputElement).getJobs();
+				return new Object[0];
+			}
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		});
+		jobTableViewer.setSorter(new ViewerSorter() {
+			public int compare(Viewer viewer, Object j1, Object j2) {
+				return ((IPJob)j1).getName().compareTo(((IPJob)j2).getName());
+			}
+		});
+		jobTableViewer.setInput(manager);
+		jobTableViewer.getTable().addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				ISelection selection = jobTableViewer.getSelection();
+				TableItem item = jobTableViewer.getTable().getItem(new Point(e.x, e.y));
+				if (item == null && !selection.isEmpty()) {
+					jobTableViewer.getTable().deselectAll();
+					doChangeJob((IPJob) null);
+				}
+				else if (item != null) {
+					IPJob job = (IPJob)item.getData();
+					if (job == null) {
+						doChangeJob((IPJob) null);
+					}
+					else if (selection.isEmpty()) {
+						doChangeJob(job);
+					}
+					else {
+						String cur_id = getCurrentID();
+						if (cur_id == null || !cur_id.equals(job.getID())) {
+							doChangeJob(job);
+						}
+					}
+				}
+			}
+		});
+		// ----------------------------------------------------------------------
+		// Enable property sheet updates when tree items are selected.
+		// Note for this to work each item in the tree must either implement
+		// IPropertySource, or support IPropertySource.class as an adapter type
+		// in its AdapterFactory.
+		// ----------------------------------------------------------------------
+		getSite().setSelectionProvider(jobTableViewer);
+		
+		createJobContextMenu();
+		elementViewComposite = createElementView(sashForm);
+		changeView(current_view);
+
+		/*
+		 * Wait until the view has been created before registering for events
+		 */
+		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+		synchronized (mm) {
+		    /*
+		     * Add us to any existing RM's. I guess it's possible we could
+		     * miss a RM if a new event arrives while we're doing this, but is 
+		     * it a problem?
+		     */
+		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		        rm.addChildListener(resourceManagerListener);
+		    }
+		    mm.addListener(modelManagerListener);
+		}
 	}
 	
-	public String getQueueID() {
-		IPQueue queue = getQueue();
-		if (queue != null) {
-			return queue.getID();
-		}
-		return IManager.EMPTY_ID;
+	/** Create Job context menu
+	 * 
+	 */
+	protected void createJobContextMenu() {
+		MenuManager menuMgr = new MenuManager("#jobpopupmenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				manager.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
+				manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
+				fillJobContextMenu(manager);
+			}
+		});
+		Menu menu = menuMgr.createContextMenu(jobTableViewer.getTable());
+		jobTableViewer.getTable().setMenu(menu);
+	}
+	
+	/** Create job context menu
+	 * @param menuManager
+	 */
+	protected void fillJobContextMenu(IMenuManager menuManager) {
+		ParallelAction removeAllTerminatedAction = new RemoveAllTerminatedAction(this);
+		removeAllTerminatedAction.setEnabled(getJobManager().hasStoppedJob());
+		menuManager.add(removeAllTerminatedAction);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
+	 */
+	protected void createToolBarActions(IToolBarManager toolBarMgr) {
+		terminateAllAction = new TerminateJobAction(this);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
+		super.buildInToolBarActions(toolBarMgr);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
+	 */
+	public void doubleClick(IElement element) {
+		openProcessViewer(getJobManager().findProcess(element.getID()));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
+	 */
+	protected Object convertElementObject(IElement element) {
+		if (element == null)
+			return null;
+		
+		return getJobManager().findProcess(element.getID());
 	}
 	
 	/* (non-Javadoc)
@@ -239,10 +507,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 	 */
 	public String getRulerIndex(Object obj, int index) {
 		if (obj instanceof IElement) {
-			Object procObj = convertElementObject((IElement)obj);
-			if (procObj instanceof IPProcess) {
-				return ((IPProcess)procObj).getProcessIndex();
-			}
+			return ((IElement)obj).getName();
 		}
 		return super.getRulerIndex(obj, index);
 	}
@@ -276,172 +541,79 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
-	public void handleEvent(final IChangedProcessEvent e) {
-		refresh(true);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
-	 */
-	public void handleEvent(final IRemoveProcessEvent e) {
-		if (e.getSource() instanceof IPJob) {
-			final boolean isCurrent = e.getSource().equals(getCurrentID());
-			
-			for (IPProcess process : e.getProcesses()) {
-				getJobManager().removeProcess(process);
-			}
-			
-			if (isCurrent) {
-				UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-					public void run() {
-						updateJobSet();
-						repaint(true);
-					}
-				});
-			}
+	public synchronized String getCurrentID() {
+		IPJob job = getJobManager().getJob();
+		if (job != null) {
+			return job.getID();
 		}
+		return IManager.EMPTY_ID;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+	/** Change job
+	 * @param job_id Target job ID
 	 */
-	public void handleEvent(IChangedResourceManagerEvent e) {
-		// Don't need to do anything
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
-	 */
-	public void handleEvent(INewResourceManagerEvent e) {
-		e.getResourceManager().addChildListener(this);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-	 */
-	public void handleEvent(IRemoveResourceManagerEvent e) {
-		e.getResourceManager().removeChildListener(this);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
-	 */
-	public void handleEvent(final INewJobEvent e) {
-		for (IPJob job : e.getJobs()) {
-			changeJobRefresh(job);
+	protected void selectJob(IPJob job) {
+		IPJob old = getJobManager().getJob();
+		if (old != null) {
+			old.removeChildListener(jobChildListener);
+			old.removeElementListener(jobListener);
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewMachineEvent)
-	 */
-	public void handleEvent(INewMachineEvent e) {
-		// Don't need to do anything
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobNewProcessEvent)
-	 */
-	public void handleEvent(final INewProcessEvent e) {
-		final boolean isCurrent = e.getSource().getID().equals(getCurrentID());
-		
-		for (IPProcess process : e.getProcesses()) {
-			getJobManager().addProcess(process);
+		getJobManager().setJob(job);
+		if (job != null) {
+			job.addChildListener(jobChildListener);
+			job.addElementListener(jobListener);
 		}
-		
-		// FIXME: make JobManager thread safe so we can get rid
-		// of this safeRunAsyncInUIThread stuff!
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+		updateJobSet();
+	}
+	
+	public void doChangeJob(String job_id) {
+		doChangeJob(((JobManager)manager).findJobById(job_id));
+	}
+	public void doChangeJob(IPJob job) {
+		selectJob(job);
+		asyncExec(new Runnable() {
 			public void run() {
-				if (isCurrent) {
-					updateJobSet();
-					repaint(true);
-				}
+				update();
 			}
-		});	
+		});
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent)
-	 */
-	public void handleEvent(INewQueueEvent e) {
-		for (IPQueue queue : e.getQueues()) {
-			queue.addChildListener(this);
+	public void changeJobRefresh(IPJob job, boolean force) {
+		IPJob cur_job = getJobManager().getJob();
+		ISelection selection = null;
+		if (cur_job == null && job != null) {
+			doChangeJob(job);
+			selection = new StructuredSelection(job);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent)
-	 */
-	public void handleEvent(final IChangedJobEvent e) {
-		refresh(true);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
-	 */
-	public void handleEvent(final IRemoveJobEvent e) {
-		for (IPJob job : e.getJobs()) {
-			getJobManager().removeJob(job);
+		else if (cur_job != null && job == null) {
+			doChangeJob((IPJob)null);
+			selection = new StructuredSelection();
 		}
-		
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			public void run() {
-				changeJobRefresh(null);
+		else if (cur_job != null && job != null) {
+			if (!cur_job.getID().equals(job.getID())) {
+				doChangeJob(job);
 			}
-		});	
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
-	 */
-	public void handleEvent(IChangedMachineEvent e) {
-		// Don't need to do anything
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
-	 */
-	public void handleEvent(IChangedQueueEvent e) {
-		// Don't need to do anything
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
-	 */
-	public void handleEvent(IRemoveMachineEvent e) {
-		// Don't need to do anything
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
-	 */
-	public void handleEvent(IRemoveQueueEvent e) {
-		for (IPQueue queue : e.getQueues()) {
-			queue.removeChildListener(this);
+			selection = new StructuredSelection(job);
+		}
+		else { //cur_job == null && job == null
+			selection = new StructuredSelection();
+		}
+		if (isVisible()) {
+			jobViewUpdateJob.schedule(selection, force);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
-	 */
-	public void repaint(boolean all) {
-		if (all) {
-			if (!jobTableViewer.getTable().isDisposed()) {
-				jobTableViewer.refresh(true);
-			}
-		}
-		update();
+	public void changeJobRefresh(IPJob job) {
+		changeJobRefresh(job , false);
 	}
 	
-	public void setFocus() {
-		super.setFocus();
-		IPJob job = getCheckedJob();
-		if (job == null) {
-			changeJob((String)null);
-		}
+	/** Update Job
+	 * 
+	 */
+	public void updateJobSet() {
+		IElementHandler setManager = getCurrentElementHandler();
+		selectSet(setManager == null ? null : setManager.getSetRoot());
 	}
 	
 	/* (non-Javadoc)
@@ -459,193 +631,110 @@ public class ParallelJobsView extends AbstractParallelSetView implements
 			}
 		}
 	}
-	
-	/** Update Job
-	 * 
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
 	 */
-	public void updateJobSet() {
-		IElementHandler setManager = getCurrentElementHandler();
-		selectSet(setManager == null ? null : setManager.getSetRoot());
-	}
-	
-	private JobManager getJobManager() {
-		return ((JobManager) manager);
-	}
-	
-	/** Change job
-	 * @param job
-	 */
-	protected void changeJob(final IPJob job) {
-		selectJob(job);
-		//updateAction();
+	public void repaint(boolean all) {
+		if (all) {
+			if (!jobTableViewer.getTable().isDisposed()) {
+				jobTableViewer.refresh(true);
+			}
+		}
 		update();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
-	 */
-	protected Object convertElementObject(IElement element) {
-		if (element == null)
-			return null;
-		
-		return getJobManager().findProcess(element.getID());
+	protected JobManager getJobManager() {
+		return ((JobManager) manager);
 	}
 	
-	/** Create Job context menu
-	 * 
-	 */
-	protected void createJobContextMenu() {
-		MenuManager menuMgr = new MenuManager("#jobpopupmenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				manager.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
-				manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
-				fillJobContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(jobTableViewer.getTable());
-		jobTableViewer.getTable().setMenu(menu);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
-	 */
-	protected void createToolBarActions(IToolBarManager toolBarMgr) {
-		terminateAllAction = new TerminateJobAction(this);
-		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
-		super.buildInToolBarActions(toolBarMgr);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse.swt.widgets.Composite)
-	 */
-	protected void createView(Composite parent) {
-		parent.setLayout(new FillLayout(SWT.VERTICAL));
-		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashForm = new SashForm(parent, SWT.HORIZONTAL);
-		sashForm.setLayout(new FillLayout(SWT.VERTICAL));
-		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobTableViewer = new TableViewer(sashForm, SWT.SINGLE | SWT.BORDER);
-		jobTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobTableViewer.setLabelProvider(new LabelProvider() {
-			public Image getImage(Object element) {
-				if (element instanceof IPJob) {
-					IPJob job = (IPJob) element;
-					return ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0];
-				}
-				return null;
-			}
-			public String getText(Object element) {
-				if (element instanceof IPJob) {
-					return ((IPJob) element).getName();
-				}
-				return "";
-			}
-		});
-		jobTableViewer.setContentProvider(new IStructuredContentProvider() {
-			public void dispose() {}
-			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof AbstractUIManager)
-					return ((JobManager) inputElement).getJobs();
-				return new Object[0];
-			}
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-		});
-		jobTableViewer.setSorter(new ViewerSorter() {
-			public int compare(Viewer viewer, Object j1, Object j2) {
-				return ((IPJob)j1).getName().compareTo(((IPJob)j2).getName());
-			}
-		});
-		jobTableViewer.setInput(manager);
-		jobTableViewer.getTable().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				ISelection selection = jobTableViewer.getSelection();
-				TableItem item = jobTableViewer.getTable().getItem(new Point(e.x, e.y));
-				if (item == null && !selection.isEmpty()) {
-					jobTableViewer.getTable().deselectAll();
-					changeJob((IPJob) null);
-				}
-				else if (item != null) {
-					IPJob job = (IPJob)item.getData();
-					if (job == null) {
-						changeJob((IPJob) null);
-					}
-					else if (selection.isEmpty()) {
-						changeJob(job);
-					}
-					else {
-						String cur_id = getCurrentID();
-						if (cur_id == null || !cur_id.equals(job.getID())) {
-							changeJob(job);
-						}
-					}
-				}
-			}
-		});
-		// ----------------------------------------------------------------------
-		// Enable property sheet updates when tree items are selected.
-		// Note for this to work each item in the tree must either implement
-		// IPropertySource, or support IPropertySource.class as an adapter type
-		// in its AdapterFactory.
-		// ----------------------------------------------------------------------
-		getSite().setSelectionProvider(jobTableViewer);
-		
-		createJobContextMenu();
-		elementViewComposite = createElementView(sashForm);
-		changeView(current_view);
-	}
-	
-	/** Create job context menu
-	 * @param menuManager
-	 */
-	protected void fillJobContextMenu(IMenuManager menuManager) {
-		ISelection selection;
-		IPJob selectedJob;
-
-		ParallelAction removeAllTerminatedAction = new RemoveAllTerminatedAction(this);
-		removeAllTerminatedAction.setEnabled(getJobManager().hasStoppedJob());
-		menuManager.add(removeAllTerminatedAction);
-		selection = jobTableViewer.getSelection();
-		if (selection != null) {
-			selectedJob = (IPJob) ((IStructuredSelection) selection).getFirstElement();
-			if (selectedJob != null && selectedJob.isTerminated()) {
-				ParallelAction removeSelectedJobAction = new RemoveSelectedJobAction(this, jobTableViewer);
-				removeSelectedJobAction.setEnabled(true);
-				menuManager.add(removeSelectedJobAction);
-			}
+	public void setFocus() {
+		super.setFocus();
+		IPJob job = getJobManager().getJob();
+		if (job == null) {
+			changeJobRefresh(null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
-	 */
-	protected void initialElement() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		changeJobRefresh((IPJob) manager.initial(universe));
+	
+	public IPQueue getQueue() {
+		return getJobManager().getQueue();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialView()
-	 */
-	protected void initialView() {
-		initialElement();
-		//update();
-		refresh(true);
+	
+	public String getQueueID() {
+		IPQueue queue = getQueue();
+		if (queue != null) {
+			return queue.getID();
+		}
+		return IManager.EMPTY_ID;
 	}
-
-	/** Change job
-	 * @param job_id Target job ID
-	 */
-	protected void selectJob(IPJob job) {
-		IPJob old = getJobManager().getJob();
-		if (old != null) {
-			old.removeChildListener(this);
+	
+	class JobViewUpdateWorkbenchJob extends WorkbenchJob {
+		private final ReentrantLock	waitLock = new ReentrantLock();
+		private List<ISelection> refreshJobList = new ArrayList<ISelection>();
+		public JobViewUpdateWorkbenchJob() {
+			super("Refreshing job view...");
 		}
-		getJobManager().setJob(job);
-		if (job != null) {
-			job.addChildListener(this);			
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			if (size() == 0)
+				return Status.CANCEL_STATUS;
+			
+			ISelection selection = getLastJobSelection();
+			System.err.println("============= JobViewUpdateWorkbenchJob refresh: " + selection);
+			if (!jobTableViewer.getTable().isDisposed()) {
+				jobTableViewer.setSelection(selection, true);
+				jobTableViewer.refresh(true);
+			}
+			
+			//if last refresh object is true and previous refresh is false, then refresh again 
+			ISelection lastSelection = getLastJobSelection();
+			waitLock.lock();
+			try {
+				refreshJobList.clear();
+				if (!selection.equals(lastSelection)) {
+					refreshJobList.add(lastSelection);
+					schedule();
+				}
+			}
+			finally {
+				waitLock.unlock();
+			}
+			return Status.OK_STATUS;
 		}
-		updateJobSet();
+		public boolean shouldSchedule() {
+			int size = size();
+			System.err.println("============= JobViewUpdateWorkbenchJob: " + refreshJobList.size());
+			return (size == 1);
+		}
+		private int size() {
+			waitLock.lock();
+			try {
+				return refreshJobList.size();
+			}
+			finally {
+				waitLock.unlock();
+			}
+		}
+		private ISelection getLastJobSelection() {
+			waitLock.lock();
+			try {
+				return refreshJobList.get(refreshJobList.size()-1);
+			}
+			finally {
+				waitLock.unlock();
+			}
+		}
+		public void schedule(ISelection selection, boolean force) {
+			waitLock.lock();
+			try {
+				if (force)
+					refreshJobList.clear();
+				if (!refreshJobList.contains(selection))
+					refreshJobList.add(selection);
+			}
+			finally {
+				waitLock.unlock();
+			}
+			schedule();
+		}
 	}
 }

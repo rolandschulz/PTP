@@ -54,9 +54,9 @@ public abstract class AbstractUIManager implements IManager {
 	 */
 	public void shutdown() {
 		setListeners.clear();
-		setListeners = null;
 		jListeners.clear();
-		jListeners = null;
+		//setListeners = null;
+		//jListeners = null;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
@@ -130,17 +130,14 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public void addToSet(IElement[] elements, IElementSet set) {
-		for (int i = 0; i < elements.length; i++) {
-			set.add(elements[i]);
-		}
+		set.addElements(elements);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public void addToSet(IElement[] elements, String setID, IElementHandler elementHandler) {
-		IElementSet set = elementHandler.getSet(setID);
+		IElementSet set = (IElementSet)elementHandler.getElementByID(setID);
 		addToSet(elements, set);
-		updateMatchElementSets(set, elementHandler);
 		fireSetEvent(ADD_ELEMENT_TYPE, elements, set, null);
 	}
 	/* (non-Javadoc)
@@ -149,8 +146,7 @@ public abstract class AbstractUIManager implements IManager {
 	public String createSet(IElement[] elements, String setID, String setName, IElementHandler elementHandler) {
 		IElementSet set = new ElementSet(elementHandler, setID, setName);
 		addToSet(elements, set);
-		elementHandler.add(set);
-		updateMatchElementSets(set, elementHandler);
+		elementHandler.addElements(new IElement[] { set });
 		fireSetEvent(CREATE_SET_TYPE, elements, set, null);
 		return set.getID();
 	}
@@ -158,42 +154,19 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#removeSet(java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public void removeSet(String setID, IElementHandler elementHandler) {
-		IElementSet set = elementHandler.getSet(setID);
-		String[] sets = set.getMatchSets();
-		for (int i = 0; i < sets.length; i++) {
-			elementHandler.getSet(sets[i]).removeMatchSet(setID);
-		}
-		elementHandler.remove(setID);
+		IElementSet set = (IElementSet)elementHandler.getElementByID(setID);
+		elementHandler.removeElements(new IElement[] { set });
 		fireSetEvent(DELETE_SET_TYPE, null, set, null);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeFromSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler) {
-		IElementSet set = elementHandler.getSet(setID);
-		for (int i = 0; i < elements.length; i++) {
-			set.remove(elements[i]);
-		}
-		updateMatchElementSets(set, elementHandler);
+		IElementSet set = (IElementSet)elementHandler.getElementByID(setID);
+		set.removeElements(elements);
 		fireSetEvent(REMOVE_ELEMENT_TYPE, elements, set, null);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#updateMatchElementSets(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementHandler)
-	 */
-	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler) {
-		IElementSet[] sets = elementHandler.getSortedSets();
-		for (int i = 0; i < sets.length; i++) {
-			if (sets[i].getID().equals(targetSet.getID()))
-				continue;
-			IElement[] elements = sets[i].getElements();
-			for (int j = 0; j < elements.length; j++) {
-				if (targetSet.contains(elements[j].getID())) {
-					targetSet.addMatchSet(sets[i].getID());
-					sets[i].addMatchSet(targetSet.getID());
-					break;
-				}
-			}
-		}
+		if (set.size() == 0)
+			removeSet(setID, elementHandler);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(org.eclipse.ptp.ui.model.IElement)

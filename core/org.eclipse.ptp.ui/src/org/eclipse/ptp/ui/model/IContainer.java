@@ -21,6 +21,7 @@ package org.eclipse.ptp.ui.model;
 import java.util.Collection;
 
 /**
+ * @deprecated
  * @author clement chu
  *
  */

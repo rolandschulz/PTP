@@ -417,7 +417,6 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 	}
 	
 	public void dispose() {
-		PTPCorePlugin.getDefault().getModelManager().removeListener(this);
 		elementViewComposite.dispose();
 		super.dispose();
 	}
@@ -441,8 +440,7 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 			/*
 			 * Now register the new element
 			 */
-			register(element);
-			getCurrentElementHandler().addRegisterElement(element);
+			getCurrentElementHandler().addToRegister(new IElement[] { element });
 		}
 		
 		/*
@@ -521,14 +519,6 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 		return new String[] { buffer.toString() };
 	}
 	
-	/** 
-	 * Register element
-	 * @param element Target element
-	 */
-	public void register(IElement element) {
-		element.setRegistered(true);
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
 	 */
@@ -558,14 +548,7 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 	 */
 	public void unregister() {
 		IElementHandler elementHandler = getCurrentElementHandler();
-		IElementSet rootSet = elementHandler.getSetRoot();
-		IElement[] registerElements = elementHandler.getRegisteredElements();
-		for (int i = 0; i < registerElements.length; i++) {
-			IElement pE = rootSet.get(registerElements[i].getID());
-			if (pE != null)
-				pE.setRegistered(false);
-		}
-		elementHandler.removeAllRegisterElements();
+		elementHandler.removeFromRegister(elementHandler.getRegistered());
 	}
 	
 	/* (non-Javadoc)
@@ -594,9 +577,9 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 	private IPNode getRegisteredNode() {
 		cur_selected_element_id = "";
 		IElementHandler elementHandler = getCurrentElementHandler();
-		if (elementHandler == null || cur_element_set == null || elementHandler.totalRegisterElements() == 0)
+		if (elementHandler == null || cur_element_set == null || elementHandler.totalRegistered() == 0)
 			return null;
-		String firstRegisteredElementID = elementHandler.getRegisteredElements()[0].getID();
+		String firstRegisteredElementID = elementHandler.getRegistered()[0].getID();
 		if (!cur_element_set.contains(firstRegisteredElementID))
 			return null;
 		cur_selected_element_id = firstRegisteredElementID;

@@ -18,35 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
-import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 /**
  * @author clement chu
  *
  */
-public abstract class AbstractParallelView extends ViewPart implements IModelManagerChildListener {
-	protected final String DEFAULT_TITLE = "Parallel";
+public abstract class AbstractParallelView extends ViewPart {
+	private boolean fIsVisible = false;
+	private ParallelViewPartListener partListener = null;
 
-	/** Constructor to add paralell launch listener by default
-	 * 
-	 */
-	public AbstractParallelView() {
-		PTPCorePlugin.getDefault().getModelManager().addListener(this);
+	protected void registerPartListener() {
+		if (partListener == null) {
+			partListener = new ParallelViewPartListener();
+			getSite().getPage().addPartListener(partListener);
+		}
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
-	 */
-	public void dispose() {
-		PTPCorePlugin.getDefault().getModelManager().removeListener(this);
-		super.dispose();
+	protected void deregisterPartListener() {
+		if (partListener != null) {
+			getSite().getPage().removePartListener(partListener);
+			partListener = null;
+		}
 	}
 
 	/** Get Display
@@ -56,37 +52,51 @@ public abstract class AbstractParallelView extends ViewPart implements IModelMan
 		return getViewSite().getShell().getDisplay();
 	}
 	public void asyncExec(Runnable r) {
-		getDisplay().asyncExec(r);
+		if (isVisible())
+			getDisplay().asyncExec(r);
+	}
+	public void showWhile(Runnable r) {
+		if (isVisible())
+			BusyIndicator.showWhile(getDisplay(), r);
 	}
 	
-	public abstract void refresh(boolean all);
-	public abstract void build();
 	public abstract void repaint(boolean all);
 	
-	public abstract ISelection getSelection();
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+	/**
+	 * Notification this view is now visible.
 	 */
-	public void handleEvent(IChangedResourceManagerEvent e) {
-		// Doesn't matter
+	protected void becomesVisible() {}
+	/**
+	 * Notification this view is now hidden.
+	 */
+	protected void becomesHidden() {}
+	
+	public boolean isVisible() {
+		return fIsVisible;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
-	 */
-	public void handleEvent(INewResourceManagerEvent e) {
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			public void run() {
-				build();
+	private class ParallelViewPartListener implements IPartListener2 {
+		public void partActivated(IWorkbenchPartReference partRef) {
+			System.err.println("-------------------- partActivated");
+			repaint(true);
+		}
+		public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+		public void partClosed(IWorkbenchPartReference partRef) {}
+		public void partDeactivated(IWorkbenchPartReference partRef) {}
+		public void partInputChanged(IWorkbenchPartReference partRef) {}
+		public void partOpened(IWorkbenchPartReference partRef) {}
+		public void partHidden(IWorkbenchPartReference partRef) {
+			IWorkbenchPart part = partRef.getPart(false);
+			if (part == AbstractParallelView.this) {
+				fIsVisible = false;
+				becomesHidden();
 			}
-		});	
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-	 */
-	public void handleEvent(IRemoveResourceManagerEvent e) {
-		// TODO implement remove resource manager
+		}
+		public void partVisible(IWorkbenchPartReference partRef) {
+			IWorkbenchPart part = partRef.getPart(false);
+			if (part == AbstractParallelView.this) {
+				fIsVisible = true;
+				becomesVisible();
+			}
+		}
 	}
 }
