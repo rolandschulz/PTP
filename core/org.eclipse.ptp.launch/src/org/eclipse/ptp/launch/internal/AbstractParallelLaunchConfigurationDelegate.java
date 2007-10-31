@@ -146,7 +146,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @throws CoreException
 	 */
 	protected static String getArgument(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, (String)null);
 	}
 	/**
 	 * @param configuration
@@ -199,7 +199,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @throws CoreException
 	 */
 	protected static String getQueueName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME, (String)null);
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME, (String)null);
 	}
 
 	/**
@@ -208,7 +208,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @throws CoreException
 	 */
 	protected static String getResourceManagerUniqueName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME, (String)null);
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
 	}
 	
     /**

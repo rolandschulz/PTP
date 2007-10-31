@@ -88,7 +88,7 @@ public class PArgumentsTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
      */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, (String) null);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, (String) null);
         workingDirectoryBlock.setDefaults(configuration);
     }
 
@@ -97,7 +97,7 @@ public class PArgumentsTab extends PLaunchConfigurationTab {
      */
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
-            argumentText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, EMPTY_STRING));            
+            argumentText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, EMPTY_STRING));            
             workingDirectoryBlock.initializeFrom(configuration);
         } catch (CoreException e) {
             setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
@@ -108,7 +108,7 @@ public class PArgumentsTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
      */
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, argumentText.getText());
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, argumentText.getText());
         workingDirectoryBlock.performApply(configuration);
     }    
     
