@@ -22,38 +22,54 @@ package org.eclipse.ptp.core;
  *
  */
 public interface IPTPLaunchConfigurationConstants {
+	/**
+	 * Plugin ID
+	 */
 	public static final String PTP_LAUNCHCONFIGURETYPE_ID = "org.eclipse.ptp.launch.parallelLaunch";
 
+	/**
+	 * Unique string for launch attributes
+	 */
 	public static final String PTP_LAUNCH_ID = "org.eclipse.ptp.launch";
+	
+	/**
+	 * Launch configuration attribute value. The key is
+	 * ATTR_DEBUGGER_STOP_AT_MAIN.
+	 */
+	public static final boolean DEBUGGER_STOP_AT_MAIN_DEFAULT = true;
 
-	public static final String P_TYPE = "P";
+	/**
+	 * Launch configuration attribute value. The key is
+	 * ATTR_DEBUGGER_START_MODE. Startup debugger running the program.
+	 */
+	public static final String DEBUGGER_MODE_RUN = "run";
 
-	public static final String G_TYPE = "G";
+	/**
+	 * Launch configuration attribute value. The key is
+	 * ATTR_DEBUGGER_START_MODE. Startup debugger and attach to running process.
+	 */
+	public static final String DEBUGGER_MODE_ATTACH = "attach";
 
+	/**
+	 * Launch configuration attribute key. The values is the selected
+	 * resource manager.
+	 */
+	public static final String ATTR_RESOURCE_MANAGER_UNIQUENAME = PTP_LAUNCH_ID + ".RESOURCE_MANAGER_NAME";
+
+	/**
+	 * Launch configuration attribute key. The value is the selected queue name
+	 */
+	public static final String ATTR_QUEUE_NAME = PTP_LAUNCH_ID + ".QUEUE_NAME";
+	
+	/**
+	 * Launch configuration attribute key. The value is the project name.
+	 */
 	public static final String ATTR_PROJECT_NAME = PTP_LAUNCH_ID + ".PROJECT_ATTR";
 
 	/**
-	 * Launch configuration attribute key. The value is a string specifying
-	 * application a C/C++ launch configuration.
+	 * Launch configuration attribute key. The value is the application (executable) name
 	 */
-	//public static final String ATTR_PROGRAM_NAME = PTP_LAUNCH_ID + ".PROGRAM_NAME";
-
 	public static final String ATTR_APPLICATION_NAME = PTP_LAUNCH_ID + ".APPLICATION_NAME";
-	
-	public static final String RESOURCE_MANAGER_UNIQUENAME = PTP_LAUNCH_ID + ".RESOURCE_MANAGER_NAME";
-
-	public static final String QUEUE_NAME = PTP_LAUNCH_ID + ".QUEUE_NAME";
-	
-	public static final String LAUNCH_ATTR_MAP = PTP_LAUNCH_ID + ".LAUNCH_ATTR_MAP";
-
-	public static final String ATTR_STOP_IN_MAIN = PTP_LAUNCH_ID + ".STOP_IN_MAIN";
-
-	public static final String ATTR_DEBUGGER_ID = PTP_LAUNCH_ID + ".DEBUGGER_ID";
-
-	// public static final String NETWORK_TYPE = PTP_LAUNCH_ID + ".COMMUNICATION";
-	public static final String ATTR_ARGUMENT = PTP_LAUNCH_ID + ".ARGUMENT_ATTR";
-
-	public static final String ATTR_WORK_DIRECTORY = PTP_LAUNCH_ID + ".WORK_DIRECTORY_ATTR";
 
 	/**
 	 * Launch configuration attribute key. The value is the platform string of
@@ -61,7 +77,27 @@ public interface IPTPLaunchConfigurationConstants {
 	 */
 	public static final String ATTR_PLATFORM = PTP_LAUNCH_ID + ".PLATFFORM";
 
-	public static final String DEF_NETWORK_TYPE = P_TYPE;
+	/**
+	 * Launch configuration attribute key. The value is true if the debugger
+	 * should stop in main().
+	 */
+	public static final String ATTR_STOP_IN_MAIN = PTP_LAUNCH_ID + ".STOP_IN_MAIN";
+
+	/**
+	 * Launch configuration attribute key. The value is the ID of the debugger used in launch
+	 */
+	public static final String ATTR_DEBUGGER_ID = PTP_LAUNCH_ID + ".DEBUGGER_ID";
+
+	/**
+	 * Launch configuration attribute key. The value is the program arguments that
+	 * have been supplied.
+	 */
+	public static final String ATTR_ARGUMENTS = PTP_LAUNCH_ID + ".ARGUMENT_ATTR";
+
+	/**
+	 * Launch configuration attribute key. The value is the working directory.
+	 */
+	public static final String ATTR_WORK_DIRECTORY = PTP_LAUNCH_ID + ".WORK_DIRECTORY_ATTR";
 
 	/**
 	 * Launch configuration attribute key. The value is the platform string of
@@ -94,30 +130,28 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_WORKING_DIR = PTP_LAUNCH_ID + ".DEBUGGER_WORKING_DIR";
 
 	/**
-	 * Launch configuration attribute value. The key is
-	 * ATTR_DEBUGGER_STOP_AT_MAIN.
+	 * TODO: Please document what this is
 	 */
-	public static boolean DEBUGGER_STOP_AT_MAIN_DEFAULT = true;
-
-	/**
-	 * Launch configuration attribute value. The key is
-	 * ATTR_DEBUGGER_START_MODE. Startup debugger running the program.
-	 */
-	public static String DEBUGGER_MODE_RUN = "run";
-
-	/**
-	 * Launch configuration attribute value. The key is
-	 * ATTR_DEBUGGER_START_MODE. Startup debugger and attach to running process.
-	 */
-	public static String DEBUGGER_MODE_ATTACH = "attach";
+	public static final String ATTR_DEBUGGER_MEMORY_BLOCKS = PTP_LAUNCH_ID + ".MEMORY_BLOCKS";
 	
 	/**
-	 * error code
+	 * TODO: Please document what this is
+	 */
+	public static final String ATTR_DEBUGGER_REGISTER_GROUPS = PTP_LAUNCH_ID + ".DEBUGGER_REGISTER_GROUPS";
+	
+	/**
+	 * 
+	 */
+	public static final String ATTR_REMOTE_CONNECTION = PTP_LAUNCH_ID + ".ATTR_REMOTE_CONNECTION";
+	
+	/**
+	 * 
+	 */
+	public static final String ATTR_REMOTE_EXECUTABLE_PATH = PTP_LAUNCH_ID + ".ATTR_REMOTE_EXECUTABLE_PATH";
+	
+	/**
+	 * Error codes
 	 */
 	public static final int ERR_PROGRAM_NOT_EXIST = 104;
 	public static final int ERR_PROGRAM_NOT_BINARY = 107;
-
-	public static final String ATTR_DEBUGGER_MEMORY_BLOCKS = PTP_LAUNCH_ID + ".MEMORY_BLOCKS";
-	
-	public static final String ATTR_DEBUGGER_REGISTER_GROUPS = PTP_LAUNCH_ID + ".DEBUGGER_REGISTER_GROUPS";
 }
