@@ -21,18 +21,22 @@ package org.eclipse.ptp.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public interface IModelManager extends IModelPresentation {
-	
+	/**
+	 * @param listener
+	 */
 	public void addListener(IModelManagerChildListener listener);
 	
 	/**
 	 * @param addedManager
 	 */
 	public void addResourceManager(IResourceManagerControl addedManager);
-	
+
 	/**
 	 * @param addedManagers
 	 */
@@ -42,18 +46,34 @@ public interface IModelManager extends IModelPresentation {
 	 * @return
 	 */
 	public ILaunchConfiguration getPTPConfiguration();
-
+	
 	/**
 	 * @return
 	 */
 	public IResourceManagerFactory[] getResourceManagerFactories();
-
+	
 	/**
 	 * Find the resource manager factory corresponding to the supplied ID.
 	 * @param id
 	 * @return the requested resource manager factory
 	 */
 	public IResourceManagerFactory getResourceManagerFactory(String id);
+
+	/**
+	 * Find the resource manager with the supplied unique name
+	 * 
+	 * @param rmUniqueName
+	 * @return resource manager
+	 */
+	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName);
+
+	/**
+	 * Find resource managers that have been started
+	 * 
+	 * @param universe
+	 * @return array of resource managers
+	 */
+	public IResourceManager[] getStartedResourceManagers(IPUniverse universe);
 
 	/**
 	 * Loads saved resource managers.
@@ -78,7 +98,7 @@ public interface IModelManager extends IModelPresentation {
 	public void removeResourceManagers(IResourceManagerControl[] removedRMs);
 	
 	/**
-	 * 
+	 * Save the resource manager configurations
 	 */
 	public void saveResourceManagers();
 
