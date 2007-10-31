@@ -18,18 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
+import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ui.PlatformUI;
 
-public class StartResourceManagersObjectActionDelegate
-extends AbstractResourceManagerSelectionActionDelegate {
+public class StartResourceManagersObjectActionDelegate extends
+		AbstractResourceManagerSelectionActionDelegate {
 
 	public void run(IAction action) {
 		
@@ -40,21 +42,26 @@ extends AbstractResourceManagerSelectionActionDelegate {
 			if (!isEnabledFor(rmManager)) {
 				continue;
 			}
-			
-			new Job("Starting Resource Manager"){
-
-				protected IStatus run(IProgressMonitor monitor) {
+			IRunnableWithProgress runnable = new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor)
+						throws InvocationTargetException, InterruptedException {
 					try {
 						rmManager.startUp(monitor);
 					} catch (CoreException e) {
-						return e.getStatus();
+						throw new InvocationTargetException(e);
 					}
 					if (monitor.isCanceled()) {
-						return Status.CANCEL_STATUS;
+						throw new InterruptedException();
 					}
-					return Status.OK_STATUS;
 				}
-			}.schedule();
+			};
+			try {
+				PlatformUI.getWorkbench().getProgressService().run(true, true, runnable);
+			} catch (InvocationTargetException e) {
+				UIUtils.showErrorDialog("Start Resource Manager", "Failed to start resource manager", ((CoreException)e.getCause()).getStatus());
+			} catch (InterruptedException e) {
+				// Do nothing. Operation has been canceled.
+			}
 		}
 	}
 

@@ -739,25 +739,24 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * Abort the RTS connection.
 	 */
 	private void abortConnection() {
-		runtimeSystem.shutdown();
+		try {
+			runtimeSystem.shutdown();
+		} catch (CoreException e) {
+			// TODO: Should probably throw something
+		}
 	}
 
 	/**
 	 * Close the RTS connection.
 	 */
 	private void closeConnection() {
-		runtimeSystem.shutdown();
+		try {
+			runtimeSystem.shutdown();
+		} catch (CoreException e) {
+			// TODO: Should probably throw something
+		}
 	}
 
-	/**
-	 * Open the RTS connection.
-	 * 
-	 * @throws CoreException 
-	 */
-	private void openConnection() throws CoreException {
-		runtimeSystem.startup();
-	}
-	
 	/**
 	 * 
 	 */
@@ -922,11 +921,14 @@ public abstract class AbstractRuntimeResourceManager extends
 				runtimeSystem.addRuntimeEventListener(this);
 				monitor.worked(2);
 				monitor.subTask("Starting runtime system");
-				if (!runtimeSystem.startup()) {
-					monitor.worked(7);
+				
+				try {
+					runtimeSystem.startup();
+				} catch (CoreException e) {
 					state = RMState.ERROR;
-					return false;
+					throw e;
 				}
+				
 				monitor.worked(7);
 				state = RMState.STARTING;
 				while (!monitor.isCanceled() && state != RMState.STARTED && state != RMState.ERROR) {
@@ -937,7 +939,9 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 				}
 				if (state == RMState.ERROR) {
-					return false;
+					throw new CoreException(new Status(IStatus.ERROR, 
+							PTPCorePlugin.getUniqueIdentifier(),
+							"Fatal error occurred in the runtime system"));
 				}
 				if (monitor.isCanceled()) {
 					state = RMState.STOPPED;

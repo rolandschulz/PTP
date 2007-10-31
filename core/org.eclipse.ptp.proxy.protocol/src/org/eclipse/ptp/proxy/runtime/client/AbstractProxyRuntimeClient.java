@@ -123,10 +123,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 */
 	private String								proxyName = "";
 	/*
-	 * Flag to indicate server has started
-	 */
-	private boolean								serverStarted = false;
-	/*
 	 * Main state machine variable
 	 */
 	private volatile ProxyState 				state;
@@ -298,7 +294,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#shutdown()
 	 */
-	public void shutdown() {
+	public void shutdown() throws IOException {
 		if (state != ProxyState.SHUTDOWN) {
 			if (logEvents) System.out.println(toString() + ": shutting down server...");
 			state = ProxyState.SHUTDOWN;
@@ -318,26 +314,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		sendCommand(command);
 	}
 	
-	/**
-	 * Start the proxy state machine thread. This will launch the proxy server and
-	 * forward events to listeners.
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startup()
 	 */
-	public boolean startup() {
+	public void startup() throws IOException {
 		if (state == ProxyState.IDLE) {
-			serverStarted = startupProxyServer();
-			if (serverStarted == false) {
-				return false;
-			}
-			
+			startupProxyServer();
 			state = ProxyState.STARTUP;
 
 			Thread smt = new Thread(new StateMachineThread(), proxyName + StateMachineThread.name);
 			smt.start();
 		}
-
-		return true;
 	}
 
 	/* (non-Javadoc)
@@ -934,14 +921,13 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	/**
 	 * Stop the proxy server.
 	 */
-	protected abstract void shutdownProxyServer();
+	protected abstract void shutdownProxyServer() throws IOException;
 	
 	/**
 	 * Start the proxy server, possibly on a remote machine. The server will eventually connect 
 	 * to the session created using sessionCreate(). This will result in a connected event.
 	 * 
-	 * @return true if the session was created. Server errors are handled separately
-	 * as events.
+	 * @throws IOException if the proxy failed to start.
 	 */
-	protected abstract boolean startupProxyServer();	
+	protected abstract void startupProxyServer() throws IOException;	
 }

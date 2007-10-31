@@ -24,24 +24,13 @@ import org.eclipse.core.runtime.CoreException;
 public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {	
 
 	/**
-	 * Called to start the runtime system.
-	 * @throws CoreException
-	 */
-	public boolean startup() throws CoreException;
-	
-	/**
-	 * Called when the control system is being shutdown.
-	 */
-	public void shutdown();
-	
-	/**
 	 * Adds a listener to the runtime system.  The runtime system may fire events
 	 * and will use this list of listeners to determine who to send these events to.
 	 * 
 	 * @param listener someone that wants to listener to runtime events
 	 */
 	public void addRuntimeEventListener(IRuntimeEventListener listener);
-
+	
 	/**
 	 * Removes a listener from the list of things listening to runtime events on
 	 * this runtime system.
@@ -49,4 +38,16 @@ public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {
 	 * @param listener the listener to remove
 	 */
 	public void removeRuntimeEventListener(IRuntimeEventListener listener);
+	
+	/**
+	 * Called when the control system is being shutdown.
+	 * @throws CoreException 
+	 */
+	public void shutdown() throws CoreException;
+
+	/**
+	 * Called to start the runtime system.
+	 * @throws CoreException
+	 */
+	public void startup() throws CoreException;
 }
