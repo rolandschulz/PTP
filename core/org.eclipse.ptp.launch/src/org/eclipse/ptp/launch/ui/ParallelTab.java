@@ -144,16 +144,14 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 * @see ILaunchConfigurationTab#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
-
+		final int numColumns = 2;
 		final Composite parallelComp = new Composite(parent, SWT.NONE);
 		setControl(parallelComp);
-		final int numColumns = 2;
-		parallelComp.setLayout(createGridLayout(numColumns, false, 0, 0));
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gridData.horizontalSpan = 5;
-		parallelComp.setLayoutData(gridData);
-
-		//createVerticalSpacer(parallelComp, numColumns);
+		
+		GridLayout layout = new GridLayout(2, false);
+		parallelComp.setLayout(layout);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		parallelComp.setLayoutData(gd);
 
 		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		if (universe == null) {
@@ -179,27 +177,20 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		
 		queueCombo.addSelectionListener(combosListener);
 
-		//createVerticalSpacer(parallelComp, numColumns);
-
 		// The composite that holds the RM's attributes for the launch configuration
 		Group attrGroup = new Group(parallelComp, SWT.SHADOW_ETCHED_IN);
 		attrGroup.setText("Launch Attributes");
-		gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gridData.horizontalSpan = numColumns;
-		attrGroup.setLayoutData(gridData);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd.horizontalSpan = numColumns;
+		attrGroup.setLayoutData(gd);
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;
 		attrGroup.setLayout(gridLayout);
 
-		//createVerticalSpacer(attrGroup, 2);
-		
 		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(attrGroup,
 				numColumns);
 		setLaunchAttrsScrollComposite(scrollComp);
 		
-		//createVerticalSpacer(attrGroup, 2);
-		
-		//createVerticalSpacer(parallelComp, numColumns);
 		resourceManagerCombo.deselectAll();
  	}
 
@@ -533,14 +524,6 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			}
 		}
 		return null;
-	}
-
-	private String getResourceManagerUniqueNameFromCombo() {
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm == null) {
-			return "";
-		}
-		return rm.getUniqueName();
 	}
 	
 	/**
