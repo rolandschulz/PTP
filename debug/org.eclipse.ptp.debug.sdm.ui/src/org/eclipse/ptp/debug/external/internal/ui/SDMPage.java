@@ -11,11 +11,19 @@
 package org.eclipse.ptp.debug.external.internal.ui;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.debug.core.launch.IPTPRemoteLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,6 +31,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -32,8 +41,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected Text fRMDebuggerText = null;
 	protected Button fRMDebuggerButton = null;
 	
-	private String remoteHost = null;
-	protected static final String EMPTY_STRING = "";
+	private IRemoteServices remoteServices = null;
+	private IRemoteConnection connection = null;
+	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private String errMsg = null;
 	
@@ -45,21 +55,28 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		comp.setLayout(new GridLayout(2, false));
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
+		Label label = new Label(comp, SWT.NONE);
+		label.setText(ExternalDebugUIMessages.getString("SDMDebuggerPage.path")); //$NON-NLS-1$
+		GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		label.setLayoutData(gd);
+		
 		fRMDebuggerText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		fRMDebuggerText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-		fRMDebuggerButton = createPushButton(comp, ExternalDebugUIMessages.getString("SDMDebuggerPage.remotedebugger"), null);
+		fRMDebuggerButton = createPushButton(comp, ExternalDebugUIMessages.getString("SDMDebuggerPage.browse"), null); //$NON-NLS-1$
 		fRMDebuggerButton.addSelectionListener(new SelectionAdapter() {
-		    public void widgetSelected(SelectionEvent e) {
-				/*
+		    @Override
+			public void widgetSelected(SelectionEvent e) {
 				String file = browseRemoteFile();
 				if (file != null) {
 					fRMDebuggerText.setText(file);
 			    	updateLaunchConfigurationDialog();
 				}
-				*/
 		    }
 		});
 		setControl(parent);
+		
+		enableRemoteSection(false);
 	}
 	
 	/**
@@ -83,102 +100,23 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/**
 	 * @return
 	 */
-	/*
 	private String browseRemoteFile() {
-		IHost host = getHost(remoteHost);
-		if (host != null) {
-			SystemRemoteFileDialog dialog = new SystemRemoteFileDialog(getShell(), "Select remote debugger...", host);
-			dialog.setBlockOnOpen(true);
-			if (dialog.open() == Window.OK) {
-				Object rmObj = dialog.getSelectedObject();
-				if (rmObj instanceof IRemoteFile) {
-					return ((IRemoteFile)rmObj).getAbsolutePath();
-				}
-			}
+		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+		if (fileManager != null) {
+			IPath path = fileManager.browseFile(getShell(), ExternalDebugUIMessages.getString("SDMDebuggerPage.selectDebuggerExe"), fRMDebuggerText.getText()); //$NON-NLS-1$
+			return path.toOSString();
 		}
 		return null;
 	}
-	*/
-	/*
-	private String browseRemoteDirectory() {
-		IHost host = getHost(getRemoteConnection().getHostname());
-		if (host != null) {
-			SystemRemoteFolderDialog dialog = new SystemRemoteFolderDialog(getShell(), "Select remote working directory", host);
-			//dialog.setPreSelection(selection)
-			dialog.setBlockOnOpen(true);
-			if (dialog.open() == Window.OK) {
-				Object rmObj = dialog.getSelectedObject();
-				if (rmObj instanceof IRemoteFile) {
-					return ((IRemoteFile)rmObj).getAbsolutePath();
-				}
-			}
-		}
-		return null;
-	}
-	*/
-	/*
-	private IResourceManager getResourceManager() {
-		try {
-			IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-			if (universe != null) {
-				String rmID = configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME, (String)null);
-				if (rmID != null) {
-					for (IResourceManager resMgr : universe.getResourceManagers()) {
-						if (resMgr.getUniqueName().equals(rmID)) {
-							return resMgr;
-						}
-					}
-				}
-			}
-		}
-		catch (CoreException e) {}
-		return null;
-	}
-	private IRemoteConnection getRemoteConnection() {
-		if (rmConnection == null) {
-			IResourceManager rmMgr = getResourceManager();
-			if (rmMgr != null) {
-				if (rmMgr instanceof IResourceManagerControl) {
-					IResourceManagerConfiguration rmConfig = ((IResourceManagerControl)rmMgr).getConfiguration();
-					if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-						String remoteID = ((AbstractRemoteResourceManagerConfiguration)rmConfig).getRemoteServicesId();
-						IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteID);
-						if (remoteServices != null) {
-							rmConnection = remoteServices.getConnectionManager().getConnection(((AbstractRemoteResourceManagerConfiguration)rmConfig).getConnectionName());
-						}
-					}
-				}
-			}
-		}
-		return rmConnection;
-	}
-	*/
-	
-	/**
-	 * @param hostname
-	 * @return
-	 */
-	/*
-	private IHost getHost(String hostname) {
-		if (hostname == null)
-			return null;
-		IHost[] hosts = RSECorePlugin.getDefault().getSystemRegistry().getHosts();
-		for (IHost host : hosts) {
-			if (host.getAliasName().equals(hostname)) {
-				return host;
-			}
-		}
-		return null;
-	}
-	*/
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		if (remoteHost != null) {
+		if (remoteServices != null) {
 			if (getFieldContent(fRMDebuggerText.getText()) == null) {
-				errMsg = "No remote debugger found";
+				errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
 			}
 			else
 				errMsg = null;
@@ -192,12 +130,22 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			remoteHost = configuration.getAttribute(IPTPRemoteLaunchConfigurationConstants.ATTR_REMOTE_CONNECTION, (String)null);
-			enableRemoteSection(remoteHost != null);
+			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
+			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+			if (rm != null) {
+				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
+				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+					enableRemoteSection(true);
+					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
+					if (remoteServices != null) {
+						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
+					}
+				}
+			}
 			fRMDebuggerText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
-		}
-		catch(CoreException e) {
-			errMsg = "Exception occurred reading configuration";
+		} catch(CoreException e) {
+			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err2"); //$NON-NLS-1$
 		}
 	}
 
@@ -205,7 +153,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		if (remoteHost != null) {
+		if (remoteServices != null) {
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerText.getText()));
 		}
 	}
@@ -214,7 +162,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return ExternalDebugUIMessages.getString("SDMDebuggerPage.debuggname");
+		return ExternalDebugUIMessages.getString("SDMDebuggerPage.debuggname"); //$NON-NLS-1$
 	}
 	
     /**
