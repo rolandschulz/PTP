@@ -123,11 +123,6 @@ public interface IManager {
 	 * @param elementHandler IElementHandler
 	 */
 	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler);
-	/** Update elements  
-	 * @param targetSet Target set
-	 * @param elementHandler IElementHandler
-	 */
-	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler);
 	
 	/** Add job listener
 	 * @param jobListener

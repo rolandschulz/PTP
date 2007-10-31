@@ -24,60 +24,42 @@ import org.eclipse.ptp.core.PreferenceConstants;
  * @author clement chu
  *
  */
-public interface IElementHandler extends IContainer {
+public interface IElementHandler extends IElementSet {
 	public final static String SET_ROOT_ID = PreferenceConstants.SET_ROOT_ID;
 	/** Get Set root
 	 * @return root set
 	 */
-	public IElementSet getSetRoot();
+	IElementSet getSetRoot();
 	
 	/** Get sets included
 	 * @param id Target element ID
 	 * @return included sets
 	 */
-	public IElementSet[] getSetsWithElement(String id);
-	/** Get sorted sets
-	 * @return sorted sets
-	 */
-	public IElementSet[] getSortedSets();
-	/** Get sets
-	 * @return sets
-	 */
-	public IElementSet[] getSets();
-	/** Get Set by set ID
-	 * @param id Set ID
-	 * @return set
-	 */
-	public IElementSet getSet(String id);
-	/** Get set by element index
-	 * @param index element index
-	 * @return set
-	 */
-	public IElementSet getSet(int index);
+	IElementSet[] getSetsWithElement(String id);
 	
 	/** Is element registered
 	 * @param element Target element
 	 * @return true if element is registered
 	 */
-	public boolean containsRegisterElement(IElement element);
+	boolean containsRegister(IElement element);
 	/** Add element to registered list
 	 * @param element Target element
 	 */
-	public void addRegisterElement(IElement element);
+	void addToRegister(IElement[] elements);
 	/** Remove element from registered list
 	 * @param element Target element
 	 */
-	public void removeRegisterElement(IElement element);
+	void removeFromRegister(IElement[] elements);
 	/** Get registered elements
 	 * @return registered elements
 	 */
-	public IElement[] getRegisteredElements();
-	/** Remove all registered elements
-	 * 
+	IElement[] getRegistered();
+	/** 
+	 * Remove all registered elements
 	 */
-	public void removeAllRegisterElements();
+	void removeAllRegistered();
 	/** Get total of registered elements
 	 * @return number of registered elements
 	 */
-	public int totalRegisterElements();
+	int totalRegistered();
 }

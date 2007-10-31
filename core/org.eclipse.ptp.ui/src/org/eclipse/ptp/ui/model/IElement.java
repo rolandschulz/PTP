@@ -22,7 +22,7 @@ package org.eclipse.ptp.ui.model;
  * @author clement chu
  *
  */
-public interface IElement {
+public interface IElement extends Cloneable, Comparable<IElement> {
 	/**Get parent
 	 * @return element
 	 */

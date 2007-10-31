@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,7 +38,6 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -51,6 +52,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * 
  */
 public abstract class AbstractParallelElementView extends AbstractParallelView implements IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider, ISelectionChangedListener {
+	protected final String DEFAULT_TITLE = "Parallel";
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
@@ -60,10 +62,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected final String EMPTY_TITLE = " ";
 	protected Color registerColor = null;
 	
-	protected UIWorkbenchJob uijob = new UIWorkbenchJob();
-	
-	protected boolean refreshing = false;
-	private final ReentrantLock	waitLock = new ReentrantLock();
+	protected IconRefreshWorkbenchJob iconreFreshJob = new IconRefreshWorkbenchJob();
 	
 	/**
 	 * update preference setting 
@@ -73,8 +72,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			final String preferenceType = event.getProperty();
 			final Object value = event.getNewValue();
 			if (value != null) {
-				//getDisplay().asyncExec(new Runnable() {
-				BusyIndicator.showWhile(getDisplay(), new Runnable() {
+				showWhile(new Runnable() {
 					public void run() {
 						if (!canvas.isDisposed()) {
 							if (preferenceType.startsWith("icon")) {
@@ -101,7 +99,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	};
 	
 	public AbstractParallelElementView(IManager manager) {
-		super();
 		this.manager = manager;
 	}
 
@@ -109,6 +106,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
+		registerPartListener();
+		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		createView(parent);
 		setContentDescription(EMPTY_TITLE);
 		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
@@ -152,7 +151,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param message Message of title
 	 */
 	protected void changeTitle(final String message) {
-		getDisplay().asyncExec(new Runnable() {
+		asyncExec(new Runnable() {
 			public void run() {
 				setContentDescription(message);
 			}
@@ -173,7 +172,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
 		canvas.addSelectionChangedListener(this);
-		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		getSite().setSelectionProvider(canvas);
 		return composite;
 	}
@@ -185,6 +183,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.removeSelectionChangedListener(this);
 		canvas.dispose();
 		PTPUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
+		deregisterPartListener();
 		super.dispose();
 	}
 	/* (non-Javadoc)
@@ -217,7 +216,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				manager.setCurrentSetId(set.getID());
 			}
 			canvas.setElementSet(set);
-			fireSetChangeEvent(set, cur_element_set);
+			// send event if current viewer is visible
+			if (isVisible())
+				fireSetChangeEvent(set, cur_element_set);
 			cur_element_set = set;
 		}
 		//updateAction();
@@ -231,11 +232,15 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void build() {
 		initialView();
 	}
-	/** Refresh view
-	 * 
+	/**
+	 * Refresh view
 	 */
-	public void refresh(final boolean all) {
-		uijob.schedule();
+	public void refresh(boolean all, boolean force) {
+		if (isVisible())
+			iconreFreshJob.schedule(all, force);
+	}
+	public void refresh(boolean all) {
+		refresh(all, false);
 		/*
 		WorkbenchJob uiJob = new WorkbenchJob("Refreshing icons...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -378,7 +383,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param showRuler true if show ruler
 	 */
 	public void setDisplayRuler(final boolean showRuler) {
-		getDisplay().asyncExec(new Runnable() {
+		asyncExec(new Runnable() {
 			public void run() {
 				if (!canvas.isDisposed()) {
 					canvas.setDisplayRuler(showRuler);
@@ -400,36 +405,71 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public ISelection getSelection() {
 		return canvas.getSelection();
 	}
-	private void setRefreshing(boolean rehreshing) {
-		waitLock.lock();
-		try {
-			this.refreshing = rehreshing;
-		}
-		finally {
-			waitLock.unlock();
-		}
-	}
-	
     public void selectionChanged(SelectionChangedEvent event) {}
     
-	class UIWorkbenchJob extends WorkbenchJob {
-		public UIWorkbenchJob() {
+	class IconRefreshWorkbenchJob extends WorkbenchJob {
+		private final ReentrantLock	waitLock = new ReentrantLock();
+		private List<Boolean> refreshList = new ArrayList<Boolean>();
+		public IconRefreshWorkbenchJob() {
 			super("Refreshing icons...");
 		}
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			repaint(true);
+			boolean refreshAll = isRefreshAll();
+			System.err.println("---------- IconRefreshWorkbenchJob refresh: " + refreshAll);
+			repaint(refreshAll);
 			if (!canvas.isDisposed()) {
 				canvas.redraw();
 			}
-			setRefreshing(false);
+			
+			//if last refresh object is true and previous refresh is false, then refresh again 
+			boolean lastValue = isRefreshAll();
+			waitLock.lock();
+			try {
+				refreshList.clear();
+				if (refreshAll != lastValue && !refreshAll) {
+					refreshList.add(new Boolean(true));
+					schedule();
+				}
+			}
+			finally {
+				waitLock.unlock();
+			}
 			return Status.OK_STATUS;
 		}
 		public boolean shouldSchedule() {
-			if (!refreshing) {
-				setRefreshing(true);
-				return true;
+			int size = size();
+			System.err.println("---------- IconRefreshWorkbenchJob: " + refreshList.size());
+			return (size == 1);
+		}
+		private int size() {
+			waitLock.lock();
+			try {
+				return refreshList.size();
 			}
-			return false;
+			finally {
+				waitLock.unlock();
+			}
+		}
+		private boolean isRefreshAll() {
+			waitLock.lock();
+			try {
+				return refreshList.get(refreshList.size()-1).booleanValue();
+			}
+			finally {
+				waitLock.unlock();
+			}
+		}
+		public void schedule(boolean refresh_all, boolean force) {
+			waitLock.lock();
+			try {
+				if (force)
+					refreshList.clear();
+				refreshList.add(new Boolean(refresh_all));
+			}
+			finally {
+				waitLock.unlock();
+			}
+			schedule();
 		}
 	}
 }

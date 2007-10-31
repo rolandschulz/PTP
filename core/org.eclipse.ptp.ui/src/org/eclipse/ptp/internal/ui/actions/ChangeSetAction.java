@@ -57,15 +57,17 @@ public class ChangeSetAction extends GotoDropDownAction {
 		if (setManager == null)
 			return;
 
-		IElementSet[] sets = setManager.getSortedSets();
-	    	if (sets.length > 1)
-	    		dropDownMenuMgr.add(new Separator());
-	    	for (int i=0; i<sets.length; i++) {
-	    		if (sets[i].getID().equals(IElementHandler.SET_ROOT_ID))
+		IElement[] sets = setManager.getElements();
+    	if (sets.length > 1)
+    		dropDownMenuMgr.add(new Separator());
+    	for (IElement set : sets) {
+    		if (set instanceof IElementSet) {
+	    		if (set.getID().equals(IElementHandler.SET_ROOT_ID))
 	    			continue;
 	    		
-	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID, null);
-	    	}		
+	    		addAction(dropDownMenuMgr, set.getID(), set.getID(), curID, null);
+    		}
+    	}		
 	}
 	
 	/* (non-Javadoc)
@@ -91,17 +93,16 @@ public class ChangeSetAction extends GotoDropDownAction {
 		if (setManager == null)
 			return;
 		
-	    	IElementSet[] sets = setManager.getSortedSets();
-	    	for (int i=0; i<sets.length; i++) {
-	    		if (view.getCurrentSetID().equals(sets[i].getID())) {
-	    			if (i + 1 < sets.length)
-	    				run(null, sets[i+1]);
-	    			else
-	    				run(null, sets[0]);
-	    			
-	    			break;
-	    		}
-	    	}
+		IElement[] sets = setManager.getElements();		
+    	for (int i=0; i<sets.length; i++) {
+    		if (view.getCurrentSetID().equals(sets[i].getID())) {
+    			if (i + 1 < sets.length)
+    				run(null, (IElementSet)sets[i+1]);
+    			else
+    				run(null, (IElementSet)sets[0]);
+    			break;
+    		}
+    	}
 	}
 	
 	/** run action
@@ -122,7 +123,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 		if (setManager == null)
 			return;
 		
-		run(elements, setManager.getSet(id));
+		run(elements, (IElementSet)setManager.getElementByID(id));
 	}
 
 	/** Inner internal set action

@@ -60,10 +60,10 @@ public class DeleteSetAction extends ParallelAction {
 				IManager uiManager = view.getUIManager();
 				uiManager.removeSet(set.getID(), setManager);
 						
-				IElementSet[] sets = setManager.getSortedSets();
+				IElement[] sets = setManager.getElements();
 				if (sets.length > 0) {
-					IElementSet lastSet = sets[sets.length-1];
-					view.selectSet(setManager.getSet(lastSet.getID()));
+					IElement lastSet = sets[sets.length-1];
+					view.selectSet((IElementSet)setManager.getElementByID(lastSet.getID()));
 					//view.update();
 					view.refresh(false);
 				}

@@ -53,10 +53,9 @@ public class CreateSetAction extends GotoDropDownAction {
 		if (setManager == null)
 			return;
 
-		IElementSet[] sets = setManager.getSortedSets();
-	    	for (int i=1; i<sets.length; i++) {
-	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID, null);
-	    	}		
+    	for (IElement set : setManager.getElements()) {
+    		addAction(dropDownMenuMgr, set.getID(), set.getID(), curID, null);
+    	}		
 	}
 	
 	/* (non-Javadoc)
@@ -105,7 +104,7 @@ public class CreateSetAction extends GotoDropDownAction {
 			} else
 				view.getUIManager().addToSet(elements, setID, setManager);
 			
-			view.selectSet(setManager.getSet(setID));
+			view.selectSet((IElementSet)setManager.getElementByID(setID));
 			//Need to deselect all elements manually
 			//view.update();
 			view.refresh(false);

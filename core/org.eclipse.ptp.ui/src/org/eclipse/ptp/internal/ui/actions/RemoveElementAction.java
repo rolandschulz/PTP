@@ -59,7 +59,7 @@ public class RemoveElementAction extends ParallelAction {
 
 				if (UIUtils.showQuestionDialog("Remove Confirmation", "Are you sure you want to remove (" + elements.length + ") elements from this set?"))	{			
 					view.getUIManager().removeFromSet(elements, set.getID(), setManager);
-					view.selectSet(setManager.getSet(set.getID()));
+					view.selectSet((IElementSet)setManager.getElementByID(set.getID()));
 					view.updateTitle();
 					view.refresh(false);
 				}

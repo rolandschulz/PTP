@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
@@ -62,14 +64,21 @@ public class MachineManager extends AbstractUIManager {
 			} else {
 				handler = machineElementHandlerList.get(mac.getID());				
 			}
+			List<IElement> elements = new ArrayList<IElement>();
 			IElementSet set = handler.getSetRoot();
 			for (IPNode node : mac.getNodes()) {
-				String id = node.getID();
-				if (set.getElement(id) == null) {
-					set.add(new Element(set, id, node.getName()));
-				}
+				elements.add(createNodeElement(set, node.getID(), node.getName()));
 			}
+			set.addElements(elements.toArray(new IElement[0]));
 		}
+	}
+	
+	protected IElement createNodeElement(IElementSet set, String key, String name) {
+		return new Element(set, key, name) {
+			public int compareTo(IElement e) {
+				return getID().compareTo(e.getID());
+			}
+		};
 	}
 	
 	/** Add machine
@@ -79,10 +88,7 @@ public class MachineManager extends AbstractUIManager {
 		addMachine(node.getMachine());
 		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
 		IElementSet set = elementHandler.getSetRoot();
-		String id = node.getID();
-		if (set.getElement(id) == null) {
-			set.add(new Element(set, id, node.getName()));
-		}
+		set.addElements(new IElement[] { createNodeElement(set, node.getID(), node.getName()) });
 	}
 	
 	/**
@@ -95,9 +101,9 @@ public class MachineManager extends AbstractUIManager {
 		if (handler != null) {
 			IElementSet set = handler.getSetRoot();
 			for (IPNode node : machine.getNodes()) {
-				IElement element = set.getElement(node.getID());
+				IElement element = set.getElementByID(node.getID());
 				if (element != null) {
-					set.remove(element);
+					set.removeElement(node.getID());
 				}
 			}
 		}
@@ -112,7 +118,10 @@ public class MachineManager extends AbstractUIManager {
 	public void removeNode(IPNode node) {
 		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
 		IElementSet set = elementHandler.getSetRoot();
-		set.remove(node.getID());
+		IElement element = set.getElementByID(node.getID());
+		if (element != null) {
+			set.removeElement(node.getID());
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -321,7 +330,7 @@ public class MachineManager extends AbstractUIManager {
 			IElementHandler elementHandler = getElementHandler(machine.getID());
 			if (elementHandler == null)
 				return false;
-			IElementSet set = elementHandler.getSet(getCurrentSetId());
+			IElementSet set = (IElementSet)elementHandler.getElementByID(getCurrentSetId());
 			if (set == null)
 				return false;
 			return set.contains(nodeID);

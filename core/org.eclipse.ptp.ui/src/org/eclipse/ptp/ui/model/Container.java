@@ -22,8 +22,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
+ * @deprecated
  * @author clement chu
  *
  */

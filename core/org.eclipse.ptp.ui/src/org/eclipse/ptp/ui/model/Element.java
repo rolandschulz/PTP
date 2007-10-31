@@ -18,13 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
-
-
 /**
  * @author clement chu
  *
  */
-public class Element implements IElement, Cloneable, Comparable<Object> {
+public class Element implements IElement {
 	protected String id = "0";
 	protected String name = "";
 	protected boolean registered = false;
@@ -86,22 +84,7 @@ public class Element implements IElement, Cloneable, Comparable<Object> {
 			return null;
 		}
 	}
-	
-	/**
-	 * @param obj compare to
-	 * @return -1 if smaller than obj, 1 if bigger than obj, otherwise they equal
-	 */
-	public int compareTo(Object obj) {
-		if (obj instanceof IElement) {
-			int my_rank = Integer.parseInt(id);
-			int his_rank = Integer.parseInt(((IElement) obj).getID());
-			if (my_rank < his_rank)
-				return -1;
-			if (my_rank == his_rank)
-				return 0;
-			if (my_rank > his_rank)
-				return 1;
-		}
-		return 0;
-	}	
+	public int compareTo(IElement e) {
+		return getName().compareTo(e.getName());
+	}
 }

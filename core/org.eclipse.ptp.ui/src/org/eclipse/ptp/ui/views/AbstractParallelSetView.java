@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -42,7 +43,6 @@ import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -203,7 +203,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected void openProcessViewer(final IPProcess element) {
 		if (element == null)
 			return;
-		BusyIndicator.showWhile(getDisplay(), new Runnable() {
+		showWhile(new Runnable() {
 			public void run() {
 				try {
 					PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), IPTPUIConstants.VIEW_PARALLELProcess);
@@ -251,10 +251,10 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 				if (last_action == IIconCanvasActionListener.CUT_ACTION) {
 					if (last_element_set != null && !last_element_set.getID().equals(cur_element_set.getID())) {
 						if (last_element_set.size() == clipElements.length) {
-							manager.removeSet(last_element_set.getID(), last_element_set.getElementHandler());
+							manager.removeSet(last_element_set.getID(), (IElementHandler)last_element_set.getParent());
 						}
 						else {
-							manager.removeFromSet(clipElements, last_element_set.getID(), last_element_set.getElementHandler());
+							manager.removeFromSet(clipElements, last_element_set.getID(), (IElementHandler)last_element_set.getParent());
 						}
 					}
 				}
@@ -262,8 +262,8 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 				if (cur_element_set.isRootSet())
 					createSetAction.run(clipElements);
 				else {
-					manager.addToSet(clipElements, cur_element_set.getID(), cur_element_set.getElementHandler());
-					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));					
+					manager.addToSet(clipElements, cur_element_set.getID(), (IElementHandler)cur_element_set.getParent());
+					selectSet((IElementSet)((IElementHandler)cur_element_set.getParent()).getElementByID(cur_element_set.getID()));					
 					//update();
 					refresh(false);
 				}

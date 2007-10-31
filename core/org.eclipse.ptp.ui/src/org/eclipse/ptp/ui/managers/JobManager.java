@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -60,43 +62,34 @@ public class JobManager extends AbstractUIManager {
 	 */
 	public void addJob(IPJob job) {
 		if (job != null) {
-			IElementHandler handler;
-			if (!jobList.containsKey(job.getID())) {
-				handler = new ElementHandler();
-				jobList.put(job.getID(), job);
-				jobElementHandlerList.put(job.getID(), handler);
-			} else {
-				handler = jobElementHandlerList.get(job.getID());
-			}
-			IElementSet set = handler.getSetRoot();
+			IElementSet set = createElementHandler(job).getSetRoot();
+			List<IElement> elements = new ArrayList<IElement>();
 			for (IPProcess proc : job.getProcesses()) {
-				if (proc == null)
+				if (proc == null || set.contains(proc.getID()))
 					continue;
-				String id = proc.getID();
-				if (set.getElement(id) == null) {
-					set.add(createElement(set, id, ""+proc.getProcessIndex()));
-				}
+				System.err.println("@@@@@@@@@@!!! ADD JOB PRCOESS CREATED: " + proc.getProcessIndex() + " @@@@@@@@@@@@@@");
+				elements.add(createProcessElement(set, proc.getID(), proc.getProcessIndex()));
 			}
+			set.addElements(elements.toArray(new IElement[0]));
 		}
 	}
-	
 	public void addProcess(IPProcess proc) {
-		addJob(proc.getJob());
-		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
-		if (elementHandler != null) {
-			IElementSet set = elementHandler.getSetRoot();
-			if (set.getElement(proc.getID()) == null) {
-				set.add(createElement(set, proc.getID(), ""+proc.getProcessIndex()));
-			}
+		IPJob job = proc.getJob();
+		IElementSet set = createElementHandler(job).getSetRoot();
+		if (!set.contains(proc.getID())) {
+			System.err.println("@@@@@@@@@@ ADD PRCOESS CREATED: " + proc.getProcessIndex() + " @@@@@@@@@@@@@@");
+			set.addElements(new IElement[] { createProcessElement(set, proc.getID(), proc.getProcessIndex()) });
 		}
 	}
 
-	
 	public void removeProcess(IPProcess proc) {
 		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
 		if (elementHandler != null) {
 			IElementSet set = elementHandler.getSetRoot();
-			set.remove(proc.getID());
+			IElement element = set.getElementByID(proc.getID());
+			if (element != null) {
+				set.removeElement(proc.getID());
+			}
 		}
 	}
 	
@@ -104,10 +97,8 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#clear()
 	 */
 	public void clear() {
-		if (jobList != null) {
-			jobList.clear();
-			jobElementHandlerList.clear();
-		}
+		jobList.clear();
+		jobElementHandlerList.clear();
 	}
 	
 	/** Find process
@@ -116,10 +107,10 @@ public class JobManager extends AbstractUIManager {
 	 * @return
 	 */
 	public IPProcess findProcess(IPJob job, String task_id) {
-		if (job == null) {
+		if (job == null)
 			return null;
-		}
 		return job.getProcessByIndex(task_id);
+		//return job.findProcess(id);
 	}
 	
 	public IPProcess findProcess(String proc_id) {
@@ -151,6 +142,24 @@ public class JobManager extends AbstractUIManager {
 	 */
 	public IElementHandler getElementHandler(String id) {
 		return (IElementHandler) jobElementHandlerList.get(id);
+	}
+	public IElementHandler createElementHandler(IPJob job) {
+		IElementHandler handler = getElementHandler(job.getID());
+		if (handler == null) {
+			handler = new ElementHandler();
+			jobList.put(job.getID(), job);
+			jobElementHandlerList.put(job.getID(), handler);
+		}
+		return handler;
+	}
+	
+	private void removeElementHandler(IPJob job) {
+		IElementHandler elementHandler = getElementHandler(job.getID());
+		if (elementHandler != null) {
+			elementHandler.removeAllRegistered();
+			elementHandler.clean();
+		}
+		jobElementHandlerList.remove(job.getID());		
 	}
 	
 	/** 
@@ -219,10 +228,10 @@ public class JobManager extends AbstractUIManager {
 		if (eHandler == null)
 			return new String[0];
 		
-		IElementSet[] eSets = eHandler.getSets();
-		String[] sets = new String[eSets.length];
+		IElement[] elements = eHandler.getElements();
+		String[] sets = new String[elements.length];
 		for (int i=1; i<sets.length+1; i++) {
-			String tmp = eSets[i-1].getID();
+			String tmp = elements[i-1].getID();
 			if (tmp.equals(IElementHandler.SET_ROOT_ID)) {
 				continue;
 			}
@@ -279,10 +288,10 @@ public class JobManager extends AbstractUIManager {
 		if (job != null) {
 			if (!job.getID().equals(jid))
 				return false;
-			IElementHandler elementHandler = getElementHandler(job.getID());
+			IElementHandler elementHandler = getElementHandler(jid);
 			if (elementHandler == null)
 				return false;
-			IElementSet set = elementHandler.getSet(getCurrentSetId());
+			IElementSet set = (IElementSet)elementHandler.getElementByID(getCurrentSetId());
 			if (set == null)
 				return false;
 			return set.contains(processID);
@@ -294,14 +303,10 @@ public class JobManager extends AbstractUIManager {
 	 * @param job_id Job ID
 	 */
 	public void setJob(IPJob job) {
-		String new_id = EMPTY_ID;
-		String old_id = EMPTY_ID;
-		if (cur_job != null) {
-			old_id = cur_job.getID();
-		}
+		String old_id = (cur_job==null)?EMPTY_ID:cur_job.getID();
+		String new_id = (job==null)?EMPTY_ID:job.getID();
 		if (job != null) {
 			addJob(job);
-			new_id = job.getID();
 		}
 		cur_job = job;
 		fireJobChangedEvent(IJobChangedListener.CHANGED, new_id, old_id);
@@ -362,14 +367,12 @@ public class JobManager extends AbstractUIManager {
 		return false;
 	}
 	
-	/** Create Element
-	 * @param set
-	 * @param key
-	 * @param name
-	 * @return
-	 */
-	protected IElement createElement(IElementSet set, String key, String name) {
-		return new Element(set, key, name);
+	protected IElement createProcessElement(IElementSet set, String key, String taskID) {
+		return new Element(set, key, taskID) {
+			public int compareTo(IElement e) {
+				return new Integer(getName()).compareTo(new Integer(e.getName()));
+			}
+		};
 	}
 	
 	/* (non-Javadoc)
@@ -402,16 +405,16 @@ public class JobManager extends AbstractUIManager {
 	public void removeJob(IPJob job) {
 		//remove launch from debug view
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-		ILaunch[] launches = launchManager.getLaunches();
-		for (int i=0; i<launches.length; i++) {
-			String launchedJobID = launches[i].getAttribute(ElementAttributes.getIdAttributeDefinition().getId());
-			if (launchedJobID != null && launchedJobID.equals(job.getID())) {
-				launchManager.removeLaunch(launches[i]);
+		String jid = job.getID();
+		for (ILaunch launch : launchManager.getLaunches()) {
+			String launchedJobID = launch.getAttribute(ElementAttributes.getIdAttributeDefinition().getId());
+			if (launchedJobID != null && launchedJobID.equals(jid)) {
+				launchManager.removeLaunch(launch);
 			}
 		}
-		fireJobChangedEvent(IJobChangedListener.REMOVED, null, job.getID());
-		jobList.remove(job.getID());
-		jobElementHandlerList.remove(job.getID());
+		jobList.remove(jid);
+		removeElementHandler(job);
+		fireJobChangedEvent(IJobChangedListener.REMOVED, null, jid);
 	}
 	
 	/* (non-Javadoc)
@@ -419,7 +422,7 @@ public class JobManager extends AbstractUIManager {
 	 */
 	public void removeAllStoppedJobs() {
 		Map<String, IPQueue> queues = new HashMap<String, IPQueue>();
-		for (IPJob job : jobList.values()) {
+		for (IPJob job : getJobs()) {
 			IPQueue queue = job.getQueue();
 			if (!queues.containsKey(queue.getID())) {
 				queue.getResourceManager().removeTerminatedJobs(queue);
