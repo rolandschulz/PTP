@@ -31,6 +31,7 @@ import org.eclipse.ui.part.ViewPart;
 public abstract class AbstractParallelView extends ViewPart {
 	private boolean fIsVisible = false;
 	private ParallelViewPartListener partListener = null;
+	private boolean debug = false;
 
 	protected void registerPartListener() {
 		if (partListener == null) {
@@ -76,7 +77,9 @@ public abstract class AbstractParallelView extends ViewPart {
 	}
 	private class ParallelViewPartListener implements IPartListener2 {
 		public void partActivated(IWorkbenchPartReference partRef) {
-			System.err.println("-------------------- partActivated");
+			if (debug) {
+				System.err.println("-------------------- partActivated");
+			}
 			repaint(true);
 		}
 		public void partBroughtToTop(IWorkbenchPartReference partRef) {}
