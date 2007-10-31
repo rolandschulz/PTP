@@ -23,13 +23,61 @@ import java.io.IOException;
 
 
 public interface IProxyRuntimeClient {
-	public boolean startup();
-	public void shutdown();
-	public void startEvents() throws IOException;
-	public void stopEvents() throws IOException;
-	public void submitJob(String[] args) throws IOException;
-	public void terminateJob(String jobId) throws IOException;
-	
+	/**
+	 * Register for events
+	 * 
+	 * @param listener
+	 */
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
+	
+	/**
+	 * Unregister for events
+	 * 
+	 * @param listener
+	 */
 	public void removeProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
+	
+	/**
+	 * Shut down the proxy
+	 * 
+	 * @throws IOException if proxy fails to stop
+	 */
+	public void shutdown() throws IOException;
+	
+	/**
+	 * Tell proxy to start sending events
+	 * 
+	 * @throws IOException 
+	 */
+	public void startEvents() throws IOException;
+	
+	/**
+	 * Start up the proxy
+	 * 
+	 * @throws IOException if proxy fails to start
+	 */
+	public void startup() throws IOException;
+	
+	/**
+	 * Tell proxy to stop sending events
+	 * 
+	 * @throws IOException
+	 */
+	public void stopEvents() throws IOException;
+	
+	/**
+	 * Submit a job for execution
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
+	public void submitJob(String[] args) throws IOException;
+	
+	/**
+	 * Terminate a job
+	 * 
+	 * @param jobId
+	 * @throws IOException
+	 */
+	public void terminateJob(String jobId) throws IOException;
 }

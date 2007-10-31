@@ -17,7 +17,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
@@ -62,7 +65,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	 * @see org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient#startupProxyServer()
 	 */
 	@Override
-	protected boolean startupProxyServer() {
+	protected void startupProxyServer() throws IOException {
 		if (getEventLogging()) {
 			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
 			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
@@ -79,10 +82,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			 */
 			IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteServicesId);
 			if (remoteServices == null) {
-				PTPCorePlugin.log(toString() + " startup: Could not find remote services ID " + remoteServicesId);
-				return false;
+				throw new IOException("Could not find remote services ID " + remoteServicesId);
 			}
-			
+
 			if (manualLaunch) {
 				sessionCreate();
 				
@@ -108,6 +110,18 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 				IRemoteConnection conn = connMgr.getConnection(connectionName);
+
+				/*
+				 * Check the remote proxy exists
+				 */
+				IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+				try {
+					if (!fileManager.getResource(new Path(proxyPath), new NullProgressMonitor()).fetchInfo().exists()){
+						throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
+					}
+				} catch (CoreException e1) {
+					throw new IOException(e1.getMessage());
+				}
 
 				if (!stdio) {
 					sessionCreate();
@@ -194,14 +208,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Exception starting up proxy. :(");
 			try {
 				sessionFinish();
 			} catch (IOException e1) {
 				PTPCorePlugin.log(e1);
 			}
-			return false;
+			throw new IOException("Failed to start proxy: " + e.getMessage());
 		}
-		return true;
 	}
 }

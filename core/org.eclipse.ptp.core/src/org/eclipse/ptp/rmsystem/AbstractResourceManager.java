@@ -67,23 +67,23 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
+import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
+import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.INewNodeEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewQueueEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
-import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
-import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
@@ -95,14 +95,14 @@ import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
 import org.eclipse.ptp.internal.core.elements.PProcess;
 import org.eclipse.ptp.internal.core.elements.PQueue;
-import org.eclipse.ptp.internal.core.elements.events.NewMachineEvent;
-import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedQueueEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
 
 /**
  * @author rsqrd
@@ -530,13 +530,13 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 				boolean started = doStartup(new SubProgressMonitor(monitor, 10));
 				if (started) {
 					setState(ResourceManagerAttributes.State.STARTED);
-				} else if (!monitor.isCanceled()) {
-					setState(ResourceManagerAttributes.State.ERROR);					
 				} else {
 		        	setState(ResourceManagerAttributes.State.STOPPED);					
 				}
-			}
-			finally {
+			} catch (CoreException e) {
+				setState(ResourceManagerAttributes.State.ERROR);
+				throw e;
+			} finally {
 				monitor.done();
 			}
         }
@@ -774,13 +774,15 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected abstract List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue);
 
 	/**
+	 * Stop the resource manager subsystem.
+	 * 
 	 * @throws CoreException
 	 */
 	protected abstract void doShutdown(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Start the resource manager subsystem. Returns true if the system was started successfully
-	 * or false if not. An error can be distinguished from user canceled by checking the monitor state.
+	 * or false if startup was canceled by the user.
 	 * 
 	 * @param monitor
 	 * @return true if successful
