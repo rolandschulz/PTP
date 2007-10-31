@@ -41,6 +41,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
@@ -194,6 +195,9 @@ public class ModelManager implements IModelManager {
 		// Ignore - handled by listener on RM		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
+	 */
 	public void loadResourceManagers() throws CoreException {
         ResourceManagerPersistence rmp = new ResourceManagerPersistence();
         rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
@@ -300,7 +304,38 @@ public class ModelManager implements IModelManager {
 			((IModelManagerChildListener)listener).handleEvent(event);
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFromUniqueName(java.lang.String)
+	 */
+	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
+		IPUniverse universe = getUniverse();
+		if (universe != null) {
+			IResourceManager[] rms = getStartedResourceManagers(universe);
+			
+			for (IResourceManager rm : rms) {
+				if (rm.getUniqueName().equals(rmUniqueName)) {
+					return rm;
+				}
+			}
+		}
+		return null;
+	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#getStartedResourceManagers(org.eclipse.ptp.core.elements.IPUniverse)
+	 */
+	public IResourceManager[] getStartedResourceManagers(IPUniverse universe) {
+		IResourceManager[] rms = universe.getResourceManagers();
+		ArrayList<IResourceManager> startedRMs = 
+			new ArrayList<IResourceManager>(rms.length);
+		for (IResourceManager rm : rms) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+				startedRMs.add(rm);
+			}
+		}
+		return startedRMs.toArray(new IResourceManager[startedRMs.size()]);
+	}
 
 	/**
 	 * @return
