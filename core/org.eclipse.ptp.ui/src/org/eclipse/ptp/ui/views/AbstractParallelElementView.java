@@ -64,6 +64,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	
 	protected IconRefreshWorkbenchJob iconreFreshJob = new IconRefreshWorkbenchJob();
 	
+	private boolean debug = false;
+	
 	/**
 	 * update preference setting 
 	 */
@@ -415,7 +417,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			boolean refreshAll = isRefreshAll();
-			System.err.println("---------- IconRefreshWorkbenchJob refresh: " + refreshAll);
+			if (debug) {
+				System.err.println("---------- IconRefreshWorkbenchJob refresh: " + refreshAll);
+			}
 			repaint(refreshAll);
 			if (!canvas.isDisposed()) {
 				canvas.redraw();
@@ -438,7 +442,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		public boolean shouldSchedule() {
 			int size = size();
-			System.err.println("---------- IconRefreshWorkbenchJob: " + refreshList.size());
+			if (debug) {
+				System.err.println("---------- IconRefreshWorkbenchJob: " + refreshList.size());
+			}
 			return (size == 1);
 		}
 		private int size() {
