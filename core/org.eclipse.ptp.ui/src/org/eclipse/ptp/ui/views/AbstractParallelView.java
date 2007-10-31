@@ -56,6 +56,10 @@ public abstract class AbstractParallelView extends ViewPart {
 		if (isVisible())
 			getDisplay().asyncExec(r);
 	}
+	public void syncExec(Runnable r) {
+		if (isVisible())
+			getDisplay().syncExec(r);
+	}
 	public void showWhile(Runnable r) {
 		if (isVisible())
 			BusyIndicator.showWhile(getDisplay(), r);
