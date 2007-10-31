@@ -142,6 +142,7 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			}
 		}
 	}
+	
 	private final class JobListener implements IJobListener {
 		public void handleEvent(IJobChangeEvent e) {
 			if (debug) {
@@ -150,6 +151,7 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			changeJobRefresh(e.getSource(), true);			
 		}
 	}
+	
 	private final class MMChildListener implements IModelManagerChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
@@ -180,6 +182,7 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			e.getResourceManager().removeChildListener(resourceManagerListener);
 		}		
 	}
+	
 	private final class QueueChildListener implements IQueueChildListener {
 		public void handleEvent(IChangedJobEvent e) {
 			//refresh(true);
@@ -203,6 +206,7 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			changeJobRefresh(null, true);
 		}
 	}
+	
 	private final class RMChildListener implements IResourceManagerChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
@@ -344,40 +348,52 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			}
 		}
 	}
-	// view flag
+	
+	/*
+	 * view flags
+	 */
 	public static final String BOTH_VIEW = "0";
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
+	protected String current_view = BOTH_VIEW;
+	
+	/*
+	 * Model listeners
+	 */
 	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
 	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
 	private final IJobChildListener jobChildListener = new JobChildListener();
 	private final IQueueChildListener queueChildListener = new QueueChildListener();
 	private final IJobListener jobListener = new JobListener();
+	
+	/*
+	 * Debug flag
+	 */
 	private boolean debug = false;
 	
-	// selected element
+	/*
+	 * Currently selected element
+	 */
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 
-	// composite
+	/*
+	 * UI components
+	 */
 	protected Menu jobPopupMenu = null;
 	protected SashForm sashForm = null;
 	protected TableViewer jobTableViewer = null;
 	protected Composite elementViewComposite = null;
-	// action
-	// protected ParallelAction changeJobViewAction = null;
-	protected ParallelAction terminateAllAction = null;
-	
-	protected String current_view = BOTH_VIEW;
-
 	protected JobViewUpdateWorkbenchJob jobViewUpdateJob = new JobViewUpdateWorkbenchJob();
+	
+	/*
+	 * Terminate all action
+	 */
+	protected ParallelAction terminateAllAction = null;
 	
 	public ParallelJobsView() {
 		this(PTPUIPlugin.getDefault().getJobManager());
 	}
 	
-	/** Constructor
-	 * 
-	 */
 	public ParallelJobsView(IManager manager) {
 		super(manager);
 	}
@@ -418,7 +434,8 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		}
 	}
 	
-	/** Change view
+	/** 
+	 * Change view
 	 * @param view_flag
 	 */
 	public void changeView(String view_flag) {
@@ -438,6 +455,9 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#dispose()
+	 */
 	public void dispose() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
@@ -494,7 +514,8 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		return IManager.EMPTY_ID;
 	}
 	
-	/** Get current view flag
+	/** 
+	 * Get current view flag
 	 * @return flag of view
 	 */
 	public String getCurrentView() {
@@ -621,8 +642,8 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		return getJobManager().findProcess(element.getID());
 	}
 	
-	/** Create Job context menu
-	 * 
+	/** 
+	 * Create Job context menu
 	 */
 	protected void createJobContextMenu() {
 		MenuManager menuMgr = new MenuManager("#jobpopupmenu");
@@ -742,7 +763,8 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		}
 	}
 	
-	/** Create job context menu
+	/** 
+	 * Create job context menu
 	 * @param menuManager
 	 */
 	protected void fillJobContextMenu(IMenuManager menuManager) {
@@ -781,10 +803,10 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	 */
 	protected void initialView() {
 		initialElement();
-		//update();
 	}
 	
-	/** Change job
+	/** 
+	 * Change job
 	 * @param job_id Target job ID
 	 */
 	protected void selectJob(IPJob job) {
