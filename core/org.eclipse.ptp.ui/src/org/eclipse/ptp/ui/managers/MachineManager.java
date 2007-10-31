@@ -73,14 +73,6 @@ public class MachineManager extends AbstractUIManager {
 		}
 	}
 	
-	protected IElement createNodeElement(IElementSet set, String key, String name) {
-		return new Element(set, key, name) {
-			public int compareTo(IElement e) {
-				return getID().compareTo(e.getID());
-			}
-		};
-	}
-	
 	/** Add machine
 	 * @param mac machine
 	 */
@@ -91,39 +83,6 @@ public class MachineManager extends AbstractUIManager {
 		set.addElements(new IElement[] { createNodeElement(set, node.getID(), node.getName()) });
 	}
 	
-	/**
-	 * @param machine
-	 */
-	public void removeMachine(IPMachine machine) {
-		machineList.remove(machine.getID());
-		machineElementHandlerList.remove(machine.getID());
-		IElementHandler handler = machineElementHandlerList.get(machine.getID());
-		if (handler != null) {
-			IElementSet set = handler.getSetRoot();
-			for (IPNode node : machine.getNodes()) {
-				IElement element = set.getElementByID(node.getID());
-				if (element != null) {
-					set.removeElement(node.getID());
-				}
-			}
-		}
-		if (cur_machine == machine) {
-			cur_machine = null;
-		}
-	}
-	
-	/** Add machine
-	 * @param mac machine
-	 */
-	public void removeNode(IPNode node) {
-		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
-		IElementSet set = elementHandler.getSetRoot();
-		IElement element = set.getElementByID(node.getID());
-		if (element != null) {
-			set.removeElement(node.getID());
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#clear()
 	 */
@@ -132,6 +91,14 @@ public class MachineManager extends AbstractUIManager {
 			machineList.clear();
 			machineElementHandlerList.clear();
 		}
+	}
+	
+	/**
+	 * @param id
+	 * @return
+	 */
+	public IPMachine findMachineById(String id) {
+		return (IPMachine) machineList.get(id);
 	}
 	
 	/** Find node 
@@ -152,10 +119,6 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public IPMachine getCurrentMachine() {
 		return cur_machine;
-	}
-	
-	public IPMachine findMachineById(String id) {
-		return (IPMachine) machineList.get(id);
 	}
 	
 	/* (non-Javadoc)
@@ -302,7 +265,7 @@ public class MachineManager extends AbstractUIManager {
 		}
 		return getNodeStatus(null);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#initial()
 	 */
@@ -315,7 +278,7 @@ public class MachineManager extends AbstractUIManager {
 
 		setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		return null;
-	}	
+	}
 	
 	/** Is current set contain node
 	 * @param mid machine ID
@@ -344,6 +307,46 @@ public class MachineManager extends AbstractUIManager {
 	public boolean isNoMachine() {
 		return cur_machine == null;
 	}
+
+	/**
+	 * @param machine
+	 */
+	public void removeMachine(IPMachine machine) {
+		machineList.remove(machine.getID());
+		machineElementHandlerList.remove(machine.getID());
+		IElementHandler handler = machineElementHandlerList.get(machine.getID());
+		if (handler != null) {
+			IElementSet set = handler.getSetRoot();
+			for (IPNode node : machine.getNodes()) {
+				IElement element = set.getElementByID(node.getID());
+				if (element != null) {
+					set.removeElement(node.getID());
+				}
+			}
+		}
+		if (cur_machine == machine) {
+			cur_machine = null;
+		}
+	}	
+	
+	/** Add machine
+	 * @param mac machine
+	 */
+	public void removeNode(IPNode node) {
+		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
+		IElementSet set = elementHandler.getSetRoot();
+		IElement element = set.getElementByID(node.getID());
+		if (element != null) {
+			set.removeElement(node.getID());
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#setCurrentSetId(java.lang.String)
+	 */
+	public void setCurrentSetId(String set_id) {
+		cur_set_id = set_id;
+	}
 	
 	/** 
 	 * Set current machine ID. If the machine has never been set before, add an entry to
@@ -356,13 +359,6 @@ public class MachineManager extends AbstractUIManager {
 			cur_machine = machine;
 			addMachine(machine);
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#setCurrentSetId(java.lang.String)
-	 */
-	public void setCurrentSetId(String set_id) {
-		cur_set_id = set_id;
 	}
 	
 	/* (non-Javadoc)
@@ -379,5 +375,19 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int size() {
 		return machineList.size();
+	}
+	
+	/**
+	 * @param set
+	 * @param key
+	 * @param name
+	 * @return
+	 */
+	protected IElement createNodeElement(IElementSet set, String key, String name) {
+		return new Element(set, key, name) {
+			public int compareTo(IElement e) {
+				return getID().compareTo(e.getID());
+			}
+		};
 	}
 }
