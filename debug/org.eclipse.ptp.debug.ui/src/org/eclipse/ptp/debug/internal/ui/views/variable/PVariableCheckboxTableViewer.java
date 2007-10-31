@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.util.Assert;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -50,12 +50,10 @@ public class PVariableCheckboxTableViewer extends TableViewer implements IChecka
 	// Column properties
 	private static final String CP_NAME = "name";
 	private static final String CP_JOB = "job";
-	private static final String CP_SET = "set";
 
 	// Column labels
 	private static final String CL_NAME = PVariableMessages.getString("PExpressionViewer.name");
 	private static final String CL_JOB = PVariableMessages.getString("PExpressionViewer.job");
-	private static final String CL_SET = PVariableMessages.getString("PExpressionViewer.set");
 
 	/**
 	 * Constructor for PExpressionViewer
@@ -74,17 +72,14 @@ public class PVariableCheckboxTableViewer extends TableViewer implements IChecka
 		new TableColumn(table, SWT.NULL);
 		new TableColumn(table, SWT.NULL);
 		new TableColumn(table, SWT.NULL);
-		new TableColumn(table, SWT.NULL);
 		TableColumn[] columns = table.getColumns();
 		columns[0].setResizable(false);
 		columns[1].setResizable(true);
 		columns[2].setResizable(true);
-		columns[3].setResizable(true);
 
 		columns[0].setText("");
 		columns[1].setText(CL_NAME);
 		columns[2].setText(CL_JOB);
-		columns[3].setText(CL_SET);
 
 		columns[0].addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -104,20 +99,13 @@ public class PVariableCheckboxTableViewer extends TableViewer implements IChecka
 				refresh();
 			}
 		});
-		columns[3].addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				((PVariableViewerSorter)getSorter()).setColumn(3);
-				refresh();
-			}
-		});
 
 		PixelConverter pc = new PixelConverter(parent);
 		columns[0].setWidth(pc.convertWidthInCharsToPixels(3));
 		columns[1].setWidth(pc.convertWidthInCharsToPixels(20));
 		columns[2].setWidth(pc.convertWidthInCharsToPixels(20));
-		columns[3].setWidth(pc.convertWidthInCharsToPixels(20));
 
-		setColumnProperties(new String[]{ "", CP_NAME, CP_JOB, CP_SET });
+		setColumnProperties(new String[]{ "", CP_NAME, CP_JOB });
 	}
 	
     public void addCheckStateListener(ICheckStateListener listener) {

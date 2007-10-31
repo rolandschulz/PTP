@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -84,7 +85,6 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		uiDebugManager = new UIDebugManager();
-		//refreshPluginActions();
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.debug.ui", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
 	/** Get active workbench shell
@@ -186,6 +186,12 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	public static boolean isPTPDebugPerspective() {
 		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG);		
+	}
+	public static boolean isPTPPerspective() {
+		String curID = getCurrentPerspectiveID();
+		if (curID == null)
+			return false;
+		return (curID.equals(IPTPUIConstants.PERSPECTIVE_RUN) || curID.equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG));
 	}
 	
 	/***** LOG *****/

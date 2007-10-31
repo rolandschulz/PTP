@@ -16,29 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2004, 2005 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainerTypeDelegate;
-import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * See <code>CDirectorySourceContainer</code>.
+ * @author clement
+ * See <code>PDirectorySourceContainer</code>.
  */
 public class PDirectorySourceContainerType extends AbstractSourceContainerTypeDelegate {
 	/*
@@ -64,7 +54,6 @@ public class PDirectorySourceContainerType extends AbstractSourceContainerTypeDe
 		abort(InternalSourceLookupMessages.getString("PDirectorySourceContainerType.2"), null);
 		return null;
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

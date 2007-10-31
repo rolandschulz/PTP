@@ -18,40 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.debug.core.model.ICModule;
-import org.eclipse.cdt.debug.core.model.IDisassembly;
-import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
-import org.eclipse.cdt.debug.core.model.IRegisterDescriptor;
-import org.eclipse.cdt.debug.core.model.IRestart;
-import org.eclipse.cdt.debug.core.model.ISteppingModeTarget;
-import org.eclipse.cdt.debug.core.model.ITargetProperties;
+import java.math.BigInteger;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
 
 /**
  * @author Clement chu
  * 
  */
-public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IResumeWithoutSignal, IPDebugElement, ISteppingModeTarget, ITargetProperties {
-	public void cleanup();
-	public void terminated();
-	public int getTargetID();
-	public BitList getTask();
-	public boolean isLittleEndian();
-	public boolean hasSignals() throws DebugException;
-	public IPSignal[] getSignals() throws DebugException;
-	public IDisassembly getDisassembly() throws DebugException;
-	public boolean isPostMortem();
-	public boolean hasModules() throws DebugException;
-	public ICModule[] getModules() throws DebugException;
-	public void loadSymbolsForAllModules() throws DebugException;
-	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException;
-	public void addRegisterGroup(String name, IRegisterDescriptor[] descriptors);
-	public void removeRegisterGroups(IRegisterGroup[] groups);
-	public void modifyRegisterGroup(IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors);
-	public void restoreDefaultRegisterGroups();
-	public IAddress getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException;
+public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IResumeWithoutSignal, IPDebugElement, ITargetProperties, ISteppingModeTarget {
+	BitList getTasks();
+	void dispose();
+
+	boolean isLittleEndian();
+	boolean isPostMortem();
+	boolean hasSignals() throws DebugException;
+	IPSignal[] getSignals() throws DebugException;
+	IPRegisterDescriptor[] getRegisterDescriptors() throws DebugException;
+	void addRegisterGroup(String name, IPRegisterDescriptor[] descriptors);
+	void removeRegisterGroups(IRegisterGroup[] groups);
+	void modifyRegisterGroup(IPPersistableRegisterGroup group, IPRegisterDescriptor[] descriptors);
+	void restoreDefaultRegisterGroups();
+	BigInteger getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException;
+	IPDITarget getPDITarget();
 }

@@ -22,12 +22,13 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
-import org.eclipse.ptp.debug.core.model.IPType;
 import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PDebugElementState;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * @author Clement chu
@@ -35,6 +36,12 @@ import org.eclipse.ptp.debug.core.model.PDebugElementState;
  */
 public class PValueFactory {
 	static public final IPValue NULL_VALUE = new IPValue() {
+		public IAIF getAIF() {
+			return null;
+		}
+		public IPSession getSession() {
+			return null;
+		}
 		public String getReferenceTypeName() throws DebugException {
 			return "";
 		}
@@ -62,9 +69,6 @@ public class PValueFactory {
 		public Object getAdapter(Class adapter) {
 			return null;
 		}
-		public IPType getType() throws DebugException {
-			return null;
-		}
 		public String evaluateAsExpression(IPStackFrame frame) {
 			return "";
 		}
@@ -74,25 +78,20 @@ public class PValueFactory {
 		public Object getCurrentStateInfo() {
 			return null;
 		}
+		public int getID() {
+			return -1;
+		}
 	};
-	static public IPValue createValue(PVariable parent, IPCDIVariable cdiVariable) {
-		//TODO:  may ignore this checking
-		/*
-		try {
-			if (cdiVariable.getType() instanceof IAIFTypeFloat) {
-				return new PFloatingPointValue(parent, cdiVariable);			
-			}
-		} catch (PCDIException e) {}
-		*/
-		return new PValue(parent, cdiVariable);
+	static public PValue createValue(PVariable parent, IPDIVariable variable) {
+		return new PValue(parent, variable);
 	}
-	static public PIndexedValue createIndexedValue(AbstractPVariable parent, IPCDIVariable cdiVariable, int start, int length) {
-		return new PIndexedValue(parent, cdiVariable, start, length);
+	static public PIndexedValue createIndexedValue(AbstractPVariable parent, IPDIVariable variable, int start, int length) {
+		return new PIndexedValue(parent, variable, start, length);
 	}
-	static public IPValue createValueWithError(PVariable parent, String message) {
+	static public PValue createValueWithError(PVariable parent, String message) {
 		return new PValue(parent, message);
 	}
-	static public IPValue createGlobalValue(PVariable parent, IPCDIVariable cdiVariable) {
-		return new PGlobalValue(parent, cdiVariable);
+	static public PValue createGlobalValue(PVariable parent, IPDIVariable variable) {
+		return new PGlobalValue(parent, variable);
 	}
 }

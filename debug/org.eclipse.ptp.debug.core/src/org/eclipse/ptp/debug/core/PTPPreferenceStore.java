@@ -61,7 +61,7 @@ public class PTPPreferenceStore implements IPreferenceStore {
 	 * @see org.eclipse.jface.preference.IPreferenceStore#firePropertyChangeEvent(java.lang.String, java.lang.Object, java.lang.Object)
 	 */
 	public void firePropertyChangeEvent(String name, Object oldValue, Object newValue) {
-		Iterator it = fListeners.keySet().iterator();
+		Iterator<IPropertyChangeListener> it = fListeners.keySet().iterator();
 		while (it.hasNext()) {
 			((IPropertyChangeListener) it.next()).propertyChange(new PropertyChangeEvent(this, name, oldValue, newValue));
 		}

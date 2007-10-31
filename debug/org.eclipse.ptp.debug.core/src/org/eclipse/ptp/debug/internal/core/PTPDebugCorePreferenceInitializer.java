@@ -18,17 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core; 
 
-import org.eclipse.cdt.debug.core.cdi.ICDIFormat;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
  
 public class PTPDebugCorePreferenceInitializer extends AbstractPreferenceInitializer {
 	public PTPDebugCorePreferenceInitializer() {
 		super();
 	}
 	public void initializeDefaultPreferences() {
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, ICDIFormat.NATURAL );
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, ICDIFormat.NATURAL );
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault(IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, IPDIFormat.NATURAL);
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL);
 	}
 }

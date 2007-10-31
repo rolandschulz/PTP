@@ -18,10 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -35,29 +31,24 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
+import org.eclipse.ptp.debug.internal.ui.PVariableManager.PVariableInfo;
 import org.eclipse.ptp.debug.internal.ui.actions.AddPExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.CompareValueAction;
 import org.eclipse.ptp.debug.internal.ui.actions.DeletePExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.EditPExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.UpdatePExpressionAction;
-import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
+import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.ui.listeners.IJobChangedListener;
-import org.eclipse.ptp.ui.listeners.ISetListener;
-import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * @author Clement chu
  */
-public class PVariableView extends AbstractDebugView implements IJobChangedListener, ISetListener, ICheckStateListener {
-	private AbstractPDebugEventHandler fEventHandler;
+public class PVariableView extends AbstractDebugView implements ICheckStateListener {
+	private AbstractPDebugViewEventHandler fEventHandler;
 	private UIDebugManager uiManager = null;
 	private PVariableCheckboxTableViewer viewer = null;
 	
@@ -92,10 +83,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		    	updateActionsEnable();
 		    }
 		});
-		uiManager.addJobChangedListener(this);
-		uiManager.addSetListener(this);
 		setEventHandler(new PVariableViewEventHandler(this));
-		
 		return viewer;
 	}
 	public UIDebugManager getUIManager() {
@@ -113,7 +101,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	 * 
 	 * @param eventHandler event handler
 	 */
-	protected void setEventHandler(AbstractPDebugEventHandler eventHandler) {
+	protected void setEventHandler(AbstractPDebugViewEventHandler eventHandler) {
 		this.fEventHandler = eventHandler;
 	}
 	/**
@@ -121,7 +109,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	 * 
 	 * @return The event handler for this view
 	 */
-	protected AbstractPDebugEventHandler getEventHandler() {
+	protected AbstractPDebugViewEventHandler getEventHandler() {
 		return this.fEventHandler;
 	}	
 	/* (non-Javadoc)
@@ -172,44 +160,13 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		uiManager.removeSetListener(this);
-		uiManager.removeJobChangedListener(this);
 		viewer.removeCheckStateListener(this);
 		super.dispose();
 		if (getEventHandler() != null) {
 			getEventHandler().dispose();
 		}	
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IJobChangedListener#jobChangedEvent(java.lang.String, java.lang.String)
-	 */
-	public void jobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				doJobChangedEvent(type, cur_job_id, pre_job_id, monitor);
-				monitor.done();
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.setPriority(Job.INTERACTIVE);
-		uiJob.schedule();		
-	}
 
-	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
-		switch (type) {
-		case IJobChangedListener.CHANGED:
-			refresh();
-			break;
-		case IJobChangedListener.REMOVED:
-			if (pre_job_id != null) {
-				uiManager.getJobVariableManager().removeJobVariables(pre_job_id);
-				refresh();
-			}
-			break;
-		}
-		updateActionsEnable();
-	}
 	private boolean isEmpty() {
 		return (viewer.getTable().getItemCount()==0);
 	}
@@ -224,21 +181,14 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		getAction(UpdatePExpressionAction.name).setEnabled(!isEmpty());
 		getAction(CompareValueAction.name).setEnabled(!getSelection().isEmpty());
 	}
-	public void deleteSetEvent(IElementSet set) {
-		refresh();
-	}
-	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {}
-	public void createSetEvent(IElementSet set, IElement[] elements) {}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
 	 */
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		Object data = event.getElement();
-		if (data instanceof JobVariable) {
-			((JobVariable)data).setEnable(event.getChecked());
+		if (data instanceof PVariableInfo) {
+			((PVariableInfo)data).setEnabled(event.getChecked());
 		}
 	}
 }

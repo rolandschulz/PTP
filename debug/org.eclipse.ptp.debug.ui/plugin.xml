@@ -3,91 +3,15 @@
 <plugin>
 
 	<extension-point id="PDebuggerPage" name="%PDebuggerPage.name" schema="schema/PDebuggerPage.exsd"/>
-
-	<!-- preferences //-->
+	
+	<!-- debug model presentation //-->
 	<extension
-		point="org.eclipse.core.runtime.preferences">
-		<initializer
-			class="org.eclipse.ptp.debug.internal.ui.preferences.PreferenceInitializer">
-		</initializer>
+		point="org.eclipse.debug.ui.debugModelPresentations">
+		<debugModelPresentation
+			class="org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation"
+			id="org.eclipse.ptp.debug.core">
+		</debugModelPresentation>
 	</extension>
-   
-	<extension
-		point="org.eclipse.ui.preferencePages">
-		<page
-			name="%PDebugPreferencePage.name"
-			category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
-			class="org.eclipse.ptp.debug.internal.ui.preferences.PDebugPreferencePage"
-			id="org.eclipse.ptp.debug.ui.PDebugPreferencePage">
-		</page>
-	</extension>
-	<extension
-		point="org.eclipse.debug.core.sourceLocators">
-		<sourceLocator
-			name="%DefaultSourceLocator.name"
-			class="org.eclipse.ptp.debug.ui.sourcelookup.DefaultSourceLocator"
-			id="org.eclipse.ptp.debug.ui.DefaultSourceLocator">
-		</sourceLocator>
-	</extension>
-	<!-- 
-	Not yet develop Source Map UI
-	<extension
-		point="org.eclipse.debug.ui.sourceContainerPresentations">
-		<sourceContainerPresentation
-			browserClass="org.eclipse.ptp.debug.internal.ui.sourcelookup.MappingSourceContainerBrowser"
-			containerTypeID="org.eclipse.ptp.debug.core.containerType.mapping"
-			icon="icons/obj16/mapping_obj.gif"
-			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.mapping"/>
-		<sourceContainerPresentation
-			containerTypeID="org.eclipse.ptp.debug.core.containerType.mapEntry"
-			icon="icons/obj16/mapentry_obj.gif"
-			id="org.eclipse.ppt.debug.ui.sourceContainerPresentation.mapEntry"/>
-	</extension>
-	//-->
-   	<!-- perspective //-->
-	<extension
-		point="org.eclipse.ui.perspectives">
-		<perspective
-			name="%ParallelDebugPerspective.name"
-			icon="icons/ptpdebug.gif"
-			class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
-			id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-			<description>
-				%ParallelDebugPerspective.description
-			</description>
-		</perspective>
-	</extension>   
-	<extension
-		point="org.eclipse.ui.perspectiveExtensions">
-		<perspectiveExtension
-			targetID="org.eclipse.ui.resourcePerspective">
-			<perspectiveShortcut
-				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-			</perspectiveShortcut>
-		</perspectiveExtension>
-		<perspectiveExtension
-			targetID="org.eclipse.debug.ui.DebugPerspective">
-			<perspectiveShortcut
-				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-			</perspectiveShortcut>
-		</perspectiveExtension>
-		<perspectiveExtension
-			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-			<perspectiveShortcut
-				id="org.eclipse.ptp.ui.PTPRunPerspective">
-			</perspectiveShortcut>
-			<perspectiveShortcut
-				id="org.eclipse.debug.ui.DebugPerspective">
-			</perspectiveShortcut>
-			<actionSet
-				id="org.eclipse.debug.ui.launchActionSet">
-			</actionSet>
-			<actionSet
-				id="org.eclipse.ptp.ui.actionSets">
-			</actionSet>
-		</perspectiveExtension>
-	</extension>   
-
 	<!-- view //-->
 	<extension
 		point="org.eclipse.ui.views">
@@ -124,110 +48,79 @@
 			id="org.eclipse.ptp.debug.ui.views.PVariableView">
 		</view>
 	</extension>
-
+	<!-- perspective extensions //-->
 	<extension
-		point="org.eclipse.debug.ui.debugModelPresentations">
-		<debugModelPresentation
-			class="org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation"
-			id="org.eclipse.ptp.debug.core">
-		</debugModelPresentation>
+		point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension
+			targetID="org.eclipse.ui.resourcePerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			</perspectiveShortcut>
+		</perspectiveExtension>
+		<perspectiveExtension
+			targetID="org.eclipse.debug.ui.DebugPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			</perspectiveShortcut>
+		</perspectiveExtension>
+		<perspectiveExtension
+			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.ui.PTPRunPerspective">
+			</perspectiveShortcut>
+			<perspectiveShortcut
+				id="org.eclipse.debug.ui.DebugPerspective">
+			</perspectiveShortcut>
+			<view
+				visible="true"
+				relative="org.eclipse.ui.console.ConsoleView"
+				relationship="stack"
+				id="org.eclipse.ui.views.ProblemView">
+			</view>      
+			<viewShortcut
+				id="org.eclipse.ui.views.ProblemView">
+			</viewShortcut>
+			<actionSet
+				id="org.eclipse.debug.ui.launchActionSet">
+			</actionSet>
+			<actionSet
+				id="org.eclipse.ptp.ui.actionSets">
+			</actionSet>
+			<actionSet
+				id="org.eclipse.cdt.debug.ui.debugActionSet">
+			</actionSet>
+		</perspectiveExtension>
+	</extension>   	
+	<!-- preferences //-->
+	<extension
+		point="org.eclipse.ui.preferencePages">
+		<page
+			name="%PDebugPreferencePage.name"
+			category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+			class="org.eclipse.ptp.debug.internal.ui.preferences.PDebugPreferencePage"
+			id="org.eclipse.ptp.debug.ui.PDebugPreferencePage">
+		</page>
+	</extension>
+	<extension
+		point="org.eclipse.core.runtime.preferences">
+		<initializer
+			class="org.eclipse.ptp.debug.internal.ui.preferences.PreferenceInitializer">
+		</initializer>
 	</extension>
 
-	<!-- annotation //-->
+   	<!-- perspective //-->
 	<extension
-		point="org.eclipse.ui.editors.annotationTypes">
-		<type
-			markerType="org.eclipse.ptp.debug.core.pBreakpointMarker"
-			super="org.eclipse.debug.core.breakpoint"
-			name="org.eclipse.ptp.debug.core.breakpoint">
-		</type>
-		<type
-			markerType="org.eclipse.ptp.debug.ui.regCurrentIP"
-			name="org.eclipse.ptp.debug.ui.regCurrentIP">
-		</type>
-		<type
-			markerType="org.eclipse.ptp.debug.ui.regSecondaryIP"
-			name="org.eclipse.ptp.debug.ui.regSecondaryIP">
-		</type>      
-		<type
-			markerType="org.eclipse.ptp.debug.ui.currentSetIP"
-			name="org.eclipse.ptp.debug.ui.currentSetIP">
-		</type>      
-		<type
-			markerType="org.eclipse.ptp.debug.ui.setIP"
-			name="org.eclipse.ptp.debug.ui.setIP">
-		</type>      
-	</extension>
-
-	<extension
-		point="org.eclipse.ui.editors.markerAnnotationSpecification">
-		<specification
-			annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
-			annotationType="org.eclipse.ptp.debug.core.breakpoint"
-			label="%PBreakpointAnnotation.label"
-			presentationLayer="4">
-		</specification>
-		<specification
-			annotationType="org.eclipse.ptp.debug.ui.regCurrentIP"
-			icon="icons/debug/reg_cur_ip.gif"
-			presentationLayer="7"
-			colorPreferenceKey="ptpRegCurrentIPColor"
-			colorPreferenceValue="198,219,174"
-			highlightPreferenceValue="true"
-			highlightPreferenceKey="ptpRegCurrentIPHighlight"
-			textPreferenceValue="false"
-			textPreferenceKey="ptpRegCurrentIPIndication"
-			verticalRulerPreferenceValue="true"
-			verticalRulerPreferenceKey="ptpRegCurrentIPVerticalRuler"
-			overviewRulerPreferenceValue="true"
-			overviewRulerPreferenceKey="ptpRegCucurrentIPOverviewRuler">
-		</specification>
-		<specification
-			annotationType="org.eclipse.ptp.debug.ui.regSecondaryIP"
-			icon="icons/debug/reg_sec_ip.gif"
-			presentationLayer="7"
-			colorPreferenceValue="219,235,204"
-			colorPreferenceKey="ptpRegSecondaryIPColor"
-			highlightPreferenceValue="true"
-			highlightPreferenceKey="ptpRegSecondaryIPHighlight"
-			textPreferenceValue="false"
-			textPreferenceKey="ptpRegSecondaryIPIndication"
-			verticalRulerPreferenceValue="true"
-			verticalRulerPreferenceKey="ptpRegSecondaryIPVerticalRuler"
-			overviewRulerPreferenceValue="true"
-			overviewRulerPreferenceKey="ptpRegSecondaryIPOverviewRuler">
-		</specification>
-		<specification
-			annotationType="org.eclipse.ptp.debug.ui.currentSetIP"
-			icon="icons/debug/cur_set_ip.gif"
-			presentationLayer="6"
-			colorPreferenceValue="130,105,20"
-			colorPreferenceKey="ptpCurrentIPColor"
-			highlightPreferenceValue="true"
-			highlightPreferenceKey="ptpCurrentSetIPHighlight"
-			textPreferenceValue="false"
-			textPreferenceKey="ptpCurrentSetIPIndication"
-			verticalRulerPreferenceValue="true"
-			verticalRulerPreferenceKey="ptpCurrentSetIPVerticalRuler"
-			overviewRulerPreferenceValue="true"
-			overviewRulerPreferenceKey="ptpCurrentSetIPOverviewRuler">
-		</specification>
-		<specification
-			annotationType="org.eclipse.ptp.debug.ui.setIP"
-			icon="icons/debug/set_ip.gif"
-			presentationLayer="6"
-			colorPreferenceValue="255,255,0"
-			colorPreferenceKey="ptpSecondaryIPColor"
-			highlightPreferenceValue="true"
-			highlightPreferenceKey="ptpSetIPHighlight"
-			textPreferenceValue="false"
-			textPreferenceKey="ptpSetIPIndication"
-			verticalRulerPreferenceValue="true"
-			verticalRulerPreferenceKey="ptpSetIPVerticalRuler"
-			overviewRulerPreferenceValue="true"
-			overviewRulerPreferenceKey="ptpSetIPOverviewRuler">
-		</specification>
-	</extension>
+		point="org.eclipse.ui.perspectives">
+		<perspective
+			name="%ParallelDebugPerspective.name"
+			icon="icons/ptpdebug.gif"
+			class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
+			id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			<description>
+				%ParallelDebugPerspective.description
+			</description>
+		</perspective>
+	</extension>   
 
 	<!-- annotation //-->		      
 	<extension
@@ -239,65 +132,94 @@
 			class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.PBreakpointSetOrganizer"
 			id="org.eclipse.ptp.debug.ui.pBreakpointSetOrganizer"/>
 	</extension>
-		   
-	<!--
+
+	<!-- Extension //-->
 	<extension
-		point="org.eclipse.ui.viewActions">
-		<viewContribution
-			targetID="org.eclipse.debug.ui.BreakpointView"
-			id="org.eclipse.ptp.debug.ui.breakpointView.menu">
-			<action
-				label="%ShowFullPathsAction.label"
-				icon="icons/tool/show_paths.gif"
-				style="toggle"
-				tooltip="%ShowFullPathsAction.tooltip"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction"
-				menubarPath="pDebugActions"
-				id="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction">
-			</action>
-		</viewContribution>
+		point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension
+			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			<view
+				relative="org.eclipse.debug.ui.VariableView"
+				visible="false"
+				relationship="stack"
+				id="org.eclipse.ptp.debug.ui.SignalsView">
+			</view>
+			<viewShortcut
+				id="org.eclipse.ptp.debug.ui.SignalsView">
+			</viewShortcut>
+			<viewShortcut
+				id="org.eclipse.debug.ui.MemoryView">
+			</viewShortcut>
+			<viewShortcut
+				id="org.eclipse.debug.ui.ExpressionView">
+			</viewShortcut>
+		</perspectiveExtension>
 	</extension>
-	//-->
-		
-	<extension point="org.eclipse.core.runtime.adapters">
-		<factory 
-			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
-			adaptableType="org.eclipse.cdt.internal.ui.editor.CEditor">
-			<adapter
-				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
-			</adapter>
-			<adapter
-				type="org.eclipse.debug.ui.actions.IRunToLineTarget">
-			</adapter>
-		</factory>
-		<factory
-			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-			adaptableType="org.eclipse.ui.views.contentoutline.ContentOutline">
-			<adapter
-				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
-			</adapter>
-		</factory>
-		<factory
-			class="org.eclipse.ptp.debug.internal.ui.PBreakpointWorkbenchAdapterFactory"
-			adaptableType="org.eclipse.ptp.debug.core.model.IPBreakpoint">
-			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
-		</factory>
-	</extension>
-	<!--
+
+	<!-- Action sets //-->
 	<extension
-		point="org.eclipse.ui.editorActions">
-		<editorContribution
-			targetID="org.eclipse.cdt.ui.editor.CEditor"
-			id="org.eclipse.ptp.debug.ui.CEditor.BreakpointRulerActions">
+		point="org.eclipse.ui.actionSets">
+		<actionSet
+        id="org.eclipse.ptp.debug.ui.debugActionSet"
+        label="%DebugActionSet.label"
+        visible="true">
+			<menu
+				label="%RunMenu.label"
+				path="additions"
+				id="org.eclipse.ui.run">
+			</menu>
 			<action
-				label="%ToggleBreakpoint.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-				actionID="RulerDoubleClick"
-				id="org.eclipse.ptp.debug.ui.CEditor.ManageBreakpointRulerAction">
+				id="org.eclipse.ptp.debug.ui.actions.ResumeAtLine"
+				class="org.eclipse.ptp.debug.internal.ui.actions.RetargetResumeAtLineAction"
+				disabledIcon="icons/tool/jump_co_disable.gif"
+				enablesFor="1"
+				icon="icons/tool/jump_co_normal.gif"
+				helpContextId="jump_to_line_action_context"
+				label="%GlobalJumpToLineAction.label"
+				menubarPath="org.eclipse.ui.run/stepGroup">
+				<enablement>
+					<pluginState
+						value="activated"
+						id="org.eclipse.ptp.debug.ui">
+					</pluginState>
+				</enablement>
 			</action>
-		</editorContribution>
+			<action
+				id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+				class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+				disabledIcon="icons/tool/signal0_co_disable.gif"
+				enablesFor="1"
+				icon="icons/tool/signal0_co_normal.gif"
+				helpContextId="resume_without_signal_action_context"
+				label="%SignalZeroAction.label"
+				menubarPath="org.eclipse.ui.run/stepGroup"
+				tooltip="%SignalZeroAction.tooltip">
+				<enablement>
+					<pluginState
+						value="activated"
+						id="org.eclipse.ptp.debug.ui">
+					</pluginState>
+				</enablement>
+			</action>
+			<action
+				id="org.eclipse.ptp.debug.ui.internal.actions.RestartActionDelegate"
+				class="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate"
+				disabledIcon="icons/tool/restart_disable.gif"
+				enablesFor="1"
+				icon="icons/tool/restart_normal.gif"
+				helpContextId="restart_action_context"
+				label="%RestartAction.label"
+				menubarPath="org.eclipse.ui.run/stepGroup">
+				<enablement>
+					<pluginState
+						value="activated"
+						id="org.eclipse.ptp.debug.ui">
+					</pluginState>
+				</enablement>
+			</action>
+		</actionSet>
 	</extension>
-	//-->
+	<!-- poupup menus //-->
 	<extension
 		point="org.eclipse.ui.popupMenus">
 		<viewerContribution
@@ -330,6 +252,45 @@
 				id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
 			</action>
 		</viewerContribution>
+		<!--//
+		<viewerContribution
+			targetID="#CEditorContext"
+			id="org.eclipse.cdt.debug.ui.CEditorPopupActions">
+			<visibility>
+				<and>
+					<systemProperty
+						value="true"
+						name="org.eclipse.ptp.debug.ui.debuggerActive"/>
+					<objectClass name="org.eclipse.jface.text.ITextSelection"/>
+				</and>
+			</visibility>
+			<action
+				label="%AddExpressionAction.label"
+				icon="icons/debug/ptp_bpt_set.gif"
+				helpContextId="add_expression_action_context"
+				class="org.eclipse.ptp.debug.internal.ui.actions.AddExpressionEditorActionDelegate"
+				menubarPath="additions"
+				id="org.eclipse.ptp.debug.internal.ui.actions.AddExpressionActionDelegate">
+			</action>
+			<action
+				label="%JumpToLineAction.label"
+				icon="icons/debug/ptp_bpt_set.gif"
+				helpContextId="jump_to_line_action_context"
+				class="org.eclipse.ptp.debug.internal.ui.actions.ResumeAtLineActionDelegate"
+				menubarPath="additions"
+				enablesFor="1"
+				id="org.eclipse.ptp.debug.internal.ui.actions.JumpToLineActionDelegate">
+			</action>
+			<action
+				helpContextId="run_to_line_action_context"
+				label="%RunToLineAction.label"
+				definitionId="org.eclipse.debug.ui.commands.RunToLine"
+				class="org.eclipse.debug.ui.actions.RunToLineActionDelegate"
+				menubarPath="additions"
+				id="org.eclipse.ptp.debug.ui.actions.popup.RunToLine">
+			</action>
+		</viewerContribution>
+		//-->
 		<viewerContribution
 			targetID="org.eclipse.debug.ui.BreakpointView"
 			id="org.eclipse.ptp.debug.ui.breakpointview.popupMenu">
@@ -462,10 +423,10 @@
 		</viewerContribution>
 		<!-- debug view end -->
 		<!-- variable view start -->
+		<!--//
 		<viewerContribution
 			targetID="org.eclipse.debug.ui.VariableView"
 			id="org.eclipse.ptp.debug.ui.variablesView.popupMenu">
-		<!--//
 			<action
 				helpContextId="remove_all_globals_action_context"
 				enablesFor="*"
@@ -473,7 +434,7 @@
 				tooltip="%RemoveAllGlobalsAction.tooltip"
 				icon="icons/rem_all_co.gif"
 				class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
-				menubarPath="additions"
+				menubarPath="additions"org.eclipse.cdt.debug.core.model.ICastToType
 				id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
 				<enablement>
 					<pluginState
@@ -534,13 +495,15 @@
 					class="org.eclipse.ptp.debug.core.model.IPVariable">
 				</selection>
 			</action>
-			//-->
 		</viewerContribution>
+		//-->
 		<!-- variable view end -->      
 	</extension>
-
+	
+	<!--
 	<extension
 		point="org.eclipse.ui.viewActions">
+	//-->
 		<!-- variable toolbar start //-->
 		<!--
 		<viewContribution
@@ -598,8 +561,53 @@
 		</viewContribution>
 		//-->
 		<!-- variable toolbar end //-->
+		<!--
+		<viewContribution
+			targetID="org.eclipse.debug.ui.BreakpointView"
+			id="org.eclipse.ptp.debug.ui.breakpointView.menu">
+			<action
+				label="%ShowFullPathsAction.label"
+				icon="icons/tool/show_paths.gif"
+				style="toggle"
+				tooltip="%ShowFullPathsAction.tooltip"
+				class="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction"
+				menubarPath="pDebugActions"
+				id="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction">
+			</action>
+		</viewContribution>
+		//-->
+	<!--
 	</extension>
-
+	//-->
+	
+	<!-- editor actions //-->
+	<!--
+	<extension
+		point="org.eclipse.ui.editorActions">
+		<editorContribution
+			targetID="org.eclipse.cdt.ui.editor.CEditor"
+			id="org.eclipse.ptp.debug.ui.CEditor.BreakpointRulerActions">
+			<action
+				label="%ToggleBreakpoint.label"
+				class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+				actionID="RulerDoubleClick"
+				id="org.eclipse.ptp.debug.ui.CEditor.ManageBreakpointRulerAction">
+			</action>
+		</editorContribution>
+	</extension>
+	//-->
+	<!-- text hovers //-->
+	<extension
+		point="org.eclipse.cdt.ui.textHovers">
+		<hover
+			label="%DebugTextHover.label"
+			description="%DebugTextHover.description"
+			class="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover"
+			id="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover">
+		</hover>
+	</extension>		
+	
+	<!-- property pages //-->
 	<extension
 		point="org.eclipse.ui.propertyPages">
 		<page
@@ -631,15 +639,185 @@
 			</enabledWhen>
 		</page>
 	</extension>
-
+	
+	<!-- source locators //-->
 	<extension
-		point="org.eclipse.cdt.ui.textHovers">
-		<hover
-			label="%DebugTextHover.label"
-			description="%DebugTextHover.description"
-			class="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover"
-			id="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover">
-		</hover>
+		point="org.eclipse.debug.core.sourceLocators">
+		<sourceLocator
+			name="%DefaultSourceLocator.name"
+			class="org.eclipse.ptp.debug.ui.sourcelookup.DefaultSourceLocator"
+			id="org.eclipse.ptp.debug.ui.DefaultSourceLocator">
+		</sourceLocator>
+	</extension>
+
+	<!-- new //-->
+	<extension
+		point="org.eclipse.ui.contexts">
+		<context
+			name="%DebuggingPContext.name"
+			description="%DebuggingPContext.description"
+			parentId="org.eclipse.debug.ui.debugging"
+			id="org.eclipse.ptp.debug.ui.debugging">
+		</context>
+	</extension>
+	<extension
+		point="org.eclipse.debug.ui.debugModelContextBindings">
+		<modelContextBinding
+			debugModelId="org.eclipse.ptp.debug.core"
+			contextId="org.eclipse.ptp.debug.ui.debugging">
+		</modelContextBinding>
+	</extension>
+	<extension
+		point="org.eclipse.debug.ui.contextViewBindings">
+		<contextViewBinding
+			viewId="org.eclipse.debug.ui.MemoryView"
+			contextId="org.eclipse.ptp.debug.ui.debugging">
+		</contextViewBinding>
+		<contextViewBinding
+			autoOpen="false"
+			contextId="org.eclipse.ptp.debug.ui.debugging"
+			viewId="org.eclipse.ptp.debug.ui.SignalsView">
+		</contextViewBinding>
+		<contextViewBinding
+			viewId="org.eclipse.debug.ui.RegisterView"
+			contextId="org.eclipse.ptp.debug.ui.debugging">
+		</contextViewBinding>
+	</extension>
+
+	<!-- annotation //-->
+	<extension
+		point="org.eclipse.ui.editors.annotationTypes">
+		<type
+			markerType="org.eclipse.ptp.debug.core.pBreakpointMarker"
+			super="org.eclipse.debug.core.breakpoint"
+			name="org.eclipse.ptp.debug.core.breakpoint">
+		</type>
+		<type
+			markerType="org.eclipse.ptp.debug.ui.regCurrentIP"
+			name="org.eclipse.ptp.debug.ui.regCurrentIP">
+		</type>
+		<type
+			markerType="org.eclipse.ptp.debug.ui.regSecondaryIP"
+			name="org.eclipse.ptp.debug.ui.regSecondaryIP">
+		</type>      
+		<type
+			markerType="org.eclipse.ptp.debug.ui.currentSetIP"
+			name="org.eclipse.ptp.debug.ui.currentSetIP">
+		</type>      
+		<type
+			markerType="org.eclipse.ptp.debug.ui.setIP"
+			name="org.eclipse.ptp.debug.ui.setIP">
+		</type>      
+	</extension>
+	<extension
+		point="org.eclipse.ui.editors.markerAnnotationSpecification">
+		<specification
+			annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
+			annotationType="org.eclipse.ptp.debug.core.breakpoint"
+			label="%PBreakpointAnnotation.label"
+			presentationLayer="4">
+		</specification>
+		<specification
+			annotationType="org.eclipse.ptp.debug.ui.regCurrentIP"
+			icon="icons/debug/reg_cur_ip.gif"
+			presentationLayer="7"
+			colorPreferenceKey="ptpRegCurrentIPColor"
+			colorPreferenceValue="102,204,255"
+			highlightPreferenceValue="true"
+			highlightPreferenceKey="ptpRegCurrentIPHighlight"
+			textPreferenceValue="false"
+			textPreferenceKey="ptpRegCurrentIPIndication"
+			verticalRulerPreferenceValue="true"
+			verticalRulerPreferenceKey="ptpRegCurrentIPVerticalRuler"
+			overviewRulerPreferenceValue="true"
+			overviewRulerPreferenceKey="ptpRegCucurrentIPOverviewRuler">
+		</specification>
+		<specification
+			annotationType="org.eclipse.ptp.debug.ui.regSecondaryIP"
+			icon="icons/debug/reg_sec_ip.gif"
+			presentationLayer="7"
+			colorPreferenceValue="204,255,102"
+			colorPreferenceKey="ptpRegSecondaryIPColor"
+			highlightPreferenceValue="true"
+			highlightPreferenceKey="ptpRegSecondaryIPHighlight"
+			textPreferenceValue="false"
+			textPreferenceKey="ptpRegSecondaryIPIndication"
+			verticalRulerPreferenceValue="true"
+			verticalRulerPreferenceKey="ptpRegSecondaryIPVerticalRuler"
+			overviewRulerPreferenceValue="true"
+			overviewRulerPreferenceKey="ptpRegSecondaryIPOverviewRuler">
+		</specification>
+		<specification
+			annotationType="org.eclipse.ptp.debug.ui.currentSetIP"
+			icon="icons/debug/cur_set_ip.gif"
+			presentationLayer="6"
+			colorPreferenceValue="255,204,102"
+			colorPreferenceKey="ptpCurrentIPColor"
+			highlightPreferenceValue="true"
+			highlightPreferenceKey="ptpCurrentSetIPHighlight"
+			textPreferenceValue="false"
+			textPreferenceKey="ptpCurrentSetIPIndication"
+			verticalRulerPreferenceValue="true"
+			verticalRulerPreferenceKey="ptpCurrentSetIPVerticalRuler"
+			overviewRulerPreferenceValue="true"
+			overviewRulerPreferenceKey="ptpCurrentSetIPOverviewRuler">
+		</specification>
+		<specification
+			annotationType="org.eclipse.ptp.debug.ui.setIP"
+			icon="icons/debug/set_ip.gif"
+			presentationLayer="6"
+			colorPreferenceValue="204,255,102"
+			colorPreferenceKey="ptpSecondaryIPColor"
+			highlightPreferenceValue="true"
+			highlightPreferenceKey="ptpSetIPHighlight"
+			textPreferenceValue="false"
+			textPreferenceKey="ptpSetIPIndication"
+			verticalRulerPreferenceValue="true"
+			verticalRulerPreferenceKey="ptpSetIPVerticalRuler"
+			overviewRulerPreferenceValue="true"
+			overviewRulerPreferenceKey="ptpSetIPOverviewRuler">
+		</specification>
+	</extension>
+
+	<!-- runtime adapters //-->
+	<extension point="org.eclipse.core.runtime.adapters">
+		<factory 
+			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
+			adaptableType="org.eclipse.cdt.internal.ui.editor.CEditor">
+			<adapter
+				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+			</adapter>
+			<adapter
+				type="org.eclipse.debug.ui.actions.IRunToLineTarget">
+			</adapter>
+		</factory>
+		<factory
+			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+			adaptableType="org.eclipse.ui.views.contentoutline.ContentOutline">
+			<adapter
+				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+			</adapter>
+		</factory>
+		<factory
+			class="org.eclipse.ptp.debug.internal.ui.PBreakpointWorkbenchAdapterFactory"
+			adaptableType="org.eclipse.ptp.debug.core.model.IPBreakpoint">
+			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+		</factory>
+		<factory
+			adaptableType="org.eclipse.cdt.debug.core.sourcelookup.MappingSourceContainer"
+			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
+			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+		</factory>
+		<factory
+			adaptableType="org.eclipse.cdt.debug.internal.core.sourcelookup.MapEntrySourceContainer"
+			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
+			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+		</factory>
+		<factory
+			adaptableType="org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer"
+			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
+			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+		</factory>
 	</extension>
 
 	<!-- Watch Expression //-->
@@ -649,7 +827,6 @@
 			debugModel="org.eclipse.ptp.debug.core"
 			delegateClass="org.eclipse.ptp.debug.internal.ui.PWatchExpressionDelegate"/>
 	</extension>
-   
 	<!-- Memory //-->
 	<extension
 		point="org.eclipse.debug.ui.memoryRenderings">
@@ -658,96 +835,28 @@
 			primaryId="org.eclipse.debug.ui.rendering.raw_memory"
 			renderingIds="org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint">
 			<enablement>
-				<instanceof value="org.eclipse.ptp.debug.internal.core.model.PTPMemoryBlockExtension"/>
+				<instanceof value="org.eclipse.ptp.debug.internal.core.model.PMemoryBlockExtension"/>
 			</enablement>
 		</renderingBindings>
 	</extension>
-
-	<!-- Extension //-->
+	<!-- source container //-->
 	<extension
-		point="org.eclipse.ui.perspectiveExtensions">
-		<perspectiveExtension
-			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-			<view
-				relative="org.eclipse.debug.ui.VariableView"
-				visible="false"
-				relationship="stack"
-				id="org.eclipse.ptp.debug.ui.SignalsView">
-			</view>
-			<viewShortcut
-				id="org.eclipse.ptp.debug.ui.SignalsView">
-			</viewShortcut>
-			<viewShortcut
-				id="org.eclipse.debug.ui.MemoryView">
-			</viewShortcut>
-			<viewShortcut
-				id="org.eclipse.debug.ui.ExpressionView">
-			</viewShortcut>
-		</perspectiveExtension>
+		point="org.eclipse.debug.ui.sourceContainerPresentations">
+		<sourceContainerPresentation
+			browserClass="org.eclipse.ptp.debug.internal.ui.sourcelookup.MappingSourceContainerBrowser"
+			containerTypeID="org.eclipse.ptp.debug.core.containerType.mapping"
+			icon="icons/obj16/mapping_obj.gif"
+			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.mapping"/>
+		<sourceContainerPresentation
+			containerTypeID="org.eclipse.ptp.debug.core.containerType.mapEntry"
+			icon="icons/obj16/mapentry_obj.gif"
+			id="org.eclipse.ppt.debug.ui.sourceContainerPresentation.mapEntry"/>
+		<sourceContainerPresentation
+			containerTypeID="org.eclipse.ptp.debug.core.containerType.absolutePath"
+			icon="icons/obj16/abspath_obj.gif"
+			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.absolutePath"/>
 	</extension>
 
-	<!-- Action sets //-->
-	<extension
-		point="org.eclipse.ui.actionSets">
-		<actionSet
-			label="%DebugActionSet.label"
-			id="org.eclipse.ptp.debug.ui.debugActionSet">
-			<menu
-				label="%RunMenu.label"
-				path="additions"
-				id="org.eclipse.ui.run">
-			</menu>
-			<action
-				id="org.eclipse.ptp.debug.ui.actions.ResumeAtLine"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RetargetResumeAtLineAction"
-				disabledIcon="icons/tool/jump_co_disable.gif"
-				enablesFor="1"
-				icon="icons/tool/jump_co_normal.gif"
-				helpContextId="jump_to_line_action_context"
-				label="%GlobalJumpToLineAction.label"
-				menubarPath="org.eclipse.ui.run/stepGroup">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui">
-					</pluginState>
-				</enablement>
-			</action>
-			<action
-				id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
-				class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
-				disabledIcon="icons/tool/signal0_co_disable.gif"
-				enablesFor="1"
-				icon="icons/tool/signal0_co_normal.gif"
-				helpContextId="resume_without_signal_action_context"
-				label="%SignalZeroAction.label"
-				menubarPath="org.eclipse.ui.run/stepGroup"
-				tooltip="%SignalZeroAction.tooltip">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui">
-					</pluginState>
-				</enablement>
-			</action>
-			<action
-				id="org.eclipse.ptp.debug.ui.internal.actions.RestartActionDelegate"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate"
-				disabledIcon="icons/tool/restart_disable.gif"
-				enablesFor="1"
-				icon="icons/tool/restart_normal.gif"
-				helpContextId="restart_action_context"
-				label="%RestartAction.label"
-				menubarPath="org.eclipse.ui.run/stepGroup">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui">
-					</pluginState>
-				</enablement>
-			</action>
-		</actionSet>
-	</extension>
 	<!-- testing
 	<extension
 		point="org.eclipse.core.filebuffers.annotationModelCreation">

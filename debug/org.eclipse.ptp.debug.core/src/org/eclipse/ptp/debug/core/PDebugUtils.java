@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.transform.OutputKeys;
@@ -34,6 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IStatusHandler;
 import org.w3c.dom.Document;
@@ -194,49 +196,66 @@ public class PDebugUtils {
 			try {
 				refs = project.getReferencedProjects();
 			}
-			catch( CoreException e ) {
+			catch(CoreException e) {
 			}
-			for( int i = 0; i < refs.length; ++i ) {
-				if ( !project.equals( refs[i] ) && refs[i] != null && refs[i].exists() && refs[i].isOpen() ) {
-					list.add( refs[i] );
+			for(int i = 0; i < refs.length; ++i) {
+				if (!project.equals(refs[i]) && refs[i] != null && refs[i].exists() && refs[i].isOpen()) {
+					list.add(refs[i]);
 					getReferencedProjects(project, refs[i], list);
 				}
 			}
 		}
 		return list;
 	}
-	private static void getReferencedProjects( IProject root, IProject project, List<IProject> list ) {
-		if ( project != null && project.exists() && project.isOpen() ) {
+	private static void getReferencedProjects(IProject root, IProject project, List<IProject> list) {
+		if (project != null && project.exists() && project.isOpen()) {
 			IProject[] refs = new IProject[0];
 			try {
 				refs = project.getReferencedProjects();
 			}
-			catch( CoreException e ) {
+			catch(CoreException e) {
 			}
-			for( int i = 0; i < refs.length; ++i ) {
-				if ( !list.contains( refs[i] ) && refs[i] != null && !refs[i].equals( root ) && refs[i].exists() && refs[i].isOpen() ) {
+			for(int i = 0; i < refs.length; ++i) {
+				if (!list.contains(refs[i]) && refs[i] != null && !refs[i].equals(root) && refs[i].exists() && refs[i].isOpen()) {
 					list.add(refs[i]);
-					getReferencedProjects( root, refs[i], list );
+					getReferencedProjects(root, refs[i], list);
 				}
 			}
 		}
 	}
+	public static boolean isReferencedProject(IProject parent, IProject project) {
+		if (parent != null && parent.exists()) {
+			List<IProject> projects = PDebugUtils.getReferencedProjects(project);
+			Iterator<IProject> it = projects.iterator();
+			while(it.hasNext()) {
+				IProject prj = (IProject)it.next();
+				if (prj.exists() && (prj.equals(project)))
+					return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * Serializes a XML document into a string - encoded in UTF8 format, with platform line separators.
-	 * 
 	 * @param doc document to serialize
 	 * @return the document as a string
 	 */
-	public static String serializeDocument( Document doc ) throws IOException, TransformerException {
+	public static String serializeDocument(Document doc) throws IOException, TransformerException {
 		ByteArrayOutputStream s = new ByteArrayOutputStream();
 		TransformerFactory factory = TransformerFactory.newInstance();
 		Transformer transformer = factory.newTransformer();
-		transformer.setOutputProperty( OutputKeys.METHOD, "xml" ); //$NON-NLS-1$
-		transformer.setOutputProperty( OutputKeys.INDENT, "yes" ); //$NON-NLS-1$
-		DOMSource source = new DOMSource( doc );
-		StreamResult outputTarget = new StreamResult( s );
-		transformer.transform( source, outputTarget );
-		return s.toString( "UTF8" ); //$NON-NLS-1$			
+		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		DOMSource source = new DOMSource(doc);
+		StreamResult outputTarget = new StreamResult(s);
+		transformer.transform(source, outputTarget);
+		return s.toString("UTF8");			
+	}
+	
+	public static int getAddressSize() {
+		if (Platform.getOSArch().endsWith("64"))
+			return 8;
+		return 4;
 	}
 }
 

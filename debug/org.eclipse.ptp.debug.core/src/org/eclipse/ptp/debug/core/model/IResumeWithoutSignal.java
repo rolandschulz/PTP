@@ -43,5 +43,3 @@ public interface IResumeWithoutSignal {
 	 */
 	boolean canResumeWithoutSignal();
 }
-
-

@@ -20,6 +20,8 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.AbstractRulerActionDelegate;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -52,5 +54,10 @@ public class ManageBreakpointRulerActionDelegate extends AbstractRulerActionDele
 		}
 		activeEditor = targetEditor;
 		super.setActiveEditor(callerAction, targetEditor);
+	}
+
+	public void mouseDoubleClick(MouseEvent e) {
+		if (PTPDebugUIPlugin.isPTPPerspective())
+			targetAction.run();
 	}
 }

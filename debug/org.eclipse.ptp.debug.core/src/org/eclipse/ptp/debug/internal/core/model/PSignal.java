@@ -19,127 +19,61 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPSignal;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
+import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
  */
-public class PSignal extends PDebugElement implements IPSignal, IPCDIEventListener {
-	private IPCDISignal fCDISignal;
+public class PSignal extends PDebugElement implements IPSignal {
+	private IPDISignal pdiSignal;
 
-	/**
-	 * Constructor for PSignal.
-	 * 
-	 * @param target
-	 */
-	public PSignal(PDebugTarget target, IPCDISignal cdiSignal) {
-		super(target);
-		fCDISignal = cdiSignal;
-		getCDISession().getEventManager().addEventListener(this);
+	public PSignal(PSession session, BitList tasks, IPDISignal pdiSignal) {
+		super(session, tasks);
+		this.pdiSignal = pdiSignal;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#getDescription()
-	 */
 	public String getDescription() throws DebugException {
-		return getCDISignal().getDescription();
+		return getPDISignal().getDescription();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#getName()
-	 */
 	public String getName() throws DebugException {
-		return getCDISignal().getName();
+		return getPDISignal().getName();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#isPassEnabled()
-	 */
 	public boolean isPassEnabled() throws DebugException {
-		return !getCDISignal().isIgnore();
+		return !getPDISignal().isIgnore();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#isStopEnabled()
-	 */
 	public boolean isStopEnabled() throws DebugException {
-		return getCDISignal().isStopSet();
+		return getPDISignal().isStopSet();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#setPassEnabled(boolean)
-	 */
 	public void setPassEnabled(boolean enable) throws DebugException {
 		handle(enable, isStopEnabled());
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#setStopEnabled(boolean)
-	 */
 	public void setStopEnabled(boolean enable) throws DebugException {
 		handle(isPassEnabled(), enable);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener#handleDebugEvents(IPCDIEvent)
-	 */
-	public void handleDebugEvents(IPCDIEvent[] events) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#dispose()
-	 */
 	public void dispose() {
-		getCDISession().getEventManager().removeEventListener(this);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.model.IPSignal#signal()
-	 */
 	public void signal() throws DebugException {
 		try {
-			getCDITarget().resume(getCDISignal());
-		} catch (PCDIException e) {
+			getPDISession().resume(getTasks(), getPDISignal());
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
-
-	protected IPCDISignal getCDISignal() {
-		return fCDISignal;
+	protected IPDISignal getPDISignal() {
+		return pdiSignal;
 	}
-
 	private void handle(boolean pass, boolean stop) throws DebugException {
 		try {
-			getCDISignal().handle(!pass, stop);
-		} catch (PCDIException e) {
+			getPDISignal().handle(!pass, stop);
+		} catch (PDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
-
 	public boolean canModify() {
-		// TODO add canModify method to IPCDISignal
+		// TODO add canModify method to IPDISignal
 		return true;
 	}
 }

@@ -32,19 +32,17 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class DebugCoreMessages {
-
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.DebugCoreMessages";//$NON-NLS-1$
-
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle( BUNDLE_NAME );
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.DebugCoreMessages";
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private DebugCoreMessages() {
 	}
 
-	public static String getString( String key ) {
+	public static String getString(String key) {
 		try {
-			return RESOURCE_BUNDLE.getString( key );
+			return RESOURCE_BUNDLE.getString(key);
 		}
-		catch( MissingResourceException e ) {
+		catch(MissingResourceException e) {
 			return '!' + key + '!';
 		}
 	}

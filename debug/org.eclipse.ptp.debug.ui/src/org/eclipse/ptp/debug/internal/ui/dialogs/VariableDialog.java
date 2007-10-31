@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui.dialogs;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -34,6 +33,8 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
+import org.eclipse.ptp.debug.core.model.IPVariable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -48,11 +49,11 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public abstract class VariableDialog extends Dialog {
-	protected IStackFrame frame = null;
+	protected IPStackFrame frame = null;
 	protected ListViewer listViewer = null;
-	protected IVariable selectedVariable = null;
+	protected IPVariable selectedVariable = null;
 
-	public VariableDialog(Shell parent, IStackFrame frame) {
+	public VariableDialog(Shell parent, IPStackFrame frame) {
 		super(parent);
 		this.frame = frame;
 	}
@@ -120,7 +121,7 @@ public abstract class VariableDialog extends Dialog {
 	public Button getOkButton() {
 		return getButton(IDialogConstants.OK_ID);
 	}
-	public IVariable getSelectedVariable() {
+	public IPVariable getSelectedVariable() {
 		return selectedVariable;
 	}
 	protected void buttonPressed(int buttonId) {
@@ -130,8 +131,8 @@ public abstract class VariableDialog extends Dialog {
 			if (!selection.isEmpty()) {
 				if (selection instanceof IStructuredSelection) {
 					Object obj = ((IStructuredSelection) selection).getFirstElement();
-					if (obj instanceof IVariable)
-						selectedVariable = (IVariable) obj;
+					if (obj instanceof IPVariable)
+						selectedVariable = (IPVariable) obj;
 				}
 			}
 		}

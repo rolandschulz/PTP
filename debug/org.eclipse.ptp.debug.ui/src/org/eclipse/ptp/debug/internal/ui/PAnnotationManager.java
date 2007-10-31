@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -38,14 +37,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.sourcelookup.ISourceLookupResult;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -55,34 +52,35 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.resources.FileStorage;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugEventListener;
+import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
-import org.eclipse.ptp.debug.core.events.IPDebugInfo;
-import org.eclipse.ptp.debug.core.events.IPDebugSuspendInfo;
+import org.eclipse.ptp.debug.core.event.IPDebugEvent;
+import org.eclipse.ptp.debug.core.event.IPDebugInfo;
+import org.eclipse.ptp.debug.core.event.IPDebugSuspendInfo;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
+import org.eclipse.ptp.debug.core.model.IPThread;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest;
 import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
+import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -103,11 +101,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	public PAnnotationManager(UIDebugManager uiDebugManager) {
 		this.uiDebugManager = uiDebugManager;
-		uiDebugManager.addJobChangedListener(this);
-		PTPDebugCorePlugin.getDefault().addDebugEventListener(this);
 		// make sure every time created the same object reference
-		if (instance == null)
+		if (instance == null) {
+			uiDebugManager.addJobChangedListener(this);
+			PTPDebugCorePlugin.getDefault().addDebugEventListener(this);
 			instance = this;
+		}
 	}
 	/* Get instance of PAnnotationManager
 	 * @return
@@ -166,17 +165,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return (AnnotationGroup) annotationMap.get(job_id);
 		}
 	}
-	/* Get top stack frame of given thread
-	 * @param thread
-	 * @return
-	 */
-	protected IStackFrame getTopStackFrame(IThread thread) {
-		try {
-			return thread.getTopStackFrame();
-		} catch (DebugException de) {
-			return null;
-		}
-	}
+
 	/* Get editor and open editor if it is not opened or focus on it if it is already opened
 	 * @param page
 	 * @param input
@@ -196,25 +185,6 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		};
 		BusyIndicator.showWhile(Display.getDefault(), r);
 		return editor[0];
-	}
-	/* Get editor ID
-	 * @param filename
-	 * @return
-	 */
-	protected String getEditorId(IFile file) {
-		if (file == null)
-			return IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
-		
-		IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
-		IEditorDescriptor descriptor = registry.getDefaultEditor(file.getName());
-		//IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR | CUIPlugin.EDITOR_ID
-		return (descriptor != null) ? descriptor.getId() : IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
-	}
-	protected IEditorInput getEditorInput(IFile file) {
-		if  (file.exists())
-			return new FileEditorInput(file);
-
-		return new ExternalEditorInput(new FileStorage(file.getFullPath()));
 	}
 	/* Get editor part
 	 * @param file
@@ -252,7 +222,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					}
 				}
 				try {
-					editor[0] = page.openEditor(getEditorInput(file), getEditorId(file), false);
+					editor[0] = page.openEditor(PDebugUIUtils.getEditorInput(file), PDebugUIUtils.getEditorId(file), false);
 				} catch (PartInitException e) {
 					//PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot open editor", e);
 				}
@@ -324,7 +294,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return null;
 	}
-	/* Create poistion in the source file
+	/* Create position in the source file
 	 * @param lineNumber
 	 * @param doc
 	 * @return
@@ -349,7 +319,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected BitList getTasks(IDebugTarget debugTarget) {
 		if (debugTarget instanceof IPDebugTarget) {
-			return ((IPDebugTarget) debugTarget).getTask();
+			return ((IPDebugTarget) debugTarget).getTasks();
 		}
 		return null;
 	}
@@ -360,22 +330,6 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected BitList getTasks(IThread thread) {
 		return getTasks(thread.getDebugTarget());
 	}
-	/* Get tasks from stack frame
-	 * @param stackFrame
-	 * @return
-	 */
-	protected BitList getTasks(IStackFrame stackFrame) {
-		return getTasks(stackFrame.getDebugTarget());
-	}
-	protected BitList filterRunningTasks(String job_id, BitList tasks) {//get suspend tasks
-		IPCDISession session = uiDebugManager.getDebugSession(job_id);
-		if (session != null) {
-			IAbstractDebugger debugger = session.getDebugger();
-			if (debugger != null)
-				tasks.and(debugger.getSuspendedProc());
-		}
-		return tasks;
-	}	
 	/* Is given type register type
 	 * @param type
 	 * @return
@@ -431,45 +385,44 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param stackFrame
 	 * @throws CoreException
 	 */
-	public void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
-		/*
-		int lineNumber = stackFrame.getLineNumber();
-		if (lineNumber > -1) {
+	public void addAnnotation(IEditorPart editorPart, IPStackFrame stackFrame) throws CoreException {
+		IPStackFrame selectedFrame = stackFrame;
+		
+		BitList tasks = getTasks(stackFrame.getDebugTarget());
+		if (tasks == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		ITextEditor textEditor = getTextEditor(editorPart);
+		if (textEditor == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		IFile file = getFile(textEditor.getEditorInput());
+		if (file == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		//try to find the stack frame with line number
+		if (selectedFrame.getLineNumber() == 0) {
+			IStackFrame[] frames = selectedFrame.getThread().getStackFrames();
+			for (IStackFrame frame : frames) {
+				if (frame.getLineNumber() > 0) {
+					selectedFrame = (IPStackFrame)frame;
+					break;
+				}
+			}
+		}
+		if (selectedFrame.getLineNumber() > 0) {
 			String job_id = uiDebugManager.getCurrentJobId();
-			if (job_id.length() == 0)
-				return;
-			ITextEditor textEditor = getTextEditor(editorPart);
-			if (textEditor == null)
-				throw new CoreException(Status.CANCEL_STATUS);
-			IFile file = getFile(textEditor.getEditorInput());
-			if (file == null)
-				throw new CoreException(Status.CANCEL_STATUS);
-			BitList tasks = getTasks(stackFrame);
-			if (tasks == null)
-				throw new CoreException(Status.CANCEL_STATUS);
-
 			synchronized (LOCK) {
 				AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 				if (annotationGroup == null) {
 					annotationGroup = new AnnotationGroup();
 					putAnnotationGroup(job_id, annotationGroup);
 				}
-				//assume tasks contains 1 process only
-				PInstructionPointerAnnotation2[] annotations = findAnnotations(annotationGroup, tasks);
-				if (annotations.length == 0) {
-					IStackFrame tos = getTopStackFrame(stackFrame.getThread());
-					String type = (tos == null || stackFrame.equals(tos)) ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY;			
-					addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
-				}
-				else {
-					textEditor.selectAndReveal(annotations[0].getPosition().getOffset(), 0);
-				}
+				removeAnnotation(annotationGroup, tasks);
+				addAnnotation(annotationGroup, textEditor, file, selectedFrame.getLineNumber(), tasks, (selectedFrame.getLevel() > 1) ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT);
 			}
 		}
-		*/		
 	}
 	private PSourceLookupDirector getSourceLocator(String job_id) {
-		IPCDISession session = PTPDebugCorePlugin.getDebugModel().getPCDISession(job_id);
+		IPSession session = uiDebugManager.getDebugSession(job_id);
 		if (session != null) {
 			ISourceLocator locator = session.getLaunch().getSourceLocator();
 			if (locator instanceof PSourceLookupDirector) {
@@ -495,39 +448,55 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		return new Path(filename);
 	}
 	// called by event
-	/* Add annotation called from debug event
-	 * @param job_id
-	 * @param fullPathFileName
-	 * @param lineNumber
-	 * @param tasks
-	 * @param isRegister
-	 * @throws CoreException
+	/*
+	 * Add annotation called from debug event
 	 */
-	protected void addAnnotation(String job_id, String filename, int lineNumber, BitList unregTasks, BitList regTasks) throws CoreException {
-		if (lineNumber > -1) {
-			
-			IFile file = findFile(getFilePath(job_id, filename));
-			//IFile file = findFile(fullPathFileName);
-			if (file == null)
-				throw new CoreException(Status.CANCEL_STATUS);
+	protected void addUnregisterAnnotation(String job_id, int level, String filename, int lineNumber, BitList tasks) throws CoreException {
+		if (tasks.isEmpty())
+			return;
 
-			IEditorPart editorPart = getEditorPart(file);
-			if (editorPart == null)
-				throw new CoreException(Status.CANCEL_STATUS);
-			ITextEditor textEditor = getTextEditor(editorPart);
-			if (textEditor == null)
-				throw new CoreException(Status.CANCEL_STATUS);
-			
-			//String type = isRegister ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
-			synchronized (LOCK) {
-				AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
-				if (annotationGroup == null) {
-					annotationGroup = new AnnotationGroup();
-					putAnnotationGroup(job_id, annotationGroup);
-				}
-				addAnnotation(annotationGroup, textEditor, file, lineNumber, unregTasks, ((containsCurrentSet(unregTasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT));				
-				addAnnotation(annotationGroup, textEditor, file, lineNumber, regTasks, IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT);				
+		IFile file = findFile(getFilePath(job_id, filename));
+		//IFile file = findFile(fullPathFileName);
+		if (file == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+
+		IEditorPart editorPart = getEditorPart(file);
+		if (editorPart == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		ITextEditor textEditor = getTextEditor(editorPart);
+		if (textEditor == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		synchronized (LOCK) {
+			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
+			if (annotationGroup == null) {
+				annotationGroup = new AnnotationGroup();
+				putAnnotationGroup(job_id, annotationGroup);
 			}
+			addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, ((level > 1)?IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT:((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)));				
+		}
+	}
+	protected void addAnnotation(String job_id, int level, String filename, int lineNumber, BitList rTasks, BitList uTasks) throws CoreException {
+		IFile file = findFile(getFilePath(job_id, filename));
+		//IFile file = findFile(fullPathFileName);
+		if (file == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+
+		IEditorPart editorPart = getEditorPart(file);
+		if (editorPart == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		ITextEditor textEditor = getTextEditor(editorPart);
+		if (textEditor == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		synchronized (LOCK) {
+			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
+			if (annotationGroup == null) {
+				annotationGroup = new AnnotationGroup();
+				putAnnotationGroup(job_id, annotationGroup);
+			}
+			addAnnotation(annotationGroup, textEditor, file, lineNumber, rTasks, ((level > 1)?IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY: IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT));				
+			addAnnotation(annotationGroup, textEditor, file, lineNumber, uTasks, ((level > 1)?IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT:((containsCurrentSet(uTasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)));				
 		}
 	}
 	/* Is given tasks in the current set
@@ -538,8 +507,13 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
 			return true;
-		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), set_id);
-		return (tasks != null && tasks.intersects(aTasks));
+		try {
+			BitList tasks = uiDebugManager.getTasks(set_id);
+			return (tasks != null && tasks.intersects(aTasks));
+		}
+		catch (CoreException e) {
+			return false;
+		}
 	}
 	// generic
 	/* Add annotation
@@ -570,7 +544,6 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				annotation.addTasks(tasks);
 				annotation.setMessage(isRegisterType(type));
 			}
-	
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					textEditor.selectAndReveal(position.getOffset(), 0);
@@ -588,8 +561,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		synchronized (LOCK) {
 			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				if (annotation.getPosition().length == position.length) {
-					String annotationType = annotation.getType();
-					if (annotationType.equals(type)) {
+					if (annotation.getType().equals(type)) {
 						return annotation;
 					}
 				}
@@ -603,19 +575,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param thread
 	 * @throws CoreException
 	 */
-	protected void removeAnnotation(IEditorPart editorPart, IThread thread) throws CoreException {
-		BitList tasks = getTasks(thread);
-		if (tasks == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		String job_id = uiDebugManager.getCurrentJobId();
-		synchronized (LOCK) {
-			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
-			if (annotationGroup != null) {
-				removeAnnotation(annotationGroup, tasks);
-				if (annotationGroup.isEmpty())
-					removeAnnotationGroup(job_id);
-			}
-		}
+	protected void removeAnnotation(IEditorPart editorPart, IPThread thread) throws CoreException {
+		removeAnnotation(uiDebugManager.getCurrentJobId(), getTasks(thread));
 	}
 	// called by event
 	/* Remove annotation called from debug event
@@ -625,7 +586,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected void removeAnnotation(String job_id, BitList tasks) throws CoreException {
 		if (tasks == null || tasks.isEmpty())
-			return;
+			throw new CoreException(Status.CANCEL_STATUS);
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
@@ -715,7 +676,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param type
 	 */
 	protected void changeAnnotationType(PInstructionPointerAnnotation2 annotation, String type) {
-		if (!annotation.getType().equals(type)) {
+		if (!annotation.getType().equals(type)) {			
 			annotation.setType(type);
 		}
 	}
@@ -730,7 +691,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 						continue;
 					
 					boolean isRegister = isRegisterType(annotation.getType());
-					if (!isRegister)// register annotation
+					if (!isRegister)// unregister annotation
 						updateExistedAnnotation(annotationGroup, annotation, cpTasks, isRegister);
 				}
 			}
@@ -800,19 +761,24 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				AnnotationGroup annotationGroup = getAnnotationGroup(uiDebugManager.getCurrentJobId());
 				if (annotationGroup != null) {
-					BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
-					synchronized (LOCK) {
-						for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
-							// change icon for unregistered processes only if the set is changed
-							if (!isRegisterType(annotation.getType())) {
-								// if all the tasks in current is not match the unregistered tasks, display SET_ANN
-								// simply only display SET_ANN when the current set only contain registered tasks
-								if (currentSet.isRootSet())
-									changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
-								else
-									changeAnnotationType(annotation, annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+					try {
+						BitList tasks = uiDebugManager.getTasks(currentSet.getID());
+						synchronized (LOCK) {
+							for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
+								// change icon for unregistered processes only if the set is changed
+								if (!isRegisterType(annotation.getType())) {
+									// if all the tasks in current is not match the unregistered tasks, display SET_ANN
+									// simply only display SET_ANN when the current set only contain registered tasks
+									if (currentSet.isRootSet())
+										changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
+									else
+										changeAnnotationType(annotation, annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+								}
 							}
 						}
+					}
+					catch (CoreException e) {
+						return e.getStatus();
 					}
 				}
 				return Status.OK_STATUS;
@@ -876,7 +842,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			case IPDebugEvent.CREATE:
 				switch (event.getDetail()) {
 				case IPDebugEvent.REGISTER:
-					register(job.getID(), info.getAllRegisteredProcesses());
+					register(job.getID(), info.getAllTasks());
+					break;
+				case IPDebugEvent.BREAKPOINT:
 					break;
 				}
 				break;
@@ -886,21 +854,24 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					removeAnnotationGroup(job.getID());
 					break;
 				case IPDebugEvent.REGISTER:
-					unregister(job.getID(), info.getAllUnregisteredProcesses());
+					unregister(job.getID(), info.getAllTasks());
+					break;
+				case IPDebugEvent.BREAKPOINT:
 					break;
 				default:
-					removeAnnotationAction(job, info.getAllProcesses());
+					removeAnnotationAction(job, info.getAllTasks());
 					break;
 				}
 				break;
 			case IPDebugEvent.RESUME:
-				removeAnnotationAction(job, info.getAllProcesses());
+				removeAnnotationAction(job, info.getAllTasks());
 				break;
 			case IPDebugEvent.SUSPEND:
-				IPDebugSuspendInfo susInfo = (IPDebugSuspendInfo)info; 
+				IPDebugSuspendInfo susInfo = (IPDebugSuspendInfo)info;
 				try {
-					addAnnotation(job.getID(), susInfo.getFilename(), susInfo.getLineNumber(), info.getAllUnregisteredProcesses(), info.getAllRegisteredProcesses());
-				} catch (final CoreException e) {
+					addAnnotation(job, susInfo);
+				}
+				catch (final CoreException e) {
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							PTPDebugUIPlugin.errorDialog("Error", e);
@@ -911,14 +882,59 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			case IPDebugEvent.CHANGE:
 				break;
 			case IPDebugEvent.ERROR:
-				removeAnnotationAction(job, info.getAllProcesses());
+				//removeAnnotationAction(job, info.getAllTasks());
 				break;
 		}
-	}	
+	}
+	private void addAnnotation(IPJob job, IPDebugSuspendInfo info) throws CoreException {
+		int line = info.getLineNumber();
+		if (line == 0) {
+			//FIXME: this menthod is only for unreg tasks, reg tasks depends on selection on stack frame on debug view
+			addAnnotationWithSourceFound(job, info.getAllUnregisteredTasks(), info.getLevel()+1, info.getDepth());
+		}
+		else {
+			addAnnotation(job.getID(), info.getLevel(), info.getFilename(), line, info.getAllRegisteredTasks(), info.getAllUnregisteredTasks());
+		}
+	}
+	private void addAnnotationWithSourceFound(IPJob job, BitList tasks, int low, int high) throws CoreException {
+		if (tasks.isEmpty())
+			return;
+
+		IPSession session = uiDebugManager.getDebugSession(job);
+		if (session != null) {
+			if (!session.isReady())
+				return;
+			
+			IPDIListStackFramesRequest request = session.getPDISession().getRequestFactory().getStackFramesRequest(tasks, low, high);
+			try {
+				session.getPDISession().getEventRequestManager().addEventRequest(request);
+				Map<BitList, Object> map = request.getResultMap(tasks);
+				for (Iterator<BitList> i = map.keySet().iterator(); i.hasNext();) {
+					BitList sTasks = i.next();
+					Object value = map.get(sTasks);
+					if (value instanceof ProxyDebugStackFrame[]) {
+						ProxyDebugStackFrame[] frames = (ProxyDebugStackFrame[])value;
+						for (ProxyDebugStackFrame frame : frames) {
+							ProxyDebugLocator locator = frame.getLocator();
+							if (locator.getLineNumber() > 0) {
+								addUnregisterAnnotation(job.getID(), frame.getLevel(), locator.getFile(), locator.getLineNumber(), sTasks);
+								break;
+							}
+						}
+					}
+				}
+			}
+			catch (PDIException e) {
+				//throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+			}
+		}
+	}
+	
 	private void removeAnnotationAction(IPJob job, BitList tasks) {
 		try {
 			removeAnnotation(job.getID(), tasks);
-		} catch (final CoreException e) {
+		}
+		catch (final CoreException e) {
 			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					PTPDebugUIPlugin.errorDialog("Error", e);

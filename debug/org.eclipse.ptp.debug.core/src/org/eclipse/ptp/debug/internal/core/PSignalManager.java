@@ -19,120 +19,153 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.model.IPSignal;
+import org.eclipse.ptp.debug.core.pdi.IPDISession;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
+import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.debug.internal.core.model.PSignal;
 
 /**
  * @author Clement chu
  */
-public class PSignalManager implements IAdaptable {
-	/**
-	 * The debug target associated with this manager.
-	 */
-	private PDebugTarget fDebugTarget;
-
-	/**
-	 * The list of signals.
-	 */
-	private IPSignal[] fSignals = null;
-
-	/**
-	 * The dispose flag.
-	 */
-	private boolean fIsDisposed = false;
-
-	/**
-	 * Constructor for PSignalManager.
-	 */
-	public PSignalManager(PDebugTarget target) {
-		fDebugTarget = target;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.ICSignalManager#getSignals()
-	 */
-	public IPSignal[] getSignals() throws DebugException {
-		if (!isDisposed() && fSignals == null) {
-			try {
-				IPCDISignal[] cdiSignals = getDebugTarget().getCDITarget().getSignals();
-				ArrayList<PSignal> list = new ArrayList<PSignal>(cdiSignals.length);
-				for(int i = 0; i < cdiSignals.length; ++i) {
-					list.add(new PSignal(getDebugTarget(), cdiSignals[i]));
+public class PSignalManager implements IAdaptable, IPDIEventListener {
+	private class PSignalSet {
+		PDebugTarget debugTarget = null;
+		BitList sTasks;
+		
+		PSignalSet(BitList sTasks, PDebugTarget debugTarget) {
+			this.sTasks = sTasks;
+			this.debugTarget = debugTarget;
+		}
+		PDebugTarget getDebugTarget() {
+			if (debugTarget == null)
+				debugTarget = session.findDebugTarget(sTasks);
+			return debugTarget;
+		}
+		IPSignal[] fSignals = null;
+		boolean fIsDisposed = false;
+		IPSignal[] getSignals() throws DebugException {
+			if (!isDisposed() && fSignals == null) {
+				try {
+					IPDISignal[] pdiSignals = session.getPDISession().getSignalManager().getSignals(sTasks);
+					ArrayList<IPSignal> list = new ArrayList<IPSignal>(pdiSignals.length);
+					for(int i = 0; i < pdiSignals.length; ++i) {
+						list.add(new PSignal(session, sTasks, pdiSignals[i]));
+					}
+					fSignals = (IPSignal[])list.toArray(new IPSignal[list.size()]);
 				}
-				fSignals = (IPSignal[])list.toArray(new IPSignal[list.size()]);
+				catch(PDIException e) {
+					throwDebugException(e.getMessage(), DebugException.TARGET_REQUEST_FAILED, e);
+				}
 			}
-			catch(PCDIException e) {
-				throwDebugException(e.getMessage(), DebugException.TARGET_REQUEST_FAILED, e);
+			return (fSignals != null) ? fSignals : new IPSignal[0];
+		}
+		void dispose() {
+			if (fSignals != null)
+				for(int i = 0; i < fSignals.length; ++i) {
+					((PSignal)fSignals[i]).dispose();
+				}
+			fSignals = null;
+			fIsDisposed = true;
+		}
+		void signalChanged(IPDISignal pdiSignal) {
+			PSignal signal = find(pdiSignal);
+			if (signal != null) {
+				signal.fireChangeEvent(DebugEvent.STATE);
 			}
 		}
-		return (fSignals != null) ? fSignals : new IPSignal[0];
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.internal.core.CUpdateManager#dispose()
-	 */
-	public void dispose() {
-		if (fSignals != null)
-			for(int i = 0; i < fSignals.length; ++i) {
-				((PSignal)fSignals[i]).dispose();
+		PSignal find(IPDISignal pdiSignal) {
+			try {
+				IPSignal[] signals = getSignals();
+				for(int i = 0; i < signals.length; ++i)
+					if (signals[i].getName().equals(pdiSignal.getName()))
+						return (PSignal)signals[i];
 			}
-		fSignals = null;
-		fIsDisposed = true;
+			catch(DebugException e) {
+			}
+			return null;
+		}
+		boolean isDisposed() {
+			return fIsDisposed;
+		}
 	}
+	
+	protected Map<BitList, PSignalSet> fPSignalSetMap;
+	private PSession session;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-	 */
+	public PSignalManager(PSession session) {
+		this.session = session;
+	}
+	public void initialize(IProgressMonitor monitor) {
+		fPSignalSetMap = new Hashtable<BitList, PSignalSet>();
+		//session.getPDISession().getEventManager().addEventListener(this);
+	}
+	public void dispose(IProgressMonitor monitor) {
+		DebugPlugin.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				synchronized(fPSignalSetMap) {
+					Iterator<PSignalSet> it = fPSignalSetMap.values().iterator();
+					while(it.hasNext()) {
+						((PSignalSet)it.next()).dispose();
+					}
+					fPSignalSetMap.clear();
+				}
+			}
+		});
+		//session.getPDISession().getEventManager().removeEventListener(this);
+	}	
+	public PSignalSet getSignalSet(BitList qTasks) {
+		synchronized (fPSignalSetMap) {
+			PSignalSet set = (PSignalSet)fPSignalSetMap.get(qTasks);
+			if (set == null) {
+				set = new PSignalSet(qTasks, null);
+				fPSignalSetMap.put(qTasks, set);
+			}
+			return set;
+		}
+	}
+	public void dispose(BitList qTasks) {
+		getSignalSet(qTasks).dispose();
+	}
+	public void signalChanged(BitList qTasks, IPDISignal pdiSignal) {
+		getSignalSet(qTasks).signalChanged(pdiSignal);
+	}
+	public IPSignal[] getSignals(BitList qTasks) throws DebugException {
+		return getSignalSet(qTasks).getSignals();
+	}
 	public Object getAdapter(Class adapter) {
-		if (adapter.equals(PSignalManager.class)) {
+		if (adapter.equals(IPDISession.class))
+			return getSession();
+		if (adapter.equals(PSignalManager.class))
 			return this;
-		}
-		if (adapter.equals(PDebugTarget.class)) {
-			return getDebugTarget();
-		}
 		return null;
 	}
-
-	public void signalChanged(IPCDISignal cdiSignal) {
-		PSignal signal = find(cdiSignal);
-		if (signal != null) {
-			signal.fireChangeEvent(DebugEvent.STATE);
-		}
-	}
-
-	private PSignal find(IPCDISignal cdiSignal) {
-		try {
-			IPSignal[] signals = getSignals();
-			for(int i = 0; i < signals.length; ++i)
-				if (signals[i].getName().equals(cdiSignal.getName()))
-					return (PSignal)signals[i];
-		}
-		catch(DebugException e) {
-		}
-		return null;
-	}
-
-	protected boolean isDisposed() {
-		return fIsDisposed;
-	}
-
-	/**
-	 * Throws a debug exception with the given message, error code, and underlying exception.
-	 */
 	protected void throwDebugException(String message, int code, Throwable exception) throws DebugException {
-		throw new DebugException(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), code, message, exception));
+		throw new DebugException(new Status(IStatus.ERROR, PDebugModel.getPluginIdentifier(), code, message, exception));
 	}
-
-	protected PDebugTarget getDebugTarget() {
-		return fDebugTarget;
+	protected IPSession getSession() {
+		return session;
+	}
+	/****************************************
+	 * IPDIEventListener
+	 ****************************************/
+	public void handleDebugEvents(IPDIEvent[] events) {
 	}
 }

@@ -61,8 +61,8 @@ import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
+import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
@@ -88,10 +88,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		private String mode;
 		private IPLaunch launch;
 		private AttributeManager attrMgr;
-		private IAbstractDebugger debugger;
+		private IPTPDebugger debugger;
 		
 		public JobSubmission(ILaunchConfiguration configuration, String mode, IPLaunch launch,
-				AttributeManager attrMgr, IAbstractDebugger debugger) {
+				AttributeManager attrMgr, IPTPDebugger debugger) {
 			this.configuration = configuration;
 			this.mode = mode;
 			this.launch = launch;
@@ -130,7 +130,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		/**
 		 * @return the debugger
 		 */
-		public IAbstractDebugger getDebugger() {
+		public IPTPDebugger getDebugger() {
 			return debugger;
 		}
 	}
@@ -292,7 +292,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @param job
 	 */
 	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,  
-			AttributeManager mgr, IAbstractDebugger debugger, IPJob job);
+			AttributeManager mgr, IPTPDebugger debugger, IPJob job);
 	
 	/**
 	 * Get all the attributes specified in the launch configuration.
@@ -467,7 +467,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch,
-			AttributeManager attrMgr, IAbstractDebugger debugger, IProgressMonitor monitor) throws CoreException {
+			AttributeManager attrMgr, IPTPDebugger debugger, IProgressMonitor monitor) throws CoreException {
 		
 		synchronized (jobSubmissions) {
 			final IResourceManager rm = getResourceManager(configuration);

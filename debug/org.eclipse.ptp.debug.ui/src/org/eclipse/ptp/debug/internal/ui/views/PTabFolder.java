@@ -18,9 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Adapter;
@@ -32,7 +46,8 @@ import org.eclipse.swt.widgets.Composite;
  * @author Clement chu
  *
  */
-public abstract class PTabFolder extends PDebugView {
+public abstract class PTabFolder extends AbstractParallelView {
+	protected Map<String, PTabItem> items = new HashMap<String, PTabItem>();
 	protected CTabFolder folder = null;
 
 	public void createPartControl(Composite parent) {
@@ -78,5 +93,58 @@ public abstract class PTabFolder extends PDebugView {
 		return folder;
 	}
 	
-	public abstract void createTabItem(String tabName, Object selection);
+	public void dispose() {
+		closeAllTabs();
+		super.dispose();
+	}
+	public void closeTab(String name) {
+		if (items != null)
+			items.remove(name);
+	}
+	public void closeAllTabs() {
+		for (PTabItem item : getItems()) {
+			item.dispose();
+		}
+		items.clear();
+	}
+	public PTabItem[] getItems() {
+		return items.values().toArray(new PTabItem[0]);
+	}
+	public PTabItem getTab(String name) {
+		return items.get(name);
+	}
+	public IPStackFrame getStackFrame() throws CoreException {
+		ISelection selection = getViewSite().getPage().getSelection(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (selection instanceof StructuredSelection) {
+			Object obj = ((StructuredSelection)selection).getFirstElement();
+			if (obj instanceof IPStackFrame) {
+				return (IPStackFrame)obj;
+			}
+		}
+		/*
+		IWorkbenchWindow activeWindow = PTPDebugUIPlugin.getActiveWorkbenchWindow();
+		if (activeWindow == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "No active window found", null));
+		
+		IWorkbenchPage page = activeWindow.getActivePage();
+		if (page == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "No active page found", null));	
+
+		IViewPart part = page.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (part != null) {
+			IDebugView adapter = (IDebugView)part.getAdapter(IDebugView.class);
+			if (adapter != null) {				
+				ISelection selection = adapter.getViewer().getSelection();
+				if (selection instanceof StructuredSelection) {
+					Object obj = ((StructuredSelection)selection).getFirstElement();
+					if (obj instanceof IPStackFrame) {
+						return (IPStackFrame)obj;
+					}
+				}
+			}
+		}
+		*/
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "No stack frame found", null));
+	}	
+	public abstract void createTabItem(String tabName, Object selection) throws DebugException;
 }

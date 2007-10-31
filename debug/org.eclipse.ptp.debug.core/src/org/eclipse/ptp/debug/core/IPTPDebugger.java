@@ -26,16 +26,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
-/**
- * @deprecated
- *
- */
 public interface IPTPDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+	IPDISession createDebugSession(long timeout, IPLaunch launch, IFile exe, IPath corefile, IProgressMonitor monitor) throws CoreException;
+	int getDebuggerPort(int timeout) throws CoreException;
 }

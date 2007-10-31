@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -48,7 +49,6 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.MapEntrySourceContainer;
  * The source container for path mappings.
  */
 public class MappingSourceContainer extends AbstractSourceContainer {
-
 	/**
 	 * Unique identifier for the mapping source container type (value <code>org.eclipse.cdt.debug.core.containerType.mapping</code>).
 	 */
@@ -172,7 +172,7 @@ public class MappingSourceContainer extends AbstractSourceContainer {
 	}
 
 	public void clear() {
-		Iterator it = fContainers.iterator();
+		Iterator<MapEntrySourceContainer> it = fContainers.iterator();
 		while (it.hasNext()) {
 			((ISourceContainer) it.next()).dispose();
 		}
@@ -186,7 +186,7 @@ public class MappingSourceContainer extends AbstractSourceContainer {
 	 */
 	public void dispose() {
 		super.dispose();
-		Iterator it = fContainers.iterator();
+		Iterator<MapEntrySourceContainer> it = fContainers.iterator();
 		while (it.hasNext()) {
 			((ISourceContainer) it.next()).dispose();
 		}

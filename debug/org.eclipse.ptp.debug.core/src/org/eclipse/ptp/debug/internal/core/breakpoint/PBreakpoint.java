@@ -19,11 +19,8 @@
 package org.eclipse.ptp.debug.internal.core.breakpoint;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -33,23 +30,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.Breakpoint;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.core.model.IPThread;
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
-	private Map<IPDebugTarget, Set<IPThread>> fFilteredThreadsByTarget;
-
-	public PBreakpoint() {
-		fFilteredThreadsByTarget = new HashMap<IPDebugTarget, Set<IPThread>>(10);
-	}
-	public PBreakpoint(final IResource resource, final String markerType, final Map attributes, final boolean add) throws CoreException {
+	public PBreakpoint() {}
+	
+	public PBreakpoint(final IResource resource, final String markerType, final Map<?,?> attributes, final boolean add) throws CoreException {
 		this();
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
@@ -65,7 +56,7 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		};
 		run(wr);
 	}
-	public void createMarker(final IResource resource, final String markerType, final Map attributes, final boolean add) throws DebugException {
+	public void createMarker(final IResource resource, final String markerType, final Map<?,?> attributes, final boolean add) throws DebugException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				// create the marker
@@ -86,6 +77,24 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public boolean isInstalled() throws CoreException {
 		return ensureMarker().getAttribute(INSTALL_COUNT, 0) > 0;
 	}
+	public synchronized void resetInstallCount() throws CoreException {
+		setAttribute(INSTALL_COUNT, 0);
+	}
+	public synchronized int incrementInstallCount() throws CoreException {
+		int count = getInstallCount();
+		setAttribute(INSTALL_COUNT, ++count);
+		return count;
+	}
+	public int getInstallCount() throws CoreException {
+		return ensureMarker().getAttribute(INSTALL_COUNT, 0);
+	}
+	public synchronized int decrementInstallCount() throws CoreException {
+		int count = getInstallCount();
+		if (count > 0) {
+			setAttribute(INSTALL_COUNT, --count);
+		}
+		return count;
+	}
 	public String getCondition() throws CoreException {
 		return ensureMarker().getAttribute(CONDITION, "");
 	}
@@ -100,23 +109,11 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		setAttribute(IGNORE_COUNT, ignoreCount);
 		setAttribute(IMarker.MESSAGE, getMarkerMessage());
 	}
-	public String getThreadId() throws CoreException {
-		return ensureMarker().getAttribute(THREAD_ID, null);
-	}
-	public void setThreadId(String threadId) throws CoreException {
-		setAttribute(THREAD_ID, threadId);
-	}
 	public String getSourceHandle() throws CoreException {
 		return ensureMarker().getAttribute(SOURCE_HANDLE, "");
 	}
 	public void setSourceHandle(String sourceHandle) throws CoreException {
 		setAttribute(SOURCE_HANDLE, sourceHandle);
-	}
-	public String getModule() throws CoreException {
-		return ensureMarker().getAttribute(MODULE, null);
-	}
-	public void setModule(String module) throws CoreException {
-		setAttribute(MODULE, module);
 	}
 	public String getSetId() throws CoreException {
 		return ensureMarker().getAttribute(SET_ID, "");
@@ -160,25 +157,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public void updateMarkerMessage() throws CoreException {
 		setAttribute(IMarker.MESSAGE, getMarkerMessage());
 	}
-	protected abstract String getMarkerMessage() throws CoreException;
-	public synchronized void resetInstallCount() throws CoreException {
-		setAttribute(INSTALL_COUNT, 0);
-	}
-	public synchronized int incrementInstallCount() throws CoreException {
-		int count = getInstallCount();
-		setAttribute(INSTALL_COUNT, ++count);
-		return count;
-	}
-	public int getInstallCount() throws CoreException {
-		return ensureMarker().getAttribute(INSTALL_COUNT, 0);
-	}
-	public synchronized int decrementInstallCount() throws CoreException {
-		int count = getInstallCount();
-		if (count > 0) {
-			setAttribute(INSTALL_COUNT, --count);
-		}
-		return count;
-	}
 	public boolean isConditional() throws CoreException {
 		return ((getCondition() != null && getCondition().trim().length() > 0) || getIgnoreCount() > 0);
 	}
@@ -191,13 +169,38 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		StringBuffer sb = new StringBuffer();
 		int ignoreCount = getIgnoreCount();
 		if (ignoreCount > 0) {
-			sb.append(MessageFormat.format(BreakpointMessages.getString("PBreakpoint.1"), new Integer[] { new Integer(ignoreCount) }));
+			sb.append(MessageFormat.format(BreakpointMessages.getString("PBreakpoint.1"), new Object[] { new Integer(ignoreCount) }));
 		}
 		String condition = getCondition();
 		if (condition != null && condition.length() > 0) {
-			sb.append(MessageFormat.format(BreakpointMessages.getString("PBreakpoint.2"), new String[] { condition }));
+			sb.append(MessageFormat.format(BreakpointMessages.getString("PBreakpoint.2"), new Object[] { condition }));
 		}
 		return sb.toString();
+	}
+	public String getJobSetFormat() throws CoreException {
+		return "{" + getJobName() + ":" + getSetId() + "}";
+	}
+	protected abstract String getMarkerMessage() throws CoreException;
+	/*
+	public String getThreadId() throws CoreException {
+		return ensureMarker().getAttribute(THREAD_ID, null);
+	}
+	public void setThreadId(String threadId) throws CoreException {
+		setAttribute(THREAD_ID, threadId);
+	}
+	public String getModule() throws CoreException {
+		return ensureMarker().getAttribute(MODULE, null);
+	}
+	public void setModule(String module) throws CoreException {
+		setAttribute(MODULE, module);
+	}
+	public void setTargetFilter(IPDebugTarget target) throws CoreException {
+		fFilteredThreadsByTarget.put(target, null);
+	}
+	public void setThreadFilters(IPThread[] threads) throws CoreException {
+		if (threads != null && threads.length > 0) {
+			fFilteredThreadsByTarget.put((IPDebugTarget)threads[0].getDebugTarget(), new HashSet<IPThread>(Arrays.asList(threads)));
+		}
 	}
 	public IPDebugTarget[] getTargetFilters() throws CoreException {
 		Set<IPDebugTarget> set = fFilteredThreadsByTarget.keySet();
@@ -226,16 +229,5 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 			}
 		}
 	}
-	public void setTargetFilter(IPDebugTarget target) throws CoreException {
-		fFilteredThreadsByTarget.put(target, null);
-	}
-	public void setThreadFilters(IPThread[] threads) throws CoreException {
-		if (threads != null && threads.length > 0) {
-			fFilteredThreadsByTarget.put((IPDebugTarget)threads[0].getDebugTarget(), new HashSet<IPThread>(Arrays.asList(threads)));
-		}
-	}
-	
-	public String getJobSetFormat() throws CoreException {
-		return "{" + getJobName() + ":" + getSetId() + "}";		
-	}
+	*/
 }

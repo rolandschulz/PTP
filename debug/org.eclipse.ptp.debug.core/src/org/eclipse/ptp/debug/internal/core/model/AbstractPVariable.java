@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.model.IEnableDisableTarget;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
@@ -31,7 +31,7 @@ public abstract class AbstractPVariable extends PDebugElement implements IPVaria
 	private PDebugElement fParent;
 
 	public AbstractPVariable(PDebugElement parent) {
-		super((PDebugTarget) parent.getDebugTarget());
+		super((PSession)parent.getSession(), parent.getTasks());
 		setParent(parent);
 	}
 	protected PDebugElement getParent() {
@@ -52,11 +52,10 @@ public abstract class AbstractPVariable extends PDebugElement implements IPVaria
 		return null;
 	}
 	public Object getAdapter(Class adapter) {
-		if (IEnableDisableTarget.class.equals(adapter))
+		if (adapter.equals(IEnableDisableTarget.class))
 			return this;
 		return super.getAdapter(adapter);
 	}
-	public abstract String getExpressionString() throws DebugException;
 	public abstract void dispose();
 	protected abstract void resetValue();
 	protected abstract void setChanged(boolean changed);

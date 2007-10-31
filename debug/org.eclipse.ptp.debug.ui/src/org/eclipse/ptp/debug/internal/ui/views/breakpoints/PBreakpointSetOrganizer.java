@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.views.breakpoints;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.model.IBreakpoint;

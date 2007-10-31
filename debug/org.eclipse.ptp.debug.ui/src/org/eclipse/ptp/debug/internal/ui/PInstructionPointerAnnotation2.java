@@ -97,7 +97,7 @@ public class PInstructionPointerAnnotation2 {
 		return (marker != null && marker.exists());
 	}
 	public boolean isMarkDeleted() {
-		return annotation.isMarkedDeleted();
+		return (annotation == null || annotation.isMarkedDeleted());
 	}
 	public void addAnnotationToModel() {
 		marker = createMarker();

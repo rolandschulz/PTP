@@ -21,27 +21,24 @@ package org.eclipse.ptp.debug.internal.core.model;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IIndexedValue;
 import org.eclipse.debug.core.model.IVariable;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
-import org.eclipse.ptp.debug.core.model.IPType;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * @author Clement chu
  * 
  */
 public class PIndexedValue extends AbstractPValue implements IIndexedValue {
-	private IPCDIVariable fVariable;
+	private IPDIVariable pdiVariable;
 	private IVariable[] fVariables;
 	private int fOffset;
 	private int fSize;
-	private IPType fType;
 
-	public PIndexedValue(AbstractPVariable parent, IPCDIVariable variable, int offset, int size) {
+	public PIndexedValue(AbstractPVariable parent, IPDIVariable variable, int offset, int size) {
 		super(parent);
 		fVariables = new IVariable[size];
-		fVariable = variable;
+		pdiVariable = variable;
 		fOffset = offset;
 		fSize = size;
 	}
@@ -74,32 +71,19 @@ public class PIndexedValue extends AbstractPValue implements IIndexedValue {
 			}
 		}
 	}
-	public IPCDIVariable getCurrentVariable() {
-		return fVariable;
-	}	
-	public IPType getType() throws DebugException {
-		if (fType == null) {
-			synchronized (this) {
-				if (fType == null) {
-					try {
-						IAIFType aifType = getCurrentVariable().getType();
-						if (aifType != null)
-							fType = new PType(aifType);
-					}
-					catch(PCDIException e) {
-						targetRequestFailed( e.getMessage(), null );
-					}
-				}
-			}
+	public IAIF getAIF() throws DebugException {
+		try {
+			return pdiVariable.getAIF();
+		} catch (PDIException e) {
+			targetRequestFailed(e.getMessage(), e);
+			return null;
 		}
-		return fType;
 	}
 	public String getReferenceTypeName() throws DebugException {
-		IPType type = getType();
-		return (type != null) ? type.getName() : "";
+		return getAIF().getType().toString();
 	}
 	public String getValueString() throws DebugException {
-		return "";
+		return "[" + fOffset + " - " + fSize + "]";
 	}
 	public boolean isAllocated() throws DebugException {
 		return true;
@@ -130,13 +114,6 @@ public class PIndexedValue extends AbstractPValue implements IIndexedValue {
 	}
 	public int getInitialOffset() {
 		return fOffset;
-	}
-	protected IAIFValueArray getCDIValue() {
-		try {
-			return (IAIFValueArray)getCurrentVariable().getValue();
-		} catch (PCDIException e) {
-			return null;
-		}
 	}
 	private int getPartitionSize(int index) {
 		int psize = getPreferredPartitionSize();
@@ -173,28 +150,15 @@ public class PIndexedValue extends AbstractPValue implements IIndexedValue {
 		int prefSize = getPreferredPartitionSize();
 		int psize = getPartitionSize(index);
 		int findex = index * prefSize;
-		IPCDIVariable[] cdiVars = new IPCDIVariable[0];
-		IPCDIVariable variable = getCurrentVariable();
-		//variable.setCastingArrayStart(variable.getCastingArrayStart() + findex);
-		//variable.setCastingArrayEnd(psize);
+		IPDIVariable[] pdiVars = new IPDIVariable[0];
 		try {
-			//cdiVars = variable.getChildren();
-			cdiVars = variable.getChildren(findex, psize);
-			/*
-			if (variable instanceof Register) {
-				IPCDIVariable[] vars = variable.getChildren();
-				if (findex < vars.length && (findex + psize) <= vars.length) {
-					cdiVars = new IPCDIVariable[psize];
-					System.arraycopy(vars, findex, cdiVars, 0, psize);
-				}
-			}
-			*/
+			pdiVars = pdiVariable.getChildren(findex, psize);
 		}
-		catch(PCDIException e) {
+		catch(PDIException e) {
 			requestFailed(e.getMessage(), null);
 		}
-		for( int i=0; i<cdiVars.length; ++i) {
-			fVariables[i + findex] = PVariableFactory.createLocalVariable(this, cdiVars[i]);
+		for( int i=0; i<pdiVars.length; ++i) {
+			fVariables[i + findex] = PVariableFactory.createLocalVariable(this, pdiVars[i]);
 		}
 	}
 	private int getSize0() {

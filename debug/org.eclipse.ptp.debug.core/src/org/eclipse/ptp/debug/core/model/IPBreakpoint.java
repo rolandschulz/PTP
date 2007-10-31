@@ -28,60 +28,62 @@ import org.eclipse.debug.core.model.IBreakpoint;
 public interface IPBreakpoint extends IBreakpoint {
 	public static final String GLOBAL = "Global";
 	
-	public static final String INSTALL_COUNT = "org.eclipse.ptp.debug.core.installCount";
 	public static final String CONDITION = "org.eclipse.ptp.debug.core.condition";
 	public static final String IGNORE_COUNT = "org.eclipse.ptp.debug.core.ignoreCount";
-	public static final String THREAD_ID = "org.eclipse.ptp.debug.core.threadId";
-	public static final String MODULE = "org.eclipse.ptp.debug.core.module";
 	public static final String SOURCE_HANDLE = "org.eclipse.ptp.debug.core.sourceHandle";
+	public static final String INSTALL_COUNT = "org.eclipse.ptp.debug.core.installCount";
+	//public static final String THREAD_ID = "org.eclipse.ptp.debug.core.threadId";
+	//public static final String MODULE = "org.eclipse.ptp.debug.core.module";
 	
 	public static final String SET_ID = "org.eclipse.ptp.debug.core.setid";
 	public static final String CUR_SET_ID = "org.eclipse.ptp.debug.core.cursetid";
 	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid";
 	public static final String JOB_NAME = "org.eclipse.ptp.debug.core.jobname";
 
-	public void updateMarkerMessage() throws CoreException;
+	void updateMarkerMessage() throws CoreException;
 	
-	public boolean isGlobal() throws CoreException;
+	boolean isGlobal() throws CoreException;
 	
-	public String getCurSetId() throws CoreException;
-	public void setCurSetId(String id) throws CoreException;
+	String getCurSetId() throws CoreException;
+	void setCurSetId(String id) throws CoreException;
 
-	public String getSetId() throws CoreException;
-	public void setSetId(String id) throws CoreException;
+	String getSetId() throws CoreException;
+	void setSetId(String id) throws CoreException;
 	
-	public String getJobId() throws CoreException;
-	public void setJobId(String id) throws CoreException;
+	String getJobId() throws CoreException;
+	void setJobId(String id) throws CoreException;
+	
+	String getJobName() throws CoreException;
+	void setJobName(String name) throws CoreException;
+	
+	boolean isInstalled() throws CoreException;
+	boolean isConditional() throws CoreException;
 
-	public String getJobName() throws CoreException;
-	public void setJobName(String name) throws CoreException;
+	int incrementInstallCount() throws CoreException;
+	int decrementInstallCount() throws CoreException;
+	void resetInstallCount() throws CoreException;
+
+	String getCondition() throws CoreException;
+	void setCondition(String condition) throws CoreException;
 	
-	public boolean isInstalled() throws CoreException;
-	public boolean isConditional() throws CoreException;
+	int getIgnoreCount() throws CoreException;
+	void setIgnoreCount(int ignoreCount) throws CoreException;
 	
-	public String getCondition() throws CoreException;
-	public void setCondition(String condition) throws CoreException;
+	String getSourceHandle() throws CoreException;
+	void setSourceHandle(String sourceHandle) throws CoreException;
+/*
+ * TODO - Not Implemented
+	String getThreadId() throws CoreException;
+	void setThreadId(String threadId) throws CoreException;
 	
-	public int getIgnoreCount() throws CoreException;
-	public void setIgnoreCount(int ignoreCount) throws CoreException;
+	String getModule() throws CoreException;
+	void setModule(String module) throws CoreException;
 	
-	public String getThreadId() throws CoreException;
-	public void setThreadId(String threadId) throws CoreException;
-	
-	public String getModule() throws CoreException;
-	public void setModule(String module) throws CoreException;
-	
-	public String getSourceHandle() throws CoreException;
-	public void setSourceHandle(String sourceHandle) throws CoreException;
-	
-	public int incrementInstallCount() throws CoreException;
-	public int decrementInstallCount() throws CoreException;
-	public void resetInstallCount() throws CoreException;
-	
-	public void setTargetFilter(IPDebugTarget target) throws CoreException;
-	public void removeTargetFilter(IPDebugTarget target) throws CoreException;
-	public void setThreadFilters(IPThread[] threads) throws CoreException;
-	public void removeThreadFilters(IPThread[] threads) throws CoreException;
-	public IPThread[] getThreadFilters(IPDebugTarget target) throws CoreException;
-	public IPDebugTarget[] getTargetFilters() throws CoreException; 
+	void setTargetFilter(IPDebugTarget target) throws CoreException;
+	void removeTargetFilter(IPDebugTarget target) throws CoreException;
+	void setThreadFilters(IPThread[] threads) throws CoreException;
+	void removeThreadFilters(IPThread[] threads) throws CoreException;
+	IPThread[] getThreadFilters(IPDebugTarget target) throws CoreException;
+	IPDebugTarget[] getTargetFilters() throws CoreException;
+*/ 
 }

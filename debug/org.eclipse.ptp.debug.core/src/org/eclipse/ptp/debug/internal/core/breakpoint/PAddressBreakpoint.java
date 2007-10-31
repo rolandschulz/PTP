@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.core.breakpoint;
 
 import java.text.MessageFormat;
 import java.util.Map;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
@@ -33,10 +34,9 @@ public class PAddressBreakpoint extends AbstractLineBreakpoint implements IPAddr
 
 	public PAddressBreakpoint() {
 	}
-	public PAddressBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+	public PAddressBreakpoint(IResource resource, Map<?,?> attributes, boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, add);
 	}
-
 	public static String getMarkerType() {
 		return P_ADDRESS_BREAKPOINT;
 	}
@@ -45,6 +45,6 @@ public class PAddressBreakpoint extends AbstractLineBreakpoint implements IPAddr
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PAddressBreakpoint"), new String[] { fileName, getAddress(), getConditionText() });
+		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PAddressBreakpoint"), new Object[] { fileName, getAddress(), getConditionText() });
 	}
 }

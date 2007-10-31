@@ -42,7 +42,8 @@ public class DebugJobStorage {
 		addDebugStorage(this.name, this);
 	}
 	public void closeDebugJobStorage() {
-		for (Storage st : jobMap.values()) {
+		Storage[] storages = jobMap.values().toArray(new Storage[0]);
+		for (Storage st : storages) {
 			st.clean();
 		}
 		jobMap.clear();
@@ -165,7 +166,8 @@ public class DebugJobStorage {
 	}
 	public static void removeDebugStorages() {
 		synchronized (storages) {
-			for (DebugJobStorage dStoreage : storages.values()) {
+			DebugJobStorage[] dStoreages = storages.values().toArray(new DebugJobStorage[0]);
+			for (DebugJobStorage dStoreage : dStoreages) {
 				dStoreage.closeDebugJobStorage();
 			}
 			storages.clear();

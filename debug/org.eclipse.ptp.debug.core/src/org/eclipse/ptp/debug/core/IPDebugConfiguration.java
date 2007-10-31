@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 public interface IPDebugConfiguration {
 	final static String CPU_NATIVE = "native";
 	
-	IAbstractDebugger createDebugger() throws CoreException;
+	IPTPDebugger getDebugger() throws CoreException;
 	String getName();
 	String getID();
 	String getPlatform();

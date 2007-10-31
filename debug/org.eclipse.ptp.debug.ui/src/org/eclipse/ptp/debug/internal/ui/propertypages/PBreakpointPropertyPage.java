@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.propertypages;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -323,11 +324,11 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		//show total number of processes
 		if (!job_id.equals(IPBreakpoint.GLOBAL)) {
 			IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
-			IElementSet elementSet = setManager.getSet(set_id);
+			IElementSet elementSet = (IElementSet)setManager.getElementByID(set_id);
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.22"), String.valueOf(elementSet.size())));
-			String[] setNames = elementSet.getMatchSets();
+			String[] setNames = elementSet.getMatchSetIDs();
 			StringBuffer buffer = new StringBuffer();
-			for (int i = 0; i < setNames.length; i++) {
+			for (int i=0; i<setNames.length; i++) {
 				buffer.append(setNames[i]);
 				if (i < setNames.length - 1)
 					buffer.append(",");
@@ -417,11 +418,11 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	/** Set breakpoint properties
 	 * @param changedProperties
 	 */
-	protected void setBreakpointProperties(final List changedProperties) {
+	protected void setBreakpointProperties(final List<String> changedProperties) {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IPBreakpoint breakpoint = getBreakpoint();
-				Iterator changed = changedProperties.iterator();
+				Iterator<String> changed = changedProperties.iterator();
 				while (changed.hasNext()) {
 					String property = (String) changed.next();
 					if (property.equals(PBreakpointPreferenceStore.ENABLED)) {

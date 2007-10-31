@@ -78,7 +78,7 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 				
 				try {
 					if (result != null)
-						appendVariable(buffer, frame.getTargetID(), makeHTMLSafe(expression), makeHTMLSafe(result.trim()));
+						appendVariable(buffer, frame.getID(), makeHTMLSafe(expression), makeHTMLSafe(result.trim()));
 				}
 				catch(DebugException x) {
 					PTPDebugUIPlugin.log(x);

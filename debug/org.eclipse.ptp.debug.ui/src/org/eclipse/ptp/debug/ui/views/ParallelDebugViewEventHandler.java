@@ -23,14 +23,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.events.IPDebugErrorInfo;
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
-import org.eclipse.ptp.debug.core.events.IPDebugInfo;
-import org.eclipse.ptp.debug.core.events.IPDebugRegisterInfo;
+import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.event.IPDebugErrorInfo;
+import org.eclipse.ptp.debug.core.event.IPDebugEvent;
+import org.eclipse.ptp.debug.core.event.IPDebugInfo;
+import org.eclipse.ptp.debug.core.event.IPDebugRegisterInfo;
 import org.eclipse.ptp.debug.internal.ui.PDebugUIUtils;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
-import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
+import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -38,11 +38,9 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 /**
  * @author Clement chu
  */
-public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
+public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandler  {
 	/**
 	 * Constructs a new event handler on the given view
-	 * 
-	 * @param view signals view
 	 */
 	public ParallelDebugViewEventHandler(ParallelDebugView view) {
 		super(view);
@@ -51,46 +49,51 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 		return (ParallelDebugView)getView();
 	}
 	public void refresh(boolean all) {
-		getPView().refresh(all);
+		if (getPView().isVisible())
+			getPView().refresh(all);
 	}
 	protected void doHandleDebugEvent(IPDebugEvent event, IProgressMonitor monitor) {
 		IPDebugInfo info = event.getInfo();
-		IPJob job = info.getJob();
+		final IPJob job = info.getJob();
 		switch(event.getKind()) {
 			case IPDebugEvent.CREATE:
 				switch (event.getDetail()) {
-				case IPDebugEvent.DEBUGGER:
-					PTPDebugUIPlugin.getUIDebugManager().defaultRegister((IPCDISession)event.getSource());
-					refresh();
-					break;
 				case IPDebugEvent.REGISTER:
 					boolean refresh = true;
 					if (info instanceof IPDebugRegisterInfo) {
 						refresh = ((IPDebugRegisterInfo)info).isRefresh();
 					}
-					int[] processes = info.getAllRegisteredProcesses().toArray();
+					int[] c_regTask_array = info.getAllTasks().toArray();
 					if (refresh) {
 						IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 						if (elementHandler != null) {
-							for (int j=0; j<processes.length; j++) {
-								IPProcess proc = job.getProcessByIndex(processes[j]);
-								IElement element = elementHandler.getSetRoot().get(proc.getID());
-								element.setRegistered(true);
-								elementHandler.addRegisterElement(element);
+							IElement[] regElementArray = new IElement[c_regTask_array.length];
+							for (int j=0; j<c_regTask_array.length; j++) {
+								IPProcess proc = job.getProcessByIndex(c_regTask_array[j]);
+								((UIDebugManager) getPView().getUIManager()).addConsoleWindow(job, proc);
+								regElementArray[j] = elementHandler.getSetRoot().getElementByID(proc.getID());
 							}
+							elementHandler.addToRegister(regElementArray);
 						}
 						refresh();
 					}
-					
-					if (processes.length > 0) {
-						getPView().focusOnDebugTarget(job, processes[0]);
+					if (c_regTask_array.length > 0) {
+						getPView().focusOnDebugTarget(job, c_regTask_array[0]);
 					}
+					break;
+				case IPDebugEvent.DEBUGGER:
+					break;
+				case IPDebugEvent.BREAKPOINT:
 					break;
 				}
 				break;
 			case IPDebugEvent.TERMINATE:
+				IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 				switch (event.getDetail()) {
 				case IPDebugEvent.DEBUGGER:
+					if (elementHandler != null) {
+						elementHandler.removeElements(elementHandler.getRegistered());
+					}
 					refresh(true);
 					break;
 				case IPDebugEvent.REGISTER:
@@ -98,52 +101,63 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					if (info instanceof IPDebugRegisterInfo) {
 						refresh = ((IPDebugRegisterInfo)info).isRefresh();
 					}
-					int[] processes = info.getAllUnregisteredProcesses().toArray();
 					if (refresh) {
-						IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 						if (elementHandler != null) {
-							for (int j = 0; j < processes.length; j++) {
-								IPProcess proc = job.getProcessByIndex(processes[j]);
-								IElement element = elementHandler.getSetRoot().get(proc.getID());
-								element.setRegistered(false);
-								elementHandler.removeRegisterElement(element);
+							int[] t_regTask_array = info.getAllTasks().toArray();
+							IElement[] regElementArray = new IElement[t_regTask_array.length];
+							for (int j = 0; j < t_regTask_array.length; j++) {
+								IPProcess proc = job.getProcessByIndex(t_regTask_array[j]);
+								((UIDebugManager) getPView().getUIManager()).removeConsoleWindow(job, proc);
+								regElementArray[j] = elementHandler.getSetRoot().getElementByID(proc.getID());
 							}
+							elementHandler.removeFromRegister(regElementArray);
 						}
 						refresh();
 					}
 					break;
-				default:
-					/*
-					if (job.getID().equals(getPView().getCurrentID())) {
-						BitList tsource = (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
-						BitList ttarget = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
-						getPView().updateTerminateButton(tsource, ttarget);
+				case IPDebugEvent.BREAKPOINT:
+					break;
+				case IPDebugEvent.PROCESS_SPECIFIC:
+					UIDebugManager uiMgr = (UIDebugManager)getPView().getUIManager();
+					IPSession session = uiMgr.getDebugSession(job);
+					if (session != null) {
+						uiMgr.unregisterTasks(session, info.getAllRegisteredTasks());
 					}
-					*/
+					refresh(true);
+					break;
+				default:
 					refresh(true);
 					break;
 				}
 				break;
 			case IPDebugEvent.RESUME:
-				((UIDebugManager) getPView().getUIManager()).updateVariableValue(false, info.getAllRegisteredProcesses());
+				//((UIDebugManager) getPView().getUIManager()).updateVariableValue(false, info.getAllRegisteredTasks());
+				refresh(true);
+				break;
 			case IPDebugEvent.SUSPEND:
-				if (job.getID().equals(getPView().getCurrentID())) {
-					//BitList ssource = (BitList)job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
-					//BitList starget = (BitList)job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
-					//getPView().updateSuspendResumeButton(ssource, starget);
-
-					if (event.getKind() == IPDebugEvent.SUSPEND) {
-						getPView().updateStepReturnButton(info.getAllProcesses());
-						PTPDebugUIPlugin.getUIDebugManager().updateVariableValueOnSuspend(info.getAllProcesses());
-					}
+				int[] processes = info.getAllRegisteredTasks().toArray();
+				if (processes.length > 0) {
+					getPView().focusOnDebugTarget(job, processes[0]);
 				}
-				getPView().updateAction();
-				refresh();
+				//if (job.getID().equals(getPView().getCurrentID())) {
+					//PTPDebugUIPlugin.getUIDebugManager().updateVariableValueOnSuspend(info.getAllTasks());
+				//}
+				refresh(true);
 				break;
 			case IPDebugEvent.CHANGE:
-				/*
-				int detail = event.getDetail();
-				if (detail == IPDebugEvent.EVALUATION || detail == IPDebugEvent.CONTENT) {
+				switch (event.getDetail()) {
+				case IPDebugEvent.PROCESS_SPECIFIC:
+					UIDebugManager uiMgr = (UIDebugManager)getPView().getUIManager();
+					if (uiMgr.isEnabledDefaultRegister()) {
+						IPSession session = uiMgr.getDebugSession(job);
+						if (session != null) {
+							uiMgr.registerTasks(session, session.getTasks(0));
+						}
+					}
+					break;
+				case IPDebugEvent.EVALUATION:
+				case IPDebugEvent.CONTENT:
+					/*
 					int[] diffTasks = info.getAllProcesses().toArray();
 					IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 					for (int j=0; j<diffTasks.length; j++) {
@@ -157,20 +171,38 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 							}
 						}
 					}
+					*/
+					break;
 				}
-				*/
-				refresh();
 				break;
 			case IPDebugEvent.ERROR:
 				final IPDebugErrorInfo errInfo = (IPDebugErrorInfo)info;
-				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						String msg = "Error on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses()) + " - " + errInfo.getMsg();
-						IStatus status = new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, msg, null);
-						PTPDebugUIPlugin.errorDialog("Error", status);
+				if (event.getDetail() != IPDebugEvent.ERR_NORMAL) {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							String msg = "Error on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllTasks()) + " - " + errInfo.getMsg() + "\nReason: " + errInfo.getDetailsMsg();
+							IStatus status = new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, msg, null);
+							PTPDebugUIPlugin.errorDialog("Error", status);
+						}
+					});
+					//only change process icon and unregister for fatal error
+					if (event.getDetail() == IPDebugEvent.ERR_FATAL) { 
+						IElementHandler eHandler = getPView().getElementHandler(job.getID());
+						if (eHandler != null) {
+							int[] e_regTask_array = info.getAllRegisteredTasks().toArray();
+							if (e_regTask_array.length > 0) {
+								IElement[] regElementArray = new IElement[e_regTask_array.length];
+								for (int j = 0; j < e_regTask_array.length; j++) {
+									IPProcess proc = job.getProcessByIndex(e_regTask_array[j]);
+									((UIDebugManager) getPView().getUIManager()).removeConsoleWindow(job, proc);
+									regElementArray[j] = eHandler.getSetRoot().getElementByID(proc.getID());
+								}
+								eHandler.removeFromRegister(regElementArray);
+							}
+						}
+						refresh(true);
 					}
-				});
-				refresh(true);
+				}
 				break;
 		}
 	}

@@ -20,22 +20,22 @@ package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IExpression;
-import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
-import org.eclipse.ptp.debug.core.model.IPType;
+import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
+import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
+import org.eclipse.ptp.debug.core.pdi.IPDIVariableInfo;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
+import org.eclipse.ptp.debug.core.pdi.model.IPDITargetExpression;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 
 /**
  * @author Clement chu
@@ -43,70 +43,55 @@ import org.eclipse.ptp.debug.core.model.PVariableFormat;
  */
 public class PExpression extends PLocalVariable implements IExpression {
 	private String fText;
-	private IPCDIExpression fCDIExpression;
+	private IPDITargetExpression fPDIExpression;
 	private PStackFrame fStackFrame;
-	private IValue fValue = PValueFactory.NULL_VALUE;
-	private IPType fType;
+	private IPValue fValue = PValueFactory.NULL_VALUE;
 
 	/** Constructor
 	 * @param frame
 	 * @param cdiExpression
 	 * @param varObject
 	 */
-	public PExpression(PStackFrame frame, IPCDIExpression cdiExpression, IPCDIVariableDescriptor varObject) {
+	public PExpression(PStackFrame frame, IPDITargetExpression pdiExpression, IPDIVariableDescriptor varObject) {
 		super(frame, varObject);
 		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT)));
-		fText = cdiExpression.getExpressionText();
-		fCDIExpression = cdiExpression;
+		fText = pdiExpression.getExpressionText();
+		fPDIExpression = pdiExpression;
 		fStackFrame = frame;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IExpression#getExpressionText()
-	 */
 	public String getExpressionText() {
 		return fText;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent[])
-	 */
-	public void handleDebugEvents(IPCDIEvent[] events) {
+	public void handleDebugEvents(IPDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
-			IPCDIEvent event = events[i];
-			if (event instanceof IPCDIResumedEvent) {
-				IPCDIObject source = event.getSource();
-				if (source != null) {
-					IPCDITarget cdiTarget = source.getTarget();
-					if (getCDITarget().equals(cdiTarget)) {
-						setChanged(false);
-						resetValue();
-					}
+			IPDIEvent event = events[i];
+			if (!event.contains(getTasks()))
+				continue;
+			
+			if (event instanceof IPDIResumedEvent) {
+				setChanged(false);
+				resetValue();
+			}
+			else if (event instanceof IPDIChangedEvent) {
+				IPDISessionObject reason = ((IPDIChangedEvent)event).getReason();
+				if (reason instanceof IPDIVariableInfo) {
+					setChanged(false);
+					resetValue();
 				}
 			}
 		}
 		super.handleDebugEvents(events);
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.IEnableDisableTarget#isEnabled()
-	 */
 	public boolean isEnabled() {
 		return true;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.IEnableDisableTarget#canEnableDisable()
-	 */
 	public boolean canEnableDisable() {
 		return true;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#isBookkeepingEnabled()
-	 */
 	protected boolean isBookkeepingEnabled() {
 		return false;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IVariable#getValue()
-	 */
-	public IValue getValue() {
+	public IPValue getValue() {
 		PStackFrame frame = (PStackFrame) getStackFrame();
 		try {
 			return getValue(frame);
@@ -114,69 +99,47 @@ public class PExpression extends PLocalVariable implements IExpression {
 		}
 		return null;
 	}
-	/** Get value
-	 * @param frame
-	 * @return
-	 * @throws DebugException
-	 */
-	protected synchronized IValue getValue(PStackFrame frame) throws DebugException {
+	protected synchronized IPValue getValue(PStackFrame frame) throws DebugException {
 		if (fValue.equals(PValueFactory.NULL_VALUE)) {
 			if (frame.isSuspended()) {
 				try {
-					IPCDIVariable variable = fCDIExpression.getCDIVariable(frame.getCDIStackFrame());
+					IPDIVariable variable = fPDIExpression.getVariable(frame.getPDIStackFrame());
 					if (variable != null) {
-						IAIFValue aifValue = variable.getValue();
-						if (aifValue != null) {
-							if (aifValue instanceof IAIFValueArray) {
-								IPType type = new PType(aifValue.getType());
-								if (type != null && type.isArray()) {
-									int[] dims = type.getArrayDimensions();
-									if (dims.length > 0 && dims[0] > 0)
-										fValue = PValueFactory.createIndexedValue(this, variable, 0, dims[0]);
-								}
-							}
+						IAIF aif = variable.getAIF();
+						if (aif != null && aif.getType() instanceof IAIFTypeArray) {
+							int[] dims = ((IAIFTypeArray)aif.getType()).getDimensionDetails();
+							if (dims.length > 0 && dims[0] > 0)
+								fValue = PValueFactory.createIndexedValue(this, variable, 0, dims[0]);
 						}
 						else {
 							fValue = PValueFactory.createValue(this, variable);
 						}
 					}
-				} catch (PCDIException e) {
+				} catch (PDIException e) {
 					targetRequestFailed(e.getMessage(), null);
 				}
 			}
 		}
 		return fValue;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getStackFrame()
-	 */
 	protected IPStackFrame getStackFrame() {
 		return fStackFrame;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#resetValue()
-	 */
 	protected void resetValue() {
 		if (fValue instanceof AbstractPValue) {
 			((AbstractPValue) fValue).reset();
 		} 
 		fValue = PValueFactory.NULL_VALUE;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getExpressionString()
-	 */
 	public String getExpressionString() throws DebugException {
 		return getExpressionText();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#dispose()
-	 */
 	public void dispose() {
-		if (fCDIExpression != null) {
+		if (fPDIExpression != null) {
 			try {
-				fCDIExpression.dispose();
-				fCDIExpression = null;
-			} catch (PCDIException e) {
+				fPDIExpression.dispose();
+				fPDIExpression = null;
+			} catch (PDIException e) {
 			}
 		}
 		if (fValue instanceof AbstractPValue) {
@@ -185,27 +148,5 @@ public class PExpression extends PLocalVariable implements IExpression {
 		}
 		internalDispose(true);
 		setDisposed(true);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPVariable#getType()
-	 */
-	public IPType getType() throws DebugException {
-		if (isDisposed())
-			return null;
-		if (fType == null) {
-			synchronized (this) {
-				if (fType == null) {
-					fType = ((AbstractPValue)fValue).getType();
-				}
-			}
-		}
-		return fType;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IVariable#getReferenceTypeName()
-	 */
-	public String getReferenceTypeName() throws DebugException {
-		IPType type = getType();
-		return (type != null) ? type.getName() : "";
 	}
 }

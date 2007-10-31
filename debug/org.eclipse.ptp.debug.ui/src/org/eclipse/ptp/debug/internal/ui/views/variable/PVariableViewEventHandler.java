@@ -19,45 +19,94 @@
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
-import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
+import org.eclipse.ptp.debug.core.event.IPDebugEvent;
+import org.eclipse.ptp.debug.core.event.IPDebugInfo;
+import org.eclipse.ptp.debug.internal.ui.PVariableManager;
+import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.listeners.IJobChangedListener;
+import org.eclipse.ptp.ui.listeners.ISetListener;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author Clement chu
  */
-public class PVariableViewEventHandler extends AbstractPDebugEventHandler {
+public class PVariableViewEventHandler extends AbstractPDebugViewEventHandler implements IJobChangedListener, ISetListener {
+	private PVariableManager varMgr;
 	/**
 	 * Constructs a new event handler on the given view
-	 * 
-	 * @param view signals view
+	 * @param view variable viewer
 	 */
 	public PVariableViewEventHandler(PVariableView view) {
 		super(view);
+		varMgr = PTPDebugUIPlugin.getUIDebugManager().getJobVariableManager();
+		PTPDebugUIPlugin.getUIDebugManager().addSetListener(this);
+		PTPDebugUIPlugin.getUIDebugManager().addJobChangedListener(this);
 	}
-	public PVariableView getPView() {
+	public void dispose() {
+		PTPDebugUIPlugin.getUIDebugManager().removeSetListener(this);
+		PTPDebugUIPlugin.getUIDebugManager().removeJobChangedListener(this);
+		super.dispose();
+	}
+	public PVariableView getPVariableView() {
 		return (PVariableView)getView();
 	}
 	public void refresh(boolean all) {
-		getPView().refresh();
+		if (getPVariableView().isVisible()) {
+			getPVariableView().refresh();
+		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler#doHandleDebugEvent(org.eclipse.ptp.debug.core.event.IPDebugEvent, org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	protected void doHandleDebugEvent(IPDebugEvent event, IProgressMonitor monitor) {
 		switch(event.getKind()) {
 			case IPDebugEvent.CREATE:
 				switch (event.getDetail()) {
 				case IPDebugEvent.DEBUGGER:
-					getPView().updateActionsEnable();
+					getPVariableView().updateActionsEnable();
 					refresh();
 					break;
 				}
 				break;
+			case IPDebugEvent.RESUME:
+				IPDebugInfo info = event.getInfo();
+				varMgr.resetValue(info.getJob(), info.getAllTasks());
+				break;
 			case IPDebugEvent.TERMINATE:
 				switch (event.getDetail()) {
 				case IPDebugEvent.DEBUGGER:
-					getPView().updateActionsEnable();
+					getPVariableView().updateActionsEnable();
 					refresh();
 					break;
 				}
 				break;
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.IJobChangedListener#jobChangedEvent(java.lang.String, java.lang.String)
+	 */
+	public void jobChangedEvent(int type, String cur_job_id, String pre_job_id) {
+		switch (type) {
+		case IJobChangedListener.CHANGED:
+			//refresh();
+			break;
+		case IJobChangedListener.REMOVED:
+			if (pre_job_id != null) {
+				varMgr.removeVariable(pre_job_id);
+				refresh();
+			}
+			break;
+		}
+		getPVariableView().updateActionsEnable();
+	}
+	public void deleteSetEvent(IElementSet set) {}
+	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {
+		//updateVariableValueOnChange();		
+	}
+	public void createSetEvent(IElementSet set, IElement[] elements) {}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {}
 }

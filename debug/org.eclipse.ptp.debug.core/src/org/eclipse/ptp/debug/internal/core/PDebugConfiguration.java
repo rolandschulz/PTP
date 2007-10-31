@@ -33,19 +33,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
+import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 
 public class PDebugConfiguration implements IPDebugConfiguration {
-	/**
-	 * The configuration element of the extension.
-	 */
 	private IConfigurationElement fElement;
 	private HashSet<String> fModes;
 	private HashSet<String> fCPUs;
@@ -59,10 +57,10 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return fElement;
 	}
 
-	public IAbstractDebugger createDebugger() throws CoreException {
+	public IPTPDebugger getDebugger() throws CoreException {
 		Object debugger = getConfigurationElement().createExecutableExtension("class");
-		if (debugger instanceof IAbstractDebugger) {
-			return (IAbstractDebugger)debugger;
+		if (debugger instanceof IPTPDebugger) {
+			return (IPTPDebugger)debugger;
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, InternalDebugCoreMessages.getString("DebugConfiguration.0"), null));
 	}
@@ -107,7 +105,6 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	
 	/**
 	 * Returns the set of modes specified in the configuration data.
-	 * 
 	 * @return the set of modes specified in the configuration data
 	 */
 	protected Set<String> getModes() {
@@ -147,11 +144,6 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		}
 		return fCPUs;
 	}
-
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.ICDebugConfiguration#getCoreFileExtensions()
-	 */
 	public String[] getCoreFileExtensions() {
 		if (fCoreExt == null) {
 			List<String> exts = new ArrayList<String>();

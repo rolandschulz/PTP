@@ -18,17 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.cdt.debug.core.model.ICastToArray;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValueModification;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * @author Clement chu
  * 
  */
-public interface IPVariable extends IVariable, IPDebugElement, IFormatSupport, ICastToArray, IValueModification, IEnableDisableTarget {
-	IPType getType() throws DebugException;
+public interface IPVariable extends IVariable, IPDebugElement, IFormatSupport, IValueModification, IEnableDisableTarget {
+	IAIF getAIF() throws DebugException;
 	boolean isArgument();
+	public String getExpressionString() throws DebugException;
 }
 

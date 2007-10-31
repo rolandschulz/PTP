@@ -19,10 +19,12 @@
 package org.eclipse.ptp.debug.internal.ui.dialogs;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
+import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -30,30 +32,27 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class ArrayVariableDialog extends VariableDialog {
-	private static final String ARRAY_TAG = "[";
-	
-	public ArrayVariableDialog(Shell parent, IStackFrame frame) {
+	public ArrayVariableDialog(Shell parent, IPStackFrame frame) {
 		super(parent, frame);
 	}
-	
 	protected ViewerFilter getViewFilter() {
 		return new ArrayFilter();
 	}
-	
 	private class ArrayFilter extends ViewerFilter {
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			if (element instanceof IVariable) {
+			if (element instanceof IPVariable) {
 				try {
-					return isArray((IVariable)element);
+					IAIF aif = ((IPVariable)element).getAIF();
+					if (aif == null)
+						return false;
+					if (aif.getType() instanceof IAIFTypeArray) {
+						return true;
+					}
 				} catch (DebugException e) {
 					return false;
 				}
 			}
 			return false;
-		}
-		
-		private boolean isArray(IVariable variable) throws DebugException {
-			return (variable.getReferenceTypeName().indexOf(ARRAY_TAG)>-1);
 		}
 	}
 }

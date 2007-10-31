@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.internal.ui.preferences;
 
 import java.io.File;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -128,7 +129,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		sdmPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
 		sdmArgsText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 		sdmHostText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
-		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND)));
+		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE)));
 		sdmBackendPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH));
 		super.performDefaults();
 	}
@@ -137,7 +138,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
 		sdmArgsText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 		sdmHostText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
-		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND)));
+		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE)));
 		sdmBackendPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH));
 	}	
 	protected void storeValues() {
@@ -145,7 +146,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, sdmPathText.getText());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, sdmArgsText.getText());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_HOST, sdmHostText.getText());
-		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND, sdmBackendCombo.getItem(sdmBackendCombo.getSelectionIndex()));
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE, sdmBackendCombo.getItem(sdmBackendCombo.getSelectionIndex()));
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH, sdmBackendPathText.getText());
 	}
 	

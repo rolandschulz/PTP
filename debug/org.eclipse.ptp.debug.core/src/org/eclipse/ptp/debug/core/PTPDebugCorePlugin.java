@@ -21,12 +21,6 @@ package org.eclipse.ptp.debug.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -44,7 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
+import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
@@ -56,12 +50,22 @@ public class PTPDebugCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.core";
 	public static final int INTERNAL_ERROR = 1000;
 	private static PTPDebugCorePlugin plugin;
+	private static PDebugModel debugModel = null;
+	
+	/**
+	 * Constant identifying the job family identifier for the background event job.
+	 */
+	public static final Object FAMILY_EVENT = new Object();
+	
 	private HashMap<String, PDebugConfiguration> fDebugConfigurations;
-	private static Logger logger;
-	private Level loggingLevel = Level.FINE;
-	//private ListenerList fBreakpointListeners;
 	private CommonSourceLookupDirector fCommonSourceLookupDirector;
-	private static PCDIDebugModel debugModel = null;
+	
+	public static final String PTPDEBUGGER_EXTENSION_POINT_ID = "PTPDebugger";
+	public static final String DEBUGGER_ELEMENT = "debugger";
+	
+	/**********************************************************
+	 * Event
+	 **********************************************************/
 	private EventDispatchJob dispatchJob = new EventDispatchJob();
 	private ListenerList fEventListeners = new ListenerList();
 	private List<IPDebugEvent> fEventQueue = new ArrayList<IPDebugEvent>();
@@ -87,11 +91,9 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return getDefault().getBundle().getSymbolicName();
 	}
-	
 	public IPreferenceStore getPTPPreferenceStore() {
 		return new PTPPreferenceStore(getPluginPreferences());
 	}
-	
 	public static void log(Throwable t) {
 		Throwable top = t;
 		if (t instanceof DebugException) {
@@ -103,7 +105,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		// this message is intentionally not internationalized, as an exception may
 		// be due to the resource bundle itself
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, "Internal error logged from CDI Debug: ", top));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, "Internal error logged from PDI Debug: ", top));
 	}
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
@@ -112,7 +114,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		getDefault().getLog().log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, message, null));
 	}
 	private void initializeDebugConfiguration() {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(), "PTPDebugger");
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(), PTPDEBUGGER_EXTENSION_POINT_ID);
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 		fDebugConfigurations = new HashMap<String, PDebugConfiguration>(infos.length);
 		for (int i = 0; i < infos.length; i++) {
@@ -138,7 +140,21 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return dbgCfg;
 	}
-	
+	public void saveDefaultDebugConfiguration(String id) {
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue(IPDebugConstants.PREF_DEFAULT_DEBUGGER_TYPE, (id != null)?id:"");
+	}
+	public IPDebugConfiguration getDefaultDebugConfiguration() {
+		IPDebugConfiguration result = null;
+		try {
+			result = getDebugConfiguration(PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_DEFAULT_DEBUGGER_TYPE));
+		}
+		catch (CoreException e) {
+		}
+		return result;
+	}
+	public boolean isDefaultDebugConfiguration(String id) {
+		return (id.compareTo(PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_DEFAULT_DEBUGGER_TYPE)) == 0);
+	}
 	/*
 	protected void resetBreakpointsInstallCount() {
 		IBreakpointManager bm = DebugPlugin.getDefault().getBreakpointManager();
@@ -170,24 +186,20 @@ public class PTPDebugCorePlugin extends Plugin {
 		fBreakpointListeners = null;
 	}
 	*/
-	public static PCDIDebugModel getDebugModel() {
+	public static PDebugModel getDebugModel() {
 		return debugModel;
 	}
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		debugModel = new PCDIDebugModel();
+		debugModel = new PDebugModel();
 		initializeCommonSourceLookupDirector();
-		//createBreakpointListenersList();
-		//resetBreakpointsInstallCount();
-		// setSessionManager(new SessionManager());
 	}
 	public void stop(BundleContext context) throws Exception {
 		try {
 			setShuttingDown(true);
-			//disposeBreakpointListenersList();
-			//resetBreakpointsInstallCount();
-			disposeCommonSourceLookupDirector();
 			debugModel.shutdown();
+			disposeCommonSourceLookupDirector();
+			disposeDebugConfigurations();
 			DebugJobStorage.removeDebugStorages();
 		} finally {
 			super.stop(context);
@@ -209,10 +221,6 @@ public class PTPDebugCorePlugin extends Plugin {
 			}
 		}
 	}
-	private void disposeCommonSourceLookupDirector() {
-		if (fCommonSourceLookupDirector != null)
-			fCommonSourceLookupDirector.dispose();
-	}
 	public PSourceLookupDirector getCommonSourceLookupDirector() {
 		return fCommonSourceLookupDirector;
 	}
@@ -222,30 +230,25 @@ public class PTPDebugCorePlugin extends Plugin {
 	public IPSourceLocation[] getCommonSourceLocations() {
 		return SourceUtils.getCommonSourceLocationsFromMemento(PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_SOURCE_LOCATIONS));
 	}
-	public Logger getLogger() {
-		if (logger == null) {
-			logger = Logger.getLogger(getClass().getName());
-			Handler[] handlers = logger.getHandlers();
-			for (int index = 0; index < handlers.length; index++) {
-				logger.removeHandler(handlers[index]);
-			}
-			Handler console = new ConsoleHandler();
-			console.setFormatter(new Formatter() {
-				public String format(LogRecord record) {
-					String out = record.getLevel() + " : " + record.getSourceClassName() + "." + record.getSourceMethodName();
-					if (!record.getMessage().equals(""))
-						out = out + " : " + record.getMessage();
-					out += "\n";
-					return out;
-				}
-			});
-			console.setLevel(loggingLevel);
-			logger.addHandler(console);
-			logger.setLevel(loggingLevel);
-		}
-		return logger;
+	public void saveCommonSourceLocations(IPSourceLocation[] locations) {
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue(IPDebugConstants.PREF_SOURCE_LOCATIONS, SourceUtils.getCommonSourceLocationsMemento(locations));
 	}
-
+	private void disposeCommonSourceLookupDirector() {
+		if (fCommonSourceLookupDirector != null)
+			fCommonSourceLookupDirector.dispose();
+	}
+	private void disposeDebugConfigurations() {
+		if (fDebugConfigurations != null) {
+			fDebugConfigurations.clear();
+			fDebugConfigurations = null;
+		}
+	}
+	public int getCommandTimeout() {
+		return getPluginPreferences().getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
+	}
+	/*************************************************
+	 * EVENT
+	 *************************************************/
 	private synchronized void setDispatching(boolean dispatching) {
 		if (dispatching) {
 			fDispatching++;
@@ -260,21 +263,15 @@ public class PTPDebugCorePlugin extends Plugin {
 		return fDispatching > 0;
 	}
 	/**
-	 * Returns whether this plug-in is in the process of 
-	 * being shutdown.
-	 * 
-	 * @return whether this plug-in is in the process of 
-	 *  being shutdown
+	 * Returns whether this plug-in is in the process of being shutdown.
+	 * @return whether this plug-in is in the process of being shutdown
 	 */
 	public boolean isShuttingDown() {
 		return fShuttingDown;
 	}
 	/**
-	 * Sets whether this plug-in is in the process of 
-	 * being shutdown.
-	 * 
-	 * @param value whether this plug-in is in the process of 
-	 *  being shutdown
+	 * Sets whether this plug-in is in the process of being shutdown.
+	 * @param value whether this plug-in is in the process of being shutdown
 	 */
 	public void setShuttingDown(boolean value) {
 		fShuttingDown = value;
@@ -302,13 +299,10 @@ public class PTPDebugCorePlugin extends Plugin {
          * Creates a new event dispatch job.
          */
         public EventDispatchJob() {
-            super("EventDispatchJob"); 
+            super("EventDispatchJob");
             setPriority(Job.INTERACTIVE);
             setSystem(true);
         }
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-         */
         protected IStatus run(IProgressMonitor monitor) {
             while (!fEventQueue.isEmpty()) {
                 IPDebugEvent event = null;
@@ -323,15 +317,9 @@ public class PTPDebugCorePlugin extends Plugin {
             }
             return Status.OK_STATUS;
         }
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
-         */
         public boolean shouldRun() {
             return shouldSchedule();
         }
-        /* (non-Javadoc)
-         * @see org.eclipse.core.internal.jobs.InternalJob#shouldSchedule()
-         */
         public boolean shouldSchedule() {
             return !(isShuttingDown() || fEventListeners.isEmpty());
         }		
@@ -339,15 +327,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	class EventNotifier implements ISafeRunnable {
 		private IPDebugEvent fEvent;
 		private IPDebugEventListener fListener;
-		/**
-		 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
-		 */
 		public void handleException(Throwable exception) {
 			log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, "PTPDebugCorePlugin occurred exception while dispacthing debug event", exception));
 		}
-		/**
-		 * @see org.eclipse.core.runtime.ISafeRunnable#run()
-		 */
 		public void run() throws Exception {
 			fListener.handleDebugEvent(fEvent);
 		}
@@ -367,9 +349,5 @@ public class PTPDebugCorePlugin extends Plugin {
 			fEvent = null;
 			fListener = null;			
 		}
-	}
-	
-	public int getCommandTimeout() {
-		return getPluginPreferences().getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
 	}
 }

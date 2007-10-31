@@ -24,23 +24,24 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.eclipse.cdt.debug.core.CDebugUtils;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.sourcelookup.IDirectorySourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.IProjectSourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.MappingSourceContainer;
-import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,7 +63,7 @@ public class SourceUtils {
 			Element element = document.createElement(NAME_COMMON_SOURCE_LOCATIONS);
 			document.appendChild(element);
 			saveSourceLocations(document, element, locations);
-			return CDebugUtils.serializeDocument(document);
+			return PDebugUtils.serializeDocument(document);
 		} catch (ParserConfigurationException e) {
 			ex = e;
 		} catch (IOException e) {
@@ -126,7 +127,7 @@ public class SourceUtils {
 					try {
 						clazz = PTPDebugCorePlugin.getDefault().getBundle().loadClass(className);
 					} catch (ClassNotFoundException e) {
-						PTPDebugCorePlugin.log(MessageFormat.format("Unable to restore source location - class not found {0}", new String[] { className }));
+						PTPDebugCorePlugin.log(MessageFormat.format("Unable to restore source location - class not found {0}", new Object[] { className }));
 						continue;
 					}
 					IPSourceLocation location = null;

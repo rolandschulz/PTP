@@ -28,11 +28,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
+import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 /**
  * @author Clement chu
  *
  */
 public interface IPDebugEventListener {
-	public void handleDebugEvent(IPDebugEvent event);
+	/**
+	 * Handle debug event
+	 * @param event IPDebugEvent
+	 */
+	void handleDebugEvent(IPDebugEvent event);
 }

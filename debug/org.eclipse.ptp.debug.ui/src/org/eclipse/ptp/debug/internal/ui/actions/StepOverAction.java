@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
@@ -51,8 +52,12 @@ public class StepOverAction extends StepAction {
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {
-			setEnabled(false);
-			((UIDebugManager)manager).stepOver();
+			try {
+				setEnabled(false);
+				((UIDebugManager)manager).stepOver();
+			} catch (CoreException e) {
+				setEnabled(true);
+			}
 		}
 	}
 }

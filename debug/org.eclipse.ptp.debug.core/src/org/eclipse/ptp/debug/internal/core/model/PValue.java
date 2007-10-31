@@ -24,33 +24,32 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.core.IAddressFactory;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
-import org.eclipse.ptp.debug.core.aif.AIFException;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
-import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
-import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
-import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
-import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
-import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
-import org.eclipse.ptp.debug.core.aif.IAIFValueString;
-import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
-import org.eclipse.ptp.debug.core.aif.ITypeDerived;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
-import org.eclipse.ptp.debug.core.model.IPType;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeChar;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeInt;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeString;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueChar;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValuePointer;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueReference;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueString;
+import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeAggregate;
+import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeDerived;
 
 /**
  * @author Clement chu
@@ -59,10 +58,9 @@ import org.eclipse.ptp.debug.core.model.PVariableFormat;
 public class PValue extends AbstractPValue {
 	private String fValueString = null;
 	private List<IVariable> fVariables = Collections.EMPTY_LIST;
-	private PType fType;
-	private IPCDIVariable fVariable;
+	private IPDIVariable fVariable;
 
-	protected PValue(PVariable parent, IPCDIVariable variable) {
+	protected PValue(PVariable parent, IPDIVariable variable) {
 		super(parent);
 		fVariable = variable;		
 	}
@@ -74,20 +72,18 @@ public class PValue extends AbstractPValue {
 		return (getParentVariable() != null) ? getParentVariable().getReferenceTypeName() : null;
 	}
 	public String getValueString() throws DebugException {
-		if (fValueString == null && getUnderlyingValue() != null) {
+		if (fValueString == null && getAIF() != null) {
 			resetStatus();
 			IPStackFrame pframe = getParentVariable().getStackFrame();
-			boolean isSuspended = (pframe == null) ? getCDITarget().isSuspended() : pframe.isSuspended();
+			boolean isSuspended = (pframe == null) ? getPDISession().isSuspended(getTasks()) : pframe.isSuspended();
 			if (isSuspended) {
 				try {
 					if (fVariable == null) {
 						targetRequestFailed("No variable found", null);
 					}
-					fValueString = processUnderlyingValue(fVariable.getType(), fVariable.getValue());
-				} catch (PCDIException pe) {
+					fValueString = processUnderlyingValue(getAIF());
+				} catch (AIFException pe) {
 					setStatus(IPDebugElementStatus.ERROR, pe.getMessage());
-				} catch (AIFException e) {
-					setStatus(IPDebugElementStatus.ERROR, e.getMessage());
 				}
 			}
 		}
@@ -105,11 +101,11 @@ public class PValue extends AbstractPValue {
 			return Collections.EMPTY_LIST;
 		if (fVariables.size() == 0) {
 			try {
-				List<IPCDIVariable> vars = getCDIVariables();
+				List<IPDIVariable> vars = getPDIVariables();
 				fVariables = new ArrayList<IVariable>(vars.size());
-				Iterator it = vars.iterator();
+				Iterator<IPDIVariable> it = vars.iterator();
 				while (it.hasNext()) {
-					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariable)it.next()));
+					fVariables.add(PVariableFactory.createLocalVariable(this, (IPDIVariable)it.next()));
 				}
 				resetStatus();
 			} catch (DebugException e) {
@@ -119,42 +115,33 @@ public class PValue extends AbstractPValue {
 		return fVariables;
 	}
 	public boolean hasVariables() throws DebugException {
-		try {
-			IPCDIVariable var = getCurrentVariable();
-			if (var != null) {
-				//return var.getChildrenNumber()>0;
-				IAIFType type = var.getType();
-				if (type instanceof ITypeAggregate) {
-					return true;
-				}
-				if (type instanceof ITypeDerived) {
-					return true;
-				}
+		IAIF aif = getAIF();
+		if (aif != null) {
+			IAIFType type = aif.getType();
+			if (type instanceof ITypeAggregate || type instanceof ITypeDerived) {
+				return true;
 			}
-		} catch (PCDIException e) {
-			targetRequestFailed(e.getMessage(), null);
 		}
 		return false;
 	}
-	public IPCDIVariable getCurrentVariable() {
-		return fVariable;
-	}
-	public IAIFValue getUnderlyingValue() {
+	public IAIF getAIF() throws DebugException {
 		try {
-			return getCurrentVariable().getValue();
-		} catch (PCDIException e) {
+			return fVariable.getAIF();
+		} catch (PDIException e) {
+			targetRequestFailed(e.getMessage(), e);
 			return null;
 		}
 	}
-	protected List<IPCDIVariable> getCDIVariables() throws DebugException {
-		IPCDIVariable[] vars = null;
+	protected List<IPDIVariable> getPDIVariables() throws DebugException {
+		IPDIVariable[] vars = null;
 		try {
-			IPCDIVariable var = getCurrentVariable();
-			vars = var.getChildren();
-			if (vars == null) {
-				vars = new IPCDIVariable[0];
+			if (fVariable != null) {
+				vars = fVariable.getChildren();
+				if (vars == null) {
+					vars = new IPDIVariable[0];
+				}
 			}
-		} catch (PCDIException e) {
+		} catch (PDIException e) {
 			requestFailed(e.getMessage(), e);
 		}
 		return Arrays.asList(vars);
@@ -164,41 +151,40 @@ public class PValue extends AbstractPValue {
 			fValueString = null;
 			resetStatus();
 		}
-		else {
-			//if (getCDITarget().getConfiguration() instanceof IPCDITargetConfiguration2 && ((IPCDITargetConfiguration2)getCDITarget().getConfiguration()).supportsPassiveVariableUpdate())
-				//fValueString = null;
-		}
-		Iterator it = fVariables.iterator();
+		Iterator<IVariable> it = fVariables.iterator();
 		while (it.hasNext()) {
 			((AbstractPVariable) it.next()).setChanged(changed);
 		}
 	}
 	public void dispose() {
-		Iterator it = fVariables.iterator();
+		Iterator<IVariable> it = fVariables.iterator();
 		while (it.hasNext()) {
 			((AbstractPVariable) it.next()).dispose();
 		}
 	}
-	protected String processUnderlyingValue(IAIFType aifType, IAIFValue aifValue) throws AIFException {
-		if (aifValue != null) {
-			if (aifType instanceof IAIFTypeChar)
-				return getCharValueString((IAIFValueChar) aifValue);
-			else if (aifType instanceof IAIFTypeInt)
-				return getIntValueString((IAIFValueInt) aifValue);
-			else if (aifType instanceof IAIFTypeFloat)
-				return getFloatingPointValueString((IAIFValueFloat) aifValue);
-			else if (aifType instanceof IAIFTypePointer)
-				return getPointerValueString((IAIFValuePointer) aifValue);
-			else if (aifType instanceof IAIFTypeReference)
-				return processUnderlyingValue(aifType, ((IAIFValueReference) aifValue).getParent());
-			else if (aifType instanceof IAIFTypeString)
-				return getWCharValueString((IAIFValueString) aifValue);
-			else if (aifType instanceof ITypeAggregate)
-				return "{...}";
-			else
-				return aifValue.getValueString();
+	protected String processUnderlyingValue(IAIF aif) throws AIFException {
+		if (aif != null) {
+			return processUnderlyingValue(aif.getType(), aif.getValue());
 		}
 		return null;
+	}
+	private String processUnderlyingValue(IAIFType type, IAIFValue value) throws AIFException {
+		if (type instanceof IAIFTypeChar)
+			return getCharValueString((IAIFValueChar) value);
+		else if (type instanceof IAIFTypeInt)
+			return getIntValueString((IAIFValueInt) value);
+		else if (type instanceof IAIFTypeFloat)
+			return getFloatingPointValueString((IAIFValueFloat) value);
+		else if (type instanceof IAIFTypePointer)
+			return getPointerValueString((IAIFValuePointer) value);
+		else if (type instanceof IAIFTypeReference)
+			return processUnderlyingValue(type, ((IAIFValueReference) value).getParent());
+		else if (type instanceof IAIFTypeString)
+			return getWCharValueString((IAIFValueString) value);
+		else if (type instanceof ITypeAggregate)
+			return "{...}";
+		else
+			return value.getValueString();
 	}
 	private String getCharValueString(IAIFValueChar value) throws AIFException {
 		PVariableFormat format = getParentVariable().getFormat();
@@ -207,11 +193,9 @@ public class PValue extends AbstractPValue {
 			return ((Character.isISOControl(charValue) && charValue != '\b' && charValue != '\t' && charValue != '\n' && charValue != '\f' && charValue != '\r') || charValue < 0) ? "" : "\'" + value.getValueString() + "\'";
 		} else if (PVariableFormat.DECIMAL.equals(format)) {
 			return Integer.toString((byte)charValue);
-			//return (isSigned()) ? Integer.toString(byteValue): Integer.toString(value.shortValue());
 		} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
 			StringBuffer sb = new StringBuffer("0x");
 			String stringValue = Integer.toString((byte)charValue);
-			//String stringValue = (isSigned()) ? Integer.toHexString((byte) value.byteValue()) : Integer.toHexString(value.shortValue());
 			sb.append((stringValue.length() > 2) ? stringValue.substring(stringValue.length() - 2) : stringValue);
 			return sb.toString();
 		}
@@ -222,7 +206,6 @@ public class PValue extends AbstractPValue {
 		String stringValue = value.getValueString();
 		if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
 			return stringValue;
-			//return (isSigned()) ? Integer.toString(value.intValue()) : Long.toString(value.longValue());
 		} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
 			StringBuffer sb = new StringBuffer("0x");
 			if (value.isShort()) {
@@ -232,7 +215,6 @@ public class PValue extends AbstractPValue {
 			} else if (value.isLong()) {
 				stringValue = Long.toHexString(value.longValue());
 			}
-			//String stringValue = (isSigned()) ? Integer.toHexString(value.intValue()) : Long.toHexString(value.longValue());
 			sb.append((stringValue.length() > 8) ? stringValue.substring(stringValue.length() - 8) : stringValue);
 			return sb.toString();
 		}
@@ -252,7 +234,6 @@ public class PValue extends AbstractPValue {
 		if (PVariableFormat.NATURAL.equals(format)) {
 			return floatValue;
 		}
-
 		Float flt = new Float(floatValue);
 		if (flt.isNaN() || flt.isInfinite())
 			return "";
@@ -272,7 +253,6 @@ public class PValue extends AbstractPValue {
 		if (PVariableFormat.NATURAL.equals(format)) {
 			return doubleValue;
 		}
-
 		Double dbl = new Double(doubleValue);
 		if (dbl.isNaN() || dbl.isInfinite())
 			return "";
@@ -288,154 +268,33 @@ public class PValue extends AbstractPValue {
 		return doubleValue;
 	}
 	private String getPointerValueString(IAIFValuePointer value) throws AIFException {
-		//IAIFValue baseValue = value.getValue();
-		//if (baseValue instanceof IValueAggregate) {//if base type is not primitive type display address;
-			IAddressFactory factory = ((PDebugTarget) getDebugTarget()).getAddressFactory();
-			BigInteger pv = value.pointerValue();
-			if (pv == null)
-				return "";
-			IAddress address = factory.createAddress(pv);
-			if (address == null)
-				return "";
-			PVariableFormat format = getParentVariable().getFormat();
-			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.HEXADECIMAL.equals(format))
-				return address.toHexAddressString();
-			if (PVariableFormat.DECIMAL.equals(format))
-				return address.toString();
-		//}
-		//else {
-			//return baseValue.getValueString();
-		//}
+		BigInteger pv = value.pointerValue();
+		if (pv == null)
+			return "";
+		PVariableFormat format = getParentVariable().getFormat();
+		if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.HEXADECIMAL.equals(format))
+			return pv.toString(16);
+		if (PVariableFormat.DECIMAL.equals(format))
+			return pv.toString(10);
 		return null;
 	}
 	private String getWCharValueString(IAIFValueString value) throws AIFException {
 		return value.getValueString();
-		/*
-		if (getParentVariable() instanceof PVariable) {
-			PVariableFormat format = getParentVariable().getFormat();
-			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
-				return (isSigned()) ? Short.toString(value.shortValue()) : Integer.toString(value.intValue());
-			} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
-				StringBuffer sb = new StringBuffer("0x");
-				String stringValue = Integer.toHexString((isSigned()) ? value.shortValue() : value.intValue());
-				sb.append((stringValue.length() > 4) ? stringValue.substring(stringValue.length() - 4) : stringValue);
-				return sb.toString();
-			}
-		}
-		int size = ((PVariable) getParentVariable()).sizeof();
-		if (size == 4) {
-			PVariableFormat format = getParentVariable().getFormat();
-			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
-				return (isSigned()) ? Integer.toString(value.intValue()) : Long.toString(value.longValue());
-			} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
-				StringBuffer sb = new StringBuffer("0x");
-				String stringValue = (isSigned()) ? Integer.toHexString(value.intValue()) : Long.toHexString(value.longValue());
-				sb.append((stringValue.length() > 8) ? stringValue.substring(stringValue.length() - 8) : stringValue);
-				return sb.toString();
-			}
-		}
-		*/
 	}
-	/*
-	private boolean isSigned() {
-		boolean result = false;
-		try {
-			IPType type = getParentVariable().getType();
-			if (type != null)
-				result = type.isSigned();
-		} catch (DebugException e) {
-		}
-		return result;
-	}
-	*/
 	protected void reset() {
 		resetStatus();
 		fValueString = null;
-		Iterator it = fVariables.iterator();
+		Iterator<IVariable> it = fVariables.iterator();
 		while (it.hasNext()) {
 			((AbstractPVariable) it.next()).resetValue();
 		}
 	}
-	public IPType getType() throws DebugException {
-		IAIFValue aifValue = getUnderlyingValue();
-		if (fType == null) {
-			if (aifValue != null) {
-				synchronized (this) {
-					if (fType == null) {
-						fType = new PType(aifValue.getType());
-					}
-				}
-			}
-		}
-		return fType;
-	}
 	protected void preserve() {
 		setChanged(false);
 		resetStatus();
-		Iterator it = fVariables.iterator();
+		Iterator<IVariable> it = fVariables.iterator();
 		while (it.hasNext()) {
 			((AbstractPVariable) it.next()).preserve();
 		}
 	}
 }
-
-/*
-	private String getLongValueString(IAIFValueLong value) throws PCDIException {
-		try {
-			PVariableFormat format = getParentVariable().getFormat();
-			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
-				if (!isSigned()) {
-					BigInteger bigValue = new BigInteger(value.getValueString());
-					return bigValue.toString();
-				}
-				return Long.toString(value.longValue());
-			} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
-				StringBuffer sb = new StringBuffer("0x");
-				if (isSigned()) {
-					sb.append(Long.toHexString(value.longValue()));
-				} else {
-					BigInteger bigValue = new BigInteger(value.getValueString());
-					sb.append(bigValue.toString(16));
-				}
-				return sb.toString();
-			}
-		} catch (NumberFormatException e) {
-		}
-		return null;
-	}
-	private String getLongLongValueString(IAIFValueLongLong value) throws PCDIException {
-		try {
-			PVariableFormat format = getParentVariable().getFormat();
-			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
-				if (!isSigned()) {
-					BigInteger bigValue = new BigInteger(value.getValueString());
-					return bigValue.toString();
-				}
-				return Long.toString(value.longValue());
-			} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
-				StringBuffer sb = new StringBuffer("0x");
-				if (isSigned()) {
-					sb.append(Long.toHexString(value.longValue()));
-				} else {
-					BigInteger bigValue = new BigInteger(value.getValueString());
-					sb.append(bigValue.toString(16));
-				}
-				return sb.toString();
-			}
-		} catch (NumberFormatException e) {
-		}
-		return null;
-	}
-	private String getShortValueString(IAIFValueShort value) throws PCDIException {
-		PVariableFormat format = getParentVariable().getFormat();
-		if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
-			return (isSigned()) ? Short.toString(value.shortValue()) : Integer.toString(value.intValue());
-		} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
-			StringBuffer sb = new StringBuffer("0x");
-			String stringValue = Integer.toHexString((isSigned()) ? value.shortValue() : value.intValue());
-			sb.append((stringValue.length() > 4) ? stringValue.substring(stringValue.length() - 4) : stringValue);
-			return sb.toString();
-		}
-		return null;
-	}
-*/

@@ -19,12 +19,14 @@
 package org.eclipse.ptp.debug.internal.ui.actions;
 
 import java.util.Iterator;
+
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
+import org.eclipse.ptp.debug.internal.ui.PVariableManager.PVariableInfo;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 
 /**
@@ -53,13 +55,15 @@ public class DeletePExpressionAction extends Action {
 		ISelection selection = view.getSelection();
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 			IStructuredSelection structSelection = (IStructuredSelection)selection;
-			for (Iterator i=structSelection.iterator(); i.hasNext();) {
-				JobVariable jVar = (JobVariable)i.next();
-				view.getUIManager().getJobVariableManager().removeJobVariable(jVar.getJob().getID(), jVar.getVar());		
-				view.refresh();
-				if (jVar.getJob().getID().equals(view.getUIManager().getCurrentJobId())) {
-					view.getUIManager().cleanVariableValue(null);
+			for (Iterator<?> i=structSelection.iterator(); i.hasNext();) {
+				PVariableInfo jVar = (PVariableInfo)i.next();
+				try {
+					view.getUIManager().getJobVariableManager().removeVariable(jVar.getJob(), jVar.getName());
 				}
+				catch (CoreException e) {
+					e.printStackTrace();
+				}
+				view.refresh();
 			}
 		}
 	}

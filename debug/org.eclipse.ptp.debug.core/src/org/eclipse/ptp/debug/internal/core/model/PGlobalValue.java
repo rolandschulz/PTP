@@ -19,12 +19,12 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 
 public class PGlobalValue extends PValue {
 	private Boolean fHasChildren = null;
 
-	public PGlobalValue(PVariable parent, IPCDIVariable variable) {
+	public PGlobalValue(PVariable parent, IPDIVariable variable) {
 		super(parent, variable);
 	}
 	public boolean hasVariables() throws DebugException {
