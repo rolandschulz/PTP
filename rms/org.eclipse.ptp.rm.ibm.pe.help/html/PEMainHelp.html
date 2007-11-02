@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- Copyright (c) 2007 IBM Corporation.                                     -->
+<!-- All rights reserved. This program and the accompanying materials        -->
+<!-- are made available under the terms of the Eclipse Public License v1.0   -->
+<!-- which accompanies this distribution, and is available at                -->
+<!-- http://www.eclipse.org/legal/epl-v10.html                               -->
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Running Parallel Environment Applications</title>
+</head>
+
+<body>
+<h1>Running Parallel Environment Applications</h1>
+<h2><A name=introduction></A>Introduction</h2>
+<p>This plugin allows you to run a parallel application using Parallel Environment from within the PTP framework. 
+In addition to running applications, you can monitor their status, control their execution, and view their stdio
+output from within PTP.</p>
+<h2><A name=requirements></A>Requirements</h2>
+<p>In addition to having Eclipse and PTP installed, you need to have the following software packages installed.</p>
+<ul>
+<li>CDT 4.0, available from the Eclipse download site</li>
+<li>Parallel Environment 4.3.1 or later, available from IBM</li>
+<li>LAPI 2.4.4.0 or later, available from IBM</li>
+</ul>
+<p>See the IBM Parallel Environment for AIX and Linux Installation Guide, available at 
+<a href="http://publib.boulder.ibm.com/epubs/pdf/am101m00.pdf">
+http://publib.boulder.ibm.com/epubs/pdf/am101m00.pdf</a> for specific Parallel Environment installation requirements.</p>
+<h2><A name=starting></A>Getting Started</h2>
+<p>Define an appropriate project, either a C/C++ project using CDT or a FORTRAN project, using Photran. You can define 
+either a standard make project or a managed make project.</p>
+<p>When you define the project, you should specify the project location as a directory which is shared among all nodes 
+where the parallel application will run to ensure Parallel Environment has access to the executable on all nodes. The 
+following image shows how a project can be created using a directory visible to all nodes.</p>
+<img src="images/project_create_1.jpg"> 
+<p>You should use the following compiler invocation commands
+to invoke the compiler, either in your makefile, or when specifying the compiler and linker in a managed make project.</p>
+<ul>
+<li>AIX</li>
+<ul>
+<li>mpcc_r for C programs</li>
+<li>mpCC_r for C++ programs</li>
+<li>mpxlf_r for FORTRAN programs</li>
+</ul>
+<li>Linux</li>
+<ul>
+<li>mpcc for C programs</li>
+<li>mpCC for C++ programs</li>
+<li>mpfort for FORTRAN programs</li>
+</ul>
+</ul> 
+<p>The following image shows how the compiler is specified for a managed make project. The correct linker should also
+be specified by clicking the settings for the linker.</p>
+<img src="images/project_create_2.jpg">
+<p>Once you have created your project, you should switch to the PTP runtime perspective, and set up the default 
+preferences for Parallel Environment and specify the required resource manager. This setup needs to only be done once.</p>
+<p>You specify the default preferences by opening the preferences dialog, opening the <b>PTP</b> node, opening the
+<b>Resource Managers</b> node, and then clicking the <b>Parallel Environment</b> entry. The PE preferences panel is displayed. Here,
+you specify the default path for a resource manager to be used for Parallel Environment.</p>
+<img src="images/pe_preferences.jpg">
+<p>Once you have set up preferences, create the resource manager for Parallel Environment. To do this, right-click in the
+resource managers view and selecting <b>Add Resource Manager</b> from the menu. A resource manager wizard will be 
+displayed. Select <b>PE</b> from the list of resource manager types and click next. The next panel displayed configures
+the PE resource manager. Select the Remote service provider and proxy server location from the dropdown lists. You can
+also create a new proxy server location by clicking the <b>New</b> button in this pane. Specify the path to the proxy 
+server executable, or just accept the value filled in as default from the preferences panel. Uncheck the <b>Launch server 
+manually</b> and click next again. On the final page of the resource configuration manager wizard, either accept the 
+default resource manager name, or uncheck the checkbox and enter a name and description for the resource manager. 
+Then click finish to create the resource manager entry.</p>
+<p>The image below shows the PE proxy configuration panel of the resource manager wizard.</p>
+<img src="images/pe_proxy_config.jpg">
+<p>You may have as many resource managers defined as you require for your system configuration.</p>
+<p>Once you have defined a resource manager, you must start it before it can run a parallel application using that
+resource manager. To start a resource manager, right-click over the name of the resource manager in the resource manager 
+view then select <b>Start resource manager</b> from the popup menu. Once started, the icon for the selected resource 
+manager will turn green.</p> 
+<p>If necessary, you can stop a resource manager by right-clicking over its name in the resource manager and selecting 
+<b>Stop resource manager</b> from the popup menu. Normally, a resource manger will shutdown automatically when PTP is
+shutdown, and if it was running when PTP was shutdown, then it will automatically start when PTP is started again.</p>
+<h2><A name=running></A>Running a Parallel Application</h2>
+<p>Once an application has been compiled, the first step in running the application is to be sure the resource manager for 
+Parallel Environment is running on the node where you intend to start the application. To do this, check the resource 
+manager's entry in the resource manager view. The icon for the resource manager should be green. If it is not green, then 
+right click over the resource manager's name and select <b>Start resource manager</b> from the popup menu to start the
+resource manager.</p>
+<p>Before running an application, it must have a launch configuration defined for it. A launch configuration contains 
+all of the settings required to run the application. The values entered in a launch configuration are saved so that the
+next time the application is run using the same launch configuration, those values do not need to be entered again.</p>
+<p>To create a launch configuration, click the <b>Run</b> menu in the Eclipse menubar and select <b>Open Run Dialog</b>. 
+Alternatively, click the dropdown next to the run icon in the Eclipse toolbar and select Open Run Dialog. 
+When the run dialog is displayed, right click over <b>Parallel Application</b> and click <b>New</b> from the menu. 
+This will create a new launch configuration. Set its name to the desired value. Select the <b>Main</b> tab and fill in
+the name of the project and the application program. Make sure that the debugger tab has an appropriate debugger selected.
+Fill in the Arguments tab with any application program arguments. Fill in the Environment tab with any environment variable
+settings required by the application. If you are using Parallel Environment in basig mode, described below, then you should
+not set any Parallel Environment environment variables (starting with MP_) in the Environment tab and not specify any
+options specific to the <b>poe</b> command in the Arguments tab, since those settings may conflict with settings in the
+Parallel tab and cause application invocation to fail.</p>
+<p>The <b>Parallel</b> tab is the tab where invocation options unique to Parallel Environment. When it is initially displayed,
+it will appear as follows.</p>
+<img src="images/pe_run_config.jpg">
+<p>The first step is to select a resource manager from the dropdown list at the top of the parallel tab. This list contains
+entries for each running resource manager. The <b>Select queue</b> dropdown can be ignored since there are no job queues
+used by the Parallel Environment resource manager. (The queue dropdown will be removed in the future).<p>
+<p>The next step is to select the run mode for the resource manager by checking or unchecking the <b>Advanced Mode</b>
+checkbox.</p>
+<p>When this checkbox is checked, the resource manager is running in advanced mode. In this mode, you need to have an existing
+setup script created. This is a text file, similar to a .rc or .profile script, where you specify Parallel Environment
+environment variable settings. Each setting is specified as a keyword-value pair such as</p>
+<samp>
+MP_PROCS=2<br>
+MP_HOSTFILE=/home/deepview/hostfile
+</samp>
+<p>This file should contain only Parallel Environment environment variable settings. Anything else is ignored. 
+Environment variable settings in this file are not validity checked. You may also specify Parallel Environment environment 
+variables in the Environment tab in this mode, as well as specifying parameters to the <b>poe</b> command in the Arguments
+tab in advanced mode. Any settings in these tabs will not be checked, and may result in conflicts with what is specified
+in the setup script.</p>
+<p>When using advanced mode, the <b>Environment Setup Script</b> will be enabled, and you must fill in the pathname to the 
+setup script.</p>
+<p>If the <b>Advanced Mode</b> checkbox is not checked, then the resource manager is running in basic mode. In this mode,
+the tabbed pane at the bottom of the Parallel tab will be enabled, and you can fill in the required values for running 
+your application.</p>
+<p>In basic mode, each Parallel Environment option has a field in the tabbed pane at the bottom of the parallel tab. 
+Each field has flyover help, where you can see that help by moving the mouse over the field in question. Each field is 
+validity checked where possible to reduce the probability of invoking an application with invalid parameters.</p>
+<p>If any value in the parallel tab is invalid, an error message will appear in the upper left corner of the launch
+configuration dialog and the apply and run buttons will be disabled. Once all fields have valid values, then you can
+click the <b>Apply</b>button to save the current settings for the launch configuration, or click the <b>Run</b> button to
+invoke the application.</p>
+<p>As a minimum, the launch configuration or the Parallel Environment setup script must specify the path name of a valid 
+hostfile (MP_HOSTFILE) and number of parallel tasks (MP_TASKS)<p>
+<h2><a name=redirection></a>Redirecting stdio</h2>
+<p>The default behavior is that data the application writes to stdout is sent to the PTP GUI. That data can be viewed by 
+double clicking the task icon for the task, normally task 0, in the jobs view row for the application. This will open
+a process view window showing the data. By default, the application stderr output is written to the console where Eclipse 
+was invoked.</p>
+<p>If the application writes a large amount of data to stdout or stderr, the default behavior of sending that data to the
+PTP GUI for handling can cause the GUI to become slow or unresponsive. Alternatively, stdout and stderr can be redirected to
+files on the node where the resource manager process is running. This is done by specifying the path name for stdout or
+stderr in the fields labelled <b>Stdout Path</b> or <b>Stderr Path</b> in the parallel tab of the launch configuration.</p>
+<h2><a name=monitoring></a>Monitoring Application Execution</h2>
+<p>Once you click run to invoke the application, the resource manager will monitor the application's execution. When Parallel
+Environment allocates tasks to nodes, the default machine view for the resource manager will be updated to show the nodes 
+that are currently in use. If you move the mouse over a node icon, in the machine view, you will see the hostname for that node. 
+If you double click a node icon in the machine view, the node attributes and process info windows in the machine view
+will be updated to report current status for that node. Once a job completes, the machines view will be updated to 
+show the current status. As applications complete, nodes may disappear from the machine view if no other parallel tasks
+invoked by you are using those nodes.</p>
+<p>Once a parallel application starts, the jobs view will be updated to show an entry for that job, along with icons for each
+task in the application. The job and task icons will change state once Parallel Environment setup is complete to show the
+job is running, and again when the application exits, to show that the job has completed. At any time that a job is shown in
+the jobs view, you can double click a task icon to show the stdout output for that task if stdout has not been
+redirected to a file.</p>
+<h2><A name=restrictions></A>Restrictions</h2>
+<ul>
+<li>Applications cannot read input from stdin at this time</li>
+<li>Debugging applications is not supported at this time</li>
+<li>All pathnames specified in the Parallel tab of the launch configuration must be absolute pathnames</li>
+</ul>
+</body>
+</html>
