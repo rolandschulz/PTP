@@ -23,8 +23,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -40,6 +38,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -52,6 +51,8 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -74,10 +75,8 @@ public class ParallelLaunchConfigurationDelegate
 			launch.setPJob(job);
 			try {
 				setDefaultSourceLocator(launch, configuration);
-				IBinaryObject exeFile = verifyBinary(configuration);
-				IProject project = verifyProject(configuration);
-				final IFile exec = project.getFile(getProgramName(configuration));
-				final IPath execPath = exeFile.getPath();
+				final IProject project = verifyProject(configuration);
+				final IPath execPath = verifyExecutablePath(configuration);
 				
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
@@ -85,8 +84,8 @@ public class ParallelLaunchConfigurationDelegate
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								try {
 									long timeout = PTPDebugUIPlugin.getDefault().getPreferenceStore().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
-									//Wait for the incoming debug server connection. This can be cancelled by the user.
-									PTPDebugCorePlugin.getDebugModel().createDebugSession(timeout, debugger, launch, exec, execPath, monitor);
+									//Wait for the incoming debug server connection. This can be canceled by the user.
+									PTPDebugCorePlugin.getDebugModel().createDebugSession(timeout, debugger, launch, project, execPath, monitor);
 								} catch (CoreException e) {
 									throw new InvocationTargetException(e);
 								}
@@ -137,8 +136,26 @@ public class ParallelLaunchConfigurationDelegate
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.subTask("Configuring debug setting . . .");
 				
+				/*
+				 * FIXME: all this code needs to be moved to the debug.external.core plugin and
+				 * made into an interface.
+				 */
+				
+				/*
+				 * Get the local address from the resource manager
+				 */
+				String localAddress = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST);
+				IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+				if (rm != null) {
+					IResourceManagerConfiguration conf = rm.getConfiguration();
+					if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+						AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+						localAddress = remConf.getLocalAddress();
+					}
+				}
+				
 				ArrayList<String> dbgArgs = new ArrayList<String>();
-				dbgArgs.add("--host=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
+				dbgArgs.add("--host=" + localAddress);
 				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE));
 				
 				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
@@ -163,7 +180,7 @@ public class ParallelLaunchConfigurationDelegate
 				if (dbgExePath == null) {
 					dbgExePath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
 				}
-				verifyDebuggerPath(dbgExePath);
+				verifyDebuggerPath(dbgExePath, configuration);
 				
 				IPath path = new Path(dbgExePath);
 				attrManager.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));

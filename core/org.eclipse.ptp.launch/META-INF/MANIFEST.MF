@@ -9,6 +9,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.runtime,
+ org.eclipse.core.filesystem,
  org.eclipse.debug.ui,
  org.eclipse.ptp.remote,
  org.eclipse.ptp.core,

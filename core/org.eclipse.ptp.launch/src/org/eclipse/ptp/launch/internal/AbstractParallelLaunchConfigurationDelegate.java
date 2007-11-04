@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.internal;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,9 +29,7 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,6 +37,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
@@ -52,6 +50,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
@@ -71,12 +70,20 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteResource;
+import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  *
  */
-public abstract class AbstractParallelLaunchConfigurationDelegate 
-	extends LaunchConfigurationDelegate implements IJobListener {
+public abstract class AbstractParallelLaunchConfigurationDelegate extends
+		LaunchConfigurationDelegate implements IJobListener {
 	
 	/**
 	 * The JobSubmission class encapsulates all the information used in 
@@ -100,6 +107,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		}
 
 		/**
+		 * @return the attrMgr
+		 */
+		public AttributeManager getAttrMgr() {
+			return attrMgr;
+		}
+
+		/**
 		 * @return the configuration
 		 */
 		public ILaunchConfiguration getConfiguration() {
@@ -107,10 +121,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		}
 
 		/**
-		 * @return the mode
+		 * @return the debugger
 		 */
-		public String getMode() {
-			return mode;
+		public IPTPDebugger getDebugger() {
+			return debugger;
 		}
 
 		/**
@@ -121,34 +135,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		}
 
 		/**
-		 * @return the attrMgr
+		 * @return the mode
 		 */
-		public AttributeManager getAttrMgr() {
-			return attrMgr;
-		}
-
-		/**
-		 * @return the debugger
-		 */
-		public IPTPDebugger getDebugger() {
-			return debugger;
+		public String getMode() {
+			return mode;
 		}
 	}
 	
-    protected Map<IPJob, JobSubmission> jobSubmissions = new HashMap<IPJob, JobSubmission>();
-    
-	public AbstractParallelLaunchConfigurationDelegate() {
-	}
-	
-	/**
+    /**
+	 * Get the program arguments specified in the Arguments tab
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
 	 */
-	protected static String getArgument(ILaunchConfiguration configuration) throws CoreException {
+	protected static String getArguments(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, (String)null);
 	}
+    
 	/**
+	 * Get the debugger executable path
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
@@ -158,6 +165,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/**
+	 * Get the ID of the debugger for this launch
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
@@ -165,8 +174,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	protected static String getDebuggerID(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, (String)null);
 	}
-	
 	/**
+	 * Get the working directory for this debug session
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
@@ -174,8 +183,24 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	protected static String getDebuggerWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
 	}
-
+	
 	/**
+     * Get the absolute path of the executable to launch. If the executable is on a remote machine,
+     * this is the path to the executable on that machine.
+     * 
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	protected static String getExecutablePath(ILaunchConfiguration configuration) throws CoreException {
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String)null);
+	}
+	
+	/**
+	 * Get the name of the application to launch
+	 * 
+	 * @deprecated
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
@@ -185,6 +210,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 
 	/**
+	 * Get the name of the project
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
@@ -192,17 +219,21 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	protected static String getProjectName(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
 	}
-
-	/**
+	
+    /**
+	 * Get the name of the queue for the launch
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
 	 */
 	protected static String getQueueName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME, (String)null);
-	}
-
+	} 
+	
 	/**
+	 * Get the resource manager to use for the launch
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
@@ -210,14 +241,24 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	protected static String getResourceManagerUniqueName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
 	}
-	
-    /**
+
+	/**
+     * Get the working directory for the application launch
+     * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
 	 */
 	protected static String getWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
+	}
+
+	/*
+	 * HashMap used to keep track of job submissions
+	 */
+	protected Map<IPJob, JobSubmission> jobSubmissions = new HashMap<IPJob, JobSubmission>();
+	
+    public AbstractParallelLaunchConfigurationDelegate() {
 	}    
 	
 	/* (non-Javadoc)
@@ -279,6 +320,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/**
+	 * Abort the job launch if anything goes wrong.
+	 * 
 	 * @param message
 	 * @param exception
 	 * @param code
@@ -289,6 +332,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/**
+	 * This method is called when the job state changes to RUNNING. This allows the launcher to
+	 * complete the job launch.
+	 * 
+	 * @param configuration
+	 * @param mode
+	 * @param launch
+	 * @param mgr
+	 * @param debugger
 	 * @param job
 	 */
 	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,  
@@ -310,10 +361,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 					attrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(queue.getID()));
 			}
 			
-			IPath programFile = getProgramFile(configuration);
-			attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programFile.lastSegment()));
+			IPath programPath = verifyExecutablePath(configuration);
+			attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programPath.lastSegment()));
 			
-			String path = programFile.removeLastSegments(1).toOSString();
+			String path = programPath.removeLastSegments(1).toOSString();
 			if (path != null) {
 				attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 			}
@@ -337,12 +388,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		return attrMgr;
 	}
 	
-	/***
-	 * Debug
-	 */
 	/**
-	 * @param config
-	 * @return
+	 * Get the debugger configuration
+	 * 
+	 * @param configuration launch configuration
+	 * @return debugger configuration
 	 * @throws CoreException
 	 */
 	protected IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
@@ -357,8 +407,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/**
-	 * @param configuration
-	 * @return
+	 * Get the path of the program to launch. No longer used since the program may not be
+	 * on the local machine.
+	 * 
+	 * @deprecated
+	 * 
+	 * @param configuration launch configuration
+	 * @return IPath corresponding to program executable
 	 * @throws CoreException
 	 */
 	protected IPath getProgramFile(ILaunchConfiguration configuration) throws CoreException {
@@ -383,29 +438,35 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/**
-	 * @param configuration
-	 * @return
+	 * Convert application arguments to an array of strings.
+	 * 
+	 * @param configuration launch configuration
+	 * @return array of strings containing the program arguments
 	 * @throws CoreException
 	 */
 	protected String[] getProgramParameters(ILaunchConfiguration configuration) throws CoreException {
 		List<String> arguments = new ArrayList<String>();
-		String temp = getArgument(configuration);
+		String temp = getArguments(configuration);
 		if (temp != null && temp.length() > 0) 
 			arguments.add(temp);
 		return (String[]) arguments.toArray(new String[arguments.size()]);
 	}
 	
 	/**
-     * @param proName
-     * @return
+	 * Get the IProject object from the project name.
+	 * 
+     * @param project name of the project
+     * @return IProject resource
      */
-    protected IProject getProject(String proName) {
-        return getWorkspaceRoot().getProject(proName);
+    protected IProject getProject(String project) {
+        return getWorkspaceRoot().getProject(project);
     }
 	
 	/**
-	 * @param configuration
-	 * @return
+	 * Find the resource manager that corresponds to the unique name specified in the configuration
+	 * 
+	 * @param configuration launch configuration
+	 * @return resource manager
 	 * @throws CoreException
 	 */
 	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
@@ -422,13 +483,18 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/**
-     * @return
+	 * Get the workspace root.
+	 * 
+     * @return workspace root
      */
     protected IWorkspaceRoot getWorkspaceRoot() {
     	return ResourcesPlugin.getWorkspace().getRoot();
     }
 	
 	/**
+	 * Create a source locator from the ID specified in the configuration, or create
+	 * a default one if it hasn't been specified.
+	 * 
 	 * @param launch
 	 * @param configuration
 	 * @throws CoreException
@@ -454,10 +520,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		}
 	}
 	
-	/****
-	 * Source
-	 ****/
 	/**
+	 * Set the source locator for this application
+	 * 
 	 * @param launch
 	 * @param config
 	 * @throws CoreException
@@ -466,6 +531,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		setDefaultSourceLocator(launch, config);
 	}
 	
+	/**
+	 * Submit a job to the resource manager. Keeps track of the submission so we know when the
+	 * job actually starts running. When this happens, the abstract method doCompleteJobLaunch()
+	 * is invoked.
+	 * 
+	 * @param configuration
+	 * @param mode
+	 * @param launch
+	 * @param attrMgr
+	 * @param debugger
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch,
 			AttributeManager attrMgr, IPTPDebugger debugger, IProgressMonitor monitor) throws CoreException {
 		
@@ -489,6 +567,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
+	 * @deprecated
 	 */
 	protected IBinaryObject verifyBinary(ILaunchConfiguration configuration) throws CoreException {
 		IProject project = verifyProject(configuration);
@@ -505,6 +584,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @param exePath
 	 * @return
 	 * @throws CoreException
+	 * @deprecated
 	 */
 	protected IBinaryObject verifyBinary(IProject project, IPath exePath) throws CoreException {
 		ICExtensionReference[] parserRef = CCorePlugin.getDefault().getBinaryParserExtensions(project);
@@ -536,15 +616,18 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @param path
 	 * @throws CoreException
 	 */
-	protected void verifyDebuggerPath(String path) throws CoreException {
-		if (!verifyPath(path)) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+	protected void verifyDebuggerPath(String dbgPath, ILaunchConfiguration configuration) throws CoreException {
+		IPath path = verifyResource(dbgPath, configuration);
+		if (path == null) {
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found"), 
+					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 	}
 
 	/**
 	 * @param path
 	 * @return
+	 * @deprecated
 	 */
 	protected boolean verifyPath(String path) {
 		IPath programPath = new Path(path);
@@ -555,6 +638,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 
 	/**
+	 * Verify that the project exists prior to the launch.
+	 * 
      * @param configuration
      * @return
      * @throws CoreException
@@ -572,32 +657,72 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
     }
 
 	/**
+	 * Verify the working directory. If no working directory is specified, the default is
+	 * the location of the executable.
+	 * 
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
 	 */
 	protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
+		IPath path;
         String workPath = getWorkDirectory(configuration);
         if (workPath == null) {
-			IProject project = verifyProject(configuration);
-			if (project != null)
-				return project.getLocation().toOSString();
+        	path = verifyExecutablePath(configuration).removeLastSegments(1);
 		} else {
-			IPath path = new Path(workPath);
-			if (path.isAbsolute()) {
-				File dir = new File(path.toOSString());
-				if (dir.isDirectory())
-					return path.toOSString();
-
-				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toOSString())), IStatus.INFO);
+			path = verifyResource(workPath, configuration);
+		}
+        if (path == null) {
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toOSString())), IStatus.INFO);
+		}
+		return path.toString();        
+    }
+	
+	/**
+	 * @param configuration
+	 * @return
+	 */
+	protected IPath verifyExecutablePath(ILaunchConfiguration configuration)  throws CoreException {
+		String exePath = getExecutablePath(configuration);
+		IPath path = verifyResource(exePath, configuration);
+		if (path == null) {
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_does_not_exist"), 
+					new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", 
+							exePath)), IStatus.INFO);
+		}
+		return path;
+	}
+	
+	/**
+	 * @param path
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	protected IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
+		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+		if (rm != null) {
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				if (remoteServices != null) {
+					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+					IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
+					IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+					try {
+						IPath resPath = new Path(path);
+						IRemoteResource res = fileManager.getResource(resPath, new NullProgressMonitor());
+						if (res.fetchInfo().exists()) {
+							return resPath;
+						}
+					} catch (IOException e) {
+					}
+				}
 			} else {
-				IResource res = getWorkspaceRoot().findMember(path);
-				if (res instanceof IContainer && res.exists())
-					return res.getLocation().toOSString();
-
-				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toOSString())), IStatus.INFO);
+				// FIXME: work out what to do for RM's that don't extend AbstractRemoteResourceManagerConfiguration
 			}
 		}
-		return null;        
-    }
+		return null;
+	}
 }
