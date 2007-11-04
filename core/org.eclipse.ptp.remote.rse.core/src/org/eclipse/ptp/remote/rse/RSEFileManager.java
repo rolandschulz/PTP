@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.IRemoteFileManager;
@@ -26,6 +28,7 @@ import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class RSEFileManager implements IRemoteFileManager {
@@ -73,28 +76,65 @@ public class RSEFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
 	 */
-	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) {
-		ISubSystem[] subs = connection.getHost().getSubSystems();
-		for (ISubSystem sub : subs) {
-			if (sub instanceof IRemoteFileSubSystem) {
-				IRemoteFileSubSystem fileSub = (IRemoteFileSubSystem)sub;
-				IRemoteFile file;
-				try {
-					file = fileSub.getRemoteFileObject(path.toString(), monitor);
-				} catch (SystemMessageException e) {
-					return null;
+	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) throws IOException {
+		IRemoteResource res = lookup(path);
+		if (res != null) {
+			return res;
+		}
+		
+		IRemoteFileSubSystem fileSub = getConnectedRemoteFileSubsystem();
+		if (fileSub == null) {
+			throw new IOException("No connected file subsystem found!");
+		}
+			
+		IRemoteFile file;
+		try {
+			file = fileSub.getRemoteFileObject(path.toString(), monitor);
+		} catch (SystemMessageException e) {
+			throw new IOException("Could not get remote resource: " + e.getMessage());
+		}
+		
+		res = new RSEResource(this, file);
+		cache(path, res);
+		return res;
+	}
+
+	/**
+	 * @return
+	 */
+	private IRemoteFileSubSystem getConnectedRemoteFileSubsystem() {
+		IRemoteFileSubSystem subSystem = null;
+		IHost currentConnection = connection.getHost();
+		if (currentConnection != null) {
+			ISubSystem[] subSystems = currentConnection.getSubSystems();
+			for (ISubSystem sub : subSystems) {
+				if (sub instanceof IRemoteFileSubSystem) {
+					subSystem = (IRemoteFileSubSystem)sub;
+					break;
 				}
-				if (file != null) {
-					IRemoteResource res = lookup(path);
-					if (res == null) {
-						res = new RSEResource(this, file);
-						cache(path, res);
+			}
+			
+			if (subSystem != null) {
+				final ISubSystem ss = subSystem;
+				// Need to run this in the UI thread
+				Display.getDefault().syncExec(new Runnable()
+				{
+					public void run()
+					{	try {
+							ss.connect(new NullProgressMonitor(), false);
+						} catch (Exception e) {
+							// Ignore
+							e.printStackTrace();
+						}
 					}
-					return res;
+				});
+				
+				if(!subSystem.isConnected()) {
+					return null;
 				}
 			}
 		}
-		return null;
+		return subSystem;
 	}
 
 	/**
