@@ -19,7 +19,6 @@ import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.ISubSystem;
-import org.eclipse.rse.services.IService;
 import org.eclipse.rse.services.shells.HostShellProcessAdapter;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
@@ -68,8 +67,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		remoteCmd += CMD_DELIMITER + EXIT_CMD;
 		
-		IShellService shellService = (IShellService) getConnectedRemoteService();
-		
+		IShellService shellService = (IShellService) getConnectedRemoteShellService();
 		if (shellService == null) {
 			throw new IOException("Remote service not found");
 		}
@@ -83,7 +81,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		return new RSEProcess(p);
 	}
 
-	private IService getConnectedRemoteService() {
+	private IShellService getConnectedRemoteShellService() {
 		IHost currentConnection = ((RSEConnection)connection()).getHost();
 		if (currentConnection != null) {
 			ISubSystem[] subSystems = currentConnection.getSubSystems();
