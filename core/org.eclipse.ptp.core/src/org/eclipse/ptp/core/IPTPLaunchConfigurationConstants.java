@@ -140,14 +140,11 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_REGISTER_GROUPS = PTP_LAUNCH_ID + ".DEBUGGER_REGISTER_GROUPS";
 	
 	/**
-	 * 
+	 *  Launch configuration attribute key. The value is the absolute path to the executable that
+	 *  is to be launched. If the executable is located on a remote machine, it is the path to the
+	 *  exectuable on this machine.
 	 */
-	public static final String ATTR_REMOTE_CONNECTION = PTP_LAUNCH_ID + ".ATTR_REMOTE_CONNECTION";
-	
-	/**
-	 * 
-	 */
-	public static final String ATTR_REMOTE_EXECUTABLE_PATH = PTP_LAUNCH_ID + ".ATTR_REMOTE_EXECUTABLE_PATH";
+	public static final String ATTR_EXECUTABLE_PATH = PTP_LAUNCH_ID + ".ATTR_REMOTE_EXECUTABLE_PATH";
 	
 	/**
 	 * Error codes
