@@ -19,6 +19,8 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -27,21 +29,30 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,6 +62,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -64,80 +76,213 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- *
+ * The Main tab is used to specify the resource manager for the launch,
+ * select the project and executable to launch, and specify the location
+ * of the executable if it is a remote launch.
  */
 public class PMainTab extends PLaunchConfigurationTab {
-    protected Text projText = null;
-    protected Text appText = null;
-    //protected Button stopInMainCheckButton = null;
-    protected Button projButton = null;
-    protected Button appButton = null;
-
     protected class WidgetListener extends SelectionAdapter implements ModifyListener {
-	    public void widgetSelected(SelectionEvent e) {
-	        Object source = e.getSource();
-	        if (source == projButton)
-	            handleProjectButtonSelected();
-	        else if (source == appButton)
-	            handleApplicationButtonSelected();
-	        else
-	            handleProjectButtonSelected();
-	    }
-        public void modifyText(ModifyEvent e) {
+	    public void modifyText(ModifyEvent e) {
             updateLaunchConfigurationDialog();
         }
+        public void widgetSelected(SelectionEvent e) {
+	        Object source = e.getSource();
+			if (source == resourceManagerCombo) {
+				rmSelectionChanged();
+			} else if (source == projButton) {
+	            handleProjectButtonSelected();
+			} else if (source == appButton) {
+	            handleApplicationButtonSelected();
+			} else if (source == appDirButton) {
+	            handleApplicationDirButtonSelected();
+	        } else {
+	            handleProjectButtonSelected();
+	        }
+	    }
     }
     
-    protected WidgetListener listener = new WidgetListener();
-    
+    private Combo resourceManagerCombo = null;
+    private IResourceManager resourceManager = null;
+    private final Map<Integer, IResourceManager> resourceManagers = new HashMap<Integer, IResourceManager>();
+    private final HashMap<IResourceManager, Integer> resourceManagerIndices = new HashMap<IResourceManager, Integer>();
+
+    protected Text projText = null;
+	protected Text appText = null;
+	protected Text appDirText = null;
+	protected Button projButton = null; 
+    protected Button appButton = null;
+    protected Button appDirButton = null;
+	protected WidgetListener listener = new WidgetListener();
+
+	/* (non-Javadoc)
+     * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+     */
     public void createControl(Composite parent) {
         Composite comp = new Composite(parent, SWT.NONE);
         setControl(comp);
-        //WorkbenchHelp.setHelp(getControl(), ICDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
         
 		comp.setLayout(new GridLayout());
 		createVerticalSpacer(comp, 1);
 
-		Composite projectComp = new Composite(comp, SWT.NONE);		
-		projectComp.setLayout(createGridLayout(2, false, 0, 0));
-		projectComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite rmComp = new Composite(comp, SWT.NONE);		
+		rmComp.setLayout(createGridLayout(2, false, 0, 0));
+		rmComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Label projLabel = new Label(projectComp, SWT.NONE);
-		projLabel.setText(LaunchMessages.getResourceString("PMainTab.&Project_Label"));
+		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
+		IPUniverse universe = modelManager.getUniverse();
+		IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
+		new Label(rmComp, SWT.NONE).setText(LaunchMessages.getResourceString("PMainTab.RM_Selection_Label")); //$NON-NLS-1$
+			
+		resourceManagerCombo = new Combo(rmComp, SWT.READ_ONLY);
+		for (int i = 0; i < rms.length; i++) {
+			resourceManagerCombo.add(rms[i].getName());
+			resourceManagers.put(i, rms[i]);
+			resourceManagerIndices.put(rms[i], i);
+		}
+		resourceManagerCombo.addSelectionListener(listener);
+		resourceManagerCombo.deselectAll();
+
+		createVerticalSpacer(comp, 1);
+
+		Composite mainComp = new Composite(comp, SWT.NONE);		
+		mainComp.setLayout(createGridLayout(2, false, 0, 0));
+		mainComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label projLabel = new Label(mainComp, SWT.NONE);
+		projLabel.setText(LaunchMessages.getResourceString("PMainTab.&Project_Label")); //$NON-NLS-1$
 		projLabel.setLayoutData(spanGridData(-1, 2));
 
-		projText = new Text(projectComp, SWT.SINGLE | SWT.BORDER);
+		projText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		projText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		projText.addModifyListener(listener);
 		
-		projButton = createPushButton(projectComp, LaunchMessages.getResourceString("Tab.common.&Browse_1"), null);
+		projButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.&Browse_1"), null); //$NON-NLS-1$
 		projButton.addSelectionListener(listener);
 		
 		createVerticalSpacer(comp, 1);
 		
-		Label appLabel = new Label(projectComp, SWT.NONE);
-		appLabel.setText(LaunchMessages.getResourceString("PMainTab.&Application_Label"));
+		Label appLabel = new Label(mainComp, SWT.NONE);
+		appLabel.setText(LaunchMessages.getResourceString("PMainTab.&Application_Label")); //$NON-NLS-1$
 		appLabel.setLayoutData(spanGridData(-1, 2));
 
-		appText = new Text(projectComp, SWT.SINGLE | SWT.BORDER);
+		appText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		appText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		appText.addModifyListener(listener);
 		
-		appButton = createPushButton(projectComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null);
+		appButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null); //$NON-NLS-1$
 		appButton.addSelectionListener(listener);
+/*
+		createVerticalSpacer(comp, 1);
 		
-		/*
-		createVerticalSpacer(projectComp, 2);
-		stopInMainCheckButton = createCheckButton(projectComp, LaunchMessages.getResourceString("PMainTab.St&op_in_main"));
-		stopInMainCheckButton.setLayoutData(spanGridData(-1, 2));
-		stopInMainCheckButton.addSelectionListener(new SelectionAdapter() {
-		    public void widgetSelected(SelectionEvent e) {
-		        updateLaunchConfigurationDialog();
-		    }
-		});
+		Label appDirLabel = new Label(mainComp, SWT.NONE);
+		appDirLabel.setText(LaunchMessages.getResourceString("PMainTab.&Directory_Label")); //$NON-NLS-1$
+		appDirLabel.setLayoutData(spanGridData(-1, 2));
+
+		appDirText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
+		appDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		appDirText.addModifyListener(listener);
+		
+		appDirButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.Br&owse_3"), null); //$NON-NLS-1$
+		appDirButton.addSelectionListener(listener);
 		*/
     }
+
+	/* (non-Javadoc)
+     * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
+     */
+    public Image getImage() {
+        return LaunchImages.getImage(LaunchImages.IMG_MAIN_TAB);
+    }
+	
+	/* (non-Javadoc)
+     * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+     */
+    public String getName() {
+        return LaunchMessages.getResourceString("PMainTab.Main"); //$NON-NLS-1$
+    }
+ 
+	/* (non-Javadoc)
+     * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+     */
+    public void initializeFrom(ILaunchConfiguration configuration) {
+        try {
+			resourceManager = getResourceManager(configuration);
+			if (resourceManager == null) {
+				setErrorMessage(LaunchMessages
+						.getResourceString("PMainTab.No_Resource_Manager_Available")); //$NON-NLS-1$
+				return;
+			}
+
+			setResourceManagerComboSelection(resourceManager);
+			
+            projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
+            appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, EMPTY_STRING));
+        } catch (CoreException e) {
+            setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage())); //$NON-NLS-1$
+        }
+    }
+	
+    /* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public boolean isValid(ILaunchConfiguration config) {
+		setErrorMessage(null);
+		setMessage(null);
+
+		if (resourceManager == null) {
+			setErrorMessage(LaunchMessages
+					.getResourceString("PMainTab.No_Resource_Manager_Available")); //$NON-NLS-1$
+			return false;
+		}
+		
+		String name = getFieldContent(projText.getText());
+		if (name != null) {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			IStatus status = workspace.validateName(name, IResource.PROJECT);
+			if (status.isOK()) {
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+				if (!project.exists()) {
+					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_not_exist"), new Object[] {name})); //$NON-NLS-1$
+					return false;
+				}
+				if (!project.isOpen()) {
+					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_is_closed"), new Object[] {name})); //$NON-NLS-1$
+					return false;
+				}
+			} else {
+				setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Illegal_project"), new Object[]{status.getMessage()})); //$NON-NLS-1$
+				return false;
+			}
+		}
+		
+		name = getFieldContent(appText.getText());
+		if (name == null) {
+			setErrorMessage(LaunchMessages.getResourceString("PMainTab.Application_program_not_specified")); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
     
+    /* (non-Javadoc)
+     * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+     */
+    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+    	if (resourceManager != null) {
+			configuration.setAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+					resourceManager.getUniqueName());
+    	}
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+				getFieldContent(projText.getText()));
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				getFieldContent(appText.getText()));
+    }
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+     */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         IProject project = getDefaultProject(configuration);
         String projectName = null;
@@ -147,117 +292,100 @@ public class PMainTab extends PLaunchConfigurationTab {
     		configuration.rename(name);
         }
         
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);       
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String) null);
-        //configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
-    }    
-
-    public void initializeFrom(ILaunchConfiguration configuration) {
-        try {
-            projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
-            appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, EMPTY_STRING));
-            //stopInMainCheckButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false));
-        } catch (CoreException e) {
-            setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
+        String rmName = null;
+        IResourceManager rm = getResourceManagerDefault();
+        if (rm != null) {
+        	rmName = rm.getUniqueName();
         }
-    }
-
-    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, getFieldContent(projText.getText()));
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, getFieldContent(appText.getText()));
-        //configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, stopInMainCheckButton.getSelection());
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+				rmName);
+        configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+				projectName);
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				(String) null);
     }    
-    
-	public boolean isValid(ILaunchConfiguration config) {
-		setErrorMessage(null);
-		setMessage(null);
 
-		String name = getFieldContent(projText.getText());
-		if (name != null) {
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			IStatus status = workspace.validateName(name, IResource.PROJECT);
-			if (status.isOK()) {
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-				if (!project.exists()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_not_exits"), new Object[] {name}));
-					return false;
-				}
-				if (!project.isOpen()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_is_closed"), new Object[] {name}));
-					return false;
-				}
-			} else {
-				setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Illegal_project"), new Object[]{status.getMessage()}));
-				return false;
-			}
-		}
-		
-		name = getFieldContent(appText.getText());
-		if (name == null) {
-			setErrorMessage(LaunchMessages.getResourceString("PMainTab.Application_program_not_specified"));
-			return false;
-		}
-		return true;
-	}
-	
-    /**
-     * @see ILaunchConfigurationTab#getName()
-     */
-    public String getName() {
-        return LaunchMessages.getResourceString("PMainTab.Main");
-    }
-
-    /**
-     * @see ILaunchConfigurationTab#setLaunchConfigurationDialog(ILaunchConfigurationDialog)
+    /* (non-Javadoc)
+     * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.ILaunchConfigurationDialog)
      */
     public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
         super.setLaunchConfigurationDialog(dialog);
     }
-    
+
     /**
-     * @see ILaunchConfigurationTab#getImage()
+	 * Find a default resource manager
+	 * 
+	 * @return resource manager
+	 */
+	private IResourceManager getResourceManagerDefault() {
+		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe != null) {
+			IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
+			if (rms.length == 0) {
+				return null;
+			}
+			return rms[0];
+		}
+		return null;
+	}    
+    
+	/**
+	 * @return
+	 */
+	private IResourceManager getResourceManagerFromCombo() {
+		if (resourceManagerCombo != null) {
+			int i = resourceManagerCombo.getSelectionIndex();
+			return resourceManagers.get(i);
+		}
+		return null;
+	}
+
+	/**
+     * Handle selection of a resource manager
      */
-    public Image getImage() {
-        return LaunchImages.getImage(LaunchImages.IMG_MAIN_TAB);
+    private void rmSelectionChanged() {
+    	resourceManager = getResourceManagerFromCombo();
     }
 
     /**
-     * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#updateLaunchConfigurationDialog()
+     * Set enabled flags for application directory widgets
+     * 
+     * @param enabled
      */
-    protected void updateLaunchConfigurationDialog() {
-        super.updateLaunchConfigurationDialog();
+    private void setApplicationDirectoryEnabled(boolean enabled) {
+    	appDirText.setEnabled(enabled);
+    	appDirButton.setEnabled(enabled);
     }
     
-    protected void handleApplicationButtonSelected() {
-        IResource file = chooseFile();
-        if (file == null)
-            return;
-        
-        String fileName = file.getProjectRelativePath().toString();
-        appText.setText(fileName);
-    }
-    
-	protected void handleProjectButtonSelected() {
-		IProject project = chooseProject();
-		if (project == null)
-			return;
-		
-		String projectName = project.getName();
-		projText.setText(projectName);
-	}
-    
-	protected IProject getProject() {
-		String projectName = projText.getText().trim();
-		if (projectName.length() < 1) {
-			return null;
+    /**
+	 * Given a resource manager, select it in the combo
+	 * 
+	 * @param resource manager
+	 */
+	private void setResourceManagerComboSelection(IResourceManager rm) {
+		final Integer results = resourceManagerIndices.get(rm);
+		int i = 0;
+		if (results != null) {
+			i = results.intValue();
 		}
-		return getWorkspaceRoot().getProject(projectName);		
+		resourceManagerCombo.select(i);
+		rmSelectionChanged();
 	}
-	
+
+    /**
+     * Create a dialog that allows the user to select a file in the current project.
+     * 
+	 * @return selected file
+	 */
 	protected IResource chooseFile() {
 	    final IProject project = getProject();
 	    if (project == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("PMainTab.Project_required"), LaunchMessages.getResourceString("PMainTab.Enter_project_before_browsing_for_program"));
+			MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("PMainTab.Project_required"), 
+					LaunchMessages.getResourceString("PMainTab.Enter_project_before_browsing_for_program")); //$NON-NLS-1$
 	        return null;	        
 	    }
 	    		
@@ -272,17 +400,20 @@ public class PMainTab extends PLaunchConfigurationTab {
 		dialog.setValidator(new ISelectionStatusValidator() {
 			public IStatus validate(Object[] selection) {
 				if (selection.length == 0 || ! (selection[0] instanceof IFile)) {
-					return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, LaunchMessages.getResourceString("PMainTab.Selection_must_be_file"), null);
+					return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, 
+							LaunchMessages.getResourceString("PMainTab.Selection_must_be_file"), null); //$NON-NLS-1$
 				}
 				try {
 					IResource resource = project.findMember( ((IFile)selection[0]).getProjectRelativePath());
 					if (resource == null || resource.getType() != IResource.FILE) {
-						return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, LaunchMessages.getResourceString("PMainTab.Selection_must_be_file"), null);
+						return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, 
+								LaunchMessages.getResourceString("PMainTab.Selection_must_be_file"), null); //$NON-NLS-1$
 					}
 
 					return new Status(IStatus.OK, PTPCorePlugin.getUniqueIdentifier(), IStatus.OK, resource.getName(), null);
 				} catch (Exception ex) {
-					return new Status(IStatus.ERROR, PTPCorePlugin.PLUGIN_ID, IStatus.INFO, LaunchMessages.getResourceString("PMainTab.Selection_must_be_file"), null);
+					return new Status(IStatus.ERROR, PTPCorePlugin.PLUGIN_ID, IStatus.INFO, 
+							LaunchMessages.getResourceString("PMainTab.Selection_must_be_file"), null); //$NON-NLS-1$
 				}
 			}
 		});
@@ -292,13 +423,18 @@ public class PMainTab extends PLaunchConfigurationTab {
 		return null;
 	}
     
-	protected IProject chooseProject() {
+    /**
+     * Create a dialog that allows the user to choose a project.
+     * 
+     * @return selected project
+     */
+    protected IProject chooseProject() {
 		IProject[] projects = getWorkspaceRoot().getProjects();
 
 		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
-		dialog.setTitle(LaunchMessages.getResourceString("PMainTab.Project_Selection_Title"));
-		dialog.setMessage(LaunchMessages.getResourceString("PMainTab.Project_Selection_Message"));
+		dialog.setTitle(LaunchMessages.getResourceString("PMainTab.Project_Selection_Title")); //$NON-NLS-1$
+		dialog.setMessage(LaunchMessages.getResourceString("PMainTab.Project_Selection_Message")); //$NON-NLS-1$
 		dialog.setElements(projects);
 		
 		IProject project = getProject();
@@ -310,7 +446,15 @@ public class PMainTab extends PLaunchConfigurationTab {
 		}			
 		return null;		
 	}
-	
+    
+	/**
+	 * Get a default project. This is either the project name that
+	 * has been previously selected, or the project that is currently
+	 * selected in the workspace.
+	 * 
+	 * @param configuration
+	 * @return default project
+	 */
 	protected IProject getDefaultProject(ILaunchConfiguration configuration) {
 		String projectName = null;
 		try {
@@ -319,7 +463,7 @@ public class PMainTab extends PLaunchConfigurationTab {
 		    return null;
 		}
 		IWorkbenchPage page = PTPLaunchPlugin.getActivePage();
-		if (projectName != null && !projectName.equals("")) {
+		if (projectName != null && !projectName.equals("")) { //$NON-NLS-1$
 			IProject project = getWorkspaceRoot().getProject(projectName);
 			if (project != null && project.exists())
 			    return project;
@@ -348,5 +492,76 @@ public class PMainTab extends PLaunchConfigurationTab {
 			    return file.getProject();
 		}
 		return null;
-	}	
+	}
+    
+	/**
+	 * Get the IProject the corresponds to the project name that is
+	 * displayed in the projText control
+	 * 
+	 * @return project
+	 */
+	protected IProject getProject() {
+		String projectName = projText.getText().trim();
+		if (projectName.length() < 1) {
+			return null;
+		}
+		return getWorkspaceRoot().getProject(projectName);		
+	}
+	
+	/**
+     * Allow the user to choose the application to execute
+     */
+    protected void handleApplicationButtonSelected() {
+ /*
+    	IResource file = chooseFile();
+        if (file == null)
+            return;
+        
+        String fileName = file.getProjectRelativePath().toString();
+        appText.setText(fileName);
+        String dirName = file.getProject().getLocationURI().getPath();
+        appDirText.setText(dirName);
+        */
+    	AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)resourceManager).getConfiguration();
+    	IRemoteServices remServices = PTPRemotePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
+    	if (remServices != null) {
+    		IRemoteConnection remCon = remServices.getConnectionManager().getConnection(rmConf.getConnectionName());
+    		if (remCon != null) {
+    			IRemoteFileManager fileMgr = remServices.getFileManager(remCon);
+    			if (fileMgr != null) {
+    				IPath path = fileMgr.browseFile(getShell(), "Select application to execute", appText.getText());
+    				if (path != null) {
+    					appText.setText(path.toOSString());
+    				}
+    			}
+    		}
+    	}
+    }
+	
+	/**
+     * Allow the user to choose the location of the application execute.
+     * This is only called if the resource manager supports remote launching.
+     */
+    protected void handleApplicationDirButtonSelected() {
+
+    }
+    
+	/**
+	 * Allow the user to choose a project
+	 */
+	protected void handleProjectButtonSelected() {
+		IProject project = chooseProject();
+		if (project == null)
+			return;
+		
+		String projectName = project.getName();
+		projText.setText(projectName);
+	}
+	
+	/* (non-Javadoc)
+     * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#updateLaunchConfigurationDialog()
+     */
+    protected void updateLaunchConfigurationDialog() {
+        super.updateLaunchConfigurationDialog();
+    }	
 }
