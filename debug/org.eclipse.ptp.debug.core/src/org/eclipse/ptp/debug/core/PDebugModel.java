@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -71,17 +71,29 @@ public class PDebugModel {
 	public IPSession getSession(IPJob job) {
 		return sessionMgr.getSession(job);
 	}
+	
+	/**
+	 * 
+	 */
 	public void shutdown() {
 		for (IPSession session : sessionMgr.getSessions()) {
 			shutdownnSession(session);
 		}
 		sessionMgr.shutdown();
 	}
+	
+	/**
+	 * @param job
+	 */
 	public void shutdownSession(IPJob job) {
 		if (job != null) {
 			shutdownnSession(getSession(job));
 		}
 	}
+	
+	/**
+	 * @param session
+	 */
 	public void shutdownnSession(IPSession session) {
 		if (session != null) {
 			try {
@@ -93,15 +105,36 @@ public class PDebugModel {
 			session.dispose();
 		}
 	}
-	public IPSession createDebugSession(long timeout, IPTPDebugger debugger, IPLaunch launch, IFile exec, IPath coreFile, IProgressMonitor monitor) throws CoreException {
-		PSession session = new PSession(debugger.createDebugSession(timeout, launch, exec, coreFile, monitor), launch, exec, monitor);
+	
+	/**
+	 * @param timeout
+	 * @param debugger
+	 * @param launch
+	 * @param project
+	 * @param coreFile
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IPSession createDebugSession(long timeout, IPTPDebugger debugger, IPLaunch launch, IProject project, IPath coreFile, IProgressMonitor monitor) throws CoreException {
+		PSession session = new PSession(debugger.createDebugSession(timeout, launch, coreFile, monitor), launch, project, monitor);
 		sessionMgr.addSession(launch.getPJob(), session);
 		session.connectToDebugger(monitor);
 		return session;
 	}
+	
+	/**
+	 * @return
+	 */
 	public static String getPluginIdentifier() {
 		return PTPDebugCorePlugin.getUniqueIdentifier();
 	}
+	
+	/**
+	 * @param job
+	 * @param tasks
+	 * @param refresh
+	 */
 	public void fireRegisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
 			IPSession session = getSession(job);
@@ -111,6 +144,12 @@ public class PDebugModel {
 			}
 		}
 	}
+	
+	/**
+	 * @param job
+	 * @param tasks
+	 * @param refresh
+	 */
 	public void fireUnregisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
 			IPSession session = getSession(job);
@@ -120,9 +159,15 @@ public class PDebugModel {
 			}
 		}
 	}
+	
 	/**************************************************
 	 * Register / Unregister
 	 **************************************************/
+	/**
+	 * @param launch
+	 * @param tasks
+	 * @param refresh
+	 */
 	public void removeDebugTarget(final IPLaunch launch, final BitList tasks, final boolean refresh) {
 		WorkspaceJob aJob = new WorkspaceJob("Removing the debug targets...") {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
@@ -141,6 +186,14 @@ public class PDebugModel {
 		aJob.setSystem(true);
 		aJob.schedule();		
 	}
+	
+	/**
+	 * @param launch
+	 * @param tasks
+	 * @param pdiTargets
+	 * @param refresh
+	 * @param resumeTarget
+	 */
 	public void addNewDebugTargets(final IPLaunch launch, final BitList tasks, final IPDITarget[] pdiTargets, final boolean refresh, final boolean resumeTarget) {
 		WorkspaceJob aJob = new WorkspaceJob("Creating new debug targets...") {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
@@ -168,9 +221,23 @@ public class PDebugModel {
 		aJob.setSystem(true);
 		aJob.schedule();
 	}
+	
 	/**************************************************
 	 * Breakpoint
 	 **************************************************/
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param lineNumber
+	 * @param enabled
+	 * @param ignoreCount
+	 * @param condition
+	 * @param register
+	 * @param set_id
+	 * @param job
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPLineBreakpoint createLineBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, IPJob job) throws CoreException {
 		String job_id = IPBreakpoint.GLOBAL;
 		String jobName = IPBreakpoint.GLOBAL;
@@ -194,9 +261,42 @@ public class PDebugModel {
 		attributes.put(IPBreakpoint.JOB_NAME, jobName);
 		return new PLineBreakpoint(resource, attributes, register);
 	}
+	
+	/**
+	 * @param module
+	 * @param sourceHandle
+	 * @param resource
+	 * @param address
+	 * @param enabled
+	 * @param ignoreCount
+	 * @param condition
+	 * @param register
+	 * @param set_id
+	 * @param job_id
+	 * @param jobName
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPAddressBreakpoint createAddressBreakpoint(String module, String sourceHandle, IResource resource, BigInteger address, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, String job_id, String jobName) throws CoreException {
 		return createAddressBreakpoint(module, sourceHandle, resource, -1, address, enabled, ignoreCount, condition, register, set_id, job_id, jobName);
 	}
+	
+	/**
+	 * @param module
+	 * @param sourceHandle
+	 * @param resource
+	 * @param lineNumber
+	 * @param address
+	 * @param enabled
+	 * @param ignoreCount
+	 * @param condition
+	 * @param register
+	 * @param set_id
+	 * @param job_id
+	 * @param jobName
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPAddressBreakpoint createAddressBreakpoint(String module, String sourceHandle, IResource resource, int lineNumber, BigInteger address, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, String job_id, String jobName) throws CoreException {
 		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, getPluginIdentifier());
@@ -215,6 +315,23 @@ public class PDebugModel {
 		attributes.put(IPBreakpoint.JOB_NAME, jobName);
 		return new PAddressBreakpoint(resource, attributes, register);
 	}
+	
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param writeAccess
+	 * @param readAccess
+	 * @param expression
+	 * @param enabled
+	 * @param ignoreCount
+	 * @param condition
+	 * @param register
+	 * @param set_id
+	 * @param job_id
+	 * @param jobName
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPWatchpoint createWatchpoint(String sourceHandle, IResource resource, boolean writeAccess, boolean readAccess, String expression, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, String job_id, String jobName) throws CoreException {
 		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, getPluginIdentifier());
@@ -227,6 +344,26 @@ public class PDebugModel {
 		attributes.put(IPWatchpoint.WRITE, Boolean.valueOf(writeAccess));
 		return new PWatchpoint(resource, attributes, register);
 	}
+	
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param charStart
+	 * @param charEnd
+	 * @param lineNumber
+	 * @param writeAccess
+	 * @param readAccess
+	 * @param expression
+	 * @param enabled
+	 * @param ignoreCount
+	 * @param condition
+	 * @param register
+	 * @param set_id
+	 * @param job_id
+	 * @param jobName
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPWatchpoint createWatchpoint(String sourceHandle, IResource resource, int charStart, int charEnd, int lineNumber, boolean writeAccess, boolean readAccess, String expression, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, String job_id, String jobName) throws CoreException {
 		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, getPluginIdentifier());
@@ -242,6 +379,24 @@ public class PDebugModel {
 		attributes.put(IPWatchpoint.WRITE, Boolean.valueOf(writeAccess));
 		return new PWatchpoint(resource, attributes, register);
 	}
+	
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param function
+	 * @param charStart
+	 * @param charEnd
+	 * @param lineNumber
+	 * @param enabled
+	 * @param ignoreCount
+	 * @param condition
+	 * @param register
+	 * @param set_id
+	 * @param job_id
+	 * @param jobName
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPFunctionBreakpoint createFunctionBreakpoint(String sourceHandle, IResource resource, String function, int charStart, int charEnd, int lineNumber, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, String job_id, String jobName) throws CoreException {
 		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, getPluginIdentifier());
@@ -255,6 +410,14 @@ public class PDebugModel {
 		attributes.put(IPBreakpoint.CONDITION, condition);
 		return new PFunctionBreakpoint(resource, attributes, register);
 	}
+	
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param lineNumber
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		List<IBreakpoint> foundBreakpoints = new ArrayList<IBreakpoint>(0);
@@ -272,8 +435,15 @@ public class PDebugModel {
 		}
 		return foundBreakpoints.toArray(new IPLineBreakpoint[0]);
 	}
-	// remove global breakpoint or the breakpoint same as job id given
+	
+	/**
+	 * @param breakpoints
+	 * @param job
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPLineBreakpoint lineBreakpointExists(IPLineBreakpoint[] breakpoints, IPJob job) throws CoreException {
+		// remove global breakpoint or the breakpoint same as job id given
 		for (int i = 0; i < breakpoints.length; i++) {
 			String bpt_job_id = breakpoints[i].getJobId();
 			if (bpt_job_id.equals(IPBreakpoint.GLOBAL) || (job != null && bpt_job_id.equals(job.getID())))
@@ -281,6 +451,14 @@ public class PDebugModel {
 		}
 		return null;
 	}
+	
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param expression
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPWatchpoint[] watchpointExists(String sourceHandle, IResource resource, String expression) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		List<IBreakpoint> foundBreakpoints = new ArrayList<IBreakpoint>(0);
@@ -301,6 +479,14 @@ public class PDebugModel {
 		}
 		return foundBreakpoints.toArray(new IPWatchpoint[0]);
 	}
+	
+	/**
+	 * @param sourceHandle
+	 * @param resource
+	 * @param function
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPFunctionBreakpoint[] functionBreakpointExists(String sourceHandle, IResource resource, String function) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		List<IBreakpoint> foundBreakpoints = new ArrayList<IBreakpoint>(0);
@@ -321,6 +507,12 @@ public class PDebugModel {
 		}
 		return foundBreakpoints.toArray(new IPFunctionBreakpoint[0]);
 	}
+	
+	/**
+	 * @param handle1
+	 * @param handle2
+	 * @return
+	 */
 	private static boolean sameSourceHandle(String handle1, String handle2) {
 		if (handle1 == null || handle2 == null)
 			return false;
@@ -330,12 +522,23 @@ public class PDebugModel {
 			return path1.equals(path2);
 		return handle1.equals(handle2);
 	}
+	
+	/**
+	 * @return
+	 */
 	public static IBreakpoint[] getPBreakpoints() {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getPluginIdentifier());
 	}
+	
 	/***************************************
 	 * Other breakpoint functions
 	 ***************************************/
+	/**
+	 * @param job_id
+	 * @param set_id
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPBreakpoint[] findPBreakpoints(String job_id, String set_id) throws CoreException {
 		List<IPBreakpoint> bptList = new ArrayList<IPBreakpoint>();
 		IBreakpoint[] breakpoints = getPBreakpoints();
@@ -349,6 +552,13 @@ public class PDebugModel {
 		}
 		return (IPBreakpoint[]) bptList.toArray(new IPBreakpoint[0]);
 	}
+	
+	/**
+	 * @param job_id
+	 * @param includeGlobal
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IPBreakpoint[] findPBreakpoints(String job_id, boolean includeGlobal) throws CoreException {
 		List<IPBreakpoint> bptList = new ArrayList<IPBreakpoint>();
 		IBreakpoint[] breakpoints = getPBreakpoints();
@@ -363,16 +573,33 @@ public class PDebugModel {
 		}
 		return (IPBreakpoint[]) bptList.toArray(new IPBreakpoint[bptList.size()]);
 	}
+	
+	/**
+	 * @param job_id
+	 * @param set_id
+	 * @throws CoreException
+	 */
 	public static void deletePBreakpoint(final String job_id, final String set_id) throws CoreException {
 		IPBreakpoint[] breakpoints = findPBreakpoints(job_id, set_id);
 		if (breakpoints.length > 0)
 			DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);		
 	}
+	
+	/**
+	 * @param job_id
+	 * @throws CoreException
+	 */
 	public static void deletePBreakpoint(final String job_id) throws CoreException {
 		IPBreakpoint[] breakpoints = findPBreakpoints(job_id, false);
 		if (breakpoints.length > 0)
 			DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
 	}
+	
+	/**
+	 * @param set_id
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	public static void updatePBreakpoints(String set_id, IProgressMonitor monitor) throws CoreException {
 		try {
 			IBreakpoint[] breakpoints = getPBreakpoints();
@@ -387,12 +614,24 @@ public class PDebugModel {
 			monitor.done();
 		}
 	}
+	
 	/**************************************************
 	 * Debug Job
 	 **************************************************/
+	/**
+	 * @param session
+	 * @param set_id
+	 * @param tasks
+	 */
 	public void createSet(IPSession session, String set_id, BitList tasks) {
 		session.getSetManager().createSet(set_id, tasks);
 	}
+	
+	/**
+	 * @param session
+	 * @param set_id
+	 * @param tasks
+	 */
 	public void addTasks(IPSession session, String set_id, BitList tasks) {
 		BitList curSetTasks = getTasks(session, set_id);
 		session.getSetManager().addTasks(set_id, tasks);
@@ -405,6 +644,12 @@ public class PDebugModel {
 			PTPDebugCorePlugin.log(e);
 		}
 	}
+	
+	/**
+	 * @param session
+	 * @param set_id
+	 * @param tasks
+	 */
 	public void removeTasks(IPSession session, String set_id, BitList tasks) {
 		BitList curSetTasks = getTasks(session, set_id);
 		session.getSetManager().removeTasks(set_id, tasks);
@@ -417,6 +662,11 @@ public class PDebugModel {
 			PTPDebugCorePlugin.log(e);
 		}
 	}
+	
+	/**
+	 * @param session
+	 * @param set_id
+	 */
 	public void deleteSet(IPSession session, String set_id) {
 		try {
 			PDebugModel.deletePBreakpoint(session.getJob().getID(), set_id);			
@@ -427,6 +677,12 @@ public class PDebugModel {
 		//must delete breakpoint and then delete set
 		session.getSetManager().deleteSets(set_id);
 	}
+	
+	/**
+	 * @param session
+	 * @param set_id
+	 * @return
+	 */
 	public BitList getTasks(IPSession session, String set_id) {
 		BitList tasks = session.getSetManager().getTasks(set_id);
 		if (tasks != null)
