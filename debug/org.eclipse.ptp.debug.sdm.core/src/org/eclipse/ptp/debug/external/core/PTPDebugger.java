@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,16 +45,54 @@ import org.eclipse.ptp.debug.internal.core.pdi.Session;
 public class PTPDebugger implements IPTPDebugger {
 	private IPDIDebugger pdiDebugger = null;
 	
-	public IPDISession createDebugSession(long timeout, IPLaunch launch, IFile exe, IPath corefile, IProgressMonitor monitor) throws CoreException {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPTPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
 		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
 		}
-		return createSession(timeout, launch, exe, corefile, monitor);
+		return createSession(timeout, launch, corefile, monitor);
 	}
-	protected Session createSession(long timeout, IPLaunch launch, IFile exe, IPath corefile, IProgressMonitor monitor) throws CoreException {
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPTPDebugger#getDebuggerPort(int)
+	 */
+	public int getDebuggerPort(int timeout) throws CoreException {
+		if (pdiDebugger == null) {
+			pdiDebugger = new PDIDebugger();
+		}
+		try {
+			return pdiDebugger.getDebuggerPort(timeout);
+		}
+		catch (PDIException e) {
+			pdiDebugger = null;
+			throw newCoreException(e);
+		}
+	}
+	
+	/**
+	 * @return
+	 */
+	private IPDIDebugger getDebugger() {
+		if (pdiDebugger == null) {
+			pdiDebugger = new PDIDebugger();
+		}
+		return pdiDebugger;
+	}
+	
+	/**
+	 * @param timeout
+	 * @param launch
+	 * @param corefile
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	protected Session createSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
 		int job_size = getJobSize(job);
 		try {
@@ -65,19 +102,11 @@ public class PTPDebugger implements IPTPDebugger {
 			throw newCoreException(e);
 		}
 	}
-	public int getDebuggerPort(int timeout) throws CoreException {
-		pdiDebugger = new PDIDebugger();
-		try {
-			return pdiDebugger.getDebuggerPort(timeout);
-		}
-		catch (PDIException e) {
-			pdiDebugger = null;
-			throw newCoreException(e);
-		}
-	}
-	private IPDIDebugger getDebugger() {
-		return pdiDebugger;
-	}
+	
+	/**
+	 * @param job
+	 * @return
+	 */
 	protected int getJobSize(IPJob job) {
 		IntegerAttribute numProcAttr = job.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		if (numProcAttr != null) {
@@ -85,6 +114,11 @@ public class PTPDebugger implements IPTPDebugger {
 		}
 		return 1;
 	}
+	
+	/**
+	 * @param exception
+	 * @return
+	 */
 	protected CoreException newCoreException(Throwable exception) {
 		MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, "Cannot start debugging", exception);
 		status.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, exception == null ? new String() : exception.getLocalizedMessage(), exception));
