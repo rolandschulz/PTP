@@ -98,16 +98,18 @@ public interface IRemoteProcessBuilder {
 	/**
 	 * Starts a new process using the attributes of this process builder.
 	 * 
-	 * @return
+	 * @return remote process object
+	 * @throws IOException
 	 */
 	public abstract IRemoteProcess start() throws IOException;
 
 	/**
-	 * Starts a new process using the attributes of this process builder. Guarantess
+	 * Starts a new process using the attributes of this process builder. Guarantees
 	 * that the process will execute asynchronously with respect to the Java process 
 	 * that owns the IRemoteProcess object.
 	 * 
-	 * @return
+	 * @return remote process object
+	 * @throws IOException
 	 */
 	public abstract IRemoteProcess asyncStart() throws IOException;
 

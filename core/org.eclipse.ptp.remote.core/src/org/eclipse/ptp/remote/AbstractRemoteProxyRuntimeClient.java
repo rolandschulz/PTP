@@ -116,7 +116,8 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				 */
 				IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
 				try {
-					if (!fileManager.getResource(new Path(proxyPath), new NullProgressMonitor()).fetchInfo().exists()){
+					IRemoteResource res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
+					if (!res.fetchInfo().exists()){
 						throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
 					}
 				} catch (CoreException e1) {

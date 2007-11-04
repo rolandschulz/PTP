@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.remote;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.IPath;
@@ -74,7 +75,7 @@ public class LocalFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) {
+	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) throws IOException {
 		try {
 			return new LocalResource(EFS.getLocalFileSystem().getStore(path));
 		} finally {

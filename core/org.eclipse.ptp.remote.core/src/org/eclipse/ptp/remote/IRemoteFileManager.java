@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
@@ -48,6 +50,7 @@ public interface IRemoteFileManager {
 	 * @param path path to resource
 	 * @param monitor progress monitor
 	 * @return the file store representing the remote path
+	 * @throws IOException if the associated resource cannot be located
 	 */
-	public IRemoteResource getResource(IPath path, IProgressMonitor monitor);
+	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) throws IOException;
 }
