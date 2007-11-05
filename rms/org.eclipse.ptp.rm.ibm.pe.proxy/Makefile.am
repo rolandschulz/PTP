@@ -3,18 +3,15 @@
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
-PROXY =					../org.eclipse.ptp.proxy
-UTILS =					../org.eclipse.ptp.utils
-SUBDIRS =				$(PROXY) $(UTILS)
 
 bin_PROGRAMS =			ptp_ibmpe_proxy ptp_ibmpe_miniproxy
 
 ptp_ibmpe_proxy_SOURCES =		src/ptp_ibmpe_proxy.c
-ptp_ibmpe_proxy_CFLAGS =		-g -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) 
-ptp_ibmpe_proxy_LDFLAGS = -g
-ptp_ibmpe_proxy_LDADD =		-lpthread $(PROXY)/libproxysvr.a $(UTILS)/libutils.a
+ptp_ibmpe_proxy_CFLAGS =		-g $(AM_CFLAGS) 
+ptp_ibmpe_proxy_LDFLAGS =		-g
+ptp_ibmpe_proxy_LDADD =			-lpthread
 
-ptp_ibmpe_miniproxy_SOURCES =		src/ptp_ibmpe_miniproxy.c
-ptp_ibmpe_miniproxy_CFLAGS =		-g 
-ptp_ibmpe_miniproxy_LDFLAGS = -g
+ptp_ibmpe_miniproxy_SOURCES =	src/ptp_ibmpe_miniproxy.c
+ptp_ibmpe_miniproxy_CFLAGS =	-g 
+ptp_ibmpe_miniproxy_LDFLAGS = 	-g
 ptp_ibmpe_miniproxy_LDADD =		-lpthread 

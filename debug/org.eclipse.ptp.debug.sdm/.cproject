@@ -47,14 +47,7 @@
 </scannerInfoProvider>
 </profile>
 </storageModule>
-<storageModule moduleId="org.eclipse.cdt.core.pathentry">
-<pathentry include="/usr/local/ompi/include" kind="inc" path="" system="true"/>
-<pathentry include="/usr/local/ompi/include/openmpi/orte" kind="inc" path="" system="true"/>
-<pathentry include="/usr/local/ompi/include/openmpi/opal" kind="inc" path="" system="true"/>
-<pathentry kind="src" path=""/>
-<pathentry kind="out" path=""/>
-<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-</storageModule>
+
 <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 <buildTargets>
 <target name="all" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
@@ -88,6 +81,17 @@
 <attribute key="c++filt" value="c++filt"/>
 </extension>
 </extensions>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+<pathentry include="/usr/local/openmpi-1.2.3/include" kind="inc" path="" system="true"/>
+<pathentry include="/usr/local/openmpi-1.2.3/include/openmpi/orte" kind="inc" path="" system="true"/>
+<pathentry include="/usr/local/openmpi-1.2.3/include/openmpi/opal" kind="inc" path="" system="true"/>
+<pathentry base-path="org.eclipse.ptp.debug.sdm" include="" kind="inc" path="" system="true"/>
+<pathentry kind="src" path=""/>
+<pathentry kind="out" path=""/>
+<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
 </storageModule>
 </cconfiguration>
 </storageModule>

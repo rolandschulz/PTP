@@ -3,7 +3,7 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT(org.eclipse.ptp.proxy, 1.0.0)
+AC_INIT(org.eclipse.ptp.proxy, 2.0.0)
 AC_CONFIG_SRCDIR(src/proxy.c)
 AC_CONFIG_HEADERS(config.h)
 
@@ -11,7 +11,13 @@ AM_INIT_AUTOMAKE
 
 AC_CANONICAL_BUILD
 
-UTILS="../org.eclipse.ptp.utils"
+dnl
+dnl Eclipse adds version number to end of package when deploying via update site
+dnl
+
+AC_CHECK_FILE(../org.eclipse.ptp.utils, UTILS="../org.eclipse.ptp.utils")
+AC_CHECK_FILE(../org.eclipse.ptp.utils_2.0.0, UTILS="../org.eclipse.ptp.utils_2.0.0")
+
 CFLAGS="$CFLAGS -Wall -I$UTILS/include"
 LIBS="$LIBS -L$UTILS"
 
