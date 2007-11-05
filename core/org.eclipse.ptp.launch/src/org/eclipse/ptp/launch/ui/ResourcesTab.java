@@ -178,6 +178,7 @@ public class ResourcesTab extends PLaunchConfigurationTab {
 		try {
 			IResourceManager rm = getResourceManager(configuration);
 			if (rm == null) {
+				queueCombo.setEnabled(false);
 				setErrorMessage(LaunchMessages.getResourceString(
 						"ResourcesTab.No_Resource_Manager")); //$NON-NLS-1$
 				return;
@@ -475,6 +476,7 @@ public class ResourcesTab extends PLaunchConfigurationTab {
 			queues.put(i, qs[i]);
 			queueIndices.put(qs[i], i);
 		}
+		
 		queueCombo.select(0);
 	}
 
@@ -518,8 +520,9 @@ public class ResourcesTab extends PLaunchConfigurationTab {
 	private void setQueueComboSelection(IPQueue queue) {
 		final Integer results = queueIndices.get(queue);
 		int i = 0;
-		if (results != null)
+		if (results != null) {
 			i = results.intValue();
+		}
 		queueCombo.select(i);
 		queueSelectionChanged();
 	}
