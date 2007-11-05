@@ -19,26 +19,32 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipse.cdt.debug.core"/>
-      <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ui.console"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.cdt.debug.core"/>
       <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.cdt.debug.mi.core"/>
-      <import plugin="org.eclipse.cdt.launch"/>
-      <import plugin="org.eclipse.cdt.debug.mi.ui"/>
-      <import plugin="org.eclipse.help"/>
+      <import plugin="org.eclipse.ptp.debug.core"/>
+      <import plugin="org.eclipse.ptp.ui"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.ptp.remote"/>
+      <import plugin="org.eclipse.ptp.debug.ui"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.ptp.orte.core"/>
+      <import plugin="org.eclipse.ptp.launch"/>
    </requires>
 
    <plugin
@@ -103,48 +109,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.remote.rse"
-         download-size="0"
-         install-size="0"
-         version="2.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.linux.x86"
-         download-size="0"
-         install-size="0"
-         version="1.1.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.ptp.lsf.core"
-         download-size="0"
-         install-size="0"
-         version="2.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.lsf.ui"
-         download-size="0"
-         install-size="0"
-         version="2.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.mpich2.core"
-         download-size="0"
-         install-size="0"
-         version="2.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.mpich2.ui"
-         download-size="0"
-         install-size="0"
-         version="2.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ptp.orte.core"
          download-size="0"
          install-size="0"
@@ -156,6 +120,34 @@
          download-size="0"
          install-size="0"
          version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.ibmpe.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.ibmpe.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.ibmpe.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.proxy.protocol"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
