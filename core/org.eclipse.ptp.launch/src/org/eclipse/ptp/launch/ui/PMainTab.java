@@ -93,8 +93,6 @@ public class PMainTab extends PLaunchConfigurationTab {
 	            handleProjectButtonSelected();
 			} else if (source == appButton) {
 	            handleApplicationButtonSelected();
-			} else if (source == appDirButton) {
-	            handleApplicationDirButtonSelected();
 	        } else {
 	            handleProjectButtonSelected();
 	        }
@@ -108,10 +106,8 @@ public class PMainTab extends PLaunchConfigurationTab {
 
     protected Text projText = null;
 	protected Text appText = null;
-	protected Text appDirText = null;
 	protected Button projButton = null; 
     protected Button appButton = null;
-    protected Button appDirButton = null;
 	protected WidgetListener listener = new WidgetListener();
 
 	/* (non-Javadoc)
@@ -171,20 +167,6 @@ public class PMainTab extends PLaunchConfigurationTab {
 		
 		appButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null); //$NON-NLS-1$
 		appButton.addSelectionListener(listener);
-/*
-		createVerticalSpacer(comp, 1);
-		
-		Label appDirLabel = new Label(mainComp, SWT.NONE);
-		appDirLabel.setText(LaunchMessages.getResourceString("PMainTab.&Directory_Label")); //$NON-NLS-1$
-		appDirLabel.setLayoutData(spanGridData(-1, 2));
-
-		appDirText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
-		appDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		appDirText.addModifyListener(listener);
-		
-		appDirButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.Br&owse_3"), null); //$NON-NLS-1$
-		appDirButton.addSelectionListener(listener);
-		*/
     }
 
 	/* (non-Javadoc)
@@ -206,7 +188,10 @@ public class PMainTab extends PLaunchConfigurationTab {
      */
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
-			resourceManager = getResourceManager(configuration);
+            projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
+            appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, EMPTY_STRING));
+
+            resourceManager = getResourceManager(configuration);
 			if (resourceManager == null) {
 				setErrorMessage(LaunchMessages
 						.getResourceString("PMainTab.No_Resource_Manager_Available")); //$NON-NLS-1$
@@ -214,9 +199,6 @@ public class PMainTab extends PLaunchConfigurationTab {
 			}
 
 			setResourceManagerComboSelection(resourceManager);
-			
-            projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
-            appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, EMPTY_STRING));
         } catch (CoreException e) {
             setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage())); //$NON-NLS-1$
         }
@@ -349,16 +331,6 @@ public class PMainTab extends PLaunchConfigurationTab {
      */
     private void rmSelectionChanged() {
     	resourceManager = getResourceManagerFromCombo();
-    }
-
-    /**
-     * Set enabled flags for application directory widgets
-     * 
-     * @param enabled
-     */
-    private void setApplicationDirectoryEnabled(boolean enabled) {
-    	appDirText.setEnabled(enabled);
-    	appDirButton.setEnabled(enabled);
     }
     
     /**
@@ -510,18 +482,15 @@ public class PMainTab extends PLaunchConfigurationTab {
 	
 	/**
      * Allow the user to choose the application to execute
+     * 
+     * Initial path does not work on MacOS X: see bug #153365
      */
     protected void handleApplicationButtonSelected() {
- /*
-    	IResource file = chooseFile();
-        if (file == null)
-            return;
-        
-        String fileName = file.getProjectRelativePath().toString();
-        appText.setText(fileName);
-        String dirName = file.getProject().getLocationURI().getPath();
-        appDirText.setText(dirName);
-        */
+    	String initPath = appText.getText();
+    	if (initPath.equals(EMPTY_STRING)) {
+    		initPath = getProject().getLocationURI().getPath();
+    	}
+    	
     	AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)resourceManager).getConfiguration();
     	IRemoteServices remServices = PTPRemotePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
     	if (remServices != null) {
@@ -529,23 +498,15 @@ public class PMainTab extends PLaunchConfigurationTab {
     		if (remCon != null) {
     			IRemoteFileManager fileMgr = remServices.getFileManager(remCon);
     			if (fileMgr != null) {
-    				IPath path = fileMgr.browseFile(getShell(), "Select application to execute", appText.getText());
+    				IPath path = fileMgr.browseFile(getShell(), "Select application to execute", initPath);
     				if (path != null) {
-    					appText.setText(path.toOSString());
+    					appText.setText(path.toString());
     				}
     			}
     		}
     	}
     }
 	
-	/**
-     * Allow the user to choose the location of the application execute.
-     * This is only called if the resource manager supports remote launching.
-     */
-    protected void handleApplicationDirButtonSelected() {
-
-    }
-    
 	/**
 	 * Allow the user to choose a project
 	 */
