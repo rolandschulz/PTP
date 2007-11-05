@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.proxy;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -105,14 +106,17 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 				while (state != DebugProxyState.CONNECTED && !timeout && !monitor.isCanceled()) {
 					waiting = true;
 					try {
-						waitCondition.await();
+						//added to wait for 1000
+						waitCondition.await(1000, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is canceled
+						// Expect to be interrupted if monitor is cancelled
+						monitor.setCanceled(true);
 					}
 				}
 				if (timeout) {
 					throw new IOException("Timeout waiting for debugger to connect");
-				} else if (monitor.isCanceled()) {
+				}
+				if (monitor.isCanceled()) {
 					doShutdown();
 					return false;
 				}
