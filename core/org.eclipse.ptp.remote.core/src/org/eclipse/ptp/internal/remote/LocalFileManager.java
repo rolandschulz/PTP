@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteResource;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -33,12 +34,12 @@ public class LocalFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseFile(Shell shell, String message, String filterPath) {
-		FileDialog dialog = new FileDialog(PTPRemotePlugin.getShell());
+		FileDialog dialog = new FileDialog(PTPRemotePlugin.getShell(), SWT.MULTI);
 		dialog.setText(message);
 		if (filterPath != null) {
 			File path = new File(filterPath);
 			if (path.exists()) {
-				dialog.setFilterPath(path.isFile() ? filterPath : path.getParent());
+				dialog.setFilterPath(path.isFile() ? path.getParent() : filterPath);
 			}
 		}
 	
@@ -59,7 +60,7 @@ public class LocalFileManager implements IRemoteFileManager {
 		if (filterPath != null) {
 			File path = new File(filterPath);
 			if (path.exists()) {
-				dialog.setFilterPath(path.isFile() ? filterPath : path.getParent());
+				dialog.setFilterPath(path.isFile() ? path.getParent() : filterPath);
 			}
 		}
 	
