@@ -58,7 +58,7 @@
          id="org.eclipse.ptp.debug.core"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
@@ -85,7 +85,7 @@
          id="org.eclipse.ptp.debug.external.core"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
@@ -99,7 +99,7 @@
          id="org.eclipse.ptp.help"
          download-size="0"
          install-size="0"
-         version="1.1.0"/>
+         version="2.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.remote"
@@ -126,28 +126,28 @@
          id="org.eclipse.ptp.ibmpe.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ibmpe.help"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ibmpe.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.proxy.protocol"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
 </feature>
