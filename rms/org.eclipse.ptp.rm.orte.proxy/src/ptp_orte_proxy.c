@@ -1778,7 +1778,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (num_procs <= 0) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify a working directory");
+		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify number of processes to launch");
 		return PROXY_RES_OK;
 	}
 		
