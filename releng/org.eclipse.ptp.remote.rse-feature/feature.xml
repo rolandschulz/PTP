@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.remote.rse"
+      label="%featureName"
+      version="2.0.0"
+      provider-name="%providerName"
+      image="eclipse_update_120.jpg">
+
+   <description url="http://eclipse.org/ptp">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ptp.remote"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.rse.core"/>
+      <import plugin="org.eclipse.rse.ui"/>
+      <import plugin="org.eclipse.rse.files.ui"/>
+      <import plugin="org.eclipse.rse.subsystems.files.core"/>
+      <import plugin="org.eclipse.rse.services"/>
+      <import plugin="org.eclipse.rse.subsystems.shells.core"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.remote.rse"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+</feature>
