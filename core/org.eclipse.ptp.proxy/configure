@@ -1744,48 +1744,15 @@ build_os=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 
 
-echo "$as_me:$LINENO: checking for ../org.eclipse.ptp.utils" >&5
-echo $ECHO_N "checking for ../org.eclipse.ptp.utils... $ECHO_C" >&6
-if test "${ac_cv_file____org_eclipse_ptp_utils+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+UTILS="../org.eclipse.ptp.utils"
+if test ! -d $UTILS; then
+	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	if test ! -d $UTILS; then
+		{ { echo "$as_me:$LINENO: error: utils directory not found" >&5
+echo "$as_me: error: utils directory not found" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "../org.eclipse.ptp.utils"; then
-  ac_cv_file____org_eclipse_ptp_utils=yes
-else
-  ac_cv_file____org_eclipse_ptp_utils=no
+	fi
 fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file____org_eclipse_ptp_utils" >&5
-echo "${ECHO_T}$ac_cv_file____org_eclipse_ptp_utils" >&6
-if test $ac_cv_file____org_eclipse_ptp_utils = yes; then
-  UTILS="../org.eclipse.ptp.utils"
-fi
-
-echo "$as_me:$LINENO: checking for ../org.eclipse.ptp.utils_2.0.0" >&5
-echo $ECHO_N "checking for ../org.eclipse.ptp.utils_2.0.0... $ECHO_C" >&6
-if test "${ac_cv_file____org_eclipse_ptp_utils_2_0_0+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "../org.eclipse.ptp.utils_2.0.0"; then
-  ac_cv_file____org_eclipse_ptp_utils_2_0_0=yes
-else
-  ac_cv_file____org_eclipse_ptp_utils_2_0_0=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file____org_eclipse_ptp_utils_2_0_0" >&5
-echo "${ECHO_T}$ac_cv_file____org_eclipse_ptp_utils_2_0_0" >&6
-if test $ac_cv_file____org_eclipse_ptp_utils_2_0_0 = yes; then
-  UTILS="../org.eclipse.ptp.utils_2.0.0"
-fi
-
 
 CFLAGS="$CFLAGS -Wall -I$UTILS/include"
 LIBS="$LIBS -L$UTILS"
