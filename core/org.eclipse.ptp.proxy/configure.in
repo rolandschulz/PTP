@@ -15,8 +15,13 @@ dnl
 dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
-AC_CHECK_FILE(../org.eclipse.ptp.utils, UTILS="../org.eclipse.ptp.utils")
-AC_CHECK_FILE(../org.eclipse.ptp.utils_2.0.0, UTILS="../org.eclipse.ptp.utils_2.0.0")
+UTILS="../org.eclipse.ptp.utils"
+if test ! -d $UTILS; then
+	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	if test ! -d $UTILS; then
+		AC_MSG_ERROR([utils directory not found])
+	fi
+fi
 
 CFLAGS="$CFLAGS -Wall -I$UTILS/include"
 LIBS="$LIBS -L$UTILS"
