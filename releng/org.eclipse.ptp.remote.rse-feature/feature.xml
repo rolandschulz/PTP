@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.remote.rse"
       label="%featureName"
-      version="2.0.0"
+      version="2.0.0.qualifier"
       provider-name="%providerName"
       image="eclipse_update_120.jpg">
 
@@ -35,7 +35,7 @@
          id="org.eclipse.ptp.remote.rse"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
 </feature>

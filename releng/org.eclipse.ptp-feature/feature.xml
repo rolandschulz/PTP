@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp"
       label="%featureName"
-      version="2.0.0"
+      version="2.0.0.qualifier"
       provider-name="%providerName"
       image="eclipse_update_120.jpg">
 
@@ -24,6 +24,7 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.ptp.proxy.protocol"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.jface.text"/>
@@ -43,111 +44,115 @@
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.help"/>
+      <import plugin="org.eclipse.ui.intro"/>
+      <import plugin="org.eclipse.ui.intro.universal"/>
       <import plugin="org.eclipse.ptp.orte.core"/>
       <import plugin="org.eclipse.ptp.launch"/>
+      <import plugin="org.eclipse.ptp.ibmpe.core"/>
    </requires>
 
    <plugin
          id="org.eclipse.ptp.core"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.debug.core"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.debug.ui"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.launch"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ui"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
 
    <plugin
          id="org.eclipse.ptp.debug.external.core"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.debug.external.ui"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.help"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
 
    <plugin
          id="org.eclipse.ptp.remote"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.orte.core"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.orte.ui"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ibmpe.core"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ibmpe.help"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ibmpe.ui"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.proxy.protocol"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
 </feature>

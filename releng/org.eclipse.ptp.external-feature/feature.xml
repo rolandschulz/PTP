@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.external"
       label="%featureName"
-      version="2.0.0"
+      version="2.0.0.qualifier"
       provider-name="%providerName"
       image="eclipse_update_120.jpg">
 
@@ -27,65 +27,72 @@
          id="org.eclipse.ptp.aix.ppc"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.linux.ppc"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.linux.x86"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.linux.x86_64"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.macosx.ppc"
          download-size="0"
          install-size="0"
-         version="2.0.0"
+         version="2.0.0.qualifier"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.debug.sdm"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
 
    <plugin
          id="org.eclipse.ptp.ibmpe.proxy"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
 
    <plugin
          id="org.eclipse.ptp.orte.proxy"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
 
    <plugin
          id="org.eclipse.ptp.proxy"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
 
    <plugin
          id="org.eclipse.ptp.utils"
          download-size="0"
          install-size="0"
-         version="2.0.0"/>
+         version="2.0.0.qualifier"/>
+
+   <plugin
+         id="org.eclipse.ptp.macosx.x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
 
 </feature>
