@@ -4,11 +4,15 @@
 #
 export KNOWN_FRAGMENTS="\
 	org.eclipse.ptp.utils\
-	org.eclipse.ptp.utils_2.0.0\
+	org.eclipse.ptp.utils_*\
 	org.eclipse.ptp.proxy\
-	org.eclipse.ptp.proxy_2.0.0\
-	org.eclipse.ptp.ibmpe.proxy\
-	org.eclipse.ptp.ibmpe.proxy_2.0.0"
+	org.eclipse.ptp.proxy_*\
+	org.eclipse.ptp.debug.sdm\
+	org.eclipse.ptp.debug.sdm_*\
+	org.eclipse.ptp.orte.proxy\
+	org.eclipse.ptp.orte.proxy_*\
+	org.eclipse.ptp.mpich2.proxy\
+	org.eclipse.ptp.mpich2.proxy_*"
 		
 export PARENT=`dirname $PWD`
 export FRAGMENT=`basename $PWD`
