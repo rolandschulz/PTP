@@ -115,7 +115,6 @@ static int	GDBMIQuit(void);
 static int	GDBMIDataEvaluateExpression(char*);
 static int	GDBGetPartialAIF(char *, char *, int, int);
 static int	GDBMIVarDelete(char*);
-static int	GDBGetAIFType(char*);
 
 static void SendCommandWait(MISession *, MICommand *);
 static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
@@ -161,7 +160,6 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIDataEvaluateExpression,
 	GDBGetPartialAIF,
 	GDBMIVarDelete,
-	//GDBGetAIFType,
 	GDBMIQuit
 };
 
@@ -766,13 +764,12 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	 		return DBGRES_ERR;
 	 	}
 	}
-/***
- * Working dir is not important in debugging
+
 	if (*work_dir != '\0' && chdir(work_dir) < 0) {
 		DbgSetError(DBGERR_CHDIR, work_dir);
 		return DBGRES_ERR;
 	}
-***/
+
 	if (path != NULL)
 		asprintf(&prog_path, "%s/%s", path, prog);
 	else
@@ -2004,30 +2001,6 @@ GDBMIGetNativeType(char *var)
 	return DBGRES_OK;
 }
 
-#ifdef notdef
-/*
-** Find AIF type of variable.
-*/
-static int
-GDBGetAIFType(char *var)
-{
-	dbg_event *	e;
-	AIF *		a;
-	char *		type;
-
-	CHECK_SESSION();
-	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
-		return DBGRES_ERR;
-		
-	e = NewDbgEvent(DBGEV_TYPE);
-	e->type_desc = AIF_FORMAT(a);
-
-	SaveEvent(e);
-	AIFFree(a);
-	return DBGRES_OK;
-}
-#endif
-
 static int
 GetAIFVar(char *var, AIF **val, char **type)
 {
@@ -2805,50 +2778,6 @@ GetMIVarDetails(char *name)
 	MICommandFree(cmd);
 	return mivar;
 }
-/*
-static int 
-GDBGetAIFType(char* name)
-{
-	MIVar *mivar;
-	int id;
-	char *pt;
-	
-	mivar = CreateMIVar(name);
-	if (mivar == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, name);
-		return DBGRES_ERR; 
-	}
-
-	if (strcmp(mivar->type, "<text variable, no debug info>") == 0) {
-		DeleteMIVar(mivar->name);
-		MIVarFree(mivar);
-		DbgSetError(DBGERR_NOSYMS, "");
-		return DBGRES_ERR; 
-	}
-
-	id = get_simple_type(mivar->type);
-	if (id == T_OTHER) {
-		pt = GetPtypeValue(mivar->type);
-		if (pt != NULL) {
-			mivar->type = strdup(pt);
-			id = get_simple_type(mivar->type);
-			free(pt);
-		}
-	}
-	if (id == T_OTHER) {
-		
-	}
-	else if (id == T_ARRAY) {
-		
-	}
-	else {
-		
-	}
-	DeleteMIVar(mivar->name);
-	MIVarFree(mivar);
-	return DBGRES_OK;
-}
-*/
 
 static int
 GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
