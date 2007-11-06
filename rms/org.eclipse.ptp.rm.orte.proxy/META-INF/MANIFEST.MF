@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP Proxy Server for OpenRTE
 Bundle-SymbolicName: org.eclipse.ptp.orte.proxy
-Bundle-Version: 2.0.0
+Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.ptp.utils,
  org.eclipse.ptp.proxy

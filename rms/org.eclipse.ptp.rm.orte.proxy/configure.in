@@ -15,10 +15,21 @@ dnl
 dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
-AC_CHECK_FILE(../org.eclipse.ptp.utils, UTILS="../org.eclipse.ptp.utils")
-AC_CHECK_FILE(../org.eclipse.ptp.utils_2.0.0, UTILS="../org.eclipse.ptp.utils_2.0.0")
-AC_CHECK_FILE(../org.eclipse.ptp.proxy, PROXY="../org.eclipse.ptp.proxy")
-AC_CHECK_FILE(../org.eclipse.ptp.proxy_2.0.0, PROXY="../org.eclipse.ptp.proxy_2.0.0")
+UTILS="../org.eclipse.ptp.utils"
+if test ! -d $UTILS; then
+	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	if test ! -d $UTILS; then
+		AC_MSG_ERROR([utils directory not found])
+	fi
+fi
+
+PROXY="../org.eclipse.ptp.proxy"
+if test ! -d $PROXY; then
+	PROXY="`echo ${PROXY}_${PACKAGE_VERSION}.*`"
+	if test ! -d $PROXY; then
+		AC_MSG_ERROR([proxy directory not found])
+	fi
+fi
 
 CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
 LIBS="$LIBS -L$UTILS -L$PROXY"
