@@ -3,7 +3,6 @@
 		copyright="blah blah "
 		id="MPIhelloWorldCProject" label="%HelloWorld.CAnsitemplate.label" description="%HelloWorld.CAnsitemplate.description"
 		 help="help.html">
-
 	<property-group id="basics" label="%HelloWorld.basics.label" description="%HelloWorld.basics.description" type="PAGES-ONLY" help="help.html">
 		<property id="author"
 			label="%HelloWorld.author.label"
@@ -26,7 +25,7 @@
 			description="%HelloWorld.message.description"
 			type="input"
 			pattern=".*"
-			default="%HelloWorld.message.default"
+			default="%HelloWorld.message.default.mpi"
 			hidden="false"
 			persist="true"/>
 		<property id="sourceDir"
@@ -59,6 +58,11 @@
 				<simple name="replaceable" value="true"/>
 			</element>
 		</complex-array>
+	</process>
+	
+	<process type="org.eclipse.ptp.pldt.wizards.storeInfo">
+		<simple name="projectName" value="$(projectName)"/>
+		<simple name="projectType" value="mpi_project"/>
 	</process>
 
 </template>
