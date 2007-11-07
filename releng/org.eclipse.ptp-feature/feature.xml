@@ -28,9 +28,7 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ptp.proxy.protocol"/>
       <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.ui.console"/>
@@ -40,20 +38,13 @@
       <import plugin="org.eclipse.cdt.ui"/>
       <import plugin="org.eclipse.cdt.debug.core"/>
       <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.ptp.debug.core"/>
-      <import plugin="org.eclipse.ptp.ui"/>
       <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="org.eclipse.ptp.remote"/>
-      <import plugin="org.eclipse.ptp.debug.ui"/>
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.help"/>
       <import plugin="org.eclipse.ui.intro"/>
       <import plugin="org.eclipse.ui.intro.universal"/>
-      <import plugin="org.eclipse.ptp.orte.core"/>
-      <import plugin="org.eclipse.ptp.launch"/>
-      <import plugin="org.eclipse.ptp.ibmpe.core"/>
    </requires>
 
    <plugin
@@ -112,41 +103,6 @@
 
    <plugin
          id="org.eclipse.ptp.remote"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.orte.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.orte.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.ibmpe.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.ibmpe.help"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.ibmpe.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
