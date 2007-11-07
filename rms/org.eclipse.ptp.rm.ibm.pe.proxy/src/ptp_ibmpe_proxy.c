@@ -3201,7 +3201,10 @@ main(int argc, char *argv[])
     n = 1;
     while (n < argc) {
 	cp = strchr(argv[n], '=');
-	if (cp != NULL) {
+	if (cp == NULL) {
+	    break;
+	}
+	else {
 	    *cp = '\0';
 	    if (strcmp(argv[n], "--proxy") == 0) {
 		proxy_str = cp + 1;
