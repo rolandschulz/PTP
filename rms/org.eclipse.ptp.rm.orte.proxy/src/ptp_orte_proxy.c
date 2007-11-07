@@ -2149,7 +2149,7 @@ ORTE_Quit(int trans_id, int nargs, char **args)
 int
 server(char *name, char *host, int port)
 {
-	int				rc;
+	int				rc = 0;
 	struct timeval	timeout = {0, 20000};
 	
 	gJobList = NewList();
