@@ -23,9 +23,6 @@ if test ! -d $UTILS; then
 	fi
 fi
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include"
-LIBS="$LIBS -L$UTILS"
-
 dnl
 dnl Check for programs.
 dnl
@@ -35,6 +32,9 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
+CFLAGS="$CFLAGS -Wall -I$UTILS/include"
+LIBS="$LIBS -L$UTILS"
 
 dnl
 dnl Check for libraries.
