@@ -33,6 +33,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPVariable;
 import org.eclipse.ptp.debug.internal.ui.views.CTable;
+import org.eclipse.ptp.debug.internal.ui.views.ICTableCellSelectionListener;
 import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
 import org.eclipse.ptp.debug.internal.ui.views.PTabItem;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -388,6 +389,33 @@ public class ArrayTabItem extends PTabItem {
 	}
 	private void rightPanel(Composite parent) {
 		cTable = new CTable(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		cTable.addCellSelectionListener(new ICTableCellSelectionListener() {
+			public void cellSelected(int col, int row, int statemask) {
+				if (leftContent != null) {
+					boolean isCol = false;
+					boolean isRow = false;
+					for (Control control : leftContent.getChildren()) {
+						if (control instanceof Button) {
+							if (control.getToolTipText().equals(COL_TYPE)) {
+								isCol = ((Button)control).getSelection();
+								continue;
+							}
+							if (control.getToolTipText().equals(ROW_TYPE)) {
+								isRow = ((Button)control).getSelection();
+								continue;
+							}
+						}
+						if (control instanceof Spinner) {
+							if (isCol || isRow) {
+								((Spinner)control).setSelection((isCol?col:row)-1);
+								continue;
+							}
+						}
+					}
+				}				
+			}
+			public void fixedCellSelected(int col, int row, int statemask) {}
+		});
 		//cTable.setRowSelectionMode(true);
 		//cTable.setMultiSelectionMode(true);
 	}
