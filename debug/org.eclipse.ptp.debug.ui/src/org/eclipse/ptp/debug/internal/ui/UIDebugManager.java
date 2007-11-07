@@ -60,7 +60,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  */
 public class UIDebugManager extends JobManager implements IBreakpointListener {
 	private DebugJobStorage consoleStorage = new DebugJobStorage("Console");
-	private PVariableManager jobMgr = new PVariableManager();
+	private PVariableManager jobVarMgr = new PVariableManager();
 	private PAnnotationManager annotationMgr = null;
 	private PDebugModel debugModel = null;
 	private IPSession currentSession = null;
@@ -113,11 +113,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		annotationMgr.shutdown();
-		jobMgr.shutdown();
+		jobVarMgr.shutdown();
 		super.shutdown();
 	}
 	public PVariableManager getJobVariableManager() {
-		return jobMgr;
+		return jobVarMgr;
 	}
 	/**
 	 * Initial preference settings
@@ -146,6 +146,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			return "No job found";
 		
 		return getJobVariableManager().getValue(getJob(), taskID);
+	}
+	public void updateCurrentJobVariableValues() {
+		getJobVariableManager().updateValues(getJob());
 	}
 	/**
 	 * Is Job in debug mode

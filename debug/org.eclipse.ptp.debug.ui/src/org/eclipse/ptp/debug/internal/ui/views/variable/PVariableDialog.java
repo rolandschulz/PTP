@@ -121,10 +121,13 @@ public class PVariableDialog extends Dialog {
 		varTable.setLayoutData(gd);
 		varTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (((TableItem)e.item).getChecked()) {
+				TableItem item = (TableItem)e.item;
+				boolean checked = item.getChecked();
+				if (checked) {
 					varText.setText("");
 				}
 				updateButtons();
+				item.setChecked(checked);
 			}
 		});
 
@@ -263,23 +266,21 @@ public class PVariableDialog extends Dialog {
 		initContent();
 		return composite;
 	}
-	protected String[] getSelectedAvailableVariables() {
+	protected String[] getSelectedVariables() {
 		List<String> vars = new ArrayList<String>();
 		TableItem[] items = varTable.getItems();
 		for (int i=0; i<items.length; i++) {
-			if (items[i].getChecked())
+			if (items[i].getChecked()) {
 				vars.add(items[i].getText());
-		}
-		return (String[])vars.toArray(new String[0]);
-	}
-	protected String[] getSelectedVariables() {
-		String[] vars = getSelectedAvailableVariables();
-		if (vars.length == 0) {
-			if (varText.getText().length() > 0) {
-				return new String[] { varText.getText() };
+				items[i].setChecked(mode==NEW_MODE);
 			}
 		}
-		return vars;
+		if (vars.size() == 0) {
+			if (varText.getText().length() > 0) {
+				vars.add(varText.getText());
+			}
+		}
+		return (String[])vars.toArray(new String[0]);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
@@ -289,7 +290,6 @@ public class PVariableDialog extends Dialog {
 		IPJob job = view.getUIManager().getJob();
 		String[] vars = getSelectedVariables();
 		boolean checked = checkBtn.getSelection();
-
 		switch(mode) {
 		case NEW_MODE:
 			//check duplicate variable
