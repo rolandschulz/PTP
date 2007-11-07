@@ -20,14 +20,16 @@
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.search"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.ptp.proxy.protocol"/>
-      <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.remote"/>
+      <import plugin="org.eclipse.ptp.proxy.protocol"/>
       <import plugin="org.eclipse.ptp.ui"/>
       <import plugin="org.eclipse.ptp.launch"/>
+      <import plugin="org.eclipse.ptp.proxy"/>
+      <import plugin="org.eclipse.ptp.utils"/>
    </requires>
 
    <plugin
