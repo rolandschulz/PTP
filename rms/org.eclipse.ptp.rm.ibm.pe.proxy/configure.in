@@ -36,15 +36,6 @@ if test ! -d $PROXY; then
 	fi
 fi
 
-LIBS="$LIBS -L$UTILS -L$PROXY"
-
-os=`uname -s`
-if test "x$os" = "xAIX" ; then
-	CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt  -I$UTILS/include -I$PROXY/include"
-else
-	CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
-fi
-
 dnl
 dnl Check for programs.
 dnl
@@ -54,6 +45,16 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+	CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+	CFLAGS="$CFLAGS -Wall"
+fi
+
+CFLAGS="$CFLAGS -I$UTILS/include -I$PROXY/include"
+LIBS="$LIBS -L$UTILS -L$PROXY"
 
 dnl
 dnl Check for libraries.

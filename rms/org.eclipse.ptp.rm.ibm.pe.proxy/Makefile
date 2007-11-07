@@ -100,7 +100,7 @@ AUTOMAKE = ${SHELL} /Users/greg/Documents/workspaces/ptp_head/org.eclipse.ptp.ib
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS =  -Wall -I../org.eclipse.ptp.utils/include -I../org.eclipse.ptp.proxy/include
+CFLAGS = -g -O2 -Wall -I../org.eclipse.ptp.utils/include -I../org.eclipse.ptp.proxy/include
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo

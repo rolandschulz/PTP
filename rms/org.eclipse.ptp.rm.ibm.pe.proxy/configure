@@ -1769,15 +1769,6 @@ echo "$as_me: error: proxy directory not found" >&2;}
 	fi
 fi
 
-LIBS="$LIBS -L$UTILS -L$PROXY"
-
-os=`uname -s`
-if test "x$os" = "xAIX" ; then
-	CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt  -I$UTILS/include -I$PROXY/include"
-else
-	CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
-fi
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3174,6 +3165,16 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+	CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+	CFLAGS="$CFLAGS -Wall"
+fi
+
+CFLAGS="$CFLAGS -I$UTILS/include -I$PROXY/include"
+LIBS="$LIBS -L$UTILS -L$PROXY"
 
 
 
