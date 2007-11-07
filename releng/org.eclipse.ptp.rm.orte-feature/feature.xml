@@ -26,10 +26,10 @@
       <import plugin="org.eclipse.ptp.proxy.protocol"/>
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.remote"/>
-      <import plugin="org.eclipse.ptp.ui"/>
-      <import plugin="org.eclipse.ptp.launch"/>
       <import plugin="org.eclipse.ptp.utils"/>
       <import plugin="org.eclipse.ptp.proxy"/>
+      <import plugin="org.eclipse.ptp.ui"/>
+      <import plugin="org.eclipse.ptp.launch"/>
    </requires>
 
    <plugin
@@ -51,5 +51,11 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.debug.sdm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>
