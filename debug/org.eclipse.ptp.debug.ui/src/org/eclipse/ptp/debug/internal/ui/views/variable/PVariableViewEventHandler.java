@@ -25,14 +25,11 @@ import org.eclipse.ptp.debug.internal.ui.PVariableManager;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
-import org.eclipse.ptp.ui.listeners.ISetListener;
-import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author Clement chu
  */
-public class PVariableViewEventHandler extends AbstractPDebugViewEventHandler implements IJobChangedListener, ISetListener {
+public class PVariableViewEventHandler extends AbstractPDebugViewEventHandler implements IJobChangedListener {
 	private PVariableManager varMgr;
 	/**
 	 * Constructs a new event handler on the given view
@@ -41,11 +38,9 @@ public class PVariableViewEventHandler extends AbstractPDebugViewEventHandler im
 	public PVariableViewEventHandler(PVariableView view) {
 		super(view);
 		varMgr = PTPDebugUIPlugin.getUIDebugManager().getJobVariableManager();
-		PTPDebugUIPlugin.getUIDebugManager().addSetListener(this);
 		PTPDebugUIPlugin.getUIDebugManager().addJobChangedListener(this);
 	}
 	public void dispose() {
-		PTPDebugUIPlugin.getUIDebugManager().removeSetListener(this);
 		PTPDebugUIPlugin.getUIDebugManager().removeJobChangedListener(this);
 		super.dispose();
 	}
@@ -62,25 +57,9 @@ public class PVariableViewEventHandler extends AbstractPDebugViewEventHandler im
 	 */
 	protected void doHandleDebugEvent(IPDebugEvent event, IProgressMonitor monitor) {
 		switch(event.getKind()) {
-			case IPDebugEvent.CREATE:
-				switch (event.getDetail()) {
-				case IPDebugEvent.DEBUGGER:
-					getPVariableView().updateActionsEnable();
-					refresh();
-					break;
-				}
-				break;
 			case IPDebugEvent.RESUME:
 				IPDebugInfo info = event.getInfo();
 				varMgr.resetValue(info.getJob(), info.getAllTasks());
-				break;
-			case IPDebugEvent.TERMINATE:
-				switch (event.getDetail()) {
-				case IPDebugEvent.DEBUGGER:
-					getPVariableView().updateActionsEnable();
-					refresh();
-					break;
-				}
 				break;
 		}
 	}
@@ -102,11 +81,4 @@ public class PVariableViewEventHandler extends AbstractPDebugViewEventHandler im
 		}
 		getPVariableView().updateActionsEnable();
 	}
-	public void deleteSetEvent(IElementSet set) {}
-	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {
-		//updateVariableValueOnChange();		
-	}
-	public void createSetEvent(IElementSet set, IElement[] elements) {}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {}
 }

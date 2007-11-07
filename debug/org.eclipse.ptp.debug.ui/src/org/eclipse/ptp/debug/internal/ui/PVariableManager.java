@@ -14,11 +14,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
@@ -91,11 +95,50 @@ public class PVariableManager {
 			info.setEnabled(enabled);
 		}
 	}
+	public void updateValues(IPJob job) {
+		try {
+			updateValues(job, getSession(job).getTasks());
+		}
+		catch (CoreException ce) {
+			ce.printStackTrace();
+		}
+	}
+	public void updateValues(final IPJob job, final BitList tasks) {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			  public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				  try {
+					  IPDISession session = getSession(job).getPDISession();
+					  BitList targetTasks = session.getTaskManager().getSuspendedTasks(tasks);
+					  if (targetTasks.isEmpty())
+						  monitor.done();
+					  else
+						  session.getExpressionManager().updateMultiExpressions(targetTasks, monitor);
+				  }
+				  catch (CoreException ce) {
+					  throw new InterruptedException(ce.getMessage());
+				  }
+				  catch (PDIException e) {
+					  throw new InterruptedException(e.getMessage());
+				  }
+			  }
+		};
+		try {
+			new ProgressMonitorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException ie) {
+			ie.printStackTrace();
+		}
+	}
 	public String getValue(final IPJob job, final int task) {
 		try {
 			IPSession session = getSession(job);
 			IPDIExpression[] expressions = session.getPDISession().getExpressionManager().getMultiExpressions(task);
 			if (expressions == null || expressions.length == 0)
+				return "";
+
+			IPProcess p = job.getProcessByIndex(task);
+			if (p == null || p.getState() != ProcessAttributes.State.SUSPENDED)
 				return "";
 			
 			StringBuffer display = new StringBuffer();
