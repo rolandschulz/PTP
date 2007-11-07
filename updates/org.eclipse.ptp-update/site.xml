@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site >
-   <description url="http://download.eclipse.org/tools/ptp/releases/1.1.1">
-      Parallel Tools Platform update site - Release 1.1.1
+<site>
+   <description url="http://download.eclipse.org/tools/ptp/releases/2.0">
+      Parallel Tools Platform update site - Release 2.0
    </description>
-   <feature url="features/org.eclipse.ptp_1.1.1.jar" id="org.eclipse.ptp" version="1.1.1">
+   <feature url="features/org.eclipse.ptp_2.0.0.200711071148.jar" id="org.eclipse.ptp" version="2.0.0.200711071148">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.pldt_1.1.1.jar" id="org.eclipse.ptp.pldt" version="1.1.1">
-      <category name="Parallel Language Development Tools"/>
+   <feature url="features/org.eclipse.ptp.pldt_2.0.0.qualifier.jar" id="org.eclipse.ptp.pldt" version="2.0.0.qualifier">
+      <category name="Parallel Tools Platform"/>
    </feature>
-   <category-def name="Parallel Tools Platform" label="PTP"/>
-   <category-def name="Parallel Language Development Tools" label="PLDT"/>
+   <feature url="features/org.eclipse.ptp.external_2.0.0.200711071148.jar" id="org.eclipse.ptp.external" version="2.0.0.200711071148">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.remote.rse_2.0.0.200711071148.jar" id="org.eclipse.ptp.remote.rse" version="2.0.0.200711071148">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.ibmpe_2.0.0.200711071148.jar" id="org.eclipse.ptp.ibmpe" version="2.0.0.200711071148">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.lsf_2.0.0.200711071148.jar" id="org.eclipse.ptp.lsf" version="2.0.0.200711071148">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.mpich2_2.0.0.200711071148.jar" id="org.eclipse.ptp.mpich2" version="2.0.0.200711071148">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.orte_2.0.0.200711071148.jar" id="org.eclipse.ptp.orte" version="2.0.0.200711071148">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <category-def name="Parallel Tools Platform" label="Parallel Tools Platform"/>
 </site>
