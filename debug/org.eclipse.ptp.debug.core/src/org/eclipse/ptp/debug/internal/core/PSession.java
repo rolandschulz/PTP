@@ -511,8 +511,6 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param event
 	 */
 	public void fireErrorEvent(IPDIErrorEvent event) {
-		changeProcessState(event.getTasks(), ProcessAttributes.State.ERROR);
-
 		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
 		int detail = IPDebugEvent.UNSPECIFIED;
 		IPDISessionObject reason = event.getReason();
@@ -521,6 +519,8 @@ public class PSession implements IPSession, IPDIEventListener {
 			switch (code) {
 			case IPDIErrorInfo.DBG_FATAL:
 				detail = IPDebugEvent.ERR_FATAL;
+				//only fatal error reports process error
+				changeProcessState(event.getTasks(), ProcessAttributes.State.ERROR);
 				break;
 			case IPDIErrorInfo.DBG_WARNING:
 				detail = IPDebugEvent.ERR_WARNING;
