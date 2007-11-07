@@ -31,9 +31,6 @@ if test ! -d $PROXY; then
 	fi
 fi
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
-LIBS="$LIBS -L$UTILS -L$PROXY"
-
 dnl
 dnl Check for programs.
 dnl
@@ -43,6 +40,9 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
+LIBS="$LIBS -L$UTILS -L$PROXY"
 
 dnl
 dnl Check for libraries.

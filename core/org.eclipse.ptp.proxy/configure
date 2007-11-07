@@ -1754,9 +1754,6 @@ echo "$as_me: error: utils directory not found" >&2;}
 	fi
 fi
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include"
-LIBS="$LIBS -L$UTILS"
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3153,6 +3150,9 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+
+CFLAGS="$CFLAGS -Wall -I$UTILS/include"
+LIBS="$LIBS -L$UTILS"
 
 
 

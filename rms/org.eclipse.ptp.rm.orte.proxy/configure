@@ -1769,9 +1769,6 @@ echo "$as_me: error: proxy directory not found" >&2;}
 	fi
 fi
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
-LIBS="$LIBS -L$UTILS -L$PROXY"
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -2951,6 +2948,9 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
+LIBS="$LIBS -L$UTILS -L$PROXY"
 
 
 
