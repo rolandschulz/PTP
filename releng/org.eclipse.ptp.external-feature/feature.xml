@@ -27,48 +27,48 @@
          id="org.eclipse.ptp.aix.ppc"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"
+         version="0.0.0"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.linux.ppc"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"
+         version="0.0.0"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.linux.x86"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"
+         version="0.0.0"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.linux.x86_64"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"
+         version="0.0.0"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.macosx.ppc"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"
+         version="0.0.0"
          fragment="true"/>
 
    <plugin
          id="org.eclipse.ptp.proxy"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.utils"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.macosx.x86"
