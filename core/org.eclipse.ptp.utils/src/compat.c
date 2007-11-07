@@ -19,7 +19,7 @@
 
 #include "compat.h"
 
-#ifdef __linux__
+#if defined (__linux__) || defined (_AIX)
 int
 digittoint(int c)
 {
@@ -55,12 +55,28 @@ asprintf(char ** ret, const char * fmt, ...)
 
 	va_start(ap, fmt);
 
-	len = snprintf(buf, 2, fmt, ap);	/* get length of string first */
+	len = vsnprintf(buf, 2, fmt, ap);	/* get length of string first */
 	*ret = malloc(len+1);
-	len = snprintf(*ret, len+1, fmt, ap);
+	len = vsnprintf(*ret, len+1, fmt, ap);
 
 	va_end(ap);
 	return len;
 }
 
 #endif /* !HAVE_ASPRINTF */
+
+#ifdef _AIX
+/*
+* The vasprintf function is not implemented for AIX. Since no
+* code in the Parallel Environment proxy calls vasprintf at this 
+* time, the only requirement is to provide an alternate function
+* to satisfy the linker (since code in proxy_event.c, unused by
+* the PE proxy, does call vasprintf).
+* For now, all this alternate function does is call abort(),
+* assuring a proxy crash if anything ever does call vasprintf
+*/
+int vasprintf(char **strp, const char *fmt, va_list ap)
+{
+	abort();
+}
+#endif /* _AIX */

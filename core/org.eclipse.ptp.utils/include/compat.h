@@ -51,6 +51,8 @@
 #include <limits.h>
 #define BITSPERBYTE     CHAR_BIT
 extern int digittoint(int);
+#elif _AIX
+#define BITSPERBYTE 8
 #else
 #error "Need to define BITSPERBYTE for your operating system"
 #endif
