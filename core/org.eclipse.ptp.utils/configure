@@ -1743,8 +1743,6 @@ build_os=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 
 
-CFLAGS="$CFLAGS -Wall"
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3141,6 +3139,13 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+	CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+	CFLAGS="$CFLAGS -Wall"
+fi
 
 
 
