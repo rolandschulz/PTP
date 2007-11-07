@@ -18,11 +18,6 @@
       %license
    </license>
 
-   <requires>
-      <import plugin="org.eclipse.ptp.proxy"/>
-      <import plugin="org.eclipse.ptp.utils"/>
-   </requires>
-
    <plugin
          id="org.eclipse.ptp.aix.ppc"
          download-size="0"
