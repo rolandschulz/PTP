@@ -28,6 +28,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.views.IToolTipProvider;
 
 /**
  * @author clement
@@ -130,7 +131,7 @@ public class PVariableManager {
 			ie.printStackTrace();
 		}
 	}
-	public String getValue(final IPJob job, final int task) {
+	public String getValue(final IPJob job, final int task, final IToolTipProvider provider) {
 		try {
 			IPSession session = getSession(job);
 			IPDIExpression[] expressions = session.getPDISession().getExpressionManager().getMultiExpressions(task);
@@ -162,6 +163,8 @@ public class PVariableManager {
 								  catch (PDIException e) {
 									  throw new InterruptedException(e.getMessage());
 								  }
+								  if (provider != null)
+									  provider.update(null, getValue(job, task, null));
 							  }
 						};
 						queueRunnable(runnable);

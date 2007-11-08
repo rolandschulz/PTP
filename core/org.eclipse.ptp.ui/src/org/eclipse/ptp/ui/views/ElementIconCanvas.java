@@ -163,4 +163,14 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		super.doSelectionAll();
 		setSelection(new StructuredSelection(getSelectedElements()));
 	}
+	public void updateToolTipText(Object obj, final String content) {
+		getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				if (fInformationControl != null) {
+					fInformationControl.setInformation(content);
+					fInformationControl.getShellSize();
+				}
+			}
+		});
+	}
 }

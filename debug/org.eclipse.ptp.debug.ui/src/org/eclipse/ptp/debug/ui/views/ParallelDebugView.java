@@ -326,7 +326,7 @@ public class ParallelDebugView extends ParallelJobsView {
 		if (obj == null)
 			return new String[] {"", ""};
 		String[] header = super.getToolTipText(obj);
-		String variableText = ((UIDebugManager) manager).getValueText(new Integer(((IPProcess)obj).getProcessIndex()).intValue());
+		String variableText = ((UIDebugManager) manager).getValueText(new Integer(((IPProcess)obj).getProcessIndex()).intValue(), this);
 		if (variableText != null && variableText.length() > 0) {
 			return new String[] { header[0], variableText };
 		}
