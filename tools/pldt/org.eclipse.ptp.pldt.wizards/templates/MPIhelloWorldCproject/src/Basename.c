@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mpi.h"
-// Sample MPI program
+
 int main(int argc, char* argv[]){
 	int  my_rank; /* rank of process */
 	int  p;       /* number of processes */
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]){
 		   dest, tag, MPI_COMM_WORLD);
 	}
 	else{
-		printf("From process 0: Num processes: %d\n",p);
+		printf("Hello From process 0: Num processes: %d\n",p);
 		for (source = 1; source < p; source++) {
 			MPI_Recv(message, 100, MPI_CHAR, source, tag,
 			      MPI_COMM_WORLD, &status);

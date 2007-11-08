@@ -1,3 +1,12 @@
+/*
+ ============================================================================
+ Name        : $(baseName).c
+ Author      : $(author)
+ Version     :
+ Copyright   : $(copyright)
+ Description : Calculate Pi in MPI
+ ============================================================================
+ */
 #include <mpi.h>
 #include <stdio.h>
 #include <string.h>
