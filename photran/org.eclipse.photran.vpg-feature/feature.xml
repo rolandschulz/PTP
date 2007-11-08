@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran.vpg_feature"
       label="Photran Analysis &amp; Refactoring Feature"
-      version="4.0.2"
+      version="4.0.3"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
       os="linux,macosx,solaris,win32"
       nl="en_US">
@@ -149,21 +149,21 @@ Inc. in the United States, other countries, or both.
    </license>
 
    <requires>
-      <import feature="org.eclipse.photran_feature" version="4.0.2" match="perfect"/>
+      <import feature="org.eclipse.photran_feature" version="4.0.3"/>
    </requires>
 
    <plugin
          id="org.eclipse.photran.core.vpg"
          download-size="0"
          install-size="0"
-         version="4.0.2"
+         version="4.0.3"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.ui.vpg"
          download-size="0"
          install-size="0"
-         version="4.0.2"
+         version="4.0.3"
          unpack="false"/>
 
 </feature>

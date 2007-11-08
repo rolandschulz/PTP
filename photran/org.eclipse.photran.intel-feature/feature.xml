@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran.intel"
       label="%featureName"
-      version="4.0.2"
+      version="4.0.3"
       provider-name="%providerName"
       os="linux">
 
@@ -19,7 +19,7 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.photran_feature" version="4.0.0"/>
+      <import feature="org.eclipse.photran_feature" version="4.0.3"/>
    </requires>
 
    <plugin
@@ -28,7 +28,7 @@
          arch="ia64,x86"
          download-size="0"
          install-size="0"
-         version="4.0.2"/>
+         version="4.0.3"/>
 
    <plugin
          id="org.eclipse.photran.core.intel"
@@ -36,6 +36,6 @@
          arch="ia64,x86"
          download-size="0"
          install-size="0"
-         version="4.0.2"/>
+         version="4.0.3"/>
 
 </feature>

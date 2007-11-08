@@ -12,6 +12,8 @@ package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ISourceRange;
+import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
@@ -25,8 +27,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.MarginPainter;
@@ -42,7 +46,10 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate;
@@ -57,6 +64,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.IShowInSource;
@@ -65,6 +74,7 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -73,7 +83,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  * 
  * @author Jeff Overbey
  */
-public abstract class AbstractFortranEditor extends TextEditor //implements ISelectionChangedListener
+public abstract class AbstractFortranEditor extends TextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
@@ -170,15 +180,15 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
         setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID });
     }
 
-    /**
-     * Create actions that will be registered with the editor.
-     */
-    protected void createActions()
-    {
-        super.createActions();
-        createAction(new FortranBlockCommentActionDelegate(this), BLOCK_COMMENT_COMMAND_ID);
-        //createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
-    }
+//    /**
+//     * Create actions that will be registered with the editor.
+//     */
+//    protected void createActions()
+//    {
+//        super.createActions();
+//        createAction(new FortranBlockCommentActionDelegate(this), BLOCK_COMMENT_COMMAND_ID);
+//        //createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
+//    }
 
     protected void createAction(IAction action, String id)
     {
@@ -369,7 +379,7 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
 	public CContentOutlinePage getOutlinePage() {
 		if (fOutlinePage == null) {
 			fOutlinePage = new CContentOutlinePage(null);
-			//fOutlinePage.addSelectionChangedListener(this);
+			fOutlinePage.addSelectionChangedListener(this);
 		}
 		setOutlinePageInput(fOutlinePage, getEditorInput());
 		return fOutlinePage;
@@ -388,14 +398,6 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
 		}
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
 //    /**
 //     * Gets the outline page of the c-editor.
 //     * 
@@ -431,124 +433,111 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
 //            page.setInput(manager.getWorkingCopy(input));
 //        }
 //    }
-//    
-//    // ISelectionChangedListener Implementation ///////////////////////////////////////////////////
-//    // (for updating editor when Outline clicked)
-//    
-//    public void selectionChanged(SelectionChangedEvent event) {
-//        ISelection sel = event.getSelection();
-//        if (sel instanceof IStructuredSelection) {
-//            IStructuredSelection selection = (IStructuredSelection) sel;
-//            Object obj = selection.getFirstElement();
-//            if (obj instanceof ISourceReference) {
-//                try {
-//                    ISourceRange range = ((ISourceReference) obj).getSourceRange();
-//                    if (range != null) {
-//                        setSelection(range, !isActivePart());
-//                    }
-//                } catch (CModelException e) {
-//                    // Selection change not applied.
-//                }
-//            }
-//        }
-//    }
-//    
-//    /**
-//     * Checks is the editor active part.
-//     * 
-//     * @return <code>true</code> if editor is the active part of the
-//     *         workbench.
-//     */
-//    protected boolean isActivePart() {
-//        IWorkbenchWindow window = getSite().getWorkbenchWindow();
-//        IPartService service = window.getPartService();
-//        return (this == service.getActivePart());
-//    }
-//
-//    /**
-//     * Sets the current editor selection to the source range. Optionally sets
-//     * the current editor position.
-//     * 
-//     * @param element
-//     *            the source range to be shown in the editor, can be null.
-//     * @param moveCursor
-//     *            if true the editor is scrolled to show the range.
-//     */
-//    public void setSelection(ISourceRange element, boolean moveCursor) {
-//    
-//        if (element == null) {
-//            return;
-//        }
-//    
-//        try {
-//            IRegion alternateRegion = null;
-//            int start = element.getStartPos();
-//            int length = element.getLength();
-//    
-//            // Sanity check sometimes the parser may throw wrong numbers.
-//            if (start < 0 || length < 0) {
-//                start = 0;
-//                length = 0;
-//            }
-//    
-//            // 0 length and start and non-zero start line says we know
-//            // the line for some reason, but not the offset.
-//            if (length == 0 && start == 0 && element.getStartLine() > 0) {
-//                // We have the information in term of lines, we can work it out.
-//                // Binary elements return the first executable statement so we
-//                // have to substract -1
-//                start = getDocumentProvider().getDocument(getEditorInput())
-//                        .getLineOffset(element.getStartLine() - 1);
-//                if (element.getEndLine() > 0) {
-//                    length = getDocumentProvider()
-//                            .getDocument(getEditorInput()).getLineOffset(
-//                                    element.getEndLine())
-//                            - start;
-//                } else {
-//                    length = start;
-//                }
-//                // create an alternate region for the keyword highlight.
-//                alternateRegion = getDocumentProvider().getDocument(
-//                        getEditorInput()).getLineInformation(
-//                        element.getStartLine() - 1);
-//                if (start == length || length < 0) {
-//                    if (alternateRegion != null) {
-//                        start = alternateRegion.getOffset();
-//                        length = alternateRegion.getLength();
-//                    }
-//                }
-//            }
-//            setHighlightRange(start, length, moveCursor);
-//    
-//            if (moveCursor) {
-//                start = element.getIdStartPos();
-//                length = element.getIdLength();
-//                if (start == 0 && length == 0 && alternateRegion != null) {
-//                    start = alternateRegion.getOffset();
-//                    length = alternateRegion.getLength();
-//                }
-//                if (start > -1 && getSourceViewer() != null) {
-//                    getSourceViewer().revealRange(start, length);
-//                    getSourceViewer().setSelectedRange(start, length);
-//                }
-//                // JO: This was used in CDT 3.3 and earlier
-//                // Replaced constant with literal string since CTextEditorActionConstants no longer exists in CDT 4
-//                //updateStatusField(CTextEditorActionConstants.STATUS_CURSOR_POS);
-//                updateStatusField("CursorPosition");
-//                
-//                // JO: This is used in CDT 4.0 (7/18/07) according to CEditor.java
-//                updateStatusField(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
-//            }
-//            return;
-//        } catch (IllegalArgumentException x) {
-//            // No information to the user
-//        } catch (BadLocationException e) {
-//            // No information to the user
-//        }
-//    
-//        if (moveCursor)
-//            resetHighlightRange();
-//    }
+    
+    // ISelectionChangedListener Implementation ///////////////////////////////////////////////////
+    // (for updating editor when Outline clicked)
+    
+    /**
+     * React to changed selection in the outline view.
+     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+     */
+    public void selectionChanged(SelectionChangedEvent event) {
+        ISelection sel = event.getSelection();
+        if (sel instanceof IStructuredSelection) {
+            IStructuredSelection selection = (IStructuredSelection) sel;
+            Object obj = selection.getFirstElement();
+            if (obj instanceof ISourceReference) {
+                try {
+                    ISourceRange range = ((ISourceReference) obj).getSourceRange();
+                    if (range != null) {
+                        setSelection(range, !isActivePart());
+                    }
+                } catch (CModelException e) {
+                    // Selection change not applied.
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the current editor selection to the source range. Optionally
+     * sets the current editor position.
+     *
+     * @param element the source range to be shown in the editor, can be null.
+     * @param moveCursor if true the editor is scrolled to show the range.
+     */
+    public void setSelection(ISourceRange element, boolean moveCursor) {
+
+        if (element == null) {
+            return;
+        }
+
+        try {
+            IRegion alternateRegion = null;
+            int start = element.getStartPos();
+            int length = element.getLength();
+
+            // Sanity check sometimes the parser may throw wrong numbers.
+            if (start < 0 || length < 0) {
+                start = 0;
+                length = 0;
+            }
+
+            // 0 length and start and non-zero start line says we know
+            // the line for some reason, but not the offset.
+            if (length == 0 && start == 0 && element.getStartLine() > 0) {
+                // We have the information in term of lines, we can work it out.
+                // Binary elements return the first executable statement so we have to substract -1
+                start = getDocumentProvider().getDocument(getEditorInput()).getLineOffset(element.getStartLine() - 1);
+                if (element.getEndLine() > 0) {
+                    length = getDocumentProvider().getDocument(getEditorInput()).getLineOffset(element.getEndLine()) - start;
+                } else {
+                    length = start;
+                }
+                // create an alternate region for the keyword highlight.
+                alternateRegion = getDocumentProvider().getDocument(getEditorInput()).getLineInformation(element.getStartLine() - 1);
+                if (start == length || length < 0) {
+                    if (alternateRegion != null) {
+                        start = alternateRegion.getOffset();
+                        length = alternateRegion.getLength();
+                    }
+                }
+            }
+            setHighlightRange(start, length, moveCursor);
+
+            if (moveCursor) {
+                start = element.getIdStartPos();
+                length = element.getIdLength();
+                if (start == 0 && length == 0 && alternateRegion != null) {
+                    start = alternateRegion.getOffset();
+                    length = alternateRegion.getLength();
+                }
+                if (start > -1 && getSourceViewer() != null) {
+                    getSourceViewer().revealRange(start, length);
+                    getSourceViewer().setSelectedRange(start, length);
+                }
+                updateStatusField(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
+            }
+            return;
+        } catch (IllegalArgumentException x) {
+            // No information to the user
+        } catch (BadLocationException e) {
+            // No information to the user
+        }
+
+        if (moveCursor)
+            resetHighlightRange();
+    }
+
+    /**
+     * Checks is the editor active part. 
+     * @return <code>true</code> if editor is the active part of the workbench.
+     */
+    private boolean isActivePart() {
+        IWorkbenchWindow window = getSite().getWorkbenchWindow();
+        IPartService service = window.getPartService();
+        return (this == service.getActivePart());
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Utility Methods

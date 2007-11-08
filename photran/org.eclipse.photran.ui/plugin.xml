@@ -121,13 +121,6 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.CommentCommand"/>
-        <!-- The above don't seem to work anymore... something else is taking over those keystrokes,
-             so install this one as well -->
-        <key
-            sequence="M1+M2+1"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.CommentCommand"/>
    </extension>
 
    <!-- Define toggling a breakpoint as the default double-click action -->

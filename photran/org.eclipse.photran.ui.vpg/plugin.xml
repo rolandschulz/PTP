@@ -204,7 +204,7 @@
             sequence="M3+M2+I"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.IntroduceImplicitNoneRefactoringCommand"
+            commandId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
      />
      <key
             sequence="M3+M2+R"

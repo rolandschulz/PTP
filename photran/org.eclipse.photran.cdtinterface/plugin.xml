@@ -34,8 +34,6 @@
       <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
          <perspectiveShortcut id="org.eclipse.debug.ui.DebugPerspective"/>
          <perspectiveShortcut id="org.eclipse.team.ui.TeamSynchronizingPerspective"/>
-         <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
-         <actionSet id="org.eclipse.cdt.managedbuilder.ui.buildConfigActionSet"/>
          <view
                id="org.eclipse.cdt.make.ui.views.MakeView"
                relationship="stack"
@@ -43,6 +41,18 @@
                visible="true"/>
          <viewShortcut id="org.eclipse.cdt.make.ui.views.MakeView"/>
          <actionSet id="org.eclipse.cdt.make.ui.makeTargetActionSet"/>
+
+	 <!-- Copied from CDT UI for CDT 4.0 -->
+         <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
+         <actionSet id="org.eclipse.cdt.ui.buildConfigActionSet"/>
+         <actionSet id="org.eclipse.cdt.ui.NavigationActionSet"/>
+         <actionSet id="org.eclipse.cdt.ui.OpenActionSet"/>
+         <actionSet id="org.eclipse.ui.edit.text.actionSet.presentation"/>
+         <!--showInPart id="org.eclipse.cdt.ui.includeBrowser"/-->
+         <!--showInPart id="org.eclipse.cdt.ui.CView"/-->
+         <!--showInPart id="org.eclipse.ui.navigator.ProjectExplorer"/-->
+         <viewShortcut id="org.eclipse.ui.navigator.ProjectExplorer"/>
+         <viewShortcut id="org.eclipse.cdt.ui.includeBrowser"/>
       </perspectiveExtension>
    </extension>
 
