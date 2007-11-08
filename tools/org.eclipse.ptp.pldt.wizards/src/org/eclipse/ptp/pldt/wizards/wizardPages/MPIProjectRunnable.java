@@ -52,6 +52,7 @@ import org.osgi.framework.Bundle;
  */
 public class MPIProjectRunnable implements Runnable {
 	private static final boolean traceOn=false;
+	private boolean wizTraceOn=MPIProjectWizardPage.wizardTraceOn;
 
 	/**
 	 * Take the info from the MPI project wizard page and fix up the project include paths etc.
@@ -59,8 +60,16 @@ public class MPIProjectRunnable implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
+		if(wizTraceOn)System.out.println("MPIProjectRunnable().run()...");
+		
 		String pageID = MPIProjectWizardPage.PAGE_ID;
 		String propID = MPIProjectWizardPage.DO_MPI_INCLUDES;
+		
+		String key=StoreInfoProcessRunner.PROJECT_TYPE_KEY;
+		Object projectType=MBSCustomPageManager.getPageProperty(pageID, key);
+		if(traceOn)System.out.println("  projectType="+projectType);
+
+		
 		Object obj = MBSCustomPageManager.getPageProperty(pageID, propID);
 		boolean doMpiIncludes = MPIProjectWizardPage.getDefaultUseMpiIncludes();
 		if (obj != null)

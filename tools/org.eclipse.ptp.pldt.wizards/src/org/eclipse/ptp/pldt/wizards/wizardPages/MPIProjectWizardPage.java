@@ -15,12 +15,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageData;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
+import org.eclipse.cdt.ui.wizards.CProjectWizard;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.swt.SWT;
@@ -48,6 +56,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class MPIProjectWizardPage extends MBSCustomPage {
 	private static final boolean traceOn=false;
+	public static final boolean wizardTraceOn=false;
 
 	private Composite composite;
 	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage";
@@ -118,10 +127,18 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * The CDT new project wizard page for MPI projects.  
 	 * Adds the include paths, library information, etc. for an MPI project.
 	 * This page shows up after the other CDT new project wizard pages.
+	 * @throws CoreException 
 	 * 
 	 */
-	public MPIProjectWizardPage() {
+	public MPIProjectWizardPage() throws CoreException {
 		super(PAGE_ID);
+		if(wizardTraceOn)System.out.println("MPIProjectWizardPage().ctor...");
+		String key=StoreInfoProcessRunner.PROJECT_TYPE_KEY;
+		Object projectType=MBSCustomPageManager.getPageProperty(pageID, key);
+		if(wizardTraceOn)System.out.println("  projectType="+projectType);
+		
+		
+
 
 		//CommonPlugin.log(IStatus.ERROR,"Test error");
 		//CommonPlugin.log(IStatus.WARNING,"Test warning");
@@ -151,6 +168,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * Warn user that the MPI project preferences aren't set, and thus the new project wizard will not be very useful.
 	 * <br>
 	 * TODO: do we need a "do not show this message again" setting?
+	 * TODO: need to not show this UNLESS it's really an MPI project.
 	 */
 	private void showNoPrefs() {
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -363,6 +381,15 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * @param defaultEnabled indicates if the "use defaults" checkbox is to be initially selected.
 	 */
 	private void createUserEntryArea(Composite composite, boolean defaultEnabled) {
+		//?? err? causes things to happen in wrong order??   IProject project = this.getProject();
+		//String name = project.getName();
+		if(wizardTraceOn)System.out.println("MPIProjectWizardPage.createUserEntryArea() " );
+
+		String key=StoreInfoProcessRunner.PROJECT_TYPE_KEY;
+		Object pto=MBSCustomPageManager.getPageProperty(pageID, key);
+		String projectType=(String)pto;
+		if(wizardTraceOn)System.out.println("  projectType="+projectType); 
+		
 		includePathLabel = new Label(composite, SWT.NONE);
 		includePathLabel.setText("Include path:");
 		includePathLabel.setToolTipText("Location of MPI include path(s)");
@@ -509,7 +536,8 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 				MBSCustomPageManager.addPageProperty(pageID, DO_MPI_INCLUDES, Boolean.toString(useMpiProjectSettings));
 				
 				useDefaultsButton.setEnabled(useMpiProjectSettings);
-				mpiSampleButton.setEnabled(useMpiProjectSettings);
+				if(mpiSampleButton!=null)
+				   mpiSampleButton.setEnabled(useMpiProjectSettings);
 				if(useMpiProjectSettings) {
 				  boolean useDefaults=useDefaultsButton.getSelection();
 				  setUserAreaEnabled(!useDefaults);
@@ -705,6 +733,31 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 */
 	public static boolean getDefaultUseMpiIncludes() {
 		return defaultUseMpiIncludes;
+	}
+	
+	public IProject getProject(){
+		CProjectWizard wiz=null;
+		MBSCustomPageData pData = MBSCustomPageManager.getPageData(PAGE_ID);
+		
+
+ 		try {
+			IWizardPage wp = pData.getWizardPage();// in the constructor, this isn't available
+			IWizard w = wp.getWizard();
+			if(w instanceof CProjectWizard){
+				wiz = (CProjectWizard)w;
+			}
+			if(wiz==null){
+				System.out.println("Can't get CProjectWizard from MBS page data. Quitting. No MPI info added to project.");
+				return null;
+			}
+		}
+		catch (Exception e) {
+			Throwable reason = e.getCause();
+			System.out.println(e.getMessage()+" reason: "+reason);
+			
+		}
+		IProject proj=wiz.getProject(true);
+		return proj;
 	}
 
 }

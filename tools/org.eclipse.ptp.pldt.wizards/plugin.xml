@@ -17,7 +17,6 @@
             filterPattern=" "
             id="org.eclipse.ptp.pldt.projects.MPIhelloWorldCProject"
             location="templates/MPIhelloWorldCproject/template.xml"
-            pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIPageProvider"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
       <template
@@ -37,5 +36,19 @@
       </template>
    
    </extension>
+      <extension
+            point="org.eclipse.cdt.core.templateProcessTypes">
+         <processType
+               name="storeInfo"
+               processRunner="org.eclipse.ptp.pldt.wizards.wizardPages.StoreInfoProcessRunner">
+                       <simple
+                  name="projectName">
+            </simple>
+            <simple
+                  name="projectType">
+            </simple>
+
+         </processType>
+      </extension>
 
 </plugin>
