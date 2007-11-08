@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
-import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.swt.SWT;
