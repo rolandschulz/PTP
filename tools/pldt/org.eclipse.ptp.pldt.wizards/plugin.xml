@@ -1,59 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-
-     <extension
-         point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
-      <wizardPage
-            ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage"
-            operationClass="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectRunnable"
-            pageClass="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage"/>
-
-   </extension>
    
-      <extension
-         point="org.eclipse.cdt.core.templates">
+      <extension point="org.eclipse.cdt.core.templates">
       <template
             filterPattern=" "
             id="org.eclipse.ptp.pldt.projects.MPIhelloWorldCProject"
             location="templates/MPIhelloWorldCproject/template.xml"
+            pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcessPages"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
-            <template
-            filterPattern=" "
-            id="org.eclipse.ptp.pldt.projects.MPIpiCProject"
-            location="templates/MPIpiCproject/template.xml"
-            projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+      <template
+                  filterPattern=" "
+                  id="org.eclipse.ptp.pldt.projects.MPIpiCProject"
+                  location="templates/MPIpiCproject/template.xml"
+                  pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcessPages"
+                  projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
       <template
             id="org.eclipse.ptp.pldt.projects.MPIemptyCproject"
             location="templates/MPIemptyCproject/template.xml"
+            pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcessPages"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
-         <template
-            id="org.eclipse.ptp.pldt.projects.OpenMPhelloWorldCProject"
-            location="templates/OpenMPhelloWorldCproject/template.xml"
-            projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+      <template
+               id="org.eclipse.ptp.pldt.projects.OpenMPhelloWorldCProject"
+               location="templates/OpenMPhelloWorldCproject/template.xml"
+               pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectProcessPages"
+               projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
       <template
             id="org.eclipse.ptp.pldt.projects.OpenMPemptyCproject"
             location="templates/OpenMPemptyCproject/template.xml"
+            pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectProcessPages"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
    
    </extension>
-      <extension
-            point="org.eclipse.cdt.core.templateProcessTypes">
+      <extension point="org.eclipse.cdt.core.templateProcessTypes">
          <processType
-               name="storeInfo"
-               processRunner="org.eclipse.ptp.pldt.wizards.wizardPages.StoreInfoProcessRunner">
-                       <simple
-                  name="projectName">
-            </simple>
-            <simple
-                  name="projectType">
-            </simple>
-
+               name="mpiProjectProcess"
+               processRunner="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcess">
+         </processType>
+         <processType
+               name="openMPProjectProcess"
+               processRunner="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectProcess">
          </processType>
       </extension>
 

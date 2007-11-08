@@ -16,9 +16,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.cdt.core.templateengine.TemplateCore;
+import org.eclipse.cdt.core.templateengine.process.ProcessArgument;
+import org.eclipse.cdt.core.templateengine.process.ProcessFailureException;
+import org.eclipse.cdt.core.templateengine.process.ProcessRunner;
 import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
@@ -26,16 +31,14 @@ import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.IOption;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageData;
-import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.wizards.CProjectWizard;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
 import org.osgi.framework.Bundle;
 
@@ -50,27 +53,32 @@ import org.osgi.framework.Bundle;
  * @author Beth Tibbitts
  *
  */
-public class MPIProjectRunnable implements Runnable {
+public class MPIProjectProcess extends ProcessRunner {
 	private static final boolean traceOn=false;
 	private boolean wizTraceOn=MPIProjectWizardPage.wizardTraceOn;
+	//private static final templateID=
 
-	/**
-	 * Take the info from the MPI project wizard page and fix up the project include paths etc.
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run() {
-		if(wizTraceOn)System.out.println("MPIProjectRunnable().run()...");
+	private Map<String,String> valueStore;
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void process(TemplateCore template, ProcessArgument[] args,
+			String processId, IProgressMonitor monitor)
+			throws ProcessFailureException {
+		if(wizTraceOn)System.out.println("MPIProjectProcess().run()...");
 		
+		valueStore= template.getValueStore();
 		String pageID = MPIProjectWizardPage.PAGE_ID;
-		String propID = MPIProjectWizardPage.DO_MPI_INCLUDES;
 		
-		String key=StoreInfoProcessRunner.PROJECT_TYPE_KEY;
-		Object projectType=MBSCustomPageManager.getPageProperty(pageID, key);
-		if(traceOn)System.out.println("  projectType="+projectType);
+		String templateID= template.getTemplateId(); // TODO - is this enough instead of project type?
+		//		Object projectType=valueStore.get("projectType");
+		//		if(traceOn)System.out.println("  projectType="+projectType);
 
-		
-		Object obj = MBSCustomPageManager.getPageProperty(pageID, propID);
+		if(!templateID.startsWith("MPI")) {
+			if(wizTraceOn)System.out.println("templateID="+templateID+" - not MPI - skip this process");
+			return;
+		}
+		Object obj = getNewPropValue(pageID, MPIProjectWizardPage.DO_MPI_INCLUDES, null);
 		boolean doMpiIncludes = MPIProjectWizardPage.getDefaultUseMpiIncludes();
 		if (obj != null)
 			doMpiIncludes = Boolean.valueOf((String) obj);
@@ -79,31 +87,20 @@ public class MPIProjectRunnable implements Runnable {
 				System.out.println("Do not save MPI info in this project.");
 			return;
 		}
-		MBSCustomPageData pData = MBSCustomPageManager.getPageData(pageID);
+
  		CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
 
- 		try {
-			IWizardPage wp = pData.getWizardPage();
-			IWizard w = wp.getWizard();
-			if(w instanceof CProjectWizard){
-				wiz = (CProjectWizard)w;
-			}
-			if(wiz==null){
-				System.out.println("Can't get CProjectWizard from MBS page data. Quitting. No MPI info added to project.");
-				return;
-			}
+ 		// this process must be executed after a separate process which creates the project
+		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName"));
+		if(!proj.exists()) {
+			System.out.println("Project does not exist!. Quitting. No MPI info added to project.");
+			return;	
 		}
-		catch (Exception e) {
-			Throwable reason = e.getCause();
-			System.out.println(e.getMessage()+" reason: "+reason);
-			
-		}
-		IProject proj=wiz.getProject(true);
 
 		if(traceOn)System.out.println("Project: " + proj.getName());
 
 		// Collect the values that the user entered on the wizard page
-		propID = MPIProjectWizardPage.INCLUDE_PATH_PROP_ID;
+		String propID = MPIProjectWizardPage.INCLUDE_PATH_PROP_ID;
 		String newIncludePath = getNewPropValue(pageID, propID,"c:/mpich2/include");
 		if(traceOn)System.out.println("Got prop: "+propID+"="+newIncludePath);
 		
@@ -128,7 +125,7 @@ public class MPIProjectRunnable implements Runnable {
 			// note: assumed null if this is not a managed build project? will we get here in that case?
 			if(traceOn)System.out.println("Build info: " + info);
 		} catch (Exception e) {
-			System.out.println("MPIProjectRunnable.run(), "+e.getMessage());
+			System.out.println("MPIProjectProcess.run(), "+e.getMessage());
 			e.printStackTrace();
 			return;
 		}
@@ -147,7 +144,7 @@ public class MPIProjectRunnable implements Runnable {
 			setCompileCommand(cf,mpiCompileCommand);
 			setLinkCommand(cf,mpiLinkCommand);		
 		}
-		if(traceOn)System.out.println("MPIProjectRunnable, newIncludePath: "+newIncludePath);
+		if(traceOn)System.out.println("MPIProjectProcess, newIncludePath: "+newIncludePath);
 		if(traceOn)System.out.println("   newLib: "+newLib+"  newLibSrchPth: "+newLibSearchPath);
 		if(traceOn)System.out.println("   compileCmd: "+mpiCompileCommand);
 		if(traceOn)System.out.println("   linkCmd: "+mpiLinkCommand);
@@ -198,7 +195,7 @@ public class MPIProjectRunnable implements Runnable {
 	 * @return
 	 */
 	private String getNewPropValue(String pageID, String propID, String defaultVal) {
-		Object obj = MBSCustomPageManager.getPageProperty(pageID, propID);
+		Object obj = valueStore.get(pageID+MPIProjectWizardPage.DOT+propID);
 		// if selection made on page, obj is non-null.
 		String newValue = defaultVal;
 		String msg=" ( used default value)";
@@ -252,7 +249,7 @@ public class MPIProjectRunnable implements Runnable {
 			ManagedBuildManager.setOption(cf, cfTool, option, newIncludePaths);
 		}
 		else{
-			System.out.println("MPIProjectRunnable, no option for include paths found.");
+			System.out.println("MPIProjectProcess, no option for include paths found.");
 		}
 	}
 
@@ -318,14 +315,14 @@ public class MPIProjectRunnable implements Runnable {
 				break;
 			
 			default:
-				System.out.println("MPIProjectWizard runnable postprocessing (MPIProjectRunnable), can't get type of option for " + option.getName());
+				System.out.println("MPIProjectWizard Process postprocessing (MPIProjectProcess), can't get type of option for " + option.getName());
 				return;
 			}
 			// update the option in the managed builder options
 			ManagedBuildManager.setOption(cf, tool, option, valueList);
 
 		} catch (BuildException e) {
-			System.out.println("MPIProjectRunnable.addOptionValue(), "+e.getMessage());
+			System.out.println("MPIProjectProcess.addOptionValue(), "+e.getMessage());
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
@@ -546,8 +543,8 @@ public class MPIProjectRunnable implements Runnable {
 		}
 		return null;
 	}
-
 }
+
 /**
  * 
  * Some sample tool data from showOptions() on Windows XP with cygwin Tool 1:

@@ -13,14 +13,11 @@
 #include <math.h>    
 #include "openmp.h"    
 
- 
-// Sample dummy OpenMP program 
-
 
 int main(int argc, char* argv[]){
 	int    i,arraySize;
 	double *x, *y;     /* the arrays                 */
-	printf("Hello OpenMP World.\n");	
+	printf("$(openmp.hello.message)\n");	
 	
 // sample openMP API
 	if (omp_in_parallel()){

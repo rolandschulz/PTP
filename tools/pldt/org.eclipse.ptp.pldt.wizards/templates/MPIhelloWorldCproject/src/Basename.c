@@ -33,14 +33,14 @@ int main(int argc, char* argv[]){
 	
 	if (my_rank !=0){
 		/* create message */
-		sprintf(message, "Greetings from process %d!", my_rank);
+		sprintf(message, "$(mpi.hello.message) from process %d!", my_rank);
 		dest = 0;
 		/* use strlen+1 so that '\0' get transmitted */
 		MPI_Send(message, strlen(message)+1, MPI_CHAR,
 		   dest, tag, MPI_COMM_WORLD);
 	}
 	else{
-		printf("Hello From process 0: Num processes: %d\n",p);
+		printf("$(mpi.hello.message) From process 0: Num processes: %d\n",p);
 		for (source = 1; source < p; source++) {
 			MPI_Recv(message, 100, MPI_CHAR, source, tag,
 			      MPI_COMM_WORLD, &status);

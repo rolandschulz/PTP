@@ -20,7 +20,7 @@
 			default="%HelloWorld.copyright.default"
 			hidden="false"
 			persist="true"/>
-		<property id="message"
+		<property id="mpi.hello.message"
 			label="%HelloWorld.message.label"
 			description="%HelloWorld.message.description"
 			type="input"
@@ -60,9 +60,8 @@
 		</complex-array>
 	</process>
 	
-	<process type="org.eclipse.ptp.pldt.wizards.storeInfo">
-		<simple name="projectName" value="$(projectName)"/>
-		<simple name="projectType" value="mpi_project"/>
+	<process type="org.eclipse.ptp.pldt.wizards.mpiProjectProcess">
+		<!-- no arguments as we go straight to the store (not recommended usage of template engine..) -->
 	</process>
 
 </template>

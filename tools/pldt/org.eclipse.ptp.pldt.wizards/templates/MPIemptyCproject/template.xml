@@ -4,9 +4,8 @@
 		id="MPIemptyCproject" label="MPI Empty C Project" description="An empty MPI  project template"
 		 help="help.html">
 
-	<process type="org.eclipse.ptp.pldt.wizards.storeInfo">
-		<simple name="projectName" value="$(projectName)"/>
-		<simple name="projectType" value="mpi_project"/>
+	<process type="org.eclipse.ptp.pldt.wizards.mpiProjectProcess">
+		<!-- no arguments as we go straight to the store (not recommended usage of template engine..) -->
 	</process>
 </template>
 

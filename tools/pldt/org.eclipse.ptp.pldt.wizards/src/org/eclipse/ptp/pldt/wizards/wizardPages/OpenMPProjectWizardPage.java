@@ -25,6 +25,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.openmp.core.OpenMPIDs;
+import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,29 +45,29 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Wizard Page for collecting info about OpenMP project - appended to end of
+ * Wizard Page for collecting info about OpenMP!! project - appended to end of
  * "New Managed Make C project" wizard
  * 
- * FIXME remove dup code, share with MPI version in a common class etc.
+ *  * FIXME remove dup code, share with MPI version in a common class etc.
  * @author Beth Tibbitts
  * 
  */
-public class MPIProjectWizardPage extends AbstractWizardDataPage {
+public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	public static final String DOT = ".";
 	private static final boolean traceOn=false;
-	public static final boolean wizardTraceOn=false;
+	public static final boolean wizardTraceOn=true;
 
 	private Composite composite;
-	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage";
+	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectWizardPage";
 
-	// The following are IDs for storing info in MBSPageData so it can be retrieved in MpiProjectRunnable
+	// The following are IDs for storing info in MBSPageData so it can be retrieved in OpenMPProjectRunnable
 	// when the wizard is done.
 	/**
-	 * Store in MBSPageData  (with this ID) whether user wants to include MPI info in the project.
+	 * Store in MBSPageData  (with this ID) whether user wants to include OpenMP info in the project.
 	 */
-	public static final String DO_MPI_INCLUDES = "doMPIincludes";
+	public static final String DO_OpenMP_INCLUDES = "doOpenMPincludes";
 	/**
-	 * store in MBSPageData (with this ID) what the include path to MPI will be.
+	 * store in MBSPageData (with this ID) what the include path to OpenMP will be.
 	 */
 	public static final String INCLUDE_PATH_PROP_ID = "includePath";
 	/**
@@ -77,36 +79,36 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 */
 	public static final String LIBRARY_SEARCH_PATH_PROP_ID = "libPath";
 	
-	public static final String MPI_COMPILE_COMMAND_PROP_ID = "mpiCompileCommand";
-	public static final String MPI_LINK_COMMAND_PROP_ID = "mpiLinkCommand";
-	public static final String MPI_SAMPLE_FILE_PROP_ID = "mpiSampleFile";
+	public static final String OpenMP_COMPILE_COMMAND_PROP_ID = "OpenMPCompileCommand";
+	public static final String OpenMP_LINK_COMMAND_PROP_ID = "OpenMPLinkCommand";
+	public static final String OpenMP_SAMPLE_FILE_PROP_ID = "OpenMPSampleFile";
 
-	private String currentMpiIncludePath;
+	private String currentOpenMPIncludePath;
 	private String currentLibName;
 	private String currentLibPath;
-	private String currentMpiCompileCommand;
-	private String currentMpiLinkCommand;
+	private String currentOpenMPCompileCommand;
+	private String currentOpenMPLinkCommand;
 
-	private String defaultMpiIncludePath;
-	private String defaultMpiLibName;
-	private String defaultMpiLibPath;
-	private String defaultMpiBuildCommand;
+	private String defaultOpenMPIncludePath;
+	private String defaultOpenMPLibName;
+	private String defaultOpenMPLibPath;
+	private String defaultOpenMPBuildCommand;
 	
 	private Text includePathField;
 	private Text libNameField;
 	private Text libPathField;
-	private Text mpiCompileCommandField, mpiLinkCommandField;
+	private Text openMPCompileCommandField, openMPLinkCommandField;
 	
-	private Label includePathLabel, libLabel, libPathLabel, mpiCompileCommandLabel, mpiLinkCommandLabel;
+	private Label includePathLabel, libLabel, libPathLabel, openMPCompileCommandLabel, openMPLinkCommandLabel;
 
 	private Button browseButton;
 	private Button browseButton2;
 
 	private Button useDefaultsButton;
-	private Button useMpiProjectSettingsButton;
-	private static boolean defaultUseMpiIncludes=false;
+	private Button useOpenMPProjectSettingsButton;
+	private static boolean defaultUseOpenMPIncludes=false;
 	
-	private Button mpiSampleButton;
+	private Button OpenMPSampleButton;
 
 	private IPreferenceStore preferenceStore;
 
@@ -117,8 +119,8 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * FIXME make indiv. pages for openmp, etc. and use particular page
 	 * for each template.  Might be able to do it all in the template as well.
 	 */
-	private boolean useMpiProjectSettings=false;
-	private String desc = "MPI Project Page";
+	private boolean useOpenMPProjectSettings=false;
+	private String desc = "OpenMP Project Page";
 	private String fTemplateID;
 	
 	/**
@@ -128,33 +130,33 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * @throws CoreException 
 	 * 
 	 */
-	public MPIProjectWizardPage() throws CoreException {
-		super("MPI Project Settings");
+	public OpenMPProjectWizardPage() throws CoreException {
+		super("OpenMP Project Settings");
 		
-		if(wizardTraceOn)System.out.println("MPIProjectWizardPage().ctor...");
+		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage().ctor...");
 
 		//CommonPlugin.log(IStatus.ERROR,"Test error");
 		//CommonPlugin.log(IStatus.WARNING,"Test warning");
 		
 		// access the preference store from the MPI plugin
-		preferenceStore = MpiPlugin.getDefault().getPreferenceStore();
-		String mip=preferenceStore.getString(MpiIDs.MPI_INCLUDES);
-		if(traceOn)System.out.println("Got mpi include pref from other plugin: "+mip);
+		preferenceStore = OpenMPPlugin.getDefault().getPreferenceStore();
+		String mip=preferenceStore.getString(OpenMPIDs.OpenMP_INCLUDES);
+		if(traceOn)System.out.println("Got OpenMP include pref from other plugin: "+mip);
 
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
-		defaultMpiIncludePath = preferenceStore.getString(MpiIDs.MPI_INCLUDES);
-		if(defaultMpiIncludePath.length()==0) {
+		defaultOpenMPIncludePath = preferenceStore.getString(OpenMPIDs.OpenMP_INCLUDES);
+		if(defaultOpenMPIncludePath.length()==0) {
 			// warn if no MPI preferences have been set
 			showNoPrefs();
 		}
-		setDefaultOtherNames(defaultMpiIncludePath);
+		setDefaultOtherNames(defaultOpenMPIncludePath);
 		// the following sets what will be remembered when we leave the page.
-		setCurrentMpiIncludePath(defaultMpiIncludePath);
+		setCurrentOpenMPIncludePath(defaultOpenMPIncludePath);
 		
-		defaultMpiBuildCommand=preferenceStore.getString(MpiIDs.MPI_BUILD_CMD);
-		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
-		setCurrentMpiLinkCommand(defaultMpiBuildCommand);		
+		defaultOpenMPBuildCommand=preferenceStore.getString(OpenMPIDs.OpenMP_BUILD_CMD);
+		setCurrentOpenMPCompileCommand(defaultOpenMPBuildCommand);
+		setCurrentOpenMPLinkCommand(defaultOpenMPBuildCommand);		
 	}
 
 	/**
@@ -167,11 +169,11 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	private static void showNoPrefs() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			StringBuffer buf=new StringBuffer("No MPI Preferences set; ");
-			buf.append("Default project setting will be more useful if MPI preferences are set first. ");
+			StringBuffer buf=new StringBuffer("No OpenMP Preferences set; ");
+			buf.append("Default project setting will be more useful if OpenMP preferences are set first. ");
 			buf.append("\nUse Window > Preferences and select Parallel Language Development Tools, which may be under PTP preferences.");
-			buf.append("You can cancel out of new project wizard to enter MPI preferences now.");
-			MessageDialog.openWarning(shell, "No MPI Preferences set", buf.toString());
+			buf.append("You can cancel out of new project wizard to enter OpenMP preferences now.");
+			MessageDialog.openWarning(shell, "No OpenMP Preferences set", buf.toString());
 			alreadyShown= true;
 		}
 	}
@@ -189,33 +191,33 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * 
 	 * @param mpiIncludePath
 	 */
-	private void setDefaultOtherNames(String mpiIncludePath) {
-		defaultMpiLibName="mpi";
-		setCurrentMpiLibName(defaultMpiLibName);
+	private void setDefaultOtherNames(String OpenMPIncludePath) {
+		defaultOpenMPLibName="openmp";
+		setCurrentOpenMPLibName(defaultOpenMPLibName);
 		
 		// if >1 path in mpi include path, use just the first
 		// one to guess at the libpath
-		String tempPath=mpiIncludePath;
+		String tempPath=OpenMPIncludePath;
 		int sepLoc=tempPath.indexOf(java.io.File.pathSeparatorChar);
 		if(-1!=sepLoc) {
-			tempPath=mpiIncludePath.substring(0, sepLoc);
+			tempPath=OpenMPIncludePath.substring(0, sepLoc);
 		}
 		IPath path = Path.fromOSString(tempPath);
 		path=path.removeLastSegments(1);
 		path=path.addTrailingSeparator();
 
-		defaultMpiLibPath=path.toString()+"lib";
-		//System.out.println("defaultMpiLibPath="+defaultMpiLibPath);
-		setCurrentMpiLibPath(defaultMpiLibPath);
+		defaultOpenMPLibPath=path.toString()+"lib";
+		//System.out.println("defaultOpenMPLibPath="+defaultOpenMPLibPath);
+		setCurrentOpenMPLibPath(defaultOpenMPLibPath);
 		
 		//standardize format for mpi include path, too
-		path = Path.fromOSString(mpiIncludePath);
+		path = Path.fromOSString(OpenMPIncludePath);
 		String temp=path.toString();
 		temp=stripTrailingSeparator(temp);
-		defaultMpiIncludePath=temp;
-		setCurrentMpiIncludePath(defaultMpiIncludePath);	
+		defaultOpenMPIncludePath=temp;
+		setCurrentOpenMPIncludePath(defaultOpenMPIncludePath);	
 			
-		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
+		setCurrentOpenMPCompileCommand(defaultOpenMPBuildCommand);
 	}
 
 	/**
@@ -225,8 +227,8 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * 
 	 * @param path
 	 */
-	private void setCurrentMpiIncludePath(String path) {
-		currentMpiIncludePath = path;
+	private void setCurrentOpenMPIncludePath(String path) {
+		currentOpenMPIncludePath = path;
 		pageData.put(PAGE_ID+DOT+INCLUDE_PATH_PROP_ID, path);
 	}
 	/**
@@ -236,8 +238,8 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * 
 	 * @param path
 	 */
-	private void setCurrentMpiLibName(String name) {
-		currentMpiIncludePath = name;
+	private void setCurrentOpenMPLibName(String name) {
+		currentOpenMPIncludePath = name;
 		pageData.put(PAGE_ID+DOT+LIB_PROP_ID, name);
 	}
 	
@@ -250,21 +252,21 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * 
 	 * @param path
 	 */
-	private void setCurrentMpiLibPath(String path) {
-		currentMpiIncludePath = path;
+	private void setCurrentOpenMPLibPath(String path) {
+		currentOpenMPIncludePath = path;
 		pageData.put(PAGE_ID+DOT+LIBRARY_SEARCH_PATH_PROP_ID, path);
 	}
-	private void setCurrentMpiCompileCommand(String buildCommand) {
-		currentMpiCompileCommand = buildCommand;
-		pageData.put(PAGE_ID+DOT+MPI_COMPILE_COMMAND_PROP_ID, buildCommand);
+	private void setCurrentOpenMPCompileCommand(String buildCommand) {
+		currentOpenMPCompileCommand = buildCommand;
+		pageData.put(PAGE_ID+DOT+OpenMP_COMPILE_COMMAND_PROP_ID, buildCommand);
 	}
-	private void setCurrentMpiLinkCommand(String buildCommand) {
-		currentMpiLinkCommand = buildCommand;
-		pageData.put(PAGE_ID+DOT+MPI_LINK_COMMAND_PROP_ID, buildCommand);
+	private void setCurrentOpenMPLinkCommand(String buildCommand) {
+		currentOpenMPLinkCommand = buildCommand;
+		pageData.put(PAGE_ID+DOT+OpenMP_LINK_COMMAND_PROP_ID, buildCommand);
 	}
-	private void setCurrentMpiSample(boolean doit){
+	private void setCurrentOpenMPSample(boolean doit){
 		String str=Boolean.toString(doit);
-		pageData.put(PAGE_ID+DOT+MPI_SAMPLE_FILE_PROP_ID, str);
+		pageData.put(PAGE_ID+DOT+OpenMP_SAMPLE_FILE_PROP_ID, str);
 	}
 
 	public String getName() {
@@ -315,7 +317,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		String dirName = getPathFromPathField(includePathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(includePathField.getShell());
-		dialog.setMessage("MPI Include path:");
+		dialog.setMessage("OpenMP Include path:");
 
 		dialog.setFilterPath(dirName);
 
@@ -327,7 +329,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 			includePathField.setText(selectedDirectory);
 			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
 			// set value to where we can find it in the runnable later
-			setCurrentMpiIncludePath(selectedDirectory);
+			setCurrentOpenMPIncludePath(selectedDirectory);
 		}
 	}
 	private void handleLocationBrowseButton2Pressed() {
@@ -336,7 +338,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		String dirName = getPathFromPathField(libPathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(libPathField.getShell());
-		dialog.setMessage("MPI library search path:");
+		dialog.setMessage("OpenMP library search path:");
 
 		dialog.setFilterPath(dirName);
 
@@ -348,7 +350,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 			libPathField.setText(selectedDirectory);
 			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
 			// set value to where we can find it in the runnable later
-			setCurrentMpiLibPath(selectedDirectory);
+			setCurrentOpenMPLibPath(selectedDirectory);
 		}
 	}
 
@@ -377,11 +379,11 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	private void createUserEntryArea(Composite composite, boolean defaultEnabled) {
 		//?? err? causes things to happen in wrong order??   IProject project = this.getProject();
 		//String name = project.getName();
-		if(wizardTraceOn)System.out.println("MPIProjectWizardPage.createUserEntryArea() " );
+		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage.createUserEntryArea() " );
 		
 		includePathLabel = new Label(composite, SWT.NONE);
 		includePathLabel.setText("Include path:");
-		includePathLabel.setToolTipText("Location of MPI include path(s)");
+		includePathLabel.setToolTipText("Location of OpenMP include path(s)");
 
 		// Include path location  entry field
 		includePathField = new Text(composite, SWT.BORDER);
@@ -389,11 +391,11 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		data.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		data.horizontalSpan = 2;
 		includePathField.setLayoutData(data);
-		includePathField.setText(defaultMpiIncludePath);
+		includePathField.setText(defaultOpenMPIncludePath);
 		includePathField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setCurrentMpiIncludePath(includePathField.getText());
-				if(traceOn)System.out.println("locationField.modifyText(): " + currentMpiIncludePath);
+				setCurrentOpenMPIncludePath(includePathField.getText());
+				if(traceOn)System.out.println("locationField.modifyText(): " + currentOpenMPIncludePath);
 			}
 		});
 
@@ -420,10 +422,10 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		gd.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd.horizontalSpan=2;
 		libNameField.setLayoutData(gd);
-		libNameField.setText(defaultMpiLibName);
+		libNameField.setText(defaultOpenMPLibName);
 		libNameField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setCurrentMpiLibName(libNameField.getText());
+				setCurrentOpenMPLibName(libNameField.getText());
 				if(traceOn)System.out.println("libNameField.modifyText(): " + currentLibName);
 			}
 		});
@@ -440,10 +442,10 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		gd2.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd2.horizontalSpan=2;
 		libPathField.setLayoutData(gd2);
-		libPathField.setText(defaultMpiLibPath);
+		libPathField.setText(defaultOpenMPLibPath);
 		libPathField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setCurrentMpiLibPath(libPathField.getText());
+				setCurrentOpenMPLibPath(libPathField.getText());
 				if(traceOn)System.out.println("libPathField.modifyText(): " + currentLibPath);
 			}
 		});
@@ -459,34 +461,34 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 			}
 		});
-		mpiCompileCommandLabel= new Label(composite,SWT.NONE);
-		mpiCompileCommandLabel.setText("MPI compile command: ");
-		mpiCompileCommandField=new Text(composite,SWT.BORDER);
+		openMPCompileCommandLabel= new Label(composite,SWT.NONE);
+		openMPCompileCommandLabel.setText("OpenMP compile command: ");
+		openMPCompileCommandField=new Text(composite,SWT.BORDER);
 		GridData gd3 = new GridData(GridData.FILL_HORIZONTAL);
 		gd3.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd3.horizontalSpan=2;
-		mpiCompileCommandField.setLayoutData(gd3);
-		mpiCompileCommandField.setText(defaultMpiBuildCommand);
-		mpiCompileCommandField.addModifyListener(new ModifyListener() {
+		openMPCompileCommandField.setLayoutData(gd3);
+		openMPCompileCommandField.setText(defaultOpenMPBuildCommand);
+		openMPCompileCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setCurrentMpiCompileCommand(mpiCompileCommandField.getText());
-				if(traceOn)System.out.println("mpiCompileCommandField.modifyText(): " + currentMpiCompileCommand);
+				setCurrentOpenMPCompileCommand(openMPCompileCommandField.getText());
+				if(traceOn)System.out.println("OpenMPCompileCommandField.modifyText(): " + currentOpenMPCompileCommand);
 			}
 		});
 		(new Label(composite,SWT.NONE)).setText(" ");//spacer
 		
-		mpiLinkCommandLabel= new Label(composite,SWT.NONE);
-		mpiLinkCommandLabel.setText("MPI link command: ");
-		mpiLinkCommandField=new Text(composite,SWT.BORDER);
+		openMPLinkCommandLabel= new Label(composite,SWT.NONE);
+		openMPLinkCommandLabel.setText("OpenMP link command: ");
+		openMPLinkCommandField=new Text(composite,SWT.BORDER);
 		GridData gd4 = new GridData(GridData.FILL_HORIZONTAL);
 		gd4.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd4.horizontalSpan=2;
-		mpiLinkCommandField.setLayoutData(gd3);
-		mpiLinkCommandField.setText(defaultMpiBuildCommand);
-		mpiLinkCommandField.addModifyListener(new ModifyListener() {
+		openMPLinkCommandField.setLayoutData(gd3);
+		openMPLinkCommandField.setText(defaultOpenMPBuildCommand);
+		openMPLinkCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setCurrentMpiLinkCommand(mpiLinkCommandField.getText());
-				if(traceOn)System.out.println("mpiLinkCommandField.modifyText(): " + currentMpiLinkCommand);
+				setCurrentOpenMPLinkCommand(openMPLinkCommandField.getText());
+				if(traceOn)System.out.println("OpenMPLinkCommandField.modifyText(): " + currentOpenMPLinkCommand);
 			}
 		});
 		(new Label(composite,SWT.NONE)).setText(" ");//spacer
@@ -512,22 +514,22 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		group.setLayout(layout);
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		useMpiProjectSettingsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		useMpiProjectSettingsButton.setText("Add MPI project settings to this project");
+		useOpenMPProjectSettingsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
+		useOpenMPProjectSettingsButton.setText("Add OpenMP project settings to this project");
 		GridData gd=new GridData();
 		gd.horizontalSpan=columns;
-		useMpiProjectSettingsButton.setLayoutData(gd);
-		useMpiProjectSettingsButton.setSelection(useMpiProjectSettings);
-		useMpiProjectSettingsButton.addSelectionListener(new SelectionAdapter() {
+		useOpenMPProjectSettingsButton.setLayoutData(gd);
+		useOpenMPProjectSettingsButton.setSelection(useOpenMPProjectSettings);
+		useOpenMPProjectSettingsButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				useMpiProjectSettings = useMpiProjectSettingsButton.getSelection();
+				useOpenMPProjectSettings = useOpenMPProjectSettingsButton.getSelection();
 				// set value so we can read it later
-				pageData.put(PAGE_ID+DOT+DO_MPI_INCLUDES, Boolean.toString(useMpiProjectSettings));
+				pageData.put(PAGE_ID+DOT+DO_OpenMP_INCLUDES, Boolean.toString(useOpenMPProjectSettings));
 				
-				useDefaultsButton.setEnabled(useMpiProjectSettings);
-				if(mpiSampleButton!=null)
-				   mpiSampleButton.setEnabled(useMpiProjectSettings);
-				if(useMpiProjectSettings) {
+				useDefaultsButton.setEnabled(useOpenMPProjectSettings);
+				if(OpenMPSampleButton!=null)
+				   OpenMPSampleButton.setEnabled(useOpenMPProjectSettings);
+				if(useOpenMPProjectSettings) {
 				  boolean useDefaults=useDefaultsButton.getSelection();
 				  setUserAreaEnabled(!useDefaults);
 				}
@@ -552,23 +554,23 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 				if (useDefaults) { 
 					// reset all fields and values back to the defaults
-					includePathField.setText(defaultMpiIncludePath);
-					setCurrentMpiIncludePath(defaultMpiIncludePath);
+					includePathField.setText(defaultOpenMPIncludePath);
+					setCurrentOpenMPIncludePath(defaultOpenMPIncludePath);
 					
-					libPathField.setText(defaultMpiLibName);
-					setCurrentMpiLibName(defaultMpiLibName);
+					libPathField.setText(defaultOpenMPLibName);
+					setCurrentOpenMPLibName(defaultOpenMPLibName);
 					
-					libNameField.setText(defaultMpiLibName);
-					setCurrentMpiLibName(defaultMpiLibName);
+					libNameField.setText(defaultOpenMPLibName);
+					setCurrentOpenMPLibName(defaultOpenMPLibName);
 					
-					libPathField.setText(defaultMpiLibPath);
-					setCurrentMpiLibPath(defaultMpiLibPath);
+					libPathField.setText(defaultOpenMPLibPath);
+					setCurrentOpenMPLibPath(defaultOpenMPLibPath);
 					
-					mpiCompileCommandField.setText(defaultMpiBuildCommand);
-					setCurrentMpiCompileCommand(defaultMpiBuildCommand);
+					openMPCompileCommandField.setText(defaultOpenMPBuildCommand);
+					setCurrentOpenMPCompileCommand(defaultOpenMPBuildCommand);
 					
-					mpiLinkCommandField.setText(defaultMpiBuildCommand);
-					setCurrentMpiLinkCommand(defaultMpiBuildCommand);
+					openMPLinkCommandField.setText(defaultOpenMPBuildCommand);
+					setCurrentOpenMPLinkCommand(defaultOpenMPBuildCommand);
 				}
 				setUserAreaEnabled(!useDefaults);
 			}
@@ -577,19 +579,19 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		createUserEntryArea(group, defaultEnabled);
 /*		
  		// mpi sample file now provided by project template (also openmp)
-		mpiSampleButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		mpiSampleButton.setText("Include sample MPI source file?");
-		mpiSampleButton.setSelection(false);
-		mpiSampleButton.setEnabled(false);
+		OpenMPSampleButton = new Button(group, SWT.CHECK | SWT.RIGHT);
+		OpenMPSampleButton.setText("Include sample OpenMP source file?");
+		OpenMPSampleButton.setSelection(false);
+		OpenMPSampleButton.setEnabled(false);
 		GridData gdSample=new GridData();
 		gdSample.horizontalSpan = columns;
-		mpiSampleButton.setLayoutData(gdSample);
-		mpiSampleButton.addSelectionListener(new SelectionAdapter() {
+		OpenMPSampleButton.setLayoutData(gdSample);
+		OpenMPSampleButton.addSelectionListener(new SelectionAdapter() {
 		
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				boolean doit=mpiSampleButton.getSelection();
-				setCurrentMpiSample(doit);
+				boolean doit=OpenMPSampleButton.getSelection();
+				setCurrentOpenMPSample(doit);
 			}
 		
 		});
@@ -618,7 +620,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	}
 
 	public String getDescription() {
-		String tmp="Select the MPI include path, lib name, library search path, and build command information to be automatically be added to the new project.";
+		String tmp="Select the OpenMP include path, lib name, library search path, and build command information to be automatically be added to the new project.";
 		return tmp;
 	}
 
@@ -637,7 +639,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	}
 
 	public String getTitle() {
-		return "MPI Project Settings";
+		return "OpenMP Project Settings";
 	}
 
 	public void performHelp() {
@@ -670,7 +672,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 */
 	public void setVisible(boolean visible) {
 		composite.setVisible(visible);
-		if(traceOn)System.out.println("MPIProjectWizardPage.setVisible: " + visible);
+		if(traceOn)System.out.println("OpenMPProjectWizardPage.setVisible: " + visible);
 
 	}
 
@@ -708,20 +710,20 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		libPathLabel.setEnabled(enabled);
 		libLabel.setEnabled(enabled);
 		
-		mpiCompileCommandLabel.setEnabled(enabled);
-		mpiCompileCommandField.setEnabled(enabled);
-		mpiLinkCommandLabel.setEnabled(enabled);
-		mpiLinkCommandField.setEnabled(enabled);
+		openMPCompileCommandLabel.setEnabled(enabled);
+		openMPCompileCommandField.setEnabled(enabled);
+		openMPLinkCommandLabel.setEnabled(enabled);
+		openMPLinkCommandField.setEnabled(enabled);
 	}
 	
 	/**
-	 * What's the default, do we include MPI includes or not?
+	 * What's the default, do we include OpenMP includes or not?
 	 * If there is any difficulty getting information, use this default
 	 * setting.
 	 * @return
 	 */
-	public static boolean getDefaultUseMpiIncludes() {
-		return defaultUseMpiIncludes;
+	public static boolean getDefaultUseOpenMPIncludes() {
+		return defaultUseOpenMPIncludes;
 	}
 
 	public Map<String,String> getPageData() {
