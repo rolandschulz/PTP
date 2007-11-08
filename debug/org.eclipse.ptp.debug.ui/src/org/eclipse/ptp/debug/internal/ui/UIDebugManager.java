@@ -51,6 +51,7 @@ import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.views.IToolTipProvider;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
@@ -140,12 +141,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param taskID
 	 * @return
 	 */
-	public String getValueText(int taskID) {
+	public String getValueText(int taskID, IToolTipProvider provider) {
 		IPJob job = getJob();
 		if (job == null)
 			return "No job found";
 		
-		return getJobVariableManager().getValue(getJob(), taskID);
+		return getJobVariableManager().getValue(getJob(), taskID, provider);
 	}
 	public void updateCurrentJobVariableValues() {
 		getJobVariableManager().updateValues(getJob());

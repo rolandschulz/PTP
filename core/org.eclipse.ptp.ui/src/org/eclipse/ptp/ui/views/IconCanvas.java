@@ -115,7 +115,7 @@ public class IconCanvas extends Canvas {
 	private final int DEFAULT_OFFSET = 5;
 	// tooltip
 	private IconHover iconHover = new IconHover();
-	private IIconInformationControl fInformationControl = null; 
+	protected IIconInformationControl fInformationControl = null; 
 	protected long tooltip_timeout = 10000;
 	protected boolean show_tooltip_allthetime = false;
 	private Timer hoverTimer = null;
@@ -2123,9 +2123,14 @@ public class IconCanvas extends Canvas {
 		}
 		boolean isShift = (event.stateMask & SWT.MOD2) != 0;
 		boolean isCtrl = (event.stateMask & SWT.MOD1) != 0;
+		showToolTip(index, (!isShift && !isCtrl));
+	}
+	protected void showToolTip(int index, boolean showExtra) {
 		String[] tooltipTexts = getToolTipText(getObject(index));
-		boolean showExtra = (!isShift && !isCtrl && (tooltipTexts.length>1));
-		IIconInformationControl informationControl= getInformationControl(showExtra);
+		// confirm to show extra if array is larger than 1
+		if (showExtra)
+			showExtra = (tooltipTexts.length>1);
+		IIconInformationControl informationControl = getInformationControl(showExtra);
 		if (informationControl != null) {
 			Rectangle clientArea = getClientArea();
 			//informationControl.setSizeConstraints(clientArea.width, clientArea.height);
@@ -2330,6 +2335,9 @@ public class IconCanvas extends Canvas {
         		texts[1] = contentText;
         		return texts;
         		*/
+        	}
+        	public void update(Object obj, String content) {
+        		
         	}
         });
         iconCanvas.setTotal(totalImage);
