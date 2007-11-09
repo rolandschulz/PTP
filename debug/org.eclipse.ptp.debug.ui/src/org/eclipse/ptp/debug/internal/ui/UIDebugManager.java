@@ -441,7 +441,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				break;
 			case CHANGE_SET_TYPE:
 				if (cur_set != null) {
-					annotationMgr.updateAnnotation(cur_set, pre_set);
+					//annotationMgr.updateAnnotation(cur_set, pre_set);
 					updateBreakpointMarker(cur_set.getName());
 					updateRegisterUnRegisterElements(cur_set, pre_set, getCurrentJobId());
 				}
