@@ -71,7 +71,11 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 		Map<BitList, Object> results = request.getResultMap(tasks);
 		for (Iterator<BitList> i = results.keySet().iterator(); i.hasNext();) {
 			BitList sTasks = i.next();
-			IAIF aif = (IAIF)results.get(sTasks);
+			Object obj = results.get(sTasks);
+			if (!(obj instanceof IAIF))
+				throw new PDIException(tasks, "Updating expression value error");
+				
+			IAIF aif = (IAIF)obj;
 			for (int task : sTasks.toArray()) {
 				if (monitor.isCanceled()) {
 					throw new PDIException(tasks, "Updating is cancelled by user");
