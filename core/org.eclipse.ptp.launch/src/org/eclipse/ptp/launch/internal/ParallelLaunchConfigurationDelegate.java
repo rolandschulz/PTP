@@ -159,10 +159,7 @@ public class ParallelLaunchConfigurationDelegate
 				}
 				
 				ArrayList<String> dbgArgs = new ArrayList<String>();
-				//TODO
 				dbgArgs.add("--host=" + localAddress);
-				//dbgArgs.add("--host=192.168.200.81"); //apac
-				//dbgArgs.add("--host=172.16.65.254"); //mahar
 				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE));
 				
 				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
@@ -180,7 +177,6 @@ public class ParallelLaunchConfigurationDelegate
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
 				int port = debugger.getDebuggerPort(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
-				//port = 54321;
 				dbgArgs.add("--port=" + port);
 			
 				// remote setting
@@ -227,6 +223,8 @@ public class ParallelLaunchConfigurationDelegate
 	}
 
 	/**
+	 * Show the PTP Debug view
+	 * 
 	 * @param viewID
 	 */
 	protected void showPTPDebugView(final String viewID) {
@@ -250,6 +248,13 @@ public class ParallelLaunchConfigurationDelegate
 			});
 		}
 	}
+	
+	
+	/**
+	 * Used to force switching to the PTP Debug perspective
+	 * 
+	 * @param perspectiveID
+	 */
 	protected void switchPerspective(final String perspectiveID) {
 		Display display = Display.getCurrent();
 		if (display == null) {
