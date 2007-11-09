@@ -188,7 +188,7 @@ public class ParallelLaunchConfigurationDelegate
 				
 				IPath path = new Path(dbgExePath);
 				attrManager.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-				attrManager.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
+				attrManager.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toString()));
 
 				String dbgWD = getDebuggerWorkDirectory(configuration);
 				if (dbgWD != null) {
