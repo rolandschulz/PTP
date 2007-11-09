@@ -147,7 +147,7 @@ public class ElementSet extends Element implements IElementSet {
 	}
 	
 	public void addMatchSet(String setID) {
-		if (containsMatchSet(setID)) {
+		if (!containsMatchSet(setID)) {
 			matchSetList.add(setID);
 		}
 	}
