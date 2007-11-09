@@ -104,7 +104,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 		if (fileManager != null) {
 			IPath path = fileManager.browseFile(getShell(), ExternalDebugUIMessages.getString("SDMDebuggerPage.selectDebuggerExe"), fRMDebuggerText.getText()); //$NON-NLS-1$
-			return path.toOSString();
+			return path.toString();
 		}
 		return null;
 	}
