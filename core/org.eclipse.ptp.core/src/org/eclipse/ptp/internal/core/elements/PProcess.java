@@ -67,9 +67,9 @@ public class PProcess extends Parent implements IPProcessControl {
 		 * Derive a unique name for the output file
 		 */
 		String name = job.getQueue().getResourceManager().getName()
-						+ ":" + job.getQueue().getName()
-						+ ":" + job.getName()
-						+ ":" + getName();
+						+ "_" + job.getQueue().getName()
+						+ "_" + job.getName()
+						+ "_" + getName();
 	
 		outputFile = new OutputTextFile(name, 
 							ProcessAttributes.getStdoutAttributeDefinition().getId(), 
@@ -189,7 +189,7 @@ public class PProcess extends Parent implements IPProcessControl {
 		if (attrDef.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
 			return outputFile.getContents();
 		} else {
-			return null;
+			return "";
 		}
 	}
 
