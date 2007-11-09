@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -57,6 +58,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.WorkbenchException;
 /**
  * 
  */
@@ -70,8 +72,6 @@ public class ParallelLaunchConfigurationDelegate
 			AttributeManager mgr, final IPTPDebugger debugger, IPJob job) {
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			// show ptp debug view
-			showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 			launch.setPJob(job);
 			try {
 				setDefaultSourceLocator(launch, configuration);
@@ -82,6 +82,8 @@ public class ParallelLaunchConfigurationDelegate
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+								if (monitor.isCanceled())
+									throw new InterruptedException("The job is cancalled.");
 								try {
 									long timeout = PTPDebugUIPlugin.getDefault().getPreferenceStore().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
 									//Wait for the incoming debug server connection. This can be canceled by the user.
@@ -113,8 +115,7 @@ public class ParallelLaunchConfigurationDelegate
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, 
-			IProgressMonitor monitor) throws CoreException {
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		if (!(launch instanceof IPLaunch)) {
 			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_launch_object"), null, 0);
 		}
@@ -129,11 +130,14 @@ public class ParallelLaunchConfigurationDelegate
 		IPTPDebugger debugger = null;
 		IPJob job = null;
 		
+		//switch perspective
+		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 		AttributeManager attrManager = getAttributeManager(configuration);
-
 		try {
 			IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				// show ptp debug view
+				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 				monitor.subTask("Configuring debug setting . . .");
 				
 				/*
@@ -155,7 +159,10 @@ public class ParallelLaunchConfigurationDelegate
 				}
 				
 				ArrayList<String> dbgArgs = new ArrayList<String>();
+				//TODO
 				dbgArgs.add("--host=" + localAddress);
+				//dbgArgs.add("--host=192.168.200.81"); //apac
+				//dbgArgs.add("--host=172.16.65.254"); //mahar
 				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE));
 				
 				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
@@ -172,8 +179,9 @@ public class ParallelLaunchConfigurationDelegate
 				 // The debug server is created when the job is launched via the submitJob() command.
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
-				int timeout = store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
-				dbgArgs.add("--port=" + debugger.getDebuggerPort(timeout));
+				int port = debugger.getDebuggerPort(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
+				//port = 54321;
+				dbgArgs.add("--port=" + port);
 			
 				// remote setting
 				String dbgExePath = getDebuggerExePath(configuration);
@@ -240,6 +248,30 @@ public class ParallelLaunchConfigurationDelegate
 					}
 				}
 			});
+		}
+	}
+	protected void switchPerspective(final String perspectiveID) {
+		Display display = Display.getCurrent();
+		if (display == null) {
+			display = Display.getDefault();
+		}
+		if (display != null && !display.isDisposed()) {
+			display.syncExec(new Runnable() {
+	            public void run() {
+					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
+					if (window != null) {
+						IWorkbenchPage page = window.getActivePage();
+						if (page != null) {
+			                if (page.getPerspective().getId().equals(perspectiveID))
+			                    return;
+
+							try {
+				                window.getWorkbench().showPerspective(perspectiveID, window);
+			                } catch (WorkbenchException e) { }
+						}
+					}
+	            }
+	        });
 		}
 	}
 }
