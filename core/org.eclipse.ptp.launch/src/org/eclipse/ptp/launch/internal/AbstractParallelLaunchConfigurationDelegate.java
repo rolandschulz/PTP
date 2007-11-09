@@ -364,7 +364,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			IPath programPath = verifyExecutablePath(configuration);
 			attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programPath.lastSegment()));
 			
-			String path = programPath.removeLastSegments(1).toOSString();
+			String path = programPath.removeLastSegments(1).toString();
 			if (path != null) {
 				attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 			}
@@ -673,7 +673,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			path = verifyResource(workPath, configuration);
 		}
         if (path == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toOSString())), IStatus.INFO);
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toString())), IStatus.INFO);
 		}
 		return path.toString();        
     }
