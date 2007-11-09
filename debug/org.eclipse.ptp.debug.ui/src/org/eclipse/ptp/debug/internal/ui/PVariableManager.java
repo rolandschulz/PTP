@@ -161,7 +161,7 @@ public class PVariableManager {
 									  throw new InterruptedException(ce.getMessage());
 								  }
 								  catch (PDIException e) {
-									  throw new InterruptedException(e.getMessage());
+									  //throw new InterruptedException(e.getMessage());
 								  }
 								  if (provider != null)
 									  provider.update(null, getValue(job, task, null));

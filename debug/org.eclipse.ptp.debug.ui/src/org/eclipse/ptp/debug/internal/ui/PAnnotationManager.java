@@ -560,7 +560,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected PInstructionPointerAnnotation2 findAnnotation(AnnotationGroup annotationGroup, Position position, String type) {
 		synchronized (LOCK) {
 			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
-				if (annotation.getPosition().length == position.length) {
+				if (annotation.getPosition().equals(position)) {
 					if (annotation.getType().equals(type)) {
 						return annotation;
 					}
@@ -657,7 +657,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected PInstructionPointerAnnotation2 findOtherTypeAnnotation(AnnotationGroup annotationGroup, Position position, boolean isRegister) {
 		synchronized (LOCK) {
 			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
-				if (annotation.getPosition().length == position.length) {
+				if (annotation.getPosition().equals(position)) {
 					String annotationType = annotation.getType();
 					if (isRegister) {
 						if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
@@ -684,15 +684,18 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
-				BitList cpTasks = tasks.copy();
-				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, cpTasks)) {
+				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, tasks)) {
+					BitList cpTasks = tasks.copy();
 					cpTasks.and(annotation.getTasks());
 					if (cpTasks.isEmpty())
 						continue;
 					
+					updateExistedAnnotation(annotationGroup, annotation, cpTasks, false);
+					/*
 					boolean isRegister = isRegisterType(annotation.getType());
 					if (!isRegister)// unregister annotation
 						updateExistedAnnotation(annotationGroup, annotation, cpTasks, isRegister);
+					*/
 				}
 			}
 		}
@@ -701,15 +704,18 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
-				BitList cpTasks = tasks.copy();
-				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, cpTasks)) {
+				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, tasks)) {
+					BitList cpTasks = tasks.copy();
 					cpTasks.and(annotation.getTasks());
 					if (cpTasks.isEmpty())
 						continue;
-					
+
+					updateExistedAnnotation(annotationGroup, annotation, cpTasks, true);
+					/*
 					boolean isRegister = isRegisterType(annotation.getType());
 					if (isRegister)// register annotation
 						updateExistedAnnotation(annotationGroup, annotation, cpTasks, isRegister);
+					*/
 				}
 			}
 		}
@@ -740,7 +746,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				oAnnotation.setMessage(!isRegister);
 			}
 			else {
-				String type = isRegister ? ((containsCurrentSet(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT;
+				//String type = isRegister ? ((containsCurrentSet(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT;
+				String type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;
 				oAnnotation = new PInstructionPointerAnnotation2(file, type, position, annotation.getAnnotationModel());
 				annotationGroup.addAnnotation(oAnnotation);
 				oAnnotation.addTasks(tasks);
@@ -889,7 +896,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	private void addAnnotation(IPJob job, IPDebugSuspendInfo info) throws CoreException {
 		int line = info.getLineNumber();
 		if (line == 0) {
-			//FIXME: this menthod is only for unreg tasks, reg tasks depends on selection on stack frame on debug view
+			//FIXME: this method is only for unreg tasks, reg tasks depends on selection on stack frame on debug view
 			addAnnotationWithSourceFound(job, info.getAllUnregisteredTasks(), info.getLevel()+1, info.getDepth());
 		}
 		else {
