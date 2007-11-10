@@ -117,7 +117,6 @@ public abstract class FortranRefactoring extends Refactoring
         vpg.ensureVPGIsUpToDate(pm);
        	pm.done();
         
-        pm.beginTask("Analyzing program", IProgressMonitor.UNKNOWN);
         this.astOfFileInEditor = vpg.acquireTransientAST(fileInEditor);
         logVPGErrors(status);
         if (astOfFileInEditor == null)

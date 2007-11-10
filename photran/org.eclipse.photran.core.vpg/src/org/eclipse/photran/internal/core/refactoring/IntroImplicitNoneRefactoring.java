@@ -33,6 +33,7 @@ import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourceEditor;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
 /**
  * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all implicitly-declared variables
@@ -55,6 +56,13 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
         return "Introduce Implicit None";
     }
 
+    public String getScopeDescription()
+    {
+    	return selectedScope == null || selectedScope.getHeaderStmt() == null
+    		? "the selected scope..."
+    		: "\n" + SourcePrinter.getSourceCodeFromASTNode(selectedScope.getHeaderStmt());
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////

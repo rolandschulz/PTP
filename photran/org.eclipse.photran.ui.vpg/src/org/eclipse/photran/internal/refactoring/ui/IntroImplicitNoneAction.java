@@ -10,7 +10,16 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.refactoring.ui;
 
+import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
@@ -41,7 +50,22 @@ public class IntroImplicitNoneAction
 
         protected void doAddUserInputPages()
         {
-            // No user input required!
+        	addPage(new UserInputWizardPage(refactoring.getName())
+            {
+                public void createControl(Composite parent)
+                {
+                    Composite top = new Composite(parent, SWT.NONE);
+                    initializeDialogUnits(top);
+                    setControl(top);
+                
+                    top.setLayout(new GridLayout(1, false));
+                
+                    Label lbl = new Label(top, SWT.NONE);
+                    lbl.setText("Click OK to introduce implicit none in "
+                    		    + refactoring.getScopeDescription()
+                    		    + "\nTo see what changes will be made, click Preview.");
+                }
+            });
         }
     }
 }
