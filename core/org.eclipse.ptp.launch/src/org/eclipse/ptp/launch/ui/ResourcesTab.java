@@ -304,6 +304,7 @@ public class ResourcesTab extends PLaunchConfigurationTab {
 		if (rm == null) {
 			setErrorMessage(LaunchMessages.getResourceString(
 					"ResourcesTab.No_Resource_Manager")); //$NON-NLS-1$
+			return;
 		}
 		final IPQueue queue = getQueueDefault(rm);
 		final String queueName = (queue != null ? queue.getName() : ""); //$NON-NLS-1$
@@ -313,8 +314,9 @@ public class ResourcesTab extends PLaunchConfigurationTab {
 		if (rmDynamicTab == null) {
 			setErrorMessage(LaunchMessages.getFormattedResourceString(
 					"ResourcesTab.No_Launch_Configuration", rm.getName())); //$NON-NLS-1$
+		} else {
+			rmDynamicTab.setDefaults(configuration, rm, queue);
 		}
-		rmDynamicTab.setDefaults(configuration, rm, queue);
 	}
 
 	/* (non-Javadoc)
