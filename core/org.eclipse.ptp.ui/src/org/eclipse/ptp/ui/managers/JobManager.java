@@ -81,7 +81,7 @@ public class JobManager extends AbstractUIManager {
 		IPJob job = proc.getJob();
 		IElementSet set = createElementHandler(job).getSetRoot();
 		if (!set.contains(proc.getID())) {
-			System.err.println("@@@@@@@@@@ ADD PROCESS CREATED: " + proc.getProcessIndex() + " @@@@@@@@@@@@@@");
+			//System.err.println("@@@@@@@@@@ ADD PROCESS CREATED: " + proc.getProcessIndex() + " @@@@@@@@@@@@@@");
 			set.addElements(new IElement[] { createProcessElement(set, proc.getID(), proc.getProcessIndex()) });
 		}
 	}
