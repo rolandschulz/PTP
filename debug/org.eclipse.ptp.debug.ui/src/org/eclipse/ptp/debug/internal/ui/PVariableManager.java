@@ -56,6 +56,27 @@ public class PVariableManager {
 
 		return infoList.toArray(new PVariableInfo[0]);
 	}
+	public boolean isPVariableEnable(IPJob job, String varname) {
+		List<PVariableInfo> infoList = jobVariableMap.get(job.getID());
+		if (infoList != null) {
+			for (PVariableInfo info : infoList.toArray(new PVariableInfo[0])) {
+				if (info.getName().equals(varname))
+					return info.isEnabled();
+			}
+		}
+		return false;
+	}
+	public void updateVariableStatus(PVariableInfo info, boolean enabled) throws CoreException {
+		info.setEnabled(enabled);
+		getSession(info.getJob()).getPDISession().getExpressionManager().updateStatusMultiExpressions(info.getName(), enabled);
+	}
+	public void updateVariableStatus(IPJob job, String varname, boolean enabled) throws CoreException {
+		PVariableInfo info = findVariableInfo(job, varname);
+		if (info == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable " + varname + " is not existed.", null));
+
+		updateVariableStatus(info, enabled);
+	}
 	public void addVariable(IPJob job, String varname, boolean enabled) throws CoreException {
 		if (findVariableInfo(job, varname) != null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable " + varname + " is already existed.", null));
@@ -66,7 +87,7 @@ public class PVariableManager {
 			jobVariableMap.put(job.getID(), infoList);
 		}
 		IPSession session = getSession(job);
-		getSession(job).getPDISession().getExpressionManager().createMutliExpressions(session.getTasks(), varname);
+		session.getPDISession().getExpressionManager().createMutliExpressions(session.getTasks(), varname, enabled);
 		infoList.add(new PVariableInfo(job, varname, enabled));
 	}
 	public void removeVariable(IPJob job) {
@@ -89,11 +110,7 @@ public class PVariableManager {
 			addVariable(job, newvarname, enabled);
 		}
 		else {
-			PVariableInfo info = findVariableInfo(job, varname);
-			if (info == null)
-				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable " + varname + " is not existed.", null));
-
-			info.setEnabled(enabled);
+			updateVariableStatus(job, varname, enabled);
 		}
 	}
 	public void updateValues(IPJob job) {

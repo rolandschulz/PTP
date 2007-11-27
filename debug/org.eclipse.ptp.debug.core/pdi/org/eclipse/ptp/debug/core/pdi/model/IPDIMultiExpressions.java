@@ -30,6 +30,11 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  */
 public interface IPDIMultiExpressions extends IPDISessionObject {
 	/**
+	 * Returns status of this expression
+	 * @return status of this expression
+	 */
+	boolean isEnabled();
+	/**
 	 * Returns expression text
 	 * @return expression text
 	 */

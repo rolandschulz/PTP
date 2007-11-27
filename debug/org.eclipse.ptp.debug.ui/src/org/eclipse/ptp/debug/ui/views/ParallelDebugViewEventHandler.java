@@ -39,6 +39,8 @@ import org.eclipse.ptp.ui.model.IElementHandler;
  * @author Clement chu
  */
 public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandler  {
+	private long time_record = 0;
+	
 	/**
 	 * Constructs a new event handler on the given view
 	 */
@@ -131,10 +133,20 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				}
 				break;
 			case IPDebugEvent.RESUME:
+				time_record = System.currentTimeMillis();
+				System.err.println("================= TIME RESUME: " + time_record);
 				//((UIDebugManager) getPView().getUIManager()).updateVariableValue(false, info.getAllRegisteredTasks());
 				refresh(true);
 				break;
 			case IPDebugEvent.SUSPEND:
+				IPSession s = ((UIDebugManager) getPView().getUIManager()).getDebugSession(job);
+				if (s != null) {
+					if (s.getTasks().cardinality() == s.getPDISession().getTaskManager().getSuspendedTasks().cardinality()) {
+						System.err.println("================= TIME ALL SUSPENDED: " + (System.currentTimeMillis() - time_record));
+						time_record = System.currentTimeMillis();
+					}
+				}
+
 				int[] processes = info.getAllRegisteredTasks().toArray();
 				if (processes.length > 0) {
 					getPView().focusOnDebugTarget(job, processes[0]);

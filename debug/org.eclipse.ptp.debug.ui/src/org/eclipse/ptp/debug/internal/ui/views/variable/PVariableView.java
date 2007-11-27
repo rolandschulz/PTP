@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -188,7 +189,12 @@ public class PVariableView extends AbstractDebugView implements ICheckStateListe
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		Object data = event.getElement();
 		if (data instanceof PVariableInfo) {
-			((PVariableInfo)data).setEnabled(event.getChecked());
+			try {
+				getUIManager().getJobVariableManager().updateVariableStatus((PVariableInfo)data, event.getChecked());
+			}
+			catch (CoreException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

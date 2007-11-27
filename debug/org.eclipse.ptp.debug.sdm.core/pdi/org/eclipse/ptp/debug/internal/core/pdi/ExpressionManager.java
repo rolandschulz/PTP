@@ -212,12 +212,19 @@ public class ExpressionManager extends Manager implements IPDIExpressionManager 
 		return request.getAIF(qTasks);
 	}
 	//MultiExpression
+	public void updateStatusMultiExpressions(String exprText, boolean enabled) {
+		IPDIMultiExpressions mexpr = getMultiExpression(exprText);
+		if (mexpr != null) {
+			((MultiExpressions)mexpr).setEnabled(enabled);
+		}
+	}
 	public void updateMultiExpressions(String exprText, BitList tasks, IProgressMonitor monitor) throws PDIException {
 		IPDIMultiExpressions mexpr = getMultiExpression(exprText);
 		if (mexpr == null)
 			throw new PDIException(tasks, "No expression " + exprText + " found");
 	
-		((MultiExpressions)mexpr).updateExpressionsValue(tasks, monitor);
+		if (mexpr.isEnabled())
+			((MultiExpressions)mexpr).updateExpressionsValue(tasks, monitor);
 	}
 	public void cleanMultiExpressions(String exprText, BitList tasks, IProgressMonitor monitor) throws PDIException {
 		IPDIMultiExpressions mexpr = getMultiExpression(exprText);
@@ -229,7 +236,8 @@ public class ExpressionManager extends Manager implements IPDIExpressionManager 
 	
 	public void updateMultiExpressions(BitList tasks, IProgressMonitor monitor) throws PDIException {
 		for (IPDIMultiExpressions mexpr : getMultiExpressions()) {
-			((MultiExpressions)mexpr).updateExpressionsValue(tasks, monitor);
+			if (mexpr.isEnabled())
+				((MultiExpressions)mexpr).updateExpressionsValue(tasks, monitor);
 		}
 	}	
 	public void cleanMultiExpressions(BitList tasks, IProgressMonitor monitor) throws PDIException {
@@ -240,6 +248,8 @@ public class ExpressionManager extends Manager implements IPDIExpressionManager 
 	public IPDIExpression[] getMultiExpressions(int task) {
 		List<IPDIExpression> exprList = new ArrayList<IPDIExpression>();
 		for (IPDIMultiExpressions mexpr : getMultiExpressions()) {
+			if (!mexpr.isEnabled())
+				continue;
 			IPDIExpression expr = ((MultiExpressions)mexpr).getExpression(task);
 			if (expr != null) {
 				exprList.add(expr);
@@ -250,8 +260,8 @@ public class ExpressionManager extends Manager implements IPDIExpressionManager 
 	public IPDIMultiExpressions getMultiExpression(String exprText) {
 		return mutliExprMap.get(exprText);
 	}
-	public void createMutliExpressions(BitList tasks, String exprText) {
-		mutliExprMap.put(exprText, new MultiExpressions(session, tasks, exprText));
+	public void createMutliExpressions(BitList tasks, String exprText, boolean enabled) {
+		mutliExprMap.put(exprText, new MultiExpressions(session, tasks, exprText, enabled));
 	}
 	public IPDIMultiExpressions[] getMultiExpressions() {
 		return mutliExprMap.values().toArray(new IPDIMultiExpressions[0]);

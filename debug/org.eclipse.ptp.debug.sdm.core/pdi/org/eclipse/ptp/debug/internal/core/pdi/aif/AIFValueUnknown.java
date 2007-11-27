@@ -32,7 +32,7 @@ public class AIFValueUnknown extends AIFValue {
 	
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = "<value not supported>";
+			result = "NOT SUPPORTED";
 		}
 		return result;
 	}
