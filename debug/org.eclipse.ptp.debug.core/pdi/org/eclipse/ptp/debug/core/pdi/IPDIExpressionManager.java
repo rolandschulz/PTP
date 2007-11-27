@@ -31,6 +31,12 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITargetExpression;
  */
 public interface IPDIExpressionManager extends IPDISessionObject {
 	/**
+	 * Update status of multiple expressions
+	 * @param exprText expression name
+	 * @param enabled status of this expression
+	 */
+	void updateStatusMultiExpressions(String exprText, boolean enabled);
+	/**
 	 * Remove multiple expressions from store
 	 * @param exprText expression name
 	 */
@@ -62,8 +68,9 @@ public interface IPDIExpressionManager extends IPDISessionObject {
 	 * Creates mutliple expression object for a number of processes with one variable
 	 * @param tasks task
 	 * @param exprText variable
+	 * @param enabled status of this expression
 	 */
-	void createMutliExpressions(BitList tasks, String exprText);
+	void createMutliExpressions(BitList tasks, String exprText, boolean enabled);
 	
 	/**
 	 * Returns IPDIMultiExpressions with specific expression value
@@ -73,9 +80,9 @@ public interface IPDIExpressionManager extends IPDISessionObject {
 	IPDIMultiExpressions getMultiExpression(String exprText);
 	
 	/**
-	 * Returns array of IPDIExpression with specific task id
+	 * Returns array of enabled IPDIExpression with specific task id
 	 * @param task task id
-	 * @return array of IPDIExpression with specific task id
+	 * @return array of enabled IPDIExpression with specific task id
 	 */
 	IPDIExpression[] getMultiExpressions(int task);
 

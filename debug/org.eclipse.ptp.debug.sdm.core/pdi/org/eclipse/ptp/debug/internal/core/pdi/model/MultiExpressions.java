@@ -10,6 +10,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.internal.core.pdi.AIFFactory;
 import org.eclipse.ptp.debug.internal.core.pdi.Session;
 import org.eclipse.ptp.debug.internal.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.internal.core.pdi.request.DataEvaluateExpressionRequest;
@@ -20,20 +21,28 @@ import org.eclipse.ptp.debug.internal.core.pdi.request.DataEvaluateExpressionReq
  */
 public class MultiExpressions extends SessionObject implements IPDIMultiExpressions {
 	private String expr;
+	private boolean enabled;
 	private Map<Integer,IPDIExpression> expressions = new HashMap<Integer,IPDIExpression>();
 	
-	public MultiExpressions(Session session, BitList tasks, String ex) {
+	public MultiExpressions(Session session, BitList tasks, String ex, boolean enabled) {
 		super(session, tasks);
 		this.expr = ex;
+		this.enabled = enabled;
 		initital();
 	}
 	public void shutdown() {
 		expressions.clear();
-	}
+	}	
 	private void initital() {
 		for (int task : getTasks().toArray()) {
 			addExpression(new MExpression(task));
 		}
+	}
+	public boolean isEnabled() {
+		return enabled;
+	}
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 	public String getExpressionText() {
 		return expr;
@@ -72,18 +81,28 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 		for (Iterator<BitList> i = results.keySet().iterator(); i.hasNext();) {
 			BitList sTasks = i.next();
 			Object obj = results.get(sTasks);
-			if (!(obj instanceof IAIF))
-				throw new PDIException(tasks, "Updating expression value error");
+			if (!(obj instanceof IAIF)) {
+				//set unknown aif for tasks
+				for (int task : sTasks.toArray()) {
+					IPDIExpression expression = getExpression(task);
+					if (expression == null)
+						continue;
+					expression.setAIF(AIFFactory.UNKNOWNAIF());
+				}
+				continue;
+				//throw new PDIException(tasks, "Updating expression value error");
+			}
 				
 			IAIF aif = (IAIF)obj;
 			for (int task : sTasks.toArray()) {
+				IPDIExpression expression = getExpression(task);
+				if (expression == null)
+					continue;
 				if (monitor.isCanceled()) {
+					expression.setAIF(AIFFactory.UNKNOWNAIF());
 					throw new PDIException(tasks, "Updating is cancelled by user");
 				}
-				IPDIExpression expression = getExpression(task);
-				if (expression != null) {
-					expression.setAIF(aif);
-				}
+				expression.setAIF(aif);
 				monitor.worked(1);
 			}
 		}
