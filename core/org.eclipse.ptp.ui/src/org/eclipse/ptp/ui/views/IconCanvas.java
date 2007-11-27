@@ -2156,7 +2156,7 @@ public class IconCanvas extends Canvas {
 				if (ly > 0)
 					display_y = ly;
 			}
-			Point real_location = getViewActualLocation(this, null, display_x, display_y);
+			Point real_location = getViewActualLocation(this, null, display_x-2, display_y-2);
 			informationControl.setLocation(real_location);
 			informationControl.setVisible(true);
 			//informationControl.setFocus();
