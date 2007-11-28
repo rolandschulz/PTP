@@ -90,10 +90,10 @@ the program that are not affected by such error.
 
 <h2 id="barError">Barrier Error View </h2>
 <p>When a barrier error is detected, it is highlighted in
-the editor (red arrows). In additon, a counter example is shownwhich contains 
+the editor (red arrows). In additon, a counter example is shown which contains 
 two sequences of barriers which have different sizes along two
 paths starting from the highlighted error position. This counter example
-simulates? an execution and illustrates the reason of the 
+simulates? an execution and illustrates the reason for the 
 synchronization error. Note that a synchronization error occurs if different 
 MPI tasks meet a different number of barriers.  If a barrier b is in a loop, and
 all tasks execute the same number of iterations, then barrier b is marked by 
@@ -104,6 +104,11 @@ of such loop), then we show the counter example as the sequence of barriers
 in the loop body. 
 <p>
 <img src="images/BarrierErrorView.gif">
+<p>If a filename and LineNo are shown, double-click on that line in
+the Barrier Errors view to locate that Barrier or error.
+To show a path with or without barriers (e.g. a counterexample),
+double-click on the Path line in the view, as shown below:
+<br><img src="images/barrierPathSelection.gif" border=1>
 
 
 <h3> testMPI.c </h3>
