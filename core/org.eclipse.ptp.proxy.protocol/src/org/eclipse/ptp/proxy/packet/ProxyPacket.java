@@ -154,7 +154,13 @@ public class ProxyPacket {
 		
 		CharBuffer len_str = decoder.decode(lengthBytes);
 	
-		int len = Integer.parseInt(len_str.subSequence(0, PACKET_LENGTH_SIZE).toString(), 16);
+		int len;
+		try {
+			len = Integer.parseInt(len_str.subSequence(0, PACKET_LENGTH_SIZE).toString(), 16);
+		} catch (NumberFormatException e) {
+			System.out.println("BAD PACKET LENGTH: \"" + len_str + "\"");
+			throw new IOException("Bad packet length format");
+		}
 		
 		/*
 		 * Read len bytes of rest of event
@@ -196,6 +202,9 @@ public class ProxyPacket {
 				packetArgs[i] = ProtocolUtil.decodeString(eventBuf, argPos);
 				argPos += packetArgs[i].length() + PACKET_ARG_LEN_SIZE + 2;
 			}
+		} catch (NumberFormatException e) {
+			System.out.println("BAD PACKET FORMAT: \"" + eventBuf + "\"");
+			throw new IOException("Bad packet format");
 		} catch (IndexOutOfBoundsException e1) {
 			return false;
 		}
