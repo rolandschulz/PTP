@@ -89,12 +89,11 @@ public class PMainTab extends PLaunchConfigurationTab {
 	        Object source = e.getSource();
 			if (source == resourceManagerCombo) {
 				rmSelectionChanged();
+	            updateLaunchConfigurationDialog();
 			} else if (source == projButton) {
 	            handleProjectButtonSelected();
 			} else if (source == appButton) {
 	            handleApplicationButtonSelected();
-	        } else {
-	            handleProjectButtonSelected();
 	        }
 	    }
     }
