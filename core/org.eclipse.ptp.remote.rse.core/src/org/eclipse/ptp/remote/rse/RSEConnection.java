@@ -13,6 +13,7 @@ package org.eclipse.ptp.remote.rse;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
@@ -22,9 +23,11 @@ import org.eclipse.rse.core.model.IHost;
 
 public class RSEConnection implements IRemoteConnection {
 	private IHost rseHost;
+	private IFileSystem fileSystem;
 
-	public RSEConnection(IHost host) {
-		rseHost = host;
+	public RSEConnection(IHost host, IFileSystem fileSystem) {
+		this.rseHost = host;
+		this.fileSystem = fileSystem;
 	}
 	
 	/* (non-Javadoc)
@@ -42,7 +45,16 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
-
+	
+	/**
+	 * Get the file system for this connection
+	 * 
+	 * @return
+	 */
+	public IFileSystem getFileSystem() {
+		return fileSystem;
+	}
+	
 	/**
 	 * Get RSE host object 
 	 * 
