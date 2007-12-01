@@ -25,6 +25,8 @@ import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -63,6 +65,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		
 		fRMDebuggerText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		fRMDebuggerText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fRMDebuggerText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+		    	updateLaunchConfigurationDialog();
+			}
+		});
 		fRMDebuggerButton = createPushButton(comp, ExternalDebugUIMessages.getString("SDMDebuggerPage.browse"), null); //$NON-NLS-1$
 		fRMDebuggerButton.addSelectionListener(new SelectionAdapter() {
 		    @Override
@@ -70,7 +77,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				String file = browseRemoteFile();
 				if (file != null) {
 					fRMDebuggerText.setText(file);
-			    	updateLaunchConfigurationDialog();
 				}
 		    }
 		});
