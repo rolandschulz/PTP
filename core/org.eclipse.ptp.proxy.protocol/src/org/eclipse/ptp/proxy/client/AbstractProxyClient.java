@@ -175,8 +175,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				try {
 					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
-					sessInput = sessSock.socket().getChannel();
-					sessOutput = sessSock.socket().getChannel();
+					sessInput = sessSock;
+					sessOutput = sessSock;
 				} catch (SocketTimeoutException e) {
 					error = true;
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
