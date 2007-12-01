@@ -32,6 +32,8 @@ public class ProxyPacket {
 	public static final int PACKET_NARGS_SIZE = 8;
 	public static final int PACKET_ARG_LEN_SIZE = 8;
 
+	private boolean debug = true;
+	
 	private int packetID;
 	private int packetTransID;
 	private String[] packetArgs;
@@ -109,7 +111,7 @@ public class ProxyPacket {
 	 * where:
 	 * 
 	 * LENGTH	is an PACKET_LENGTH_SIZE hexadecimal number representing
-	 * 			the total length of the event excluding the LENGTH field.
+	 * 			the total length of the HEADER and BODY sections.
 	 * 
 	 * HEADER consists of the following fields:
 	 * 
@@ -147,22 +149,34 @@ public class ProxyPacket {
 		ByteBuffer lengthBytes = ByteBuffer.allocate(PACKET_LENGTH_SIZE);
 		fullRead(channel, lengthBytes);
 		CharBuffer len_str = decoder.decode(lengthBytes);
+		
+		if (debug) {
+			System.out.print("PACKET:[" + len_str);
+		}
 	
 		int len;
 		try {
 			len = Integer.parseInt(len_str.subSequence(0, PACKET_LENGTH_SIZE).toString(), 16);
 		} catch (NumberFormatException e) {
-			System.out.println("BAD PACKET LENGTH: \"" + len_str + "\"");
+			if (debug) {
+				System.out.println("] BAD PACKET LENGTH");
+			} else {
+				System.out.println("BAD PACKET LENGTH: \"" + len_str + "\"");
+			}
 			throw new IOException("Bad packet length format");
 		}
 		
 		/*
-		 * Read len bytes of rest of event
+		 * Read len bytes of rest of packet
 		 */
-		ByteBuffer eventBytes = ByteBuffer.allocate(len);
-		fullRead(channel, eventBytes);
-		CharBuffer eventBuf = decoder.decode(eventBytes);
+		ByteBuffer packetBytes = ByteBuffer.allocate(len);
+		fullRead(channel, packetBytes);
+		CharBuffer packetBuf = decoder.decode(packetBytes);
 		
+		if (debug) {
+			System.out.println(packetBuf + "]");
+		}
+
 		/*
 		 * Extract transaction ID and event type
 		 */
@@ -175,12 +189,12 @@ public class ProxyPacket {
 		int numArgsEnd = numArgsStart + PACKET_NARGS_SIZE;
 		
 		try {
-			packetID = Integer.parseInt(eventBuf.subSequence(idStart, idEnd).toString(), 16);
-			packetTransID = Integer.parseInt(eventBuf.subSequence(transStart, transEnd).toString(), 16);
-			int packetNumArgs = Integer.parseInt(eventBuf.subSequence(numArgsStart, numArgsEnd).toString(), 16);
+			packetID = Integer.parseInt(packetBuf.subSequence(idStart, idEnd).toString(), 16);
+			packetTransID = Integer.parseInt(packetBuf.subSequence(transStart, transEnd).toString(), 16);
+			int packetNumArgs = Integer.parseInt(packetBuf.subSequence(numArgsStart, numArgsEnd).toString(), 16);
 			
 			/*
-			 * Extract rest of event arguments. Each argument is an 8 byte hex length, ':' and
+			 * Extract rest of the arguments. Each argument is an 8 byte hex length, ':' and
 			 * then the characters of the argument.
 			 */
 			
@@ -188,11 +202,11 @@ public class ProxyPacket {
 			int argPos = numArgsEnd + 1;
 			
 			for (int i = 0; i < packetNumArgs; i++) {
-				packetArgs[i] = ProtocolUtil.decodeString(eventBuf, argPos);
+				packetArgs[i] = ProtocolUtil.decodeString(packetBuf, argPos);
 				argPos += packetArgs[i].length() + PACKET_ARG_LEN_SIZE + 2;
 			}
 		} catch (NumberFormatException e) {
-			System.out.println("BAD PACKET FORMAT: \"" + eventBuf + "\"");
+			System.out.println("BAD PACKET FORMAT: \"" + packetBuf + "\"");
 			throw new IOException("Bad packet format");
 		} catch (IndexOutOfBoundsException e1) {
 			return false;
