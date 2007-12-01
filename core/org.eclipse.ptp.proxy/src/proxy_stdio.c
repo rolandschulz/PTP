@@ -253,15 +253,15 @@ proxy_stdio_decode_string(char *str, char **arg, char **end)
 	char *	ep;
 	char *	p;
 	
-	if (str_len < CMD_ARG_LEN_SIZE + 1) {
+	if (str_len < MSG_ARG_LEN_SIZE + 1) {
 		return -1;
 	}
 	
-	ep = str + CMD_ARG_LEN_SIZE;
+	ep = str + MSG_ARG_LEN_SIZE;
 	*ep++ = '\0';
 	arg_len = strtol(str, NULL, 16);
 	
-	if (str_len < CMD_ARG_LEN_SIZE + arg_len + 1) {
+	if (str_len < MSG_ARG_LEN_SIZE + arg_len + 1) {
 		return -1;
 	}
 	
@@ -270,7 +270,7 @@ proxy_stdio_decode_string(char *str, char **arg, char **end)
 	p[arg_len] = '\0';
 	
 	*arg = p;
-	*end = str + CMD_ARG_LEN_SIZE + arg_len + 1;
+	*end = str + MSG_ARG_LEN_SIZE + arg_len + 1;
 	
 	return 0;
 }

@@ -22,15 +22,6 @@
 
 #define CMD_QUIT			0
 
-#define CMD_ID_SIZE			4
-#define CMD_ID_MASK			0xffff
-#define CMD_TRANS_ID_SIZE	4
-#define CMD_TRANS_ID_MASK	0xffff
-#define CMD_NARGS_SIZE		8
-#define CMD_NARGS_MASK		0xffffffff
-#define CMD_ARG_LEN_SIZE	8
-#define CMD_ARG_LEN_MASK	0xffffffff
-
 /*
  * Command dispatch structure
  */
