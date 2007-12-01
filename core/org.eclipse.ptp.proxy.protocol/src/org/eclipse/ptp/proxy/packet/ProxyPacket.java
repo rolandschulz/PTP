@@ -145,13 +145,7 @@ public class ProxyPacket {
 		 * First EVENT_LENGTH_SIZE bytes are the length of the event
 		 */
 		ByteBuffer lengthBytes = ByteBuffer.allocate(PACKET_LENGTH_SIZE);
-		int readLen;
-		
-		readLen = fullRead(channel, lengthBytes);
-		if (readLen != PACKET_LENGTH_SIZE) {
-			return false;
-		}
-		
+		fullRead(channel, lengthBytes);
 		CharBuffer len_str = decoder.decode(lengthBytes);
 	
 		int len;
@@ -166,12 +160,7 @@ public class ProxyPacket {
 		 * Read len bytes of rest of event
 		 */
 		ByteBuffer eventBytes = ByteBuffer.allocate(len);
-	
-		readLen = fullRead(channel, eventBytes);
-		if (readLen < PACKET_ID_SIZE + PACKET_TRANS_ID_SIZE + PACKET_NARGS_SIZE + 3) {
-			return false;
-		}
-	
+		fullRead(channel, eventBytes);
 		CharBuffer eventBuf = decoder.decode(eventBytes);
 		
 		/*
@@ -231,39 +220,40 @@ public class ProxyPacket {
 	}
 	
 	/**
-	 * Read a full buffer from the socket.
+	 * Read a full buffer from the socket. Guaranteed to read buf.remaining() bytes
+	 * from the channel.
 	 * 
-	 * @return	number of bytes read
+	 * FIXME: Can this block if there is nothing available on the channel? If so, then
+	 * there should be some kind of timeout to prevent the UI from hanging.
+	 * 
 	 * @throws	IOException if EOF
 	 */
-	private int fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
-		int n = 0;
+	private void fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
 		buf.clear();
-		while (buf.remaining() > 0) {
-			n = channel.read(buf);
+		while (buf.hasRemaining()) {
+			int n = channel.read(buf);
 			if (n < 0) {
 				throw new IOException("EOF from proxy");
 			}
 		}
 		buf.flip();
-		return n;
 	}
 	
 	/**
-	 * Write a full buffer to the socket.
+	 * Write a full buffer to the socket. Guaranteed to write buf.remaingin() bytes to
+	 * the channel.
+	 * 
+	 * FIXME: Can this block? If so, then there should be some kind of timeout to prevent the UI from hanging.
 	 * 
 	 * @param buf
-	 * @return number of bytes written
 	 * @throws IOException
 	 */
-	private int fullWrite(WritableByteChannel channel, ByteBuffer buf) throws IOException {
-		int n = 0;
-		while (buf.remaining() > 0) {
-			n = channel.write(buf);
+	private void fullWrite(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+		while (buf.hasRemaining()) {
+			int n = channel.write(buf);
 			if (n < 0) {
 				throw new IOException("EOF from proxy");
 			}
 		}
-		return n;
 	}
 }
