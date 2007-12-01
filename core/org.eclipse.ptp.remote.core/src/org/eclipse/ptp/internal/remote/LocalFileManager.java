@@ -14,11 +14,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteResource;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -76,9 +76,9 @@ public class LocalFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) throws IOException {
+	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
 		try {
-			return new LocalResource(EFS.getLocalFileSystem().getStore(path));
+			return EFS.getLocalFileSystem().getStore(path);
 		} finally {
 			monitor.done();
 		}

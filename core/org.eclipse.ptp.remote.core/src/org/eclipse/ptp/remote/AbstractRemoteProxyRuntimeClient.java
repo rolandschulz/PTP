@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -115,13 +115,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				 * Check the remote proxy exists
 				 */
 				IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
-				try {
-					IRemoteResource res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
-					if (!res.fetchInfo().exists()){
-						throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
-					}
-				} catch (CoreException e1) {
-					throw new IOException(e1.getMessage());
+				IFileStore res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
+				if (!res.fetchInfo().exists()){
+					throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
 				}
 
 				if (!stdio) {

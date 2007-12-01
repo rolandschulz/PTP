@@ -29,6 +29,7 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -74,7 +75,6 @@ import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteResource;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -712,7 +712,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 					IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
 					try {
 						IPath resPath = new Path(path);
-						IRemoteResource res = fileManager.getResource(resPath, new NullProgressMonitor());
+						IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
 						if (res.fetchInfo().exists()) {
 							return resPath;
 						}
