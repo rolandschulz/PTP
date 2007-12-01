@@ -16,7 +16,11 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileInfo;
+import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,22 +28,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.AbstractRemoteResource;
-import org.eclipse.ptp.remote.IRemoteResource;
-import org.eclipse.ptp.remote.IRemoteResourceInfo;
 import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
 
-public class RemoteToolsResource extends AbstractRemoteResource {
+public class RemoteToolsFileStore extends FileStore {
 
 	private IRemoteItem remoteItem;
 	private URI remoteURI;
 	private RemoteToolsFileManager fileMgr;
 	private boolean isDirectory;
 	
-	public RemoteToolsResource(RemoteToolsConnection conn, RemoteToolsFileManager mgr, IRemoteItem remoteItem, boolean isDirectory) {
+	public RemoteToolsFileStore(RemoteToolsConnection conn, RemoteToolsFileManager mgr, IRemoteItem remoteItem, boolean isDirectory) {
 		this.fileMgr = mgr;
 		this.remoteItem = remoteItem;
 		this.isDirectory = isDirectory;
@@ -51,7 +52,7 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#childNames(int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public String[] childNames(int options, IProgressMonitor monitor)
@@ -77,7 +78,7 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#delete(int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.core.filesystem.provider.FileStore#delete(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void delete(int options, IProgressMonitor monitor)
@@ -93,47 +94,45 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#fetchInfo(int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.core.filesystem.provider.FileStore#fetchInfo(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IRemoteResourceInfo fetchInfo(int options, IProgressMonitor monitor)
+	public IFileInfo fetchInfo(int options, IProgressMonitor monitor)
 			throws CoreException {
 		FileInfo info = new FileInfo(new Path(remoteItem.getPath()).lastSegment());
 		if (remoteItem == null || !remoteItem.exists()) {
 			info.setExists(false);
-			return new RemoteToolsResourceInfo(info);
+			return info;
 		}
 		
 		info.setExists(true);
 		info.setLastModified(remoteItem.getModificationTime());
 		info.setDirectory(isDirectory);
-		info.setAttribute(IRemoteResource.ATTRIBUTE_READ_ONLY, !remoteItem.isWritable());
+		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !remoteItem.isWritable());
 		
 		if (!isDirectory) {
 			IRemoteFile file = (IRemoteFile)remoteItem;
-			info.setAttribute(IRemoteResource.ATTRIBUTE_EXECUTABLE, file.isExecutable());
+			info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, file.isExecutable());
 			info.setLength(file.getSize());
 		}
 
-		return new RemoteToolsResourceInfo(info);
+		return info;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#getChild(java.lang.String)
-	 * 
-	 * FIXME: Should throw CoreException
+	 * @see org.eclipse.core.filesystem.provider.FileStore#getChild(java.lang.String)
 	 */
 	@Override
-	public IRemoteResource getChild(String name, IProgressMonitor monitor) {
+	public IFileStore getChild(String name) {
 		IPath childPath = new Path(remoteItem.getPath()).append(name);
 		
-		IRemoteResource resource = fileMgr.lookup(childPath);
+		IFileStore resource = fileMgr.lookup(childPath);
 		if (resource != null) {
 			return resource;
 		}
 		
 		try {
-			return fileMgr.getResource(childPath, monitor);
+			return fileMgr.getResource(childPath, new NullProgressMonitor());
 		} catch (IOException e) {
 			return null;
 		}
@@ -154,7 +153,7 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 	 * FIXME: should throw a core exception
 	 */
 	@Override
-	public IRemoteResource getParent() {
+	public IFileStore getParent() {
 		IPath parent;
 		try {
 			parent = new Path(fileMgr.getParent(remoteItem.getPath()));
@@ -162,7 +161,7 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 			return null;
 		}
 		
-		IRemoteResource resource = fileMgr.lookup(parent);
+		IFileStore resource = fileMgr.lookup(parent);
 		if (resource != null) {
 			return resource;
 		}
@@ -177,7 +176,7 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#mkdir(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IRemoteResource mkdir(int options, IProgressMonitor monitor)
+	public IFileStore mkdir(int options, IProgressMonitor monitor)
 			throws CoreException {
 		try {
 			fileMgr.mkdir(remoteItem.getPath());
@@ -235,16 +234,16 @@ public class RemoteToolsResource extends AbstractRemoteResource {
 	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#putInfo(org.eclipse.ptp.remote.IRemoteResourceInfo, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void putInfo(IRemoteResourceInfo info, int options,
+	public void putInfo(IFileInfo info, int options,
 			IProgressMonitor monitor) throws CoreException {
 		try {
 			boolean modified = false;
-			if ((options & IRemoteResource.SET_ATTRIBUTES) != 0) {
+			if ((options & EFS.SET_ATTRIBUTES) != 0) {
 				//We cannot currently write isExecutable(), isHidden()
-				remoteItem.setWriteable(!info.getAttribute(IRemoteResource.ATTRIBUTE_READ_ONLY));
+				remoteItem.setWriteable(!info.getAttribute(EFS.ATTRIBUTE_READ_ONLY));
 				modified = true;
 			} 
-			if ((options & IRemoteResource.SET_LAST_MODIFIED) != 0) {
+			if ((options & EFS.SET_LAST_MODIFIED) != 0) {
 				remoteItem.setModificationTime(info.getLastModified());
 				modified = true;
 			}

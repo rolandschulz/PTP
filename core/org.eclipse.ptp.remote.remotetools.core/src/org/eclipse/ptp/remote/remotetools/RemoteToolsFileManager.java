@@ -16,10 +16,10 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteResource;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
 	private RemoteToolsConnection connection;
-	private Map<IPath, IRemoteResource> pathCache = new HashMap<IPath, IRemoteResource>();
+	private Map<IPath, IFileStore> pathCache = new HashMap<IPath, IFileStore>();
 	
 	public RemoteToolsFileManager(RemoteToolsConnection conn) {
 		this.connection = conn;
@@ -55,7 +55,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @param path path to the remote resource
 	 * @param resource resource to add to the cache
 	 */
-	public void cache(IPath path, IRemoteResource resource) {
+	public void cache(IPath path, IFileStore resource) {
 		synchronized (pathCache) {
 			pathCache.put(path, resource);
 		}
@@ -83,8 +83,8 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
 	 */
-	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) throws IOException {
-		IRemoteResource res = lookup(path);
+	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
+		IFileStore res = lookup(path);
 		if (res != null) {
 			return res;
 		}
@@ -106,7 +106,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			throw new IOException(e.getMessage());
 		}
 		
-		res = new RemoteToolsResource(connection, this, item, isDirectory);
+		res = new RemoteToolsFileStore(connection, this, item, isDirectory);
 		cache(path, res);
 		return res;
 	}
@@ -128,7 +128,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @param path path to the remote resource
 	 * @return cached IRemoteResource or null
 	 */
-	public IRemoteResource lookup(IPath path) {
+	public IFileStore lookup(IPath path) {
 		synchronized (pathCache) {
 			return pathCache.get(path);
 		}
