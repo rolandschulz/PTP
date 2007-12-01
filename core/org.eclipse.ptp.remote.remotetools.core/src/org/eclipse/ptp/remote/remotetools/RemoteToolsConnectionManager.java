@@ -16,7 +16,7 @@ import java.util.Map;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
+import org.eclipse.ptp.remote.remotetools.ui.ConfigurationDialog;
 import org.eclipse.ptp.remotetools.core.AuthToken;
 import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
 import org.eclipse.swt.SWT;
@@ -98,12 +98,12 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
 	 */
 	public void newConnection(Shell shell) {
-		AuthDialog dlg = new AuthDialog(shell);
-		dlg.open();
+		ConfigurationDialog dialog = new ConfigurationDialog(shell);
+		dialog.open();
 		
-		org.eclipse.ptp.remotetools.core.IRemoteConnection conn = RemotetoolsPlugin.createSSHConnection(dlg.getAuth(), dlg.getHost());
+		//org.eclipse.ptp.remotetools.core.IRemoteConnection conn = RemotetoolsPlugin.createSSHConnection(dialog.getAuth(), dialog.getHost());
 		
-		connections.put(dlg.getHost(), new RemoteToolsConnection(conn, dlg.getHost(), dlg.getAuth().getUsername()));
+		//connections.put(dialog.getHost(), new RemoteToolsConnection(conn, dialog.getHost(), dialog.getAuth().getUsername()));
 	}
 
 	/* (non-Javadoc)
