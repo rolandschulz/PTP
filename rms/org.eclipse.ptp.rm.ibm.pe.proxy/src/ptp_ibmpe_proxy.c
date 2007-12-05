@@ -233,6 +233,7 @@ int main(int argc, char *argv[]);
 extern char **environ;
 static int events_enabled = 0;
 static int shutdown_requested;
+static int debug_level = 0; /* 0 is off */
 static int ptp_signal_exit;
 static List *jobs;		/* Jobs run by this proxy                   */
 static Hash *nodes;		/* Nodes currently in use                   */
@@ -273,7 +274,7 @@ static pthread_t thread_map_table[256];
 #ifdef __linux__
 static struct option longopts[] = { {"proxy", required_argument, NULL, 'P'},
 {"port", required_argument, NULL, 'p'}, {"host", required_argument,
-					 NULL, 'h'}, {NULL, 0, NULL, 0}
+					 NULL, 'h'}, {"debug", required_argument, NULL, 'd'}, {NULL, 0, NULL, 0}
 };
 #endif
 
@@ -3172,7 +3173,7 @@ main(int argc, char *argv[])
     }
 #endif
 #ifdef __linux__
-    while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, "P:p:h:d:", longopts, NULL)) != -1) {
 	switch (ch) {
 	    case 'P':
 		proxy_str = optarg;
@@ -3183,9 +3184,12 @@ main(int argc, char *argv[])
 	    case 'h':
 		host = optarg;
 		break;
+	    case 'd':
+	    debug_level = atoi(optarg);
+	    break;
 	    default:
 		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port]\n",
+			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--debug=level]\n",
 			      argv[0]);
 		return 1;
 	}
@@ -3218,11 +3222,15 @@ main(int argc, char *argv[])
 		host = cp + 1;
 		n = n + 1;
 	    }
+	    else if (strcmp(argv[n], "--debug") == 0) {
+	    debug_level = atoi(cp + 1);
+		n = n + 1;
+	    }
 	    else {
 		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n",
 			      argv[n], n);
 		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port]\n",
+			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--debug]\n",
 			      argv[0]);
 		return 1;
 	    }

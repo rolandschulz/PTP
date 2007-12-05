@@ -168,6 +168,7 @@ static pid_t		orted_pid = 0;
 static List *		gJobList;
 static List *		gMachineList;
 static int			ptp_signal_exit;
+static int			debug_level = 0; /* 0 is off */
 static RETSIGTYPE	(*saved_signals[NSIG])(int);
 
 static proxy_svr_helper_funcs helper_funcs = {
@@ -197,6 +198,7 @@ static struct option longopts[] = {
 	{"proxy",			required_argument,	NULL, 	'P'}, 
 	{"port",			required_argument,	NULL, 	'p'}, 
 	{"host",			required_argument,	NULL, 	'h'}, 
+	{"debug",			required_argument,	NULL, 	'd'}, 
 	{NULL,				0,					NULL,	0}
 };
 
@@ -655,8 +657,10 @@ int
 ORTECheckErrorCode(int trans_id, int type, int rc)
 {
 	if(rc != ORTE_SUCCESS) {
-		fprintf(stderr, "ARgh!  An error!\n"); fflush(stderr);
-		fprintf(stderr, "ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "ARgh!  An error!\n"); fflush(stderr);
+			fprintf(stderr, "ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
+		}
 		sendErrorEvent(trans_id, type, (char *)ORTE_ERROR_NAME(rc));
 		return 1;
 	}
@@ -750,7 +754,9 @@ orte_start_iof(ptp_job *job)
 	        return;
 	    }
 	    	
-		fprintf(stderr, "registering IO forwarding - name = '%s'\n", (char *)name); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "registering IO forwarding - name = '%s'\n", (char *)name); fflush(stderr);
+		}
 		
 		if (!job->debug) {
 			callback = iof_callback;
@@ -783,7 +789,9 @@ orte_stop_iof(ptp_job *job)
 	     	ORTE_ERROR_LOG(rc);
 	        	return;
 	    }
-		fprintf(stderr, "unregistering IO forwarding - name = %s\n", (char *)name); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "unregistering IO forwarding - name = %s\n", (char *)name); fflush(stderr);
+		}
 	    if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT))) {                
 			opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
 		}
@@ -806,7 +814,9 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	ptp_job *	j = find_job(jobid, JOBID_ORTE);
 	
 	if (j == NULL) {
-		fprintf(stderr, "JOB STATE CALLBACK: could not find jobid %d\n", jobid); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "JOB STATE CALLBACK: could not find jobid %d\n", jobid); fflush(stderr);
+		}
 		return;
 	}
 	
@@ -816,7 +826,9 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 static void
 do_state_callback(ptp_job *job, orte_proc_state_t state) 
 {
-	fprintf(stderr, "STATE CALLBACK: %d\n", state); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "STATE CALLBACK: %d\n", state); fflush(stderr);
+	}
 		
 	switch (state) {
 #if !ORTE_VERSION_1_0
@@ -1034,7 +1046,7 @@ get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_no
 {
 	int					rc;
 	int					i;
-	char *				name;
+	char *				name = NULL;
 	char *				user = NULL;
 	char *				group = NULL;
 	char *				status = NODE_STATE_UP;
@@ -1127,7 +1139,9 @@ do_orte_init(int trans_id, char *universe_name)
 	int rc;
 	char *str;
 		
-	fprintf(stderr, "ORTEInit (%s)\n", universe_name); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "ORTEInit (%s)\n", universe_name); fflush(stderr);
+	}
 	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
 	putenv(str);
 	
@@ -1261,11 +1275,15 @@ subscribe_proc(ptp_job * job, int procid)
 	orte_gpr_value_t *			values;
 	orte_process_name_t			proc;
 
-	fprintf(stderr, "subscribing proc %d\n", procid); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "subscribing proc %d\n", procid); fflush(stderr);
+	}
 	
 	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->orte_jobid);
 	if(rc != ORTE_SUCCESS) {
-		fprintf(stderr, "ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
+		}
 		return -1;
 	}
 		
@@ -1325,13 +1343,17 @@ subscribe_job(orte_jobid_t jobid)
 	ptp_job *	job;
 	
 	if (ORTE_SUCCESS != (rc = ORTE_GET_VPID_RANGE(jobid, &vpid_start, &vpid_range))) {
-		fprintf(stderr, "no processes for job\n"); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "no processes for job\n"); fflush(stderr);
+		}
 		return -1;
 	}
 	
 	job = find_job(jobid, JOBID_ORTE);
 	if (job != NULL) {
-		fprintf(stderr, "subscribing %d procs\n", vpid_range); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "subscribing %d procs\n", vpid_range); fflush(stderr);
+		}
 		
 		for (vpid = vpid_start; vpid < vpid_start + vpid_range; vpid++)
 			subscribe_proc(job, vpid);
@@ -1356,7 +1378,9 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	char *res, *kv, *str1, *str2, *str3, *foo, *bar, *nodename;
 	int machID;
 	
-	fprintf(stderr, "BPROC NOTIFY CALLBACK!\n"); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "BPROC NOTIFY CALLBACK!\n"); fflush(stderr);
+	}
 	
 	values = (orte_gpr_value_t**)(data->values)->addr;
 	
@@ -1370,13 +1394,17 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 		keyvals = value->keyvals;
 		
 		asprintf(&nodename, "%s", value->tokens[1]);
-		fprintf(stderr, "NODE NAME = %s\n", nodename);
+		if (debug_level > 0) {
+			fprintf(stderr, "NODE NAME = %s\n", nodename);
+		}
 		
 		for(j=0; j<value->cnt; j++) {
 			orte_gpr_keyval_t *keyval = keyvals[j];
 			char *external_key;
 			
-			fprintf(stderr, "--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stderr);
+			if (debug_level > 0) {
+				fprintf(stderr, "--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stderr);
+			}
 			
 			if(!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
 				asprintf(&external_key, "%s", ATTRIB_NODE_NAME);
@@ -1389,23 +1417,33 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_MODE))
 				asprintf(&external_key, "%s", ATTRIB_NODE_MODE);
 			else
-				fprintf(stderr, "******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stderr);
-					
+				if (debug_level > 0) {
+					fprintf(stderr, "******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stderr);
+				}
+			
 			switch(keyval->type) {
 				case ORTE_NODE_STATE:
-					fprintf(stderr, "--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stderr);
+					if (debug_level > 0) {
+						fprintf(stderr, "--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stderr);
+					}
 					asprintf(&kv, "%s=%d", external_key, keyval->value.node_state);
 					break;
 				case ORTE_STRING:
-					fprintf(stderr, "--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stderr);
+					if (debug_level > 0) {
+						fprintf(stderr, "--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stderr);
+					}
 					asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
 					break;
 				case ORTE_UINT32:
-					fprintf(stderr, "--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stderr);
+					if (debug_level > 0) {
+						fprintf(stderr, "--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stderr);
+					}
 					asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
 					break;
 				default:
-					fprintf(stderr, "--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stderr);
+					if (debug_level > 0) {
+						fprintf(stderr, "--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stderr);
+					}
 					asprintf(&kv, "%s=%d", external_key, keyval->type);
 			}
 			
@@ -1497,9 +1535,13 @@ subscribe_bproc(void)
 int
 do_orte_shutdown(void)
 {
-	fprintf(stderr, "ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stderr);
+	}
 	ORTE_SHUTDOWN();
-	fprintf(stderr, "ORTEShutdown() - told ORTEd to exit.\n"); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "ORTEShutdown() - told ORTEd to exit.\n"); fflush(stderr);
+	}
 	
 	orte_finalize();
 	
@@ -1535,7 +1577,9 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	fd_set			fds;
 	struct timeval	timeout;
 	
-	fprintf(stderr, "ORTE_Initialize (%d):\n", trans_id); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "ORTE_Initialize (%d):\n", trans_id); fflush(stderr);
+	}
 	
 	if (proxy_state != STATE_INIT) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
@@ -1577,11 +1621,15 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			asprintf(&res, "%s --universe PTP-ORTE-%d --report-uri %d", DEFAULT_ORTED_ARGS, getpid(), pfd[1]);
 
 			orted_args  = Str2Args(res);
-			fprintf(stderr, "StartDaemon(orted %s)\n", res); fflush(stderr);
+			if (debug_level > 0) {
+				fprintf(stderr, "StartDaemon(orted %s)\n", res); fflush(stderr);
+			}
 			free(res);
 			
 			/* spawn the daemon */
-			fprintf(stderr, "CHILD: Starting execvp now!\n"); fflush(stderr);
+			if (debug_level > 0) {
+				fprintf(stderr, "CHILD: Starting execvp now!\n"); fflush(stderr);
+			}
 			errno = 0;
 			close(pfd[0]);
 
@@ -1591,15 +1639,19 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			FreeArgs(orted_args);
 			
 			if (ret != 0) {
-				fprintf(stderr, "CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
-				fprintf(stderr, "CHILD: PATH = %s\n", getenv("PATH")); fflush(stderr);
+				if (debug_level > 0) {
+					fprintf(stderr, "CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
+					fprintf(stderr, "CHILD: PATH = %s\n", getenv("PATH")); fflush(stderr);
+				}
 				exit(ret);
 			}
 		}
 		break;
     /* parent */
     default:
-    	fprintf(stderr, "PARENT: orted_pid = %d\n", orted_pid); fflush(stderr);
+		if (debug_level > 0) {
+			fprintf(stderr, "PARENT: orted_pid = %d\n", orted_pid); fflush(stderr);
+		}
     	
 		/* 
 		 * the daemon will report it's URI on the pipe when it's started up 
@@ -1627,7 +1679,9 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 		default:
 			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
 				buf[n] = '\0';
-				fprintf(stderr, "PARENT: URI = %s\n", buf); fflush(stderr);
+				if (debug_level > 0) {
+					fprintf(stderr, "PARENT: URI = %s\n", buf); fflush(stderr);
+				}
 			}
 		}
 
@@ -1651,7 +1705,9 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 
 	ORTE_QUERY(ORTE_JOBID_INVALID);
 	
-	fprintf(stderr, "Start daemon returning OK.\n"); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "Start daemon returning OK.\n"); fflush(stderr);
+	}
 	
 	proxy_state = STATE_RUNNING;
 	
@@ -1666,7 +1722,9 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 int
 ORTE_ModelDef(int trans_id, int nargs, char **args)
 {
-	fprintf(stderr, "ORTE_ModelDef (%d):\n", trans_id); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "ORTE_ModelDef (%d):\n", trans_id); fflush(stderr);
+	}
 	
 #ifdef HAVE_SYS_BPROC_H
 	sendAttrDefStringEvent(trans_id, NODE_USER_ATTR, "User Name", "User owner of node (BPROC)", "");
@@ -1683,7 +1741,9 @@ ORTE_ModelDef(int trans_id, int nargs, char **args)
  int
 ORTE_StopEvents(int trans_id, int nargs, char **args)
 {
-	fprintf(stderr, "  ORTE_StopEvents (%d):\n", trans_id); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "  ORTE_StopEvents (%d):\n", trans_id); fflush(stderr);
+	}
 	/* notification that start events have completed */
 	sendOKEvent(gTransID);
 	gTransID = 0;
@@ -1717,7 +1777,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	char *					debug_exec_name = NULL;
 	char *					debug_exec_path = NULL;
 	char *					debug_full_path;
-	char **					debug_args;
+	char **					debug_args = NULL;
 	char **					env = NULL;
 	orte_app_context_t *	app_context;
 	orte_app_context_t *	debug_context;
@@ -1725,7 +1785,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	orte_jobid_t			debug_jobid = -1;
 	ptp_job *				job;
 
-	fprintf(stderr, "  ORTE_SubmitJob (%d):\n", trans_id);
+	if (debug_level > 0) {
+		fprintf(stderr, "  ORTE_SubmitJob (%d):\n", trans_id);
+	}
 
 	for (i = 0; i < nargs; i++) {
 		fprintf(stderr, "\t%s\n", args[i]);
@@ -1875,10 +1937,12 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	app_context->argc = num_args + 1;
 #endif /* ORTE_VERSION_1_0 */
 
-	fprintf(stderr, "%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , 
+	if (debug_level > 0) {
+		fprintf(stderr, "%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , 
 			(int)app_context->num_procs, app_context->app);
-	fprintf(stderr, "\tprogram name '%s'\n", app_context->argv[0]);
-	fflush(stderr);
+		fprintf(stderr, "\tprogram name '%s'\n", app_context->argv[0]);
+		fflush(stderr);
+	}
 	
 	/*
 	 * To spawn a debug job, two process allocations must be made. This first is for the 
@@ -1935,7 +1999,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 			return rc;
 		}
 
-		fprintf(stderr, "About to launch debugger: %s on %d procs\n", debug_full_path, debug_context->num_procs);
+		if (debug_level > 0) {
+			fprintf(stderr, "About to launch debugger: %s on %d procs\n", debug_full_path, debug_context->num_procs);
+		}
 	} else {
 		rc = ORTE_ALLOCATE_JOB(&app_context, 1, &app_jobid, job_state_callback);
 		if (rc != ORTE_SUCCESS) {
@@ -1969,8 +2035,10 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 
-	fprintf(stderr, "NEW JOB (%s,%d,%d,%d)\n", jobsubid, ptpid, (int)app_jobid, (int)debug_jobid); fflush(stderr);
-
+	if (debug_level > 0) {
+		fprintf(stderr, "NEW JOB (%s,%d,%d,%d)\n", jobsubid, ptpid, (int)app_jobid, (int)debug_jobid); fflush(stderr);
+	}
+	
 	/*
 	 * Send ok for job submission.
 	 */	
@@ -2065,7 +2133,9 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	int				nodeid;
 	int				num_nodes;
 	
-	fprintf(stderr, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stderr);
+	}
 
 	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
@@ -2133,7 +2203,9 @@ ORTE_Quit(int trans_id, int nargs, char **args)
 {
 	int old_state = proxy_state;
 	
-	fprintf(stderr, "ORTE_Quit called!\n"); fflush(stderr);
+	if (debug_level > 0) {
+		fprintf(stderr, "ORTE_Quit called!\n"); fflush(stderr);
+	}
 	
 	proxy_state = STATE_SHUTTING_DOWN;
 
@@ -2212,7 +2284,7 @@ main(int argc, char *argv[])
 	char *			proxy_str = DEFAULT_PROXY;
 	int				rc;
 	
-	while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1)
+	while ((ch = getopt_long(argc, argv, "P:p:h:d:", longopts, NULL)) != -1)
 	switch (ch) {
 	case 'P':
 		proxy_str = optarg;
@@ -2223,8 +2295,11 @@ main(int argc, char *argv[])
 	case 'h':
 		host = optarg;
 		break;
+	case 'd':
+		debug_level = (int)strtol(optarg, NULL, 10);
+		break;
 	default:
-		fprintf(stderr, "%s [--proxy=proxy] [--host=host_name] [--port=port]\n", argv[0]);
+		fprintf(stderr, "%s [--proxy=proxy] [--host=host_name] [--port=port] [--debug=level]\n", argv[0]);
 		return 1;
 	}
 	
