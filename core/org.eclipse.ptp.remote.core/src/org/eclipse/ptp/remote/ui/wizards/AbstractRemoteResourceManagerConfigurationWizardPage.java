@@ -104,7 +104,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private Button portForwardingButton = null;
 	private Button manualButton = null;
 	private WidgetListener listener = new WidgetListener();
-	private Button newRemoteConnectionButton;
+	private Button configureRemoteConnectionButton;
 	private Label  connectionLabel;
 	private Combo  remoteCombo;
 	private Combo  connectionCombo;
@@ -271,7 +271,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 1;
 		connectionCombo.setLayoutData(gd);
 
-		newRemoteConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.newButton"), null);
+		configureRemoteConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.configureButton"), null);
 
 		/*
 		 * Composite for proxy path
@@ -362,7 +362,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				updatePage();
 			}
 		});
-		newRemoteConnectionButton.addSelectionListener(new SelectionAdapter() {
+		configureRemoteConnectionButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
 				handleNewRemoteConnectionSelected();
 				updatePage();
@@ -597,7 +597,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			/*
 			 * Enable 'new' button if new connections are supported
 			 */
-			newRemoteConnectionButton.setEnabled(connectionManager.supportsNewConnections());
+			configureRemoteConnectionButton.setEnabled(connectionManager.supportsNewConnections());
 		}
 	}
 	
