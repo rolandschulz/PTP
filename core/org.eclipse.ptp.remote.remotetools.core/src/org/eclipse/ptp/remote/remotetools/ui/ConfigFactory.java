@@ -33,7 +33,7 @@ public class ConfigFactory {
 	
 	ControlAttributes attributes = null;
 	
-	private static final String PREFIX = "cellbox."; //$NON-NLS-1$
+	private static final String PREFIX = "remotetools."; //$NON-NLS-1$
 	public static final String ATTR_LOCALHOST_SELECTION = PREFIX + "localhost-selection"; //$NON-NLS-1$
 	public static final String ATTR_LOGIN_USERNAME = PREFIX + "login-username"; //$NON-NLS-1$
 	public static final String ATTR_LOGIN_PASSWORD = PREFIX + "login-password"; //$NON-NLS-1$

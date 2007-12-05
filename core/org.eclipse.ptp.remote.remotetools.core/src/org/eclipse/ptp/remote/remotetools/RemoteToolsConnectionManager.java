@@ -13,68 +13,17 @@ package org.eclipse.ptp.remote.remotetools;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.remotetools.ui.ConfigFactory;
 import org.eclipse.ptp.remote.remotetools.ui.ConfigurationDialog;
+import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.AuthToken;
-import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
-	private class AuthDialog extends Dialog {
-		private Text hostnameText;
-		private Text usernameText;
-		private Text passwordText;
-		
-		public AuthDialog(Shell parent) {
-			super(parent);
-		}
-		
-		protected Control createDialogArea(Composite parent) {
-			Composite comp = (Composite) super.createDialogArea(parent);
-			
-			GridLayout layout = (GridLayout) comp.getLayout();
-			layout.numColumns = 2;
-			
-			Label label = new Label(comp, SWT.RIGHT);
-			label.setText("Hostname: ");
-			hostnameText = new Text(comp, SWT.SINGLE);
-			GridData data = new GridData(GridData.FILL_HORIZONTAL);
-			hostnameText.setLayoutData(data);
-			
-			label = new Label(comp, SWT.RIGHT);
-			label.setText("Username: ");
-			usernameText = new Text(comp, SWT.SINGLE);
-			data = new GridData(GridData.FILL_HORIZONTAL);
-			usernameText.setLayoutData(data);
-			
-			label = new Label(comp, SWT.RIGHT);
-			label.setText("Password: ");
-			passwordText = new Text(comp, SWT.SINGLE | SWT.PASSWORD);
-			data = new GridData(GridData.FILL_HORIZONTAL);
-			passwordText.setLayoutData(data);
-			
-			return comp;
-		}
-		  
-		public AuthToken getAuth() {
-			return new PasswdAuthToken(usernameText.getText(), passwordText.getText());
-		}
-		
-		public String getHost() {
-			return hostnameText.getText();
-		}
-	}
-	
 	private Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
 	
 	public RemoteToolsConnectionManager() {
@@ -101,9 +50,15 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		ConfigurationDialog dialog = new ConfigurationDialog(shell);
 		dialog.open();
 		
-		//org.eclipse.ptp.remotetools.core.IRemoteConnection conn = RemotetoolsPlugin.createSSHConnection(dialog.getAuth(), dialog.getHost());
+		ControlAttributes attributes = dialog.getAttributes();
 		
-		//connections.put(dialog.getHost(), new RemoteToolsConnection(conn, dialog.getHost(), dialog.getAuth().getUsername()));
+		String host = attributes.getString(ConfigFactory.ATTR_CONNECTION_ADDRESS);
+		AuthToken auth = dialog.getAuthToken();
+		
+		org.eclipse.ptp.remotetools.core.IRemoteConnection conn = 
+			RemotetoolsPlugin.createSSHConnection(auth, host);
+		
+		connections.put(host, new RemoteToolsConnection(conn, host, auth.getUsername()));
 	}
 
 	/* (non-Javadoc)

@@ -20,20 +20,16 @@ import org.eclipse.ptp.remote.IRemoteServicesDelegate;
 
 
 public class RemoteToolsServices implements IRemoteServicesDelegate {
-	private IRemoteConnectionManager connMgr;
+	private static RemoteToolsServices instance = new RemoteToolsServices();
+	private static RemoteToolsConnectionManager connMgr = null;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+	/**
+	 * Get shared instance of this class
+	 * 
+	 * @return instance
 	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
-		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
-		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
+	public static RemoteToolsServices getInstance() {
+		return instance;
 	}
 	
 	/* (non-Javadoc)
@@ -54,10 +50,26 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
+		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
+		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
 	public boolean initialize() {
-		connMgr = new RemoteToolsConnectionManager();
+		if (connMgr == null) {
+			connMgr = new RemoteToolsConnectionManager();
+		}
 		return true;
 	}
 }
