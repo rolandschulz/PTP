@@ -223,7 +223,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedJobs.add(job);
 				} else {
-					System.out.println("JobChange: unknown node " + elementId);
+					PTPCorePlugin.log("JobChange: unknown node " + elementId);
 				}
 			}
 
@@ -436,7 +436,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedNodes.add(node);
 				} else {
-					System.out.println("NodeChange: unknown node " + elementId);
+					PTPCorePlugin.log("NodeChange: unknown node " + elementId);
 				}
 			}
 
@@ -472,7 +472,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedProcesses.add(process);
 				} else {
-					System.out.println("ProcessChange: unknown process " + elementId);
+					PTPCorePlugin.log("ProcessChange: unknown process " + elementId);
 				}
 			}
 			
@@ -500,7 +500,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (queue != null) {
 					queues.add(queue);
 				} else {
-					System.out.println("QueueChange: unknown queue " + elementId);
+					PTPCorePlugin.log("QueueChange: unknown queue " + elementId);
 				}
 			}
 			

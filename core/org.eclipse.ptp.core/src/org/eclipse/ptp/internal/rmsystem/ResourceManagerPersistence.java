@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
@@ -54,7 +55,9 @@ public class ResourceManagerPersistence {
 
 	public static void saveResourceManagers(File file,
 			IResourceManagerControl[] resourceManagers) {
-		System.out.println("In saveResourceManagers to file, " + file.getAbsolutePath());
+		if (DebugUtil.RM_MESSAGES) {
+			System.out.println("In saveResourceManagers to file, " + file.getAbsolutePath());
+		}
 		XMLMemento memento = XMLMemento.createWriteRoot(TAG_RESOURCEMANAGERS);
 		saveResourceManagers(memento, resourceManagers);
 		FileWriter writer = null;
@@ -72,7 +75,9 @@ public class ResourceManagerPersistence {
 				PTPCorePlugin.log(e);
 			}
 		}
-		System.out.println("Leaving saveResourceManagers");
+		if (DebugUtil.RM_MESSAGES) {
+			System.out.println("Leaving saveResourceManagers");
+		}
 	}
 
 	private static void saveResourceManagers(XMLMemento memento,

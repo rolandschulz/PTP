@@ -23,7 +23,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
+import org.eclipse.ptp.proxy.util.DebugOptions;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
@@ -35,7 +37,6 @@ import org.eclipse.ptp.remote.PTPRemotePlugin;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
-	private boolean				proxyDebugOutput = true;
 	private final String		proxyName;
 	private final String		proxyPath;
 	private final String		localAddr;
@@ -54,6 +55,19 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		this.localAddr = config.getLocalAddress();
 		this.proxyOptions = config.getOptions();
 		this.invocationOptions = config.getInvocationOptions();
+		
+		/*
+		 * Set up debug options
+		 */
+		if (DebugUtil.PROTOCOL_TRACING) {
+			setDebugOption(DebugOptions.PROTOCOL_TRACING);
+		}
+		if (DebugUtil.PROXY_CLIENT_MESSAGES) {
+			setDebugOption(DebugOptions.CLIENT_MESSAGES);
+		}
+		if (DebugUtil.PROXY_SERVER_MESSAGES) {
+			setDebugOption(DebugOptions.SERVER_MESSAGES);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +88,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	 */
 	@Override
 	protected void startupProxyServer() throws IOException {
-		if (getEventLogging()) {
+		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
 			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
 			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
 		}
@@ -105,9 +119,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					args.add("--host=" + localAddr);
 				}
 				args.add("--port="+getSessionPort());
+				if (getDebugOption(DebugOptions.SERVER_MESSAGES)) {
+					args.add("--debug=1");
+				}
 				args.addAll(invocationOptions);
 				
-				if (getEventLogging()) {
+				if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
 					System.out.println("Launch command: " + args.toString());
 				}
 				
@@ -140,9 +157,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						args.add("--host=" + localAddr);
 					}
 					args.add("--port="+getSessionPort());
+					if (getDebugOption(DebugOptions.SERVER_MESSAGES)) {
+						args.add("--debug=1");
+					}
 					args.addAll(invocationOptions);
 					
-					if (getEventLogging()) {
+					if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
 						System.out.println("Launch command: " + args.toString());
 					}
 
@@ -157,7 +177,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 							try {
 								String output;
 								while ((output = out_reader.readLine()) != null) {
-									if (proxyDebugOutput) System.out.println(proxyName + ": " + output);
+									if (getDebugOption(DebugOptions.SERVER_MESSAGES)) {
+										System.out.println(proxyName + ": " + output);
+									}
 								}
 							} catch (IOException e) {
 								// Ignore
@@ -170,7 +192,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 							try {
 								String line;
 								while ((line = err_reader.readLine()) != null) {
-									if (proxyDebugOutput) System.err.println(proxyName + ": " + line);
+									if (getDebugOption(DebugOptions.SERVER_MESSAGES)) {
+										System.err.println(proxyName + ": " + line);
+									}
 								}
 							} catch (IOException e) {
 								// Ignore
@@ -178,7 +202,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						}
 					}, "Error output Thread").start();
 					
-					if (getEventLogging()) {
+					if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
 						System.out.println(toString() + ": Waiting on accept.");
 					}
 				} else {
@@ -199,7 +223,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 							try {
 								String line;
 								while ((line = err_reader.readLine()) != null) {
-									if (proxyDebugOutput) System.err.println(proxyName + ": " + line);
+									if (getDebugOption(DebugOptions.SERVER_MESSAGES)) {
+										System.err.println(proxyName + ": " + line);
+									}
 								}
 							} catch (IOException e) {
 								// Ignore
@@ -207,7 +233,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						}
 					}, "Error output Thread").start();
 					
-					if (getEventLogging()) {
+					if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
 						System.out.println(toString() + ": Waiting on accept.");
 					}
 				}

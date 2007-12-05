@@ -32,7 +32,7 @@ public class ProxyPacket {
 	public static final int PACKET_NARGS_SIZE = 8;
 	public static final int PACKET_ARG_LEN_SIZE = 8;
 
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	private int packetID;
 	private int packetTransID;
@@ -44,7 +44,7 @@ public class ProxyPacket {
 
 	public ProxyPacket() {
 	}
-
+	
 	public ProxyPacket(IProxyCommand cmd) {
 		this.packetID = cmd.getCommandID();
 		this.packetTransID = cmd.getTransactionID();
@@ -74,7 +74,7 @@ public class ProxyPacket {
 	public CharsetEncoder encoder() {
 		return encoder;
 	}
-
+	
 	/**
 	 * Get the arguments
 	 * 
@@ -83,7 +83,7 @@ public class ProxyPacket {
 	public String[] getArgs() {
 		return packetArgs;
 	}
-	
+
 	/**
 	 * Get the packet type
 	 * 
@@ -231,6 +231,15 @@ public class ProxyPacket {
 				PACKET_LENGTH_SIZE) + " " + body;
 		
 		fullWrite(channel, encoder.encode(CharBuffer.wrap(packet)));
+	}
+	
+	/**
+	 * Enable/disable protocol debugging
+	 * 
+	 * @param logging
+	 */
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 	
 	/**
