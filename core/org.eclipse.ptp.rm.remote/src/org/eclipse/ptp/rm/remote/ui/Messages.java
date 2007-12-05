@@ -22,10 +22,10 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.rm.remote.Activator;
 
 public class Messages {
-    private static final String BUNDLE_NAME = PTPRemotePlugin.PLUGIN_ID + ".ui.Messages";
+    private static final String BUNDLE_NAME = Activator.PLUGIN_ID + ".ui.Messages";
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
     /** Get string
