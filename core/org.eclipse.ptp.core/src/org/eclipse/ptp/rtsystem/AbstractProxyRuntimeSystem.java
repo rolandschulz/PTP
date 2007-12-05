@@ -673,7 +673,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 */
 	public void terminateJob(IPJob job) throws CoreException {
 		if(job == null) {
-			System.err.println("ERROR: Tried to abort a null job.");
+			PTPCorePlugin.log("Tried to terminate a null job.");
 			return;
 		}
 		
@@ -738,10 +738,10 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						IAttribute<?,?,?> attr = attrDef.create(value);
 						mgr.addAttribute(attr);
 					} else {
-						System.out.println("AbstractProxyRuntimSystem: unknown attribute definition");
+						PTPCorePlugin.log("AbstractProxyRuntimSystem: unknown attribute definition");
 					}
 				} catch (IllegalValueException e1) {
-					System.out.println("AbstractProxyRuntimSystem: invalid attribute for definition");
+					PTPCorePlugin.log("AbstractProxyRuntimSystem: invalid attribute for definition");
 				}
 			}
 		}

@@ -83,6 +83,7 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeShutdownStateEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeTerminateJobErrorEvent;
+import org.eclipse.ptp.proxy.util.DebugOptions;
 
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyRuntimeClient,IProxyEventListener {
 
@@ -96,7 +97,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (logEvents) System.out.println("state machine thread exited");
+			if (logEvents) {
+				System.out.println("state machine thread exited");
+			}
 		}
 	}
 	
@@ -117,7 +120,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	/*
 	 * Flag to enable/disable logging messages
 	 */
-	private boolean								logEvents = true;
+	private boolean								logEvents = false;
 	/*
 	 * Actual name of the proxy - used for debugging messages
 	 */
@@ -155,6 +158,10 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		this.state = ProxyState.IDLE;
 		super.setEventFactory(factory);
 		super.addProxyEventListener(this);
+		
+		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+			this.logEvents = true;
+		}
 	}
 	
 	/**
@@ -173,15 +180,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 */
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener) {
 		listeners.add(listener);
-	}
-	
-	/**
-	 * Get flag that controls logging of events
-	 * 
-	 * @return flag that specifies if event logging is turned on or off
-	 */
-	public boolean getEventLogging() {
-		return this.logEvents;
 	}
 
 	/* (non-Javadoc)
@@ -282,21 +280,14 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		listeners.remove(listener);
 	}
 	
-	/**
-	 * Set flag to control the logging of events
-	 * 
-	 * @param logEvents - event logging is turned on if true, turned off otherwise 
-	 */ 
-	public void setEventLogging(boolean logEvents) {
-		this.logEvents = logEvents;
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#shutdown()
 	 */
 	public void shutdown() throws IOException {
 		if (state != ProxyState.SHUTDOWN) {
-			if (logEvents) System.out.println(toString() + ": shutting down server...");
+			if (logEvents) {
+				System.out.println(toString() + ": shutting down server...");
+			}
 			state = ProxyState.SHUTDOWN;
 			shutdownProxyServer();
 		}
@@ -397,7 +388,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 */
 	private void processRunningEvent(IProxyCommand command, IProxyEvent event) {
 		if (logEvents) {
-			System.out.println(toString() + " recieved event " + event);
+			System.out.println(toString() + " received event " + event);
 		}
     	if (command instanceof IProxyRuntimeStartEventsCommand) {
     		if (event instanceof IProxyRuntimeNewJobEvent) {

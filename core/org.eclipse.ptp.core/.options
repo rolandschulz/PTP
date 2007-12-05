@@ -1,0 +1,13 @@
+org.eclipse.ptp.core/debug=true
+
+# Proxy protocol tracing
+org.eclipse.ptp.core/debug/proxy/protocol_tracing=false
+
+# Proxy client debugging messages
+org.eclipse.ptp.core/debug/proxy/client_messages=false
+
+# Proxy server debugging messages
+org.eclipse.ptp.core/debug/proxy/server_messages=false
+
+# Resource manager debugging messages
+org.eclipse.ptp.core/debug/rm/messages=false

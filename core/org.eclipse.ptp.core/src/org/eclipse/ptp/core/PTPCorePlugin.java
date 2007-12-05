@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -89,6 +90,9 @@ public class PTPCorePlugin extends Plugin {
 	 * @param msg
 	 */
 	public static void log(String msg) {
+		if (DebugUtil.RM_MESSAGES) {
+			System.err.println(msg);
+		}
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
 	}
 
@@ -209,6 +213,7 @@ public class PTPCorePlugin extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		DebugUtil.configurePluginDebugOptions();
 		modelManager = new ModelManager();
 		modelManager.start();
 	}
