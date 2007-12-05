@@ -11,6 +11,7 @@
  */
 package org.eclipse.ptp.remote.remotetools.ui;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
+import org.eclipse.ptp.remotetools.core.AuthToken;
+import org.eclipse.ptp.remotetools.core.KeyAuthToken;
+import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
 import org.eclipse.ptp.remotetools.utils.ui.swt.AuthenticationFrame;
 import org.eclipse.ptp.remotetools.utils.ui.swt.AuthenticationFrameMold;
 import org.eclipse.ptp.remotetools.utils.ui.swt.ComboGroup;
@@ -55,7 +59,6 @@ public class ConfigurationDialog extends Dialog {
 			if (counter < 0) {
 				return;
 			}
-			readControls();
 			try {
 				remoteAuthFrame.validateFields();
 			} catch (CoreException e1) {
@@ -69,9 +72,6 @@ public class ConfigurationDialog extends Dialog {
 		}
 	}
 	
-	private static int DEFAULT_PORT = 22;
-	private static int DEFAULT_TIMEOUT = 5;
-
 	private String targetName;
 	private TextGroup targetNameGroup;
 	private AuthenticationFrame remoteAuthFrame;
@@ -115,8 +115,21 @@ public class ConfigurationDialog extends Dialog {
 		return topControl;
 	}
 	
-	public Map<String, String> getAttributes() {
-		return configFactory.getMap();
+	public ControlAttributes getAttributes() {
+		return configFactory.getAttributes();
+	}
+	
+	public AuthToken getAuthToken() {
+		if (remoteAuthFrame.isPasswordBased()) {
+			PasswdAuthToken pwd = new PasswdAuthToken(remoteAuthFrame.getUserName(), 
+					remoteAuthFrame.getPassword());
+			return pwd;
+		}
+		
+		File keyFile = new File(remoteAuthFrame.getPublicKeyPath());
+		KeyAuthToken key = new KeyAuthToken(remoteAuthFrame.getUserName(), 
+				keyFile, remoteAuthFrame.getPassphrase());
+		return key;
 	}
 	
 	public String getName() {
@@ -177,9 +190,6 @@ public class ConfigurationDialog extends Dialog {
 			cipherGroup.add(new ComboGroupItem(key, value));
 		}
 		cipherGroup.selectIndexUsingID(RemotetoolsPlugin.CIPHER_DEFAULT);
-	}
-
-	private void readControls() {
 	}
 
 	private void registerListeners() {

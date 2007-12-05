@@ -9,5 +9,15 @@
             name="Remote Tools">
       </remoteServices>
    </extension>
+   <extension
+         id="org.eclipse.ptp.remotetools.filesystem"
+         point="org.eclipse.core.filesystem.filesystems">
+      <filesystem
+            scheme="remotetools">
+         <run
+               class="org.eclipse.ptp.remote.remotetools.RemoteToolsFileSystem">
+         </run>
+      </filesystem>
+   </extension>
 
 </plugin>
