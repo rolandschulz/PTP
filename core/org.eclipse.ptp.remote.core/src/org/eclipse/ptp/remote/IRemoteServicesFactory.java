@@ -10,28 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
-public abstract class AbstractRemoteServicesFactory {
-	protected static CoreException makeCoreException(String string) {
-		IStatus status = new Status(Status.ERROR, PTPRemotePlugin.getUniqueIdentifier(),
-				Status.ERROR, string, null);
-		return new CoreException(status);
-	}
-	
+public interface IRemoteServicesFactory {
 	/**
 	 * @param rm
 	 * @return
 	 */
-	public IRemoteServicesDelegate create() {
-		return doCreate();
-	}
-
-	/**
-	 * @param rm
-	 * @return
-	 */
-	protected abstract IRemoteServicesDelegate doCreate();
+	public IRemoteServicesDelegate getServices();
 }
