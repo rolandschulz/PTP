@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP Remote Resource Manager Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.rm.remote
+Bundle-Version: 2.0.0
+Bundle-Activator: org.eclipse.ptp.rm.remote.Activator
+Bundle-Vendor: Eclipse.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.filesystem,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.remote,
+ org.eclipse.ptp.proxy.protocol,
+ org.eclipse.ptp.ui
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.rm.remote.core,
+ org.eclipse.ptp.rm.remote.ui,
+ org.eclipse.ptp.rm.remote.ui.preferences,
+ org.eclipse.ptp.rm.remote.ui.wizards
