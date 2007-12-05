@@ -12,8 +12,12 @@
 package org.eclipse.ptp.bluegene;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.ptp.bluegene.db.BGCommands;
+import org.eclipse.ptp.bluegene.db.IBGEventListener;
+import org.eclipse.ptp.bluegene.db.JobInfo;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
@@ -26,9 +30,13 @@ import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
 import org.eclipse.ptp.proxy.runtime.server.IProxyRuntimeCommandListener;
 
 public class BGProxyServer extends AbstractProxyRuntimeServer implements
-		IProxyRuntimeCommandListener {
+		IProxyRuntimeCommandListener, IBGEventListener {
 
-	private BGCommands	commands = new BGCommands();
+	private final BGCommands	commands = new BGCommands();
+	
+	private String protocolVersion;
+	private String baseElementId;
+	private int startEventsId = -1;
 
 	/**
 	 * @param args
@@ -67,10 +75,21 @@ public class BGProxyServer extends AbstractProxyRuntimeServer implements
 	public void handleCommand(IProxyRuntimeInitCommand c) {
 		IProxyEvent event;
 		
-		if (commands.init()) {
+		String[] args = c.getArguments();
+		if (args.length < 2) {
+			sendEvent(ProxyEventFactory.newErrorEvent(c.getTransactionID(), 0, "Not enough arguments"));
+			return;			
+		}
+		
+		protocolVersion = args[0];
+		baseElementId = args[1];
+		
+		String[] newArgs = Arrays.asList(args).subList(2, args.length).toArray(args);
+		
+		if (commands.init(newArgs)) {
 			event = ProxyEventFactory.newOKEvent(c.getTransactionID());
 		} else {
-			event = ProxyEventFactory.newErrorEvent(c.getTransactionID(), 0, "");
+			event = ProxyEventFactory.newErrorEvent(c.getTransactionID(), commands.getErrorCode(), commands.getErrorMessage());
 		}
 		
 		sendEvent(event);
@@ -80,29 +99,51 @@ public class BGProxyServer extends AbstractProxyRuntimeServer implements
 	 * @see org.eclipse.ptp.proxy.runtime.server.IProxyRuntimeCommandListener#handleCommand(org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand)
 	 */
 	public void handleCommand(IProxyRuntimeModelDefCommand c) {
+		sendEvent(ProxyEventFactory.newOKEvent(c.getTransactionID()));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.server.IProxyRuntimeCommandListener#handleCommand(org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand)
 	 */
 	public void handleCommand(IProxyRuntimeStartEventsCommand c) {
+		if (startEventsId < 0) {
+			startEventsId = c.getTransactionID();
+			commands.addListener(this);
+			commands.startEvents();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.server.IProxyRuntimeCommandListener#handleCommand(org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand)
 	 */
 	public void handleCommand(IProxyRuntimeStopEventsCommand c) {
+		if (startEventsId >= 0) {
+			commands.stopEvents();
+			commands.removeListener(this);
+			sendEvent(ProxyEventFactory.newOKEvent(c.getTransactionID()));
+			sendEvent(ProxyEventFactory.newOKEvent(startEventsId));
+			startEventsId = -1;
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.server.IProxyRuntimeCommandListener#handleCommand(org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand)
 	 */
 	public void handleCommand(IProxyRuntimeSubmitJobCommand c) {
+		commands.submitJob(c.getArguments());
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.server.IProxyRuntimeCommandListener#handleCommand(org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand)
 	 */
 	public void handleCommand(IProxyRuntimeTerminateJobCommand c) {
+		commands.terminateJob(c.getArguments());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.bluegene.db.IBGEventListener#handleJobChangedEvent(java.util.List)
+	 */
+	public void handleJobChangedEvent(List<JobInfo> jobs) {
+		
 	}
 }
