@@ -13,7 +13,7 @@ package org.eclipse.ptp.internal.remote;
 import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.ptp.remote.AbstractRemoteServicesFactory;
+import org.eclipse.ptp.remote.IRemoteServicesFactory;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
@@ -44,7 +44,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	private final IConfigurationElement configElement;
 	private final String id;
 	private final String name;
-	private AbstractRemoteServicesFactory factory;
+	private IRemoteServicesFactory factory;
 	private IRemoteServicesDelegate delegate;
 	
 	public RemoteServicesProxy(IConfigurationElement configElement) {
@@ -70,12 +70,12 @@ public class RemoteServicesProxy implements IRemoteServices {
 	 * 
 	 * @return instance of the factory
 	 */
-	public AbstractRemoteServicesFactory getFactory() {
+	public IRemoteServicesFactory getFactory() {
 		if (factory != null) {
 			return factory;
 		}
 		try {
-			factory = (AbstractRemoteServicesFactory)configElement.createExecutableExtension(ATTR_CLASS);
+			factory = (IRemoteServicesFactory)configElement.createExecutableExtension(ATTR_CLASS);
 		} catch (Exception e) {
 			PTPRemotePlugin.log(
 					"Failed to instatiate factory: "
@@ -148,9 +148,9 @@ public class RemoteServicesProxy implements IRemoteServices {
 	 */
 	private void loadServices() {
 		if (delegate == null) {
-			AbstractRemoteServicesFactory factory = getFactory();
+			IRemoteServicesFactory factory = getFactory();
 			if (factory != null) {
-				delegate = factory.create();
+				delegate = factory.getServices();
 				if (delegate.initialize()) {
 					initialized = true;
 				}
