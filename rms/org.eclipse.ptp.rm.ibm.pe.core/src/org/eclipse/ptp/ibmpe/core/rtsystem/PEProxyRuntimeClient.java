@@ -8,7 +8,7 @@
 package org.eclipse.ptp.ibmpe.core.rtsystem;
 
 import org.eclipse.ptp.ibmpe.core.rmsystem.PEResourceManagerConfiguration;
-import org.eclipse.ptp.remote.AbstractRemoteProxyRuntimeClient;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeClient;
 
 public class PEProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 	public PEProxyRuntimeClient(PEResourceManagerConfiguration config, 

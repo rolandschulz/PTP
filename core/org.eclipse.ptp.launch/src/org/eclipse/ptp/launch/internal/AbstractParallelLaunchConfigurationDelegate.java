@@ -71,12 +71,12 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
