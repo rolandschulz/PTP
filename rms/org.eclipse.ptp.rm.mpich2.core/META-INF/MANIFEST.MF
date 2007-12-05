@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.ptp.proxy.protocol,
  org.eclipse.ptp.core,
- org.eclipse.ptp.remote
+ org.eclipse.ptp.remote,
+ org.eclipse.ptp.rm.remote
 Eclipse-LazyStart: true
 Bundle-Vendor: Los Alamos National Laboratory
 Export-Package: org.eclipse.ptp.mpich2.core,

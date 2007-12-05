@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.bluegene.ui.wizards;
 
-import org.eclipse.ptp.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
 public final class BGResourceManagerConfigurationWizardPage extends

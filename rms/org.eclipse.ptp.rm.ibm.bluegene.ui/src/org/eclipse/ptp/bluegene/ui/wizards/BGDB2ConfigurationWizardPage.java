@@ -22,7 +22,7 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.bluegene.core.rmsystem.BGResourceManagerConfiguration;
-import org.eclipse.ptp.remote.ui.Messages;
+import org.eclipse.ptp.rm.remote.ui.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;

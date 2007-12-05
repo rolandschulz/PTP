@@ -21,7 +21,7 @@
  */
 package org.eclipse.ptp.mpich2.core.rmsystem;
 
-import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 

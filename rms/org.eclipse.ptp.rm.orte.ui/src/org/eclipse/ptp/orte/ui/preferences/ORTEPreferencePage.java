@@ -20,7 +20,7 @@ package org.eclipse.ptp.orte.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.orte.core.ORTEPreferenceManager;
-import org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage;
+import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class ORTEPreferencePage extends AbstractRemotePreferencePage {
 	/* (non-Javadoc)

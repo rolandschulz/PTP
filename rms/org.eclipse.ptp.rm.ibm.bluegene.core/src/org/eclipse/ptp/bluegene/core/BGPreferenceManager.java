@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 
 public class BGPreferenceManager {
 	private static final String PROXY_EXECUTABLE_NAME = "ptp_orte_proxy";

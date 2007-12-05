@@ -20,7 +20,7 @@ package org.eclipse.ptp.lsf.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.lsf.core.LSFPreferenceManager;
-import org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage;
+import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class LSFPreferencePage extends AbstractRemotePreferencePage {
 	/* (non-Javadoc)
