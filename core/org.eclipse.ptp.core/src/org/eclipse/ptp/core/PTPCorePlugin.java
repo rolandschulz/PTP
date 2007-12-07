@@ -90,7 +90,7 @@ public class PTPCorePlugin extends Plugin {
 	 * @param msg
 	 */
 	public static void log(String msg) {
-		if (DebugUtil.RM_MESSAGES) {
+		if (DebugUtil.RM_TRACING) {
 			System.err.println(msg);
 		}
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));

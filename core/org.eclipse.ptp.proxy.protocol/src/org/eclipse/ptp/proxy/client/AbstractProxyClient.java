@@ -88,13 +88,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		listeners.add(listener);
 	}
 	
-	/**
-	 * Get debugging option
-	 */
-	public boolean getDebugOption(int debugOption) {
-		return debugOptions.getOption(debugOption);
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#getSessionPort()
 	 */
@@ -169,12 +162,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionCreate(int, int)
 	 */
 	public void sessionCreate(int port, int timeout) throws IOException {
-		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println("sessionCreate("+port+","+timeout+")");
 		}
 		sessSvrSock = ServerSocketChannel.open();
 		InetSocketAddress isa = new InetSocketAddress(port);
-		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println("bind("+isa.toString()+")");
 		}
 		sessSvrSock.socket().bind(isa);
@@ -186,7 +179,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			state = SessionState.WAITING;
 		}
 		
-		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println("port=" + sessPort);
 		}
 		
@@ -194,7 +187,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			public void run() {
 				boolean error = false;
 				try {
-					if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+					if (DebugOptions.CLIENT_TRACING) {
 						System.out.println("accept thread starting...");
 					}
 					sessSock = sessSvrSock.accept();
@@ -213,7 +206,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					try {
 						sessSvrSock.close();
 					} catch (IOException e) {
-						if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+						if (DebugOptions.CLIENT_TRACING) {
 							System.out.println("IO Exception trying to close server socket (non fatal)");
 						}
 					}
@@ -229,7 +222,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 							state = SessionState.SHUTDOWN;
 						}
 					}
-					if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+					if (DebugOptions.CLIENT_TRACING) {
 						System.out.println("accept thread exiting...");
 					}
 				}
@@ -247,7 +240,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @param	input		stream to read from
 	 */
 	public void sessionCreate(OutputStream output, InputStream input) {
-		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println("sessionCreate(stdin, stdout)");
 		}
 		sessInput = Channels.newChannel(input);
@@ -315,7 +308,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				boolean error = false;
 				int errorCount = 0;			
 				
-				if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+				if (DebugOptions.CLIENT_TRACING) {
 					System.out.println("event thread starting...");
 				}
 				try {
@@ -333,7 +326,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					synchronized (state) {
 						if (!isInterrupted() && state != SessionState.SHUTTING_DOWN) {
 							error = true;
-							if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+							if (DebugOptions.CLIENT_TRACING) {
 								System.out.println("event thread IOException . . . " + e.getMessage());
 							}
 						}
@@ -355,7 +348,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 
 				fireProxyDisconnectedEvent(new ProxyDisconnectedEvent(error));
 				
-				if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+				if (DebugOptions.CLIENT_TRACING) {
 					System.out.println("event thread exited");
 				}
 			}
@@ -371,30 +364,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 	
 	/**
-	 * Set debugging option
-	 * 
-	 * @param debugOption
-	 */
-	public void setDebugOption(int debugOption) {
-		debugOptions.setOption(debugOption);
-	}
-
-	/**
 	 * Set the factory used to decode events
 	 * 
 	 * @param factory
 	 */
 	public void setEventFactory(IProxyEventFactory factory) {
 		this.proxyEventFactory = factory;
-	}
-
-	/**
-	 * Unset debugging option
-	 * 
-	 * @param debugOption
-	 */
-	public void unsetDebugOption(int debugOption) {
-		debugOptions.unsetOption(debugOption);
 	}
 
 	/**
@@ -405,7 +380,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	private boolean sessionProgress() throws IOException {
 		ProxyPacket packet = new ProxyPacket();
-		if (debugOptions.getOption(DebugOptions.PROTOCOL_TRACING)) {
+		if (DebugOptions.PROTOCOL_TRACING) {
 			packet.setDebug(true);
 		}
 		if (!packet.read(sessInput)) {

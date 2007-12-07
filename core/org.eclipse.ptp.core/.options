@@ -1,13 +1,15 @@
 org.eclipse.ptp.core/debug=true
 
 # Proxy protocol tracing
-org.eclipse.ptp.core/debug/proxy/protocol_tracing=false
+org.eclipse.ptp.core/debug/proxy/protocol/tracing=false
 
 # Proxy client debugging messages
-org.eclipse.ptp.core/debug/proxy/client_messages=false
+org.eclipse.ptp.core/debug/proxy/client/tracing=false
 
 # Proxy server debugging messages
-org.eclipse.ptp.core/debug/proxy/server_messages=false
+# Level 0 is off
+# Level >0 is on. Higher levels mean more debugging
+org.eclipse.ptp.core/debug/proxy/server/debug_level=0
 
 # Resource manager debugging messages
-org.eclipse.ptp.core/debug/rm/messages=false
+org.eclipse.ptp.core/debug/rm/tracing=false
