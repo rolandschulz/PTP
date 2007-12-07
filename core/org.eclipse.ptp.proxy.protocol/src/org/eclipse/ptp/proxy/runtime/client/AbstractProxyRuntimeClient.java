@@ -159,7 +159,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		super.setEventFactory(factory);
 		super.addProxyEventListener(this);
 		
-		if (getDebugOption(DebugOptions.CLIENT_MESSAGES)) {
+		if (DebugOptions.CLIENT_TRACING) {
 			this.logEvents = true;
 		}
 	}

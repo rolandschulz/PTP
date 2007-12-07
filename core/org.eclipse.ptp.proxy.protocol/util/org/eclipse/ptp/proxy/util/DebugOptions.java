@@ -1,38 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2007 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.proxy.util;
 
-import java.util.BitSet;
-
-
 public class DebugOptions {
-	public final static int NUMBER_OF_OPTIONS = 3;
-	
-	public final static int CLIENT_MESSAGES = 0;
-	public final static int SERVER_MESSAGES = 1;
-	public final static int PROTOCOL_TRACING = 2;
-	
-	private BitSet options = new BitSet(NUMBER_OF_OPTIONS);
-
-	public DebugOptions() {
-	}
-
-	/**
-	 * @return true if the option is set
-	 */
-	public boolean getOption(int option) {
-		return options.get(option);
-	}
-
-	/**
-	 * @param option the option to set
-	 */
-	public void setOption(int option) {
-		options.set(option);
-	}
-	
-	/**
-	 * @param option the option to unset
-	 */
-	public void unsetOption(int option) {
-		options.clear(option);
-	}
+	public static boolean CLIENT_TRACING = false;
+	public static int SERVER_DEBUG_LEVEL = 0;
+	public static boolean PROTOCOL_TRACING = false;
 }

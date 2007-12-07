@@ -55,7 +55,7 @@ public class ResourceManagerPersistence {
 
 	public static void saveResourceManagers(File file,
 			IResourceManagerControl[] resourceManagers) {
-		if (DebugUtil.RM_MESSAGES) {
+		if (DebugUtil.RM_TRACING) {
 			System.out.println("In saveResourceManagers to file, " + file.getAbsolutePath());
 		}
 		XMLMemento memento = XMLMemento.createWriteRoot(TAG_RESOURCEMANAGERS);
@@ -75,7 +75,7 @@ public class ResourceManagerPersistence {
 				PTPCorePlugin.log(e);
 			}
 		}
-		if (DebugUtil.RM_MESSAGES) {
+		if (DebugUtil.RM_TRACING) {
 			System.out.println("Leaving saveResourceManagers");
 		}
 	}
