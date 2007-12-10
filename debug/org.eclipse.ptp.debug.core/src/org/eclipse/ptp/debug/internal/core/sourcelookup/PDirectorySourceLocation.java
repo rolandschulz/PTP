@@ -41,7 +41,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.resources.FileStorage;
+import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.sourcelookup.IDirectorySourceLocation;
@@ -215,7 +215,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 		return null;
 	}
 	private IStorage createExternalFileStorage(IPath path) {
-		return new FileStorage(path);
+		return new LocalFileStorage(path.toFile());
 	}
 	public String getMemento() throws CoreException {
 		Document document = null;

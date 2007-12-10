@@ -147,7 +147,7 @@ public class PDebugUIUtils {
 			if  (f.exists())
 				return new FileEditorInput(f);
 			
-			return new ExternalEditorInput(new FileStorage(f.getFullPath()));
+			return new ExternalEditorInput(new LocalFileStorage(f.getFullPath().toFile()));
 		}
 		if (element instanceof IPBreakpoint) {
 			IPBreakpoint pbk = (IPBreakpoint) element;
