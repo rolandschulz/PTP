@@ -10,5 +10,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.filesystem,
  org.eclipse.ptp.remote,
  org.eclipse.ptp.remotetools.core,
- org.eclipse.ptp.remotetools.utils
+ org.eclipse.ptp.remotetools.utils,
+ org.eclipse.ptp.remotetools.environment.core
 Eclipse-LazyStart: true
