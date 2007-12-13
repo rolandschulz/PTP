@@ -34,6 +34,7 @@ import org.eclipse.ptp.remote.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
@@ -44,6 +45,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	private final String		remoteServicesId;
 	private final String		connectionName;
 	private final List<String>	invocationOptions;
+	private IRemoteConnection	connection;
 
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
 			int baseModelId) {
@@ -74,6 +76,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		} catch (IOException e) {
 			e.printStackTrace();
 			PTPCorePlugin.log(e);
+		}
+		if (connection.isOpen()) {
+			connection.close();
 		}
 	}
 
@@ -128,12 +133,15 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				PTPCorePlugin.log(info);
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-				IRemoteConnection conn = connMgr.getConnection(connectionName);
+				connection = connMgr.getConnection(connectionName);
+				if (!connection.isOpen()) {
+					connection.open();
+				}
 
 				/*
 				 * Check the remote proxy exists
 				 */
-				IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 				IFileStore res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
 				if (!res.fetchInfo().exists()){
 					throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
@@ -160,7 +168,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						System.out.println("Launch command: " + args.toString());
 					}
 
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, args);
+					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
 					IRemoteProcess process = processBuilder.asyncStart();
 					
 					final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -201,7 +209,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					args.add("--proxy=stdio");
 					args.addAll(invocationOptions);
 
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, args);
+					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
 					IRemoteProcess process = processBuilder.asyncStart();
 					
 					sessionCreate(process.getOutputStream(), process.getInputStream());
@@ -232,6 +240,8 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			} catch (IOException e1) {
 				PTPCorePlugin.log(e1);
 			}
+			throw new IOException("Failed to start proxy: " + e.getMessage());
+		} catch (RemoteConnectionException e) {
 			throw new IOException("Failed to start proxy: " + e.getMessage());
 		}
 	}
