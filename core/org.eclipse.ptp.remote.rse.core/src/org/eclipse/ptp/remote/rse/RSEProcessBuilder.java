@@ -17,20 +17,19 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.shells.HostShellProcessAdapter;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
-import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShellServiceSubSystem;
-import org.eclipse.swt.widgets.Display;
 
 public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final static 	String EXIT_CMD = "exit"; //$NON-NLS-1$
 	private final static 	String CMD_DELIMITER = ";"; //$NON-NLS-1$
+	
+	private RSEConnection connection;
 
 	public RSEProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
+		this.connection = (RSEConnection)conn;
 	}
 	
 	public RSEProcessBuilder(IRemoteConnection conn, String... command) {
@@ -67,7 +66,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		remoteCmd += CMD_DELIMITER + EXIT_CMD;
 		
-		IShellService shellService = (IShellService) getConnectedRemoteShellService();
+		IShellService shellService = connection.getRemoteShellService();
 		if (shellService == null) {
 			throw new IOException("Remote service not found");
 		}
@@ -81,38 +80,4 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		return new RSEProcess(p);
 	}
 
-	private IShellService getConnectedRemoteShellService() {
-		IHost currentConnection = ((RSEConnection)connection()).getHost();
-		if (currentConnection != null) {
-			ISubSystem[] subSystems = currentConnection.getSubSystems();
-			ISubSystem subSystem = null;
-			for (ISubSystem sub : subSystems) {
-				if (sub instanceof IShellServiceSubSystem) {
-					subSystem = sub;
-					break;
-				}
-			}
-			
-			final ISubSystem ss = subSystem;
-			// Need to run this in the UI thread
-			Display.getDefault().syncExec(new Runnable()
-			{
-				public void run()
-				{	try {
-						ss.connect(new NullProgressMonitor(), false);
-					} catch (Exception e) {
-						// Ignore
-						e.printStackTrace();
-					}
-				}
-			});
-			
-			if(!subSystem.isConnected()) {
-				return null;
-			}
-			
-			return ((IShellServiceSubSystem)subSystem).getShellService();
-		}
-		return null;
-	}
 }

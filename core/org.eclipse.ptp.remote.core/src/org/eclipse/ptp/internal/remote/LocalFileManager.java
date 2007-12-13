@@ -29,6 +29,28 @@ import org.eclipse.swt.widgets.Shell;
 public class LocalFileManager implements IRemoteFileManager {
 	public LocalFileManager() {
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
+	 */
+	public IPath browseDirectory(Shell shell, String message, String filterPath) {
+		DirectoryDialog dialog = new DirectoryDialog(PTPRemotePlugin.getShell());
+		dialog.setText(message);
+		if (filterPath != null) {
+			File path = new File(filterPath);
+			if (path.exists()) {
+				dialog.setFilterPath(path.isFile() ? path.getParent() : filterPath);
+			}
+		}
+	
+		
+		String path = dialog.open();
+		if (path == null) {
+			return null;
+		}
+		
+		return new Path(path);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
@@ -52,28 +74,6 @@ public class LocalFileManager implements IRemoteFileManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
-	 */
-	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		DirectoryDialog dialog = new DirectoryDialog(PTPRemotePlugin.getShell());
-		dialog.setText(message);
-		if (filterPath != null) {
-			File path = new File(filterPath);
-			if (path.exists()) {
-				dialog.setFilterPath(path.isFile() ? path.getParent() : filterPath);
-			}
-		}
-	
-		
-		String path = dialog.open();
-		if (path == null) {
-			return null;
-		}
-		
-		return new Path(path);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
@@ -82,5 +82,13 @@ public class LocalFileManager implements IRemoteFileManager {
 		} finally {
 			monitor.done();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IPath getWorkingDirectory(IProgressMonitor monitor)
+			throws IOException {
+		return new Path(System.getProperty("user.dir"));
 	}
 }

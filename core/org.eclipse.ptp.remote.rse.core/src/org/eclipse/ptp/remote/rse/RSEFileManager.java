@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RSEFileManager implements IRemoteFileManager {
 	private RSEConnection connection;
-	
+
 	public RSEFileManager(RSEConnection conn) {
 		this.connection = conn;
 	}
@@ -47,7 +47,7 @@ public class RSEFileManager implements IRemoteFileManager {
 		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
@@ -70,5 +70,13 @@ public class RSEFileManager implements IRemoteFileManager {
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
 		return connection.getFileSystem().getStore(connection.toURI(path));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IPath getWorkingDirectory(IProgressMonitor monitor)
+			throws IOException {
+		return new Path("/"); // TODO: RSE doesn't provide any way to get this
 	}
 }

@@ -54,4 +54,12 @@ public interface IRemoteFileManager {
 	 * @throws IOException if the associated resource cannot be located
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException;
+	
+	/**
+	 * Get the working directory. Relative paths will be resolved using this path.
+	 * 
+	 * @param monitor
+	 * @return IPath representing the current working directory
+	 */
+	public IPath getWorkingDirectory(IProgressMonitor monitor) throws IOException;
 }
