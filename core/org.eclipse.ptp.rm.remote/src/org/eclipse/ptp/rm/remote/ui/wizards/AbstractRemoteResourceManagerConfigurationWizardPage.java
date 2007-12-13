@@ -27,6 +27,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -36,6 +39,8 @@ import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.remote.Activator;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
@@ -104,7 +109,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private Button portForwardingButton = null;
 	private Button manualButton = null;
 	private WidgetListener listener = new WidgetListener();
-	private Button configureRemoteConnectionButton;
+	private Button newConnectionButton;
 	private Label  connectionLabel;
 	private Combo  remoteCombo;
 	private Combo  connectionCombo;
@@ -271,7 +276,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 1;
 		connectionCombo.setLayoutData(gd);
 
-		configureRemoteConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.configureButton"), null);
+		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.newButton"), null);
 
 		/*
 		 * Composite for proxy path
@@ -362,7 +367,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				updatePage();
 			}
 		});
-		configureRemoteConnectionButton.addSelectionListener(new SelectionAdapter() {
+		newConnectionButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
 				handleNewRemoteConnectionSelected();
 				updatePage();
@@ -547,6 +552,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	protected void handlePathBrowseButtonSelected() 
 	{
 		if (connection != null) {
+			if (!connection.isOpen()) {
+				try {
+					connection.open();
+				} catch (RemoteConnectionException e) {
+					ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+				}
+			}
 			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 			String correctPath = getFieldContent(serverText.getText());
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("RemoteConfigurationWizard.select"), correctPath);
@@ -597,7 +610,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			/*
 			 * Enable 'new' button if new connections are supported
 			 */
-			configureRemoteConnectionButton.setEnabled(connectionManager.supportsNewConnections());
+			newConnectionButton.setEnabled(connectionManager.supportsNewConnections());
 		}
 	}
 	
