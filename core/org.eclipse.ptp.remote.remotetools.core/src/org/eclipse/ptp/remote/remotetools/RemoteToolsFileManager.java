@@ -19,11 +19,15 @@ import java.util.Map;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.ui.RemoteResourceBrowser;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
+import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 import org.eclipse.swt.widgets.Shell;
 
@@ -39,14 +43,32 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		return null;
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, new Path(filterPath), shell);
+		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
+		if (browser.open() == Window.CANCEL) {
+			return null;
+		}
+		IPath path = browser.getPath();
+		if (path == null) {
+			return null;
+		}
+		return path;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseFile(Shell shell, String message, String filterPath) {
-		return null;
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, new Path(filterPath), shell);
+		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
+		if (browser.open() == Window.CANCEL) {
+			return null;
+		}
+		IPath path = browser.getPath();
+		if (path == null) {
+			return null;
+		}
+		return path;
 	}
 
 	/**
@@ -111,6 +133,18 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		return res;
 	}
 	
+	public IPath getWorkingDirectory(IProgressMonitor monitor)
+			throws IOException {
+		String cwd = "//";
+		try {
+			cwd = connection.getExecutionManager().getExecutionTools().executeWithOutput("pwd").trim();
+		} catch (RemoteExecutionException e) {
+		} catch (RemoteConnectionException e) {
+		} catch (CancelException e) {
+		}
+		return new Path(cwd);
+	}
+	
 	/**
 	 * @param path
 	 * @return
@@ -153,7 +187,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	public InputStream openInputStream(String path) throws RemoteConnectionException, IOException {
 		return connection.getExecutionManager().getRemoteCopyTools().executeDownload(path).getInputStreamFromProcessRemoteFile();
 	}
-	
+
 	/**
 	 * @param path
 	 * @return

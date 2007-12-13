@@ -145,6 +145,10 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public String getName() {
+		IPath path = new Path(remoteItem.getPath());
+		if (path.isRoot()) {
+			return path.toString();
+		}
 		return new Path(remoteItem.getPath()).lastSegment();
 	}
 

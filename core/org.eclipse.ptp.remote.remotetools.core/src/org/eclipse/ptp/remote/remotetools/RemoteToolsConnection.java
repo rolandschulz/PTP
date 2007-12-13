@@ -12,25 +12,53 @@ package org.eclipse.ptp.remote.remotetools;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
+import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
+import org.eclipse.ptp.remotetools.environment.control.ITargetJob;
+import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 
 public class RemoteToolsConnection implements IRemoteConnection {
-	private org.eclipse.ptp.remotetools.core.IRemoteConnection conn;
+	private String connName;
 	private String hostName;
 	private String userName;
-
 	private IRemoteExecutionManager exeMgr = null;
+	private ITargetControl control;
 
-	public RemoteToolsConnection(org.eclipse.ptp.remotetools.core.IRemoteConnection conn, String hostName, String userName) {
-		this.conn = conn;
+	private final ReentrantLock jobLock = new ReentrantLock();
+	private final Condition jobCondition = jobLock.newCondition();
+
+	public RemoteToolsConnection(String name, String hostName, String userName, ITargetControl control) {
+		this.control = control;
+		this.connName = name;
 		this.hostName = hostName;
 		this.userName = userName;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
+	 */
+	public void close() {
+		jobLock.lock();
+		try {
+			exeMgr = null;
+			jobCondition.signal();
+		} finally {
+			jobLock.unlock();
+		}
+		try {
+			control.kill(new NullProgressMonitor());
+		} catch (CoreException e) {
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -50,16 +78,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 
 	/**
-	 * @return
+	 * @return execution manager
 	 * @throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException 
 	 */
 	public IRemoteExecutionManager getExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
-		if (!conn.isConnected()) {
-			conn.connect();
-		}
-		if (exeMgr == null) {
-			exeMgr = conn.createRemoteExecutionManager();
-		}
 		return exeMgr;
 	}
 
@@ -71,7 +93,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
 	public String getName() {
-		return userName + "@" + hostName;
+		return connName;
 	}
 	
 	public String getUsername() {
@@ -79,12 +101,75 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#isOpen()
+	 */
+	public synchronized boolean isOpen() {
+		return exeMgr != null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
+	 */
+	public void open() throws RemoteConnectionException {
+		if (control.query() == ITargetStatus.STOPPED) {
+			try {
+				control.create(new NullProgressMonitor());
+			} catch (CoreException e) {
+				throw new RemoteConnectionException(e.getMessage());
+			}
+		}
+		
+		if (exeMgr == null) {
+			try {
+				control.startJob(new ITargetJob() {
+					public void run(IRemoteExecutionManager manager) {
+						jobLock.lock();
+						try {
+							exeMgr = manager;
+							jobCondition.signal();
+						} finally {
+							jobLock.unlock();
+						}
+						jobLock.lock();
+						try {
+							while (exeMgr != null) {
+								try {
+									jobCondition.await();
+								} catch (InterruptedException e) {
+									break;
+								}
+							}
+						} finally {
+							jobLock.unlock();
+						}
+					}
+				});
+			} catch (CoreException e1) {
+				throw new RemoteConnectionException(e1.getMessage());
+			}
+			
+			jobLock.lock();
+			try {
+				while (exeMgr == null) {
+					try {
+						jobCondition.await();
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+			} finally {
+				jobLock.unlock();
+			}
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
 	 */
 	public void setHostname(String hostName) {
 		this.hostName = hostName;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setUsername(java.lang.String)
 	 */
