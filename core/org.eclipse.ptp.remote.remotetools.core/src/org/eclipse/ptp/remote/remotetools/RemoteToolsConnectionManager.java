@@ -13,20 +13,48 @@ package org.eclipse.ptp.remote.remotetools;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.remotetools.ui.ConfigFactory;
-import org.eclipse.ptp.remote.remotetools.ui.ConfigurationDialog;
-import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
-import org.eclipse.ptp.remotetools.core.AuthToken;
-import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
+import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
+import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
+import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
+import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
+import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
+import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
 import org.eclipse.swt.widgets.Shell;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
+	private TargetTypeElement genericHost = null;
 	private Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
 	
 	public RemoteToolsConnectionManager() {
+		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
+		for (Object obj : targetMgr.getTypeElements()) {
+			TargetTypeElement element = (TargetTypeElement)obj;
+			if (element.getName().equals("Generic Host")) {
+				genericHost = element;
+				break;
+			}
+		}
+		refreshConnections();
+	}
+	
+	private void refreshConnections() {
+		for (Object obj : genericHost.getElements()) {
+			ITargetElement element = (ITargetElement)obj;
+			IRemoteConnection conn = connections.get(element.getName());
+			if (conn == null) {
+				ITargetControl control;
+				try {
+					control = element.getControl();
+					connections.put(element.getName(), new RemoteToolsConnection(element.getName(), "", "", control));
+				} catch (CoreException e) {
+				}
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -47,24 +75,21 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
 	 */
 	public void newConnection(Shell shell) {
-		ConfigurationDialog dialog = new ConfigurationDialog(shell);
-		dialog.open();
-		
-		ControlAttributes attributes = dialog.getAttributes();
-		
-		String host = attributes.getString(ConfigFactory.ATTR_CONNECTION_ADDRESS);
-		AuthToken auth = dialog.getAuthToken();
-		
-		org.eclipse.ptp.remotetools.core.IRemoteConnection conn = 
-			RemotetoolsPlugin.createSSHConnection(auth, host);
-		
-		connections.put(host, new RemoteToolsConnection(conn, host, auth.getUsername()));
+		if (genericHost != null) {
+			EnvironmentWizard wizard = new EnvironmentWizard(genericHost);
+			WizardDialog dialog = new WizardDialog(shell, wizard);
+			dialog.create();
+			dialog.setBlockOnOpen(true);
+			if (dialog.open() == WizardDialog.OK) {
+				refreshConnections();
+			}
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#supportsNewConnections()
 	 */
 	public boolean supportsNewConnections() {
-		return true;
+		return genericHost != null;
 	}
 }

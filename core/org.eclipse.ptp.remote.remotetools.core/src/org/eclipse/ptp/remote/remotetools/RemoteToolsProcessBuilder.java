@@ -24,10 +24,12 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, List<String> command) {
 		super(conn, command);
+		this.connection = conn;
 	}
 	
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, String... command) {
 		super(conn, command);
+		this.connection = conn;
 	}
 	
 
