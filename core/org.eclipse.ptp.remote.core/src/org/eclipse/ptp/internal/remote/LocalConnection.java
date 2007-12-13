@@ -22,11 +22,20 @@ public class LocalConnection implements IRemoteConnection {
 	private String name;
 	private String hostname;
 	private String username;
+	private boolean connected;
 	
 	public LocalConnection() {
 		this.name = "Local";
 		this.hostname = "localhost";
 		this.username = System.getProperty("user.name");
+		this.connected = false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
+	 */
+	public void close() {
+		connected = false;
 	}
 	
 	/* (non-Javadoc)
@@ -44,7 +53,7 @@ public class LocalConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getHostname()
 	 */
@@ -64,6 +73,20 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public String getUsername() {
 		return username;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#isOpen()
+	 */
+	public boolean isOpen() {
+		return connected;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
+	 */
+	public void open() throws RemoteConnectionException {
+		connected = true;
 	}
 
 	/* (non-Javadoc)

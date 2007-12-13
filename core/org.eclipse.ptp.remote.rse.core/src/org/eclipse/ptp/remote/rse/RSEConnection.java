@@ -15,19 +15,38 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.rse.core.model.IHost;
+import org.eclipse.rse.core.subsystems.ISubSystem;
+import org.eclipse.rse.services.shells.IShellService;
+import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShellServiceSubSystem;
+import org.eclipse.swt.widgets.Display;
 
 public class RSEConnection implements IRemoteConnection {
 	private IHost rseHost;
 	private IFileSystem fileSystem;
+	private IShellService shellService = null;
+	private ISubSystem subSystem = null;
 
 	public RSEConnection(IHost host, IFileSystem fileSystem) {
 		this.rseHost = host;
 		this.fileSystem = fileSystem;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
+	 */
+	public void close() {
+		if (subSystem != null && subSystem.isConnected()) {
+			try {
+				subSystem.disconnect();
+			} catch (Exception e) {
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -54,7 +73,7 @@ public class RSEConnection implements IRemoteConnection {
 	public IFileSystem getFileSystem() {
 		return fileSystem;
 	}
-	
+
 	/**
 	 * Get RSE host object 
 	 * 
@@ -63,7 +82,10 @@ public class RSEConnection implements IRemoteConnection {
 	public IHost getHost() {
 		return rseHost;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getHostname()
+	 */
 	public String getHostname() {
 		return rseHost.getHostName();
 	}
@@ -74,9 +96,63 @@ public class RSEConnection implements IRemoteConnection {
 	public String getName() {
 		return rseHost.getAliasName();
 	}
+
+	/**
+	 * Get the shell service for this connection
+	 * 
+	 * @return shell service
+	 */
+	public IShellService getRemoteShellService() {
+		return shellService;
+	}
 	
 	public String getUsername() {
 		return rseHost.getDefaultUserId();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#isOpen()
+	 */
+	public boolean isOpen() {
+		return subSystem != null && subSystem.isConnected();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
+	 */
+	public void open() throws RemoteConnectionException {
+		if (subSystem == null) {
+			ISubSystem[] subSystems = rseHost.getSubSystems();
+			for (ISubSystem sub : subSystems) {
+				if (sub instanceof IShellServiceSubSystem) {
+					subSystem = sub;
+					break;
+				}
+			}
+			if (subSystem == null) {
+				throw new RemoteConnectionException("Could not locate shell service");
+			}
+			
+			shellService = ((IShellServiceSubSystem)subSystem).getShellService();
+		}
+		
+		if (!subSystem.isConnected()) {
+			// Need to run this in the UI thread
+			Display.getDefault().syncExec(new Runnable()
+			{
+				public void run()
+				{	try {
+						subSystem.connect(new NullProgressMonitor(), false);
+					} catch (Exception e) {
+						// Ignore
+					}
+				}
+			});
+			
+			if(!subSystem.isConnected()) {
+				throw new RemoteConnectionException("Could not connect shell service");
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -85,7 +161,7 @@ public class RSEConnection implements IRemoteConnection {
 	public void setHostname(String hostname) {
 		rseHost.setHostName(hostname);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setUsername(java.lang.String)
 	 */

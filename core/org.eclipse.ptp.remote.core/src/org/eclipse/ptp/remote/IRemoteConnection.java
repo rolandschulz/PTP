@@ -17,6 +17,11 @@ import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 
 public interface IRemoteConnection {
 	/**
+	 * Close the connection. Must be called to terminate the connection.
+	 */
+	public void close();
+	
+	/**
 	 * Forward local port localPort to remote port remotePort on remote machine fwdAddress. If this
 	 * connection is not to fwdAddress, the port will be routed via the connection machine to
 	 * fwdAddress. 
@@ -27,7 +32,7 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public void forwardLocalTCPPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
-	
+
 	/**
 	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. If fwdAddress is not the
 	 * local machine, the port will be routed via the local machine to fwdAddress.
@@ -45,7 +50,7 @@ public interface IRemoteConnection {
 	 * return hostname
 	 */
 	public String getHostname();
-
+	
 	/**
 	 * Get unique name for this connection.
 	 * 
@@ -61,6 +66,20 @@ public interface IRemoteConnection {
 	public String getUsername();
 	
 	/**
+	 * Test if the connection is open.
+	 * 
+	 * @return true if connection is open.
+	 */
+	public boolean isOpen();
+
+	/**
+	 * Open the connection. Must be called before the connection can be used.
+	 * 
+	 * @throws RemoteConnectionException
+	 */
+	public void open() throws RemoteConnectionException;
+	
+	/**
 	 * @param hostname
 	 */
 	public void setHostname(String hostname);
@@ -69,7 +88,7 @@ public interface IRemoteConnection {
 	 * @param username
 	 */
 	public void setUsername(String username);
-
+	
 	/**
 	 * Test if this connection supports forwarding of TCP connections
 	 * 
