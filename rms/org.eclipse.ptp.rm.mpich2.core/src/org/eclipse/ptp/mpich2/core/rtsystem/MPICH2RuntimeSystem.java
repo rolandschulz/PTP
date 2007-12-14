@@ -20,37 +20,11 @@
 package org.eclipse.ptp.mpich2.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteRuntimeSystem;
 
 
-public class MPICH2RuntimeSystem extends AbstractProxyRuntimeSystem  {
+public class MPICH2RuntimeSystem extends AbstractRemoteRuntimeSystem  {
 	public MPICH2RuntimeSystem(MPICH2ProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 	}
-	
-	/* TODO
-	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e) {
-		boolean is_error = e.wasError();
-		System.out.println("Proxy Disconnected.");
-		proxyDead = true;
-		if(is_error) {
-			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
-					"There was a fatal PTP Control System error.  The proxy "+
-					"server disconnected with an error.\n\n"+
-					"Control System is now disabled.", null);
-		}
-		
-	}
-
-	public void handleProxyErrorEvent(IProxyErrorEvent e) {
-		System.err.println("Fatal error from proxy: '"+e.getErrorMessage()+"'");
-		int errorCode = e.getErrorCode();
-		String errorMsg = e.getErrorMessage();
-		PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
-				"There was a fatal PTP Control System error (ERROR CODE: "+errorCode+").\n"+
-				"Error message: \""+errorMsg+"\"\n\n"+
-				"Control System is now disabled.", null);
-		proxyDead = true;
-	}
-	*/
 }

@@ -20,9 +20,9 @@
 package org.eclipse.ptp.bluegene.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteRuntimeSystem;
 
-public class BGRuntimeSystem extends AbstractProxyRuntimeSystem {
+public class BGRuntimeSystem extends AbstractRemoteRuntimeSystem {
 	public BGRuntimeSystem(BGProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 	}

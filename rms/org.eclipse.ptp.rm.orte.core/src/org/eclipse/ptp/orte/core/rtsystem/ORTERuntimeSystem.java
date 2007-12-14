@@ -20,9 +20,9 @@
 package org.eclipse.ptp.orte.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteRuntimeSystem;
 
-public class ORTERuntimeSystem extends AbstractProxyRuntimeSystem {
+public class ORTERuntimeSystem extends AbstractRemoteRuntimeSystem {
 	public ORTERuntimeSystem(ORTEProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 	}
