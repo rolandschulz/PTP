@@ -13,13 +13,14 @@ package org.eclipse.ptp.remote;
 import java.net.URI;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 
 public interface IRemoteConnection {
 	/**
 	 * Close the connection. Must be called to terminate the connection.
 	 */
-	public void close();
+	public void close(IProgressMonitor monitor);
 	
 	/**
 	 * Forward local port localPort to remote port remotePort on remote machine fwdAddress. If this
@@ -77,7 +78,7 @@ public interface IRemoteConnection {
 	 * 
 	 * @throws RemoteConnectionException
 	 */
-	public void open() throws RemoteConnectionException;
+	public void open(IProgressMonitor monitor) throws RemoteConnectionException;
 	
 	/**
 	 * @param hostname
