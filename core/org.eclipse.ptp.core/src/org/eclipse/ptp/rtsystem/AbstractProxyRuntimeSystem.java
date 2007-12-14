@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -627,29 +628,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void shutdown() throws CoreException {
-		try {
-			proxy.shutdown();
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), 
-					IStatus.WARNING, e.getMessage(), null));
-		}
-	}
+	public abstract void shutdown(IProgressMonitor monitor) throws CoreException;
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup()
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void startup() throws CoreException {
-		try {
-			proxy.startup();
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), 
-					IStatus.WARNING, e.getMessage(), null));
-		}
-	}
+	public abstract void startup(IProgressMonitor monitor) throws CoreException;
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	public String submitJob(AttributeManager attrMgr) throws CoreException {
 		try {
 			/*
