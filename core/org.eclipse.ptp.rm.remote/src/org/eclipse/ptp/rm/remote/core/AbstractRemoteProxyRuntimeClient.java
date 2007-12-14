@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -66,27 +67,34 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		DebugOptions.SERVER_DEBUG_LEVEL = DebugUtil.PROXY_SERVER_DEBUG_LEVEL;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient#shutdownProxyServer()
+	/**
+	 * Shut down remote proxy. 
+	 * 
+	 * Calls shutdown() to stop the state machine, then sessionFinish()
+	 * to close down the connection.
+	 * 
+	 * @param monitor
+	 * @throws IOException
 	 */
-	@Override
-	protected void shutdownProxyServer() {
+	public void shutdown(IProgressMonitor monitor) throws IOException {
+		shutdown();
 		try {
 			sessionFinish();
 		} catch (IOException e) {
-			e.printStackTrace();
 			PTPCorePlugin.log(e);
 		}
 		if (connection.isOpen()) {
-			connection.close();
+			connection.close(monitor);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient#startupProxyServer()
+	/**
+	 * Start the remote connection.
+	 * 
+	 * @param monitor
+	 * @throws IOException
 	 */
-	@Override
-	protected void startupProxyServer() throws IOException {
+	public void startup(IProgressMonitor monitor) throws IOException {
 		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
 			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
@@ -135,7 +143,10 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 				connection = connMgr.getConnection(connectionName);
 				if (!connection.isOpen()) {
-					connection.open();
+					connection.open(monitor);
+				}
+				if (monitor.isCanceled()) {
+					return;
 				}
 
 				/*
@@ -244,5 +255,6 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		} catch (RemoteConnectionException e) {
 			throw new IOException("Failed to start proxy: " + e.getMessage());
 		}
+		startup();
 	}
 }
