@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.services">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.services" id="serviceProvider" name="ServiceProvider"/>
+         <meta.schema plugin="org.eclipse.ptp.services" id="serviceProvider" name="Service Provider"/>
       </appInfo>
       <documentation>
          Extension point to specify alternate providers for services.
