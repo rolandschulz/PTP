@@ -736,22 +736,11 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/**
-	 * Abort the RTS connection.
-	 */
-	private void abortConnection() {
-		try {
-			runtimeSystem.shutdown();
-		} catch (CoreException e) {
-			// TODO: Should probably throw something
-		}
-	}
-
-	/**
 	 * Close the RTS connection.
 	 */
-	private void closeConnection() {
+	private void closeConnection(IProgressMonitor monitor) {
 		try {
-			runtimeSystem.shutdown();
+			runtimeSystem.shutdown(monitor);
 		} catch (CoreException e) {
 			// TODO: Should probably throw something
 		}
@@ -886,7 +875,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		stateLock.lock();
 		try {
 			doBeforeCloseConnection();
-			closeConnection();
+			closeConnection(monitor);
 			state = RMState.STOPPING;
 			while (state != RMState.STOPPED && state != RMState.ERROR) {
 				try {
@@ -923,7 +912,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				monitor.subTask("Starting runtime system");
 				
 				try {
-					runtimeSystem.startup();
+					runtimeSystem.startup(monitor);
 				} catch (CoreException e) {
 					state = RMState.ERROR;
 					throw e;
@@ -945,7 +934,6 @@ public abstract class AbstractRuntimeResourceManager extends
 				}
 				if (monitor.isCanceled()) {
 					state = RMState.STOPPED;
-					abortConnection();
 					return false;
 				}
 				doAfterOpenConnection();
