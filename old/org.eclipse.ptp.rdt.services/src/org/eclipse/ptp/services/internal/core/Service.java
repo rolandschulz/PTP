@@ -59,4 +59,11 @@ public class Service implements IService {
 	public Set<IServiceProviderDescriptor> getProviders() {
 		return serviceProviderDescriptors;
 	}
+	
+	/**
+	 * @param provider
+	 */
+	public void addServiceProvider(IServiceProviderDescriptor provider) {
+		serviceProviderDescriptors.add(provider);
+	}
 }
