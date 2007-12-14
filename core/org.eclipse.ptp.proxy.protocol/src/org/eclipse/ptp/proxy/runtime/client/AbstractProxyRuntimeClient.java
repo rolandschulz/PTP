@@ -289,7 +289,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				System.out.println(toString() + ": shutting down server...");
 			}
 			state = ProxyState.SHUTDOWN;
-			shutdownProxyServer();
 		}
 	}
 	
@@ -310,7 +309,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 */
 	public void startup() throws IOException {
 		if (state == ProxyState.IDLE) {
-			startupProxyServer();
 			state = ProxyState.STARTUP;
 
 			Thread smt = new Thread(new StateMachineThread(), proxyName + StateMachineThread.name);
@@ -908,17 +906,4 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 			}
 		}
 	}	
-
-	/**
-	 * Stop the proxy server.
-	 */
-	protected abstract void shutdownProxyServer() throws IOException;
-	
-	/**
-	 * Start the proxy server, possibly on a remote machine. The server will eventually connect 
-	 * to the session created using sessionCreate(). This will result in a connected event.
-	 * 
-	 * @throws IOException if the proxy failed to start.
-	 */
-	protected abstract void startupProxyServer() throws IOException;	
 }
