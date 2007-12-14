@@ -34,12 +34,12 @@ public interface IService {
 	 * 
 	 * @return set of natures
 	 */
-	public Set<String> getNatureIds();
+	public Set<String> getNatures();
 	
 	/**
 	 * Get the set of all providers for this service.
 	 * 
 	 * @return set of providers for this service
 	 */
-	public Set<IServiceProviderInfo> getProviderInfos();
+	public Set<IServiceProviderDescriptor> getProviders();
 }

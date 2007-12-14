@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
-public interface IServiceProvider extends IServiceProviderInfo {
+public interface IServiceProvider extends IServiceProviderDescriptor {
 	/**
 	 * Test if this service provider has been configured.
 	 * 
