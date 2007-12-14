@@ -24,4 +24,11 @@ public interface IServiceProviderDescriptor {
 	 * @return name of this service provider
 	 */
 	public String getName();
+
+	/**
+	 * Get the service this service provider is for.
+	 * 
+	 * @return service
+	 */
+	public String getServiceId();
 }

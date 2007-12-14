@@ -24,19 +24,26 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.services.Activator;
 import org.eclipse.ptp.services.internal.core.Service;
+import org.eclipse.ptp.services.internal.core.ServiceProviderDescriptor;
+import org.eclipse.ptp.services.ui.IServiceProviderConfiguration;
 
 public class ServiceModelManager implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "service"; //$NON-NLS-1$
+	private final static String PROVIDER_EXTENSION_ID = "serviceProvider"; //$NON-NLS-1$
 	private final static String SERVICE_ELEMENT_NAME = "service"; //$NON-NLS-1$
-	private final static String SERVICE_ATTR_ID = "id"; //$NON-NLS-1$
-	private final static String SERVICE_ATTR_NAME = "name"; //$NON-NLS-1$
 	private final static String NATURE_ELEMENT_NAME = "nature"; //$NON-NLS-1$
-	private final static String NATURE_ATTR_ID = "id"; //$NON-NLS-1$
+	private final static String PROVIDER_ELEMENT_NAME = "provider"; //$NON-NLS-1$
+	private final static String ATTR_ID = "id"; //$NON-NLS-1$
+	private final static String ATTR_NAME = "name"; //$NON-NLS-1$
+	private final static String ATTR_SERVICE_ID = "serviceId"; //$NON-NLS-1$
+	private final static String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private final static String ATTR_UI_CLASS = "configurationUIClass"; //$NON-NLS-1$
 	
 	private Map<IProject, Set<IServiceConfiguration>> projectConfigurations = new HashMap<IProject, Set<IServiceConfiguration>>();
 	private Map<IProject, IServiceConfiguration> activeConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private Map<String, IServiceConfiguration> configurations = new HashMap<String, IServiceConfiguration>();
-	private Set<IService> services = new HashSet<IService>();
+	private Map<String, IService> services = new HashMap<String, IService>();
+	private Set<IService> serviceSet = new HashSet<IService>();
 	private Map<IProject, Set<IService>> projectServices = new HashMap<IProject, Set<IService>>();
 	private Map<String, Set<IService>> natureServices = new HashMap<String, Set<IService>>();
 	
@@ -67,7 +74,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	 */
 	public Set<IService> getServices() {
 		loadServices();
-		return services;
+		return serviceSet;
 	}
 
 	/* (non-Javadoc)
@@ -92,6 +99,42 @@ public class ServiceModelManager implements IServiceModelManager {
 		activeConfigurations.put(project, configuration);
 	}
 	
+	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
+		IServiceProvider provider = null;
+		IExtension extension = Platform.getExtensionRegistry().getExtension(desc.getId());
+		if (extension != null) {
+			for (IConfigurationElement element : extension.getConfigurationElements()) {
+				if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+					try {
+						provider = (IServiceProvider)element.createExecutableExtension(ATTR_CLASS);
+					} catch (Exception e) {
+						return null;
+					}
+			
+				}
+			}
+		}
+		return provider;
+	}
+	
+	public IServiceProviderConfiguration getServiceProviderConfiguration(IServiceProviderDescriptor desc) {
+		IServiceProviderConfiguration config = null;
+		IExtension extension = Platform.getExtensionRegistry().getExtension(desc.getId());
+		if (extension != null) {
+			for (IConfigurationElement element : extension.getConfigurationElements()) {
+				if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+					try {
+						config = (IServiceProviderConfiguration)element.createExecutableExtension(ATTR_UI_CLASS);
+					} catch (Exception e) {
+						return null;
+					}
+			
+				}
+			}
+		}
+		return config;
+	}
+	
 	/**
 	 * Locate and initialize service extensions.
 	 */
@@ -102,20 +145,21 @@ public class ServiceModelManager implements IServiceModelManager {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
 					if (element.getName().equals(SERVICE_ELEMENT_NAME)) {
-						String serviceID = element.getAttribute(SERVICE_ATTR_ID);
-						String serviceName = element.getAttribute(SERVICE_ATTR_NAME);
+						String id = element.getAttribute(ATTR_ID);
+						String name = element.getAttribute(ATTR_NAME);
 						IConfigurationElement[] natureConf = element.getChildren(NATURE_ELEMENT_NAME);
 						Set<String> natures = new HashSet<String>();
 						if (natureConf != null) {
 							for (IConfigurationElement nature : natureConf) {
-								String natureId = nature.getAttribute(NATURE_ATTR_ID);
+								String natureId = nature.getAttribute(ATTR_ID);
 								if (workspace.getNatureDescriptor(natureId) != null) {
 									natures.add(natureId);
 								}
 							}
 						}
-						IService service = new Service(serviceID, serviceName, natures);
-						services.add(service);
+						IService service = new Service(id, name, natures);
+						serviceSet.add(service);
+						services.put(id, service);
 						for (String nature : natures) {
 							Set<IService> svcs = natureServices.get(nature);
 							if (svcs == null) {
@@ -128,6 +172,22 @@ public class ServiceModelManager implements IServiceModelManager {
 				}
 			}
 		}
+        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, PROVIDER_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+						String id = element.getAttribute(ATTR_ID);
+						String name = element.getAttribute(ATTR_NAME);
+						String serviceId = element.getAttribute(ATTR_SERVICE_ID);
+						IServiceProviderDescriptor desc = new ServiceProviderDescriptor(id, name, serviceId);
+						Service service = (Service) services.get(id);
+						if (service != null) {
+							service.addServiceProvider(desc);
+						}
+					}
+				}
+			}
+		}	
 	}
-
 }
