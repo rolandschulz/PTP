@@ -20,6 +20,7 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {	
 
@@ -43,11 +44,11 @@ public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {
 	 * Called when the control system is being shutdown.
 	 * @throws CoreException 
 	 */
-	public void shutdown() throws CoreException;
+	public void shutdown(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Called to start the runtime system.
 	 * @throws CoreException
 	 */
-	public void startup() throws CoreException;
+	public void startup(IProgressMonitor monitor) throws CoreException;
 }
