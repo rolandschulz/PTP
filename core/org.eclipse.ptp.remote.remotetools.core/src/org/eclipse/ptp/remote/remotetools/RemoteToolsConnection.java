@@ -12,14 +12,17 @@ package org.eclipse.ptp.remote.remotetools;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -47,7 +50,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
-	public void close() {
+	public synchronized void close(IProgressMonitor monitor) {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		jobLock.lock();
 		try {
 			exeMgr = null;
@@ -55,8 +61,18 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		} finally {
 			jobLock.unlock();
 		}
+		while (control.getJobCount() > 0) {
+			try {
+				wait(500);
+			} catch (InterruptedException e) {
+				return;
+			}
+			if (monitor.isCanceled()) {
+				break;
+			}
+		}
 		try {
-			control.kill(new NullProgressMonitor());
+			control.kill(monitor);
 		} catch (CoreException e) {
 		}
 	}
@@ -110,12 +126,18 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
 	 */
-	public void open() throws RemoteConnectionException {
+	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		if (control.query() == ITargetStatus.STOPPED) {
 			try {
-				control.create(new NullProgressMonitor());
+				control.create(monitor);
 			} catch (CoreException e) {
 				throw new RemoteConnectionException(e.getMessage());
+			}
+			if (monitor.isCanceled()) {
+				throw new RemoteConnectionException("Remote connection canceled");
 			}
 		}
 		
@@ -123,6 +145,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			try {
 				control.startJob(new ITargetJob() {
 					public void run(IRemoteExecutionManager manager) {
+						if (PTPRemotePlugin.getDefault().isDebugging()) {
+							System.out.println("Remote tools fake job starting");
+						}
 						jobLock.lock();
 						try {
 							exeMgr = manager;
@@ -142,6 +167,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 						} finally {
 							jobLock.unlock();
 						}
+						if (PTPRemotePlugin.getDefault().isDebugging()) {
+							System.out.println("Remote tools fake job exiting");
+						}
 					}
 				});
 			} catch (CoreException e1) {
@@ -152,7 +180,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			try {
 				while (exeMgr == null) {
 					try {
-						jobCondition.await();
+						jobCondition.await(500, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
 						break;
 					}
