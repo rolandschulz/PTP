@@ -14,6 +14,7 @@ import java.net.URI;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
@@ -34,7 +35,7 @@ public class LocalConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
-	public void close() {
+	public void close(IProgressMonitor monitor) {
 		connected = false;
 	}
 	
@@ -85,7 +86,7 @@ public class LocalConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
 	 */
-	public void open() throws RemoteConnectionException {
+	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
 		connected = true;
 	}
 
