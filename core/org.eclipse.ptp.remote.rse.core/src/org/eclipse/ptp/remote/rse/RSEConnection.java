@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
@@ -40,7 +40,7 @@ public class RSEConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
-	public void close() {
+	public void close(IProgressMonitor monitor) {
 		if (subSystem != null && subSystem.isConnected()) {
 			try {
 				subSystem.disconnect();
@@ -120,7 +120,7 @@ public class RSEConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
 	 */
-	public void open() throws RemoteConnectionException {
+	public void open(final IProgressMonitor monitor) throws RemoteConnectionException {
 		if (subSystem == null) {
 			ISubSystem[] subSystems = rseHost.getSubSystems();
 			for (ISubSystem sub : subSystems) {
@@ -142,7 +142,7 @@ public class RSEConnection implements IRemoteConnection {
 			{
 				public void run()
 				{	try {
-						subSystem.connect(new NullProgressMonitor(), false);
+						subSystem.connect(monitor, false);
 					} catch (Exception e) {
 						// Ignore
 					}
