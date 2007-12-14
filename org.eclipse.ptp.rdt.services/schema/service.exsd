@@ -13,7 +13,7 @@
    <element name="extension">
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="nature"/>
+            <element ref="service"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -42,9 +42,31 @@
       </complexType>
    </element>
 
+   <element name="service">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="nature"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <element name="nature">
       <complexType>
-         <attribute name="natureID" type="string" use="default" value="all">
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
                   

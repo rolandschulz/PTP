@@ -13,7 +13,6 @@ package org.eclipse.ptp.services.core;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
 
 public interface IServiceModelManager {
 	/**
@@ -65,7 +64,7 @@ public interface IServiceModelManager {
 	 * @param nature project nature
 	 * @return set of services
 	 */
-	public Set<IService> getServices(IProjectNature nature);
+	public Set<IService> getServices(String nature);
 	
 	/**
 	 * Set the active configuration for a project. By default, the first configuration created

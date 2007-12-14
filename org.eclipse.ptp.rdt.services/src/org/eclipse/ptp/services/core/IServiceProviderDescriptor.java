@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
-public interface IServiceProviderInfo {
+public interface IServiceProviderDescriptor {
 	/**
 	 * Get the ID of this service provider.
 	 * 
