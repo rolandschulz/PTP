@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.remote.ui.wizards;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -27,9 +28,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -553,9 +557,25 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	{
 		if (connection != null) {
 			if (!connection.isOpen()) {
+				IRunnableWithProgress op = new IRunnableWithProgress() {
+					public void run(IProgressMonitor monitor)
+							throws InvocationTargetException,
+							InterruptedException {
+						try {
+							connection.open(monitor);
+						} catch (RemoteConnectionException e) {
+							ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
+									new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+						}
+					}
+					
+				};
 				try {
-					connection.open();
-				} catch (RemoteConnectionException e) {
+					new ProgressMonitorDialog(getShell()).run(true, true, op);
+				} catch (InvocationTargetException e) {
+					ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+				} catch (InterruptedException e) {
 					ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
