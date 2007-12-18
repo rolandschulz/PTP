@@ -1,5 +1,7 @@
 package org.eclipse.ptp.services;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -47,4 +49,15 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	public void log(Throwable e) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
+	}
+
+	public void log(IStatus status) {
+		getLog().log(status);
+	}
+	
+	public void logErrorMessage(String message) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, null));
+	}
 }
