@@ -100,7 +100,6 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
 		}
 		
-		boolean stdio = (proxyOptions & IRemoteProxyOptions.STDIO) == IRemoteProxyOptions.STDIO;
 		boolean portForwarding = (proxyOptions & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		boolean manualLaunch = (proxyOptions & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 		
@@ -149,6 +148,17 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					return;
 				}
 				
+				/*
+				 * Check the remote proxy exists
+				 */
+				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+				IFileStore res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
+				if (!res.fetchInfo().exists()){
+					throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
+				}
+
+				sessionCreate();
+
 				int remotePort = getSessionPort();
 				if (portForwarding) {
 					/*
@@ -168,100 +178,58 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					}
 				}
 
-				/*
-				 * Check the remote proxy exists
-				 */
-				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-				IFileStore res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
-				if (!res.fetchInfo().exists()){
-					throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
+				ArrayList<String> args = new ArrayList<String>();
+				args.add(proxyPath);
+				args.add("--proxy=tcp");
+				if (portForwarding) {
+					args.add("--host=localhost");
+				} else {
+					args.add("--host=" + localAddr);
+				}
+				args.add("--port="+remotePort);
+				if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
+					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL);
+				}
+				args.addAll(invocationOptions);
+				
+				if (DebugOptions.CLIENT_TRACING) {
+					System.out.println("Launch command: " + args.toString());
 				}
 
-				if (!stdio) {
-					sessionCreate();
-					
-					ArrayList<String> args = new ArrayList<String>();
-					args.add(proxyPath);
-					args.add("--proxy=tcp");
-					if (portForwarding) {
-						args.add("--host=localhost");
-					} else {
-						args.add("--host=" + localAddr);
-					}
-					args.add("--port="+remotePort);
-					if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
-						args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL);
-					}
-					args.addAll(invocationOptions);
-					
-					if (DebugOptions.CLIENT_TRACING) {
-						System.out.println("Launch command: " + args.toString());
-					}
+				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
+				IRemoteProcess process = processBuilder.asyncStart();
+				
+				final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
-					IRemoteProcess process = processBuilder.asyncStart();
-					
-					final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-					new Thread(new Runnable() {
-						public void run() {
-							try {
-								String output;
-								while ((output = out_reader.readLine()) != null) {
-									System.out.println(proxyName + ": " + output);
-								}
-							} catch (IOException e) {
-								// Ignore
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							String output;
+							while ((output = out_reader.readLine()) != null) {
+								System.out.println(proxyName + ": " + output);
 							}
+						} catch (IOException e) {
+							// Ignore
 						}
-					}, "Program output Thread").start();
-					
-					new Thread(new Runnable() {
-						public void run() {
-							try {
-								String line;
-								while ((line = err_reader.readLine()) != null) {
-									System.err.println(proxyName + ": " + line);
-								}
-							} catch (IOException e) {
-								// Ignore
-							}
-						}
-					}, "Error output Thread").start();
-					
-					if (DebugOptions.CLIENT_TRACING) {
-						System.out.println(toString() + ": Waiting on accept.");
 					}
-				} else {
-					ArrayList<String> args = new ArrayList<String>();
-					args.add(proxyPath);
-					args.add("--proxy=stdio");
-					args.addAll(invocationOptions);
-
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
-					IRemoteProcess process = processBuilder.asyncStart();
-					
-					sessionCreate(process.getOutputStream(), process.getInputStream());
-					
-					final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					
-					new Thread(new Runnable() {
-						public void run() {
-							try {
-								String line;
-								while ((line = err_reader.readLine()) != null) {
-									System.err.println(proxyName + ": " + line);
-								}
-							} catch (IOException e) {
-								// Ignore
+				}, "Program output Thread").start();
+				
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							String line;
+							while ((line = err_reader.readLine()) != null) {
+								System.err.println(proxyName + ": " + line);
 							}
+						} catch (IOException e) {
+							// Ignore
 						}
-					}, "Error output Thread").start();
-					
-					if (DebugOptions.CLIENT_TRACING) {
-						System.out.println(toString() + ": Waiting on accept.");
 					}
+				}, "Error output Thread").start();
+				
+				if (DebugOptions.CLIENT_TRACING) {
+					System.out.println(toString() + ": Waiting on accept.");
 				}
 			}
 		} catch (IOException e) {
