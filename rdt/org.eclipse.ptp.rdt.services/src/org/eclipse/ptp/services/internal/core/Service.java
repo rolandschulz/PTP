@@ -33,6 +33,13 @@ public class Service implements IService {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IService#addServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
+	 */
+	public void addServiceProvider(IServiceProviderDescriptor provider) {
+		serviceProviderDescriptors.add(provider);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getId()
 	 */
 	public String getId() {
@@ -52,18 +59,18 @@ public class Service implements IService {
 	public Set<String> getNatures() {
 		return serviceNatures;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getProviders()
 	 */
 	public Set<IServiceProviderDescriptor> getProviders() {
 		return serviceProviderDescriptors;
 	}
-	
-	/**
-	 * @param provider
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IService#removeServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
-	public void addServiceProvider(IServiceProviderDescriptor provider) {
-		serviceProviderDescriptors.add(provider);
+	public void removeServiceProvider(IServiceProviderDescriptor provider) {
+		serviceProviderDescriptors.remove(provider);
 	}
 }

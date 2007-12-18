@@ -14,6 +14,13 @@ import java.util.Set;
 
 public interface IService {
 	/**
+	 * Add service provider to list of providers for this service.
+	 * 
+	 * @param provider provider to add
+	 */
+	public void addServiceProvider(IServiceProviderDescriptor provider);
+	
+	/**
 	 * Get the ID of this service provider.
 	 * 
 	 * @return ID of this service provider
@@ -42,4 +49,12 @@ public interface IService {
 	 * @return set of providers for this service
 	 */
 	public Set<IServiceProviderDescriptor> getProviders();
+
+	/**
+	 * Remove service provider from list of providers for this service.
+	 * 
+	 * @param provider provider to remove
+	 */
+	public void removeServiceProvider(IServiceProviderDescriptor provider);
+
 }
