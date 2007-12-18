@@ -24,7 +24,7 @@ public interface IRemoteConnection {
 	
 	/**
 	 * Forward local port localPort to remote port remotePort on remote machine fwdAddress. If this
-	 * connection is not to fwdAddress, the port will be routed via the connection machine to
+	 * IRemoteConnection is not to fwdAddress, the port will be routed via the connection machine to
 	 * fwdAddress. 
 	 * 
 	 * @param localPort local port to forward
@@ -32,18 +32,18 @@ public interface IRemoteConnection {
 	 * @param remotePort remote port on remote machine
 	 * @throws RemoteConnectionException
 	 */
-	public void forwardLocalTCPPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
+	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
 
 	/**
-	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. If fwdAddress is not the
-	 * local machine, the port will be routed via the local machine to fwdAddress.
+	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. When a connection is made to remotePort
+	 * on the remote machine, it is forwarded via this IRemoteConnection to fwdPort on machine fwdAddress.
 	 * 
 	 * @param remotePort remote port to forward
 	 * @param fwdAddress address of recipient machine
 	 * @param fwdPort port on recipient machine
 	 * @throws RemoteConnectionException
 	 */
-	public void forwardRemoteTCPPort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
+	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
 
 	/**
 	 * Gets the implementation dependent hostname for this connection

@@ -40,17 +40,17 @@ public class LocalConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalTCPPort(int, java.lang.String, int)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
-	public void forwardLocalTCPPort(int localPort, String fwdAddress,
+	public void forwardLocalPort(int localPort, String fwdAddress,
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemoteTCPPort(int, java.lang.String, int)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
-	public void forwardRemoteTCPPort(int remotePort, String fwdAddress,
+	public void forwardRemotePort(int remotePort, String fwdAddress,
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
