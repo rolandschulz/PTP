@@ -43,6 +43,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	}
 	
 	private void refreshConnections() {
+		connections.clear();
 		for (Object obj : genericHost.getElements()) {
 			ITargetElement element = (ITargetElement)obj;
 			IRemoteConnection conn = connections.get(element.getName());
@@ -61,6 +62,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
+		refreshConnections();
 		return connections.get(name);
 	}
 
@@ -68,6 +70,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
+		refreshConnections();
 		return connections.values().toArray(new IRemoteConnection[connections.size()]);
 	}
 	

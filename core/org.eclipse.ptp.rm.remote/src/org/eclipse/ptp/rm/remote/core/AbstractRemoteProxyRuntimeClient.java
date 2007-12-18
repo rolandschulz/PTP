@@ -141,6 +141,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 				connection = connMgr.getConnection(connectionName);
+				if (connection == null) {
+					throw new IOException("No such connection: " + connectionName);
+				}
 				if (!connection.isOpen()) {
 					connection.open(monitor);
 				}
