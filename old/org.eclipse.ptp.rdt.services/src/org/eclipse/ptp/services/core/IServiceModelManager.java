@@ -16,6 +16,14 @@ import org.eclipse.core.resources.IProject;
 
 public interface IServiceModelManager {
 	/**
+	 * Associate the service configuration with a project
+	 * 
+	 * @param project the project
+	 * @param conf the configuration
+	 */
+	public void addConfiguration(IProject project, IServiceConfiguration conf);
+	
+	/**
 	 * Get the configuration that is currently active for the project. Each project has
 	 * exactly one active configuration, which describes the mapping from services to
 	 * service providers. By default, the first configuration created for a project will 
@@ -67,6 +75,14 @@ public interface IServiceModelManager {
 	public Set<IService> getServices(String nature);
 	
 	/**
+	 * Remove the service configuration from a project
+	 * 
+	 * @param project the project
+	 * @param conf the configuration
+	 */
+	public void removeConfiguration(IProject project, IServiceConfiguration conf);
+	
+	/**
 	 * Set the active configuration for a project. By default, the first configuration created
 	 * for a project will be the active configuration for that project.
 	 * 
@@ -74,4 +90,5 @@ public interface IServiceModelManager {
 	 * @param configuration configuration to set as active for this project
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
+
 }
