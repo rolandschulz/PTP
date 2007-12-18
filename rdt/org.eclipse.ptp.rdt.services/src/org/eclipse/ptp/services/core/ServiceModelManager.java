@@ -26,6 +26,7 @@ import org.eclipse.ptp.services.Activator;
 import org.eclipse.ptp.services.internal.core.Service;
 import org.eclipse.ptp.services.internal.core.ServiceProviderDescriptor;
 import org.eclipse.ptp.services.ui.IServiceProviderConfiguration;
+import org.eclipse.ptp.services.ui.Messages;
 
 public class ServiceModelManager implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "service"; //$NON-NLS-1$
@@ -42,12 +43,24 @@ public class ServiceModelManager implements IServiceModelManager {
 	private Map<IProject, Set<IServiceConfiguration>> projectConfigurations = new HashMap<IProject, Set<IServiceConfiguration>>();
 	private Map<IProject, IServiceConfiguration> activeConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private Map<String, IServiceConfiguration> configurations = new HashMap<String, IServiceConfiguration>();
-	private Map<String, IService> services = new HashMap<String, IService>();
-	private Set<IService> serviceSet = new HashSet<IService>();
 	private Map<IProject, Set<IService>> projectServices = new HashMap<IProject, Set<IService>>();
-	private Map<String, Set<IService>> natureServices = new HashMap<String, Set<IService>>();
+
+	private Map<String, IService> services = null;
+	private Map<String, IServiceProviderDescriptor> serviceProviders = null;
+	private Set<IService> serviceSet = null;
+	private Map<String, Set<IService>> natureServices = null;
 	
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void addConfiguration(IProject project, IServiceConfiguration conf) {
+		Set<IServiceConfiguration> confs = projectConfigurations.get(project);
+		if (confs != null) {
+			confs.add(conf);
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
 	 */
@@ -69,36 +82,10 @@ public class ServiceModelManager implements IServiceModelManager {
 		return projectConfigurations.get(project);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices()
+	/**
+	 * @param desc
+	 * @return
 	 */
-	public Set<IService> getServices() {
-		loadServices();
-		return serviceSet;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
-	 */
-	public Set<IService> getServices(IProject project) {
-		return projectServices.get(project);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
-	 */
-	public Set<IService> getServices(String natureId) {
-		return natureServices.get(natureId);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void setActiveConfiguration(IProject project,
-			IServiceConfiguration configuration) {
-		activeConfigurations.put(project, configuration);
-	}
-	
 	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
 		IServiceProvider provider = null;
 		IExtension extension = Platform.getExtensionRegistry().getExtension(desc.getId());
@@ -116,8 +103,12 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 		return provider;
 	}
-	
-	public IServiceProviderConfiguration getServiceProviderConfiguration(IServiceProviderDescriptor desc) {
+
+	/**
+	 * @param desc
+	 * @return
+	 */
+	public IServiceProviderConfiguration getServiceProviderConfigurationUI(IServiceProviderDescriptor desc) {
 		IServiceProviderConfiguration config = null;
 		IExtension extension = Platform.getExtensionRegistry().getExtension(desc.getId());
 		if (extension != null) {
@@ -134,11 +125,59 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 		return config;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices()
+	 */
+	public Set<IService> getServices() {
+		loadServices();
+		return serviceSet;
+	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
+	 */
+	public Set<IService> getServices(IProject project) {
+		return projectServices.get(project);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
+	 */
+	public Set<IService> getServices(String natureId) {
+		loadServices();
+		return natureServices.get(natureId);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
+		Set<IServiceConfiguration> confs = projectConfigurations.get(project);
+		if (confs != null) {
+			confs.remove(conf);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void setActiveConfiguration(IProject project,
+			IServiceConfiguration configuration) {
+		activeConfigurations.put(project, configuration);
+	}
+
 	/**
 	 * Locate and initialize service extensions.
 	 */
 	private void loadServices() {
+		if (services != null) {
+			return;
+		}
+		services = new HashMap<String, IService>();
+		serviceProviders = new HashMap<String, IServiceProviderDescriptor>();
+		serviceSet = new HashSet<IService>();
+		natureServices = new HashMap<String, Set<IService>>();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, SERVICE_EXTENSION_ID);
 		if (extensionPoint != null) {
@@ -181,9 +220,13 @@ public class ServiceModelManager implements IServiceModelManager {
 						String name = element.getAttribute(ATTR_NAME);
 						String serviceId = element.getAttribute(ATTR_SERVICE_ID);
 						IServiceProviderDescriptor desc = new ServiceProviderDescriptor(id, name, serviceId);
-						Service service = (Service) services.get(id);
+						IService service = services.get(id);
 						if (service != null) {
+							serviceProviders.put(id, desc);
 							service.addServiceProvider(desc);
+						} else {
+							Activator.getDefault().logErrorMessage(
+									Messages.getFormattedString(Messages.Services_invalidServiceId, serviceId));
 						}
 					}
 				}
