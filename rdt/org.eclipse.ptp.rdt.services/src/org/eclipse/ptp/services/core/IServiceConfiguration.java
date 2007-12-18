@@ -20,6 +20,13 @@ package org.eclipse.ptp.services.core;
  */
 public interface IServiceConfiguration {
 	/**
+	 * Get the name for this configuration. A configuration name must be unique for a particular project.
+	 * 
+	 * @return the name of this configuration
+	 */
+	public String getName();
+	
+	/**
 	 * Get the service provider for a particular service in this configuration.
 	 * 
 	 * @param service service for which provider is required
