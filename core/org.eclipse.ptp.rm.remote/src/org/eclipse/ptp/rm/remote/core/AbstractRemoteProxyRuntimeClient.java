@@ -148,6 +148,25 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				if (monitor.isCanceled()) {
 					return;
 				}
+				
+				int remotePort = getSessionPort();
+				if (portForwarding) {
+					/*
+					 * Try to find a free port on the remote machine. This take a while, so
+					 * allow it to be canceled. If we've tried all ports (which could take a
+					 * very long while) then bail out.
+					 */
+					while (!monitor.isCanceled()) {
+						try {
+							connection.forwardRemotePort(remotePort, "localhost", getSessionPort());
+						} catch (RemoteConnectionException e) {
+							if (++remotePort == getSessionPort()) {
+								return;
+							}
+						}
+						monitor.worked(1);
+					}
+				}
 
 				/*
 				 * Check the remote proxy exists
@@ -169,7 +188,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					} else {
 						args.add("--host=" + localAddr);
 					}
-					args.add("--port="+getSessionPort());
+					args.add("--port="+remotePort);
 					if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
 						args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL);
 					}
