@@ -150,21 +150,21 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		/*
 		 * Close all tunnels.
 		 */
-		Iterator iterator = tunnels.iterator();
-		while (iterator.hasNext()) {
+		while (tunnels.size() > 0) {
+			Iterator iterator = tunnels.iterator();
 			IRemoteTunnel tunnel = (IRemoteTunnel) iterator.next();
 			try {
+				// releaseTunnel() already removes the entry from the list.
 				releaseTunnel(tunnel);
 			} catch (RemoteConnectionException e) {
 			}
 		}
-		tunnels.clear();
 		tunnels = null;
 		
 		/*
 		 * Close all channels for remote executions.
 		 */
-		iterator = executions.iterator();
+		Iterator iterator = executions.iterator();
 		while (iterator.hasNext()) {
 			IRemoteOperation operation = (IRemoteOperation) iterator.next();
 			operation.close();
@@ -267,6 +267,14 @@ public class ExecutionManager implements IRemoteExecutionManager {
 			}
 		}
 		
+	}
+	
+	public synchronized IRemoteTunnel createTunnelR(int remotePort, String addressOnRemoteHost, int portOnRemoteHost)
+	throws RemoteConnectionException, LocalPortBoundException, CancelException {
+		test();
+		RemoteTunnel tunnel = connection.createTunnelR(remotePort, addressOnRemoteHost, portOnRemoteHost);
+		tunnels.add(tunnel);
+		return tunnel;
 	}
 
 	public synchronized void releaseTunnel(IRemoteTunnel tunnel) throws RemoteConnectionException {
