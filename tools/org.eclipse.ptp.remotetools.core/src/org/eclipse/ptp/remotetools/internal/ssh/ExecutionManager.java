@@ -268,14 +268,6 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		}
 		
 	}
-	
-	public synchronized IRemoteTunnel createTunnelR(int remotePort, String addressOnRemoteHost, int portOnRemoteHost)
-	throws RemoteConnectionException, LocalPortBoundException, CancelException {
-		test();
-		RemoteTunnel tunnel = connection.createTunnelR(remotePort, addressOnRemoteHost, portOnRemoteHost);
-		tunnels.add(tunnel);
-		return tunnel;
-	}
 
 	public synchronized void releaseTunnel(IRemoteTunnel tunnel) throws RemoteConnectionException {
 		try {

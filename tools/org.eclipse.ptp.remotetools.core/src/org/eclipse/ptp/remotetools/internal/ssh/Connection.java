@@ -496,28 +496,6 @@ public class Connection implements IRemoteConnection {
 		tunnels.add(tunnel);
 		return tunnel;
 	}
-
-	protected RemoteTunnel createTunnelR(int remotePort, String addressOnRemoteHost, int portOnRemoteHost)
-	throws RemoteConnectionException, LocalPortBoundException {
-		RemoteTunnel tunnel = new RemoteTunnel(remotePort, portOnRemoteHost, addressOnRemoteHost);
-		if (tunnels.contains(tunnel)) {
-			throw new LocalPortBoundException(Messages.Connection_CreateTunnel_TunnelPortAlreadyAlloced);
-		}
-
-		try {
-			defaultSession.setPortForwardingR(tunnel.getLocalPort(), tunnel.getAddressOnRemoteHost(), tunnel
-					.getPortOnRemoteHost());
-		} catch (JSchException e) {
-			if(e.getMessage().matches("PortForwardingR: remte port .* is already registered.")) { //$NON-NLS-1$
-				// Selected local port is already bound.
-				throw new LocalPortBoundException(Messages.Connection_CreateTunnel_TunnelPortAlreadyAlloced); 
-			}
-			throw new RemoteConnectionException(Messages.Connection_CreateTunnel_FailedCreateTunnel, e);
-		}
-
-		tunnels.add(tunnel);
-		return tunnel;
-	}
 	
 	/**
 	 * Release the forwarding of the remote port.
