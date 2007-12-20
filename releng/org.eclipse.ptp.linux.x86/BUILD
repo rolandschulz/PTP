@@ -14,7 +14,9 @@ export KNOWN_FRAGMENTS="\
 	org.eclipse.ptp.mpich2.proxy\
 	org.eclipse.ptp.mpich2.proxy_*\
 	org.eclipse.ptp.ibmpe.proxy\
-	org.eclipse.ptp.ibmpe.proxy_*"
+	org.eclipse.ptp.ibmpe.proxy_*\
+	org.eclipse.ptp.ibmll.proxy\
+	org.eclipse.ptp.ibmll.proxy_*"
 		
 export PARENT=`dirname $PWD`
 export FRAGMENT=`basename $PWD`
