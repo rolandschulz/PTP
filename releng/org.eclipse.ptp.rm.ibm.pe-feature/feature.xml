@@ -26,10 +26,11 @@
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.ptp.remote"/>
       <import plugin="org.eclipse.ptp.proxy.protocol"/>
-      <import plugin="org.eclipse.ptp.ui"/>
-      <import plugin="org.eclipse.ptp.launch"/>
       <import plugin="org.eclipse.ptp.proxy"/>
       <import plugin="org.eclipse.ptp.utils"/>
+      <import plugin="org.eclipse.ptp.ui"/>
+      <import plugin="org.eclipse.ptp.launch"/>
+      <import plugin="org.eclipse.ptp.rm.remote"/>
    </requires>
 
    <plugin
