@@ -363,6 +363,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		remoteCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				handleRemoteServiceSelected();
+				updateSettings();
 			}
 		});
 		connectionCombo.addModifyListener(new ModifyListener() {
