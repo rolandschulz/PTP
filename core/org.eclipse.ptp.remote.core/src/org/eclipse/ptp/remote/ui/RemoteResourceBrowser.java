@@ -11,6 +11,8 @@
 package org.eclipse.ptp.remote.ui;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -51,6 +53,12 @@ import org.eclipse.swt.widgets.TreeItem;
 public class RemoteResourceBrowser extends Dialog {
 	public final static int FILE_BROWSER = 0x01;
 	public final static int DIRECTORY_BROWSER = 0x02;
+
+	private class FileSorter implements Comparator<IFileStore> {
+		public int compare(IFileStore o1, IFileStore o2) {
+			return o1.getName().compareTo(o2.getName());
+		}
+	}
 	
 	private final static int widthHint = 300;
 	private final static int heightHint = 300;
@@ -244,6 +252,7 @@ public class RemoteResourceBrowser extends Dialog {
 					} catch (CoreException e) {
 					}
 					if (files != null) {
+						Arrays.sort(files, new FileSorter());
 						item.setData(files);
 						item.setItemCount(files.length);
 					}
