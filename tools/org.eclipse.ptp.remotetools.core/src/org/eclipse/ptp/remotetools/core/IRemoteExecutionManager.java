@@ -51,10 +51,10 @@ public interface IRemoteExecutionManager {
 	public IRemoteExecutionTools getExecutionTools() throws RemoteConnectionException;
 	
 	public IRemotePathTools getRemotePathTools();
-	
-	public IRemoteTunnel createTunnel(int localPort, String addressOnRemoteHost, int portOnRemoteHost) throws RemoteConnectionException, LocalPortBoundException, CancelException;
-	
+		
 	public IRemoteStatusTools getRemoteStatusTools() throws RemoteConnectionException;
+
+	public IRemotePortForwardingTools getPortForwardingTools() throws RemoteConnectionException;
 	
 	/**
 	 * Create and bind a tunnel from localhost port to a given remotehost port.
@@ -66,8 +66,16 @@ public interface IRemoteExecutionManager {
 	 * @throws RemoteConnectionException
 	 * @throws LocalPortBoundException No local port available to connect.
 	 * @throws CancelException 
+	 * (this method should be deprecated in future and moved to IRemotePortForwardingTools)
 	 */
 	public IRemoteTunnel createTunnel(String addressOnRemoteHost, int portOnRemoteHost) throws RemoteConnectionException, LocalPortBoundException, CancelException;
+	/*
+	 * (this method should be deprecated in future and moved to IRemotePortForwardingTools)
+	 */
+	public IRemoteTunnel createTunnel(int localPort, String addressOnRemoteHost, int portOnRemoteHost) throws RemoteConnectionException, LocalPortBoundException, CancelException;
+	/*
+	 * (this method should be deprecated in future and moved to IRemotePortForwardingTools)
+	 */
 	public void releaseTunnel(IRemoteTunnel tunnel) throws RemoteConnectionException;
 
 }
