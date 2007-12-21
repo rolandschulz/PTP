@@ -105,6 +105,7 @@ public class FileTools implements IRemoteFileTools {
 	
 	protected void test() throws RemoteConnectionException, CancelException {
 		manager.test();
+		manager.testCancel();
 	}
 	
 	/**

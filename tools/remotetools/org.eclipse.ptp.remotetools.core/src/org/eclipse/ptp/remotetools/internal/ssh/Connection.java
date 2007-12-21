@@ -23,9 +23,11 @@ import org.eclipse.ptp.remotetools.core.AuthToken;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteOperation;
+import org.eclipse.ptp.remotetools.core.IRemotePortForwarding;
 import org.eclipse.ptp.remotetools.core.KeyAuthToken;
 import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
+import org.eclipse.ptp.remotetools.exception.PortForwardingException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.RemoteTunnel;
 import org.eclipse.ptp.remotetools.internal.core.ConnectionProperties;
@@ -55,7 +57,7 @@ public class Connection implements IRemoteConnection {
 	 * A connection to the remote host. The default connections is always created, but more
 	 * connections may be added to the pool on demand.
 	 */
-	private Session defaultSession;
+	Session defaultSession;
 	private AuthToken authToken;
 	//private String password;
 	private String username;
@@ -73,6 +75,7 @@ public class Connection implements IRemoteConnection {
 	 * Tunnels to remote host.
 	 */
 	Set tunnels;
+		
 	/**
 	 * Executions on remote host.
 	 */
@@ -118,15 +121,13 @@ public class Connection implements IRemoteConnection {
 	 * Maps a channel to the connection where it was created.
 	 */
 	HashMap channelToConnectioPool;
+	
+	/**
+	 * Locks used on synchronized operations.
+	 */
+	protected ConnectionLocks connectionLocks;
 
-	/*public Connection(String username, String password, String hostname, int port, int timeout) {
-		this.jsch = new JSch();
-		//this.username = username;
-		//this.password = password;
-		this.hostname = hostname;
-		this.port = port;
-		this.timeout = timeout;
-	}*/
+	RemotePortForwardingPool forwardingPool;
 	
 	/**
 	 * Default constructor
@@ -255,6 +256,7 @@ public class Connection implements IRemoteConnection {
 		executions = new HashSet();
 		activeProcessTable = new Hashtable();
 		channelToConnectioPool = new HashMap();
+		forwardingPool = new RemotePortForwardingPool(this);
 	}
 
 	/*
@@ -325,6 +327,10 @@ public class Connection implements IRemoteConnection {
 		executions = null;
 		executionManagers = null;
 		tunnels = null;
+		if (forwardingPool != null) {
+			forwardingPool.disconnect();
+			forwardingPool = null;
+		}
 	}
 
 	/*
@@ -496,7 +502,7 @@ public class Connection implements IRemoteConnection {
 		tunnels.add(tunnel);
 		return tunnel;
 	}
-	
+
 	/**
 	 * Release the forwarding of the remote port.
 	 * @param tunnel
@@ -631,7 +637,23 @@ public class Connection implements IRemoteConnection {
 		}
 	}
 	
-	public void test() throws RemoteConnectionException {
+	/**
+	 * Performs a sanity test to make sure that the connection is alive and has a valid state.
+	 * <p>
+	 * The connection may get dropped due some external interference, like loosing physical
+	 * access to the remote machine.
+	 * Or the connection may drop some channel, as it may be caused by a misbehavior
+	 * of the remote SSH server or by a bug in the local SSH implementation.
+	 * <p>
+	 * If some problem is detected, then an {@link RemoteConnectionException} is thrown.
+	 * Else, the method returns.
+	 * 
+	 * @throws RemoteConnectionException The connection was entirely dropped or some channel got lost.
+	 */
+	protected void test() throws RemoteConnectionException {
+		/* 
+		 * Check all SSH sessions 
+		 */
 		Iterator iterator = connectionPool.iterator();
 		while (iterator.hasNext()) {
 			ConnectionSlot slot = (ConnectionSlot) iterator.next();
@@ -639,9 +661,17 @@ public class Connection implements IRemoteConnection {
 				throw new RemoteConnectionException("SSH connection to remote host was lost");				
 			}
 		}
+		
+		/*
+		 * Check SFTP channel.
+		 */
 		if (! sftpChannel.isConnected()) {
 			throw new RemoteConnectionException("SFTP connection to remote host was lost");				
 		}
+		
+		/*
+		 * Check control channel.
+		 */
 		if (! controlChannel.shell.isConnected()) {
 			throw new RemoteConnectionException("Control channel connection to remote host was lost");	
 		}

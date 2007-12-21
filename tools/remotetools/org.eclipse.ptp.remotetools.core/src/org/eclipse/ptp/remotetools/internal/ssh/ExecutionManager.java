@@ -19,6 +19,7 @@ import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
+import org.eclipse.ptp.remotetools.core.IRemotePortForwardingTools;
 import org.eclipse.ptp.remotetools.core.IRemoteOperation;
 import org.eclipse.ptp.remotetools.core.IRemotePathTools;
 import org.eclipse.ptp.remotetools.core.IRemoteStatusTools;
@@ -72,7 +73,12 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	 * The instance that provides the status tool.
 	 */
 	protected IRemoteStatusTools statusTools;
-	
+
+	/**
+	 * The instance that provides the port forwarding.
+	 */
+	protected IRemotePortForwardingTools portForwardingTools;
+
 	/**
 	 * Automatic-generated port attribute
 	 */
@@ -109,6 +115,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		this.copyTools = new CopyTools(this);
 		this.pathTools = new PathTools(this);
 		this.statusTools = new StatusTools(this);
+		this.portForwardingTools = null;
 	}
 
 	/*
@@ -160,6 +167,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 			}
 		}
 		tunnels = null;
+		connection.forwardingPool.disconnect(this);
 		
 		/*
 		 * Close all channels for remote executions.
@@ -239,6 +247,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	public synchronized IRemoteTunnel createTunnel(int localPort, String addressOnRemoteHost, int portOnRemoteHost)
 			throws RemoteConnectionException, LocalPortBoundException, CancelException {
 		test();
+		testCancel();
 		RemoteTunnel tunnel = connection.createTunnel(localPort, addressOnRemoteHost, portOnRemoteHost);
 		tunnels.add(tunnel);
 		return tunnel;
@@ -252,6 +261,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		throws RemoteConnectionException, LocalPortBoundException, CancelException {
 		// Generate a local port automatically, before calling the createTunnel method passing it as parameter.
 		test();
+		testCancel();
 		int storedPort = getNewPortNumber();
 		int newGeneratedPort = storedPort;
 		while(true) {
@@ -270,11 +280,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	}
 
 	public synchronized void releaseTunnel(IRemoteTunnel tunnel) throws RemoteConnectionException {
-		try {
-			test();
-		} catch (CancelException e) {
-			// Ignore.
-		}
+		test();
 		connection.releaseTunnel((RemoteTunnel) tunnel);
 		tunnels.remove(tunnel);
 	}
@@ -292,10 +298,21 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	 * @throws RemoteConnectionException The connection was lost.
 	 * @throws CancelException The manager is canceled.
 	 */
-	protected void test() throws RemoteConnectionException, CancelException {
+	protected void test() throws RemoteConnectionException {
 		connection.test();
+	}
+	
+	protected void testCancel() throws CancelException {
 		if (cancelFlag) {
 			throw new CancelException();
 		}
+	}
+
+	public IRemotePortForwardingTools getPortForwardingTools()
+			throws RemoteConnectionException {
+		if (this.portForwardingTools == null) {
+			this.portForwardingTools = new PortForwardingTools(this);
+		}
+		return this.portForwardingTools;
 	}
 }
