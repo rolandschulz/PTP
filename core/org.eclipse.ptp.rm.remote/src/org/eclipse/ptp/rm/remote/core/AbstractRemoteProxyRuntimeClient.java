@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -39,25 +38,13 @@ import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
-	private final String		proxyName;
-	private final String		proxyPath;
-	private final String		localAddr;
-	private final int	 		proxyOptions;
-	private final String		remoteServicesId;
-	private final String		connectionName;
-	private final List<String>	invocationOptions;
-	private IRemoteConnection	connection;
+	private IRemoteConnection connection;
+	private AbstractRemoteResourceManagerConfiguration config;
 
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
 			int baseModelId) {
 		super(config.getName(), baseModelId);
-		this.remoteServicesId = config.getRemoteServicesId();
-		this.connectionName = config.getConnectionName();
-		this.proxyName = config.getName();
-		this.proxyPath = config.getProxyServerPath();
-		this.localAddr = config.getLocalAddress();
-		this.proxyOptions = config.getOptions();
-		this.invocationOptions = config.getInvocationOptions();
+		this.config = config;
 		
 		/*
 		 * Set up debug options
@@ -96,53 +83,50 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	 */
 	public void startup(IProgressMonitor monitor) throws IOException {
 		if (DebugOptions.CLIENT_TRACING) {
-			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
-			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
+			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . ."); //$NON-NLS-1$
+			System.out.println("PROXY_SERVER path = '" + config.getName() + "'");  //$NON-NLS-1$  //$NON-NLS-2$
 		}
-		
-		boolean portForwarding = (proxyOptions & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
-		boolean manualLaunch = (proxyOptions & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 		
 		try {
 			/*
 			 * This can fail if we are restarting the RM from saved information and the saved remote
 			 * services provider is no longer available...
 			 */
-			IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteServicesId);
+			IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
 			if (remoteServices == null) {
-				throw new IOException("Could not find remote services ID " + remoteServicesId);
+				throw new IOException("Could not find remote services ID " + config.getRemoteServicesId());  //$NON-NLS-1$
 			}
 
-			if (manualLaunch) {
+			if (config.testOption(IRemoteProxyOptions.MANUAL_LAUNCH)) {
 				sessionCreate();
 				
 				List<String> args = new ArrayList<String>();
-				args.add(proxyPath);
-				args.add("--proxy=tcp");
-				if (portForwarding) {
-					args.add("--host=localhost");
+				args.add(config.getProxyServerPath());
+				args.add("--proxy=tcp"); //$NON-NLS-1$
+				if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+					args.add("--host=localhost"); //$NON-NLS-1$
 				} else {
-					args.add("--host=" + localAddr);
+					args.add("--host=" + config.getLocalAddress()); //$NON-NLS-1$
 				}
-				args.add("--port="+getSessionPort());
+				args.add("--port="+getSessionPort()); //$NON-NLS-1$
 				if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
-					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL);
+					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL); //$NON-NLS-1$
 				}
-				args.addAll(invocationOptions);
+				args.addAll(config.getInvocationOptions());
 				
 				if (DebugOptions.CLIENT_TRACING) {
-					System.out.println("Launch command: " + args.toString());
+					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 				
-				final String msg = "Waiting for manual launch of proxy: " + args.toString();
+				final String msg = "Waiting for manual launch of proxy: " + args.toString(); //$NON-NLS-1$
 				System.out.println(msg);
 				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
 				PTPCorePlugin.log(info);
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-				connection = connMgr.getConnection(connectionName);
+				connection = connMgr.getConnection(config.getConnectionName());
 				if (connection == null) {
-					throw new IOException("No such connection: " + connectionName);
+					throw new IOException("No such connection: " + config.getConnectionName()); //$NON-NLS-1$
 				}
 				if (!connection.isOpen()) {
 					connection.open(monitor);
@@ -155,48 +139,41 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				 * Check the remote proxy exists
 				 */
 				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-				IFileStore res = fileManager.getResource(new Path(proxyPath), new NullProgressMonitor());
+				IFileStore res = fileManager.getResource(new Path(config.getProxyServerPath()), monitor);
 				if (!res.fetchInfo().exists()){
-					throw new IOException("Could not find proxy executable \"" + proxyPath + "\"");
+					throw new IOException("Could not find proxy executable \"" + config.getName() + "\""); //$NON-NLS-1$  //$NON-NLS-2$
 				}
 
 				sessionCreate();
 
-				int remotePort = getSessionPort();
-				if (portForwarding) {
-					/*
-					 * Try to find a free port on the remote machine. This take a while, so
-					 * allow it to be canceled. If we've tried all ports (which could take a
-					 * very long while) then bail out.
-					 */
-					while (!monitor.isCanceled()) {
-						try {
-							connection.forwardRemotePort(remotePort, "localhost", getSessionPort());
-						} catch (RemoteConnectionException e) {
-							if (++remotePort == getSessionPort()) {
-								return;
-							}
-						}
-						monitor.worked(1);
+				ArrayList<String> args = new ArrayList<String>();
+				args.add(config.getProxyServerPath());
+				args.add("--proxy=tcp"); //$NON-NLS-1$
+	
+				if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+					int remotePort;
+					try {
+						remotePort = connection.forwardRemotePort("localhost", getSessionPort(), monitor); //$NON-NLS-1$
+					} catch (RemoteConnectionException e) {
+						throw new IOException(e.getMessage());
 					}
+					if (monitor.isCanceled()) {
+						return;
+					}
+					args.add("--host=localhost"); //$NON-NLS-1$
+					args.add("--port="+ remotePort); //$NON-NLS-1$
+				} else {
+					args.add("--host=" + config.getLocalAddress()); //$NON-NLS-1$
+					args.add("--port="+ getSessionPort()); //$NON-NLS-1$
 				}
 
-				ArrayList<String> args = new ArrayList<String>();
-				args.add(proxyPath);
-				args.add("--proxy=tcp");
-				if (portForwarding) {
-					args.add("--host=localhost");
-				} else {
-					args.add("--host=" + localAddr);
-				}
-				args.add("--port="+remotePort);
 				if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
-					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL);
+					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL); //$NON-NLS-1$
 				}
-				args.addAll(invocationOptions);
+				args.addAll(config.getInvocationOptions());
 				
 				if (DebugOptions.CLIENT_TRACING) {
-					System.out.println("Launch command: " + args.toString());
+					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 
 				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
@@ -210,29 +187,29 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						try {
 							String output;
 							while ((output = out_reader.readLine()) != null) {
-								System.out.println(proxyName + ": " + output);
+								System.out.println(config.getName() + ": " + output); //$NON-NLS-1$
 							}
 						} catch (IOException e) {
 							// Ignore
 						}
 					}
-				}, "Program output Thread").start();
+				}, "Program output Thread").start(); //$NON-NLS-1$
 				
 				new Thread(new Runnable() {
 					public void run() {
 						try {
 							String line;
 							while ((line = err_reader.readLine()) != null) {
-								System.err.println(proxyName + ": " + line);
+								System.err.println(config.getName() + ": " + line); //$NON-NLS-1$
 							}
 						} catch (IOException e) {
 							// Ignore
 						}
 					}
-				}, "Error output Thread").start();
+				}, "Error output Thread").start(); //$NON-NLS-1$
 				
 				if (DebugOptions.CLIENT_TRACING) {
-					System.out.println(toString() + ": Waiting on accept.");
+					System.out.println(toString() + ": Waiting on accept."); //$NON-NLS-1$
 				}
 			}
 		} catch (IOException e) {
@@ -241,9 +218,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			} catch (IOException e1) {
 				PTPCorePlugin.log(e1);
 			}
-			throw new IOException("Failed to start proxy: " + e.getMessage());
+			throw new IOException("Failed to start proxy: " + e.getMessage()); //$NON-NLS-1$
 		} catch (RemoteConnectionException e) {
-			throw new IOException("Failed to start proxy: " + e.getMessage());
+			throw new IOException("Failed to start proxy: " + e.getMessage()); //$NON-NLS-1$
 		}
 		startup();
 	}
