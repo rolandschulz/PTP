@@ -142,9 +142,15 @@ public interface IPTPLaunchConfigurationConstants {
 	/**
 	 *  Launch configuration attribute key. The value is the absolute path to the executable that
 	 *  is to be launched. If the executable is located on a remote machine, it is the path to the
-	 *  exectuable on this machine.
+	 *  executable on this machine.
 	 */
 	public static final String ATTR_EXECUTABLE_PATH = PTP_LAUNCH_ID + ".ATTR_REMOTE_EXECUTABLE_PATH";
+
+	/**
+	 *  Launch configuration attribute key. The value is the address of the host that will be contacted
+	 *  by the debug server when it starts.
+	 */
+	public static final String ATTR_DEBUGGER_HOST = PTP_LAUNCH_ID + ".ATTR_DEBUGGER_HOST";
 	
 	/**
 	 * Error codes
