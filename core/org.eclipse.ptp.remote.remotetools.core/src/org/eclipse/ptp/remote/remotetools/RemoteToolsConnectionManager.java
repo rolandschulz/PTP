@@ -42,8 +42,12 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		refreshConnections();
 	}
 	
+	/**
+	 * Refresh the list of connections that we know about. Deals with connection that are added or deleted
+	 * by another entity.
+	 */
 	private void refreshConnections() {
-		connections.clear();
+		Map<String, IRemoteConnection> newConns = new HashMap<String, IRemoteConnection>();
 		for (Object obj : genericHost.getElements()) {
 			ITargetElement element = (ITargetElement)obj;
 			IRemoteConnection conn = connections.get(element.getName());
@@ -51,11 +55,18 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 				ITargetControl control;
 				try {
 					control = element.getControl();
-					connections.put(element.getName(), new RemoteToolsConnection(element.getName(), "", "", control));
+					// element.getName() is definitely wrong, but will have to do for now
+					// until we can work out how to get the address
+					newConns.put(element.getName(), new RemoteToolsConnection(element.getName(), 
+							element.getName(), //$NON-NLS-1$
+							"", control)); //$NON-NLS-1$
 				} catch (CoreException e) {
 				}
+			} else {
+				newConns.put(element.getName(), conn);
 			}
 		}
+		connections = newConns;
 	}
 	
 	/* (non-Javadoc)
