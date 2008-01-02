@@ -24,7 +24,6 @@ import java.util.List;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration.CommonConfig;
 import org.eclipse.ui.IMemento;
 
 
@@ -177,6 +176,15 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 
 	/**
+	 * Get the local address for the proxy to connect to
+	 * 
+	 * @return local address
+	 */
+	public String getLocalAddress() {
+		return localAddress;
+	}	
+	
+	/**
 	 * Get the remote configuration options.
 	 * 
 	 * @return remote configuration options
@@ -195,15 +203,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 	
 	/**
-	 * Get the local address for the proxy to connect to
-	 * 
-	 * @return local address
-	 */
-	public String getLocalAddress() {
-		return localAddress;
-	}
-	
-	/**
 	 * Get the ID of the remote services subsystem.
 	 * 
 	 * @return
@@ -211,7 +210,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public String getRemoteServicesId() {
 		return remoteServicesId;
 	}
-
+	
 	/**
 	 * Set the connection name.
 	 * 
@@ -233,6 +232,15 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 
 	/**
+	 * Set the local address
+	 * 
+	 * @param localAddr
+	 */
+	public void setLocalAddress(String localAddr) {
+		this.localAddress = localAddr;
+	}
+
+	/**
 	 * Set the remote configuration options
 	 * 
 	 * @param options
@@ -251,20 +259,21 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 	
 	/**
-	 * Set the local address
-	 * 
-	 * @param localAddr
-	 */
-	public void setLocalAddress(String localAddr) {
-		this.localAddress = localAddr;
-	}
-	
-	/**
 	 * Set the remote services subsystem id
 	 * @param id
 	 */
 	public void setRemoteServicesId(String id) {
 		this.remoteServicesId = id;
+	}
+	
+	/**
+	 * Test if option is set.
+	 * 
+	 * @param option option to check
+	 * @return true if option is set
+	 */
+	public boolean testOption(int option) {
+		return (getOptions() & option) == option;
 	}
 
 	/* (non-Javadoc)
