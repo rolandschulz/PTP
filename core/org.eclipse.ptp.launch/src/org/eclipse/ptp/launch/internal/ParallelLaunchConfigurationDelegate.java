@@ -52,6 +52,12 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.widgets.Display;
@@ -83,7 +89,7 @@ public class ParallelLaunchConfigurationDelegate
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								if (monitor.isCanceled())
-									throw new InterruptedException("The job is cancalled.");
+									throw new InterruptedException("The job is cancalled."); //$NON-NLS-1$
 								try {
 									long timeout = PTPDebugUIPlugin.getDefault().getPreferenceStore().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
 									//Wait for the incoming debug server connection. This can be canceled by the user.
@@ -96,15 +102,15 @@ public class ParallelLaunchConfigurationDelegate
 						try {
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
 						} catch (InterruptedException e) {
-							System.out.println("Error completing debug job launch: " + e.getMessage());
+							System.out.println("Error completing debug job launch: " + e.getMessage()); //$NON-NLS-1$
 						} catch (InvocationTargetException e) {
-							System.out.println("Error completing debug job launch: " + e.getMessage());
+							System.out.println("Error completing debug job launch: " + e.getMessage()); //$NON-NLS-1$
 						}
 					}
 				});
 			} catch (CoreException e) {
 				//FIXME: Error dialog?
-				System.out.println("Error completing debug job launch");
+				System.out.println("Error completing debug job launch"); //$NON-NLS-1$
 			}
 			
 		} else {
@@ -117,13 +123,13 @@ public class ParallelLaunchConfigurationDelegate
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		if (!(launch instanceof IPLaunch)) {
-			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_launch_object"), null, 0);
+			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_launch_object"), null, 0); //$NON-NLS-1$
 		}
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
 		monitor.beginTask("", 250);
-		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { "Launching " + configuration.getName() }));
+		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { "Launching " + configuration.getName() })); //$NON-NLS-1$ $NON-NLS-2$
 		if (monitor.isCanceled()) {
 			return;
 		}
@@ -138,15 +144,40 @@ public class ParallelLaunchConfigurationDelegate
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				monitor.subTask("Configuring debug setting . . .");
+				monitor.subTask("Configuring debug setting . . ."); //$NON-NLS-1$
 				
 				/*
 				 * FIXME: all this code needs to be moved to the debug.external.core plugin and
 				 * made into an interface.
 				 */
 				
+				 // Create the debugger extension, then the connection point for the debug server. 
+				 // The debug server is created when the job is launched via the submitJob() command.
+				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				debugger = debugConfig.getDebugger();
+				int port = debugger.getDebuggerPort(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
+				
+
 				/*
-				 * Get the local address from the resource manager
+				 * Work out the address and port to supply as arguments to the debug server. There are currently
+				 * two cases:
+				 * 
+				 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is 
+				 * running the proxy (since this is where the tunnel begins), but accessible from the machine running 
+				 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a 
+				 * cluster), it will typically NOT be the same address that is used to start the proxy. The port
+				 * is a port that will be forwarded from the proxy machine back to the debugger port that
+				 * was allocated on the local machine.
+				 * 
+				 * 2. If port forwarding is not enabled, then the address will be the address of the host running 
+				 * Eclipse), and the port allocated when the debugger was created. NOTE: this assumes that the machine 
+				 * running the debug server can contact the local host directly. In the case of the SDM, the "master" 
+				 * debug server process can potentially run on any node in the cluster. In many environments, compute 
+				 * nodes cannot communicate outside their local network.
+				 * 
+				 * In both cases, the address is obtained from the debugger page in the launch configuration, since
+				 * in general it will be different for each connection. It is initialized to either the connection host
+				 * address (port forwarding) or the local address (no port forwarding).
 				 */
 				String localAddress = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST);
 				IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
@@ -154,30 +185,48 @@ public class ParallelLaunchConfigurationDelegate
 					IResourceManagerConfiguration conf = rm.getConfiguration();
 					if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
 						AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-						localAddress = remConf.getLocalAddress();
+						if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+							IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+							if (remoteServices == null) {
+								abort(LaunchMessages.getFormattedResourceString("ParallelLaunchConfigurationDelegate.Invalid_remote_services_ID", //$NON-NLS-1$
+										remConf.getRemoteServicesId()), null, 0);
+							}
+							IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+							IRemoteConnection connection = connMgr.getConnection(remConf.getConnectionName());
+							if (connection == null) {
+								abort(LaunchMessages.getFormattedResourceString("ParallelLaunchConfigurationDelegate.No_such_connection", //$NON-NLS-1$
+										remConf.getConnectionName()), null, 0);
+							}
+							localAddress = "localhost"; //$NON-NLS-1$
+							try {
+								port = connection.forwardRemotePort(localAddress, port, monitor);
+							} catch (RemoteConnectionException e) {
+								abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Unable_to_forward_port"), e, 0); //$NON-NLS-1$
+							}
+							if (monitor.isCanceled()) {
+								return;
+							}
+						} else {
+							localAddress = remConf.getLocalAddress();
+						}
 					}
 				}
 				
 				ArrayList<String> dbgArgs = new ArrayList<String>();
-				dbgArgs.add("--host=" + localAddress);
-				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE));
+				dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
+				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
 				
 				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
 				if (dbgPath.length() > 0) {
-					dbgArgs.add("--debugger_path=" + dbgPath);
+					dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
 				}
 				
 				String dbgExtraArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
 				if (dbgExtraArgs.length() > 0) {
-					dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" ")));
+					dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
 				}
 				
-				 // Create the debugger extension, then the connection point for the debug server. 
-				 // The debug server is created when the job is launched via the submitJob() command.
-				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-				debugger = debugConfig.getDebugger();
-				int port = debugger.getDebuggerPort(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
-				dbgArgs.add("--port=" + port);
+				dbgArgs.add("--port=" + port); //$NON-NLS-1$
 			
 				// remote setting
 				String dbgExePath = getDebuggerExePath(configuration);
@@ -198,14 +247,14 @@ public class ParallelLaunchConfigurationDelegate
 					} else {
 						attrManager.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
 					}
-					attrManager.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug"));
+					attrManager.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
 				}
 				attrManager.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
 				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
 			
 			monitor.worked(10);
-			monitor.subTask("Submitting the job . . .");
+			monitor.subTask("Submitting the job . . ."); //$NON-NLS-1$
 			
 			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
 			
