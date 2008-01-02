@@ -110,4 +110,9 @@
  */
 #define ERROR_CODE_ATTR				"errorCode"
 #define ERROR_MSG_ATTR				"errorMsg"
+
+extern int		proxy_test_attribute(char *key, char *attr_str);
+extern char *	proxy_get_attribute_value_str(char *attr_str);
+extern int		proxy_get_attribute_value_int(char *attr_str);
+extern int		proxy_get_attribute_value_bool(char *attr_str);
 #endif /*PROXY_ATTR_H_*/

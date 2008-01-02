@@ -56,6 +56,7 @@ ARFLAGS = cru
 libproxyclnt_a_AR = $(AR) $(ARFLAGS)
 libproxyclnt_a_LIBADD =
 am_libproxyclnt_a_OBJECTS = libproxyclnt_a-proxy.$(OBJEXT) \
+	libproxyclnt_a-proxy_attr.$(OBJEXT) \
 	libproxyclnt_a-proxy_clnt.$(OBJEXT) \
 	libproxyclnt_a-proxy_tcp.$(OBJEXT) \
 	libproxyclnt_a-proxy_tcp_clnt.$(OBJEXT) \
@@ -64,6 +65,7 @@ libproxyclnt_a_OBJECTS = $(am_libproxyclnt_a_OBJECTS)
 libproxysvr_a_AR = $(AR) $(ARFLAGS)
 libproxysvr_a_LIBADD =
 am_libproxysvr_a_OBJECTS = libproxysvr_a-proxy.$(OBJEXT) \
+	libproxysvr_a-proxy_attr.$(OBJEXT) \
 	libproxysvr_a-proxy_svr.$(OBJEXT) \
 	libproxysvr_a-proxy_stdio.$(OBJEXT) \
 	libproxysvr_a-proxy_stdio_svr.$(OBJEXT) \
@@ -136,8 +138,6 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__include = @am__include@
@@ -152,25 +152,33 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host_alias = @host_alias@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 noinst_LIBRARIES = libproxyclnt.a libproxysvr.a
 libproxyclnt_a_SOURCES = src/proxy.c \
+							src/proxy_attr.c \
 							src/proxy_clnt.c \
 							src/proxy_tcp.c \
 							src/proxy_tcp_clnt.c \
@@ -178,6 +186,7 @@ libproxyclnt_a_SOURCES = src/proxy.c \
 
 libproxyclnt_a_CFLAGS = -I./include $(AM_CFLAGS) -g
 libproxysvr_a_SOURCES = src/proxy.c \
+							src/proxy_attr.c \
 							src/proxy_svr.c \
 							src/proxy_stdio.c \
 							src/proxy_stdio_svr.c \
@@ -261,11 +270,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_attr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_clnt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_msg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_tcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_attr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_msg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_stdio.Po@am__quote@
@@ -301,6 +312,20 @@ libproxyclnt_a-proxy.obj: src/proxy.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy.c' object='libproxyclnt_a-proxy.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o libproxyclnt_a-proxy.obj `if test -f 'src/proxy.c'; then $(CYGPATH_W) 'src/proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy.c'; fi`
+
+libproxyclnt_a-proxy_attr.o: src/proxy_attr.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT libproxyclnt_a-proxy_attr.o -MD -MP -MF "$(DEPDIR)/libproxyclnt_a-proxy_attr.Tpo" -c -o libproxyclnt_a-proxy_attr.o `test -f 'src/proxy_attr.c' || echo '$(srcdir)/'`src/proxy_attr.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libproxyclnt_a-proxy_attr.Tpo" "$(DEPDIR)/libproxyclnt_a-proxy_attr.Po"; else rm -f "$(DEPDIR)/libproxyclnt_a-proxy_attr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_attr.c' object='libproxyclnt_a-proxy_attr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o libproxyclnt_a-proxy_attr.o `test -f 'src/proxy_attr.c' || echo '$(srcdir)/'`src/proxy_attr.c
+
+libproxyclnt_a-proxy_attr.obj: src/proxy_attr.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT libproxyclnt_a-proxy_attr.obj -MD -MP -MF "$(DEPDIR)/libproxyclnt_a-proxy_attr.Tpo" -c -o libproxyclnt_a-proxy_attr.obj `if test -f 'src/proxy_attr.c'; then $(CYGPATH_W) 'src/proxy_attr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_attr.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libproxyclnt_a-proxy_attr.Tpo" "$(DEPDIR)/libproxyclnt_a-proxy_attr.Po"; else rm -f "$(DEPDIR)/libproxyclnt_a-proxy_attr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_attr.c' object='libproxyclnt_a-proxy_attr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o libproxyclnt_a-proxy_attr.obj `if test -f 'src/proxy_attr.c'; then $(CYGPATH_W) 'src/proxy_attr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_attr.c'; fi`
 
 libproxyclnt_a-proxy_clnt.o: src/proxy_clnt.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT libproxyclnt_a-proxy_clnt.o -MD -MP -MF "$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo" -c -o libproxyclnt_a-proxy_clnt.o `test -f 'src/proxy_clnt.c' || echo '$(srcdir)/'`src/proxy_clnt.c; \
@@ -371,6 +396,20 @@ libproxysvr_a-proxy.obj: src/proxy.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy.c' object='libproxysvr_a-proxy.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o libproxysvr_a-proxy.obj `if test -f 'src/proxy.c'; then $(CYGPATH_W) 'src/proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy.c'; fi`
+
+libproxysvr_a-proxy_attr.o: src/proxy_attr.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT libproxysvr_a-proxy_attr.o -MD -MP -MF "$(DEPDIR)/libproxysvr_a-proxy_attr.Tpo" -c -o libproxysvr_a-proxy_attr.o `test -f 'src/proxy_attr.c' || echo '$(srcdir)/'`src/proxy_attr.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libproxysvr_a-proxy_attr.Tpo" "$(DEPDIR)/libproxysvr_a-proxy_attr.Po"; else rm -f "$(DEPDIR)/libproxysvr_a-proxy_attr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_attr.c' object='libproxysvr_a-proxy_attr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o libproxysvr_a-proxy_attr.o `test -f 'src/proxy_attr.c' || echo '$(srcdir)/'`src/proxy_attr.c
+
+libproxysvr_a-proxy_attr.obj: src/proxy_attr.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT libproxysvr_a-proxy_attr.obj -MD -MP -MF "$(DEPDIR)/libproxysvr_a-proxy_attr.Tpo" -c -o libproxysvr_a-proxy_attr.obj `if test -f 'src/proxy_attr.c'; then $(CYGPATH_W) 'src/proxy_attr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_attr.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libproxysvr_a-proxy_attr.Tpo" "$(DEPDIR)/libproxysvr_a-proxy_attr.Po"; else rm -f "$(DEPDIR)/libproxysvr_a-proxy_attr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_attr.c' object='libproxysvr_a-proxy_attr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o libproxysvr_a-proxy_attr.obj `if test -f 'src/proxy_attr.c'; then $(CYGPATH_W) 'src/proxy_attr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_attr.c'; fi`
 
 libproxysvr_a-proxy_svr.o: src/proxy_svr.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT libproxysvr_a-proxy_svr.o -MD -MP -MF "$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo" -c -o libproxysvr_a-proxy_svr.o `test -f 'src/proxy_svr.c' || echo '$(srcdir)/'`src/proxy_svr.c; \
