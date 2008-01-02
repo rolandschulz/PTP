@@ -20,6 +20,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
@@ -37,10 +38,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * The dynamic tab for gdb-based debugger implementations.
+ * The dynamic tab for SDM-based debugger implementations.
  */
 public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected Text fRMDebuggerText = null;
+	protected Text fRMDebuggerHost = null;
 	protected Button fRMDebuggerButton = null;
 	
 	private IRemoteServices remoteServices = null;
@@ -80,6 +82,21 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				}
 		    }
 		});
+		
+		label = new Label(comp, SWT.NONE);
+		label.setText(ExternalDebugUIMessages.getString("SDMDebuggerPage.host")); //$NON-NLS-1$
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		label.setLayoutData(gd);
+		
+		fRMDebuggerHost = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		fRMDebuggerHost.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fRMDebuggerHost.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+		    	updateLaunchConfigurationDialog();
+			}
+		});
+	
 		setControl(parent);
 		
 		enableRemoteSection(false);
@@ -91,8 +108,10 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private void enableRemoteSection(boolean enabled) {
 		fRMDebuggerText.setEnabled(enabled);
 		fRMDebuggerButton.setEnabled(enabled);
+		fRMDebuggerHost.setEnabled(enabled);
 		if (!enabled) {
 			fRMDebuggerText.setText(EMPTY_STRING);
+			fRMDebuggerHost.setText(EMPTY_STRING);
 		}
 	}
 	
@@ -123,9 +142,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		if (remoteServices != null) {
 			if (getFieldContent(fRMDebuggerText.getText()) == null) {
 				errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
-			}
-			else
+			} else if (getFieldContent(fRMDebuggerHost.getText()) == null) {
+				errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
+			} else {
 				errMsg = null;
+			}
 		}
 		setErrorMessage(errMsg);
 		return (errMsg == null);
@@ -136,6 +157,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
+			String host = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING);
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
 			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			if (rm != null) {
@@ -145,11 +167,20 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
 					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
 					if (remoteServices != null) {
-						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
+						IRemoteConnection conn = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
+						if (conn != connection) {
+							connection = conn;
+							if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+								host = connection.getHostname();
+							} else {
+								host = remConfig.getLocalAddress();
+							}
+						}
 					}
 				}
 			}
 			fRMDebuggerText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
+			fRMDebuggerHost.setText(host);
 		} catch(CoreException e) {
 			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err2"); //$NON-NLS-1$
 		}
@@ -161,6 +192,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (remoteServices != null) {
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerText.getText()));
+			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getFieldContent(fRMDebuggerHost.getText()));
 		}
 	}
 	
