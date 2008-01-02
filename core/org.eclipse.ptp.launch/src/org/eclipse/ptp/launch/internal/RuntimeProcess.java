@@ -92,7 +92,9 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	}
 	
 	protected void terminated() {
-		fTerminated= true;
+		synchronized (this) {
+			fTerminated = true;
+		}
 		fExitValue = 0;
 		job.removeElementListener(this);
 		fireTerminateEvent();
@@ -101,11 +103,11 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	/***************************************************************************************************************************************************************************************************
 	 * ITerminate interface
 	 **************************************************************************************************************************************************************************************************/
-	public boolean canTerminate() {
+	public synchronized boolean canTerminate() {
 		return !fTerminated;
 	}
 	
-	public boolean isTerminated() {
+	public synchronized boolean isTerminated() {
 		return fTerminated;
 	}
 	
