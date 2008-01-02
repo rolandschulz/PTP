@@ -133,13 +133,8 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Determine the initial path for the browser. This is the initialPath, if:
-	 *
-	 * 1. it was supplied
-	 * 2. if it exists on the remote machine
-	 * 3. if it is relative to the cwd
-	 * 
-	 * If none of these conditions are satisfied, then the initial path will be the cwd.
+	 * Determine the initial path for the browser. This is initialPat if it exists on the 
+	 * remote machine, otherwise the initial path will be the cwd.
 	 * 
 	 * @param initialPath
 	 * @return
@@ -147,9 +142,6 @@ public class RemoteResourceBrowser extends Dialog {
 	private IPath findInitialPath(IPath initialPath) {
 		IPath path = cwd;
 		
-		if (initialPath.matchingFirstSegments(cwd) != cwd.segmentCount()) {
-			return path;
-		}
 		if (initialPath != null) {
 			try {
 				IFileInfo info = fileMgr.getResource(initialPath, new NullProgressMonitor()).fetchInfo();
@@ -188,7 +180,7 @@ public class RemoteResourceBrowser extends Dialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		IPath initial = findInitialPath(initialPath);
+		final IPath initial = findInitialPath(initialPath);
 		
 		Composite main = (Composite) super.createDialogArea(parent);
 		
@@ -211,7 +203,7 @@ public class RemoteResourceBrowser extends Dialog {
 		IFileStore root;
 		IFileStore[] roots;
 		try {
-			root = fileMgr.getResource(cwd, new NullProgressMonitor());
+			root = fileMgr.getResource(initial, new NullProgressMonitor());
 			roots = new IFileStore[] {root};
 		} catch (IOException e) {
 			return main; //FIXME
@@ -235,7 +227,7 @@ public class RemoteResourceBrowser extends Dialog {
 					/* root-level item */
 					IFileStore[] files = (IFileStore[]) tree.getData();
 					file = files[event.index];
-					item.setText(cwd.toString());
+					item.setText(initial.toString());
 				} else {
 					IFileStore[] files = (IFileStore[]) parentItem.getData();
 					file = files[event.index];
