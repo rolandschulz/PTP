@@ -21,7 +21,6 @@ package org.eclipse.ptp.launch.internal.ui;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -29,7 +28,7 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.swt.graphics.Image;
 
 public class LaunchImages {
-	private static final String NAME_PREFIX = "org.eclipse.ptp.launch.";
+	private static final String NAME_PREFIX = "org.eclipse.ptp.launch."; //$NON-NLS-1$
 	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
     
 	private static URL iconBaseURL = null;
@@ -43,10 +42,10 @@ public class LaunchImages {
 	private static ImageRegistry imageRegistry = null;
 	private static HashMap<String,ImageDescriptor> avoidSWTErrorMap = null;
 
-	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif";
-	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif";
-	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif";
-	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif";
+	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif"; //$NON-NLS-1$
+	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif"; //$NON-NLS-1$
+	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif"; //$NON-NLS-1
+	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif"; //$NON-NLS-1$
 	
 	public static final ImageDescriptor DESC_PARALLEL_TAB = createManaged(IMG_PARALLEL_TAB);
 	public static final ImageDescriptor DESC_ARGUMENTS_TAB = createManaged(IMG_ARGUMENTS_TAB);
@@ -84,7 +83,7 @@ public class LaunchImages {
 			}
 			avoidSWTErrorMap.put(name, result);
 			if (imageRegistry != null) {
-			    System.out.println("Internal Error: Image registry already defined");
+			    System.out.println("Internal Error: Image registry already defined"); //$NON-NLS-1$
 			}
 			return result;
 		} catch (MalformedURLException e) {
