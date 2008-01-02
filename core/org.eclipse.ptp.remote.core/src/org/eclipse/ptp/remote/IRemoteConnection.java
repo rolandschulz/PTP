@@ -23,7 +23,7 @@ public interface IRemoteConnection {
 	public void close(IProgressMonitor monitor);
 	
 	/**
-	 * Forward local port localPort to remote port remotePort on remote machine fwdAddress. If this
+	 * Forward local port localPort to remote port fwdPort on remote machine fwdAddress. If this
 	 * IRemoteConnection is not to fwdAddress, the port will be routed via the connection machine to
 	 * fwdAddress. 
 	 * 
@@ -44,6 +44,32 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
+
+	/**
+	 * Forward a local port to remote port fwdPort on remote machine fwdAddress. The local port is chosen
+	 * dynamically and returned by the method. If this IRemoteConnection is not to fwdAddress, the port will 
+	 * be routed via the connection machine to fwdAddress. 
+	 * 
+	 * @param fwdAddress
+	 * @param fwdPort
+	 * @param monitor
+	 * @return local port number
+	 * @throws RemoteConnectionException
+	 */
+	public int forwardLocalPort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
+	
+	/**
+	 * Forward a remote port to port remotePort on remote machine fwdAddress. The remote port is chosen
+	 * dynamically and returned by the method. When a connection is made to this port
+	 * on the remote machine, it is forwarded via this IRemoteConnection to fwdPort on machine fwdAddress.
+	 * 
+	 * @param fwdAddress
+	 * @param fwdPort
+	 * @param monitor
+	 * @return remote port number
+	 * @throws RemoteConnectionException
+	 */
+	public int forwardRemotePort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
 
 	/**
 	 * Gets the implementation dependent hostname for this connection

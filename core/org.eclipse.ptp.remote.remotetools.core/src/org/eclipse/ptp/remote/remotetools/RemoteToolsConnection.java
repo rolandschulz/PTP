@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.exception.AddressInUseException;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -31,6 +32,7 @@ import org.eclipse.ptp.remotetools.environment.control.ITargetJob;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
+import org.eclipse.ptp.remotetools.exception.PortForwardingException;
 
 public class RemoteToolsConnection implements IRemoteConnection {
 	private String connName;
@@ -84,10 +86,13 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort)
 			throws RemoteConnectionException {
+		if (exeMgr == null) {
+			throw new RemoteConnectionException("Connection is not open");
+		}
 		try {
 			exeMgr.createTunnel(localPort, fwdAddress, fwdPort);
 		} catch (LocalPortBoundException e) {
-			throw new UnableToForwardPortException(e.getMessage());
+			throw new AddressInUseException(e.getMessage());
 		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
 			throw new RemoteConnectionException(e.getMessage());
 		} catch (CancelException e) {
@@ -96,11 +101,61 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public int forwardLocalPort(String fwdAddress, int fwdPort,
+			IProgressMonitor monitor) throws RemoteConnectionException {
+		if (exeMgr == null) {
+			throw new RemoteConnectionException("Connection is not open");
+		}
+		return 0;
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
 	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort)
 			throws RemoteConnectionException {
-		throw new UnableToForwardPortException("Remote port forwarding not supported");
+		if (exeMgr == null) {
+			throw new RemoteConnectionException("Connection is not open");
+		}
+		try {
+			exeMgr.getPortForwardingTools().forwardRemotePort(remotePort, fwdAddress, fwdPort);
+		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+			throw new RemoteConnectionException(e.getMessage());
+		} catch (CancelException e) {
+			throw new RemoteConnectionException(e.getMessage());
+		} catch (PortForwardingException e) {
+			throw new AddressInUseException(e.getMessage());
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public int forwardRemotePort(String fwdAddress, int fwdPort,
+			IProgressMonitor monitor) throws RemoteConnectionException {
+		/*
+		 * Start with a different port number, in case we're doing this all on localhost.
+		 */
+		int remotePort = fwdPort + 1;
+		/*
+		 * Try to find a free port on the remote machine. This take a while, so
+		 * allow it to be canceled. If we've tried all ports (which could take a
+		 * very long while) then bail out.
+		 */
+		while (!monitor.isCanceled()) {
+			try {
+				forwardRemotePort(remotePort, fwdAddress, fwdPort);
+			} catch (AddressInUseException e) {
+				if (++remotePort == fwdPort) {
+					throw new UnableToForwardPortException("Could not allocate remote port");
+				}
+				monitor.worked(1);
+			}
+			return remotePort;
+		}
+		return -1;
 	}
 	
 	/**
@@ -114,14 +169,14 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public String getHostname() {
 		return hostName;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
 	public String getName() {
 		return connName;
 	}
-	
+
 	public String getUsername() {
 		return userName;
 	}

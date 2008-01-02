@@ -21,17 +21,17 @@ import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 
 public class LocalConnection implements IRemoteConnection {
 	private String name;
+
 	private String hostname;
+
 	private String username;
 	private boolean connected;
-	
 	public LocalConnection() {
 		this.name = "Local";
 		this.hostname = "localhost";
 		this.username = System.getProperty("user.name");
 		this.connected = false;
 	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
@@ -48,10 +48,26 @@ public class LocalConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public int forwardLocalPort(String fwdAddress, int fwdPort,
+			IProgressMonitor monitor) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
 	public void forwardRemotePort(int remotePort, String fwdAddress,
 			int fwdPort) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public int forwardRemotePort(String fwdAddress, int fwdPort,
+			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
 	

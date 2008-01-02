@@ -28,15 +28,15 @@ import org.eclipse.swt.widgets.Display;
 
 public class RSEConnection implements IRemoteConnection {
 	private IHost rseHost;
+
 	private IFileSystem fileSystem;
+
 	private IShellService shellService = null;
 	private ISubSystem subSystem = null;
-
 	public RSEConnection(IHost host, IFileSystem fileSystem) {
 		this.rseHost = host;
 		this.fileSystem = fileSystem;
 	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
@@ -48,7 +48,7 @@ public class RSEConnection implements IRemoteConnection {
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -58,10 +58,26 @@ public class RSEConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public int forwardLocalPort(String fwdAddress, int fwdPort,
+			IProgressMonitor monitor) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
 	public void forwardRemotePort(int remotePort, String fwdAddress,
 			int fwdPort) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public int forwardRemotePort(String fwdAddress, int fwdPort,
+			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
 	
