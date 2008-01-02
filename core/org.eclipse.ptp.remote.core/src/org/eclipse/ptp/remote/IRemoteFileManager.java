@@ -58,8 +58,7 @@ public interface IRemoteFileManager {
 	/**
 	 * Get the working directory. Relative paths will be resolved using this path.
 	 * 
-	 * @param monitor
 	 * @return IPath representing the current working directory
 	 */
-	public IPath getWorkingDirectory(IProgressMonitor monitor) throws IOException;
+	public IPath getWorkingDirectory();
 }

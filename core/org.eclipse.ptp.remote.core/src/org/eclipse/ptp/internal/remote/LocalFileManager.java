@@ -87,8 +87,7 @@ public class LocalFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IPath getWorkingDirectory(IProgressMonitor monitor)
-			throws IOException {
+	public IPath getWorkingDirectory() {
 		return new Path(System.getProperty("user.dir"));
 	}
 }

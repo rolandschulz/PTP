@@ -133,8 +133,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		return res;
 	}
 	
-	public IPath getWorkingDirectory(IProgressMonitor monitor)
-			throws IOException {
+	public IPath getWorkingDirectory() {
 		String cwd = "//";
 		try {
 			cwd = connection.getExecutionManager().getExecutionTools().executeWithOutput("pwd").trim();

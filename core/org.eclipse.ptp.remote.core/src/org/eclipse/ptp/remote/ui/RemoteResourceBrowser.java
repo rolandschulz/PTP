@@ -56,7 +56,7 @@ public class RemoteResourceBrowser extends Dialog {
 
 	private class FileSorter implements Comparator<IFileStore> {
 		public int compare(IFileStore o1, IFileStore o2) {
-			return o1.getName().compareTo(o2.getName());
+			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
 	}
 	
@@ -80,11 +80,7 @@ public class RemoteResourceBrowser extends Dialog {
 		setShellStyle(SWT.RESIZE | getShellStyle());
 		this.fileMgr = fileMgr;
 		this.initialPath = initialPath;
-		try {
-			cwd = fileMgr.getWorkingDirectory(new NullProgressMonitor());
-		} catch (IOException e) {
-			cwd = new Path("//");
-		}
+		cwd = fileMgr.getWorkingDirectory();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
 		setType(FILE_BROWSER | DIRECTORY_BROWSER);
 	}
