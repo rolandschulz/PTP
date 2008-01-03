@@ -8,6 +8,7 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.ui,org.eclipse.ptp.debug.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.launch,org.eclipse.ptp.launch"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.proxy,org.eclipse.ptp.proxy"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.proxy.protocol,org.eclipse.ptp.proxy.protocol"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.remote,org.eclipse.ptp.remote"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.rm.remote,org.eclipse.ptp.rm.remote"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.ui,org.eclipse.ptp.ui"/>
