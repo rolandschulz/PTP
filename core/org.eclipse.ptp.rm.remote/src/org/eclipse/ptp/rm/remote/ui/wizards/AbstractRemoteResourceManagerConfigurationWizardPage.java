@@ -534,6 +534,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (connection != null) {
 			portFwdSupported = connection.supportsTCPPortForwarding();
 		}
+		/*
+		 * Linux doesn't call modify handler (which calls updateSettings & updatePage) so need to call them explicitly here 
+		 */
+		updateSettings();
+		updatePage();
 	}
 
 	/**
@@ -621,11 +626,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 					selected = connections.length - 1;
 					connection = null;
 				}
-				
-				/*
-				 * Should trigger call to selection handler
-				 */
+							
 				connectionCombo.select(selected);
+				/*
+				 * Linux doesn't call selection handler so need to call it explicitly here 
+				 */
+				handleConnectionSelected(); 
 			}
 			
 			/*
@@ -658,9 +664,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 		}
 		if (allServices.length > 0) {
-			// Should trigger call to selection handler
 			remoteCombo.select(defIndex);
-			handleRemoteServiceSelected();
+			/*
+			 * Linux doesn't call selection handler so need to call it explicitly here
+			 */ 
+			handleRemoteServiceSelected(); 
 			handleConnectionSelected();
 		}
 	}
@@ -723,7 +731,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 * it the current selection
 		 */
 		if (selection < 0) {
-			localAddrCombo.add(localAddr);
+			if (!localAddr.equals("")){
+				localAddrCombo.add(localAddr);
+			}
 			selection = localAddrCombo.getItemCount()-1;
 		}
 		localAddrCombo.select(selection);
