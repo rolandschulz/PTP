@@ -70,12 +70,12 @@
 /*
  * Queue attributes
  */
-#define QUEUE_STATE_ATTR				"queueState"
-#define		QUEUE_STATE_NORMAL				"NORMAL"
-#define		QUEUE_STATE_COLLECTING			"COLLECTING"
-#define		QUEUE_STATE_DRAINING			"DRAINING"
-#define		QUEUE_STATE_STOPPED				"STOPPED"
-#define QUEUE_ID_ATTR					"queueId"
+#define QUEUE_STATE_ATTR			"queueState"
+#define		QUEUE_STATE_NORMAL			"NORMAL"
+#define		QUEUE_STATE_COLLECTING		"COLLECTING"
+#define		QUEUE_STATE_DRAINING		"DRAINING"
+#define		QUEUE_STATE_STOPPED			"STOPPED"
+#define QUEUE_ID_ATTR				"queueId"
 
 /*
  * Process attributes
@@ -110,6 +110,12 @@
  */
 #define ERROR_CODE_ATTR				"errorCode"
 #define ERROR_MSG_ATTR				"errorMsg"
+
+/*
+ * Miscellaneous attributes
+ */
+#define PROTOCOL_VERSION_ATTR		"version"
+#define BASE_ID_ATTR				"baseId"
 
 extern int		proxy_test_attribute(char *key, char *attr_str);
 extern char *	proxy_get_attribute_value_str(char *attr_str);
