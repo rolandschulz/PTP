@@ -25,16 +25,21 @@
 
 #include	"args.h"
 
-#define INITIAL_MAXARGC	8
+#define CHUNK_SIZE				8
+#define LENGTH_TO_CHUNKS(len)	(len / CHUNK_SIZE + 1)
+#define FREE_SPACE(len)			(CHUNK_SIZE - (len - 1) % CHUNK_SIZE - 1)
 
+/*
+ * Convert a string to an arg array
+ */
 char **
-Str2Args(char *s)
+StrToArgs(char *s)
 {
-	int	squote = 0;
-	int	dquote = 0;
-	int	bsquote = 0;
-	int	argc = 0;
-	int	maxargc = 0;
+	int		squote = 0;
+	int		dquote = 0;
+	int		bsquote = 0;
+	int		argc = 0;
+	int		maxargc = 0;
 	char *	arg;
 	char *	copybuf;
 	char **	argv = NULL;
@@ -54,12 +59,12 @@ Str2Args(char *s)
 		{
 			if ( argv == NULL )
 			{
-				maxargc = INITIAL_MAXARGC;
+				maxargc = CHUNK_SIZE;
 				nargv = (char **)malloc(maxargc * sizeof (char *));
 			}
 			else
 			{
-				maxargc *= 2;
+				maxargc += CHUNK_SIZE;
 				nargv = (char **)realloc(argv, maxargc * sizeof (char *));
 			}
 
@@ -149,6 +154,9 @@ Str2Args(char *s)
 	return argv;
 }
 
+/*
+ * Free an arg array
+ */
 void
 FreeArgs(char **args)
 {
@@ -163,29 +171,39 @@ FreeArgs(char **args)
 	free(args);
 }
 
+/*
+ * Create a new arg array. If a0 is NULL, create an empty array.
+ */
 char **
 NewArgs(char *a0, ...)
 {
-	int	n = 1;
+	int		n = 1;
 	char **	ap;
 	char **	app;
 	va_list args;
 
 	if ( a0 == NULL )
 	{
-		ap = (char **)malloc(sizeof(char *));
+		ap = (char **)malloc(CHUNK_SIZE * sizeof(char *));
 		*ap = NULL;
 		return ap;
 	}
 
+	/*
+	 * Calclulate number of arguments (n starts at 1 to allow for a0)
+	 */
 	va_start(args, a0);
 
 	while ( va_arg(args, char *) != NULL )
 		n++;
 
 	va_end(args);
-
-	app = ap = (char **)malloc((n + 1) * sizeof(char *));
+	
+	/*
+	 * Round up to multiple of CHUNK_SIZE. This takes into account the
+	 * NULL entry also.
+	 */
+	app = ap = (char **)malloc(LENGTH_TO_CHUNKS(n + 2) * CHUNK_SIZE * sizeof(char *));
 	*app++ = strdup(a0);
 
 	va_start(args, a0);
@@ -200,79 +218,105 @@ NewArgs(char *a0, ...)
 	return ap;
 }
 
+/*
+ * Append arg array ep to arg array ap. Returns a newly allocated array.
+ */
 char **
 AppendArgv(char **ap, char **ep)
 {
-	int	n = 0;
-	char **	na;
-	char **	nap;
+	int		na = 0;
+	int 	ne = 0;
 	char **	app;
-
-	if ( ep == NULL || *ep == NULL )
-		return ap;
+	char ** npp;
 
 	for ( app = ap ; *app != NULL ; app++ )
-		n++;
+		na++;
 
 	for ( app = ep ; *app != NULL ; app++ )
-		n++;
+		ne++;
+	
+	npp = (char **)malloc(LENGTH_TO_CHUNKS(na + ne + 1) * CHUNK_SIZE * sizeof(char *));
 
-	nap = na = (char **)malloc((n + 1) * sizeof(char *));
+	for ( app = npp ; *ap != NULL ; ap++ )
+		*app++ = strdup(*ap);
 
-	for ( app = ap ; *app != NULL ; app++, nap++ )
-		*nap = strdup(*app);
+	for ( app = npp + na ; *ep != NULL ; ep++ )
+		*app++ = strdup(*ep);
 
-	for ( app = ep ; *app != NULL ; app++, nap++ )
-		*nap = strdup(*app);
+	*app = NULL;
 
-	*nap = NULL;
-
-	FreeArgs(ap);
-
-	return na;
+	return npp;
 }
 
+/*
+ * Append arguments to an arg array. Returns a newly allocted array.
+ */
 char **
 AppendArgs(char **ap, ...)
 {
-	int	n = 1;
+	int		na = 0;
+	int 	ne = 0;
 	char *	a;
-	char **	na;
-	char **	nap;
 	char **	app;
+	char ** npp;
 	va_list args;
 
 	for ( app = ap ; *app != NULL ; app++ )
-		n++;
+		na++;
 
 	va_start(args, ap);
 
 	while ( va_arg(args, char *) != NULL )
-		n++;
+		ne++;
 
 	va_end(args);
+	
+	npp = (char **)malloc(LENGTH_TO_CHUNKS(na + ne + 1) * CHUNK_SIZE * sizeof(char *));
 
-	nap = na = (char **)malloc((n + 1) * sizeof(char *));
-
-	for ( app = ap ; *app != NULL ; app++, nap++ )
-		*nap = strdup(*app);
+	for ( app = npp ; *ap != NULL ; ap++ )
+		*app++ = strdup(*ap);
 
 	va_start(args, ap);
 
-	while ( (a = va_arg(args, char *)) != NULL )
-		*nap++ = strdup(a);
+	for ( app = npp + na; (a = va_arg(args, char *)) != NULL ; )
+		*app++ = strdup(a);
 
 	va_end(args);
 
-	*nap = NULL;
+	*app = NULL;
 
-	FreeArgs(ap);
-
-	return na;
+	return npp;
 }
 
 /*
-** Convert arguments into a string.
+ * Append a string to the array. Will expand the size of
+ * the array if necessary. Returns the array with the string
+ * appended.
+ */
+char **
+AppendStr(char **ap, char *str)
+{
+	int		n;
+	int		na = 0;
+	char **	app;
+	
+	for ( app = ap ; *app != NULL ; app++ )
+		na++;
+
+	n = FREE_SPACE(na);
+	
+	if (n < 2) {
+		ap = (char **)realloc(ap, LENGTH_TO_CHUNKS(na + 2) * CHUNK_SIZE * sizeof(char *));
+	}
+	
+	*(ap + na) = strdup(str);
+	*(ap + na + 1) = NULL;
+	
+	return ap;
+}
+
+/*
+** Copy arguments into a string buffer.
 */
 void
 ArgsToBuf(char *argv[], int argc, char *buf, int len)
@@ -303,4 +347,36 @@ ArgsToBuf(char *argv[], int argc, char *buf, int len)
 			len--;
 		}
 	}
+}
+
+/*
+ * Convert arguments to a string
+ */
+char *
+ArgsToStr(char **ap) 
+{
+	int 	n = 0;
+	char **	app;
+	char *	res;
+	char *	rp;
+	
+printf("in argstostr\n");	fflush(stdout);
+	
+	for ( app = ap ; *app != NULL ; app++ ) {
+		n += strlen(*app) + 1;
+	}
+printf("len is %d\n", n);		fflush(stdout);
+	rp = res = (char *)malloc(sizeof(char *) * n + 1);
+	
+	for ( app = ap ; *app != NULL ; app++ ) {
+		if (app != ap) {
+			*rp++ = ' ';
+		}
+		n = strlen(*app);
+		memcpy(rp, *app, n);
+		rp += n;
+	}
+	*rp = '\0';
+	
+	return res;
 }

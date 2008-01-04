@@ -20,11 +20,13 @@
 #ifndef _ARGS_H_
 #define _ARGS_H_
 
-extern char **	Str2Args(char *);
+extern char **	StrToArgs(char *);
 extern char **	NewArgs(char *, ...);
 extern char **	AppendArgv(char **, char **);
 extern char **	AppendArgs(char **, ...);
+extern char **	AppendStr(char **, char *);
 extern void		ArgsToBuf(char **, int, char *, int);
+extern char *	ArgsToStr(char **);
 extern void		FreeArgs(char **);
 
 #endif /* !_ARGS_H_ */
