@@ -9,3 +9,4 @@ autom4te.cache
 bitset_test
 .libs
 .gdb_history
+args_test
