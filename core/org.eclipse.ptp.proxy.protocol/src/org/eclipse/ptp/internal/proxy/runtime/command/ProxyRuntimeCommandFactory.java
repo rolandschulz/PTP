@@ -21,8 +21,62 @@ import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.ProxyCommandFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand;
 
-public class ProxyRuntimeCommandFactory extends ProxyCommandFactory {
+public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements IProxyRuntimeCommandFactory {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeInitCommand(int)
+	 */
+	public IProxyRuntimeInitCommand newProxyRuntimeInitCommand(int baseId) {
+		return new ProxyRuntimeInitCommand(baseId);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeModelDefCommand()
+	 */
+	public IProxyRuntimeModelDefCommand newProxyRuntimeModelDefCommand() {
+		return new ProxyRuntimeModelDefCommand();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeStartEventsCommand()
+	 */
+	public IProxyRuntimeStartEventsCommand newProxyRuntimeStartEventsCommand() {
+		return new ProxyRuntimeStartEventsCommand();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeStopEventsCommand()
+	 */
+	public IProxyRuntimeStopEventsCommand newProxyRuntimeStopEventsCommand() {
+		return new ProxyRuntimeStopEventsCommand();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeSubmitJobCommand(java.lang.String[])
+	 */
+	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(
+			String[] args) {
+		return new ProxyRuntimeSubmitJobCommand(args);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeTerminateJobCommand(java.lang.String)
+	 */
+	public IProxyRuntimeTerminateJobCommand newProxyRuntimeTerminateJobCommand(
+			String jobId) {
+		return new ProxyRuntimeTerminateJobCommand(jobId);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.command.ProxyCommandFactory#toCommand(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	 */
 	public IProxyCommand toCommand(ProxyPacket packet) {
 		IProxyRuntimeCommand	cmd = null;
 
@@ -33,7 +87,7 @@ public class ProxyRuntimeCommandFactory extends ProxyCommandFactory {
 		
 		switch (packet.getID()) {
 		case IProxyRuntimeCommand.INIT:
-			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeInitCommand(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.MODEL_DEF:
@@ -41,19 +95,19 @@ public class ProxyRuntimeCommandFactory extends ProxyCommandFactory {
 			break;
 
 		case IProxyRuntimeCommand.START_EVENTS:
-			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeStartEventsCommand(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.STOP_EVENTS:
-			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeStopEventsCommand(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.SUBMIT_JOB:
-			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeSubmitJobCommand(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.TERMINATE_JOB:
-			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeTerminateJobCommand(packet.getTransID(), packet.getArgs());
 			break;
 		}
 
