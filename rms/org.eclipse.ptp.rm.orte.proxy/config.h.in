@@ -12,6 +12,9 @@
 /* Enable Open MPI support. */
 #undef OMPI
 
+/* Location of orted program */
+#undef ORTED
+
 /* Name of package */
 #undef PACKAGE
 
