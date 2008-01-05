@@ -67,6 +67,13 @@
 #define STATE_RUNNING		1
 #define STATE_SHUTTING_DOWN	2
 #define STATE_SHUTDOWN		3
+
+/*
+ * ORTE specific attributes
+ */
+#define ORTED_PATH_ATTR		"ortedPath"
+#define ORTED_ARGS_ATTR		"ortedArgs"
+
 /*
  * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
  */
@@ -159,7 +166,7 @@ int subscribe_bproc(void);
 #endif /* HAVE_SYS_BPROC_H */
 
 static int			gTransID = 0; /* transaction id for start of event stream, is 0 when events are off */
-static int			gBaseID = 0; /* base ID for event generation */
+static int			gBaseID = -1; /* base ID for event generation */
 static int			gLastID = 1; /* ID generator */
 static int			gQueueID; /* ID of default queue */
 static int 			proxy_state = STATE_INIT;
@@ -413,6 +420,12 @@ sendErrorEvent(int trans_id, int code, char *fmt, ...)
 	va_list		ap;
 
 	va_start(ap, fmt);
+	if (debug_level > 0) {
+		fprintf(stderr, "sendErrorEvent(%d, %d, ", trans_id, code);
+		vfprintf(stderr, fmt, ap);
+		fprintf(stderr, ")\n");
+		fflush(stderr);
+	}
 	proxy_svr_queue_msg(orte_proxy, proxy_error_event(trans_id, code, fmt, ap));
 	va_end(ap);
 }
@@ -1568,12 +1581,16 @@ do_orte_progress(void)
 int
 ORTE_Initialize(int trans_id, int nargs, char **args)
 {
+	int				i;
 	int				n;
 	int				ret;
+	int				orted_nargs = 0;
 	int				pfd[2];
 	char *			res;
 	char *			universe_name;
 	char			buf[BUFSIZ];
+	char *			orted_path = NULL;
+	char **			orted_args;
 	fd_set			fds;
 	struct timeval	timeout;
 	
@@ -1586,17 +1603,41 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 		return 0;
 	}
 	
-	if (nargs < 2) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
+	/*
+	 * Process arguments for the init command
+	 */
+	for (i = 0; i < nargs; i++) {
+		if (proxy_test_attribute(PROTOCOL_VERSION_ATTR, args[i])) {
+			if (strcmp(proxy_get_attribute_value_str(args[i]), WIRE_PROTOCOL_VERSION) != 0) {
+				sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
+				return 0;
+			}
+		} else if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
+			gBaseID = proxy_get_attribute_value_int(args[i]);
+		} else if (proxy_test_attribute(ORTED_PATH_ATTR, args[i])) {
+			orted_path = proxy_get_attribute_value_str(args[i]);
+		} else if (proxy_test_attribute(ORTED_ARGS_ATTR, args[i])) {
+			orted_nargs++;
+		}
+	}
+
+	/*
+	 * It's an error if no base ID was supplied
+	 */
+	if (gBaseID < 0) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "no base ID supplied");
 		return 0;
 	}
 	
-	if (strcmp(args[0], WIRE_PROTOCOL_VERSION) != 0) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
-		return 0;
+	/*
+	 * Collect the extra orted arguments.
+	 */
+	orted_args = NewArgs(NULL);
+	for (i = 0; i < nargs; i++) {
+		if (proxy_test_attribute(ORTED_ARGS_ATTR, args[i])) {
+			orted_args = AppendStr(orted_args, proxy_get_attribute_value_str(args[i]));
+		}
 	}
-	
-	gBaseID = strtol(args[1], NULL, 10);
 	
 	if (pipe(pfd) < 0)
 	{
@@ -1611,20 +1652,40 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			return 1;
 		}
 		break;
+		
 	/* child */
 	case 0:
 		{
-			char **orted_args;
+			char **a1;
+			char **a2;
+			char **a3;
+			char **args;
 			
 			proxy_svr_finish(orte_proxy);
 			
-			asprintf(&res, "%s --universe PTP-ORTE-%d --report-uri %d", DEFAULT_ORTED_ARGS, getpid(), pfd[1]);
-
-			orted_args  = Str2Args(res);
-			if (debug_level > 0) {
-				fprintf(stderr, "StartDaemon(orted %s)\n", res); fflush(stderr);
-			}
+			/*
+			 * Construct args array
+			 */
+			a1 = StrToArgs(DEFAULT_ORTED_ARGS);
+			
+			asprintf(&res, "--universe PTP-ORTE-%d --report-uri %d", getpid(), pfd[1]);
+			a2 = StrToArgs(res);
 			free(res);
+			
+			a3 = AppendArgv(a1, a2);
+			args = AppendArgv(a3, orted_args);
+
+			FreeArgs(a1);		
+			FreeArgs(a2);		
+			FreeArgs(a3);		
+			FreeArgs(orted_args);		
+			free(res);
+
+			if (debug_level > 0) {
+				res = ArgsToStr(args);
+				fprintf(stderr, "StartDaemon(orted %s)\n", res); fflush(stderr);
+				free(res);
+			}
 			
 			/* spawn the daemon */
 			if (debug_level > 0) {
@@ -1634,25 +1695,37 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			close(pfd[0]);
 
 			setsid();
-			ret = execvp("orted", orted_args);
-
-			FreeArgs(orted_args);
 			
-			if (ret != 0) {
-				if (debug_level > 0) {
-					fprintf(stderr, "CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
-					fprintf(stderr, "CHILD: PATH = %s\n", getenv("PATH")); fflush(stderr);
-				}
-				exit(ret);
+			/*
+			 * Try to launch orted:
+			 * 1. Use ortedPath attribute if it was supplied
+			 * 2. Try to locate "orted" in PATH
+			 * 3. Use ORTED definition if all else fails
+			 */
+			if (orted_path != NULL) {
+				ret = execvp(orted_path, args);
 			}
+			ret = execvp("orted", args);
+			ret = execvp(ORTED, args);
+			
+			FreeArgs(args);
+			
+			if (debug_level > 0) {
+				fprintf(stderr, "CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
+				fprintf(stderr, "CHILD: PATH = %s\n", getenv("PATH")); fflush(stderr);
+			}
+			exit(ret);
 		}
 		break;
+		
     /* parent */
     default:
 		if (debug_level > 0) {
 			fprintf(stderr, "PARENT: orted_pid = %d\n", orted_pid); fflush(stderr);
 		}
     	
+		FreeArgs(orted_args);
+		
 		/* 
 		 * the daemon will report it's URI on the pipe when it's started up 
 		 */
@@ -1687,31 +1760,32 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 
 		close(pfd[0]);
 		close(pfd[1]);
+		
+		asprintf(&universe_name, "PTP-ORTE-%d", orted_pid);
+		
+		if (do_orte_init(trans_id, universe_name) != 0) {
+			free(universe_name);
+			return 0;
+		}
+		
+		free(universe_name);
+		
+	#ifdef HAVE_SYS_BPROC_H
+		subscribe_bproc();
+	#endif /* HAVE_SYS_BPROC_H */
+
+		ORTE_QUERY(ORTE_JOBID_INVALID);
+		
+		if (debug_level > 0) {
+			fprintf(stderr, "Start daemon returning OK.\n"); fflush(stderr);
+		}
+		
+		proxy_state = STATE_RUNNING;
+		
+		sendOKEvent(trans_id);
+		
 		break;
 	}
-	
-	asprintf(&universe_name, "PTP-ORTE-%d", orted_pid);
-	
-	if (do_orte_init(trans_id, universe_name) != 0) {
-		free(universe_name);
-		return 0;
-	}
-	
-	free(universe_name);
-	
-#ifdef HAVE_SYS_BPROC_H
-	subscribe_bproc();
-#endif /* HAVE_SYS_BPROC_H */
-
-	ORTE_QUERY(ORTE_JOBID_INVALID);
-	
-	if (debug_level > 0) {
-		fprintf(stderr, "Start daemon returning OK.\n"); fflush(stderr);
-	}
-	
-	proxy_state = STATE_RUNNING;
-	
-	sendOKEvent(trans_id);
 	
 	return 0;
 }
@@ -1790,30 +1864,32 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 
 	for (i = 0; i < nargs; i++) {
-		fprintf(stderr, "\t%s\n", args[i]);
-		if (strncmp(args[i], JOB_SUB_ID_ATTR, strlen(JOB_SUB_ID_ATTR)) == 0) {
-			jobsubid = args[i]+strlen(JOB_SUB_ID_ATTR)+1;
-		} else if (strncmp(args[i], JOB_EXEC_NAME_ATTR, strlen(JOB_EXEC_NAME_ATTR)) == 0) {
-			pgm_name = args[i]+strlen(JOB_EXEC_NAME_ATTR)+1;
-		} else if (strncmp(args[i], JOB_EXEC_PATH_ATTR, strlen(JOB_EXEC_PATH_ATTR)) == 0) {
-			exec_path = args[i]+strlen(JOB_EXEC_PATH_ATTR)+1;
-		} else if (strncmp(args[i], JOB_NUM_PROCS_ATTR, strlen(JOB_NUM_PROCS_ATTR)) == 0) {
-			num_procs = (int)strtol(args[i]+strlen(JOB_NUM_PROCS_ATTR)+1, NULL, 10);
-		} else if (strncmp(args[i], JOB_WORKING_DIR_ATTR, strlen(JOB_WORKING_DIR_ATTR)) == 0) {
-			cwd = args[i]+strlen(JOB_WORKING_DIR_ATTR)+1;
-		} else if (strncmp(args[i], JOB_PROG_ARGS_ATTR, strlen(JOB_PROG_ARGS_ATTR)) == 0) {
+		if (debug_level > 0) {
+			fprintf(stderr, "\t%s\n", args[i]);
+		}
+		if (proxy_test_attribute(JOB_SUB_ID_ATTR, args[i])) {
+			jobsubid = proxy_get_attribute_value_str(args[i]);
+		} else if (proxy_test_attribute(JOB_EXEC_NAME_ATTR, args[i])) {
+			pgm_name = proxy_get_attribute_value_str(args[i]);
+		} else if (proxy_test_attribute(JOB_EXEC_PATH_ATTR, args[i])) {
+			exec_path = proxy_get_attribute_value_str(args[i]);
+		} else if (proxy_test_attribute(JOB_NUM_PROCS_ATTR, args[i])) {
+			num_procs = proxy_get_attribute_value_int(args[i]);
+		} else if (proxy_test_attribute(JOB_WORKING_DIR_ATTR, args[i])) {
+			cwd = proxy_get_attribute_value_str(args[i]);
+		} else if (proxy_test_attribute(JOB_PROG_ARGS_ATTR, args[i])) {
 			num_args++;
-		} else if (strncmp(args[i], JOB_ENV_ATTR, strlen(JOB_ENV_ATTR)) == 0) {
+		} else if (proxy_test_attribute(JOB_ENV_ATTR, args[i])) {
 			num_env++;
-		} else if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
+		} else if (proxy_test_attribute(JOB_DEBUG_ARGS_ATTR, args[i])) {
 			debug_argc++;
-		} else if (strncmp(args[i], JOB_DEBUG_FLAG_ATTR, strlen(JOB_DEBUG_FLAG_ATTR)) == 0) {
-			if (strcmp(args[i]+strlen(JOB_DEBUG_FLAG_ATTR)+1, "true") == 0) {
-				debug = true;
-			}
+		} else if (proxy_test_attribute(JOB_DEBUG_FLAG_ATTR, args[i])) {
+			debug = proxy_get_attribute_value_bool(args[i]);
 		}
 	}
-	fflush(stderr);
+	if (debug_level > 0) {
+		fflush(stderr);
+	}
 	
 	if (jobsubid == NULL) {
 		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, 0, "missing ID on job submission");
@@ -1851,8 +1927,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	if (num_env > 0) {
 		env = (char **)malloc((num_env + 1) * sizeof(char *));
 		for (i = 0, a = 0; i < nargs; i++) {
-			if (strncmp(args[i], JOB_ENV_ATTR, strlen(JOB_ENV_ATTR)) == 0)
-				env[a++] = strdup(args[i] + strlen(JOB_ENV_ATTR) + 1);
+			if (proxy_test_attribute(JOB_ENV_ATTR, args[i]))
+				env[a++] = strdup(proxy_get_attribute_value_str(args[i]));
 		}
 		env[a] = NULL;
 	}
@@ -1879,12 +1955,12 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		debug_argc++;
 		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
 		for (i = 0, a = 1; i < nargs; i++) {
-			if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
-				debug_args[a++] = args[i] + strlen(JOB_DEBUG_ARGS_ATTR) + 1;
-			} else if (strncmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR, strlen(JOB_DEBUG_EXEC_NAME_ATTR)) == 0) {
-				debug_exec_name = args[i]+strlen(JOB_DEBUG_EXEC_NAME_ATTR)+1;
-			} else if (strncmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR, strlen(JOB_DEBUG_EXEC_PATH_ATTR)) == 0) {
-				debug_exec_path = args[i]+strlen(JOB_DEBUG_EXEC_PATH_ATTR)+1;
+			if (proxy_test_attribute(JOB_DEBUG_ARGS_ATTR, args[i])) {
+				debug_args[a++] = proxy_get_attribute_value_str(args[i]);
+			} else if (proxy_test_attribute(JOB_DEBUG_EXEC_NAME_ATTR, args[i])) {
+				debug_exec_name = proxy_get_attribute_value_str(args[i]);
+			} else if (proxy_test_attribute(JOB_DEBUG_EXEC_PATH_ATTR, args[i])) {
+				debug_exec_path = proxy_get_attribute_value_str(args[i]);
 			}
 		}
 		debug_args[a] = NULL;
@@ -1928,8 +2004,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	app_context->argv[0] = strdup(full_path);
 	if (num_args > 0) {
 		for (i = 0, a = 1; i < nargs; i++) {
-			if (strncmp(args[i], JOB_PROG_ARGS_ATTR, strlen(JOB_PROG_ARGS_ATTR)) == 0)
-				app_context->argv[a++] = strdup(args[i] + strlen(JOB_PROG_ARGS_ATTR) + 1);
+			if (proxy_test_attribute(JOB_PROG_ARGS_ATTR, args[i]))
+				app_context->argv[a++] = strdup(proxy_get_attribute_value_str(args[i]));
 		}
 	}
 	app_context->argv[num_args+1] = NULL;
