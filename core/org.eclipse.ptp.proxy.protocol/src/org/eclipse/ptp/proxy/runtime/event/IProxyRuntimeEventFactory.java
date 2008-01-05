@@ -12,6 +12,8 @@
 package org.eclipse.ptp.proxy.runtime.event;
 
 import org.eclipse.ptp.proxy.event.IProxyEventFactory;
+import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
+import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 
 public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	/**
@@ -20,6 +22,43 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @return
 	 */
 	public IProxyRuntimeAttributeDefEvent newProxyRuntimeAttributeDefEvent(int transID, String[] args);
+	
+	/**
+	 * @return
+	 */
+	public IProxyRuntimeConnectedStateEvent newProxyRuntimeConnectedStateEvent();
+	
+	/**
+	 * @return
+	 */
+	public IProxyRuntimeErrorStateEvent newProxyRuntimeErrorStateEvent();
+	
+	/**
+	 * @param transID
+	 * @param args
+	 * @return
+	 */
+	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(int transID, String[] args);
+	
+	/**
+	 * @param transID
+	 * @param args
+	 * @return
+	 */
+	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(int transID, String[] args);
+	
+	/**
+	 * @param event
+	 * @return
+	 */
+	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(IProxyMessageEvent event);
+	
+	/**
+	 * @param level
+	 * @param message
+	 * @return
+	 */
+	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(Level level, String message);
 	
 	/**
 	 * @param transID
@@ -61,20 +100,6 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(int transID, String[] args);
-	
-	/**
-	 * @param transID
-	 * @param args
-	 * @return
-	 */
-	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(int transID, String[] args);
-	
-	/**
-	 * @param transID
-	 * @param args
-	 * @return
-	 */
 	public IProxyRuntimeNodeChangeEvent newProxyRuntimeNodeChangeEvent(int transID, String[] args);
 	
 	/**
@@ -97,7 +122,7 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @return
 	 */
 	public IProxyRuntimeRemoveJobEvent newProxyRuntimeRemoveJobEvent(int transID, String[] args);
-	
+
 	/**
 	 * @param transID
 	 * @param args
@@ -125,4 +150,40 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @return
 	 */
 	public IProxyRuntimeRemoveQueueEvent newProxyRuntimeRemoveQueueEvent(int transID, String[] args);
+
+	/**
+	 * @return
+	 */
+	public IProxyRuntimeRunningStateEvent newProxyRuntimeRunningStateEvent();
+	
+	/**
+	 * @return
+	 */
+	public IProxyRuntimeShutdownStateEvent newProxyRuntimeShutdownStateEvent();
+
+	/**
+	 * @param message
+	 * @return
+	 */
+	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(String message);
+	
+	/**
+	 * @param args
+	 * @return
+	 */
+	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(String args[]);
+	
+	/**
+	 * @param transID
+	 * @param args
+	 * @return
+	 */
+	public IProxyRuntimeSubmitJobErrorEvent newProxyRuntimeSubmitJobErrorEvent(int transID, String[] args);
+	
+	/**
+	 * @param transID
+	 * @param args
+	 * @return
+	 */
+	public IProxyRuntimeTerminateJobErrorEvent newProxyRuntimeTerminateJobErrorEvent(int transID, String[] args);
 }

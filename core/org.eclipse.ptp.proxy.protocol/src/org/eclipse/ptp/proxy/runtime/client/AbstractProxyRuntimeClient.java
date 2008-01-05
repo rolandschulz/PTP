@@ -26,21 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeInitCommand;
-import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeModelDefCommand;
-import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeStartEventsCommand;
-import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeStopEventsCommand;
-import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeSubmitJobCommand;
-import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeTerminateJobCommand;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeErrorStateEvent;
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeCommandFactory;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeEventFactory;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeMessageEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRunningStateEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeShutdownStateEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeStartupErrorEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeSubmitJobErrorEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.proxy.client.AbstractProxyClient;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.event.IProxyConnectedEvent;
@@ -53,6 +40,7 @@ import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
@@ -149,14 +137,19 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	/*
 	 * Factory for creating new events
 	 */
-	protected final IProxyRuntimeEventFactory	factory;
+	protected final IProxyRuntimeEventFactory	eventFactory;
+	/*
+	 * Factory for creating new commands
+	 */
+	protected final IProxyRuntimeCommandFactory	cmdFactory;
 
 	public AbstractProxyRuntimeClient(String name, int baseModelId) {
-		this.factory = new ProxyRuntimeEventFactory();
+		this.eventFactory = new ProxyRuntimeEventFactory();
+		this.cmdFactory = new ProxyRuntimeCommandFactory();
 		this.proxyName = name;
 		this.baseModelId = baseModelId;
 		this.state = ProxyState.IDLE;
-		super.setEventFactory(factory);
+		super.setEventFactory(eventFactory);
 		super.addProxyEventListener(this);
 		
 		if (DebugOptions.CLIENT_TRACING) {
@@ -299,7 +292,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		if (state != ProxyState.RUNNING) {
 			throw new IOException("Not accepting commands");
 		}
-		IProxyCommand command = new ProxyRuntimeStartEventsCommand();
+		IProxyCommand command = cmdFactory.newProxyRuntimeStartEventsCommand();
 		addCommand(command);
 		sendCommand(command);
 	}
@@ -323,7 +316,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		if (state != ProxyState.RUNNING) {
 			throw new IOException("Not accepting commands");
 		}
-		IProxyCommand command = new ProxyRuntimeStopEventsCommand();
+		IProxyCommand command = cmdFactory.newProxyRuntimeStopEventsCommand();
 		addCommand(command);
 		sendCommand(command);
 	}
@@ -335,7 +328,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		if (state != ProxyState.RUNNING) {
 			throw new IOException("Not accepting commands");
 		}
-		IProxyCommand command = new ProxyRuntimeSubmitJobCommand(args);
+		IProxyCommand command = cmdFactory.newProxyRuntimeSubmitJobCommand(args);
 		addCommand(command);
 		sendCommand(command);
 	}
@@ -347,7 +340,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		if (state != ProxyState.RUNNING) {
 			throw new IOException("Not accepting commands");
 		}
-		IProxyCommand command = new ProxyRuntimeTerminateJobCommand(jobId);
+		IProxyCommand command = cmdFactory.newProxyRuntimeTerminateJobCommand(jobId);
 		addCommand(command);
 		sendCommand(command);
 	}
@@ -430,12 +423,12 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 			}
        	} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
 			if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeSubmitJobErrorEvent(new ProxyRuntimeSubmitJobErrorEvent(event.getTransactionID(), event.getAttributes()));
+				fireProxyRuntimeSubmitJobErrorEvent(eventFactory.newProxyRuntimeSubmitJobErrorEvent(event.getTransactionID(), event.getAttributes()));
 			}
 			removeCommand(command);
        	} else if (command instanceof IProxyRuntimeTerminateJobCommand) {
 			if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeTerminateJobErrorEvent(new ProxyRuntimeTerminateJobErrorEvent(event.getTransactionID(), event.getAttributes()));
+				fireProxyRuntimeTerminateJobErrorEvent(eventFactory.newProxyRuntimeTerminateJobErrorEvent(event.getTransactionID(), event.getAttributes()));
 			}
 			removeCommand(command);
     	}
@@ -758,26 +751,26 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				if (event instanceof IProxyConnectedEvent) {
 					try {
 						sessionHandleEvents();
-						command = new ProxyRuntimeInitCommand(baseModelId);
+						command = cmdFactory.newProxyRuntimeInitCommand(baseModelId);
 						addCommand(command);
 						sendCommand(command);
 		    			state = ProxyState.INIT;
-						fireProxyRuntimeConnectedStateEvent(new ProxyRuntimeConnectedStateEvent());
+						fireProxyRuntimeConnectedStateEvent(eventFactory.newProxyRuntimeConnectedStateEvent());
 					} catch (IOException e) {
 						state = ProxyState.IDLE;
-						fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent(e.getMessage()));
+						fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent(e.getMessage()));
 					}
 				} else if (event instanceof IProxyTimeoutEvent) {
 					state = ProxyState.IDLE;
-					fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent("Proxy connection timeout out"));
+					fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent("Proxy connection timeout out"));
 				} else if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
-					fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+					fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
 				} else if (event instanceof IProxyMessageEvent) {
-					fireProxyRuntimeMessageEvent(new ProxyRuntimeMessageEvent((IProxyMessageEvent)event));
+					fireProxyRuntimeMessageEvent(eventFactory.newProxyRuntimeMessageEvent((IProxyMessageEvent)event));
 				} else {
 					state = ProxyState.ERROR;
-					fireProxyRuntimeErrorStateEvent(new ProxyRuntimeErrorStateEvent());
+					fireProxyRuntimeErrorStateEvent(eventFactory.newProxyRuntimeErrorStateEvent());
 					throw new IllegalStateException("Received " + event.toString() + " in STARTUP");
 				}
 				break;
@@ -792,27 +785,27 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 
 				if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
-					fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+					fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
 				} else {
 					command = getCommandForEvent(event);
 					if (command != null) {
 						removeCommand(command);
 						if (event instanceof IProxyOKEvent){
-							command = new ProxyRuntimeModelDefCommand();
+							command = cmdFactory.newProxyRuntimeModelDefCommand();
 							addCommand(command);
 							sendCommand(command);
 							state = ProxyState.MODEL_DEF;
 						} else if (event instanceof IProxyErrorEvent) {
 							state = ProxyState.IDLE;
-							fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent(event.getAttributes()));
+							fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent(event.getAttributes()));
 						} else {
 							state = ProxyState.ERROR;
-							fireProxyRuntimeErrorStateEvent(new ProxyRuntimeErrorStateEvent());
+							fireProxyRuntimeErrorStateEvent(eventFactory.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException("Could not find command for event in INIT");					
 						}
 					} else {
 						state = ProxyState.ERROR;
-						fireProxyRuntimeErrorStateEvent(new ProxyRuntimeErrorStateEvent());
+						fireProxyRuntimeErrorStateEvent(eventFactory.newProxyRuntimeErrorStateEvent());
 						throw new IllegalStateException("Received " + event.toString() + " in INIT");				
 					}
 				}
@@ -830,29 +823,29 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 
 				if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
-					fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+					fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
 				} else {
 					command = getCommandForEvent(event);
 					if (command != null) {
 						if (event instanceof IProxyOKEvent) {
 							removeCommand(command);
 							state = ProxyState.RUNNING;
-							fireProxyRuntimeRunningStateEvent(new ProxyRuntimeRunningStateEvent());
+							fireProxyRuntimeRunningStateEvent(eventFactory.newProxyRuntimeRunningStateEvent());
 						} else if (event instanceof IProxyRuntimeAttributeDefEvent){
 							fireProxyRuntimeAttributeDefEvent((IProxyRuntimeAttributeDefEvent)event);
 						} else if (event instanceof IProxyErrorEvent) {
 							removeCommand(command);
 							state = ProxyState.IDLE;
-							fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent(event.getAttributes()));
+							fireProxyRuntimeStartupErrorEvent(eventFactory.newProxyRuntimeStartupErrorEvent(event.getAttributes()));
 						} else {
 							state = ProxyState.ERROR;
 							removeCommand(command);
-							fireProxyRuntimeErrorStateEvent(new ProxyRuntimeErrorStateEvent());
+							fireProxyRuntimeErrorStateEvent(eventFactory.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException("Could not find command for event in MODEL_DEF");						
 						}
 					} else {
 						state = ProxyState.ERROR;
-						fireProxyRuntimeErrorStateEvent(new ProxyRuntimeErrorStateEvent());
+						fireProxyRuntimeErrorStateEvent(eventFactory.newProxyRuntimeErrorStateEvent());
 						throw new IllegalStateException("Received " + event.toString() + " in MODEL_DEF");					
 					}
 				}
@@ -869,7 +862,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 
 				if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.SHUTDOWN;
-					fireProxyRuntimeMessageEvent(new ProxyRuntimeMessageEvent(Level.FATAL, "Proxy disconnected"));
+					fireProxyRuntimeMessageEvent(eventFactory.newProxyRuntimeMessageEvent(Level.FATAL, "Proxy disconnected"));
 				} else {
 					command = getCommandForEvent(event);
 					if (command != null) {
@@ -889,7 +882,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				 * the shutdown timeout has expired. 
 				 */
 				if (isShutdown()) {
-					fireProxyRuntimeShutdownStateEvent(new ProxyRuntimeShutdownStateEvent());
+					fireProxyRuntimeShutdownStateEvent(eventFactory.newProxyRuntimeShutdownStateEvent());
 					state = ProxyState.IDLE;
 					commands.clear();
 					events.clear();
