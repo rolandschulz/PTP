@@ -862,12 +862,17 @@ start_daemon(int trans_id, int nargs, char *args[])
      * will monitor started poe processes for termination and will
      * notify the front end that the poe process has terminatred.
      */
+	int i;
     pthread_attr_t term_thread_attrs;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line = %d.\n", __FUNCTION__,
 		  __LINE__);
     print_message_args(nargs, args);
-    base_id = strtol(args[1], NULL, 10);
+    for (i = 0; i < nargs; i++) {
+    	if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
+    		base_id = proxy_get_attribute_value_int(args[i]);
+    	}
+    }
     nodes = HashCreate(1024);
     pthread_attr_init(&thread_attrs);
     pthread_attr_setdetachstate(&thread_attrs, PTHREAD_CREATE_DETACHED);

@@ -17,10 +17,13 @@ import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
 public class ProxyRuntimeInitCommand 
 	extends AbstractProxyCommand implements IProxyRuntimeInitCommand {
 	
+	public final static String PROTOCOL_VERSION_ATTR = "version";
+	public final static String BASE_ID_ATTR = "baseId";
+
 	public ProxyRuntimeInitCommand(int baseId) {
 		super(INIT);
-		addArgument(IProxyClient.WIRE_PROTOCOL_VERSION);
-		addArgument(baseId);
+		addArgument(PROTOCOL_VERSION_ATTR + "=" + IProxyClient.WIRE_PROTOCOL_VERSION);
+		addArgument(BASE_ID_ATTR + "=" + baseId);
 	}
 	
 	public ProxyRuntimeInitCommand(int transID, String[] args) {

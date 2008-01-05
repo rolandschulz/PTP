@@ -502,13 +502,18 @@ static char *job_command_file_template[] = {
  *************************************************************************/
 int command_initialize(int gui_transmission_id, int nargs, char *args[])
 {
+  int i;
   int dlopen_mode = 0;
   int my_errno = 0;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
   print_message_args(nargs, args);
 
-  ibmll_proxy_base_id = strtol(args[1], NULL, 10);      /* the base id established by gui front end */
+  for (i = 0; i < nargs; i++) {
+  	if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
+  		ibmll_proxy_base_id = proxy_get_attribute_value_int(args[i]);      /* the base id established by gui front end */
+  	}
+  }  
   sprintf(ibmll_proxy_base_id_string, "%d", ibmll_proxy_base_id);
 
   memset(&LL_SYMS, '\0', sizeof(LL_SYMS));      /* zero the LoadLeveler dlsym symbol table */
