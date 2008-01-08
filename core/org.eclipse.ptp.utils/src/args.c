@@ -360,12 +360,10 @@ ArgsToStr(char **ap)
 	char *	res;
 	char *	rp;
 	
-printf("in argstostr\n");	fflush(stdout);
-	
 	for ( app = ap ; *app != NULL ; app++ ) {
 		n += strlen(*app) + 1;
 	}
-printf("len is %d\n", n);		fflush(stdout);
+
 	rp = res = (char *)malloc(sizeof(char *) * n + 1);
 	
 	for ( app = ap ; *app != NULL ; app++ ) {
