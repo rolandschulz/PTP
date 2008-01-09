@@ -36,7 +36,17 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		}
 	}
 
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#addArgument(java.lang.String)
+	 */
+	public void addArgument(String arg) {
+		if (arg == null) {
+			args.add("");
+		} else {
+			args.add(arg);
+		}
+	}
+	
 	/**
 	 * Mark the command that it has been completed so the transaction
 	 * ID can be used by future commands.
@@ -46,19 +56,19 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getCommandID()
-	 */
-	public int getCommandID() {
-		return commandID;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getArguments()
 	 */
 	public String[] getArguments() {
 		return args.toArray(new String[args.size()]);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getCommandID()
+	 */
+	public int getCommandID() {
+		return commandID;
+	}
+
 	/**
 	 * Return the transaction id used by this command
 	 */
@@ -126,17 +136,6 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	 */
 	protected void addArgument(long arg) {
 		args.add(Long.toString(arg));
-	}
-
-	/**
-	 * @param arg
-	 */
-	protected void addArgument(String arg) {
-		if (arg == null) {
-			args.add("");
-		} else {
-			args.add(arg);
-		}
 	}
 
 	/**
