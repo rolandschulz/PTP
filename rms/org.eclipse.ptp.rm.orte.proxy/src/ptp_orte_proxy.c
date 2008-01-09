@@ -1679,18 +1679,16 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			FreeArgs(a2);		
 			FreeArgs(a3);		
 			FreeArgs(orted_args);		
-			free(res);
 
 			if (debug_level > 0) {
 				res = ArgsToStr(args);
-				fprintf(stderr, "StartDaemon(orted %s)\n", res); fflush(stderr);
+				if (orted_path == NULL) {
+					orted_path = "orted";
+				}
+				fprintf(stderr, "StartDaemon(%s %s)\n", orted_path, res); fflush(stderr);
 				free(res);
 			}
 			
-			/* spawn the daemon */
-			if (debug_level > 0) {
-				fprintf(stderr, "CHILD: Starting execvp now!\n"); fflush(stderr);
-			}
 			errno = 0;
 			close(pfd[0]);
 
@@ -1704,16 +1702,23 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			 */
 			if (orted_path != NULL) {
 				ret = execvp(orted_path, args);
+				if (debug_level > 0) {
+					fprintf(stderr, "failed to execvp %s, ret = %d, errno = %d\n", orted_path, ret, errno); fflush(stderr);
+				}
 			}
 			ret = execvp("orted", args);
+			if (debug_level > 0) {
+				fprintf(stderr, "failed to execvp orted, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
+				fprintf(stderr, "PATH = %s\n", getenv("PATH")); fflush(stderr);
+			}
 			ret = execvp(ORTED, args);
+			if (debug_level > 0) {
+				fprintf(stderr, "failed to execvp %s, ret = %d, errno = %d\n", ORTED, ret, errno); fflush(stderr);
+				fprintf(stderr, "PATH = %s\n", getenv("PATH")); fflush(stderr);
+			}
 			
 			FreeArgs(args);
 			
-			if (debug_level > 0) {
-				fprintf(stderr, "CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
-				fprintf(stderr, "CHILD: PATH = %s\n", getenv("PATH")); fflush(stderr);
-			}
 			exit(ret);
 		}
 		break;
