@@ -37,5 +37,11 @@ public interface IProxyCommand {
 	 * @return the transaction id used by this command
 	 */
 	public int getTransactionID();
-		
+	
+	/**
+	 * Add an argument to the command
+	 * 
+	 * @param arg argument to add to the command
+	 */
+	public void addArgument(String arg);
 }
