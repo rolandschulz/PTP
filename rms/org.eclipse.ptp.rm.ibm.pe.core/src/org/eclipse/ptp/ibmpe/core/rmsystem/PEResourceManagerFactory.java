@@ -37,6 +37,17 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 		super("PE");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
+	public IResourceManagerConfiguration copyConfiguration(
+			IResourceManagerConfiguration configuration) {
+		return (IResourceManagerConfiguration)configuration.clone();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		PEResourceManagerConfiguration configuration = (PEResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
@@ -44,10 +55,16 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 		return new PEResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 */
 	public IResourceManagerConfiguration createConfiguration() {
 		return new PEResourceManagerConfiguration(this);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
+	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
 		return PEResourceManagerConfiguration.load(this, memento);
 	}

@@ -137,7 +137,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		this.localAddress = remoteConfig.getLocalAddress();
 		this.options = remoteConfig.getOptions();
 		this.invocationOptions = new ArrayList<String>();
-		this.setInvocationOptions(remoteConfig.getInvocationOptions());
+		setInvocationOptions(remoteConfig.getInvocationOptions());
 	}
 	
 	/**
@@ -176,13 +176,29 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 
 	/**
+	 * Convert invocation options to a string
+	 * 
+	 * @return invocation options separated by spaces
+	 */
+	public String getInvocationOptionsStr() {
+		String opts = "";
+		for (int i = 0; i < invocationOptions.size(); i++) {
+			if (i > 0) {
+				opts += " ";
+			}
+			opts += invocationOptions.get(i);
+		}
+		return opts;
+	}	
+	
+	/**
 	 * Get the local address for the proxy to connect to
 	 * 
 	 * @return local address
 	 */
 	public String getLocalAddress() {
 		return localAddress;
-	}	
+	}
 	
 	/**
 	 * Get the remote configuration options.
@@ -210,7 +226,20 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public String getRemoteServicesId() {
 		return remoteServicesId;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration#save(org.eclipse.ui.IMemento)
+	 */
+	public void save(IMemento memento) {
+		super.save(memento);
+		memento.putString(TAG_REMOTE_SERVICES_ID, remoteServicesId);
+		memento.putString(TAG_CONNECTION_NAME, connectionName);
+		memento.putString(TAG_PROXY_PATH, proxyServerPath);
+		memento.putString(TAG_LOCAL_ADDRESS, localAddress);
+		memento.putString(TAG_OPTIONS, Integer.toString(options));
+		memento.putString(TAG_INVOCATION_OPTIONS, getInvocationOptionsStr());
+	}
+
 	/**
 	 * Set the connection name.
 	 * 
@@ -230,7 +259,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		this.invocationOptions.clear();
 		addInvocationOptions(optionString);
 	}
-
+	
 	/**
 	 * Set the local address
 	 * 
@@ -239,7 +268,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public void setLocalAddress(String localAddr) {
 		this.localAddress = localAddr;
 	}
-
+	
 	/**
 	 * Set the remote configuration options
 	 * 
@@ -265,7 +294,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public void setRemoteServicesId(String id) {
 		this.remoteServicesId = id;
 	}
-	
+
 	/**
 	 * Test if option is set.
 	 * 
@@ -274,24 +303,5 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 */
 	public boolean testOption(int option) {
 		return (getOptions() & option) == option;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration#doSave(org.eclipse.ui.IMemento)
-	 */
-	protected void doSave(IMemento memento) {
-		memento.putString(TAG_REMOTE_SERVICES_ID, remoteServicesId);
-		memento.putString(TAG_CONNECTION_NAME, connectionName);
-		memento.putString(TAG_PROXY_PATH, proxyServerPath);
-		memento.putString(TAG_LOCAL_ADDRESS, localAddress);
-		memento.putString(TAG_OPTIONS, Integer.toString(options));
-		String opts = "";
-		for (int i = 0; i < invocationOptions.size(); i++) {
-			if (i > 0) {
-				opts += " ";
-			}
-			opts += invocationOptions.get(i);
-		}
-		memento.putString(TAG_INVOCATION_OPTIONS, opts);
 	}
 }

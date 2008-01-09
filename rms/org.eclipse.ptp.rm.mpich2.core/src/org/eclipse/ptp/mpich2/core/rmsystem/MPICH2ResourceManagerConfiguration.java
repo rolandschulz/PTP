@@ -48,6 +48,27 @@ final public class MPICH2ResourceManagerConfiguration extends AbstractRemoteReso
 		setDefaultNameAndDesc();
 	}
 
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() {
+		CommonConfig commonConf = new CommonConfig(getName(),
+				getDescription(), getUniqueName());
+		RemoteConfig remoteConf = new RemoteConfig(commonConf,
+				getRemoteServicesId(), getConnectionName(),
+				getProxyServerPath(), getLocalAddress(),
+				getInvocationOptionsStr(), getOptions());
+		return new MPICH2ResourceManagerConfiguration(
+				(MPICH2ResourceManagerFactory) getFactory(), remoteConf);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
+	 */
 	public void setDefaultNameAndDesc() {
 		String name = "MPICH2";
 		String conn = getConnectionName();

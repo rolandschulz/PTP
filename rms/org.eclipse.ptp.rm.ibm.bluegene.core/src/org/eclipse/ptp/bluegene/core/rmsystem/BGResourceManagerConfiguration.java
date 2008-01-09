@@ -42,15 +42,15 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 
 		config.setServiceNode(memento.getString(TAG_SERVICE_NODE));
 		config.setDatabaseName(memento.getString(TAG_DB_NAME));
-		config.setDatabasePassword(memento.getString(TAG_DB_USERNAME));
+		config.setDatabaseUsername(memento.getString(TAG_DB_USERNAME));
 		config.setDatabasePassword(memento.getString(TAG_DB_PASSWORD));
 
 		return config;
 	}
+	
 	private String serviceNode = "";
 	private String dbName = "";
 	private String dbUsername = "";
-
 	private String dbPassword = "";
 	
 	public BGResourceManagerConfiguration(BGResourceManagerFactory factory) {
@@ -63,7 +63,28 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 		super(remoteConfig, factory);
 	}
 	
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() {
+		CommonConfig commonConf = new CommonConfig(getName(),
+				getDescription(), getUniqueName());
+		RemoteConfig remoteConf = new RemoteConfig(commonConf,
+				getRemoteServicesId(), getConnectionName(),
+				getProxyServerPath(), getLocalAddress(),
+				getInvocationOptionsStr(), getOptions());
+		BGResourceManagerConfiguration config = new BGResourceManagerConfiguration(
+				(BGResourceManagerFactory) getFactory(), remoteConf);
+		config.setServiceNode(getServiceNode());
+		config.setDatabaseName(getDatabaseName());
+		config.setDatabaseUsername(getDatabaseUsername());
+		config.setDatabasePassword(getDatabasePassword());
+		return config;
+	}
+	
 	public String getDatabaseName() {
 		return dbName;
 	}
@@ -78,6 +99,17 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 	
 	public String getServiceNode() {
 		return serviceNode;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration#save(org.eclipse.ui.IMemento)
+	 */
+	public void save(IMemento memento) {
+		super.save(memento);
+		memento.putString(TAG_SERVICE_NODE, getServiceNode());
+		memento.putString(TAG_DB_NAME, getDatabaseName());
+		memento.putString(TAG_DB_USERNAME, getDatabaseUsername());
+		memento.putString(TAG_DB_PASSWORD, getDatabasePassword());
 	}
 	
 	public void setDatabaseName(String dbName) {
@@ -107,16 +139,5 @@ final public class BGResourceManagerConfiguration extends AbstractRemoteResource
 	
 	public void setServiceNode(String serviceNode) {
 		this.serviceNode = serviceNode;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration#doSave(org.eclipse.ui.IMemento)
-	 */
-	protected void doSave(IMemento memento) {
-		memento.putString(TAG_SERVICE_NODE, getServiceNode());
-		memento.putString(TAG_DB_NAME, getDatabaseName());
-		memento.putString(TAG_DB_USERNAME, getDatabaseUsername());
-		memento.putString(TAG_DB_PASSWORD, getDatabasePassword());
-		doSave(memento);
 	}
 }

@@ -34,6 +34,17 @@ public class BGResourceManagerFactory extends AbstractResourceManagerFactory {
 		super("Blue Gene");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
+	public IResourceManagerConfiguration copyConfiguration(
+			IResourceManagerConfiguration configuration) {
+		return (IResourceManagerConfiguration)configuration.clone();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		BGResourceManagerConfiguration configuration = (BGResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
@@ -41,6 +52,9 @@ public class BGResourceManagerFactory extends AbstractResourceManagerFactory {
 		return new BGResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 */
 	public IResourceManagerConfiguration createConfiguration() {
 		BGResourceManagerConfiguration conf = new BGResourceManagerConfiguration(this);
 		
@@ -52,6 +66,9 @@ public class BGResourceManagerFactory extends AbstractResourceManagerFactory {
 		return conf;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
+	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
 		return BGResourceManagerConfiguration.load(this, memento);
 	}
