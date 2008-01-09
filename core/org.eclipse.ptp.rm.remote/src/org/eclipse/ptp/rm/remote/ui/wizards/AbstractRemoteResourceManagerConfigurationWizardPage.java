@@ -123,67 +123,10 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			String title) {
 		super(wizard, title);
 		
-		final RMConfigurationWizard confWizard = getConfigurationWizard();
-		config = (AbstractRemoteResourceManagerConfiguration) confWizard.getConfiguration();
 		setPageComplete(false);
 		isValid = false;
 	}
 
-	/**
-	 * Update wizard UI selections from settings. This should be called whenever any
-	 * settings are changed.
-	 */
-	private void updateSettings() {
-		/*
-		 * Get current settings unless we're initializing things
-		 */
-		if (!loading) {
-			muxPortFwd = portForwardingButton.getSelection();
-			manualLaunch = manualButton.getSelection();
-		}
-
-		/*
-		 * If no localAddr has been specified in the configuration, select
-		 * a default one.
-		 */
-		if (!loading || localAddr.equals("")) {
-			localAddr = localAddrCombo.getText();
-		}
-
-		/*
-		 * Fix settings
-		 */
-		if (muxPortFwd && !portFwdSupported) {
-			muxPortFwd = false;
-		}
-		
-		if (muxPortFwd && manualLaunch) {
-			manualLaunch = false;
-		}
-		
-		/*
-		 * Update UI to display correct settings
-		 */
-		if (noneButton != null) {
-			noneButton.setSelection(!muxPortFwd);
-		}
-		
-		if (portForwardingButton != null) {
-			portForwardingButton.setSelection(muxPortFwd);
-			portForwardingButton.setEnabled(portFwdSupported);
-		}
-		
-		if (localAddrCombo != null) {
-			localAddrCombo.setEnabled(!muxPortFwd);
-		}
-		
-		if (manualButton != null) {
-			manualButton.setSelection(manualLaunch && !muxPortFwd);
-			manualButton.setEnabled(!muxPortFwd);
-		}
-	}
-	
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -191,20 +134,59 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
 	    composite.setLayout(topLayout);
-
-		loading = true;
-		
-		loadSaved();
 		createContents(composite);
-		updateSettings();
-		defaultSetting();
-		
-		loading = false;
-
 		setControl(composite);
-		updatePage();
 	}
-
+	
+	/**
+	 * Initialize the contents of the local address selection combo. Host names are obtained by
+	 * performing a reverse lookup on the IP addresses of each network interface. If DNS is configured
+	 * correctly, this should add the fully qualified domain name, otherwise it will probably be
+	 * the IP address. We also add the configuration address to the combo in case it was specified manually.
+	 */
+	public void initializeLocalHostCombo() {
+		Set<String> addrs = new TreeSet<String>();
+		try {
+			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (netInterfaces.hasMoreElements()) {
+				NetworkInterface ni = (NetworkInterface)netInterfaces.nextElement();
+				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
+				while (alladdr.hasMoreElements()) {
+					InetAddress ip = (InetAddress)alladdr.nextElement();
+					if (ip instanceof Inet4Address) {
+						addrs.add(fixHostName(ip.getCanonicalHostName()));
+					}
+				}
+			}                  
+		} catch (Exception e) {
+		}
+		if (addrs.size() == 0) {
+			addrs.add("localhost");
+		}
+		localAddrCombo.removeAll();
+		int index = 0;
+		int selection = -1;
+		for (String addr : addrs) {
+			localAddrCombo.add(addr);
+			if ((localAddr.equals("") && addr.equals("localhost"))
+					|| addr.equals(localAddr)) {
+				selection = index;
+			}
+			index++;
+		}
+		/*
+		 * localAddr is not in the list, so add it and make
+		 * it the current selection
+		 */
+		if (selection < 0) {
+			if (!localAddr.equals("")){
+				localAddrCombo.add(localAddr);
+			}
+			selection = localAddrCombo.getItemCount()-1;
+		}
+		localAddrCombo.select(selection);
+	}
+	
 	/**
 	 * Save the current state in the RM configuration. This is called whenever
 	 * anything is changed.
@@ -231,6 +213,17 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		config.setProxyServerPath(proxyFile);
 		config.setOptions(options);
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
+	 */
+	@Override
+	public void setVisible(boolean visible) {
+		if (visible) {
+			initContents();
+		}
+		super.setVisible(visible);
 	}
 	
 	/**
@@ -354,9 +347,63 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		manualButton = createCheckButton(parent, Messages.getString("RemoteConfigurationWizard.manualButton"));
 		manualButton.addSelectionListener(listener);
 
+		registerListeners();
+	}
+	
+	/**
+	 * In some nameserver configurations, getCanonicalHostName() will return the inverse mapping 
+	 * of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this case we just use the IP address.
+	 * 
+	 * @param hostname host name to be fixed
+	 * @return fixed host name
+	 */
+	private String fixHostName(String hostname) {
+		try {
+			if (hostname.endsWith(".in-addr.arpa")) {
+				return InetAddress.getLocalHost().getHostAddress();
+			}
+		} catch (UnknownHostException e) {
+		}
+		return hostname;
+	}
+	
+	/**
+	 * Initialize the contents of the controls on the page. This is called after the
+	 * controls have been created.
+	 */
+	private void initContents() {
+		loading = true;
+		config = (AbstractRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
+		loadSaved();
+		updateSettings();
+		defaultSetting();
 		initializeRemoteServicesCombo();
 		initializeLocalHostCombo();
-		registerListeners();
+		updatePage();
+		loading = false;
+	}
+	
+	/**
+	 * Load the initial wizard state from the configuration settings.
+	 */
+	private void loadSaved()
+	{
+		proxyFile = config.getProxyServerPath();
+		localAddr = config.getLocalAddress();
+		
+		String rmID = config.getRemoteServicesId();
+		if (rmID != null) {
+			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
+			String conn = config.getConnectionName();
+			if (remoteServices != null && conn != null) {
+				connection = remoteServices.getConnectionManager().getConnection(conn);
+			}
+		}
+		
+		int options = config.getOptions();
+		
+		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
+		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 	}
 	
 	private void registerListeners() {
@@ -385,30 +432,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 		});
 	}
-	
-	/**
-	 * Load the initial wizard state from the configuration settings.
-	 */
-	private void loadSaved()
-	{
-		proxyFile = config.getProxyServerPath();
-		localAddr = config.getLocalAddress();
-		
-		String rmID = config.getRemoteServicesId();
-		if (rmID != null) {
-			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
-			String conn = config.getConnectionName();
-			if (remoteServices != null && conn != null) {
-				connection = remoteServices.getConnectionManager().getConnection(conn);
-			}
-		}
-		
-		int options = config.getOptions();
-		
-		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
-		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
-	}
-	
+
 	/**
 	 * @param b
 	 */
@@ -427,6 +451,60 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 	}
 
+	/**
+	 * Update wizard UI selections from settings. This should be called whenever any
+	 * settings are changed.
+	 */
+	private void updateSettings() {
+		/*
+		 * Get current settings unless we're initializing things
+		 */
+		if (!loading) {
+			muxPortFwd = portForwardingButton.getSelection();
+			manualLaunch = manualButton.getSelection();
+		}
+
+		/*
+		 * If no localAddr has been specified in the configuration, select
+		 * a default one.
+		 */
+		if (!loading || localAddr.equals("")) {
+			localAddr = localAddrCombo.getText();
+		}
+
+		/*
+		 * Fix settings
+		 */
+		if (muxPortFwd && !portFwdSupported) {
+			muxPortFwd = false;
+		}
+		
+		if (muxPortFwd && manualLaunch) {
+			manualLaunch = false;
+		}
+		
+		/*
+		 * Update UI to display correct settings
+		 */
+		if (noneButton != null) {
+			noneButton.setSelection(!muxPortFwd);
+		}
+		
+		if (portForwardingButton != null) {
+			portForwardingButton.setSelection(muxPortFwd);
+			portForwardingButton.setEnabled(portFwdSupported);
+		}
+		
+		if (localAddrCombo != null) {
+			localAddrCombo.setEnabled(!muxPortFwd);
+		}
+		
+		if (manualButton != null) {
+			manualButton.setSelection(manualLaunch && !muxPortFwd);
+			manualButton.setEnabled(!muxPortFwd);
+		}
+	}
+	
 	/**
 	 * Convenience method for creating a button widget.
 	 * 
@@ -471,7 +549,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gridLayout.marginWidth = mw;
 		return gridLayout;
 	}
-	
+
 	/**
 	 * Creates an new radio button instance and sets the default
 	 * layout data.
@@ -493,7 +571,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		return button;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -540,7 +618,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		updateSettings();
 		updatePage();
 	}
-
+	
 	/**
 	 * Handle creation of a new connection by pressing the 'New...' button. Calls
 	 * handleRemoteServicesSelected() to update the connection combo with the new
@@ -555,7 +633,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			handleRemoteServiceSelected();
 		}
 	}
-
+	
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
@@ -594,7 +672,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 		}
 	}
-
+	
 	/**
 	 * Handle selection of a new remote services provider from the 
 	 * remote services combo.
@@ -672,73 +750,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			handleConnectionSelected();
 		}
 	}
-	
-	/**
-	 * In some nameserver configurations, getCanonicalHostName() will return the inverse mapping 
-	 * of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this case we just use the IP address.
-	 * 
-	 * @param hostname host name to be fixed
-	 * @return fixed host name
-	 */
-	private String fixHostName(String hostname) {
-		try {
-			if (hostname.endsWith(".in-addr.arpa")) {
-				return InetAddress.getLocalHost().getHostAddress();
-			}
-		} catch (UnknownHostException e) {
-		}
-		return hostname;
-	}
-	
-	/**
-	 * Initialize the contents of the local address selection combo. Host names are obtained by
-	 * performing a reverse lookup on the IP addresses of each network interface. If DNS is configured
-	 * correctly, this should add the fully qualified domain name, otherwise it will probably be
-	 * the IP address. We also add the configuration address to the combo in case it was specified manually.
-	 */
-	public void initializeLocalHostCombo() {
-		Set<String> addrs = new TreeSet<String>();
-		try {
-			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-			while (netInterfaces.hasMoreElements()) {
-				NetworkInterface ni = (NetworkInterface)netInterfaces.nextElement();
-				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
-				while (alladdr.hasMoreElements()) {
-					InetAddress ip = (InetAddress)alladdr.nextElement();
-					if (ip instanceof Inet4Address) {
-						addrs.add(fixHostName(ip.getCanonicalHostName()));
-					}
-				}
-			}                  
-		} catch (Exception e) {
-		}
-		if (addrs.size() == 0) {
-			addrs.add("localhost");
-		}
-		localAddrCombo.removeAll();
-		int index = 0;
-		int selection = -1;
-		for (String addr : addrs) {
-			localAddrCombo.add(addr);
-			if ((localAddr.equals("") && addr.equals("localhost"))
-					|| addr.equals(localAddr)) {
-				selection = index;
-			}
-			index++;
-		}
-		/*
-		 * localAddr is not in the list, so add it and make
-		 * it the current selection
-		 */
-		if (selection < 0) {
-			if (!localAddr.equals("")){
-				localAddrCombo.add(localAddr);
-			}
-			selection = localAddrCombo.getItemCount()-1;
-		}
-		localAddrCombo.select(selection);
-	}
-	
+
 	/**
 	 * @return
 	 */
