@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.ui.wizards;
 
+import org.eclipse.ptp.orte.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
@@ -25,8 +26,8 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	AbstractRemoteResourceManagerConfigurationWizardPage {
 	
 	public ORTEResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, "ORTE Proxy Configuration");
-		setTitle("ORTE Proxy Configuration");
-		setDescription("Enter information to connect to an ORTE proxy server");
+		super(wizard, Messages.getString("ORTEResourceManagerConfigurationWizardPage.name")); //$NON-NLS-1$
+		setTitle(Messages.getString("ORTEResourceManagerConfigurationWizardPage.title")); //$NON-NLS-1$
+		setDescription(Messages.getString("ORTEResourceManagerConfigurationWizardPage.description")); //$NON-NLS-1$
 	}
 }
