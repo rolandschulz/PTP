@@ -84,10 +84,9 @@ final public class ORTEResourceManagerConfiguration extends
 				getRemoteServicesId(), getConnectionName(),
 				getProxyServerPath(), getLocalAddress(),
 				getInvocationOptionsStr(), getOptions());
-
 		return new ORTEResourceManagerConfiguration(
 				(ORTEResourceManagerFactory) getFactory(), remoteConf,
-				ortedPath, ortedArgs, useDefaults);
+				getOrtedPath(), getOrtedArgs(), useDefaults());
 	}
 
 	/**
