@@ -15,39 +15,38 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.ptp.internal.proxy.runtime.event;
+package org.eclipse.ptp.proxy.runtime.event;
 
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeAttributeDefEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeConnectedStateEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeErrorStateEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeJobChangeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeMachineChangeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeMessageEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewJobEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewMachineEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewNodeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewProcessEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewQueueEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNodeChangeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeProcessChangeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveAllEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveJobEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveQueueEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRunningStateEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeShutdownStateEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeStartupErrorEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeAttributeDefEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeErrorStateEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeJobChangeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeMachineChangeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeMessageEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewJobEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewMachineEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewNodeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewProcessEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewQueueEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNodeChangeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeProcessChangeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveAllEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveJobEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveMachineEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveNodeEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveProcessEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveQueueEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRunningStateEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeShutdownStateEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
-import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeTerminateJobErrorEvent;
 
 public class ProxyRuntimeEventFactory extends ProxyEventFactory implements IProxyRuntimeEventFactory {
 	/* (non-Javadoc)

@@ -15,19 +15,17 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.ptp.internal.proxy.runtime.command;
+package org.eclipse.ptp.proxy.runtime.command;
 
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeInitCommand;
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeModelDefCommand;
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeStartEventsCommand;
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeStopEventsCommand;
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeSubmitJobCommand;
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeTerminateJobCommand;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.ProxyCommandFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand;
 
 public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements IProxyRuntimeCommandFactory {
 	/* (non-Javadoc)
