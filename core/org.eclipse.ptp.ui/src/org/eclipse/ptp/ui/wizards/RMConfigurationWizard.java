@@ -243,7 +243,7 @@ public class RMConfigurationWizard extends Wizard {
 	public RMConfigurationWizard(IResourceManagerFactory resourceManagerFactory,
 			IResourceManagerControl resourceManager) {
 		this(new IResourceManagerFactory[] { resourceManagerFactory });
-		this.configs[0] = resourceManager.getConfiguration();
+		this.configs[0] = resourceManagerFactory.copyConfiguration(resourceManager.getConfiguration());
 		this.useDefaultNameAndDesc = false;
 		this.resourceManager = resourceManager;
 		factorySelected(0);

@@ -54,7 +54,23 @@ final public class PEResourceManagerConfiguration extends AbstractRemoteResource
 		setDefaultNameAndDesc();
 	}
 	
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() {
+		CommonConfig commonConf = new CommonConfig(getName(),
+				getDescription(), getUniqueName());
+		RemoteConfig remoteConf = new RemoteConfig(commonConf,
+				getRemoteServicesId(), getConnectionName(),
+				getProxyServerPath(), getLocalAddress(),
+				getInvocationOptionsStr(), getOptions());
+		return new PEResourceManagerConfiguration(
+				(PEResourceManagerFactory) getFactory(), remoteConf);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
 	 */

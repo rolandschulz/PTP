@@ -50,13 +50,12 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 			return uniqueName;
 		}		
 	}
-	
+
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
-
 	private static final String TAG_FACTORY_ID = "factoryId"; //$NON-NLS-1$
-	
+
 	/**
 	 * @param factory
 	 * @param memento
@@ -75,18 +74,19 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		String uniqueName = memento.getString(TAG_UNIQUE_NAME);
 		return new CommonConfig(name, desc, uniqueName);
 	}
-
+	
 	protected static String generateUniqueName() {
 		long time = System.currentTimeMillis();
 		return "RMID:" + Long.toString(time);
 	}
+
 	private String description;
 	private String name;
 	private final String resourceManagerId;
 	private final String resourceManagerType;
-
 	private final String uniqueName;
-
+	private final IResourceManagerFactory factory;
+	
 	/**
 	 * @param name
 	 * @param description
@@ -99,6 +99,15 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		this.resourceManagerId = factory.getId();
 		this.resourceManagerType = factory.getName();
 		this.uniqueName = commonConfig.getUniqueName();
+		this.factory = factory;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() {
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -106,6 +115,15 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	 */
 	public String getDescription() {
 		return description;
+	}
+	
+	/**
+	 * Get the factory for this configuration
+	 * 
+	 * @return factory
+	 */
+	public IResourceManagerFactory getFactory() {
+		return factory;
 	}
 	
 	/* (non-Javadoc)
@@ -128,7 +146,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public String getType() {
 		return resourceManagerType;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
@@ -140,12 +158,11 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	 * Save the common parts of this config then save the rest
 	 * @param memento
 	 */
-	public final void save(IMemento memento) {
+	public void save(IMemento memento) {
 		memento.putString(TAG_FACTORY_ID, getResourceManagerId());
 		memento.putString(TAG_NAME, getName());
 		memento.putString(TAG_DESCRIPTION, getDescription());
 		memento.putString(TAG_UNIQUE_NAME, getUniqueName());
-		doSave(memento);
 	}
 
 	/* (non-Javadoc)
@@ -161,10 +178,4 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	/**
-	 * Save the rest of the config
-	 * @param memento
-	 */
-	protected abstract void doSave(IMemento memento);
 }

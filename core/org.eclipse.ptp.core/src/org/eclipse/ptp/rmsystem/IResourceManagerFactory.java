@@ -31,29 +31,47 @@ import org.eclipse.ui.IMemento;
  */
 public interface IResourceManagerFactory {
 	/**
-	 * 
+	 * Copy a configuration. This can be used to provide a temporary working copy of a configuration
+	 *
+	 * @param configuration configuration to copy
+	 * @return copy of the configuration
 	 */
-	public String getName();
+	public IResourceManagerConfiguration copyConfiguration(IResourceManagerConfiguration configuration);
 
 	/**
+	 * Create a default configuration
 	 * 
+	 * @return default configuration
+	 */
+	public IResourceManagerConfiguration createConfiguration();
+
+	/**
+	 * Get the ID of this factory
+	 * 
+	 * @return factory ID
 	 */
 	public String getId();
 
 	/**
-	 * @param configuration
-	 * @return
+	 * Get the name of this factory
+	 * 
+	 * @return factory name
 	 */
-	IResourceManagerControl create(IResourceManagerConfiguration configuration);
-
+	public String getName();
+	
 	/**
-	 * @param memento
-	 * @return
+	 * Load a resource manager configuration from saved state
+	 * 
+	 * @param memento saved state of configuration
+	 * @return resource manager configuration
 	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento);
 	
 	/**
-	 * @return
+	 * Create a resource manager using the supplied configuration
+	 * 
+	 * @param configuration configuration to use when creating resource manager
+	 * @return resource manager control
 	 */
-	public IResourceManagerConfiguration createConfiguration();
+	IResourceManagerControl create(IResourceManagerConfiguration configuration);
 }
