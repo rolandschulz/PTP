@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.util.DebugOptions;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
@@ -45,13 +47,16 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			int baseModelId) {
 		super(config.getName(), baseModelId);
 		this.config = config;
-		
-		/*
-		 * Set up debug options
-		 */
-		DebugOptions.PROTOCOL_TRACING = DebugUtil.PROTOCOL_TRACING;
-		DebugOptions.CLIENT_TRACING = DebugUtil.PROXY_CLIENT_TRACING;
-		DebugOptions.SERVER_DEBUG_LEVEL = DebugUtil.PROXY_SERVER_DEBUG_LEVEL;
+		initDebugOptions();
+	}
+
+	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
+			int baseModelId,
+			IProxyRuntimeCommandFactory cmdFactory,
+			IProxyRuntimeEventFactory eventFactory) {
+		super(config.getName(), baseModelId, cmdFactory, eventFactory);
+		this.config = config;
+		initDebugOptions();
 	}
 
 	/**
@@ -223,5 +228,18 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			throw new IOException("Failed to start proxy: " + e.getMessage()); //$NON-NLS-1$
 		}
 		startup();
+	}
+
+	/**
+	 * Initialize debugging options
+	 */
+	private void initDebugOptions() {
+		/*
+		 * Set up debug options
+		 */
+		DebugOptions.PROTOCOL_TRACING = DebugUtil.PROTOCOL_TRACING;
+		DebugOptions.CLIENT_TRACING = DebugUtil.PROXY_CLIENT_TRACING;
+		DebugOptions.SERVER_DEBUG_LEVEL = DebugUtil.PROXY_SERVER_DEBUG_LEVEL;
+
 	}
 }
