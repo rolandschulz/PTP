@@ -427,7 +427,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			programPath = project.getFile(programPath).getLocation();
 		}
 		if (!programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.PROGRAM_PATH_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), 
+					new FileNotFoundException(
+							LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", programPath.toString())), 
+							IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 		/* --old
 		IFile programPath = project.getFile(fileName);
@@ -673,7 +676,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			path = verifyResource(workPath, configuration);
 		}
         if (path == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toString())), IStatus.INFO);
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), 
+					new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", path.toString())), IStatus.INFO);
 		}
 		return path.toString();        
     }
@@ -686,8 +690,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		String exePath = getExecutablePath(configuration);
 		IPath path = verifyResource(exePath, configuration);
 		if (path == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_does_not_exist"), 
-					new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", 
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), 
+					new FileNotFoundException(
+							LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", 
 							exePath)), IStatus.INFO);
 		}
 		return path;
