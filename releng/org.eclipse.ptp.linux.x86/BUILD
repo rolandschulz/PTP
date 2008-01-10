@@ -1,43 +1,38 @@
 #!/bin/sh
 #
-# This script is used to build any executable fragments in the workspace
+# This script is used to build proxy plugins in the workspace
 #
-export KNOWN_FRAGMENTS="\
-	org.eclipse.ptp.utils\
-	org.eclipse.ptp.utils_*\
-	org.eclipse.ptp.proxy\
-	org.eclipse.ptp.proxy_*\
-	org.eclipse.ptp.debug.sdm\
-	org.eclipse.ptp.debug.sdm_*\
-	org.eclipse.ptp.orte.proxy\
-	org.eclipse.ptp.orte.proxy_*\
-	org.eclipse.ptp.mpich2.proxy\
-	org.eclipse.ptp.mpich2.proxy_*\
-	org.eclipse.ptp.ibmpe.proxy\
-	org.eclipse.ptp.ibmpe.proxy_*\
-	org.eclipse.ptp.ibmll.proxy\
-	org.eclipse.ptp.ibmll.proxy_*"
+RMS="orte mpich2 ibmpe ibmll"
+
+KNOWN_PLUGINS="\
+	org.eclipse.ptp.utils*\
+	org.eclipse.ptp.proxy*\
+	org.eclipse.ptp.debug.sdm*"
 		
-export PARENT=`dirname $PWD`
-export FRAGMENT=`basename $PWD`
-
-export PARENT=`dirname $PWD`
-export FRAGMENT=`basename $PWD`
-
-export PREFIX=$PARENT/$FRAGMENT
+PARENT=`dirname $PWD`
+PLUGIN=`basename $PWD`
+PREFIX=$PARENT/$PLUGIN
 
 if [ ! -d bin ]; then
 	mkdir bin
 fi
 
-for fragment in $KNOWN_FRAGMENTS
+for rms in $RMS
 do
-	path=$PARENT/$fragment
-	if [ -d $path ]; then
-		(cd $path; \
-		sh configure --prefix=$PREFIX; \
-		chmod +x install-sh; \
+	KNOWN_PLUGINS="$KNOWN_PLUGINS org.eclipse.ptp.$rms.proxy*"
+done
+
+cd $PARENT
+
+for plugin in `echo $KNOWN_PLUGINS`
+do
+	if [ -e $plugin/configure ]; then
+		echo "Building $plugin..."
+		(cd $plugin; \
+		sh configure --prefix=$PREFIX && \
+		chmod +x install-sh && \
 		make install)
+		echo; echo
 	fi
 done
 
