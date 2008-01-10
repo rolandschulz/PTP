@@ -72,7 +72,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	{
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && source == serverText) {
+			if(!loading && (source == serverText || source == serverArgs)) {
 				updatePage();
 			}
 		}
@@ -97,6 +97,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	public static final String EMPTY_STRING = "";
 	private AbstractRemoteResourceManagerConfiguration config;
 	private String proxyFile = EMPTY_STRING;
+	private String proxyArgs = EMPTY_STRING;
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnectionManager connectionManager = null;
@@ -108,13 +109,13 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private boolean manualLaunch = false;
 
 	private Text serverText = null;
+	private Text serverArgs = null;
 	private Button browseButton = null;
 	private Button noneButton = null;
 	private Button portForwardingButton = null;
 	private Button manualButton = null;
 	private WidgetListener listener = new WidgetListener();
 	private Button newConnectionButton;
-	private Label  connectionLabel;
 	private Combo  remoteCombo;
 	private Combo  connectionCombo;
 	private Combo  localAddrCombo;
@@ -211,6 +212,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		config.setLocalAddress(localAddr);
 		config.setProxyServerPath(proxyFile);
+		config.setInvocationOptions(proxyArgs);
 		config.setOptions(options);
 		return true;
 	}
@@ -262,11 +264,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		/*
 		 * Proxy location
 		 */
-		connectionLabel = new Label(remoteComp, SWT.NONE);
-		connectionLabel.setText(Messages.getString("RemoteConfigurationWizard.location"));
+		label = new Label(remoteComp, SWT.NONE);
+		label.setText(Messages.getString("RemoteConfigurationWizard.location"));
 		gd = new GridData();
 		gd.horizontalSpan = 1;
-		connectionLabel.setLayoutData(gd);
+		label.setLayoutData(gd);
 		
 		connectionCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -289,11 +291,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		/*
 		 * Proxy path
 		 */
-		Label proxyLabel = new Label(remoteComp, SWT.NONE);
-		proxyLabel.setText(Messages.getString("RemoteConfigurationWizard.path"));
+		label = new Label(remoteComp, SWT.NONE);
+		label.setText(Messages.getString("RemoteConfigurationWizard.path"));
 		gd = new GridData();
 		gd.horizontalSpan = 1;
-		proxyLabel.setLayoutData(gd);
+		label.setLayoutData(gd);
 
 		serverText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -304,6 +306,21 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		browseButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.browseButton"), null);
 		browseButton.addSelectionListener(listener);
 		
+		/*
+		 * Proxy arguments
+		 */
+		label = new Label(remoteComp, SWT.NONE);
+		label.setText(Messages.getString("RemoteConfigurationWizard.arguments"));
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+
+		serverArgs = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		serverArgs.setLayoutData(gd);
+		serverArgs.addModifyListener(listener);
+
 		/*
 		 * Multiplexing options
 		 */
@@ -389,6 +406,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private void loadSaved()
 	{
 		proxyFile = config.getProxyServerPath();
+		proxyArgs = config.getInvocationOptionsStr();
 		localAddr = config.getLocalAddress();
 		
 		String rmID = config.getRemoteServicesId();
@@ -448,6 +466,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	{
 		if (serverText != null) {
 			proxyFile = serverText.getText();
+		}
+		if (serverArgs != null) {
+			proxyArgs = serverArgs.getText();
 		}
 	}
 
@@ -578,6 +599,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	protected void defaultSetting() 
 	{
 		serverText.setText(proxyFile);
+		serverArgs.setText(proxyArgs);
 	}
 
 	/**

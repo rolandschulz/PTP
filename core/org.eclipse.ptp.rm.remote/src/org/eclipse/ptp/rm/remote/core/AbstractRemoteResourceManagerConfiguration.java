@@ -45,7 +45,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		private final int options;
 
 		public RemoteConfig() {
-			this(new CommonConfig(), null, null, "", "", "", IRemoteProxyOptions.NONE);
+			this(new CommonConfig(), null, null, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, IRemoteProxyOptions.NONE);
 		}
 		
 		public RemoteConfig(CommonConfig config, String remoteId, String conn, String path, 
@@ -88,6 +88,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		}
 	}
 	
+	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
@@ -147,10 +148,12 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 * @param optionString string containing the space separated invocation options
 	 */
 	public void addInvocationOptions(String optionString) {
-		String[] options = optionString.split(" ");
-		
-		for (String option : options) {
-			this.invocationOptions.add(option);
+		if (!optionString.equals(EMPTY_STRING)) {
+			String[] options = optionString.split(" ");
+			
+			for (String option : options) {
+				this.invocationOptions.add(option);
+			}
 		}
 	}
 	
@@ -181,7 +184,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 * @return invocation options separated by spaces
 	 */
 	public String getInvocationOptionsStr() {
-		String opts = "";
+		String opts = EMPTY_STRING;
 		for (int i = 0; i < invocationOptions.size(); i++) {
 			if (i > 0) {
 				opts += " ";
