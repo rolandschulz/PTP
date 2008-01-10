@@ -67,7 +67,7 @@ if test "$ac_cv_path_ORTED" != no; then
 	AC_DEFINE(OMPI,1,[Enable Open MPI support.])
 	AC_DEFINE_UNQUOTED(ORTED,"$ac_cv_path_ORTED",[Location of orted program])
 else
-	AC_MSG_ERROR([You must install Open MPI first.])
+	AC_MSG_ERROR([Open MPI not installed, skipping...])
 fi
 
 AC_CONFIG_FILES([Makefile])
