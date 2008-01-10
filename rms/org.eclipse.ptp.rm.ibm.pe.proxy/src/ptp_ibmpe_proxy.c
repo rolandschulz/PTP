@@ -73,7 +73,9 @@
 #define SKIPPING_CHARS			4
 #define READ_BUFFER_SIZE 1024
 #define STDIO_WRITE_BUFSIZE 1024
+#ifndef POE
 #define POE "/usr/bin/poe"
+#endif /* POE */
 #define INFO_MESSAGE 0
 #define TRACE_MESSAGE 1
 #define TRACE_DETAIL_MESSAGE 2
