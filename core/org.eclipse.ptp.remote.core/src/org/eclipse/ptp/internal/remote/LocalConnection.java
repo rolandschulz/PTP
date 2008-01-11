@@ -21,14 +21,13 @@ import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 
 public class LocalConnection implements IRemoteConnection {
 	private String name;
-
-	private String hostname;
-
+	private String address;
 	private String username;
 	private boolean connected;
+	
 	public LocalConnection() {
 		this.name = "Local";
-		this.hostname = "localhost";
+		this.address = "localhost";
 		this.username = System.getProperty("user.name");
 		this.connected = false;
 	}
@@ -72,10 +71,10 @@ public class LocalConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#getHostname()
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getAddress()
 	 */
-	public String getHostname() {
-		return hostname;
+	public String getAddress() {
+		return address;
 	}
 
 	/* (non-Javadoc)
@@ -107,10 +106,10 @@ public class LocalConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#setAddress(java.lang.String)
 	 */
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	/* (non-Javadoc)
