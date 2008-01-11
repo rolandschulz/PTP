@@ -146,7 +146,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 				IFileStore res = fileManager.getResource(new Path(config.getProxyServerPath()), monitor);
 				if (!res.fetchInfo().exists()){
-					throw new IOException("Could not find proxy executable \"" + config.getName() + "\""); //$NON-NLS-1$  //$NON-NLS-2$
+					throw new IOException("Could not find proxy executable \"" + config.getProxyServerPath() + "\""); //$NON-NLS-1$  //$NON-NLS-2$
 				}
 
 				sessionCreate();
