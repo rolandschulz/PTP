@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -42,15 +41,12 @@ public class RemoteToolsFileStore extends FileStore {
 	private RemoteToolsFileManager fileMgr;
 	private boolean isDirectory;
 
-	public RemoteToolsFileStore(RemoteToolsConnection conn, RemoteToolsFileManager mgr, IRemoteItem remoteItem, boolean isDirectory) {
+	public RemoteToolsFileStore(RemoteToolsConnection conn, RemoteToolsFileManager mgr, IRemoteItem remoteItem, 
+			boolean isDirectory) {
 		this.fileMgr = mgr;
 		this.remoteItem = remoteItem;
 		this.isDirectory = isDirectory;
-		try {
-			this.remoteURI = new URI("remotetools", conn.getHostname(), remoteItem.getPath(), null);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
+		this.remoteURI = conn.toURI(new Path(remoteItem.getPath()));
 	}
 
 	/* (non-Javadoc)

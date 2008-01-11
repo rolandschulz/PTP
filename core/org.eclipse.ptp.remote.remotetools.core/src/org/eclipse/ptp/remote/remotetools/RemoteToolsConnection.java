@@ -36,7 +36,7 @@ import org.eclipse.ptp.remotetools.exception.PortForwardingException;
 
 public class RemoteToolsConnection implements IRemoteConnection {
 	private String connName;
-	private String hostName;
+	private String address;
 	private String userName;
 	private IRemoteExecutionManager exeMgr = null;
 	private ITargetControl control;
@@ -44,10 +44,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private final ReentrantLock jobLock = new ReentrantLock();
 	private final Condition jobCondition = jobLock.newCondition();
 
-	public RemoteToolsConnection(String name, String hostName, String userName, ITargetControl control) {
+	public RemoteToolsConnection(String name, String address, String userName, ITargetControl control) {
 		this.control = control;
 		this.connName = name;
-		this.hostName = hostName;
+		this.address = address;
 		this.userName = userName;
 	}
 
@@ -166,8 +166,11 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		return exeMgr;
 	}
 	
-	public String getHostname() {
-		return hostName;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getAddress()
+	 */
+	public String getAddress() {
+		return address;
 	}
 
 	/* (non-Javadoc)
@@ -257,10 +260,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#setAddress(java.lang.String)
 	 */
-	public void setHostname(String hostName) {
-		this.hostName = hostName;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	/* (non-Javadoc)
@@ -289,7 +292,12 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public URI toURI(IPath path) {
 		try {
-			return new URI("remotetools", getHostname(), path.toPortableString(), null); //$NON-NLS-1$
+			String auth = getAddress();
+			String user = getUsername();
+			if (user != null && !user.equals("")) {
+				auth = user + "@" + auth;
+			}
+			return new URI("remotetools", auth, path.toPortableString(), null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}
