@@ -28,11 +28,10 @@ import org.eclipse.swt.widgets.Display;
 
 public class RSEConnection implements IRemoteConnection {
 	private IHost rseHost;
-
 	private IFileSystem fileSystem;
-
 	private IShellService shellService = null;
 	private ISubSystem subSystem = null;
+	
 	public RSEConnection(IHost host, IFileSystem fileSystem) {
 		this.rseHost = host;
 		this.fileSystem = fileSystem;
@@ -100,9 +99,9 @@ public class RSEConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#getHostname()
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getAddress()
 	 */
-	public String getHostname() {
+	public String getAddress() {
 		return rseHost.getHostName();
 	}
 	
@@ -172,10 +171,10 @@ public class RSEConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#setAddress(java.lang.String)
 	 */
-	public void setHostname(String hostname) {
-		rseHost.setHostName(hostname);
+	public void setAddress(String address) {
+		rseHost.setHostName(address);
 	}
 
 	/* (non-Javadoc)

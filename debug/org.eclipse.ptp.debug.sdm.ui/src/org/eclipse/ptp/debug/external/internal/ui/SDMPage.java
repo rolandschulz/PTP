@@ -171,7 +171,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 						if (conn != connection) {
 							connection = conn;
 							if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-								host = connection.getHostname();
+								host = connection.getAddress();
 							} else {
 								host = remConfig.getLocalAddress();
 							}

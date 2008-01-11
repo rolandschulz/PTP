@@ -72,11 +72,11 @@ public interface IRemoteConnection {
 	public int forwardRemotePort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
 
 	/**
-	 * Gets the implementation dependent hostname for this connection
+	 * Gets the implementation dependent address for this connection
 	 * 
-	 * return hostname
+	 * return address
 	 */
-	public String getHostname();
+	public String getAddress();
 	
 	/**
 	 * Get unique name for this connection.
@@ -107,11 +107,15 @@ public interface IRemoteConnection {
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException;
 	
 	/**
-	 * @param hostname
+	 * Set the address for this connection
+	 * 
+	 * @param address
 	 */
-	public void setHostname(String hostname);
+	public void setAddress(String address);
 	
 	/**
+	 * Set the username for this connection
+	 * 
 	 * @param username
 	 */
 	public void setUsername(String username);
