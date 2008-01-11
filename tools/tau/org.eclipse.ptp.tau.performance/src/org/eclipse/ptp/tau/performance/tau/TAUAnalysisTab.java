@@ -36,7 +36,6 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -44,8 +43,8 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.tau.papiselect.PapiListSelectionDialog;
+import org.eclipse.ptp.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.ptp.tau.performance.Activator;
-import org.eclipse.ptp.tau.performance.internal.BuildLaunchUtils;
 import org.eclipse.ptp.tau.performance.internal.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.tau.toolopts.ToolPane;
 import org.eclipse.ptp.tau.toolopts.ToolPaneListener;
@@ -64,11 +63,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Defines the tab of the performance-analysis launch configuration system where performance-analysis options are selected
@@ -202,9 +199,9 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 
 	protected Text compiler;
 
-	protected Button buildonlyCheck;
+	//protected Button buildonlyCheck;
 	
-	protected Button noParallelRun;
+	//protected Button noParallelRun;
 
 	protected Button nocleanCheck;
 
@@ -237,6 +234,8 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 	protected LinkedHashSet selopts = null;
 
 	protected Combo makecombo = null;
+	
+	protected Combo dbCombo=null;
 
 	/**
 	 * The name of the selected makefile
@@ -252,7 +251,7 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 
 	protected Map varmap = null;
 	
-	protected final ToolPane tauOpts = Activator.getTool(0).allCompilers.toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
+	protected final ToolPane tauOpts = Activator.getTool(0).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
 	
 //	protected ToolPane custOpts=null;
 //	
@@ -293,21 +292,22 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 					papiSelect.setEnabled(false);
 				}
 				
-				if(noParallelRun.getSelection())
-				{
-					buildonlyCheck.setSelection(selmakefile.indexOf("-mpi")>0);
-				}
-			}
-			else
-			if(source==buildonlyCheck){
+//				if(noParallelRun.getSelection())
+//				{
+//					buildonlyCheck.setSelection(selmakefile.indexOf("-mpi")>0);
+//				}
 				updateLaunchConfigurationDialog();
 			}
-			else
-			if(source==noParallelRun){
-				if(noParallelRun.getSelection()&&selmakefile.indexOf("-mpi")>0){
-					buildonlyCheck.setSelection(true);
-				}
-			}
+//			else
+//			if(source==buildonlyCheck){
+//				updateLaunchConfigurationDialog();
+//			}
+//			else
+//			if(source==noParallelRun){
+//				if(noParallelRun.getSelection()&&selmakefile.indexOf("-mpi")>0){
+//					buildonlyCheck.setSelection(true);
+//				}
+//			}
 			else
 			if (source == browseSelfileButton) {
 				handleSelfileBrowseButtonSelected();
@@ -434,12 +434,12 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 	 *
 	 */
 	private void initMakefiles() {
-		IPreferenceStore pstore = Activator.getDefault()
-				.getPreferenceStore();
-		String archpath = pstore.getString("TAUCDTArchPath");
+		//IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+		String archpath = TAULaunch.getTauArchPath();//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH);
 
 		File[] mfiles = testTAUEnv(archpath);
 
+		/*
 		if ((mfiles == null) || (mfiles.length == 0)) {
 			String checkArch = BuildLaunchUtils.checkToolEnvPath("tau_merge");
 			if (checkArch != null) {
@@ -462,8 +462,8 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 				mfiles = testTAUEnv(checkArch);
 			}
 
-			pstore.setValue("TAUCDTArchPath", checkArch);
-		}
+			pstore.setValue(ITAULaunchConfigurationConstants.TAU_ARCH_PATH, checkArch);
+		}*/
 
 		allmakefiles = new LinkedHashSet();
 		allopts = new LinkedHashSet();
@@ -801,6 +801,17 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 //		nocleanCheck = createCheckButton(dataComp,
 //				"Keep instrumented executable");
 //		nocleanCheck.addSelectionListener(listener);
+		
+		Composite dbComp = new Composite(dataComp, SWT.NONE);
+		dbComp.setLayout(createGridLayout(2, false, 0, 0));
+		dbComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label dbLab = new Label(dbComp, 0);
+		dbLab.setText("Select Database:");
+		
+		dbCombo = new Combo(dbComp, SWT.DROP_DOWN | SWT.READ_ONLY| SWT.BORDER);
+		dbCombo.addSelectionListener(listener);
+		
 		keepprofsCheck = createCheckButton(dataComp, "Keep profiles");
 		keepprofsCheck.addSelectionListener(listener);
 
@@ -889,7 +900,7 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 					.setSelection(true);
 
 			selmakefile = configuration.getAttribute(
-					ITAULaunchConfigurationConstants.TAU_MAKEFILE, (String) null);
+					ITAULaunchConfigurationConstants.TAU_MAKENAME, (String) null);
 
 			initMakeCombo();
 			reinitMakeChecks();
@@ -919,6 +930,9 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 //			
 //			nocleanCheck.setSelection(configuration.getAttribute(
 //					IPerformanceLaunchConfigurationConstants.NOCLEAN, false));
+			
+			initDBCombo(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, (String)null));
+			
 			keepprofsCheck.setSelection(configuration.getAttribute(
 					ITAULaunchConfigurationConstants.KEEPPROFS, false));
 
@@ -936,6 +950,30 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 		}
 	}
 
+	private void initDBCombo(String selected)
+	{
+		String[] dbs = PerfDMFView.getDatabaseNames();
+	
+		dbCombo.clearSelection();
+		dbCombo.removeAll();
+		if(dbs==null||dbs.length<1)
+		{
+			dbCombo.add(ITAULaunchConfigurationConstants.NODB);
+			dbCombo.select(0);
+			return;
+		}
+		
+		for(int i=0;i<dbs.length;i++)
+		{
+			dbCombo.add(dbs[i]);
+		}
+		
+		if(selected==null||dbCombo.indexOf(selected)<0)
+			dbCombo.select(0);
+		else
+			dbCombo.select(dbCombo.indexOf(selected));
+	}
+	
 	/**
 	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
 	 */
@@ -1032,8 +1070,11 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_COMMAND,selcommand);
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT,selected);
 		}
-
+		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKENAME, makecombo.getItem(makecombo.getSelectionIndex()));
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex()));
+		
+		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, PerfDMFView.extractDatabaseName(dbCombo.getItem(dbCombo.getSelectionIndex())));
+		
 //		if(noParallelRun.getSelection()&&makecombo.getItem(makecombo.getSelectionIndex()).indexOf("-mpi")>0)
 //		{
 //			configuration.setAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY,
@@ -1149,9 +1190,9 @@ public class TAUAnalysisTab extends AbstractLaunchConfigurationTab {
 			LabelProvider papilab = new LabelProvider();
 			ArrayContentProvider paprov = new ArrayContentProvider();
 
-			int papiCountType = 0;
+			int papiCountType = PapiListSelectionDialog.PRESET;
 			if (papiCountRadios[1].getSelection()) {
-				papiCountType = 1;
+				papiCountType = PapiListSelectionDialog.NATIVE;
 			}
 			PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
 					getShell(), getPapiLoc(), paprov, papilab,

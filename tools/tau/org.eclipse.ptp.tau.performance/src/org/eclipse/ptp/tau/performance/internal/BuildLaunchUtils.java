@@ -22,13 +22,85 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.TimeZone;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.tau.performance.Activator;
+import org.eclipse.ptp.tau.toolopts.PerformanceTool;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 public class BuildLaunchUtils {
 
+	public static String findToolBinPath(String toolfind, String suggPath, String queryText, String queryMessage, Shell selshell)
+	{
+			String vtbinpath=BuildLaunchUtils.checkToolEnvPath(toolfind);
+			if(vtbinpath==null||vtbinpath.equals(""))
+			{
+				vtbinpath=BuildLaunchUtils.askToolPath(suggPath, queryText, queryMessage, selshell);
+				if(vtbinpath==null)
+					vtbinpath="";
+			}
+
+		return vtbinpath;
+	}
+	
+	public static String findToolBinPath(String toolfind, String suggPath, String toolName, Shell selshell)
+	{
+			String vtbinpath=BuildLaunchUtils.checkToolEnvPath(toolfind);
+			if(vtbinpath==null||vtbinpath.equals(""))
+			{
+				vtbinpath=BuildLaunchUtils.askToolPath(suggPath, toolName, selshell);
+				if(vtbinpath==null)
+					vtbinpath="";
+			}
+
+		return vtbinpath;
+	}
+	
+	public static String getToolPath(String toolID)
+	{
+		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+		String toolBinID=IPerformanceLaunchConfigurationConstants.TOOL_BIN_ID+ "."+toolID;
+		String path=pstore.getString(toolBinID);
+		if(path!=null)
+			return path;
+		return "";
+	}
+	
+	/**
+	 * Iterates through an array of tools, populating the preference store with their binary directory locations
+	 * @param tools The array of tools to be checked
+	 * @param force If true existing values will be overridden.
+	 */
+	public static void getAllToolPaths(PerformanceTool[] tools,boolean force)
+	{
+		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+
+		Shell ourshell = PlatformUI.getWorkbench().getDisplay()
+				.getActiveShell();
+		Iterator eIt = null;
+		Map.Entry me = null;
+
+		for (int i = 0; i < tools.length; i++) 
+		{
+			eIt = tools[i].groupApp.entrySet().iterator();
+			while (eIt.hasNext()) 
+			{
+				me = (Map.Entry) eIt.next();
+				String toolBinID=IPerformanceLaunchConfigurationConstants.TOOL_BIN_ID+ "." + (String) me.getKey();
+				if (force||pstore.getString(toolBinID).equals("")) 
+				{
+					pstore.setValue(toolBinID,
+									BuildLaunchUtils.findToolBinPath((String) me.getValue(), null,(String) me.getKey(), ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+				}
+			}
+		}
+	}
+	
 	/**
 	 * This locates name of the parent of the directory containing the given tool.
 	 * @param The name of the tool whose directory is being located
@@ -58,6 +130,10 @@ public class BuildLaunchUtils {
 		if (pPath == null)
 			return null;
 		File test = new File(pPath);
+		File toolin=new File(toolname);
+		
+		if(test.getPath().equals(toolin.getPath()))
+			return null;//TODO:  Make sure this is the right behavior when the full path is provided
 		if (test.exists()) {
 			return test.getParentFile().getPath();
 		} else
@@ -90,7 +166,7 @@ public class BuildLaunchUtils {
 	 * */
 	public static String askToolPath(String archpath, String toolName, Shell selshell) {
 
-		return askToolPath(archpath,"Select "+toolName+" Bin Directory","Please select the directory containing "+toolName+"'s executable files.",selshell);
+		return askToolPath(archpath,"Select "+toolName+" Bin Directory","Please select the directory containing "+toolName+"",selshell);
 	}
 	
 	/**

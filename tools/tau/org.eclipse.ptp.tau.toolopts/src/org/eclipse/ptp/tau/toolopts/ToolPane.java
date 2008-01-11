@@ -127,10 +127,15 @@ public class ToolPane {
 	 */
 	public void initializePane(ILaunchConfiguration configuration) throws CoreException
 	{
+		String arg="";
 		for(int i=0;i<options.length;i++){
 			options[i].unitCheck.setSelection(configuration.getAttribute(options[i].confDefString,options[i].defState));
 			if(options[i].usesTextBox())
-				options[i].argbox.setText(configuration.getAttribute(options[i].confArgString, options[i].defText));
+			{
+				arg = configuration.getAttribute(options[i].confArgString, options[i].defText);
+				if(arg!=null)
+					options[i].argbox.setText(arg);
+			}
 		}
 		updateOptDisplay();
 	}

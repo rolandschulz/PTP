@@ -17,8 +17,8 @@
  ****************************************************************************/
 package org.eclipse.ptp.tau.toolopts;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -43,12 +43,13 @@ public class PerformanceTool {
 	public boolean replaceCompiler=false;
 
 	
-	public ToolApp ccCompiler=null;
-	public ToolApp cxxCompiler=null;
-	public ToolApp f90Compiler=null;
-	public ToolApp allCompilers=null;
+	protected ToolApp ccCompiler=null;
+	protected ToolApp cxxCompiler=null;
+	protected ToolApp f90Compiler=null;
+	protected ToolApp allCompilers=null;
 	
-	public String compilerPathFinder=null;
+	//public String compilerPathFinder=null;
+	public Map groupApp=null;
 	
 	/**
 	 * If true the actual executable is an argument passed to one or more additional utilities
@@ -65,65 +66,90 @@ public class PerformanceTool {
 	 */
 	public ToolApp[] analysisCommands=null;
 	
-	/**
-	 * Returns the list of arguments associated with all compilers
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	private String getAllCompArgs(ILaunchConfiguration configuration) throws CoreException
+	public PerformanceTool()
 	{
-		String args="";
-		if(allCompilers!=null)
-		{
-			args+=allCompilers.getArgs()+allCompilers.getEnvArgs(configuration);
-		}
-		return args;
+		groupApp=new HashMap();
 	}
 	
-	/**
-	 * Returns the full command for this tool's cc compiler, including arguments
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	public String getCcCommand(ILaunchConfiguration configuration) throws CoreException
-	{
-		return ccCompiler.getCommand(configuration)+" "+getAllCompArgs(configuration);
+	
+	public ToolApp getCcCompiler(){
+		if(ccCompiler!=null)
+			return ccCompiler;
+		return allCompilers;
+	}
+	public ToolApp getCxxCompiler(){
+		if(cxxCompiler!=null)
+			return cxxCompiler;
+		return allCompilers;
+	}
+	public ToolApp getF90Compiler(){
+		if(ccCompiler!=null)
+			return f90Compiler;
+		return allCompilers;
+	}
+	public ToolApp getGlobalCompiler(){
+		return allCompilers;
 	}
 	
-	/**
-	 * Returns the full command for this tool's cxx compiler, including arguments
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	public String getCxxCommand(ILaunchConfiguration configuration) throws CoreException
-	{
-		return cxxCompiler.getCommand(configuration)+" "+getAllCompArgs(configuration);
-	}
-	
-	/**
-	 * Returns the full command for this tool's f90 compiler, including arguments
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	public String getF90Command(ILaunchConfiguration configuration) throws CoreException
-	{
-		return f90Compiler.getCommand(configuration)+" "+getAllCompArgs(configuration);
-	}
-	
-	/**
-	 * Returns the full command for all of this tool's compilers.  If compiler names are
-	 * different for the various types it may contain only arguments that apply to each
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	public String getAllCompCommand(ILaunchConfiguration configuration) throws CoreException
-	{
-		return allCompilers.getCommand(configuration);
-	}
+//	/**
+//	 * Returns the list of arguments associated with all compilers
+//	 * @param configuration
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	private String getAllCompArgs(ILaunchConfiguration configuration) throws CoreException
+//	{
+//		String args="";
+//		if(allCompilers!=null)
+//		{
+//			args+=allCompilers.getArguments(configuration);//  allCompilers.getArgs()+allCompilers.getPaneArgs(configuration);
+//		}
+//		return args;
+//	}
+//	
+//	/**
+//	 * Returns the full command for this tool's cc compiler, including arguments
+//	 * @param configuration
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	public String getCcCommand(ILaunchConfiguration configuration) throws CoreException
+//	{
+//		return ccCompiler.getCommand(configuration)+" "+getAllCompArgs(configuration);
+//	}
+//	
+//	/**
+//	 * Returns the full command for this tool's cxx compiler, including arguments
+//	 * @param configuration
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	public String getCxxCommand(ILaunchConfiguration configuration) throws CoreException
+//	{
+//		return cxxCompiler.getCommand(configuration)+" "+getAllCompArgs(configuration);
+//	}
+//	
+//	/**
+//	 * Returns the full command for this tool's f90 compiler, including arguments
+//	 * @param configuration
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	public String getF90Command(ILaunchConfiguration configuration) throws CoreException
+//	{
+//		return f90Compiler.getCommand(configuration)+" "+getAllCompArgs(configuration);
+//	}
+//	
+//	/**
+//	 * Returns the full command for all of this tool's compilers.  If compiler names are
+//	 * different for the various types it may contain only arguments that apply to each
+//	 * @param configuration
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	public String getAllCompCommand(ILaunchConfiguration configuration) throws CoreException
+//	{
+//		return allCompilers.getCommand(configuration);
+//	}
 	
 }

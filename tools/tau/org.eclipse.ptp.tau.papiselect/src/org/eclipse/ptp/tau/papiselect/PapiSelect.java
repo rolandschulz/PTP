@@ -32,8 +32,8 @@ import java.util.Vector;
  */
 public class PapiSelect {
 
-	private static final int PRESET=0;
-	private static final int NATIVE=1;
+	public static final int PRESET=0;
+	public static final int NATIVE=1;
 	
 	private LinkedHashSet avCounters=null;
 	private Vector counterNames=new Vector(256);

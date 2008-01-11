@@ -23,7 +23,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -43,10 +42,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Defines the tab of the performance-analysis launch configuration system where performance-analysis options are selected
@@ -54,7 +51,7 @@ import org.eclipse.ui.PlatformUI;
  *
  */
 public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab implements IPerformanceLaunchConfigurationConstants {
-	private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+	//private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 	/**
 	 * Determines if the launch configuration associated with this tab has access to the PTP
 	 */
@@ -72,7 +69,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 	protected Button keepprofsCheck;
 	
-	protected Button relocateTools;
+	//protected Button relocateTools;
 	
 	/**
 	 * Sets weather or not it is possible to initiate a parallel launch from this tab
@@ -136,16 +133,12 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			ModifyListener, IPropertyChangeListener {
 		public void widgetSelected(SelectionEvent e) {
 
-			Object source = e.getSource();
-			//TODO: Give the user more control over tool locations
-			if(source.equals(relocateTools))
-			{
-				Shell ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-				for(int i=0;i<tools.length;i++)
-				{
-						pstore.setValue(TOOL_BIN_ID+"."+tools[i].toolID, findToolBinPath(tools[i].compilerPathFinder,null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
-				}
-			}
+//			Object source = e.getSource();
+
+//			if(source.equals(relocateTools))
+//			{
+//				BuildLaunchUtils.getAllToolPaths(tools, true);
+//			}
 			
 			updateLaunchConfigurationDialog();
 		}
@@ -171,9 +164,9 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
-		FillLayout topLayout = new FillLayout();
-		comp.setLayout(topLayout);
-		TabFolder tabParent = new TabFolder(comp, SWT.BORDER);
+		//FillLayout topLayout = new FillLayout();
+		//comp.setLayout(topLayout);
+		//TabFolder tabParent = new TabFolder(comp, SWT.BORDER);
 
 
 		/*
@@ -181,21 +174,21 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		 * Tool Selection: Choose from the available performance tools
 		 * 
 		 * */
-		TabItem toolTab = new TabItem(tabParent, SWT.NULL);
-		toolTab.setText("Tool Selection");
+		//TabItem toolTab = new TabItem(tabParent, SWT.NULL);
+		//toolTab.setText("Tool Selection");
 
-		Composite toolComp = new Composite(tabParent, SWT.NONE);
-		toolTab.setControl(toolComp);
+		//Composite toolComp = new Composite(parent, SWT.NONE);
+		//toolTab.setControl(toolComp);
 
-		toolComp.setLayout(createGridLayout(1, false, 0, 0));
-		toolComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		comp.setLayout(createGridLayout(1, false, 0, 0));
+		comp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
 		/*
 		 * The actual controls of toolTab
 		 * */
-		createVerticalSpacer(toolComp, 1);
+		createVerticalSpacer(comp, 1);
 
-		Composite toolComboComp = new Composite(toolComp, SWT.NONE);
+		Composite toolComboComp = new Composite(comp, SWT.NONE);
 		toolComboComp.setLayout(createGridLayout(2, false, 0, 0));
 		toolComboComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
@@ -205,9 +198,9 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		toolTypes=new Combo(toolComboComp, SWT.DROP_DOWN|SWT.READ_ONLY|SWT.BORDER);
 		toolTypes.addSelectionListener(listener);
 		
-		relocateTools=new Button(toolComboComp, SWT.NONE);
-		relocateTools.setText("Relocate Tools");
-		relocateTools.addSelectionListener(listener);
+//		relocateTools=new Button(toolComboComp, SWT.NONE);
+//		relocateTools.setText("Relocate Tools");
+//		relocateTools.addSelectionListener(listener);
 		
 		
 		/*
@@ -215,24 +208,24 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		 * Data Collection: Storage and management of output data
 		 * 
 		 * */
-		TabItem dataTab = new TabItem(tabParent, SWT.NULL);
-		dataTab.setText("Data Collection");
+		//TabItem dataTab = new TabItem(tabParent, SWT.NULL);
+		//dataTab.setText("Data Collection");
 
-		Composite dataComp = new Composite(tabParent, SWT.NONE);
-		dataTab.setControl(dataComp);
+		//Composite dataComp = new Composite(parent, SWT.NONE);
+		//dataTab.setControl(dataComp);
 
-		dataComp.setLayout(createGridLayout(1, false, 0, 0));
-		dataComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		//dataComp.setLayout(createGridLayout(1, false, 0, 0));
+		//dataComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
 		/*
 		 * The actual controls of dataTab
 		 * */
-		createVerticalSpacer(dataComp, 1);
+		createVerticalSpacer(comp, 1);
 
-		buildonlyCheck = createCheckButton(dataComp,
+		buildonlyCheck = createCheckButton(comp,
 				"Build the instrumented executable but do not launch it");
 		buildonlyCheck.addSelectionListener(listener);
-		nocleanCheck = createCheckButton(dataComp,
+		nocleanCheck = createCheckButton(comp,
 				"Keep instrumented executable");
 		nocleanCheck.addSelectionListener(listener);
 	}
@@ -250,31 +243,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		
 	}
 	
-	public static String findToolBinPath(String toolfind, String suggPath, String queryText, String queryMessage, Shell selshell)
-	{
-			String vtbinpath=BuildLaunchUtils.checkToolEnvPath(toolfind);
-			if(vtbinpath==null||vtbinpath.equals(""))
-			{
-				vtbinpath=BuildLaunchUtils.askToolPath(suggPath, queryText, queryMessage, selshell);
-				if(vtbinpath==null)
-					vtbinpath="";
-			}
 
-		return vtbinpath;
-	}
-	
-	public static String findToolBinPath(String toolfind, String suggPath, String toolName, Shell selshell)
-	{
-			String vtbinpath=BuildLaunchUtils.checkToolEnvPath(toolfind);
-			if(vtbinpath==null||vtbinpath.equals(""))
-			{
-				vtbinpath=BuildLaunchUtils.askToolPath(suggPath, toolName, selshell);
-				if(vtbinpath==null)
-					vtbinpath="";
-			}
-
-		return vtbinpath;
-	}
 	
 	/**
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
@@ -283,7 +252,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		toolTypes.removeAll();
 		//toolTypes.add("TAU");
 		
-		if(tools==null||tools.length==1)
+		if(tools==null||tools.length==0)
 		{
 			toolTypes.add("Specify a valid tool configuration file in Performance Tool preferences");
 			if(tools==null)
@@ -293,13 +262,36 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			}
 		}
 		
-		Shell ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		BuildLaunchUtils.getAllToolPaths(tools, false);
+		
+//		Shell ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+//		Iterator eIt=null;
+//		Map.Entry me = null;
 		for(int i=0;i<tools.length;i++)
 		{
-			if(pstore.getString(TOOL_BIN_ID+"."+tools[i].toolID).equals(""))
-			{
-				pstore.setValue(TOOL_BIN_ID+"."+tools[i].toolID, findToolBinPath(tools[i].compilerPathFinder,null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
-			}
+//			eIt=tools[i].groupApp.entrySet().iterator();
+//			while(eIt.hasNext())
+//			{
+//				me=(Map.Entry)eIt.next();
+//				if(pstore.getString(TOOL_BIN_ID+"."+(String)me.getKey()).equals(""))
+//				{
+//					pstore.setValue(TOOL_BIN_ID+"."+(String)me.getKey(), BuildLaunchUtils.findToolBinPath((String)me.getValue(),null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+//				}
+//			}
+//			
+//			for(int j=0;j<tools[i].groupApp.size();j++)
+//			{
+//				
+//				if(tools[i].groupApp.)
+//				{
+//					
+//				}
+//			}
+//				
+//			if(pstore.getString(TOOL_BIN_ID+"."+tools[i].toolID).equals(""))
+//			{
+//				pstore.setValue(TOOL_BIN_ID+"."+tools[i].toolID, BuildLaunchUtils.findToolBinPath(tools[i].compilerPathFinder,null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+//			}
 			
 			toolTypes.add(tools[i].toolName);
 		}

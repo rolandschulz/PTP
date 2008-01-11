@@ -32,7 +32,7 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 	
 	/**
 	 * The primary launch command of this launch configuration delegate.  The operations in this function are divided into
-	 * three jobs:  Buildig, Running and Data collection
+	 * three jobs:  Building, Running and Data collection
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{

@@ -35,7 +35,7 @@
             category="org.eclipse.ptp.tau.performance.performanceToolsMainpage"
             class="org.eclipse.ptp.tau.performance.preferences.TAUPreferencePage"
             id="org.eclipse.ptp.tau.performance.preferences.TAUPreferencePage"
-            name="TAU"/> 
+            name="Tool Configuration"/> 
    </extension>
  <extension
        point="org.eclipse.ui.perspectiveExtensions">

@@ -77,7 +77,14 @@ public class IncrementInstrument implements IEditorActionDelegate {
 
 		LinkedHashSet instlines = new LinkedHashSet();
 		Selector selectinst = new Selector(cele.getCProject().getResource().getLocation().toOSString());
-		instlines.add(getPhaseTimeLine(cele.getElementName(),insertregs,insertstops));
+		String mainLine=getPhaseTimeLine(cele.getElementName(),insertregs,insertstops);
+		
+		if(mainLine==null)
+		{
+			return;
+		}
+		
+		instlines.add(mainLine);
 		selectinst.addInst(instlines);
 	}
 

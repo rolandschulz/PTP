@@ -54,8 +54,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
-import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
-import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
  * A heavily specialized implementation of SelectionDialog for displaying a list of 
@@ -93,6 +91,9 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 * Horizontal sizing constant
 	 */ 
 	private final static int SIZING_SELECTION_WIDGET_WIDTH = 300;
+	
+	public static final int PRESET=0;
+	public static final int NATIVE=1;
 
 	/**
 	 * Creates a PAPI list selection dialog.
@@ -113,7 +114,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			IStructuredContentProvider contentProvider,
 			ILabelProvider labelProvider, String message, int papiCountType) {
 		super(parentShell);
-		setTitle(WorkbenchMessages.ListSelection_title);
+		setTitle("PAPI Counters");//WorkbenchMessages.ListSelection_title);
 		papiCon = new PapiSelect(papiloc, papiCountType);
 		inputElement = papiCon.getAvail().toArray();
 		this.contentProvider = contentProvider;
@@ -122,7 +123,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		if (message != null) {
 			setMessage(message);
 		} else {
-			setMessage(WorkbenchMessages.ListSelection_message);
+			setMessage("Select PAPI counters");//WorkbenchMessages.ListSelection_message);
 		}
 	}
 
@@ -233,7 +234,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
-				IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
+				PlatformUI.PLUGIN_ID + "."+"list_selection_dialog_context");//IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
 	}
 
 	/**

@@ -26,6 +26,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
@@ -53,6 +55,8 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.tau.performance.Activator;
 import org.eclipse.ptp.tau.performance.tau.TAULaunch;
 import org.eclipse.ptp.tau.toolopts.PerformanceTool;
+import org.eclipse.ptp.tau.toolopts.ToolApp;
+import org.eclipse.ptp.tau.toolopts.ToolIO;
 
 
 /**
@@ -75,7 +79,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 	private String progPath=null;
 	
 	/**
-	 * The name of the origional application in the launch configuration
+	 * The name of the original application in the launch configuration
 	 */
 	private String application = null;
 	private String buildConf = null;
@@ -96,6 +100,8 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 	private String appnameattrib=null;
 	private ILaunchConfiguration configuration=null;
 	
+	private Map IOMap=null;
+	
 	
 	/**
 	 * Creates a new LaunchManage object with the information necessary to instrument a program for performance analysis
@@ -112,7 +118,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
 		projectLocation=thisCProject.getResource().getLocation().toOSString();
 		this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL, (String)null));
-		
+		IOMap=new HashMap();
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
 	}
 
@@ -183,11 +189,12 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 				in.close();
 				out.close();
 			}
-//TODO:  Make this work again
+//TODO:  Make this work again (e.g. distinguish between all-compiler and discrete compiler systems)
 			BufferedWriter makeOut = new BufferedWriter(new FileWriter(compilerInclude));
-			makeOut.write(replaceLocalPath(tool.getCcCommand(configuration))+"\n");
-			makeOut.write(replaceLocalPath(tool.getCxxCommand(configuration))+"\n");
-			makeOut.write(replaceLocalPath(tool.getF90Command(configuration))+"\n");
+			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
+			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+"\n");
 			makeOut.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -248,16 +255,16 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 		return;
 	}
 	
-	/**
-	 * Replaces the PROJECT_LOCATION string constant with the location of the project being analyzed
-	 * @param input
-	 * @return
-	 * @throws CoreException
-	 */
-	private String replaceLocalPath(String input) throws CoreException
-	{
-		return input.replaceAll(IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION, projectLocation);
-	}
+//	/**
+//	 * Replaces the PROJECT_LOCATION string constant with the location of the project being analyzed
+//	 * @param input
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	private String replaceLocalPath(String input) throws CoreException
+//	{
+//		return input.replaceAll(IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION, projectLocation);
+//	}
 	
 	/**
 	 * Runs the managed make build system using the performance tool's compilers and compiler options.
@@ -344,7 +351,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 		IToolChain chain = newBuildConfig.getToolChain();
 		ITool[] tools = chain.getTools();
 		
-		
+		String allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
 		for(int i =0;i<tools.length;i++){
 			String toolid=tools[i].getId();
 			if(toolid.indexOf(".c.")>=0)
@@ -352,11 +359,11 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 				{
 					if(tool.replaceCompiler)
 					{
-						tools[i].setToolCommand(replaceLocalPath(tool.getCcCommand(configuration)));
+						tools[i].setToolCommand(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs);
 					}
 					else
 					{
-						tools[i].setToolCommand(replaceLocalPath(tool.getCcCommand(configuration))+" "+tools[i].getToolCommand());
+						tools[i].setToolCommand(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+" "+tools[i].getToolCommand());
 					}
 				}
 			}
@@ -365,11 +372,11 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 				{
 					if(tool.replaceCompiler)
 					{
-						tools[i].setToolCommand(replaceLocalPath(tool.getCxxCommand(configuration)));
+						tools[i].setToolCommand(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs);
 					}
 					else
 					{
-						tools[i].setToolCommand(replaceLocalPath(tool.getCxxCommand(configuration))+" "+tools[i].getToolCommand());
+						tools[i].setToolCommand(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+" "+tools[i].getToolCommand());
 					}
 				}
 			}
@@ -378,11 +385,11 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 				{
 					if(tool.replaceCompiler)
 					{
-						tools[i].setToolCommand(replaceLocalPath(tool.getF90Command(configuration)));
+						tools[i].setToolCommand(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs);
 					}
 					else
 					{
-						tools[i].setToolCommand(replaceLocalPath(tool.getF90Command(configuration))+" "+tools[i].getToolCommand());
+						tools[i].setToolCommand(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+" "+tools[i].getToolCommand());
 					}
 				}
 			}
@@ -465,24 +472,20 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 			{
 				//Iterator utilIt=utilList.iterator();
 				
-				String firstExecUtil= tool.execUtils[0].toolCommand;// (String)utilIt.next();//confWC.getAttribute(EXEC_UTIL_LIST, (String)null);
+				String firstExecUtil= getToolExecutable(tool.execUtils[0]);// tool.execUtils[0].toolCommand;// (String)utilIt.next();//confWC.getAttribute(EXEC_UTIL_LIST, (String)null);
 				
-				String util1Path=BuildLaunchUtils.checkToolEnvPath(firstExecUtil);
+				//String util1Path=BuildLaunchUtils.checkToolEnvPath(firstExecUtil);
 				
-				if(util1Path!=null)
-				{
-					firstExecUtil=util1Path+File.separator+firstExecUtil;
-				}
-				else
+				if(firstExecUtil==null)
 					throw new Exception("Tool "+firstExecUtil+" not found");
 			
 				confWC.setAttribute(appnameattrib, firstExecUtil);
 				
-				String otherUtils=tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getEnvArgs(configuration);
+				String otherUtils=getToolArguments(tool.execUtils[0],configuration);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
 				
 				for(int i=1;i<tool.execUtils.length;i++)
 				{
-					otherUtils+=" "+tool.execUtils[i].getCommand(configuration);//TODO: Check paths of other tools
+					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration);//tool.execUtils[i].getCommand(configuration);//TODO: Check paths of other tools
 				}
 				swappedArgs=true;
 				//System.out.println(firstExecUtil+otherUtils+" "+prog+" "+arg);
@@ -497,7 +500,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 		{
 			if(!launch.canTerminate())
 			{
-				System.out.println("Launch can not terminate!  Possible infinate loop!");
+				System.out.println("Launch can not terminate!  Possible infinite loop!");
 				cleanup();
 				throw new OperationCanceledException();
 			}
@@ -562,22 +565,130 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 			{
 				File projectLoc=new File(projectLocation);
 				String runTool;
-				String toolPath;
+				//String toolPath;
 				for(int i=0;i<tool.analysisCommands.length;i++)
 				{
-					runTool=tool.analysisCommands[i].toolCommand;
-					toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
-					if(toolPath!=null)
+					runTool=getToolCommand(tool.analysisCommands[i],configuration);//tool.analysisCommands[i].toolCommand;
+					//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
+					if(runTool!=null)
 					{
-						BuildLaunchUtils.runTool(toolPath+File.separator+runTool, null, projectLoc);
+						BuildLaunchUtils.runTool(runTool, null, projectLoc);
 					}
 					else
 					{
-						System.out.println("The command "+runTool+" could not be run because the application is not in your path.");
+						System.out.println("The command "+tool.analysisCommands[i].toolCommand+" could not be run because the application is not in your path.");
 					}
 				}
 			}
 		}
 		cleanup();
 	}	
+	
+	
+	private String getToolArguments(ToolApp app, ILaunchConfiguration configuration) throws CoreException
+	{
+		if(app==null)
+			return("");
+		String allargs=app.getArguments(configuration).replaceAll(IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION, projectLocation)+parseInput(app)+" "+parseOutput(app);
+		return allargs;
+	}
+	
+	private String parseInput(ToolApp app)
+	{
+		String input="";
+		String oneIn="";
+		if(app.inputArgs!=null)
+		for(int i=0;i<app.inputArgs.length;i++)
+		{
+			oneIn="";
+			if(app.inputArgs[i].pathFlag!=null)
+				oneIn+=app.inputArgs[i].pathFlag+" ";
+			if(IOMap.containsKey(app.inputArgs[i].ID))
+			{
+				input+=IOMap.get(app.inputArgs[i].ID);
+				/*
+				 * If input type is not directory, get a file list from the specified directory
+				 */
+			}
+			else
+			{
+				return "";
+			}
+			/*
+			 * 
+			 */
+			//if(app.inputArgs[i].)
+			
+		}
+		return input;
+	}
+	
+	private String parseOutput(ToolApp app)
+	{
+		String output="";
+		
+		/*
+		 * Make and the new directory, associate it with the ID and stick -that- in the iomap!
+		 */
+		if(app.outputArgs!=null)
+			for(int i=0;i<app.outputArgs.length;i++)
+			{
+				if(app.outputArgs[i].pathFlag!=null)
+					output+=app.outputArgs[i].pathFlag+" ";
+				if(IOMap.containsKey(app.outputArgs[i].ID))
+				{
+					output+=IOMap.get(app.outputArgs[i].ID);
+					/*
+					 * If input type is not directory, get a file list from the specified directory
+					 */
+				}
+				else
+				{
+					output+=createOutputPath(app.outputArgs[i]);
+				}
+				/*
+				 * 
+				 */
+				//if(app.inputArgs[i].)
+				
+			}
+		
+		return output;
+	}
+	
+	private String createOutputPath(ToolIO IO)
+	{
+		//String ostring="";
+		String opath=projectLocation+File.separator+IO.ID+File.separator+BuildLaunchUtils.getNow();
+		File ofile=new File(opath);
+		ofile.mkdirs();
+		/*
+		 * Create the opath.  Do something smart if it is impossible.
+		 */
+		IOMap.put(IO.ID, opath);
+		
+		return opath;
+	}
+	
+	private static String getToolExecutable(ToolApp app)
+	{
+		String command=app.toolCommand;
+		
+		String toolPath=BuildLaunchUtils.getToolPath(app.toolGroup);  //checkToolEnvPath(app.toolCommand);
+		if(toolPath!=null)
+		{
+			command=toolPath+File.separator+command;
+		}
+		
+		return command;
+	}
+	
+	private String getToolCommand(ToolApp app, ILaunchConfiguration configuration) throws CoreException
+	{
+		String command=getToolExecutable(app);
+		if (command==null)
+			return null;
+		
+		return command+" "+getToolArguments(app,configuration);
+	}
 }

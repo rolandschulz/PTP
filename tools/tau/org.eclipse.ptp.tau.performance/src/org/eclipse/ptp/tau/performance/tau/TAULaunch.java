@@ -40,28 +40,8 @@ import org.eclipse.ui.PlatformUI;
  *
  */
 public class TAULaunch{
-	
-	public TAULaunch() throws CoreException {
-		super();
-		
-		if( Activator.getDefault().getPluginPreferences().getBoolean("TAUCheckForAutoOptions"))
-		{
-			Display.getDefault().syncExec(
-					  new Runnable() 
-					  {
-					    public void run()
-					    {
-							try{
-								OptionSplash splash = new OptionSplash(Display.getCurrent().getActiveShell());
-								splash.open();
-							}catch(Exception e){e.printStackTrace();}
-					    }
-					  });
-		}
-	}
 
 	private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-	//private String projectLocation=null;
 	
 	public static void adjustBuild(IConfiguration buildConf){
 		if(Activator.getDefault().getPluginPreferences().getBoolean("TAUCheckForAIXOptions"))
@@ -72,8 +52,13 @@ public class TAULaunch{
 	 * Gets the path to the TAU arch directory, as stored in the eclipse workspace
 	 * @return the path to the TAU arch directory
 	 */
-	private static String getTauArchPath(){
-		return pstore.getString("TAUCDTArchPath");
+	protected static String getTauArchPath(){
+		File binPath=new File(pstore.getString(ITAULaunchConfigurationConstants.TAU_BIN_PATH));
+		if(binPath.canRead())
+			return binPath.getParent().toString();
+		
+		return "";
+		//return pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH);
 	}
 	
 	/**
@@ -133,13 +118,147 @@ public class TAULaunch{
 		
 		//Put the profile data in the database and delete any profile files
 		if(haveprofiles)
-			manageProfiles(directory, projname, projtype, tbpath, now, configuration);
+		{
+			boolean keepprofs = configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false);
+			boolean useportal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
+			manageProfiles(directory, projname, projtype, tbpath, configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null), now, keepprofs,useportal);
+			
+		}
 		
 		//TODO: Enable tracefile management
 		//if(tracout||configuration.getAttribute(ITAULaunchConfigurationConstants.TRACE, false))
 		//manageTraceFiles(directory, projtype,now);
 	}
+
+//	/**
+//	 * Collects generated profile files and either stores them in a ppk file or, if possible, in a local database.  Optionally uploads them to TAU's 
+//	 * web portal system.  Optionally deletes local files after successfully inserted into the database.
+//	 * @param directory The directory containing the profile files
+//	 * @param projname The name of the project
+//	 * @param projtype The options used on this project
+//	 * @param tbpath The path to the TAU bin directory
+//	 * @param now The current time
+//	 * @throws CoreException
+//	 */
+//	private static void manageProfiles(final File ppkFile, final String directory, final String projname, final String projtype, final String now, final boolean keepprofs, final boolean useportal) throws CoreException
+//	{
+//
+//		class Profilefilter implements FilenameFilter {
+//			public boolean accept(File dir, String name) {
+//				if (name.indexOf("profile.") != 0)
+//					return false;
+//				return true;
+//			}
+//		}
+//
+//		class Counterfilter implements FileFilter {
+//
+//			public boolean accept(File pathname) {
+//				if (pathname.isDirectory()) {
+//					if (pathname.getName().indexOf("MULTI__") == 0)
+//						return true;
+//				}
+//				return false;
+//			}
+//
+//		}
+//
+//		File[] profiles = null;
+//		File dir = new File(directory);
+//		Profilefilter profil = new Profilefilter();
+//		profiles = dir.listFiles(profil);
+//
+//		final boolean multipapi = (projtype.indexOf("multiplecounters") >= 0 && projtype
+//				.indexOf("papi") >= 0);// configuration.getAttribute(ITAULaunchConfigurationConstants.PAPI,
+//		// false);
+//		File[] counterdirs = null;
+//		Counterfilter countfil = null;
+//		if (multipapi) {
+//			countfil = new Counterfilter();
+//			counterdirs = dir.listFiles(countfil);
+//		}
+//
+//		File[] rem = null;
+//		if (multipapi)
+//			rem = counterdirs;
+//		else
+//			rem = profiles;
+//		final File[] remprofs = rem;
+//		
+//		//final File ppkFile=makePPK(projname, projtype, now, tbpath, directory);
+//		
+////		final boolean keepprofs = configuration.getAttribute(
+////				ITAULaunchConfigurationConstants.KEEPPROFS, false);
+////		final boolean useportal = configuration.getAttribute(
+////				ITAULaunchConfigurationConstants.PORTAL, false);
+//		if (rem.length > 0)
+//			Display.getDefault().asyncExec(new Runnable() {
+//				public void run() {
+//
+//
+//					boolean hasdb = false;
+//
+//					try {
+//						hasdb = PerfDMFUIPlugin.addPerformanceData(projname,
+//								projtype, directory);
+//						if (!hasdb) {
+//							MessageDialog
+//									.openInformation(
+//											PlatformUI.getWorkbench()
+//													.getDisplay()
+//													.getActiveShell(),
+//											"TAU Warning",
+//											"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+//						}
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//
+//					
+//
+//					for (int i = 0; i < remprofs.length; i++) {
+//						if (multipapi) {
+//							File[] profs = remprofs[i].listFiles();
+//							for (int j = 0; j < profs.length; j++)
+//								profs[j].delete();
+//						}
+//						remprofs[i].delete();
+//					}
+//
+//					if (!keepprofs && hasdb) {
+//						ppkFile.delete();
+//					} else {
+//						File profdir = new File(directory + File.separator
+//								+ "Profiles" + File.separator + projtype
+//								+ File.separator + now);
+//						profdir.mkdirs();
+//
+//						ppkFile.renameTo(new File(profdir + File.separator
+//								+ ppkFile.getName()));
+//					}
+//				}
+//			});
+//
+//		if (rem.length <= 0) {
+//			System.out
+//					.println("No profile data generated!  Check for build and runtime errors!");
+//		}
+//	}
 	
+	
+//	private static File makePPK(String projname, String projtype, String now, String tbpath, String directory)
+//	{
+//		String ppkname = projname + "_" + projtype + "_" + now+ ".ppk";
+//		String paraprof = tbpath + File.separator+ "paraprof --pack " + ppkname;
+//		System.out.println(paraprof);
+//
+//		String ppk = directory + File.separator + ppkname;
+//
+//		BuildLaunchUtils.runTool(paraprof, null,new File(directory));
+//
+//		File ppkFile = new File(ppk);
+//		return ppkFile;
+//	}
 	
 	/**
 	 * Collects generated profile files and either stores them in a ppk file or, if possible, in a local database.  Optionally uploads them to TAU's 
@@ -148,188 +267,180 @@ public class TAULaunch{
 	 * @param projname The name of the project
 	 * @param projtype The options used on this project
 	 * @param tbpath The path to the TAU bin directory
+	 * @param database The name of the database recieving the profiles
 	 * @param now The current time
 	 * @throws CoreException
 	 */
-	public static void manageProfiles(final String directory, final String projname, final String projtype, final String tbpath, final String now, ILaunchConfiguration configuration) throws CoreException
+	private static void manageProfiles(final String directory, final String projname, final String projtype, final String tbpath, final String database, final String now, final boolean keepprofs, final boolean useportal) throws CoreException
 	{
-		
-		/*
-		if(haveprofiles)
-		while((profiles.equals(null) || profiles.length<numProcs)&&!profilesdone)
-		{
-			if(multipapi)
-			{
-				if(counterdirs!=null&&counterdirs.length>0)
-				{
-					profiles=counterdirs[counterdirs.length-1].listFiles(profil);
-					//System.out.println(counterdirs[0].getName()+" "+counterdirs[0].list()[0]+" "+profiles.length);
-				}
-				counterdirs=dir.listFiles(countfil);
-			}
-			else
-				profiles = dir.listFiles(profil);
-			try {
-				if(monitor.isCanceled())
-				{
-					cleanup();
-					throw new OperationCanceledException();
-				}
-				//long numMillisecondsToSleep = 1000; // 1 seconds
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
-		}*/
-		
-		class Profilefilter implements FilenameFilter{
+
+		class Profilefilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
-				if(name.indexOf("profile.")!=0)
+				if (name.indexOf("profile.") != 0)
 					return false;
 				return true;
 			}
 		}
-		
-		class Counterfilter implements FileFilter{
+
+		class Counterfilter implements FileFilter {
 
 			public boolean accept(File pathname) {
-				if(pathname.isDirectory())
-				{
-					if(pathname.getName().indexOf("MULTI__")==0)
+				if (pathname.isDirectory()) {
+					if (pathname.getName().indexOf("MULTI__") == 0)
 						return true;
 				}
-
 				return false;
 			}
-			
+
 		}
-		
+
 		File[] profiles = null;
 		File dir = new File(directory);
-		Profilefilter profil=new Profilefilter();
+		Profilefilter profil = new Profilefilter();
 		profiles = dir.listFiles(profil);
-		
-		final boolean multipapi=(projtype.indexOf("multiplecounters")>=0&&projtype.indexOf("papi")>=0);//configuration.getAttribute(ITAULaunchConfigurationConstants.PAPI, false);
+
+		final boolean multipapi = (projtype.indexOf("multiplecounters") >= 0 && projtype
+				.indexOf("papi") >= 0);// configuration.getAttribute(ITAULaunchConfigurationConstants.PAPI,
+		// false);
 		File[] counterdirs = null;
-		Counterfilter countfil=null;
-		if(multipapi)
-		{
-			countfil=new Counterfilter();
+		Counterfilter countfil = null;
+		if (multipapi) {
+			countfil = new Counterfilter();
 			counterdirs = dir.listFiles(countfil);
 		}
-		
-		File[] rem=null;
-		if(multipapi)
-			rem=counterdirs;
-			else
-				rem=profiles;
+
+		File[] rem = null;
+		if (multipapi)
+			rem = counterdirs;
+		else
+			rem = profiles;
 		final File[] remprofs = rem;
-		final boolean keepprofs=configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false);
-		final boolean useportal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
-		if(rem.length>0)
-		Display.getDefault().asyncExec(new Runnable() 
-		{
-			public void run() 
-			{
-				String ppkname=projname+"_"+projtype+"_"+now+".ppk";
-				String paraprof=tbpath+File.separator+"paraprof --pack "+ppkname;
-				System.out.println(paraprof);
-				
-				String ppk = directory+File.separator+ppkname;
-				
-				BuildLaunchUtils.runTool(paraprof,null, new File(directory));
-				
-				
-//				String s = new String();
-//				try {
-//					Process p = Runtime.getRuntime().exec(paraprof, null, new File(directory));
-//					int i = p.waitFor();
-//					if (i == 0)
-//					{
-//						BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//						//read the output from the command
-//						while ((s = stdInput.readLine()) != null) 
-//						{
-//							System.out.println(s);
-//						}
-//					}
-//					else 
-//					{
-//						BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//						//read the output from the command
-//						while ((s = stdErr.readLine()) != null) 
-//						{
-//							System.out.println(s);
-//						}
-//					}
-//				}
-//				catch (Exception e) {System.out.println(e);}
-				
-				File ppkFile=new File(ppk);
-				
-				boolean hasdb = false;
 
-					try{
-						hasdb = PerfDMFUIPlugin.addPerformanceData(projname, projtype, directory);
-						if(!hasdb)
-						{
-							MessageDialog.openInformation(
-								PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-								"TAU Warning",
-								"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
-						}
-					}catch(Exception e){e.printStackTrace();}
+		if (rem.length > 0)
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					String ppkname = projname + "_" + projtype + "_" + now
+							+ ".ppk";
+					String paraprof = tbpath + File.separator
+							+ "paraprof --pack " + ppkname;
+					System.out.println(paraprof);
 
-				if(useportal)
-				{
-					hasdb=true;
+					String ppk = directory + File.separator + ppkname;
+
+					BuildLaunchUtils.runTool(paraprof, null,
+							new File(directory));
+
+					File ppkFile = new File(ppk);
+
+					boolean hasdb = false;
+
 					try {
-						TAUPortalUploadDialog pwDialog = new TAUPortalUploadDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(),ppkFile);
-						if (pwDialog.open() != TAUPortalUploadDialog.OK&&pwDialog.open() != TAUPortalUploadDialog.CANCEL){
-							MessageDialog.openInformation(
-									PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-									"TAU Warning",
-									"Adding data to your online database failed.  Please make sure that the given URL, username and password are correct.");
-									hasdb=false;
+						if(database!=null&&!database.equals(ITAULaunchConfigurationConstants.NODB))
+							hasdb = PerfDMFUIPlugin.addPerformanceData(projname,projtype, directory, database);
+						else
+							hasdb=false;
+						if (!hasdb) {
+							MessageDialog
+									.openInformation(
+											PlatformUI.getWorkbench()
+													.getDisplay()
+													.getActiveShell(),
+											"TAU Warning",
+											"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
 						}
 					} catch (Exception e) {
-						MessageDialog.openInformation(
-							PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-							"TAU Warning",
-							"Adding data to your online database failed.  Please make sure that the given URL, username and password are correct.");
-							hasdb=false;
+						e.printStackTrace();
 					}
-				}
-				
-				for(int i=0;i<remprofs.length;i++)
-				{
-					if(multipapi)
-					{
-						File[] profs = remprofs[i].listFiles();
-						for(int j=0;j<profs.length;j++)
-							profs[j].delete();
-					}
-					remprofs[i].delete();
-				}
-				
-				if(!keepprofs&&hasdb)
-				{
-					ppkFile.delete();
-				}
-				else
-				{
-					File profdir = new File(directory+File.separator+"Profiles"+File.separator+projtype+File.separator+now);
-					profdir.mkdirs();
 
-						ppkFile.renameTo(new File(profdir+File.separator+ppkFile.getName()));
+					if (useportal) {
+						hasdb = true;
+						try {
+							TAUPortalUploadDialog pwDialog = new TAUPortalUploadDialog(
+									PlatformUI.getWorkbench().getDisplay()
+											.getActiveShell(), ppkFile);
+							if (pwDialog.open() != TAUPortalUploadDialog.OK
+									&& pwDialog.open() != TAUPortalUploadDialog.CANCEL) {
+								MessageDialog
+										.openInformation(
+												PlatformUI.getWorkbench()
+														.getDisplay()
+														.getActiveShell(),
+												"TAU Warning",
+												"Adding data to your online database failed.  Please make sure that the given URL, username and password are correct.");
+								hasdb = false;
+							}
+						} catch (Exception e) {
+							MessageDialog
+									.openInformation(
+											PlatformUI.getWorkbench()
+													.getDisplay()
+													.getActiveShell(),
+											"TAU Warning",
+											"Adding data to your online database failed.  Please make sure that the given URL, username and password are correct.");
+							hasdb = false;
+						}
+					}
+
+					for (int i = 0; i < remprofs.length; i++) {
+						if (multipapi) {
+							File[] profs = remprofs[i].listFiles();
+							for (int j = 0; j < profs.length; j++)
+								profs[j].delete();
+						}
+						remprofs[i].delete();
+					}
+
+					if (!keepprofs && hasdb) {
+						ppkFile.delete();
+					} else {
+						File profdir = new File(directory + File.separator
+								+ "Profiles" + File.separator + projtype
+								+ File.separator + now);
+						profdir.mkdirs();
+
+						ppkFile.renameTo(new File(profdir + File.separator
+								+ ppkFile.getName()));
+					}
 				}
-			}
-		});
-		
-		if(rem.length<=0)
-		{
-			System.out.println("No profile data generated!  Check for build and runtime errors!");
+			});
+
+		if (rem.length <= 0) {
+			System.out
+					.println("No profile data generated!  Check for build and runtime errors!");
 		}
 	}
+	
+//	private static boolean uploadToPortal(File ppkFile)
+//	{
+//			try {
+//				TAUPortalUploadDialog pwDialog = new TAUPortalUploadDialog(
+//						PlatformUI.getWorkbench().getDisplay()
+//								.getActiveShell(), ppkFile);
+//				if (pwDialog.open() != TAUPortalUploadDialog.OK
+//						&& pwDialog.open() != TAUPortalUploadDialog.CANCEL) {
+//					MessageDialog
+//							.openInformation(
+//									PlatformUI.getWorkbench()
+//											.getDisplay()
+//											.getActiveShell(),
+//									"TAU Warning",
+//									"Adding data to your online database failed.  Please make sure that the given URL, username and password are correct.");
+//					return false;
+//				}
+//			} catch (Exception e) {
+//				MessageDialog
+//						.openInformation(
+//								PlatformUI.getWorkbench()
+//										.getDisplay()
+//										.getActiveShell(),
+//								"TAU Warning",
+//								"Adding data to your online database failed.  Please make sure that the given URL, username and password are correct.");
+//				return false;
+//			}
+//			return true;
+//	}
+	
+	
 	
 	/**
 	 * Handle files produced by 'perflib' instrumentation by converting them to the TAU format and moving them to an
@@ -352,19 +463,7 @@ public class TAULaunch{
 		perffilter seekdir = new perffilter();
 		File dir = new File(directory);
 		File[] perfdir = dir.listFiles(seekdir);
-//		while(perfdir==null || perfdir.length<1)
-//		{
-//			perfdir = dir.listFiles(seekdir);
-//			try {
-//				if(monitor.isCanceled())
-//				{
-//					cleanup();
-//					throw new OperationCanceledException();
-//				}
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//			}
-//		}
+
 		if(perfdir==null||perfdir.length<1)
 		{
 			return;
@@ -374,37 +473,13 @@ public class TAULaunch{
 		
 		BuildLaunchUtils.runTool(perf2tau,null,dir);
 		
-//		String s = null;
-//		try {
-//			Process p = Runtime.getRuntime().exec(perf2tau, null, dir);
-//			int i = p.waitFor();
-//			if (i == 0)
-//			{
-//				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//				//read the output from the command
-//				while ((s = stdInput.readLine()) != null) 
-//				{
-//					System.out.println(s);
-//				}
-//			}
-//			else 
-//			{
-//				BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//				//read the output from the command
-//				while ((s = stdErr.readLine()) != null) 
-//				{
-//					System.out.println(s);
-//				}
-//			}
-//		}
-//		catch (Exception e) {e.printStackTrace();}
 	}
 	
 //	//TODO:  Test and enable trace management
 //	/**
 //	 * Collect and move trace files to an appropriate directory
 //	 */
-//	private void manageTraceFiles(String directory, String projtype, String now){
+//	private static void manageTraceFiles(String directory, String projtype, String now){
 //		class tracefilter implements FilenameFilter{
 //			public boolean accept(File dir, String name) {
 //				if(name.indexOf(".trc")>0||name.indexOf(".edf")>0)
@@ -412,24 +487,9 @@ public class TAULaunch{
 //				return false;
 //			}
 //		}
-//		 //trial.setName();
 //		tracefilter tracefind = new tracefilter();
 //		File dir = new File(directory);
 //		File[] mvtrc=dir.listFiles(tracefind);
-///*//		while((mvtrc.equals(null) || mvtrc.length<nprocs*2))
-////		{
-////			mvtrc = dir.listFiles(tracefind);
-////			try {
-////				if(monitor.isCanceled())
-////				{
-////					//cleanup(configuration);
-////					throw new OperationCanceledException();
-////				}
-////				//long numMillisecondsToSleep = 1000; // 1 seconds
-////				Thread.sleep(1000);
-////			} catch (InterruptedException e) {
-////			}
-////		}*/
 //		
 //		File trcdir = new File(directory+File.separator+"Traces"+File.separator+projtype+File.separator+now);
 //		trcdir.mkdirs();

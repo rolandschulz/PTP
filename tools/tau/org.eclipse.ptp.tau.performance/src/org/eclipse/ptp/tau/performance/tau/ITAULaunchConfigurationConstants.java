@@ -43,6 +43,9 @@ public interface ITAULaunchConfigurationConstants {
 	
 	public static final String ENVVARS = "environment_variable_map";
 	
+	/**This is for internally restoring the last selected makefile*/
+	public static final String TAU_MAKENAME="filename_of_last_selected_makefile";
+	
 	public static final String TAU_MAKEFILE = "tau_makefile.performance.options.configuration_id";//"selected_tau_makefile";
 	
 	public static final boolean MPI_DEF = true;
@@ -75,4 +78,24 @@ public interface ITAULaunchConfigurationConstants {
 	 * ID of the selective instrumentation file
 	 */
 	public static final String SELECT_FILE = "selective_instrumentation_file_path";
+	
+	/**
+	 * ID of the perfdmf database
+	 */
+	public static final String PERFDMF_DB="perfdmf_database_configuration";
+	
+	/**
+	 * String constant message used if no database names are found
+	 */
+	public static final String NODB="No databases available";
+	
+//	/**
+//	 * Constant for tracking the global TAU arch directory path preference
+//	 */
+//	public static final String TAU_ARCH_PATH="TAUCDTArchPath";
+	
+	/**
+	 * Constant for tracking the global TAU bin directory path preference
+	 */
+	public static final String TAU_BIN_PATH="performance_tool_bin_directory.tau";
 }

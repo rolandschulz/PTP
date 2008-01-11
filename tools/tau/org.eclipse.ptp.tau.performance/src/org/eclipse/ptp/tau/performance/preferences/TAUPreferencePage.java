@@ -18,7 +18,10 @@
 package org.eclipse.ptp.tau.performance.preferences;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
@@ -26,6 +29,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.tau.performance.Activator;
+import org.eclipse.ptp.tau.performance.internal.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.tau.toolopts.PerformanceTool;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,30 +56,111 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public class TAUPreferencePage extends PreferencePage implements IWorkbenchPreferencePage 
 {
+	
+	private class BinDirPanel
+	{
+		String group="";
+		Button browseBinButton=null;
+		Text binDir=null;
+		BinListener binLis=new BinListener();
+		
+		
+		
+		protected class BinListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener
+		{
+			public void widgetSelected(SelectionEvent e) {
+				Object source = e.getSource();
+				if(source == browseBinButton) {
+					handleBinBrowseButtonSelected(binDir,group);
+				}
+				updatePreferencePage();
+			}
+
+			public void modifyText(ModifyEvent evt) {
+				Object source = evt.getSource();
+				if(source==binDir){
+				}
+
+				updatePreferencePage();
+			}
+
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getProperty().equals(FieldEditor.IS_VALID))
+					updatePreferencePage();
+			}
+		}
+		
+		private void makeToolBinPane(Composite parent)
+		{
+			Composite tauarch = new Composite(parent, SWT.NONE);
+			tauarch.setLayout(createGridLayout(3, false, 0, 0));
+			tauarch.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+			
+			Label taubinComment = new Label(tauarch, SWT.WRAP);
+			taubinComment.setText(group+" Bin Directory:");
+			binDir = new Text(tauarch, SWT.BORDER | SWT.SINGLE);
+			binDir.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			binDir.addModifyListener(binLis);
+
+			browseBinButton = new Button(tauarch,SWT.PUSH);
+			browseBinButton.setText("Browse");
+			browseBinButton.addSelectionListener(binLis);
+		}
+
+		public BinDirPanel(String group) {
+			this.group = group;
+		}
+	}
+	
 	public static final String EMPTY_STRING = "";
-	protected Text tauArch = null;
-	protected Button browseArchButton = null;
+	
+	BinDirPanel[] toolGroups=null;
+	
+	//protected Text tauBin = null;
+	//protected Button browseBinButton = null;
 	protected Button checkAutoOpts=null;
 	protected Button checkAixOpts=null;
 
 	public TAUPreferencePage() {
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+		Iterator eIt = null;
+		Map.Entry me = null;
+		PerformanceTool[] tools=Activator.getTools();
+		Set groups = new LinkedHashSet();
+		for (int i = 0; i < tools.length; i++) 
+		{
+			eIt = tools[i].groupApp.entrySet().iterator();
+			while (eIt.hasNext()) 
+			{
+				me = (Map.Entry) eIt.next();
+				groups.add((String)me.getKey());
+			}
+		}
+		
+		toolGroups=new BinDirPanel[groups.size()];
+		Iterator gIt=groups.iterator();
+		int i=0;
+		while(gIt.hasNext())
+		{
+			toolGroups[i]=new BinDirPanel((String)gIt.next());
+			i++;
+		}
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener
 	{
 		public void widgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if(source == browseArchButton) {
-				handleArchBrowseButtonSelected();
-			}
+//			Object source = e.getSource();
+//			if(source == browseBinButton) {
+//				handleBinBrowseButtonSelected();
+//			}
 			updatePreferencePage();
 		}
 
 		public void modifyText(ModifyEvent evt) {
-			Object source = evt.getSource();
-			if(source==tauArch){
-			}
+//			Object source = evt.getSource();
+//			if(source==tauBin){
+//			}
 
 			updatePreferencePage();
 		}
@@ -109,21 +195,13 @@ public class TAUPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText("TAU Configuration");
+		aGroup.setText("Tool Configuration");
 
-		Composite tauarch = new Composite(aGroup, SWT.NONE);
-		tauarch.setLayout(createGridLayout(3, false, 0, 0));
-		tauarch.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		if(toolGroups!=null)
+		for(int i=0;i<toolGroups.length;i++)
+			toolGroups[i].makeToolBinPane(aGroup);
 
-		Label tauarchComment = new Label(tauarch, SWT.WRAP);
-		tauarchComment.setText("TAU Arch Directory:");
-		tauArch = new Text(tauarch, SWT.BORDER | SWT.SINGLE);
-		tauArch.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		tauArch.addModifyListener(listener);
-
-		browseArchButton = new Button(tauarch,SWT.PUSH);
-		browseArchButton.setText("Browse");
-		browseArchButton.addSelectionListener(listener);
+		
 		//TODO: Implement tau-option checking
 		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalSpan = 3;
@@ -131,67 +209,70 @@ public class TAUPreferencePage extends PreferencePage implements IWorkbenchPrefe
 
 		if(org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0)
 		{
-			checkAixOpts=createCheckButton(tauarch,"Automatically use Eclipse internal builder (May be needed for AIX compatibility)");
+			checkAixOpts=createCheckButton(parent,"Automatically use Eclipse internal builder (May be needed for AIX compatibility)");
 			checkAixOpts.setLayoutData(gridData);
 			checkAixOpts.addSelectionListener(listener);
 		}
 
-		checkAutoOpts=createCheckButton(tauarch, "Check for TAU System options");
+		checkAutoOpts=createCheckButton(parent, "Check for TAU System options");
 		checkAutoOpts.setLayoutData(gridData);
 		checkAutoOpts.addSelectionListener(listener);
 	}
+	
+
 
 	/**
-	 * Allow user to specify a TAU arch directory.  The specified directory must contain at least one 
-	 * recognizable TAU makefile in its lib sub-directory to be accepted.
+	 * Allow user to specify a TAU bin directory.  
 	 *
 	 */
-	protected void handleArchBrowseButtonSelected() 
+	protected void handleBinBrowseButtonSelected(Text field, String group) 
 	{
 		DirectoryDialog dialog = new DirectoryDialog(getShell());
 		File path=null;
-		String correctPath = getFieldContent(tauArch.getText());
+		String correctPath = getFieldContent(field.getText());
 		if (correctPath != null) {
 			path = new File(correctPath);
 			if (path.exists())
 				dialog.setFilterPath(path.isFile() ? correctPath : path.getParent());
 		}
+//The specified directory previously had to contain at least one recognizable TAU makefile in its lib sub-directory to be accepted.
+//		String tlpath = correctPath+File.separator+"lib";
+//
+//		class makefilter implements FilenameFilter{
+//			public boolean accept(File dir, String name) {
+//				if(name.indexOf("Makefile.tau")!=0 || name.indexOf("-pdt")<=0)
+//					return false;
+//				return true;
+//			}
+//		}
+//		File[] mfiles=null;
+//		makefilter mfilter = new makefilter();
+//		File test = new File(tlpath);
 
-		String tlpath = correctPath+File.separator+"lib";
+		dialog.setText("Select "+group+" Bin Directory");
+		//dialog.setMessage("You must select a valid TAU bin directory.  Such a directory should be created when you configure and install TAU.  It should contain least one valid stub makefile configured with the Program Database Toolkit (pdt)");
 
-		class makefilter implements FilenameFilter{
-			public boolean accept(File dir, String name) {
-				if(name.indexOf("Makefile.tau")!=0 || name.indexOf("-pdt")<=0)
-					return false;
-				return true;
-			}
-		}
-		File[] mfiles=null;
-		makefilter mfilter = new makefilter();
-		File test = new File(tlpath);
-
-		dialog.setText("Select TAU Arch Directory");
-		dialog.setMessage("You must select a valid TAU architecture directory.  Such a directory should be created when you configure and install TAU.  It must contain least one valid stub makefile configured with the Program Database Toolkit (pdt)");
-
-		String selectedPath=null;
-		while(true)
-		{
-			selectedPath = dialog.open();
-			if(selectedPath==null)
-				break;
-
-			tlpath=selectedPath+File.separator+"lib";
-			test = new File(tlpath);
-			if(test.exists()){
-				mfiles = test.listFiles(mfilter);
-			}
-			if (mfiles!=null&&mfiles.length>0)
-			{
-				if (selectedPath != null)
-					tauArch.setText(selectedPath);
-				break;
-			}
-		}
+		String selectedPath=dialog.open();//null;
+		if(selectedPath!=null)
+			field.setText(selectedPath);
+//		while(true)
+//		{
+//			selectedPath = dialog.open();
+//			if(selectedPath==null)
+//				break;
+//
+//			tlpath=selectedPath+File.separator+"lib";
+//			test = new File(tlpath);
+//			if(test.exists()){
+//				mfiles = test.listFiles(mfilter);
+//			}
+//			if (mfiles!=null&&mfiles.length>0)
+//			{
+//				if (selectedPath != null)
+//					tauBin.setText(selectedPath);
+//				break;
+//			}
+//		}
 
 	}
 
@@ -200,7 +281,13 @@ public class TAUPreferencePage extends PreferencePage implements IWorkbenchPrefe
 	{
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 
-		tauArch.setText(preferences.getString("TAUCDTArchPath"));
+		if(toolGroups!=null)
+			for(int i=0;i<toolGroups.length;i++)
+			{
+				toolGroups[i].binDir.setText(preferences.getString(IPerformanceLaunchConfigurationConstants.TOOL_BIN_ID+"."+toolGroups[i].group));// ITAULaunchConfigurationConstants.TAU_BIN_PATH));
+			}
+		
+		
 		//TODO: Add checks
 		checkAutoOpts.setSelection(preferences.getBoolean("TAUCheckForAutoOptions"));
 		if(checkAixOpts!=null)
@@ -211,7 +298,11 @@ public class TAUPreferencePage extends PreferencePage implements IWorkbenchPrefe
 	{
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 
-		preferences.setValue("TAUCDTArchPath",tauArch.getText());
+		if(toolGroups!=null)
+			for(int i=0;i<toolGroups.length;i++)
+			{
+				preferences.setValue(IPerformanceLaunchConfigurationConstants.TOOL_BIN_ID+"."+toolGroups[i].group,toolGroups[i].binDir.getText());
+			}
 		//TODO: Add checks
 		preferences.setValue("TAUCheckForAutoOptions", checkAutoOpts.getSelection());
 		if(checkAixOpts!=null)

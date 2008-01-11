@@ -103,16 +103,16 @@ public class Activator extends AbstractUIPlugin {
 		}
 		
 		File toolxml= new File(getPreferenceStore().getString(IPerformanceLaunchConfigurationConstants.XMLLOCID));
-		if(!toolxml.canRead())
+		if(!toolxml.canRead()||!toolxml.exists())
 		{
 			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse");
 			if(epath!=null)
 			{
 				toolxml=new File(epath);
-				if(toolxml.canRead())
+				if(toolxml.canRead()&&toolxml.exists())
 				{
 					toolxml=new File(toolxml.getPath()+File.separator+"tool.xml");
-					if(toolxml.canRead())
+					if(toolxml.canRead()&&toolxml.exists())
 					{
 						//tools=ToolMaker.makeTools(toolxml);
 						this.getPreferenceStore().setValue(IPerformanceLaunchConfigurationConstants.XMLLOCID, toolxml.getPath());
@@ -120,12 +120,17 @@ public class Activator extends AbstractUIPlugin {
 				}
 			}
 		}
-		
-		if(toolxml.canRead())
+		int numOTools=0;
+		if(toolxml.canRead()&&toolxml.exists())
+		{
 			otherTools=ToolMaker.makeTools(toolxml); //PerformanceTool.getSample();//new PerformanceTool[1];;
-		tools=new PerformanceTool[1+otherTools.length];
+			numOTools=otherTools.length;
+		}
+		
+			
+		tools=new PerformanceTool[1+numOTools];
 		tools[0]=tauTool[0];
-		for(int i=0;i<otherTools.length;i++)
+		for(int i=0;i<numOTools;i++)
 		{
 			tools[i+1]=otherTools[i];
 		}

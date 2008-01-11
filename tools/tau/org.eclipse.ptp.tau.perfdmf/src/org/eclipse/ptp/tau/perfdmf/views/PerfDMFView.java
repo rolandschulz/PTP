@@ -20,21 +20,54 @@ package org.eclipse.ptp.tau.perfdmf.views;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
 
-import org.eclipse.core.resources.*;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.action.*;
-//import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.*;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.FileEditorInput;
@@ -46,7 +79,17 @@ import edu.uoregon.tau.paraprof.GlobalDataWindow;
 import edu.uoregon.tau.paraprof.ParaProf;
 import edu.uoregon.tau.paraprof.ParaProfTrial;
 import edu.uoregon.tau.paraprof.interfaces.EclipseHandler;
-import edu.uoregon.tau.perfdmf.*;
+import edu.uoregon.tau.perfdmf.Application;
+import edu.uoregon.tau.perfdmf.DBDataSource;
+import edu.uoregon.tau.perfdmf.DataSource;
+import edu.uoregon.tau.perfdmf.Database;
+import edu.uoregon.tau.perfdmf.DatabaseAPI;
+import edu.uoregon.tau.perfdmf.DatabaseException;
+import edu.uoregon.tau.perfdmf.Experiment;
+import edu.uoregon.tau.perfdmf.Function;
+import edu.uoregon.tau.perfdmf.SourceRegion;
+import edu.uoregon.tau.perfdmf.Trial;
+import edu.uoregon.tau.perfdmf.UtilFncs;
 /**
  * Defines a perfdmf database browser view and associated operations
  * @author wspear
@@ -61,6 +104,10 @@ public class PerfDMFView extends ViewPart {
 
     private Action paraprofAction;
     private Action launchparaprofAction;
+    
+    private Action switchDatabaseAction;
+    
+    private String databaseName=null;
 
     static {
         ParaProf.insideEclipse = true;
@@ -172,6 +219,101 @@ public class PerfDMFView extends ViewPart {
         return null;
     }
 
+    /**
+     * Returns a list of all found databases in the form NAME - CONNECTION-STRING
+     * @return
+     */
+    public static String[] getDatabaseNames()
+    {
+    	 List dbs = Database.getDatabases();
+    	 
+    	 if(dbs.size()==0)
+    		 return null;
+    	 
+    	 String[] names = new String[dbs.size()];
+    	 
+    	 Iterator dit = dbs.iterator();
+    	 int i=0;
+         while(dit.hasNext())
+         {
+        	 Database dtest=(Database)dit.next();
+        	 names[i]=dtest.getConfig().getName()+" - "+dtest.getConfig().getConnectionString();
+        	 i++;
+         }
+    	 
+    	 return names;
+    }
+    
+    /**
+     * Returns just the configuration name of the full database identification string provided.
+     * @param A database name "name - connection string" as provided by getDatabaseNames()
+     * @return
+     */
+    public static String extractDatabaseName(String name)
+    {
+    	
+   	 List dbs = Database.getDatabases();
+	 
+	 if(dbs.size()==0)
+		 return null;
+	 
+	 //String[] names = new String[dbs.size()];
+	 
+	 Iterator dit = dbs.iterator();
+
+     while(dit.hasNext())
+     {
+    	 Database dtest=(Database)dit.next();
+    	 if(name.endsWith(dtest.getConfig().getName()+" - "+dtest.getConfig().getConnectionString()))
+    			 return dtest.getConfig().getName();
+     }
+    	
+    	return null;
+    }
+    
+    /**
+     * Given the name of a database configuration, returns the associated database and sets the 
+     * current databaseName and displayed database name to that database
+     * @param name
+     * @return
+     */
+    public Database getDatabase(String name)
+    {
+    	 List dbs = Database.getDatabases();
+         if (dbs.size() < 1) {
+             // do something
+             //throw new FileNotFoundException("perfdmf.cfg not found");
+        	 databaseName=null;
+         	return null;
+         }
+         
+         Iterator dit = dbs.iterator();
+         
+         while(dit.hasNext())
+         {
+        	 Database dtest=(Database)dit.next();
+        	 //System.out.println(dtest.getConfig().getName() + " or "+ name);
+        	 if(dtest.getConfig().getName().equals(name))
+        	 {
+        		 databaseName=name;
+        		 
+        		 if(switchDatabaseAction!=null)
+              	   switchDatabaseAction.setText("Using Database: "+ databaseName);
+        		 
+        		 return(dtest);
+        	 }
+        	 //System.out.println(dtest.getConfig().getName()+" is "+dtest.getID());
+         }
+         //TODO:  Find better default behavior?
+         databaseName=((Database) dbs.get(0)).getConfig().getName();
+         //System.out.println("Specified database not found, using "+databaseName);
+         
+         if(switchDatabaseAction!=null)
+      	   switchDatabaseAction.setText("Using Database: "+ databaseName);
+         
+         return (Database) dbs.get(0);
+    }
+    
     private void openSource(String projectName, final SourceRegion sourceLink) {
 
         try {
@@ -256,7 +398,12 @@ public class PerfDMFView extends ViewPart {
         public Object[] getElements(Object parent) {
             if (parent.equals(getViewSite())) {
                 if (invisibleRoot == null)
-                    initialize();
+                {
+                    if(!initialize())
+                    {
+                    	return null;
+                    }
+                }
                 return getChildren(invisibleRoot);
             }
             return getChildren(parent);
@@ -273,13 +420,14 @@ public class PerfDMFView extends ViewPart {
         public boolean hasChildren(Object parent) {
             return ((TreeNode) parent).hasChildren();
         }
-
+        
+        
         /*
          * We will set up a dummy model to initialize tree heararchy.
          * In a real code, you will connect to a real model and
          * expose its hierarchy.
          */
-        private void initialize() {
+        private boolean initialize() {
 
             try {
 
@@ -302,11 +450,20 @@ public class PerfDMFView extends ViewPart {
                 };
 
                 invisibleRoot = new TreeNode("", null);
-                String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
+                //String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
 
-                DatabaseAPI dbApi = new DatabaseAPI();
+               DatabaseAPI dbApi = new DatabaseAPI();
+               Database database=getDatabase(databaseName);
+               if(database==null)
+               {   
+            	   invisibleRoot.addChild(new TreeNode("none",null));
+            	   return true;
+               }
+               
+               
+                dbApi.initialize(database);
+                //dbApi.initialize(perfdmf, false);
 
-                dbApi.initialize(perfdmf, false);
 
                 for (Iterator it = dbApi.getApplicationList().iterator(); it.hasNext();) {
                     Application app = (Application) it.next();
@@ -335,6 +492,7 @@ public class PerfDMFView extends ViewPart {
             } catch (Exception e) {
                 //e.printStackTrace();
             }
+            return true;
         }
     }
 
@@ -417,21 +575,22 @@ public class PerfDMFView extends ViewPart {
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
+    	manager.add(switchDatabaseAction);
         manager.add(launchparaprofAction);
         manager.add(new Separator());
         drillDownAdapter.addNavigationActions(manager);
     }
 
-    private void openInParaProf(Trial trial) {
+    private boolean openInParaProf(Trial trial) {
         try {
-            //JFrame frame = new JFrame("HelloWorldSwing");
-            //Display the window.
-            //frame.pack();
-            //frame.setVisible(true);
 
-            String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
-            DatabaseAPI dbApi = new DatabaseAPI();
-            dbApi.initialize(perfdmf, false);
+        	DatabaseAPI dbApi = new DatabaseAPI();
+
+        	Database database = getDatabase(databaseName);
+        	if(database==null)
+        		return false;
+        	dbApi.initialize(database);
+
 
             dbApi.setTrial(trial.getID());
             DBDataSource dbDataSource = new DBDataSource(dbApi);
@@ -451,7 +610,7 @@ public class PerfDMFView extends ViewPart {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
+        return true;
     }
 
     private void makeActions() {
@@ -492,6 +651,36 @@ public class PerfDMFView extends ViewPart {
                 //showMessage("Double-click detected on " + obj.toString());
             }
         };
+        
+        switchDatabaseAction=new Action(){
+        	
+
+        	public void run(){
+        		ListDialog dblist = new ListDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+        		ArrayContentProvider dbs=new ArrayContentProvider();
+        		LabelProvider dl=new LabelProvider();
+        		
+        		String[] names=getDatabaseNames();
+        		
+        		dblist.setHelpAvailable(false);
+        		dblist.setContentProvider(dbs);
+        		dblist.setLabelProvider(dl);
+        		dblist.setTitle("Select Database");
+        		dblist.setInput(names);
+        		dblist.open();
+        		
+        		Object[] result = dblist.getResult();
+        		
+        		if(result!=null&&result.length>=1)
+        		{
+        			databaseName=extractDatabaseName(result[0].toString());
+        			 ((ViewContentProvider) viewer.getContentProvider()).refresh(viewer);
+        		}
+        	}
+        
+    };
+        switchDatabaseAction.setText("Using Database: "+databaseName);
+        switchDatabaseAction.setToolTipText("Select another database");
 
         launchparaprofAction = new Action() {
             public void run() {
@@ -536,8 +725,8 @@ public class PerfDMFView extends ViewPart {
     public void setFocus() {
         viewer.getControl().setFocus();
     }
-
-    public boolean addProfile(String project, String projectType, String directory) {
+    
+    public boolean addProfile(String project, String projectType, String directory, String dbname) {
         try {
             File[] dirs = new File[1];
             dirs[0] = new File(directory);
@@ -547,8 +736,16 @@ public class PerfDMFView extends ViewPart {
 
             // initialize database
             DatabaseAPI dbApi = new DatabaseAPI();
-            String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
-            dbApi.initialize(perfdmf, false);
+            //String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
+            //dbApi.initialize(perfdmf, false);
+
+            Database database = getDatabase(dbname);//= (Database) dbs.get(0);
+            if(database==null)
+            	return false;
+            
+            databaseName=dbname;
+             dbApi.initialize(database);
+
 
             // create the trial
             Trial trial = new Trial();
