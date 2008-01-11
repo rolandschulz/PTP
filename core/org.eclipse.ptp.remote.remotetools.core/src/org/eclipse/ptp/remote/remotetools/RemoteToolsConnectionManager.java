@@ -55,11 +55,12 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 				ITargetControl control;
 				try {
 					control = element.getControl();
-					// element.getName() is definitely wrong, but will have to do for now
-					// until we can work out how to get the address
-					newConns.put(element.getName(), new RemoteToolsConnection(element.getName(), 
-							element.getName(), //$NON-NLS-1$
-							"", control)); //$NON-NLS-1$
+					/*
+					 * FIXME: need to work out how to get this information correctly!!!!
+					 */
+					String address = (String) element.getAttributes().get("cellbox.connection-address");
+					String user = (String) element.getAttributes().get("cellbox.login-username");
+					newConns.put(element.getName(), new RemoteToolsConnection(element.getName(), address, user, control));
 				} catch (CoreException e) {
 				}
 			} else {
