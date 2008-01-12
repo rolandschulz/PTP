@@ -182,7 +182,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				}
 
 				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
-				IRemoteProcess process = processBuilder.asyncStart();
+				IRemoteProcess process = processBuilder.start();
 				
 				final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
