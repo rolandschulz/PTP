@@ -487,7 +487,13 @@ public class PMainTab extends PLaunchConfigurationTab {
     protected void handleApplicationButtonSelected() {
     	String initPath = appText.getText();
     	if (initPath.equals(EMPTY_STRING)) {
-    		initPath = getProject().getLocationURI().getPath();
+    	    final IProject project = getProject();
+    	    if (project == null) {
+    			MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("PMainTab.Project_required"), 
+    					LaunchMessages.getResourceString("PMainTab.Enter_project_before_browsing_for_program")); //$NON-NLS-1$
+    	        return;	        
+    	    }
+    	    initPath = getProject().getLocationURI().getPath();
     	}
     	
     	AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)resourceManager).getConfiguration();
