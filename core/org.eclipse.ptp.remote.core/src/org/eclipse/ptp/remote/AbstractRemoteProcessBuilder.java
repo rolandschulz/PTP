@@ -24,8 +24,6 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	private IFileStore remoteDir;
 	private Map<String, String> remoteEnv;
 	private boolean redirectErrorStream;
-	private IRemoteProcess process;
-	private boolean error;
 	
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, List<String> command) {
 		remoteConnection = conn;
