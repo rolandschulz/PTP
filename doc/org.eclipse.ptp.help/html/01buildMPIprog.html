@@ -1,13 +1,13 @@
 <html>
 <head>
-<title>Building an MPI program with Managed Build</title>
+<title>Building an MPI program</title>
 </head>
 <body>
 <h1>Building an MPI program with Managed Build</h1>
-<p>[Not yet updated for PTP 2.0]
+
 <p>Topics include:
 <ul>
-<li><a href="#create">Creating an MPI project </a>(same as for C but worth describing)
+<li><a href="#create">Creating an MPI project </a>
 
 <li><a href="#include">include paths</a>
 <li><a href="#mpicc">specifying the mpicc toolchain</a>
@@ -15,106 +15,32 @@
 (by specifying the mpirun command)?
 </ul>
 
-
-
 <h2 id="create">Create an MPI Project</h2>
+<p>Note: this tutorial assumes you have the PLDT installed, to use the wizards for creating MPI projects.
+<p>First, be sure you are in the C/C++ Perspective (Window -> Open Perspective -> Other...  and find C/C++)
 <p>To create a new MPI project in C using the managed build facility,
-Select File -> New -> Project ...  The New Project dialog opens.
-<br>Select C -> Managed Make C Project.
-<p><b>Note: </b> for automatic setup of MPI project information,
-see the PTP PLDT (Parallel Language Development Tools) help.
-
-<br><img src="images/newProject.gif">
+Select File -> New -> C Project ...  The New Project dialog opens.
+Fill in the project name, e.g. MyMPIProject.
+Expand "Executable" and select "MPI Hello World C Project"
+<br><img src="images/0112newMPIproject.gif">
 <br>Click Next.
-<br>Type the name of your project, e.g. MyCProject
-<br><img src="images/newProject2.gif">
-<br>Click Finish.
-<p>A dialog prompts you to switch to the C/C++ Perspective. Hit OK.
-The C/C++ Perspective appears.
-<p>Your new project is shown in the C/C++ Projects view.
-<br><img src="images/cPersp.gif">
-<p>Now create a source file.
-Click File -> New -> Source File.  
-<br>Type a name for the source file, e.g. "test.c"
-<br><img src="images/newSourceFile.gif">
-<br>Click Finish.
-<p>A new editor appears, in which you can enter your program.
-<br><img src="images/newEditor.gif">
-<p>Since this is a managed build project, Eclipse creates a makefile
-and tries to build with the new file.  Since the file is empty,
-you will see errors in the Problems view, and in the Console view.
-<br><img src="images/newFileErrors.gif">
-<p>Enter a program in the editor.
-(If you have the PTP PLDT installed, a sample program is available 
-in the PTP MPI tools help, available as: 
-<a href="../../org.eclipse.ptp.pldt.help/html/testMPI.c">testMPI.c</a>)
-<!--  TODO I don't think that relative URL will work in installed plug-in --> 
-<p>A sample "hello world" type MPI program is also a good
-first test program:
-<pre>
-#include &lt;stdio.h&gt;
-#include &lt;mpi.h&gt;
-int main(int argc, char *argv[]) {
-    int rank;
-    MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    printf(“my rank=%d\n”, rank);
-    MPI_Finalize();
-    return 0;
-}
+<p>In the Basic Settings dialog, fill in the author name and change any other values you like.
+<br>Click Next.
+<br><img src="images/0112projBasicSettings.gif">
+<p>In the MPI Project Settings dialog, make sure "Add MPI Project settings to this project" is checked.
+You can uncheck "Use default information" if you need to change any values for include path, lib name or search path,
+or MPI build commands.
+<br><img src="images/0112mpiProjSettings.gif">
+<p>Click Finish.
+<p>The new project is created, and appears in the C/C++ Projects view. Expand the 'src' folder to see the new source file.
+<br><img src="images/0112proj.gif">
+<p>Double-click on the source file name to open the C/C++ editor.
+<br><img src="images/0112wbSrcEditor.gif">
+<p>If you open the Console view (click on the "Console" tab near the bottom)
+you should see the result of the build.
 
-</pre>
-<p>Save your program.  The program will be compiled automatically by
-the managed build system.
-<p>You may see several errors, if you haven't set up the
-MPI information for your project.
-The first error may be that an include file isn't found.
-<br><img src="images/errorInclude.gif">
-<br>(If you hover the mouse cursor over the red "X"
-you will see the reason for the error)
-<h2 id="include">Include Paths</h2>
-<p>In order to locate needed include files, bring up the Project Properties on this C/C++ project.
-
-<br>To bring up the Project Properties dialog,
-activate the context menu  on the Project, and select "Properties."
-<br><img src="images/projProps.gif">
-<p>
-The project properties window is displayed for this C project.
-Select "C/C++ Build" on the left, and under "Configuration settings" 
-on the "Tool Settings" tab, select "Directories" under "GCC Compiler."
-This lists the Include paths used to build the project, which are now
-empty.
- 
-<br><img src="images/propsBuild.gif">
-<p>To add an include path, click the add button for Include Paths.
-<br><img src="images/includePathsAdd.gif">
-<p>Then enter or browse to find the location of the MPI includes, and
-select "OK."
-<br><img src="images/includePathsAddDlg.gif">
-<p>Now you also need to add the path to the library: Under GCC Linker,
-Libraries, select the add button for "Libraries (-l)" 
-
-<br><img src="images/projPropsLnkLib.gif">
-<p>For the library value, enter 'mpi' and select 'OK'
-<br><img src="images/linkerDlg.gif">
-<p>Then select the add button for  "Library Search Path (-L)" 
-and enter the path to the lib directory.  Select 'OK'
-<br><img src="images/libDlg.gif">
-<p>Now select "OK" in the project properties dialog to close this dialog.
-Now your project should rebuild without errors relating to finding
-the include files.
-<p>
-<h2 id="mpicc">Specifying the mpicc toolchain</h2>
-
-<p>Now specify the build/link command.
-Again in Project properties, C/C++ build page, Tool Settings tab,
-click on "GCC C compiler"
-and change the default "gcc" value to "mpicc"
-(or whatever the build command is for your MPI environment).
-<br><img src="images/projPropsMpicc.gif">
-<p>Then do the same for the "GCC C Linker."
-<br><img src="images/projPropsMpicc2.gif">
-<p>Now proceed to <a href="02pLaunchConfig.html">launch the parallel program.</a>
+<p>Next create and start a <a href="02resMgrSetup.html">Resource Manager</a>
+and then you will be ready to  <a href="02pLaunchConfig.html">launch the parallel program.</a>
 <p>&nbsp;
 
 <p>&nbsp;

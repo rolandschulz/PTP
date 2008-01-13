@@ -9,7 +9,7 @@
 <p>Topics  include:
 <ul>
 <li><a href="#defn">Resource managers</a>
-<li><a href="#createRM">Creating a Resource Manager</a>
+<li><a href="#createRM">Creating a Local Resource Manager</a>
 <li><a href="#configRM">Configuring a Resource Manager</a>
 <li><a href="#startRM">Starting the Resource Manager</a>
 <li><a href="#editRM">Editing a Resource Manager</a>
@@ -18,13 +18,16 @@
 <h2 id="defn">Resource Managers</h2>
 <p>[needs updating] A Resource Manager controls resources for launching a parallel job.
 It could be a real job scheduling program, or the simplest is ORTE for a local? job.
+<p>In this example we will create a local resource manager for ORTE, in which the parallel
+program will be launched and run on the local machine.
 
-<h2 id="createRM">Creating a Resource Manager</h2>
+<h2 id="createRM">Creating a Local Resource Manager</h2>
 <p>To create a resource manager, first open the PTP Runtime Perspective.
+(Window -> Open Perspective -> Other... and then choose "C/C++" from the list of perspectives.)
 <br>
 <img src="images/0104RuntimePerspEmpty.png">
 <p>Right-click in Resource Managers view and select 
-<b>Add Resource Manager</b>
+<b>Add Resource Manager...</b>
 <br>
 <img src="images/0104addResMgr.png">
 <p>Choose the ORTE Resource Manager Type
