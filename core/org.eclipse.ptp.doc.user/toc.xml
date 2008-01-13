@@ -4,7 +4,6 @@
 <toc label="PTP: Parallel Tools Platform" topic="html/toc.html">
      <topic label="Overview"  href="html/00overview.html"/> 
       <topic label="PTP Prerequisites"  href="html/00prereqs.html"/> 
-      <topic label="Introducing the PTP Runtime"  href="html/01introPTPruntime.html"/> 
       <topic label="Building an MPI program with Managed Build"  href="html/01buildMPIprog.html"/> 
       <topic label="PTP Launch Configuration"  href="html/02pLaunchConfig.html"/> 
       <topic label="PTP Runtime Perspective" href="html/03ptpRuntimePersp.html"/>
