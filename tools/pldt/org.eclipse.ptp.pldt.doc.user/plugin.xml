@@ -13,4 +13,21 @@
       <index path="org.eclipse.ptp.pldt.help.index1"/>
    </extension>
 
+  <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            content="intro/pldtOverview.xml"
+            configId="org.eclipse.ui.intro.universalConfig">
+      </configExtension>
+   
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="intro/pldtWhatsnew.xml">
+      </configExtension>
+  
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="intro/pldtTutorial.xml">
+      </configExtension>
+   </extension>
 </plugin>
