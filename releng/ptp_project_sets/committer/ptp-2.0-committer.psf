@@ -21,5 +21,6 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp-feature,org.eclipse.ptp-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.core-feature,org.eclipse.ptp.core-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.external-feature,org.eclipse.ptp.external-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/doc/org.eclipse.ptp.help,org.eclipse.ptp.help"/>
 </provider>
 </psf>
