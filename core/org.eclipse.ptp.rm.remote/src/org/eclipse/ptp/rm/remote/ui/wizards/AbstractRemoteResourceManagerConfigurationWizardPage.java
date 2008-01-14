@@ -687,7 +687,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				}
 			}
 			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-			String correctPath = getFieldContent(serverText.getText());
+			String correctPath = serverText.getText();
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("RemoteConfigurationWizard.select"), correctPath);
 			if (selectedPath != null) {
 				serverText.setText(selectedPath.toString());
