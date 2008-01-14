@@ -203,7 +203,7 @@ public class RemoteResourceBrowser extends Dialog {
 		IFileStore root;
 		IFileStore[] roots;
 		try {
-			root = fileMgr.getResource(initial, new NullProgressMonitor());
+			root = fileMgr.getResource(cwd, new NullProgressMonitor());
 			roots = new IFileStore[] {root};
 		} catch (IOException e) {
 			return main; //FIXME
@@ -227,7 +227,7 @@ public class RemoteResourceBrowser extends Dialog {
 					/* root-level item */
 					IFileStore[] files = (IFileStore[]) tree.getData();
 					file = files[event.index];
-					item.setText(initial.toString());
+					item.setText(cwd.toString());
 				} else {
 					IFileStore[] files = (IFileStore[]) parentItem.getData();
 					file = files[event.index];
