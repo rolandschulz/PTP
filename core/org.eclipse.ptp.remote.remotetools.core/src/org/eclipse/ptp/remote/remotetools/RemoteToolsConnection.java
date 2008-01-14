@@ -12,9 +12,6 @@ package org.eclipse.ptp.remote.remotetools;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -22,13 +19,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.remote.exception.AddressInUseException;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
+import org.eclipse.ptp.remote.remotetools.environment.core.PTPTargetControl;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
-import org.eclipse.ptp.remotetools.environment.control.ITargetJob;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
@@ -39,12 +34,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private String address;
 	private String userName;
 	private IRemoteExecutionManager exeMgr = null;
-	private ITargetControl control;
+	private PTPTargetControl control;
 
-	private final ReentrantLock jobLock = new ReentrantLock();
-	private final Condition jobCondition = jobLock.newCondition();
-
-	public RemoteToolsConnection(String name, String address, String userName, ITargetControl control) {
+	public RemoteToolsConnection(String name, String address, String userName, PTPTargetControl control) {
 		this.control = control;
 		this.connName = name;
 		this.address = address;
@@ -58,27 +50,11 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		jobLock.lock();
-		try {
-			exeMgr = null;
-			jobCondition.signal();
-		} finally {
-			jobLock.unlock();
-		}
-		while (control.getJobCount() > 0) {
-			try {
-				wait(500);
-			} catch (InterruptedException e) {
-				return;
-			}
-			if (monitor.isCanceled()) {
-				break;
-			}
-		}
 		try {
 			control.kill(monitor);
 		} catch (CoreException e) {
 		}
+		exeMgr = null;
 	}
 	
 	/* (non-Javadoc)
@@ -86,7 +62,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort)
 			throws RemoteConnectionException {
-		if (exeMgr == null) {
+		if (!isOpen()) {
 			throw new RemoteConnectionException("Connection is not open");
 		}
 		try {
@@ -105,7 +81,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public int forwardLocalPort(String fwdAddress, int fwdPort,
 			IProgressMonitor monitor) throws RemoteConnectionException {
-		if (exeMgr == null) {
+		if (!isOpen()) {
 			throw new RemoteConnectionException("Connection is not open");
 		}
 		return 0;
@@ -116,7 +92,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort)
 			throws RemoteConnectionException {
-		if (exeMgr == null) {
+		if (!isOpen()) {
 			throw new RemoteConnectionException("Connection is not open");
 		}
 		try {
@@ -188,7 +164,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#isOpen()
 	 */
 	public synchronized boolean isOpen() {
-		return exeMgr != null;
+		return control.query() == ITargetStatus.RESUMED;
 	}
 
 	/* (non-Javadoc)
@@ -208,55 +184,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				throw new RemoteConnectionException("Remote connection canceled");
 			}
 		}
-		
-		if (exeMgr == null) {
-			try {
-				control.startJob(new ITargetJob() {
-					public void run(IRemoteExecutionManager manager) {
-						if (PTPRemotePlugin.getDefault().isDebugging()) {
-							System.out.println("Remote tools fake job starting");
-						}
-						jobLock.lock();
-						try {
-							exeMgr = manager;
-							jobCondition.signal();
-						} finally {
-							jobLock.unlock();
-						}
-						jobLock.lock();
-						try {
-							while (exeMgr != null) {
-								try {
-									jobCondition.await();
-								} catch (InterruptedException e) {
-									break;
-								}
-							}
-						} finally {
-							jobLock.unlock();
-						}
-						if (PTPRemotePlugin.getDefault().isDebugging()) {
-							System.out.println("Remote tools fake job exiting");
-						}
-					}
-				});
-			} catch (CoreException e1) {
-				throw new RemoteConnectionException(e1.getMessage());
-			}
-			
-			jobLock.lock();
-			try {
-				while (exeMgr == null) {
-					try {
-						jobCondition.await(500, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						break;
-					}
-				}
-			} finally {
-				jobLock.unlock();
-			}
-		}
+		exeMgr = control.getExecutionManager();
 	}
 
 	/* (non-Javadoc)
