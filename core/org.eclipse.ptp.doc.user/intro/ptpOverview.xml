@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <introContent>
-  	<extensionContent id="orgeclipseptphelp-introExtension" style="css/sample.css" name="PTP overview intro Extension" path="overview/@">
+  	<extensionContent id="orgeclipseptphelp-introExtension" style="css/sample.css" 
+  	name="PTP overview intro Extension" path="overview/@">
 		<group style-id="content-group" id="orgeclipseptphelp-introLink-group">
-       		<link label="Parallel Tools Platform" url="http://www.eclipse.org/ptp" id="orgeclipseptphelp-introLink" style-id="content-link">
-          		<text>Learn more about PTP on the Eclipse web site.</text>
+       		<link label="Parallel Tools Platform"  id="orgeclipseptphelp-introLink" style-id="content-link"
+       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.help/html/toc.html">
+          		<text>Learn more about PTP, the Parallel Tools Platform.</text>
        		</link>
        	</group>
   	</extensionContent>
