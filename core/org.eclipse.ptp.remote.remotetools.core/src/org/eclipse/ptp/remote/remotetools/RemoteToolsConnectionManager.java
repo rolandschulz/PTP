@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.remotetools.environment.core.PTPTargetControl;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
@@ -27,15 +28,15 @@ import org.eclipse.swt.widgets.Shell;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
-	private TargetTypeElement genericHost = null;
+	private TargetTypeElement remoteHost = null;
 	private Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
 	
 	public RemoteToolsConnectionManager() {
 		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
 		for (Object obj : targetMgr.getTypeElements()) {
 			TargetTypeElement element = (TargetTypeElement)obj;
-			if (element.getName().equals("Generic Host")) {
-				genericHost = element;
+			if (element.getName().equals("Remote Host")) {
+				remoteHost = element;
 				break;
 			}
 		}
@@ -48,7 +49,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 */
 	private void refreshConnections() {
 		Map<String, IRemoteConnection> newConns = new HashMap<String, IRemoteConnection>();
-		for (Object obj : genericHost.getElements()) {
+		for (Object obj : remoteHost.getElements()) {
 			ITargetElement element = (ITargetElement)obj;
 			IRemoteConnection conn = connections.get(element.getName());
 			if (conn == null) {
@@ -58,9 +59,9 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 					/*
 					 * FIXME: need to work out how to get this information correctly!!!!
 					 */
-					String address = (String) element.getAttributes().get("cellbox.connection-address");
-					String user = (String) element.getAttributes().get("cellbox.login-username");
-					newConns.put(element.getName(), new RemoteToolsConnection(element.getName(), address, user, control));
+					String address = (String) element.getAttributes().get("ptp.connection-address");
+					String user = (String) element.getAttributes().get("ptp.login-username");
+					newConns.put(element.getName(), new RemoteToolsConnection(element.getName(), address, user, (PTPTargetControl)control));
 				} catch (CoreException e) {
 				}
 			} else {
@@ -90,8 +91,8 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
 	 */
 	public void newConnection(Shell shell) {
-		if (genericHost != null) {
-			EnvironmentWizard wizard = new EnvironmentWizard(genericHost);
+		if (remoteHost != null) {
+			EnvironmentWizard wizard = new EnvironmentWizard(remoteHost);
 			WizardDialog dialog = new WizardDialog(shell, wizard);
 			dialog.create();
 			dialog.setBlockOnOpen(true);
@@ -105,6 +106,6 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#supportsNewConnections()
 	 */
 	public boolean supportsNewConnections() {
-		return genericHost != null;
+		return remoteHost != null;
 	}
 }
