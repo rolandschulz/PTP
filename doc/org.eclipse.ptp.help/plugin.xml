@@ -33,20 +33,15 @@
             configId="org.eclipse.ui.intro.universalConfig"
             content="intro/ptpOverview.xml">
       </configExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.intro.configExtension">
-      <configExtension
-            configId="org.eclipse.ui.intro.universalConfig"
-            content="intro/ptpTutorial.xml">
-      </configExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.intro.configExtension">
       <configExtension
             configId="org.eclipse.ui.intro.universalConfig"
             content="intro/ptpWhatsnew.xml">
       </configExtension>
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="intro/ptpTutorial.xml">
+      </configExtension>
+
    </extension>
 
 </plugin>
