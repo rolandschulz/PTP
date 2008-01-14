@@ -33,7 +33,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private String connName;
 	private String address;
 	private String userName;
-	private IRemoteExecutionManager exeMgr = null;
 	private PTPTargetControl control;
 
 	public RemoteToolsConnection(String name, String address, String userName, PTPTargetControl control) {
@@ -54,7 +53,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			control.kill(monitor);
 		} catch (CoreException e) {
 		}
-		exeMgr = null;
 	}
 	
 	/* (non-Javadoc)
@@ -66,7 +64,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new RemoteConnectionException("Connection is not open");
 		}
 		try {
-			exeMgr.createTunnel(localPort, fwdAddress, fwdPort);
+			control.getExecutionManager().createTunnel(localPort, fwdAddress, fwdPort);
 		} catch (LocalPortBoundException e) {
 			throw new AddressInUseException(e.getMessage());
 		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
@@ -96,7 +94,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new RemoteConnectionException("Connection is not open");
 		}
 		try {
-			exeMgr.getPortForwardingTools().forwardRemotePort(remotePort, fwdAddress, fwdPort);
+			control.getExecutionManager().getPortForwardingTools().forwardRemotePort(remotePort, fwdAddress, fwdPort);
 		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
 			throw new RemoteConnectionException(e.getMessage());
 		} catch (CancelException e) {
@@ -139,7 +137,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException 
 	 */
 	public IRemoteExecutionManager getExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
-		return exeMgr;
+		return control.getExecutionManager();
 	}
 	
 	/* (non-Javadoc)
@@ -184,7 +182,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				throw new RemoteConnectionException("Remote connection canceled");
 			}
 		}
-		exeMgr = control.getExecutionManager();
 	}
 
 	/* (non-Javadoc)
