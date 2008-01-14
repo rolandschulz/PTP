@@ -16,15 +16,20 @@ import java.net.URISyntaxException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.AddressInUseException;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.remotetools.environment.core.PTPTargetControl;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
+import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
+import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
@@ -173,12 +178,39 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			monitor = new NullProgressMonitor();
 		}
 		if (control.query() == ITargetStatus.STOPPED) {
-			try {
-				control.create(monitor);
-			} catch (CoreException e) {
-				throw new RemoteConnectionException(e.getMessage());
+			Job job = new Job("Start the  Environment") {
+				protected IStatus run(IProgressMonitor monitor) {
+					
+					IStatus status = null;
+					
+					try {
+						if (control.create(monitor)) {
+							status = Status.OK_STATUS;
+						}
+					} catch (CoreException e) {
+						status = e.getStatus();
+					}
+					
+					return status;
+				}
+			};
+			job.setUser(true);
+			job.schedule();
+			
+			/*
+			 * Wait for the job to finish
+			 */
+			while (!monitor.isCanceled() && job.getState() != Job.NONE) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
 			}
 			if (monitor.isCanceled()) {
+				try {
+					control.kill(null);
+				} catch (CoreException e) {
+				}
 				throw new RemoteConnectionException("Remote connection canceled");
 			}
 		}
