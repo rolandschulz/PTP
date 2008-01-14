@@ -21,10 +21,12 @@ import java.util.*;
  */
 public class HelpPlugin extends AbstractUIPlugin
 {
-    // The shared instance.
+    /** The shared instance. */
     private static HelpPlugin plugin;
-    // Resource bundle.
+    /** Resource bundle */
     private ResourceBundle    resourceBundle;
+    /** the plug-in ID */
+    public static final String PLUGIN_ID="org.eclipse.ptp.pldt.help";
 
     /**
      * The constructor.
@@ -96,6 +98,6 @@ public class HelpPlugin extends AbstractUIPlugin
      */
     public static ImageDescriptor getImageDescriptor(String path)
     {
-        return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.help", path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 }
