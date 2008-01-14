@@ -127,6 +127,8 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		} catch (CoreException e) {
 			disconnect();
 			setState(NOT_OPERATIONAL);
+			monitor.done();
+			return true;
 		}
 		try {
 			executionManager = super.createRemoteExecutionManager();
