@@ -191,21 +191,4 @@ public class RSEConnection implements IRemoteConnection {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#toPath(java.net.URI)
-	 */
-	public IPath toPath(URI uri) {
-		return new Path(uri.getPath());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#toURI(org.eclipse.core.runtime.IPath)
-	 */
-	public URI toURI(IPath path) {
-		try {
-			return new URI("rse", rseHost.getHostName(), path.toPortableString(), null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			return null;
-		}
-	}
 }
