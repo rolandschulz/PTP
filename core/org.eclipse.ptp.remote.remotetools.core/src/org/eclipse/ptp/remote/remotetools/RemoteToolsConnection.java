@@ -54,10 +54,12 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		monitor.beginTask("Closing connection...", 1);
 		try {
 			control.kill(monitor);
 		} catch (CoreException e) {
 		}
+		monitor.done();
 	}
 	
 	/* (non-Javadoc)
@@ -114,6 +116,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public int forwardRemotePort(String fwdAddress, int fwdPort,
 			IProgressMonitor monitor) throws RemoteConnectionException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		monitor.beginTask("Setting up remote forwarding", 10);
 		/*
 		 * Start with a different port number, in case we're doing this all on localhost.
 		 */
@@ -132,8 +138,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				}
 				monitor.worked(1);
 			}
+			monitor.done();
 			return remotePort;
 		}
+		monitor.done();
 		return -1;
 	}
 	
@@ -177,6 +185,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		monitor.beginTask("Opening connection...", 2);
 		if (control.query() == ITargetStatus.STOPPED) {
 			Job job = new Job("Start the  Environment") {
 				protected IStatus run(IProgressMonitor monitor) {
@@ -196,7 +205,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			};
 			job.setUser(true);
 			job.schedule();
-			
+			monitor.worked(1);
 			/*
 			 * Wait for the job to finish
 			 */
@@ -213,6 +222,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				}
 				throw new RemoteConnectionException("Remote connection canceled");
 			}
+			monitor.done();
 		}
 	}
 
