@@ -71,7 +71,7 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
-		return connection.getFileSystem().getStore(connection.toURI(path));
+		return connection.getFileSystem().getStore(toURI(path));
 	}
 
 	/* (non-Javadoc)
