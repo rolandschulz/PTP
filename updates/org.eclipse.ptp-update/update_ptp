@@ -30,7 +30,7 @@ if [ ! -d $NAME ]; then
 	ln -s ../epl-v10.html)
 fi
 
-eval $ZIP_CMD $NAME.zip $NAME $ZIP_EXCLUDES
+(cd $NAME; eval $ZIP_CMD ../$NAME.zip $NAME $ZIP_EXCLUDES)
 
 (cd $NAME; \
 ln ../$NAME.zip; \
