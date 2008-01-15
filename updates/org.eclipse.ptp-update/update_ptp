@@ -1,0 +1,44 @@
+#!/bin/sh
+
+#
+# Create an update site archive and copy update site and archive up to eclipse.org
+#
+# NOTE: Tested on MacOS X only!
+#
+
+TAR_CMD="tar --create --verbose --gzip --dereference --exclude=CVS --exclude=.DS_Store --exclude=.cvsignore --exclude=readme.txt"
+ZIP_CMD="zip -r"
+ZIP_EXCLUDES="-x \*CVS\* -x \*.DS_Store -x \*.cvsignore -x \*readme.txt"
+
+UPDATE_SITE=~/Documents/workspaces/ptp_head/org.eclipse.ptp-update
+RELEASE_DIR=downloads/tools/ptp/releases/2.0
+SYSTEM=gwatson@dev.eclipse.org
+
+cd $UPDATE_SITE
+
+CORE=features/org.eclipse.ptp.core*
+VERSION=`expr $CORE : 'features/org.eclipse.ptp.core_\(.*\).jar'`
+NAME=ptp-updatesite-$VERSION
+
+if [ ! -d $NAME ]; then
+	mkdir $NAME
+	(cd $NAME; \
+	ln -s ../features; \
+	ln -s ../plugins; \
+	ln -s ../site.xml; \
+	ln -s ../notice.html; \
+	ln -s ../epl-v10.html)
+fi
+
+eval $ZIP_CMD $NAME.zip $NAME $ZIP_EXCLUDES
+
+(cd $NAME; \
+ln ../$NAME.zip; \
+$TAR_CMD --file=- .| \
+  ssh $SYSTEM "(cd $RELEASE_DIR; \
+	rm -f plugins/*.jar; rm -f features/*.jar; \
+	tar zxf -)"
+)
+
+rm -rf $NAME
+exit 0
