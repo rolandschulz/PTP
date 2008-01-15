@@ -11,6 +11,8 @@
 package org.eclipse.ptp.remote.rse;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
@@ -77,5 +79,23 @@ public class RSEFileManager implements IRemoteFileManager {
 	 */
 	public IPath getWorkingDirectory() {
 		return new Path("/"); // TODO: RSE doesn't provide any way to get this
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
+	 */
+	public IPath toPath(URI uri) {
+		return new Path(uri.getPath());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
+	 */
+	public URI toURI(IPath path) {
+		try {
+			return new URI("rse", connection.getHost().getHostName(), path.toPortableString(), null); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 }

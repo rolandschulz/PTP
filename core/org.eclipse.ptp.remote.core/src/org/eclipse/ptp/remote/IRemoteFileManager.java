@@ -11,6 +11,7 @@
 package org.eclipse.ptp.remote;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
@@ -18,19 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
 
 public interface IRemoteFileManager {
-	/**
-	 * Browse for a remote file. The return value is the path of the file
-	 * <i>on the remote system</i>. 
-	 * 
-	 * Equivalent to {@link org.eclipse.swt.widgets.FileDialog}.
-	 * 
-	 * @param shell workbench shell
-	 * @param message message to display in dialog
-	 * @param initialPath initial path to use when displaying files
-	 * @return the path to the file relative to the remote system
-	 */
-	public IPath browseFile(Shell shell, String message, String initialPath);
-
 	/**
 	 * Browse for a remote directory. The return value is the path of the directory
 	 * <i>on the remote system</i>.
@@ -43,6 +31,19 @@ public interface IRemoteFileManager {
 	 * @return the path to the directory relative to the remote system
 	 */
 	public IPath browseDirectory(Shell shell, String message, String initialPath);
+
+	/**
+	 * Browse for a remote file. The return value is the path of the file
+	 * <i>on the remote system</i>. 
+	 * 
+	 * Equivalent to {@link org.eclipse.swt.widgets.FileDialog}.
+	 * 
+	 * @param shell workbench shell
+	 * @param message message to display in dialog
+	 * @param initialPath initial path to use when displaying files
+	 * @return the path to the file relative to the remote system
+	 */
+	public IPath browseFile(Shell shell, String message, String initialPath);
 
 	/**
 	 * Get the resource associated with path. IFileStore can then
@@ -61,4 +62,21 @@ public interface IRemoteFileManager {
 	 * @return IPath representing the current working directory
 	 */
 	public IPath getWorkingDirectory();
+	
+	/**
+	 * Convert URI to a remote path. This path is suitable for
+	 * direct file operations <i>on the remote system</i>.
+	 * 
+	 * @return IPath representing the remote path
+	 */
+	public IPath toPath(URI uri);
+	
+	/**
+	 * Convert remote path to equivalent URI. This URI is suitable
+	 * for EFS operations <i>on the local system</i>.
+	 * 
+	 * @param path path on remote system
+	 * @return URI representing path on remote system
+	 */
+	public URI toURI(IPath path);
 }

@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
-import java.net.URI;
-
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 
@@ -126,21 +123,4 @@ public interface IRemoteConnection {
 	 * @return true if TCP port forwarding is supported
 	 */
 	public boolean supportsTCPPortForwarding();
-	
-	/**
-	 * Convert URI to a remote path. This path is suitable for
-	 * direct file operations <i>on the remote system</i>.
-	 * 
-	 * @return IPath representing the remote path
-	 */
-	public IPath toPath(URI uri);
-	
-	/**
-	 * Convert remote path to equivalent URI. This URI is suitable
-	 * for EFS operations <i>on the local system</i>.
-	 * 
-	 * @param path path on remote system
-	 * @return URI representing path on remote system
-	 */
-	public URI toURI(IPath path);
 }

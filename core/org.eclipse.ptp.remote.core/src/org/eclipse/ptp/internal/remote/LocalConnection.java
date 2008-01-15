@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote;
 
-import java.net.URI;
-
-import org.eclipse.core.filesystem.URIUtil;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
@@ -125,18 +121,5 @@ public class LocalConnection implements IRemoteConnection {
 	public boolean supportsTCPPortForwarding() {
 		return false;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#toPath(java.net.URI)
-	 */
-	public IPath toPath(URI uri) {
-		return URIUtil.toPath(uri);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#toURI(org.eclipse.core.runtime.IPath)
-	 */
-	public URI toURI(IPath path) {
-		return URIUtil.toURI(path);
-	}
+
 }

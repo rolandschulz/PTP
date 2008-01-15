@@ -12,9 +12,11 @@ package org.eclipse.ptp.internal.remote;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -24,7 +26,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-
 
 public class LocalFileManager implements IRemoteFileManager {
 	public LocalFileManager() {
@@ -89,5 +90,19 @@ public class LocalFileManager implements IRemoteFileManager {
 	 */
 	public IPath getWorkingDirectory() {
 		return new Path(System.getProperty("user.dir"));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
+	 */
+	public IPath toPath(URI uri) {
+		return URIUtil.toPath(uri);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
+	 */
+	public URI toURI(IPath path) {
+		return URIUtil.toURI(path);
 	}
 }

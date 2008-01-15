@@ -18,10 +18,8 @@ import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteServicesDelegate;
 
-
 public class LocalServices implements IRemoteServicesDelegate {
 	private IRemoteConnectionManager connMgr;
-	private IRemoteFileManager fileMgr;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
