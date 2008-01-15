@@ -10,15 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.IRemoteConnection;
@@ -27,9 +22,7 @@ import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.remotetools.environment.core.PTPTargetControl;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
-import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
@@ -62,6 +55,17 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		monitor.done();
 	}
 	
+	/**
+	 * Create a new execution manager. Required because script execution 
+	 * closes channel after execution.
+	 * 
+	 * @return execution manager
+	 * @throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException 
+	 */
+	public IRemoteExecutionManager createExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
+		return control.createExecutionManager();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -80,7 +84,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new RemoteConnectionException(e.getMessage());
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -145,14 +149,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		return -1;
 	}
 	
-	/**
-	 * @return execution manager
-	 * @throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException 
-	 */
-	public IRemoteExecutionManager getExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
-		return control.getExecutionManager();
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getAddress()
 	 */
@@ -209,7 +205,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			/*
 			 * Wait for the job to finish
 			 */
-			while (!monitor.isCanceled() && job.getState() != Job.NONE) {
+			while (!monitor.isCanceled() && control.query() != ITargetStatus.RESUMED) {
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -222,8 +218,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				}
 				throw new RemoteConnectionException("Remote connection canceled");
 			}
-			monitor.done();
 		}
+		monitor.done();
 	}
 
 	/* (non-Javadoc)
@@ -245,28 +241,5 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#toPath(java.net.URI)
-	 */
-	public IPath toPath(URI uri) {
-		return new Path(uri.getPath());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#toURI(org.eclipse.core.runtime.IPath)
-	 */
-	public URI toURI(IPath path) {
-		try {
-			String auth = getAddress();
-			String user = getUsername();
-			if (user != null && !user.equals("")) {
-				auth = user + "@" + auth;
-			}
-			return new URI("remotetools", auth, path.toPortableString(), null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			return null;
-		}
 	}
 }

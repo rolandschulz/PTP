@@ -17,6 +17,8 @@ import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteServicesDelegate;
+import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
+import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
 
 public class RemoteToolsServices implements IRemoteServicesDelegate {
@@ -46,7 +48,14 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 		if (!(conn instanceof RemoteToolsConnection)) {
 			return null;
 		}
-		return new RemoteToolsFileManager((RemoteToolsConnection)conn);
+		RemoteToolsConnection remConn = (RemoteToolsConnection)conn;
+		IRemoteExecutionManager mgr;
+		try {
+			mgr = remConn.createExecutionManager();
+		} catch (RemoteConnectionException e) {
+			return null;
+		}
+		return new RemoteToolsFileManager(remConn, mgr);
 	}
 	
 	/* (non-Javadoc)

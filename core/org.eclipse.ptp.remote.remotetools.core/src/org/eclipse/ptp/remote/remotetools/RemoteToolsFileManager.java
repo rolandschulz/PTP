@@ -11,8 +11,8 @@
 package org.eclipse.ptp.remote.remotetools;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.ui.RemoteResourceBrowser;
+import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -32,11 +33,13 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
+	private IRemoteExecutionManager exeMgr;
 	private RemoteToolsConnection connection;
 	private Map<IPath, IFileStore> pathCache = new HashMap<IPath, IFileStore>();
 	
-	public RemoteToolsFileManager(RemoteToolsConnection conn) {
+	public RemoteToolsFileManager(RemoteToolsConnection conn, IRemoteExecutionManager exeMgr) {
 		this.connection = conn;
+		this.exeMgr = exeMgr;
 	}
 	
 	/* (non-Javadoc)
@@ -84,22 +87,11 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	}
 
 	/**
-	 * @param path
-	 * @throws RemoteOperationException
-	 * @throws RemoteConnectionException
-	 * @throws CancelException
-	 */
-	public void delete(String path) throws RemoteOperationException, RemoteConnectionException, CancelException {
-		connection.getExecutionManager().getRemoteFileTools().removeFile(path);
-	}
-	
-	/**
-	 * @param path
+	 * Get the execution manager for this file manager
 	 * @return
-	 * @throws RemoteConnectionException
 	 */
-	public String getParent(String path) throws RemoteConnectionException {
-		return connection.getExecutionManager().getRemotePathTools().parent(path);
+	public IRemoteExecutionManager getExecutionManager() {
+		return exeMgr;
 	}
 	
 	/* (non-Javadoc)
@@ -115,7 +107,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		boolean isDirectory = false;
 		try {
 			String pathStr = path.toString();
-			IRemoteFileTools tools = connection.getExecutionManager().getRemoteFileTools();
+			IRemoteFileTools tools = exeMgr.getRemoteFileTools();
 			item = tools.getItem(pathStr);
 			if (tools.hasDirectory(pathStr)) {
 				isDirectory = true;
@@ -128,7 +120,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			throw new IOException(e.getMessage());
 		}
 		
-		res = new RemoteToolsFileStore(connection, this, item, isDirectory);
+		res = new RemoteToolsFileStore(this, item, isDirectory);
 		cache(path, res);
 		return res;
 	}
@@ -136,25 +128,14 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	public IPath getWorkingDirectory() {
 		String cwd = "//";
 		try {
-			cwd = connection.getExecutionManager().getExecutionTools().executeWithOutput("pwd").trim();
+			cwd = exeMgr.getExecutionTools().executeWithOutput("pwd").trim();
 		} catch (RemoteExecutionException e) {
 		} catch (RemoteConnectionException e) {
 		} catch (CancelException e) {
 		}
 		return new Path(cwd);
 	}
-	
-	/**
-	 * @param path
-	 * @return
-	 * @throws RemoteConnectionException
-	 * @throws RemoteOperationException
-	 * @throws CancelException
-	 */
-	public IRemoteItem[] listItems(String path) throws RemoteConnectionException, RemoteOperationException, CancelException {
-		return connection.getExecutionManager().getRemoteFileTools().listItems(path);
-	}
-	
+		
 	/**
 	 * Look up a cached IRemoteResource
 	 * 
@@ -167,33 +148,26 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		}
 	}
 	
-	/**
-	 * @param path
-	 * @throws RemoteOperationException
-	 * @throws RemoteConnectionException
-	 * @throws CancelException
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
 	 */
-	public void mkdir(String path) throws RemoteOperationException, RemoteConnectionException, CancelException {
-		connection.getExecutionManager().getRemoteFileTools().createDirectory(path);
-	}
-	
-	/**
-	 * @param path
-	 * @return
-	 * @throws RemoteConnectionException
-	 * @throws IOException
-	 */
-	public InputStream openInputStream(String path) throws RemoteConnectionException, IOException {
-		return connection.getExecutionManager().getRemoteCopyTools().executeDownload(path).getInputStreamFromProcessRemoteFile();
+	public IPath toPath(URI uri) {
+		return new Path(uri.getPath());
 	}
 
-	/**
-	 * @param path
-	 * @return
-	 * @throws RemoteConnectionException
-	 * @throws IOException
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
-	public OutputStream openOutputStream(String path) throws RemoteConnectionException, IOException {
-		return connection.getExecutionManager().getRemoteCopyTools().executeUpload(path).getOutputStreamToProcessRemoteFile();
+	public URI toURI(IPath path) {
+		try {
+			String auth = connection.getAddress();
+			String user = connection.getUsername();
+			if (user != null && !user.equals("")) {
+				auth = user + "@" + auth;
+			}
+			return new URI("remotetools", auth, path.toPortableString(), null); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 }

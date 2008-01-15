@@ -165,6 +165,16 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 	public IRemoteExecutionManager getExecutionManager() {
 		return executionManager;
 	}
+	
+	/**
+	 * Create a new execution manager. This is required for script execution
+	 * because KillableExecution closes the channel after execution.
+	 * 
+	 * @return new execution manager;
+	 */
+	public IRemoteExecutionManager createExecutionManager() throws RemoteConnectionException {
+		return super.createRemoteExecutionManager();
+	}
 
 	public String getName() {
 		return targetElement.getName();

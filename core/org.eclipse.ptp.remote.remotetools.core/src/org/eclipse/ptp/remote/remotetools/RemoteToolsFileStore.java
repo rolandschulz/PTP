@@ -29,24 +29,39 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
-import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
-
 
 public class RemoteToolsFileStore extends FileStore {
 
+	/**
+	 * Public factory method for obtaining RemoteToolsFileStore instances.
+	 * @param uri URI to get a fileStore for
+	 * @return an RemoteToolsFileStore instance for the URI.
+	 */
+	public static RemoteToolsFileStore getInstance(URI uri) throws IOException {
+		String path = uri.getPath();
+		String hostName = uri.getHost();
+		IRemoteConnectionManager connMgr = RemoteToolsServices.getInstance().getConnectionManager();
+		RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(hostName);
+		IRemoteFileManager fileMgr = RemoteToolsServices.getInstance().getFileManager(conn);
+		return (RemoteToolsFileStore)fileMgr.getResource(new Path(path), new NullProgressMonitor());
+	}
+	
 	private IRemoteItem remoteItem;
 	private URI remoteURI;
 	private RemoteToolsFileManager fileMgr;
+	private IRemoteExecutionManager exeMgr;
 	private boolean isDirectory;
 
-	public RemoteToolsFileStore(RemoteToolsConnection conn, RemoteToolsFileManager mgr, IRemoteItem remoteItem, 
+	public RemoteToolsFileStore(RemoteToolsFileManager mgr, IRemoteItem remoteItem, 
 			boolean isDirectory) {
 		this.fileMgr = mgr;
+		this.exeMgr = mgr.getExecutionManager();
 		this.remoteItem = remoteItem;
 		this.isDirectory = isDirectory;
-		this.remoteURI = conn.toURI(new Path(remoteItem.getPath()));
+		this.remoteURI = mgr.toURI(new Path(remoteItem.getPath()));
 	}
 
 	/* (non-Javadoc)
@@ -57,7 +72,7 @@ public class RemoteToolsFileStore extends FileStore {
 			throws CoreException {
 		IRemoteItem[] items;
 		try {
-			items = fileMgr.listItems(remoteItem.getPath());
+			items = exeMgr.getRemoteFileTools().listItems(remoteItem.getPath());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					Activator.getDefault().getBundle().getSymbolicName(),
@@ -82,7 +97,7 @@ public class RemoteToolsFileStore extends FileStore {
 	public void delete(int options, IProgressMonitor monitor)
 			throws CoreException {
 		try {
-			fileMgr.delete(remoteItem.getPath());
+			exeMgr.getRemoteFileTools().removeFile(remoteItem.getPath());
 		}
 		catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
@@ -156,12 +171,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileStore getParent() {
-		IPath parent;
-		try {
-			parent = new Path(fileMgr.getParent(remoteItem.getPath()));
-		} catch (RemoteConnectionException e1) {
-			return null;
-		}
+		IPath parent = new Path(exeMgr.getRemotePathTools().parent(remoteItem.getPath()));
 		
 		IFileStore resource = fileMgr.lookup(parent);
 		if (resource != null) {
@@ -181,7 +191,7 @@ public class RemoteToolsFileStore extends FileStore {
 	public IFileStore mkdir(int options, IProgressMonitor monitor)
 			throws CoreException {
 		try {
-			fileMgr.mkdir(remoteItem.getPath());
+			exeMgr.getRemoteFileTools().createDirectory(remoteItem.getPath());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					Activator.getDefault().getBundle().getSymbolicName(), 
@@ -203,7 +213,7 @@ public class RemoteToolsFileStore extends FileStore {
 					"Is a directory"));
 		}
 		try {
-			return fileMgr.openInputStream(remoteItem.getPath());
+			return exeMgr.getRemoteCopyTools().executeDownload(remoteItem.getPath()).getInputStreamFromProcessRemoteFile();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					Activator.getDefault().getBundle().getSymbolicName(),
@@ -224,7 +234,7 @@ public class RemoteToolsFileStore extends FileStore {
 					"Is a directory"));
 		}
 		try {
-			return fileMgr.openOutputStream(remoteItem.getPath());
+			return exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath()).getOutputStreamToProcessRemoteFile();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					Activator.getDefault().getBundle().getSymbolicName(),
@@ -258,26 +268,12 @@ public class RemoteToolsFileStore extends FileStore {
 					e.getMessage(), e));
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#toURI()
 	 */
 	@Override
 	public URI toURI() {
 		return remoteURI;
-	}
-	
-	/**
-	 * Public factory method for obtaining RemoteToolsFileStore instances.
-	 * @param uri URI to get a fileStore for
-	 * @return an RemoteToolsFileStore instance for the URI.
-	 */
-	public static RemoteToolsFileStore getInstance(URI uri) throws IOException {
-		String path = uri.getPath();
-		String hostName = uri.getHost();
-		IRemoteConnectionManager connMgr = RemoteToolsServices.getInstance().getConnectionManager();
-		RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(hostName);
-		IRemoteFileManager fileMgr = RemoteToolsServices.getInstance().getFileManager(conn);
-		return (RemoteToolsFileStore)fileMgr.getResource(new Path(path), new NullProgressMonitor());
 	}
 }

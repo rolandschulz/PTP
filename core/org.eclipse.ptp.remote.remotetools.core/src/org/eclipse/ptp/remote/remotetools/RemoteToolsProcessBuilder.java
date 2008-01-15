@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteProcess;
+import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteScript;
 import org.eclipse.ptp.remotetools.core.RemoteProcess;
@@ -61,11 +62,12 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		}
 		
 		try {
-			IRemoteExecutionTools exeTools = connection.getExecutionManager().getExecutionTools();
+			IRemoteExecutionManager exeMgr = connection.createExecutionManager();
+			IRemoteExecutionTools exeTools = exeMgr.getExecutionTools();
 			IRemoteScript script = exeTools.createScript();
 			script.setScript(remoteCmd);
-			RemoteProcess p = exeTools.executeProcess(script);
-			return new RemoteToolsProcess(p);
+			RemoteProcess process = exeTools.executeProcess(script);
+			return new RemoteToolsProcess(process);
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		}
