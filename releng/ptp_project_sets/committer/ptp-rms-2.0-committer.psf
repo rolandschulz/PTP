@@ -12,6 +12,8 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.ibmpe.core,org.eclipse.ptp.ibmpe.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.ibmpe.proxy,org.eclipse.ptp.ibmpe.proxy"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.ibmpe.ui,org.eclipse.ptp.ibmpe.ui"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.ibmll.help,org.eclipse.ptp.ibmll.help"/>
+
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.ibmpe-feature,org.eclipse.ptp.ibmpe-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.lsf.core,org.eclipse.ptp.lsf.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.lsf.proxy,org.eclipse.ptp.lsf.proxy"/>
