@@ -211,13 +211,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				} catch (InterruptedException e) {
 				}
 			}
-			if (monitor.isCanceled()) {
-				try {
-					control.kill(null);
-				} catch (CoreException e) {
-				}
-				throw new RemoteConnectionException("Remote connection canceled");
-			}
 		}
 		monitor.done();
 	}
