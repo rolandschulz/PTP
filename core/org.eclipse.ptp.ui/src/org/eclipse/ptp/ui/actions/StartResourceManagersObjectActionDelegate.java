@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -58,7 +59,12 @@ public class StartResourceManagersObjectActionDelegate extends
 			try {
 				PlatformUI.getWorkbench().getProgressService().run(true, true, runnable);
 			} catch (InvocationTargetException e) {
-				UIUtils.showErrorDialog("Start Resource Manager", "Failed to start resource manager", ((CoreException)e.getCause()).getStatus());
+				Throwable t = e.getCause();
+				IStatus status = null;
+				if (t != null && t instanceof CoreException) {
+					status = ((CoreException)t).getStatus();
+				}
+				UIUtils.showErrorDialog("Start Resource Manager", "Failed to start resource manager", status);
 			} catch (InterruptedException e) {
 				// Do nothing. Operation has been canceled.
 			}
