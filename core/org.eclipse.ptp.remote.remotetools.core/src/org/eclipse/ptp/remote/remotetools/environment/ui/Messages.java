@@ -48,8 +48,6 @@ public class Messages extends NLS {
 
 	public static String ConfigurationPage_LabelTargetName;
 
-	public static String ConfigurationPage_LabelSystemWorkspace;
-
 	public static String ConfigurationPage_CipherType;
 	
 	static {
