@@ -810,15 +810,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 */
 	protected void updatePage() 
 	{
-		setValid(false);
 		setErrorMessage(null);
 		setMessage(null);
 	
 		if (!isValidSetting()) {
-			return;
+			setValid(false);
+		} else {
+			performOk();
+			setValid(true);
 		}
-	
-		performOk();
-		setValid(true);
 	}
 }

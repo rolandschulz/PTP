@@ -103,8 +103,8 @@ public class ORTEConfigurationWizardPage extends RMConfigurationWizardPage {
 		super(wizard, Messages.getString("ORTEConfigurationWizardPage.name")); //$NON-NLS-1$
 		setTitle(Messages.getString("ORTEConfigurationWizardPage.title")); //$NON-NLS-1$
 		setDescription(Messages.getString("ORTEConfigurationWizardPage.description")); //$NON-NLS-1$
-		setPageComplete(false);
-		isValid = false;
+		setPageComplete(true);
+		isValid = true;
 	}
 
 	/* (non-Javadoc)
@@ -451,15 +451,14 @@ public class ORTEConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	protected void updatePage() 
 	{
-		setValid(false);
 		setErrorMessage(null);
 		setMessage(null);
 	
 		if (!isValidSetting()) {
-			return;
+			setValid(false);
+		} else {	
+			performOk();
+			setValid(true);
 		}
-	
-		performOk();
-		setValid(true);
 	}
 }
