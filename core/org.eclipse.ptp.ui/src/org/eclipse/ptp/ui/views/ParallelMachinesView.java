@@ -592,7 +592,6 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 	 */
 	protected void changeMachine(final IPMachine machine) {
 		selectMachine(machine);
-		//updateAction();
 		update();
 	}
 	
@@ -867,20 +866,20 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 				TableItem item = machineTableViewer.getTable().getItem(new Point(e.x, e.y));
 				if (item == null && !selection.isEmpty()) {
 					machineTableViewer.getTable().deselectAll();
-					changeMachine((IPMachine) null);
+					changeMachineRefresh((IPMachine) null);
 				}
 				else if (item != null) {
 					IPMachine machine = (IPMachine)item.getData();
 					if (machine == null) {
-						changeMachine((IPMachine) null);
+						changeMachineRefresh((IPMachine) null);
 					}
 					else if (selection.isEmpty()) {
-						changeMachine(machine);
+						changeMachineRefresh(machine);
 					}
 					else {
 						String cur_id = getCurrentID();
 						if (cur_id == null || !cur_id.equals(machine.getID())) {
-							changeMachine(machine);
+							changeMachineRefresh(machine);
 						}
 					}
 				}
