@@ -93,11 +93,7 @@ changes color to indicate it is running.
 <p>&nbsp;
 
 <h3 id="configRMR">Creating and configuring a Remote Resource Manager</h3>
-<p>In the  PTP Runtime Perspective,
-Right-click in Resource Managers view and select 
-<b>Add Resource Manager...</b>
-<br>
-<img src="images/0104addResMgr.png">
+
 <p>
 
 Remote Resource Managers allow control via PTP of a remote target machine.
@@ -106,9 +102,14 @@ which currently includes Eclipse RSE (Remote Systems Explorer) or the more
 lightweight PTP Remote Tools, which you probably installed with PTP.
 
 <p>The following instructions show how to configure a remote ORTE Resource Manager using the PTP Remote Tools.
+<p>The example is a local machine running Windows XP, and the remote target machine running Linux (Fedora 7).
 <p>Note: Caveat here about having source on local machine, to match executable located on remote machine.
 <p>Add a new resource manager, of type ORTE.
-
+<p>In the  PTP Runtime Perspective,
+Right-click in Resource Managers view and select 
+<b>Add Resource Manager...</b>
+<br>
+<img src="images/0104newRemoteResMgr.png">
 <p>In the ORTE Proxy Configuration dialog, 
 Select <b>Remote Tools </b> as the Remote service provider.
 <br>
@@ -164,7 +165,7 @@ Managers.
 changes color to indicate it is running.
 <br><img src="images/0104ORTEremoteStarted.png">
 <p>The Machines view should be populated with icons for your node(s).
-<p>Now you may want to proceed to <a href="02pLaunchConfig.html">Launching a parallel application</a>.
+<p>Now you may want to proceed to <a href="02pLaunchConfigRemote.html">Launching a parallel application remotely</a>.
 <p>&nbsp;
 <h2 id="editRM">Editing the Resource Manager</h2>
 <p>Note that the resource manager cannot be edited when it is running.  
