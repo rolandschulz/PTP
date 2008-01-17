@@ -6,16 +6,30 @@
 # NOTE: Tested on MacOS X only!
 #
 
+UPDATE=true
+USER=gwatson
+
+args=`getopt u:n $*`
+if [ $? != 0 ]; then
+	echo 'Usage: update_ptp [-u user] [-n]'
+	exit 1
+fi
+
+set -- $args
+
+for i; do
+	case "$i" in
+	-u) USER="$2"; shift;;
+	-n) UPDATE=false; shift;;
+	esac
+done
+
 TAR_CMD="tar --create --verbose --gzip --dereference --exclude=CVS --exclude=.DS_Store --exclude=.cvsignore --exclude=readme.txt"
 ZIP_CMD="zip -r"
 ZIP_EXCLUDES="-x \*CVS\* -x \*.DS_Store -x \*.cvsignore -x \*readme.txt"
 
-UPDATE_SITE=~/Documents/workspaces/ptp_head/org.eclipse.ptp-update
 RELEASE_DIR=downloads/tools/ptp/releases/2.0
-SYSTEM=gwatson@dev.eclipse.org
-
-cd $UPDATE_SITE
-
+SYSTEM=$USER@dev.eclipse.org
 CORE=features/org.eclipse.ptp.core*
 VERSION=`expr $CORE : 'features/org.eclipse.ptp.core_\(.*\).jar'`
 NAME=ptp-updatesite-$VERSION
@@ -32,13 +46,15 @@ fi
 
 (cd $NAME; eval $ZIP_CMD ../$NAME.zip . $ZIP_EXCLUDES)
 
-(cd $NAME; \
-ln ../$NAME.zip; \
-$TAR_CMD --file=- .| \
-  ssh $SYSTEM "(cd $RELEASE_DIR; \
-	rm -f plugins/*.jar; rm -f features/*.jar; \
-	tar zxf -)"
-)
+if [ $UPDATE = "true" ]; then
+	(cd $NAME; \
+	ln ../$NAME.zip; \
+	$TAR_CMD --file=- .| \
+	  ssh $SYSTEM "(cd $RELEASE_DIR; \
+		rm -f plugins/*.jar; rm -f features/*.jar; \
+		tar zxf -)"
+	)
+fi
 
 rm -rf $NAME
 exit 0
