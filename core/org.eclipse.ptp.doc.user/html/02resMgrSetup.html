@@ -9,13 +9,10 @@
 <p>Topics  include:
 <ul>
 <li><a href="#defn">Resource managers</a>
-<li><a href="#creat">Creating Resource Managers</a>
+<li><a href="#creat">Creating and Configuring Resource Managers</a>
 <ul>
-<li><a href="#createRML">Creating a Local Resource Manager</a>
-<li><a href="#createRMR">Creating a Remote Resource Manager</a>
-<p>
-<li><a href="#configRM">Configuring a Local Resource Manager</a>
-<li><a href="#configRMR">Configuring a Remote Resource Manager</a>
+<li><a href="#configRML">Local Resource Manager</a>
+<li><a href="#configRMR">Remote Resource Manager</a>
 </ul>
 <li><a href="#startRM">Starting the Resource Manager</a>
 <li><a href="#editRM">Editing a Resource Manager</a>
@@ -26,18 +23,18 @@
 It could be a real job scheduling program, or the simplest is ORTE for a local? job.
 <p>In this example we will create a local resource manager for ORTE, in which the parallel
 program will be launched and run on the local machine.
-<h2>Creating Resource Managers</h2>
+<h2 id="creat">Creating Resource Managers</h2>
 <p>First we will demonstrate <a href="#createRML">creating a local resource manager</a>, where PTP 
 will control a cluster whose head node is on the local machine.  This was the
 scenario that PTP 1.x handled.  Eclipse and PTP are installed on the cluster head node.
-<p>Then we will demonstrate <a href="#createRMR">creating a remote resource manager</a>, where
+<p>Then we will demonstrate <a href="#configRMR">creating a remote resource manager</a>, where
 Eclipse and PTP are on your local laptop or workstation, for example, and PTP
 controls a remote cluster.  This is one of the most significant improvements in PTP 2.0.
 A small set of PTP components need to be installed
 on the remote node (need to list these, but basically the proxy and sdm -- the 
 parts built by the "sh BUILD" step of ptp installation, need to be on the remote node.)
 
-<h3 id="createRML">Creating a Local Resource Manager</h3>
+<h3 id="configRML">Creating and Configuring a Local Resource Manager</h3>
 
 <p>To create a resource manager, first open the PTP Runtime Perspective.
 (Window -> Open Perspective -> Other... and then choose "C/C++" from the list of perspectives.)
@@ -54,14 +51,7 @@ parts built by the "sh BUILD" step of ptp installation, need to be on the remote
 <p>The Resource Manager configuration dialog is shown:
 <br>
 <img src="images/0104ORTEProxyConn1.png">
-<h3 id="createRMR">Creating a Remote Resource Manager</h3>
-<p>In the  PTP Runtime Perspective,
-Right-click in Resource Managers view and select 
-<b>Add Resource Manager...</b>
-<br>
-<img src="images/0104addResMgr.png">
-<p>
-<h2 id="configRM">Configuring a Local Resource Manager</h2>
+
 <p>To configure the simple case of a local ORTE Resource Manager,
 Select <b>Local</b> as the Remote service provider:
 <br>
@@ -86,12 +76,54 @@ for this resource manager, if desired.
 Managers.
 <br>
 <img src="images/0104resMgrListOrteLocal.png">
-<h2 id="configRMR">Configuring a Remote Resource Manager</h2>
+
+<h3 id="configRMR">Creating and configuring a Remote Resource Manager</h3>
+<p>In the  PTP Runtime Perspective,
+Right-click in Resource Managers view and select 
+<b>Add Resource Manager...</b>
+<br>
+<img src="images/0104addResMgr.png">
 <p>
-blah...
-blah...
-blah...
-blah...
+
+Remote Resource Managers allow control via PTP of a remote target machine.
+This control can be accomplished via a variety of "remote service providers,"
+which currently includes Eclipse RSE (Remote Systems Explorer) or the more
+lightweight PTP Remote Tools, which you probably installed with PTP.
+
+<p>The following instructions show how to configure a remote ORTE Resource Manager using the PTP Remote Tools.
+<p>Add a new resource manager, of type ORTE.
+<p> ... missing step??? ...
+<p>In the ORTE Proxy Configuration dialog, 
+Select <b>Remote Tools </b> as the Remote service provider.
+<br>NEED NEW SCREENSHOT of remote selected
+<br>
+<img src="images/0104ORTEProxyConn2local.png">
+<p>The proxy server location should be set to the hostname, or IP address, of the remote target machine.
+<p>Note: assure that <code>sftp</code> works on the remote machine, with a known userid and password.
+<p>
+The Path to proxy server executable 
+should point to your <code>ptp_orte_proxy</code> executable file on the target machine.
+Select "New..."  and a connection will be made to the target machine.  Navigate to, and select, the <code>ptp_orte_proxy</code> executable,
+which is probably located in the eclipse/plugins/org.eclipse.ptp.<i>os.arch</i>.xxxx directory, where <i>os.arch</i> is the 
+operating system and architecture of the remote target machine, and <code>xxxx</code> is the suffix on the plugins directory, probably
+a release name and date suffix.
+<br>SCREENSHOT of navigating on remote target
+<br>
+It should probably be pointing to your plugins directory under your eclipse installation...
+<br>[update image to show it in plugins directory]
+<br>Under Multiplexing options, <b>None</b> should be selected
+and the local address for proxy connection should be set to your local address
+(either IP address x.x.x.x or hostname of your local machine).
+This is the address with which the remote target machine will attempt to connect back with the local machine.
+<p>Select Next or Finish.
+<p>If you select Next, the Choose Resource Manager Name dialog
+is shown and you have the opportunity to change the displayed name
+for this resource manager, if desired.
+<br>
+<img src="images/0104ChooseResMgrNameAndDesc.png">
+<p>Select Finish.
+<p>The new Resource Manager should appear in the list of Resource
+Managers.
 
 <h2 id="startRM">Starting the Resource Manager</h2>
 <p>Right mouse on the resource manager and select Start Resource Manager.
@@ -99,7 +131,8 @@ blah...
 <p>The Resource Manager item in the Resource Managers view
 changes color to indicate it is running.
 <br><img src="images/0104resMgrRunning.png">
-
+<p>Now proceed to <a href="02pLaunchConfig.html">Launching a parallel application</a>.
+<p>&nbsp;
 <h2 id="editRM">Editing the Resource Manager</h2>
 <p>Note that the resource manager cannot be edited when it is running.  
 Stop it first and then
@@ -108,7 +141,8 @@ it can be edited.
 
 <h2 id="remRM">Removing the Resource Manager</h2>
 <p><br><img src="images/0104resMgrRemove.png">
-
+<p>Proceed to <a href="02pLaunchConfig.html">Launching a parallel application</a>.
+<p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
 </body>
