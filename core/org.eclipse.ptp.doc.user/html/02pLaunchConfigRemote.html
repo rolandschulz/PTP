@@ -1,10 +1,10 @@
 <html>
 <head>
-<title>Launching Parallel Programs </title>
+<title>Launching Parallel Programs Remotely</title>
 </head>
 <body>
 
-<h1 id="top">Launching Parallel Programs</h1>
+<h1 id="top">Launching Parallel Programs Remotely</h1>
 <p>Topics  include:
 <ul>
 <li>selecting the machine to run on
@@ -23,7 +23,7 @@ or click the run icon on the tool bar and select Open Run Dialog...
 <li>Create a new Parallel Application by clicking "Parallel Application" and
 then clicking on the "New" button icon.
 <br>
-<img src="images/launch1.gif">
+<img src="images/0104launchParallelRemote.png">
 <p>Enter a name for the configuration in the "Name:" field.
 Here we use the same name as the project.
 <li>In the Main Tab:</li>
@@ -31,22 +31,17 @@ Here we use the same name as the project.
 <li>Choose a resource manager (Note: a resource manager
 must be running for it to appear in the drop-down list of resource managers here.)
 </li>
-<li>Choose the Parallel Project</li>
-<li>Choose the Application Program (executable) from the project
+<li>Choose the Parallel Project - on the local machine</li>
+<li>Choose the Application Program (executable) from the project - from the remote machine via the Browse button.
 <br>(it is probably located in the Debug folder, if this is a debug configruation)
 </li>
-<br><img src="images/launch2.gif">
+<br><img src="images/0104newRemoteExecutable.png">
 </ul>
 <p>&nbsp;
-<li>Select the Arguments tab
-<ul>
-<li>Enter any <i>program</i> arguments</li>
-<li>Change working directory if necessary
 
-<p>&nbsp;
 </li>
 
-</ul>
+
 <li>Select the Resources Tab</li>
 <ul>
 
@@ -54,7 +49,7 @@ must be running for it to appear in the drop-down list of resource managers here
 set to "0" initially. Enter a value > 0.  
 
 
-<br><img src="images/launchResTab.png">
+<br><img src="images/0104newRemoteNumProcesses.png">
 </li>
 </ul>
 <p>
@@ -63,19 +58,30 @@ set to "0" initially. Enter a value > 0.
 <li>Select the Debugger that will control the parallel processes
 by selecting "SDM" (the PTP's Scalable Debug Manager) from the selection menu.
 </li>
+<br><img src="images/0104newDebugrRemoteSel.png">
+
 <p>Under Debugger options, select path
-to debugger executable (probably in your 
+to debugger executable  by clicking  Browse... and select the sdm on the remote machine.
+(This is probably in your 
 eclipse/plugins/org.eclipse.ptp.<i>os.arch</i>/bin directory,
 where <i>os.arch</i> is your operating system and architecture, e.g.
 org.eclipse.ptp.linux.x86)
+<br><img src="images/0104newDebugrRemote.png">
 
-<br><img src="images/launch5.png">
+<li>Select the Arguments tab if you need to change any information here.
+<ul>
+<li>Enter any <i>program</i> arguments</li>
+<li>Change working directory if necessary
+<p>&nbsp;
 </ul>
 <li>Click on  <b>Run</b> to launch the program.
+<br><img src="images/0104remoteLaunch.png">
 </li>
 </ul>
 <p>&nbsp;
 <li>The parallel program begins execution...
+<br><img src="images/0104launchRemote.png">
+
 
 </ul>
 
