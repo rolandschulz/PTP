@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.internal.remote.LocalServices;
 import org.eclipse.ptp.internal.remote.RemoteServicesProxy;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -31,41 +34,28 @@ import org.osgi.framework.BundleContext;
  */
 public class PTPRemotePlugin extends AbstractUIPlugin {
 
+	private class RemoteServicesSorter implements Comparator<IRemoteServices> {
+		public int compare(IRemoteServices o1, IRemoteServices o2) {
+			return o1.getName().compareToIgnoreCase(o2.getName());
+		}
+	}
+
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.remote";
-
+	
 	// The shared instance
 	private static PTPRemotePlugin plugin;
 	
-	// Active remote services plugins (not necessarily loaded)
-	private Map<String, RemoteServicesProxy> allRemoteServices;
-	
-	// Default remote services for new RM wizard
-	private IRemoteServices defaultRemoteServices;
-	
-	/**
-	 * The constructor
-	 */
-	public PTPRemotePlugin() {
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getShell();
+		}
+		return null;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-		defaultRemoteServices = null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+	
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 
 	/**
@@ -75,6 +65,18 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public static PTPRemotePlugin getDefault() {
 		return plugin;
+	}
+
+	/**
+	 * Returns the active workbench shell or <code>null</code> if none
+	 * 
+	 * @return the active workbench shell or <code>null</code> if none
+	 */
+	public static Shell getShell() {
+		if (getActiveWorkbenchWindow() != null) {
+			return getActiveWorkbenchWindow().getShell();
+		}
+		return null;
 	}
 
 	/**
@@ -90,30 +92,8 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 			return PLUGIN_ID;
 		}
 		return getDefault().getBundle().getSymbolicName();
-	}    
+	}
 
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}	
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getShell() {
-		if (getActiveWorkbenchWindow() != null) {
-			return getActiveWorkbenchWindow().getShell();
-		}
-		return null;
-	}
-	
 	/**
 	 * Logs the specified status with this plug-in's log.
 	 * 
@@ -122,8 +102,8 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
-	}
-	
+	}    
+
 	/**
 	 * Logs an internal error with the specified message.
 	 * 
@@ -132,8 +112,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public static void log(String message) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
-	}
-
+	}	
 	/**
 	 * Logs an internal error with the specified throwable
 	 * 
@@ -143,7 +122,84 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
 	}
+	// Active remote services plugins (not necessarily loaded)
+	private Map<String, RemoteServicesProxy> allRemoteServices;
+	
+	// Default remote services for new RM wizard
+	private IRemoteServices defaultRemoteServices;
+	
+	/**
+	 * The constructor
+	 */
+	public PTPRemotePlugin() {
+	}
 
+	/**
+	 * Retrieve a sorted list of remote services.
+	 * 
+	 * @return remote services
+	 */
+	public synchronized IRemoteServices[] getAllRemoteServices() {
+		if (allRemoteServices == null) {
+			allRemoteServices = retrieveRemoteServices();
+		}
+		IRemoteServices[] services = allRemoteServices.values().toArray(new IRemoteServices[allRemoteServices.size()]);
+		Arrays.sort(services, new RemoteServicesSorter());
+		return services;
+	}
+
+	/**
+	 * Retrieve the default remote services plugin. The default is the LocalServices
+	 * provider if it exists, the last plugin otherwise.
+	 * 
+	 * @return default remote services provider
+	 */
+	public synchronized IRemoteServices getDefaultServices() {
+		if (defaultRemoteServices == null) {
+			IRemoteServices[] allServices = getAllRemoteServices();
+			defaultRemoteServices = allServices[allServices.length-1];
+			for (IRemoteServices services : allServices) {
+				if (services.getId().equals(LocalServices.LocalServicesId)) {
+					defaultRemoteServices = services;
+					break;
+				}
+			}
+		}
+		
+		return defaultRemoteServices;
+	}
+	
+	/**
+	 * Get the remote services identified by id
+	 * 
+	 * @return services
+	 */
+	public synchronized IRemoteServices getRemoteServices(String id) {
+		if (allRemoteServices == null) {
+			allRemoteServices = retrieveRemoteServices();
+		}
+		return allRemoteServices.get(id);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+		defaultRemoteServices = null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
+		
 	/**
 	 * Find and load all remoteServices plugins.
 	 */
@@ -171,51 +227,4 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		
 		return services;
     }
-	
-	/**
-	 * Retrieve a list of remote services.
-	 * 
-	 * @return remote services
-	 */
-	public synchronized IRemoteServices[] getAllRemoteServices() {
-		if (allRemoteServices == null) {
-			allRemoteServices = retrieveRemoteServices();
-		}
-		return allRemoteServices.values().toArray(new IRemoteServices[allRemoteServices.size()]);
-	}
-	
-	/**
-	 * Retrieve the default remote services plugin.
-	 * 
-	 * @return 
-	 */
-	public synchronized IRemoteServices getDefaultServices() {
-		if (defaultRemoteServices == null) {
-			IRemoteServices[] services = getAllRemoteServices();
-			defaultRemoteServices = services[services.length-1];
-		}
-		
-		return defaultRemoteServices;
-	}
-	
-	/**
-	 * Set the default services plugin
-	 * 
-	 * @param services
-	 */
-	public synchronized void setDefaultServices(IRemoteServices services) {
-		defaultRemoteServices = services;
-	}
-		
-	/**
-	 * Get the remote services identified by id
-	 * 
-	 * @return services
-	 */
-	public synchronized IRemoteServices getRemoteServices(String id) {
-		if (allRemoteServices == null) {
-			allRemoteServices = retrieveRemoteServices();
-		}
-		return allRemoteServices.get(id);
-	}
 }
