@@ -45,10 +45,11 @@ import org.eclipse.swt.widgets.Text;
 
 public class RMConfigurationWizard extends Wizard {
 
+	public final static String EMPTY_STRING = ""; //$NON-NLS-1$
+	
 	public class NameAndDescPage extends WizardPage {
 
 		private Text descText;
-
 		private Text nameText;
 
 		public NameAndDescPage(String pageName) {
@@ -95,6 +96,12 @@ public class RMConfigurationWizard extends Wizard {
 					useDefaultNameAndDesc = useDefaultsButton.getSelection();
 					final boolean enabled = hasFactories
 							&& !useDefaultNameAndDesc;
+					if (useDefaultNameAndDesc) {
+						configs[selectedFactory].setDefaultNameAndDesc();
+						setNameAndDescription(configs[selectedFactory]);
+						setPageComplete(true);
+						setErrorMessage(null);
+					}
 					nameAndDescPage.setEnabled(enabled);
 					getContainer().updateButtons();
 				}
@@ -108,6 +115,10 @@ public class RMConfigurationWizard extends Wizard {
 			nameText.addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent e) {
 					configs[selectedFactory].setName(nameText.getText());
+					if (nameText.getText().equals(EMPTY_STRING)) {
+						setPageComplete(false);
+						setErrorMessage("Please specify a resource manager name");
+					}
 				}});
 
 			Label descLabel = new Label(nameGroup, SWT.NONE);
