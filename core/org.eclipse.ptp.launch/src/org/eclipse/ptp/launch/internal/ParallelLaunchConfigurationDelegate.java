@@ -37,9 +37,9 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -52,14 +52,6 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -157,60 +149,7 @@ public class ParallelLaunchConfigurationDelegate
 				debugger = debugConfig.getDebugger();
 				int port = debugger.getDebuggerPort(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
 				
-
-				/*
-				 * Work out the address and port to supply as arguments to the debug server. There are currently
-				 * two cases:
-				 * 
-				 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is 
-				 * running the proxy (since this is where the tunnel begins), but accessible from the machine running 
-				 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a 
-				 * cluster), it will typically NOT be the same address that is used to start the proxy. The port
-				 * is a port that will be forwarded from the proxy machine back to the debugger port that
-				 * was allocated on the local machine.
-				 * 
-				 * 2. If port forwarding is not enabled, then the address will be the address of the host running 
-				 * Eclipse), and the port allocated when the debugger was created. NOTE: this assumes that the machine 
-				 * running the debug server can contact the local host directly. In the case of the SDM, the "master" 
-				 * debug server process can potentially run on any node in the cluster. In many environments, compute 
-				 * nodes cannot communicate outside their local network.
-				 * 
-				 * In both cases, the address is obtained from the debugger page in the launch configuration, since
-				 * in general it will be different for each connection. It is initialized to either the connection host
-				 * address (port forwarding) or the local address (no port forwarding).
-				 */
-				String localAddress = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST);
-				IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
-				if (rm != null) {
-					IResourceManagerConfiguration conf = rm.getConfiguration();
-					if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-						AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-						if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-							IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-							if (remoteServices == null) {
-								abort(LaunchMessages.getFormattedResourceString("ParallelLaunchConfigurationDelegate.Invalid_remote_services_ID", //$NON-NLS-1$
-										remConf.getRemoteServicesId()), null, 0);
-							}
-							IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-							IRemoteConnection connection = connMgr.getConnection(remConf.getConnectionName());
-							if (connection == null) {
-								abort(LaunchMessages.getFormattedResourceString("ParallelLaunchConfigurationDelegate.No_such_connection", //$NON-NLS-1$
-										remConf.getConnectionName()), null, 0);
-							}
-							localAddress = "localhost"; //$NON-NLS-1$
-							try {
-								port = connection.forwardRemotePort(localAddress, port, monitor);
-							} catch (RemoteConnectionException e) {
-								abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Unable_to_forward_port"), e, 0); //$NON-NLS-1$
-							}
-							if (monitor.isCanceled()) {
-								return;
-							}
-						} else {
-							localAddress = remConf.getLocalAddress();
-						}
-					}
-				}
+				String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
 				
 				ArrayList<String> dbgArgs = new ArrayList<String>();
 				dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
