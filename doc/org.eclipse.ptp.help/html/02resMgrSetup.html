@@ -93,9 +93,7 @@ changes color to indicate it is running.
 <p>&nbsp;
 
 <h3 id="configRMR">Creating and configuring a Remote Resource Manager</h3>
-
 <p>
-
 Remote Resource Managers allow control via PTP of a remote target machine.
 This control can be accomplished via a variety of "remote service providers,"
 which currently includes Eclipse RSE (Remote Systems Explorer) or the more
@@ -104,6 +102,7 @@ lightweight PTP Remote Tools, which you probably installed with PTP.
 <p>The following instructions show how to configure a remote ORTE Resource Manager using the PTP Remote Tools.
 <p>The example is a local machine running Windows XP, and the remote target machine running Linux (Fedora 7).
 <p>Note: Caveat here about having source on local machine, to match executable located on remote machine.
+<p>&nbsp;
 <p>Add a new resource manager, of type ORTE.
 <p>In the  PTP Runtime Perspective,
 Right-click in Resource Managers view and select 
@@ -133,9 +132,9 @@ a release name and date suffix.
 <br>
 Click OK to close the browse dialog.
 
-<br>Under Multiplexing options, <b>None</b> should be selected
-and the local address for proxy connection should be set to your local address
-(either IP address x.x.x.x or hostname of your local machine).
+<br>Under Multiplexing options, select <b>None</b>.
+The local address for proxy connection should be set to your local address
+(either IP address x.x.x.x or hostname of your local machine: the pulldown menu should provide some alternatives or you can enter the hostname/IP Address manually).
 This is the address with which the remote target machine will attempt to connect back with the local machine.
 <br>
 <img src="images/0104orteProxyConfigRemoteAddr1.png">
