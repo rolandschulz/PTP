@@ -669,9 +669,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 							InterruptedException {
 						try {
 							connection.open(monitor);
+							if (monitor.isCanceled()) {
+								throw new InterruptedException("Cancelled by user");
+							}
 						} catch (RemoteConnectionException e) {
-							ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
-									new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+							throw new InvocationTargetException(e);
 						}
 					}
 					
@@ -680,17 +682,19 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 					new ProgressMonitorDialog(getShell()).run(true, true, op);
 				} catch (InvocationTargetException e) {
 					ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getCause().getMessage()));
 				} catch (InterruptedException e) {
 					ErrorDialog.openError(getShell(), "Connection Error", "Could not open connection", 
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
 			}
-			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-			String correctPath = serverText.getText();
-			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("RemoteConfigurationWizard.select"), correctPath);
-			if (selectedPath != null) {
-				serverText.setText(selectedPath.toString());
+			if (connection.isOpen()) {
+				IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
+				String correctPath = serverText.getText();
+				IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("RemoteConfigurationWizard.select"), correctPath);
+				if (selectedPath != null) {
+					serverText.setText(selectedPath.toString());
+				}
 			}
 		}
 	}
