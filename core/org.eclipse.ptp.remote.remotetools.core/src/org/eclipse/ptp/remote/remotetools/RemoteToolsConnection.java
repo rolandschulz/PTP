@@ -211,6 +211,10 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				} catch (InterruptedException e) {
 				}
 			}
+			
+			if (monitor.isCanceled()) {
+				job.cancel();
+			}
 		}
 		monitor.done();
 	}
