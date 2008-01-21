@@ -15,12 +15,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.remote.LocalServices;
 import org.eclipse.ptp.internal.remote.RemoteServicesProxy;
@@ -40,12 +43,14 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		}
 	}
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remote";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.remote"; //$NON-NLS-1$
 	
 	// The shared instance
 	private static PTPRemotePlugin plugin;
 	
+	/**
+	 * @return
+	 */
 	public static Shell getActiveWorkbenchShell() {
 		IWorkbenchWindow window = getActiveWorkbenchWindow();
 		if (window != null) {
@@ -54,10 +59,64 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		return null;
 	}
 	
+	/**
+	 * @return
+	 */
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 
+	/**
+     * If it is possible to adapt the given object to the given type, this
+     * returns the adapter. Performs the following checks:
+     * 
+     * <ol>
+     * <li>Returns <code>sourceObject</code> if it is an instance of the
+     * adapter type.</li>
+     * <li>If sourceObject implements IAdaptable, it is queried for adapters.</li>
+     * <li>If sourceObject is not an instance of PlatformObject (which would have
+     * already done so), the adapter manager is queried for adapters</li>
+     * </ol>
+     * 
+     * Otherwise returns null.
+     * 
+     * @param sourceObject
+     *            object to adapt, or null
+     * @param adapterType
+     *            type to adapt to
+     * @return a representation of sourceObject that is assignable to the
+     *         adapter type, or null if no such representation exists
+     */
+    public static Object getAdapter(Object sourceObject, Class adapterType) {
+    	Assert.isNotNull(adapterType);
+        if (sourceObject == null) {
+            return null;
+        }
+        if (adapterType.isInstance(sourceObject)) {
+            return sourceObject;
+        }
+
+        if (sourceObject instanceof IAdaptable) {
+            IAdaptable adaptable = (IAdaptable) sourceObject;
+
+            Object result = adaptable.getAdapter(adapterType);
+            if (result != null) {
+                // Sanity-check
+                Assert.isTrue(adapterType.isInstance(result));
+                return result;
+            }
+        } 
+        
+        if (!(sourceObject instanceof PlatformObject)) {
+            Object result = Platform.getAdapterManager().getAdapter(sourceObject, adapterType);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return null;
+    }
+	
 	/**
 	 * Returns the shared instance
 	 *
@@ -66,7 +125,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	public static PTPRemotePlugin getDefault() {
 		return plugin;
 	}
-
+	
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none
 	 * 
@@ -78,7 +137,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Get unique identifier
 	 * 
@@ -102,7 +161,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
-	}    
+	}
 
 	/**
 	 * Logs an internal error with the specified message.
@@ -112,7 +171,8 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public static void log(String message) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
-	}	
+	}
+
 	/**
 	 * Logs an internal error with the specified throwable
 	 * 
@@ -121,9 +181,10 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
-	}
+	}    
+
 	// Active remote services plugins (not necessarily loaded)
-	private Map<String, RemoteServicesProxy> allRemoteServices;
+	private Map<String, RemoteServicesProxy> allRemoteServices;	
 	
 	// Default remote services for new RM wizard
 	private IRemoteServices defaultRemoteServices;
@@ -133,7 +194,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	public PTPRemotePlugin() {
 	}
-
+	
 	/**
 	 * Retrieve a sorted list of remote services.
 	 * 
@@ -147,7 +208,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		Arrays.sort(services, new RemoteServicesSorter());
 		return services;
 	}
-
+	
 	/**
 	 * Retrieve the default remote services plugin. The default is the LocalServices
 	 * provider if it exists, the last plugin otherwise.
@@ -168,7 +229,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		
 		return defaultRemoteServices;
 	}
-	
+
 	/**
 	 * Get the remote services identified by id
 	 * 
@@ -180,7 +241,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		}
 		return allRemoteServices.get(id);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -190,7 +251,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		plugin = this;
 		defaultRemoteServices = null;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
@@ -199,8 +260,8 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		plugin = null;
 		super.stop(context);
 	}
-		
-	/**
+	
+    /**
 	 * Find and load all remoteServices plugins.
 	 */
 	private Map<String, RemoteServicesProxy> retrieveRemoteServices() {
