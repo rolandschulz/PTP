@@ -46,8 +46,9 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, new Path(filterPath), shell);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, shell);
 		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
+		browser.setInitialPath(filterPath);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
@@ -62,8 +63,9 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseFile(Shell shell, String message, String filterPath) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, new Path(filterPath), shell);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, shell);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
+		browser.setInitialPath(filterPath);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
