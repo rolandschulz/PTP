@@ -14,7 +14,7 @@ Tools feature for MPI development, you need to
 </ol>
 
 <h2 id="prefs">Specifying the MPI Include path in Preferences</h2>
-<p>To specify the MPI include path, use Window > Preferences.
+<p>To specify the MPI include path, use Window > Preferences. (For Mac, use Eclipse > Preferences)
 Under PTP, Parallel Language Development Tools, MPI...
 (Note: If you do not have core PTP installed, the "Parallel Language 
 Development Tools" section in the preferences will be included without it.)
@@ -31,26 +31,39 @@ accurate predictions of settings for new projects.
 <p>The MPI include paths must also be added to each project.
 There are two ways to do this.
 <ol>
-<li><a href="#wizard">Use the MPI new project wizard</a>, or
+<li><a href="#wizard">Use the PLDT new project wizards</a>, or
 </li>
 <li><a href="#manual">Add the build information manually</a>.
 </ol>
-<h2 id="wizard">Use the MPI new project wizard</h2>
-<p>Create a new "Managed Make C Project."
-After the "Additional Project settings" wizard page,
-you should see the "MPI Project Settings" wizard page.
-<p>(Note: we plan to add a "New MPI project" project type later.)
+<h2 id="wizard">Use the PLDT new project wizards</h2>
+<p>Create a new "C project"
+<br>File->New->C project (if you are already in the C/C++ perspective this may be the simplest)
+<br>is one way; there are several ways to get to this wizard
+Enter a project name; under Project types, expand 'executable' and select, e.g. "MPI Hello World C project"
 <br>
 <img src="images/mpiWizard.gif">
-<p>If you have configured the Preferences as described above,
-the MPI include paths and other settings should be automatically included.
-To <i>not</i> include the settings in the build configuration,
-uncheck the first box "Add MPI project settings to this project".
-If you want MPI settings but the settings for this project should be different,
-uncheck the "Use default information" and
-correct the information.
+<br>Select Next.
+<br>On the next page, fill in any project template values, e.g. your name.
+<br>Then select Next.
+<br><img src="images/mpiWizard2.gif">
+<p>On the next page, "MPI Project Settings" page,  make sure the "Add MPI project settings to this project"
+is checked.  If you want to change any of the default values for this project, you can do so
+here by unchecking the "Use default information" and altering the values.
 
+<br><img src="images/mpiWizard3.gif">
+<p>Select Finish.
+<p>The project is created and should build automatically.
+The Eclipse workbench is shown below after creating the new "MPI hello world" project.
+The project explorer view on the left shows the project contents.
+The source file is under the 'src' directory; expand this to see it.
+Double-click on the source file name to edit the source file.  The outline view on the
+right shows the outline of the file currently shown in the editor.
+The Console view at the bottom shows the results of the project build.
 
+<br><img src="images/mpiNewProjectWorkbench.gif">
+<p>
+<p><p>Now continue to set up to <a href="run.html">run the MPI tools</a>
+<p>
 <h2 id="manual">Add the Build Information Manually</h2>
 <p>If the new project wizard isn't used as described 
 above to set the MPI information for a project,
@@ -80,7 +93,7 @@ You probably also need to do the same for the linker tool.
 
 </ol>
 
-<p>Now set up to <a href="run.html">run the MPI plug-in</a>
+<p>Now continue to set up to <a href="run.html">run the MPI tools</a>
 
 <p>&nbsp;
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
