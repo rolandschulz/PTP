@@ -10,9 +10,19 @@ Setup for PTP PLDT OpenMP Tools
 as for the <a href="setup.html">MPI tools setup</a>.
 Essentially, point CDT at the header files and at the command
 to call your compiler with the OpenMP information.
-<p>Note that you must add the OpenMP include information manually to
-the project. The New Project wizard does not (yet) add this
-information automatically for OpenMP projects.
+<p>The OpenMP preferences should be set to point to your OpenMP header file
+<br><img src="images/openmpPrefs.gif">
+<p>The PLDT new project wizards now contain wizards for creating OpenMP projects as well.
+<br><img src="images/newProjOpenMP.gif">
+<p>Be sure on the project settings page that everything is filled in, including the build command.
+<br><img src="images/newProjOpenMPsettings.gif">
+
+
+
+<br>You may need to manually alter the project build properties (in the project properties) to add compiler flags
+specific to OpenMP to your project.
+<p>Note the header file name in your system, e.g. <code>openmp.h</code> vs <code>omp.h</code>; you may need to adjust the include file
+line in the sample source file to match your system.
 <p>Now set up to <a href="runOMP.html">run the OpenMP features</a>.
 <p>&nbsp;
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
