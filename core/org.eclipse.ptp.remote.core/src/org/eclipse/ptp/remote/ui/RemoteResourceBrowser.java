@@ -135,17 +135,17 @@ public class RemoteResourceBrowser extends Dialog {
 	 * @param initialPath
 	 * @return
 	 */
-	private IPath findInitialPath(IPath initialPath) {
+	private IPath findInitialPath(IPath pathToCheck) {
 		IPath path = cwd;
 		
-		if (initialPath.matchingFirstSegments(cwd) != cwd.segmentCount()) {
+		if (pathToCheck.matchingFirstSegments(cwd) != cwd.segmentCount()) {
 			return path;
 		}
-		if (initialPath != null) {
+		if (pathToCheck != null) {
 			try {
-				IFileInfo info = fileMgr.getResource(initialPath, new NullProgressMonitor()).fetchInfo();
+				IFileInfo info = fileMgr.getResource(pathToCheck, new NullProgressMonitor()).fetchInfo();
 				if (info.exists()) {
-					path = initialPath;
+					path = pathToCheck;
 				}
 			} catch (IOException e) {
 			}
@@ -175,8 +175,13 @@ public class RemoteResourceBrowser extends Dialog {
 		return contents;
 	}
 	
+	/**
+	 * Set the initial path to start browsing. This will be set in the browser text field,
+	 * and in a future version should expand the browser to this location if it exists.
+	 * @param path
+	 */
 	public void setInitialPath(String path) {
-		IPath initial = findInitialPath(initialPath);
+		IPath initial = findInitialPath(new Path(path));
 		remotePath = initial.toString();
 	}
 
