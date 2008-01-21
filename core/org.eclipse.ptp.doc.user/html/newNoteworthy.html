@@ -5,86 +5,64 @@
 </head>
 <body>
 <h1>Parallel Tools Platform (PTP) Release 2.0 - New and Noteworthy</h1>
-<p>The 2.0 release of PTP gives some new functionality, some bug fixes, and some
-increased scalability to continue to enhance development and debug capabilities
-for parallel projects.
-</p>
+<p>
+This version has had many enhancements and bug fixes since the 1.1.1  
+release. Some of the major new features include:
+<ul>
+<li>Monitor/launch/debug on multiple systems
+<p>
+2.0 allows multiple systems to be configured simultaneously. Machine  
+and node status is displayed for each system, and jobs can be launched  
+and debugged onto the different machines from within a single Eclipse  
+session.
 
-<table border="0" cellpadding="10" cellspacing="0" width="80%">
-  <tr> 
-    <td colspan="2"> <hr /> <h2>Major Features</h2>
-      <hr /></td>
-  </tr>
-  <tr> 
-    <td width="30%" valign="top" align="left"><b>Resource Managers</b></td>
-    <td width="70%" valign="top">
-    Resource Managers allow the use of schedulers, etc. to control the parallel program execution.
-      </td>
+<li>Support for resource managers
+<p>
+Adds support for job schedulers as well as interactive runtime  
+systems. Support for LoadLeveler is included by default. Additional  
+job schedulers (e.g. PBS, LSF, SLURM, etc.) will become available in  
+the future.
 
-  </tr>
-  <tr> 
-    <td width="30%" valign="top" align="left"><b>Remote</b></td>
-    <td width="70%" valign="top">
-    Eclipse can run on your local laptop or workstation and control the execution on a remote cluster.
-    <p>Remote services can be provided by RSE (Eclipse Remote System Environment) or by the PTP Remote Services
-      </td>
+<li>Remote monitoring, launch and debugging
+<p>
+In 1.1.1, Eclipse had to be running on the same machine that the  
+parallel job was launched on. In 2.0, Eclipse can be running on your  
+workstation, but you can still monitor, launch and debug applications  
+on remote machines.
+</p></li>
+<li>Port forwarding for remote connections
+<p>
+For sites that only allow a single ssh connection, 2.0 now adds  
+support for tunneling all proxy and debug traffic across a single  
+connection.
 
-  </tr>
-  
-  <tr> 
-    <td colspan="2"> <hr /> </td>
-  </tr>
-  <tr> 
-    <td width="30%" valign="top" align="left"><b>PLDT: MPI Barrier Analysis</b></td>
-    <td width="70%" valign="top">Barrier Analysis can predict deadlocks due to mismatched MPI Barriers
+<li>Combined console
+<p>
+In addition to the per-process windows that display standard out, 2.0  
+provides a single console window that combines output from all  
+processes into a single view.
 
-  </tr>
+<li>Debugger improvements
+<p>
+Includes a completely re-designed debugger framework, improvements to  
+line markers and marker colors, and tooltip popup display of variables.
 
-  <tr> 
-    <td colspan="2"> <hr /> </td>
-  </tr>
-  <tr> 
-    <td width="30%" valign="top" align="left"><b>Debugger ...</b></td>
-    <td width="70%" valign="top">Blah blah blah
+<li>Parallel Language Development Tools
+<p>
+All the features of PLDT 2.0, including MPI Barrier analysis
+and new wizards for conveniently creating MPI and OpenMP project.
 
-</td>
-  </tr>
+<li>Update site support
+<p>
+PTP can now be completely downloaded and installed from an Eclipse  
+update site.
 
-  <tr> 
-    <td colspan="2"> <hr /> </td>
-  </tr>
-
-    <tr> 
-    <td width="30%" valign="top" align="left"><b>Build improvements</b></td>
-    <td width="70%" valign="top">PTP supports a large range of
-machine architectures, operating systems and parallel runtime
-systems.
-In 1.1, dynamically linked executables have  been deprecated, and
-build scripts have been improved so this only requires one command
-for PTP installation.
-
-</td>
-  </tr>
-    <tr> 
-    <td colspan="2"> <hr /> </td>
-  <tr> 
-    <td width="30%" valign="top" align="left"><b>PTP 2.0 Release Notes</b></td>
-    <td width="70%" valign="top">Detailed PTP 2.0 release notes are available
+<li>PTP 2.0 Release Notes<p>Detailed PTP 2.0 release notes including installation instructions are available
     	at <a href="http://wiki.eclipse.org/PTP/release_notes/2.0">
     	http://wiki.eclipse.org/PTP/release_notes/2.0</a>
-     </td>
-  </tr>
-  <tr> 
-    <td colspan="2"> <hr /> </td>
-  </tr>
 
 
-  
-  
-  
- 
-</table>
-
+</ul>
 
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
