@@ -61,7 +61,6 @@ public class RemoteResourceBrowser extends Dialog {
 
 	private int browserType;
 	private IRemoteFileManager fileMgr;
-	private IPath initialPath = null;
 	private IPath cwd;
 	private String dialogTitle;
 	private String dialogLabel;
