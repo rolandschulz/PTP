@@ -1606,13 +1606,13 @@ public class SimpleTableBarrierView extends ViewPart {
 					}
 				} // end if CHANGED
 				else if (delta.getKind() == IResourceDelta.ADDED) {
-					System.out.println("Resource added.");
+					//System.out.println("Resource added.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REPLACED) {
-					System.out.println("Resource replaced.");
+					//System.out.println("Resource replaced.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REMOVED) {
-					System.out.println("Resource removed.");
+					//System.out.println("Resource removed.");
 					checkMarkerDeltas(delta);
 				}
 			} // end if FILE
@@ -1622,7 +1622,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		private void checkMarkerDeltas(IResourceDelta delta) {
 			IMarkerDelta[] md1 = delta.getMarkerDeltas();
 			int len = md1.length;
-			System.out.println("       ... found " + len + " markerDeltas.");
+			//System.out.println("       ... found " + len + " markerDeltas.");
 		}
 
 		/**
