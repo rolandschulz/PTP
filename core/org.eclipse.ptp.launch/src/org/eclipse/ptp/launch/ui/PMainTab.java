@@ -107,6 +107,7 @@ public class PMainTab extends PLaunchConfigurationTab {
 	protected Text appText = null;
 	protected Button projButton = null; 
     protected Button appButton = null;
+    protected Button consoleButton = null;
 	protected WidgetListener listener = new WidgetListener();
 
 	/* (non-Javadoc)
@@ -166,7 +167,12 @@ public class PMainTab extends PLaunchConfigurationTab {
 		
 		appButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null); //$NON-NLS-1$
 		appButton.addSelectionListener(listener);
-    }
+
+		createVerticalSpacer(mainComp, 2);
+
+		consoleButton = createCheckButton(mainComp, LaunchMessages.getResourceString("PMainTab.Console")); //$NON-NLS-1$
+		consoleButton.setSelection(false);
+   }
 
 	/* (non-Javadoc)
      * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
@@ -259,6 +265,9 @@ public class PMainTab extends PLaunchConfigurationTab {
 		configuration.setAttribute(
 				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 				getFieldContent(appText.getText()));
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_CONSOLE,
+				consoleButton.getSelection());
     }
     
     /* (non-Javadoc)
