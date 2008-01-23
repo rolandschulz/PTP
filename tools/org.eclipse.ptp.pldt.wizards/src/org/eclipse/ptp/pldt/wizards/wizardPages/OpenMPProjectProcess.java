@@ -11,9 +11,6 @@
 
 package org.eclipse.ptp.pldt.wizards.wizardPages;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +28,11 @@ import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.IOption;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.cdt.ui.wizards.CProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
-import org.osgi.framework.Bundle;
 
 /**
  * 
@@ -69,14 +61,6 @@ public class OpenMPProjectProcess extends ProcessRunner {
 		valueStore= template.getValueStore();
 		String pageID = OpenMPProjectWizardPage.PAGE_ID;
 		
-		String templateID= template.getTemplateId(); // TODO - is this enough instead of project type?
-		//		Object projectType=valueStore.get("projectType");
-		//		if(traceOn)System.out.println("  projectType="+projectType);
-
-		if(!templateID.startsWith("OpenMP")) {
-			if(wizTraceOn)System.out.println("templateID="+templateID+" - not OpenMP - skip this process");
-			return;
-		}
 		Object obj = getNewPropValue(pageID, OpenMPProjectWizardPage.DO_OpenMP_INCLUDES, null);
 		boolean doOpenMPIncludes = OpenMPProjectWizardPage.getDefaultUseOpenMPIncludes();
 		if (obj != null)
@@ -86,9 +70,6 @@ public class OpenMPProjectProcess extends ProcessRunner {
 				System.out.println("Do not save OpenMP info in this project.");
 			return;
 		}
-
- 		CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
-
  		// this process must be executed after a separate process which creates the project
 		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName"));
 		if(!proj.exists()) {
@@ -115,9 +96,6 @@ public class OpenMPProjectProcess extends ProcessRunner {
 		propID=OpenMPProjectWizardPage.OpenMP_LINK_COMMAND_PROP_ID;
 		String OpenMPLinkCommand=getNewPropValue(pageID,propID,"gcccc");
 		
-		propID=OpenMPProjectWizardPage.OpenMP_SAMPLE_FILE_PROP_ID;
-		String OpenMPSampleFileInsert=getNewPropValue(pageID, propID, "false");
- 
 		IManagedBuildInfo info = null;
 		try {
 			info = ManagedBuildManager.getBuildInfo(proj);
@@ -152,28 +130,6 @@ public class OpenMPProjectProcess extends ProcessRunner {
 		// be lost when you shut down Eclipse.
 		if(traceOn)System.out.println("ManagedBuildManager.saveBuildInfo...");
 	
-		// sample file insert is done by project templates now
-//		if(OpenMPSampleFileInsert.equals("true")){
-//			 try {
-//				Bundle bundle = Platform.getBundle(MpiWizardsPlugin.getPluginId());
-//				String sourceFilename="samples/testMPI.c";
-//				String destFileName="testMPI.c";
-//				Path path = new Path(sourceFilename);
-//				URL fileURL = FileLocator.find(bundle, path, null);
-//				InputStream destFileStream = null;
-//				try {
-//					destFileStream = fileURL.openStream();
-//					proj.getFile(destFileName).create(destFileStream,false,null);
-//					//System.out.println("file "+fname+" created.");
-//				} catch (IOException e) {
-//					System.out.println("Error creating file: "+destFileName);
-//					//e.printStackTrace();
-//				}
-//			} catch (CoreException e) {
-//				System.out.println("Error creating testMPI.c");
-//				e.printStackTrace();
-//			}
-//		}
 		ManagedBuildManager.saveBuildInfo(proj, true);
 
 	}
@@ -226,7 +182,7 @@ public class OpenMPProjectProcess extends ProcessRunner {
 		ITool cfTool = cf.getToolFromInputExtension(ext);
 		// do we need to also handle c++ case as well?
 
-		String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
+		//String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
 		String name = cfTool.getName();// "XL C Compiler"
 		IOption option = null;
 		if (name.startsWith("XL C")) { // special case for XL C compiler
