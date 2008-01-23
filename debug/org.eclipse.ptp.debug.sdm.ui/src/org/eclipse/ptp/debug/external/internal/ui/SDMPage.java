@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -79,13 +80,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 	
 				/*
-				 * Enable remote section if this is a remote resource manager
-				 */
-				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-					enableRemoteSection(true);
-				}
-	
-				/*
 				 * If the resource manager has been changed and this is a remote
 				 * resource manager, then update the host field
 				 */
@@ -102,11 +96,13 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 								address = remConfig.getLocalAddress();
 							}
 						}
+					} else {
+						address = "localhost"; //$NON-NLS-1$
 					}
 				}
-				fRMDebuggerAddressText.setText(address);
 			}
 			
+			fRMDebuggerAddressText.setText(address);
 			fRMDebuggerPathText.setText(workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
 		} catch(CoreException e) {
 			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err2"); //$NON-NLS-1$
@@ -138,7 +134,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		fRMDebuggerBrowseButton.addSelectionListener(new SelectionAdapter() {
 		    @Override
 			public void widgetSelected(SelectionEvent e) {
-				String file = browseRemoteFile();
+				String file = browseFile();
 				if (file != null) {
 					fRMDebuggerPathText.setText(file);
 				}
@@ -160,8 +156,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		});
 	
 		setControl(parent);
-		
-		enableRemoteSection(false);
 	}
 	
 	/* (non-Javadoc)
@@ -180,15 +174,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			resourceManager = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			if (resourceManager != null) {
 				IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-	
-				/*
-				 * Enable remote section if this is a remote resource manager
-				 */
 				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-					enableRemoteSection(true);
-					fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING));
+					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
+					if (remoteServices != null) {
+						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
+					}
+				} else {
+					remoteServices = null;
 				}
 			}
+			fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING));
 			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
 		} catch (CoreException e) {
 		}
@@ -199,14 +195,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		if (remoteServices != null) {
-			if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
-				errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
-			} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
-				errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
-			} else {
-				errMsg = null;
-			}
+		if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
+			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
+		} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
+			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
+		} else {
+			errMsg = null;
 		}
 		setErrorMessage(errMsg);
 		return (errMsg == null);
@@ -216,10 +210,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		if (remoteServices != null) {
-			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerPathText.getText()));
-			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getFieldContent(fRMDebuggerAddressText.getText()));
-		}
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerPathText.getText()));
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getFieldContent(fRMDebuggerAddressText.getText()));
 	}
 	
 	/* (non-Javadoc)
@@ -230,32 +222,35 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	/**
-	 * @return
+	 * Browse for a file. If remoteServices is not null, then the currently
+	 * select resource manager supports remote browsing.
+	 * 
+	 * @return path to file selected in browser
 	 */
-	private String browseRemoteFile() {
+	private String browseFile() {
 		if (remoteServices != null) {
 			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 			if (fileManager != null) {
-				IPath path = fileManager.browseFile(getShell(), ExternalDebugUIMessages.getString("SDMDebuggerPage.selectDebuggerExe"), fRMDebuggerPathText.getText()); //$NON-NLS-1$
-				return path.toString();
+				IPath path = fileManager.browseFile(getShell(), 
+						ExternalDebugUIMessages.getString("SDMDebuggerPage.selectDebuggerExe"), 
+						fRMDebuggerPathText.getText()); //$NON-NLS-1$
+				if (path != null) {
+					return path.toString();
+				}
 			}
+		} else {
+			FileDialog dialog = new FileDialog(getShell());
+			dialog.setText(ExternalDebugUIMessages.getString("SDMDebuggerPage.selectDebuggerExe"));
+			dialog.setFileName(fRMDebuggerPathText.getText());
+			return dialog.open();
 		}
 		return null;
 	}
 	
-	/**
-	 * @param enabled
-	 */
-	private void enableRemoteSection(boolean enabled) {
-		fRMDebuggerAddressText.setEnabled(enabled);
-		if (!enabled) {
-			fRMDebuggerAddressText.setText(EMPTY_STRING);
-		}
-	}
-	
     /**
-     * @param text
-     * @return
+     * Get and clean content of a Text field
+     * @param text text obtained from a Text field
+     * @return cleaned up content
      */
     protected String getFieldContent(String text) {
         if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
