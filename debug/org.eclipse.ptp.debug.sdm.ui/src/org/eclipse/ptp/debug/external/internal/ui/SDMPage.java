@@ -75,37 +75,39 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			String address = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING);
 			String rmId = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
 			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-			IResourceManagerConfiguration rmConfig = rm.getConfiguration();
-
-			/*
-			 * Enable remote section if this is a remote resource manager
-			 */
-			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-				enableRemoteSection(true);
-			}
-
-			/*
-			 * If the resource manager has been changed and this is a remote
-			 * resource manager, then update the host field
-			 */
-			if (resourceManager != rm) {
-				resourceManager = rm;
+			if (rm != null) {
+				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
+	
+				/*
+				 * Enable remote section if this is a remote resource manager
+				 */
 				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
-					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
-					if (remoteServices != null) {
-						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
-						if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-							address = connection.getAddress();
-						} else {
-							address = remConfig.getLocalAddress();
+					enableRemoteSection(true);
+				}
+	
+				/*
+				 * If the resource manager has been changed and this is a remote
+				 * resource manager, then update the host field
+				 */
+				if (resourceManager != rm) {
+					resourceManager = rm;
+					if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+						AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+						remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
+						if (remoteServices != null) {
+							connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
+							if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+								address = connection.getAddress();
+							} else {
+								address = remConfig.getLocalAddress();
+							}
 						}
 					}
 				}
+				fRMDebuggerAddressText.setText(address);
 			}
 			
 			fRMDebuggerPathText.setText(workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
-			fRMDebuggerAddressText.setText(address);
 		} catch(CoreException e) {
 			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err2"); //$NON-NLS-1$
 		}
@@ -173,18 +175,19 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
-		System.out.println("initializeFrom");
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
 			resourceManager = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-
-			/*
-			 * Enable remote section if this is a remote resource manager
-			 */
-			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-				enableRemoteSection(true);
-				fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING));
+			if (resourceManager != null) {
+				IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
+	
+				/*
+				 * Enable remote section if this is a remote resource manager
+				 */
+				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+					enableRemoteSection(true);
+					fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING));
+				}
 			}
 			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
 		} catch (CoreException e) {
