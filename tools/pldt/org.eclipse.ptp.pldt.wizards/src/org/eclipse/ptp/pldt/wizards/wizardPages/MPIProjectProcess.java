@@ -11,9 +11,6 @@
 
 package org.eclipse.ptp.pldt.wizards.wizardPages;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +28,11 @@ import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.IOption;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.cdt.ui.wizards.CProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
-import org.osgi.framework.Bundle;
 
 /**
  * 
@@ -69,16 +61,9 @@ public class MPIProjectProcess extends ProcessRunner {
 		
 		valueStore= template.getValueStore();
 		String pageID = MPIProjectWizardPage.PAGE_ID;
-		
-		String templateID= template.getTemplateId(); // TODO - is this enough instead of project type?
-		//		Object projectType=valueStore.get("projectType");
-		//		if(traceOn)System.out.println("  projectType="+projectType);
 
-		if(!templateID.startsWith("MPI")) {
-			if(wizTraceOn)System.out.println("templateID="+templateID+" - not MPI - skip this process");
-			return;
-		}
 		Object obj = getNewPropValue(pageID, MPIProjectWizardPage.DO_MPI_INCLUDES, null);
+		// use the default value if nothing was set in the pageData by the user
 		boolean doMpiIncludes = MPIProjectWizardPage.getDefaultUseMpiIncludes();
 		if (obj != null)
 			doMpiIncludes = Boolean.valueOf((String) obj);
@@ -88,7 +73,7 @@ public class MPIProjectProcess extends ProcessRunner {
 			return;
 		}
 
- 		CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
+ 		//CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
 
  		// this process must be executed after a separate process which creates the project
 		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName"));
@@ -115,10 +100,7 @@ public class MPIProjectProcess extends ProcessRunner {
 		
 		propID=MPIProjectWizardPage.MPI_LINK_COMMAND_PROP_ID;
 		String mpiLinkCommand=getNewPropValue(pageID,propID,"mpicc");
-		
-		propID=MPIProjectWizardPage.MPI_SAMPLE_FILE_PROP_ID;
-		String mpiSampleFileInsert=getNewPropValue(pageID, propID, "false");
- 
+
 		IManagedBuildInfo info = null;
 		try {
 			info = ManagedBuildManager.getBuildInfo(proj);
@@ -153,27 +135,6 @@ public class MPIProjectProcess extends ProcessRunner {
 		// be lost when you shut down Eclipse.
 		if(traceOn)System.out.println("ManagedBuildManager.saveBuildInfo...");
 		
-		if(mpiSampleFileInsert.equals("true")){
-			 try {
-				Bundle bundle = Platform.getBundle(MpiWizardsPlugin.getPluginId());
-				String sourceFilename="samples/testMPI.c";
-				String destFileName="testMPI.c";
-				Path path = new Path(sourceFilename);
-				URL fileURL = FileLocator.find(bundle, path, null);
-				InputStream destFileStream = null;
-				try {
-					destFileStream = fileURL.openStream();
-					proj.getFile(destFileName).create(destFileStream,false,null);
-					//System.out.println("file "+fname+" created.");
-				} catch (IOException e) {
-					System.out.println("Error creating file: "+destFileName);
-					//e.printStackTrace();
-				}
-			} catch (CoreException e) {
-				System.out.println("Error creating testMPI.c");
-				e.printStackTrace();
-			}
-		}
 		ManagedBuildManager.saveBuildInfo(proj, true);
 
 	}
@@ -226,7 +187,7 @@ public class MPIProjectProcess extends ProcessRunner {
 		ITool cfTool = cf.getToolFromInputExtension(ext);
 		// do we need to also handle c++ case as well?
 
-		String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
+		//String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
 		String name = cfTool.getName();// "XL C Compiler"
 		IOption option = null;
 		if (name.startsWith("XL C")) { // special case for XL C compiler
@@ -239,7 +200,6 @@ public class MPIProjectProcess extends ProcessRunner {
 			try {
 				includePaths = option.getIncludePaths();
 			} catch (BuildException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			String[] newIncludePaths = add(includePaths, newIncludePath);
@@ -516,7 +476,6 @@ public class MPIProjectProcess extends ProcessRunner {
 			try {
 				oType = option.getValueType();
 			} catch (BuildException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				continue;
 			}
