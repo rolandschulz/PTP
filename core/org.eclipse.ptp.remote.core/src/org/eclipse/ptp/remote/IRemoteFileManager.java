@@ -28,7 +28,7 @@ public interface IRemoteFileManager {
 	 * @param shell workbench shell
 	 * @param message message to display in dialog
 	 * @param initialPath initial path to use when displaying files
-	 * @return the path to the directory relative to the remote system
+	 * @return the path to the directory relative to the remote system or null if the browser was cancelled
 	 */
 	public IPath browseDirectory(Shell shell, String message, String initialPath);
 
@@ -41,7 +41,7 @@ public interface IRemoteFileManager {
 	 * @param shell workbench shell
 	 * @param message message to display in dialog
 	 * @param initialPath initial path to use when displaying files
-	 * @return the path to the file relative to the remote system
+	 * @return the path to the file relative to the remote system or null if the browser was cancelled
 	 */
 	public IPath browseFile(Shell shell, String message, String initialPath);
 
