@@ -151,7 +151,13 @@ public interface IPTPLaunchConfigurationConstants {
 	 *  by the debug server when it starts.
 	 */
 	public static final String ATTR_DEBUGGER_HOST = PTP_LAUNCH_ID + ".ATTR_DEBUGGER_HOST";
-	
+
+	/**
+	 *  Launch configuration attribute key. The value is a boolean flag indicating
+	 *  if output from all processes should be combined into a single console.
+	 */
+	public static final String ATTR_CONSOLE = PTP_LAUNCH_ID + ".ATTR_CONSOLE";
+
 	/**
 	 * Error codes
 	 */
