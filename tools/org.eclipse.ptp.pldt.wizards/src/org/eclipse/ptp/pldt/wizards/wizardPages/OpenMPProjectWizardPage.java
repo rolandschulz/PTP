@@ -53,7 +53,7 @@ import org.eclipse.ui.PlatformUI;
 public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	public static final String DOT = ".";
 	private static final boolean traceOn=false;
-	public static final boolean wizardTraceOn=true;
+	public static final boolean wizardTraceOn=false;
 
 	private Composite composite;
 	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectWizardPage";
@@ -79,7 +79,6 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	
 	public static final String OpenMP_COMPILE_COMMAND_PROP_ID = "OpenMPCompileCommand";
 	public static final String OpenMP_LINK_COMMAND_PROP_ID = "OpenMPLinkCommand";
-	public static final String OpenMP_SAMPLE_FILE_PROP_ID = "OpenMPSampleFile";
 
 	private String currentOpenMPIncludePath;
 	private String currentLibName;
@@ -104,7 +103,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 
 	private Button useDefaultsButton;
 	private Button useOpenMPProjectSettingsButton;
-	private static boolean defaultUseOpenMPIncludes=false;
+	private static boolean defaultUseOpenMPIncludes=true;
 	
 	private Button OpenMPSampleButton;
 
@@ -112,19 +111,14 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 	/**
-	 * By default we do NOT use MPI project settings in a new project.<br>
-	 * Only set MPI includes (etc) if user selects it on this page.
-	 * FIXME make indiv. pages for openmp, etc. and use particular page
-	 * for each template.  Might be able to do it all in the template as well.
+	 * By default we DO use OpenMP project settings in a new project.<br>
 	 */
-	private boolean useOpenMPProjectSettings=false;
+	private boolean useOpenMPProjectSettings=true;
 	private String desc = "OpenMP Project Page";
-	private String fTemplateID;
 	
 	/**
-	 * The CDT new project wizard page for MPI projects.  
+	 * The CDT new project wizard page for OpenMP projects.  
 	 * Adds the include paths, library information, etc. for an MPI project.
-	 * This page shows up after the other CDT new project wizard pages.
 	 * @throws CoreException 
 	 * 
 	 */
@@ -136,7 +130,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 		//CommonPlugin.log(IStatus.ERROR,"Test error");
 		//CommonPlugin.log(IStatus.WARNING,"Test warning");
 		
-		// access the preference store from the MPI plugin
+		// access the preference store from the OpenMP plugin
 		preferenceStore = OpenMPPlugin.getDefault().getPreferenceStore();
 		String mip=preferenceStore.getString(OpenMPIDs.OpenMP_INCLUDES);
 		if(traceOn)System.out.println("Got OpenMP include pref from other plugin: "+mip);
@@ -158,10 +152,9 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	}
 
 	/**
-	 * Warn user that the MPI project preferences aren't set, and thus the new project wizard will not be very useful.
+	 * Warn user that the OpenMP project preferences aren't set, and thus the new project wizard will not be very useful.
 	 * <br>
 	 * TODO: do we need a "do not show this message again" setting? (af - yes please! ;)
-	 * TODO: need to not show this UNLESS it's really an MPI project.
 	 */
 	private static boolean alreadyShown;
 	private static void showNoPrefs() {
@@ -179,26 +172,26 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	/**
 	 * Set the default lib name and lib path based on what the 
 	 * include path is.  We assume something like
-	 * <code>mpiIncludepath=/my/path/include</code>
+	 * <code>openMPIncludepath=/my/path/include</code>
 	 * in which case we set
-	 * <code>libName="lib" </code>and <code> defaultMpiLibPath=/my/path/lib</code>.
+	 * <code>libName="lib" </code>and <code> defaultOpenMPLibPath=/my/path/lib</code>.
 	 * <p>
 	 * Also, set the initial default values in the MBS page data,
 	 * so if user changes nothing on this page, the default values
 	 * will be picked up.
 	 * 
-	 * @param mpiIncludePath
+	 * @param openMPincludePath
 	 */
-	private void setDefaultOtherNames(String OpenMPIncludePath) {
+	private void setDefaultOtherNames(String openMPincludePath) {
 		defaultOpenMPLibName="openmp";
 		setCurrentOpenMPLibName(defaultOpenMPLibName);
 		
-		// if >1 path in mpi include path, use just the first
+		// if >1 path in openmp include path, use just the first
 		// one to guess at the libpath
-		String tempPath=OpenMPIncludePath;
+		String tempPath=openMPincludePath;
 		int sepLoc=tempPath.indexOf(java.io.File.pathSeparatorChar);
 		if(-1!=sepLoc) {
-			tempPath=OpenMPIncludePath.substring(0, sepLoc);
+			tempPath=openMPincludePath.substring(0, sepLoc);
 		}
 		IPath path = Path.fromOSString(tempPath);
 		path=path.removeLastSegments(1);
@@ -208,8 +201,8 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 		//System.out.println("defaultOpenMPLibPath="+defaultOpenMPLibPath);
 		setCurrentOpenMPLibPath(defaultOpenMPLibPath);
 		
-		//standardize format for mpi include path, too
-		path = Path.fromOSString(OpenMPIncludePath);
+		//standardize format for openmp include path, too
+		path = Path.fromOSString(openMPincludePath);
 		String temp=path.toString();
 		temp=stripTrailingSeparator(temp);
 		defaultOpenMPIncludePath=temp;
@@ -219,8 +212,8 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	}
 
 	/**
-	 * This sets what will be remembered for MPI include path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actualy do the change
+	 * This sets what will be remembered for OpenMP include path when we leave the wizard page
+	 * (so we can retrieve the information from the Runnable to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -231,7 +224,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	}
 	/**
 	 * This sets what will be remembered for library name when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actualy do the change
+	 * (so we can retrieve the information from the Runnable to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -245,7 +238,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	
 	/**
 	 * This sets what will be remembered for library search path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actualy do the change
+	 * (so we can retrieve the information from the Runnable to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -261,10 +254,6 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	private void setCurrentOpenMPLinkCommand(String buildCommand) {
 		currentOpenMPLinkCommand = buildCommand;
 		pageData.put(PAGE_ID+DOT+OpenMP_LINK_COMMAND_PROP_ID, buildCommand);
-	}
-	private void setCurrentOpenMPSample(boolean doit){
-		String str=Boolean.toString(doit);
-		pageData.put(PAGE_ID+DOT+OpenMP_SAMPLE_FILE_PROP_ID, str);
 	}
 
 	public String getName() {

@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Wizard Page for collecting info about OpenMP project - appended to end of
+ * Wizard Page for collecting info about MPI project - appended to end of
  * "New Managed Make C project" wizard
  * 
  * FIXME remove dup code, share with MPI version in a common class etc.
@@ -79,7 +79,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	
 	public static final String MPI_COMPILE_COMMAND_PROP_ID = "mpiCompileCommand";
 	public static final String MPI_LINK_COMMAND_PROP_ID = "mpiLinkCommand";
-	public static final String MPI_SAMPLE_FILE_PROP_ID = "mpiSampleFile";
 
 	private String currentMpiIncludePath;
 	private String currentLibName;
@@ -104,7 +103,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 	private Button useDefaultsButton;
 	private Button useMpiProjectSettingsButton;
-	private static boolean defaultUseMpiIncludes=false;
+	private static boolean defaultUseMpiIncludes=true;
 	
 	private Button mpiSampleButton;
 
@@ -112,19 +111,14 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 	/**
-	 * By default we do NOT use MPI project settings in a new project.<br>
-	 * Only set MPI includes (etc) if user selects it on this page.
-	 * FIXME make indiv. pages for openmp, etc. and use particular page
-	 * for each template.  Might be able to do it all in the template as well.
+	 * By default we DO use MPI project settings in this project.<br>
 	 */
-	private boolean useMpiProjectSettings=false;
+	private boolean useMpiProjectSettings=true;
 	private String desc = "MPI Project Page";
-	private String fTemplateID;
 	
 	/**
 	 * The CDT new project wizard page for MPI projects.  
 	 * Adds the include paths, library information, etc. for an MPI project.
-	 * This page shows up after the other CDT new project wizard pages.
 	 * @throws CoreException 
 	 * 
 	 */
@@ -143,7 +137,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
-		defaultMpiIncludePath = preferenceStore.getString(MpiIDs.MPI_INCLUDES);
+		defaultMpiIncludePath = mip;
 		if(defaultMpiIncludePath.length()==0) {
 			// warn if no MPI preferences have been set
 			showNoPrefs();
@@ -160,8 +154,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	/**
 	 * Warn user that the MPI project preferences aren't set, and thus the new project wizard will not be very useful.
 	 * <br>
-	 * TODO: do we need a "do not show this message again" setting? (af - yes please! ;)
-	 * TODO: need to not show this UNLESS it's really an MPI project.
 	 */
 	private static boolean alreadyShown;
 	private static void showNoPrefs() {
@@ -220,7 +212,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 	/**
 	 * This sets what will be remembered for MPI include path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actualy do the change
+	 * (so we can retrieve the information from the Runnable to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -245,7 +237,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	
 	/**
 	 * This sets what will be remembered for library search path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actualy do the change
+	 * (so we can retrieve the information from the Runnable to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -261,10 +253,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	private void setCurrentMpiLinkCommand(String buildCommand) {
 		currentMpiLinkCommand = buildCommand;
 		pageData.put(PAGE_ID+DOT+MPI_LINK_COMMAND_PROP_ID, buildCommand);
-	}
-	private void setCurrentMpiSample(boolean doit){
-		String str=Boolean.toString(doit);
-		pageData.put(PAGE_ID+DOT+MPI_SAMPLE_FILE_PROP_ID, str);
 	}
 
 	public String getName() {
@@ -375,8 +363,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 * @param defaultEnabled indicates if the "use defaults" checkbox is to be initially selected.
 	 */
 	private void createUserEntryArea(Composite composite, boolean defaultEnabled) {
-		//?? err? causes things to happen in wrong order??   IProject project = this.getProject();
-		//String name = project.getName();
 		if(wizardTraceOn)System.out.println("MPIProjectWizardPage.createUserEntryArea() " );
 		
 		includePathLabel = new Label(composite, SWT.NONE);
@@ -505,7 +491,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	private void createContents(Composite composite, boolean defaultEnabled) {
 
 		int columns = 4;
-
 		Composite group = new Composite(composite, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = columns;
@@ -541,7 +526,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		useDefaultsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
 		useDefaultsButton.setText("Use default information");
 		useDefaultsButton.setSelection(defaultEnabled);
-		useDefaultsButton.setEnabled(false);
+		useDefaultsButton.setEnabled(useMpiProjectSettings);
 		GridData buttonData = new GridData();
 		buttonData.horizontalSpan = columns;
 		useDefaultsButton.setLayoutData(buttonData);
