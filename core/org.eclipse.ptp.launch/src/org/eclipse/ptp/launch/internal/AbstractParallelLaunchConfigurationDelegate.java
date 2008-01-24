@@ -634,7 +634,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		IPath path = verifyResource(dbgPath, configuration);
 		if (path == null) {
 			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found"), 
-					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+					new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", 
+							dbgPath)), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 	}
 
