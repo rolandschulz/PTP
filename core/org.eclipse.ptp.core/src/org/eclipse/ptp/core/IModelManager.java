@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -28,32 +27,37 @@ import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public interface IModelManager extends IModelPresentation {
 	/**
+	 * Add a listener for model manager children events.
+	 * 
 	 * @param listener
 	 */
 	public void addListener(IModelManagerChildListener listener);
 	
 	/**
+	 * Add a resource manager to the model.
+	 * 
 	 * @param addedManager
 	 */
 	public void addResourceManager(IResourceManagerControl addedManager);
 
 	/**
+	 * Add resource managers to the model.
+	 * 
 	 * @param addedManagers
 	 */
 	public void addResourceManagers(IResourceManagerControl[] addedManagers);
 	
 	/**
-	 * @return
-	 */
-	public ILaunchConfiguration getPTPConfiguration();
-	
-	/**
-	 * @return
+	 * Get the resource manager factories that have been registered via
+	 * extensions.
+	 * 
+	 * @return array of resource manager factories
 	 */
 	public IResourceManagerFactory[] getResourceManagerFactories();
 	
 	/**
 	 * Find the resource manager factory corresponding to the supplied ID.
+	 * 
 	 * @param id
 	 * @return the requested resource manager factory
 	 */
@@ -83,16 +87,22 @@ public interface IModelManager extends IModelPresentation {
 	public void loadResourceManagers() throws CoreException;
 	
 	/**
+	 * Remove listener for model manager child events.
+	 * 
 	 * @param listener
 	 */
 	public void removeListener(IModelManagerChildListener listener);
 	
 	/**
+	 * Remove a resource manager from the model.
+	 * 
 	 * @param removedManager
 	 */
 	public void removeResourceManager(IResourceManagerControl removedManager);
 	
 	/**
+	 * Remove resource managers from the model.
+	 * 
 	 * @param removedRMs
 	 */
 	public void removeResourceManagers(IResourceManagerControl[] removedRMs);
@@ -101,11 +111,6 @@ public interface IModelManager extends IModelPresentation {
 	 * Save the resource manager configurations
 	 */
 	public void saveResourceManagers();
-
-	/**
-	 * @param config
-	 */
-	public void setPTPConfiguration(ILaunchConfiguration config);
 
 	/**
 	 * Shuts down the model manager. Should only be called at plugin shutdown.
