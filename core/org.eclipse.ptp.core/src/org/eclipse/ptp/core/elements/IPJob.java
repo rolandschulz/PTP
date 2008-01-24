@@ -36,11 +36,15 @@ import org.eclipse.ptp.core.elements.listeners.IJobListener;
 public interface IPJob extends IPElement {
 	
 	/**
+	 * Add a listener for child events.
+	 * 
 	 * @param listener
 	 */
 	public void addChildListener(IJobChildListener listener);
 
 	/**
+	 * Add a listner for element events.
+	 * 
 	 * @param listener
 	 */
 	public void addElementListener(IJobListener listener);
@@ -115,18 +119,21 @@ public interface IPJob extends IPElement {
 	public boolean isTerminated();
 
 	/**
+	 * Remove a listener for child events.
+	 * 
 	 * @param listener
 	 */
 	public void removeChildListener(IJobChildListener listener);
 	
 	/**
+	 * Remove a listener for element events.
+	 * 
 	 * @param listener
 	 */
 	public void removeElementListener(IJobListener listener);
 	
 	/**
 	 * Sets this job to be a debug job
-	 *
 	 */
 	public void setDebug();
 }
