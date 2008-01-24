@@ -37,36 +37,45 @@ public class JobAttributes {
 	public static final int IO_FORWARDING_STDOUT = 0x02;
 	public static final int IO_FORWARDING_STDERR = 0x04;
 	
-	private static final String STATE_ATTR_ID = "jobState";
-	private static final String SUBID_ATTR_ID = "jobSubId";
-	private static final String QUEUEID_ATTR_ID = "queueId";
-	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
-	private static final String EXEC_NAME_ATTR_ID = "execName";
-	private static final String EXEC_PATH_ATTR_ID = "execPath";
-	private static final String WORKING_DIR_ATTR_ID = "workingDir";
-	private static final String PROG_ARGS_ATTR_ID = "progArgs";
-	private static final String ENV_ATTR_ID = "env";
+	private static final String CONSOLE_ATTR_ID = "console";
 	private static final String DEBUG_EXEC_NAME_ATTR_ID = "debugExecName";
 	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath";
 	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs";
 	private static final String DEBUG_FLAG_ATTR_ID = "debug";
+	private static final String ENV_ATTR_ID = "env";
+	private static final String EXEC_NAME_ATTR_ID = "execName";
+	private static final String EXEC_PATH_ATTR_ID = "execPath";
 	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding";
+	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
+	private static final String PROG_ARGS_ATTR_ID = "progArgs";
+	private static final String QUEUEID_ATTR_ID = "queueId";
+	private static final String STATE_ATTR_ID = "jobState";
+	private static final String SUBID_ATTR_ID = "jobSubId";
+	private static final String WORKING_DIR_ATTR_ID = "workingDir";
 
-	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job", 
-				true, State.STARTED);
-
-	private final static StringAttributeDefinition subIdAttrDef = 
-		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
-				"Temporary ID used for job submission", false, "");
-
-	private final static StringAttributeDefinition queueIdAttrDef = 
-		new StringAttributeDefinition(QUEUEID_ATTR_ID, QUEUEID_ATTR_ID, 
-				"Job submission queue ID", true, "");
+	private final static BooleanAttributeDefinition consoleAttrDef = 
+		new BooleanAttributeDefinition(CONSOLE_ATTR_ID, CONSOLE_ATTR_ID, 
+				"Console display option", false, false);
 	
-	private final static IntegerAttributeDefinition numProcsAttrDef = 
-		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", 
-				"Number of processes to launch", true, 0);
+	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
+		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
+				"Debugger Arguments", true, null);
+
+	private final static StringAttributeDefinition debugExecNameAttrDef = 
+		new StringAttributeDefinition(DEBUG_EXEC_NAME_ATTR_ID, "Debugger Executable Name",
+				"Name of debugger executable", true, "");
+
+	private final static StringAttributeDefinition debugExecPathAttrDef = 
+		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable Path",
+				"Path to debugger executable", true, "");
+
+	private final static BooleanAttributeDefinition debugFlagAttrDef = 
+		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, 
+				"Debug Flag", true, false);
+
+	private final static ArrayAttributeDefinition<String> envAttrDef = 
+		new ArrayAttributeDefinition<String>(ENV_ATTR_ID, "Environment",
+				"Environment to be supplied to executable on launch", true, null);
 
 	private final static StringAttributeDefinition execNameAttrDef = 
 		new StringAttributeDefinition(EXEC_NAME_ATTR_ID, "Executable Name",
@@ -76,52 +85,77 @@ public class JobAttributes {
 		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path",
 				"Path of executable to be launched", true, "");
 
-	private final static StringAttributeDefinition workingDirAttrDef = 
-		new StringAttributeDefinition(WORKING_DIR_ATTR_ID, "Working Directory",
-				"Working directory where executable will run", true, "");
+	private final static IntegerAttributeDefinition ioForwardingAttrDef = 
+		new IntegerAttributeDefinition(IO_FORWARDING_ATTR_ID, "I/O Forwarding", 
+				"Specify which I/O channels to foward", false, IO_FORWARDING_STDOUT);
+
+	private final static IntegerAttributeDefinition numProcsAttrDef = 
+		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", 
+				"Number of processes to launch", true, 0);
 
 	private final static ArrayAttributeDefinition<String> progArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(PROG_ARGS_ATTR_ID, "Program Arguments",
 				"Command-line arguments supplied to executable", true, null);
 
-	private final static ArrayAttributeDefinition<String> envAttrDef = 
-		new ArrayAttributeDefinition<String>(ENV_ATTR_ID, "Environment",
-				"Environment to be supplied to executable on launch", true, null);
+	private final static StringAttributeDefinition queueIdAttrDef = 
+		new StringAttributeDefinition(QUEUEID_ATTR_ID, QUEUEID_ATTR_ID, 
+				"Job submission queue ID", true, "");
+	
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job", 
+				true, State.STARTED);
 
-	private final static StringAttributeDefinition debugExecNameAttrDef = 
-		new StringAttributeDefinition(DEBUG_EXEC_NAME_ATTR_ID, "Debugger Executable Name",
-				"Name of debugger executable", true, "");
+	private final static StringAttributeDefinition subIdAttrDef = 
+		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
+				"Temporary ID used for job submission", false, "");
 
-	private final static StringAttributeDefinition debugExecPathAttrDef = 
-		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable Path",
-				"Path to debugger executable", true,"");
+	private final static StringAttributeDefinition workingDirAttrDef = 
+		new StringAttributeDefinition(WORKING_DIR_ATTR_ID, "Working Directory",
+				"Working directory where executable will run", true, "");
 
-	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
-		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
-				"Debugger Arguments", true, null);
 
-	private final static BooleanAttributeDefinition debugFlagAttrDef = 
-		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, 
-				"Debug Flag", true, false);
-
-	private final static IntegerAttributeDefinition ioForwardingAttrDef = 
-		new IntegerAttributeDefinition(IO_FORWARDING_ATTR_ID, "I/O Forwarding", 
-				"Specify which I/O channels to foward", false, IO_FORWARDING_STDOUT);
-
-	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
-		return stateAttrDef;
+	public static BooleanAttributeDefinition getDebugFlagAttributeDefinition() {
+		return debugFlagAttrDef;
 	}
 	
-	public static StringAttributeDefinition getSubIdAttributeDefinition() {
-		return subIdAttrDef;
+	public static ArrayAttributeDefinition<String> getDebuggerArgumentsAttributeDefinition() {
+		return debugArgsAttrDef;
 	}
 
-	public static StringAttributeDefinition getQueueIdAttributeDefinition() {
-		return queueIdAttrDef;
+	public static StringAttributeDefinition getDebuggerExecutableNameAttributeDefinition() {
+		return debugExecNameAttrDef;
 	}
 	
-	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
-		return numProcsAttrDef;
+	public static StringAttributeDefinition getDebuggerExecutablePathAttributeDefinition() {
+		return debugExecPathAttrDef;
+	}
+
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+		return new IAttributeDefinition[]{
+					consoleAttrDef,
+					debugArgsAttrDef,
+					debugExecNameAttrDef,
+					debugExecPathAttrDef,
+					debugFlagAttrDef,
+					envAttrDef,
+					execNameAttrDef, 
+					execPathAttrDef,
+					ioForwardingAttrDef,
+					numProcsAttrDef,
+					progArgsAttrDef,
+					queueIdAttrDef,
+					stateAttrDef, 
+					subIdAttrDef, 
+					workingDirAttrDef,
+				};
+	}
+
+	public static BooleanAttributeDefinition getConsoleAttributeDefinition() {
+		return consoleAttrDef;
+	}
+
+	public static ArrayAttributeDefinition<String> getEnvironmentAttributeDefinition() {
+		return envAttrDef;
 	}
 
 	public static StringAttributeDefinition getExecutableNameAttributeDefinition() {
@@ -132,54 +166,31 @@ public class JobAttributes {
 		return execPathAttrDef;
 	}
 
-	public static StringAttributeDefinition getWorkingDirectoryAttributeDefinition() {
-		return workingDirAttrDef;
+	public static IntegerAttributeDefinition getIOForwardingAttributeDefinition() {
+		return ioForwardingAttrDef;
+	}
+
+	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
+		return numProcsAttrDef;
 	}
 
 	public static ArrayAttributeDefinition<String> getProgramArgumentsAttributeDefinition() {
 		return progArgsAttrDef;
 	}
 
-	public static ArrayAttributeDefinition<String> getEnvironmentAttributeDefinition() {
-		return envAttrDef;
+	public static StringAttributeDefinition getQueueIdAttributeDefinition() {
+		return queueIdAttrDef;
 	}
 
-	public static StringAttributeDefinition getDebuggerExecutableNameAttributeDefinition() {
-		return debugExecNameAttrDef;
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
+		return stateAttrDef;
 	}
 
-	public static StringAttributeDefinition getDebuggerExecutablePathAttributeDefinition() {
-		return debugExecPathAttrDef;
-	}
-
-	public static ArrayAttributeDefinition<String> getDebuggerArgumentsAttributeDefinition() {
-		return debugArgsAttrDef;
-	}
-
-	public static BooleanAttributeDefinition getDebugFlagAttributeDefinition() {
-		return debugFlagAttrDef;
-	}
-
-	public static IntegerAttributeDefinition getIOForwardingAttributeDefinition() {
-		return ioForwardingAttrDef;
+	public static StringAttributeDefinition getSubIdAttributeDefinition() {
+		return subIdAttrDef;
 	}
 	
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{
-					stateAttrDef, 
-					subIdAttrDef, 
-					queueIdAttrDef,
-					numProcsAttrDef,
-					execNameAttrDef, 
-					execPathAttrDef,
-					workingDirAttrDef,
-					progArgsAttrDef,
-					envAttrDef,
-					debugExecNameAttrDef,
-					debugExecPathAttrDef,
-					debugArgsAttrDef,
-					debugFlagAttrDef,
-					ioForwardingAttrDef,
-				};
+	public static StringAttributeDefinition getWorkingDirectoryAttributeDefinition() {
+		return workingDirAttrDef;
 	}
 }

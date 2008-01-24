@@ -253,6 +253,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
 	}
 
+	/**
+     * Get the console display option
+     * 
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	protected static boolean getConsoleDisplayOption(ILaunchConfiguration configuration) throws CoreException {
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false);
+	}
+	
 	/*
 	 * HashMap used to keep track of job submissions
 	 */
