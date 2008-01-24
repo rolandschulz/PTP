@@ -12,6 +12,7 @@ package org.eclipse.ptp.debug.external.internal.ui;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -182,8 +183,26 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * We have just selected SDM as the debugger...
 		 */
 		IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, 
-				store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
+		String path = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
+		/*
+		 * Guess that the sdm executable is in the same location as the proxy. If not then use the
+		 * preference setting.
+		 */
+		try {
+			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
+			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+			if (rm != null) {
+				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
+				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+					IPath rmPath = new Path(remConfig.getProxyServerPath());
+					path = rmPath.removeLastSegments(1).append("sdm").toString(); //$NON-NLS-1$/
+				}
+			}
+		} catch (CoreException e) {
+		}
+
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, path);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
 	}
 		
