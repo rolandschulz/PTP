@@ -120,13 +120,6 @@ public class ModelManager implements IModelManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#getPTPConfiguration()
-	 */
-	public ILaunchConfiguration getPTPConfiguration() {
-		return config;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFactories()
 	 */
 	public IResourceManagerFactory[] getResourceManagerFactories()
@@ -165,10 +158,8 @@ public class ModelManager implements IModelManager {
 		return resourceManagerFactories;
 	}
 	
-	/**
-	 * Find the resource manager factory corresponding to the supplied ID.
-	 * @param id
-	 * @return the requested resource manager factory
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFactory(java.lang.String)
 	 */
 	public IResourceManagerFactory getResourceManagerFactory(String id)
 	{
@@ -181,130 +172,6 @@ public class ModelManager implements IModelManager {
 		throw new RuntimeException("Unable to find resource manager factory");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelPresentation#getUniverse()
-	 */
-	public IPUniverse getUniverse() {
-		return universe;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
-	 */
-	public void handleEvent(IResourceManagerErrorEvent e) {
-		// Ignore - handled by listener on RM		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
-	 */
-	public void loadResourceManagers() throws CoreException {
-        ResourceManagerPersistence rmp = new ResourceManagerPersistence();
-        rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
-        IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
-        IResourceManagerControl[] rmsNeedStarting = rmp.getResourceManagerControlsNeedStarting();
-        addResourceManagers(resourceManagers);
-        startResourceManagers(rmsNeedStarting);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core.listeners.IModelManagerChildListener)
-	 */
-	public void removeListener(IModelManagerChildListener listener) {
-		resourceManagerListeners.remove(listener);
-	}
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.core.IModelManager#removeResourceManager(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl)
-     */
-    public synchronized void removeResourceManager(IResourceManagerControl rm) {
-		universe.removeResourceManager(rm);
-		fireRemoveResourceManager(rm);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl[])
-	 */
-	public synchronized void removeResourceManagers(IResourceManagerControl[] rms) {
-		for (IResourceManagerControl rm : rms) {
-			removeResourceManager(rm);
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#saveResourceManagers()
-	 */
-	public void saveResourceManagers() {
-		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
-				universe.getResourceManagerControls());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#setPTPConfiguration(org.eclipse.debug.core.ILaunchConfiguration)
-	 */
-	public void setPTPConfiguration(ILaunchConfiguration config) {
-		this.config = config;
-	}
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.core.IModelManager#shutdown()
-     */
-    public void shutdown() throws CoreException {
-		saveResourceManagers();
-		stopResourceManagers();
-		shutdownResourceManagers();
-		resourceManagerListeners.clear();
-	}
-
-    /**
-	 * shuts down all of the resource managers.
-	 */
-	private synchronized void shutdownResourceManagers() {
-		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
-		for (int i = 0; i<resourceManagers.length; ++i) {
-			resourceManagers[i].dispose();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#start()
-	 */
-	public void start() throws CoreException {
-		loadResourceManagers();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#stopResourceManagers()
-	 */
-	public void stopResourceManagers() throws CoreException {
-		IResourceManager[] resourceManagers = universe.getResourceManagers();
-		for (int i = 0; i<resourceManagers.length; ++i) {
-			resourceManagers[i].shutdown();
-		}
-	}
-
-	/**
-	 * @param rm
-	 */
-	private void fireNewResourceManager(final IResourceManager rm) {
-		INewResourceManagerEvent event = 
-			new NewResourceManagerEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener)listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * @param rm
-	 */
-	private void fireRemoveResourceManager(final IResourceManager rm) {
-		IRemoveResourceManagerEvent event = 
-			new RemoveResourceManagerEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener)listener).handleEvent(event);
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFromUniqueName(java.lang.String)
 	 */
@@ -321,7 +188,7 @@ public class ModelManager implements IModelManager {
 		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IModelManager#getStartedResourceManagers(org.eclipse.ptp.core.elements.IPUniverse)
 	 */
@@ -336,16 +203,141 @@ public class ModelManager implements IModelManager {
 		}
 		return startedRMs.toArray(new IResourceManager[startedRMs.size()]);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelPresentation#getUniverse()
+	 */
+	public IPUniverse getUniverse() {
+		return universe;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
+	 */
+	public void handleEvent(IResourceManagerErrorEvent e) {
+		// Ignore - handled by listener on RM		
+	}
+
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
+	 */
+	public void loadResourceManagers() throws CoreException {
+        ResourceManagerPersistence rmp = new ResourceManagerPersistence();
+        rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
+        IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
+        IResourceManagerControl[] rmsNeedStarting = rmp.getResourceManagerControlsNeedStarting();
+        addResourceManagers(resourceManagers);
+        startResourceManagers(rmsNeedStarting);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core.listeners.IModelManagerChildListener)
+	 */
+	public void removeListener(IModelManagerChildListener listener) {
+		resourceManagerListeners.remove(listener);
+	}
+	
+	/* (non-Javadoc)
+     * @see org.eclipse.ptp.core.IModelManager#removeResourceManager(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl)
+     */
+    public synchronized void removeResourceManager(IResourceManagerControl rm) {
+		universe.removeResourceManager(rm);
+		fireRemoveResourceManager(rm);
+	}
+
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl[])
+	 */
+	public synchronized void removeResourceManagers(IResourceManagerControl[] rms) {
+		for (IResourceManagerControl rm : rms) {
+			removeResourceManager(rm);
+		}
+	}
+
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#saveResourceManagers()
+	 */
+	public void saveResourceManagers() {
+		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
+				universe.getResourceManagerControls());
+	}
+
+	/* (non-Javadoc)
+     * @see org.eclipse.ptp.core.IModelManager#shutdown()
+     */
+    public void shutdown() throws CoreException {
+		saveResourceManagers();
+		stopResourceManagers();
+		shutdownResourceManagers();
+		resourceManagerListeners.clear();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#start()
+	 */
+	public void start() throws CoreException {
+		loadResourceManagers();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#stopResourceManagers()
+	 */
+	public void stopResourceManagers() throws CoreException {
+		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			resourceManagers[i].shutdown();
+		}
+	}
 
 	/**
+	 * Fire a new resource manager event.
+	 * 
+	 * @param rm
+	 */
+	private void fireNewResourceManager(final IResourceManager rm) {
+		INewResourceManagerEvent event = 
+			new NewResourceManagerEvent(this, rm);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener)listener).handleEvent(event);
+		}
+	}
+	
+	/**
+	 * Fire a remove resource manager event.
+	 * 
+	 * @param rm
+	 */
+	private void fireRemoveResourceManager(final IResourceManager rm) {
+		IRemoveResourceManagerEvent event = 
+			new RemoveResourceManagerEvent(this, rm);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener)listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Locate the resource managers configuration file.
+	 * 
 	 * @return
 	 */
 	private File getResourceManagersFile() {
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		return plugin.getStateLocation().append("resourceManagers.xml").toFile();
+		return plugin.getStateLocation().append("resourceManagers.xml").toFile(); //$NON-NLS-1$
 	}
 
 	/**
+	 * shuts down all of the resource managers.
+	 */
+	private synchronized void shutdownResourceManagers() {
+		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			resourceManagers[i].dispose();
+		}
+	}
+
+	/**
+	 * Start all resource managers.
+	 * 
 	 * @param rmsNeedStarting
 	 * @throws CoreException
 	 */
