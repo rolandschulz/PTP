@@ -15,9 +15,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
@@ -58,54 +61,13 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	@Override
 	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
+		/*
+		 * Debugger tab is selected from within an existing page...
+		 */
 		try {
-			/*
-			 * Work out the address to supply as argument to the debug server. There are currently
-			 * two cases:
-			 * 
-			 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is 
-			 * running the proxy (since this is where the tunnel begins), but accessible from the machine running 
-			 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a 
-			 * cluster), it will typically NOT be the same address that is used to start the proxy. 
-			 * 
-			 * 2. If port forwarding is not enabled, then the address will be the address of the host running 
-			 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly. 
-			 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster. 
-			 * In many environments, compute nodes cannot communicate outside their local network.
-			 */
-			String address = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING);
-			String rmId = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
-			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-			if (rm != null) {
-				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
-	
-				/*
-				 * If the resource manager has been changed and this is a remote
-				 * resource manager, then update the host field
-				 */
-				if (resourceManager != rm) {
-					resourceManager = rm;
-					if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-						AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
-						remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
-						if (remoteServices != null) {
-							connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
-							if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-								address = connection.getAddress();
-							} else {
-								address = remConfig.getLocalAddress();
-							}
-						}
-					} else {
-						address = "localhost"; //$NON-NLS-1$
-					}
-				}
-			}
-			
-			fRMDebuggerAddressText.setText(address);
+			fRMDebuggerAddressText.setText(getAddress(workingCopy));
 			fRMDebuggerPathText.setText(workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
 		} catch(CoreException e) {
-			errMsg = ExternalDebugUIMessages.getString("SDMDebuggerPage.err2"); //$NON-NLS-1$
 		}
 	}
 	
@@ -169,21 +131,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
+		/*
+		 * Launch configuration is selected or we have just selected SDM as the debugger...
+		 */
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
 			resourceManager = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-			if (resourceManager != null) {
-				IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
-					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
-					if (remoteServices != null) {
-						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
-					}
-				} else {
-					remoteServices = null;
-				}
-			}
 			fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING));
 			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
 		} catch (CoreException e) {
@@ -205,22 +158,35 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		setErrorMessage(errMsg);
 		return (errMsg == null);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerPathText.getText()));
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getFieldContent(fRMDebuggerAddressText.getText()));
+		/*
+		 * Note: performApply gets called when either text is modified via
+		 * updateLaunchConfigurationDialog(). Only update the configuration if
+		 * things are valid.
+		 */
+		if (isValid(configuration)) {
+			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerPathText.getText()));
+			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getFieldContent(fRMDebuggerAddressText.getText()));
+		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+		/*
+		 * We have just selected SDM as the debugger...
+		 */
+		IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, 
+				store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
 	}
-
+		
 	/**
 	 * Browse for a file. If remoteServices is not null, then the currently
 	 * select resource manager supports remote browsing.
@@ -245,6 +211,63 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			return dialog.open();
 		}
 		return null;
+	}
+
+	/**
+	 * Work out the address to supply as argument to the debug server. There are currently
+	 * two cases:
+	 * 
+	 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is 
+	 * running the proxy (since this is where the tunnel begins), but accessible from the machine running 
+	 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a 
+	 * cluster), it will typically NOT be the same address that is used to start the proxy. 
+	 * 
+	 * 2. If port forwarding is not enabled, then the address will be the address of the host running 
+	 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly. 
+	 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster. 
+	 * In many environments, compute nodes cannot communicate outside their local network.
+	 * 
+	 * @param configuration
+	 * @return
+	 */
+	private String getAddress(ILaunchConfigurationWorkingCopy configuration) {
+		String address;
+		String rmId;
+		try {
+			address = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING);
+			rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
+		} catch (CoreException e) {
+			return EMPTY_STRING;
+		}
+		
+		IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+		if (rm != null) {
+			IResourceManagerConfiguration rmConfig = rm.getConfiguration();
+
+			/*
+			 * If the resource manager has been changed and this is a remote
+			 * resource manager, then update the host field
+			 */
+			if (resourceManager != rm) {
+				resourceManager = rm;
+				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
+					if (remoteServices != null) {
+						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
+						if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+							address = connection.getAddress();
+						} else {
+							address = remConfig.getLocalAddress();
+						}
+					}
+				} else {
+					address = "localhost"; //$NON-NLS-1$
+				}
+			}
+		}
+		
+		return address;
 	}
 	
     /**
