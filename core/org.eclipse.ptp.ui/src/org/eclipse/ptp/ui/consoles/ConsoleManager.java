@@ -19,9 +19,11 @@ import java.util.Map;
 
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -41,8 +43,6 @@ import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 public class ConsoleManager implements IModelManagerChildListener,
 		IResourceManagerChildListener, IQueueChildListener {
 	
-	// TODO set this flag from preferences
-	private boolean createJobConsole = false; // Flag indicating if a console should be opened on job creation
 	private IModelManager imm = null;
 	private Map<IPJob, JobConsole> consoles = new HashMap<IPJob, JobConsole>();
 	
@@ -89,9 +89,10 @@ public class ConsoleManager implements IModelManagerChildListener,
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 	 */
 	public void handleEvent(INewJobEvent e) {
-		if (createJobConsole) {
-			synchronized (consoles) {
-				for (IPJob job: e.getJobs()) {
+		synchronized (consoles) {
+			for (IPJob job: e.getJobs()) {
+				BooleanAttribute console = job.getAttribute(JobAttributes.getConsoleAttributeDefinition());
+				if (console != null && console.getValue()) {
 					JobConsole jc = new JobConsole(job);
 					job.addChildListener(jc);
 					consoles.put(job, jc);
