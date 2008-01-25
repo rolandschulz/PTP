@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -543,10 +544,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
-		return doSubmitJob(attrMgr, monitor);
+	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, 
+			IProgressMonitor monitor) throws CoreException {
+		return doSubmitJob(configuration, attrMgr, monitor);
 	}
 	
 	/* (non-Javadoc)
@@ -748,28 +750,30 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 	
 	/**
-	 * 
+	 * Perform any cleanup activities
 	 */
 	protected abstract void doCleanUp();
 
 	/**
-	 * 
+	 * Perform any activities prior to disabling events
 	 */
 	protected abstract void doDisableEvents();
 
 	/**
-	 * 
+	 * Perform any activities prior to disposing of the resource manager.
 	 */
 	protected abstract void doDispose();
 
 	/**
-	 * 
+	 * Perform any activities prior to enabling events
 	 */
 	protected abstract void doEnableEvents();
 
 	/**
+	 * Remove terminated jobs
+	 * 
 	 * @param queue
-	 * @return
+	 * @return list of removed jobs
 	 */
 	protected abstract List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue);
 
@@ -791,15 +795,21 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected abstract boolean doStartup(IProgressMonitor monitor) throws CoreException;
 	
 	/**
+	 * Submit a job. Returns a job that represents the submitted job, or null
+	 * if the progress monitor was cancelled.
+
 	 * @param attrMgr
 	 * @param monitor
 	 * @return IPJob
 	 * @throws CoreException
 	 */
-	protected abstract IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
+	protected abstract IPJob doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, 
+			IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * @param job
+	 * Terminate a job.
+	 * 
+	 * @param job job to terminate
 	 * @throws CoreException
 	 */
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;

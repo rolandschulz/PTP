@@ -567,7 +567,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
 			}
 	
-			IPJob job = rm.submitJob(attrMgr, monitor);
+			IPJob job = rm.submitJob(configuration, attrMgr, monitor);
 
 			if (job != null) {
 				JobSubmission jobSub = new JobSubmission(configuration, mode, launch, attrMgr, debugger);
