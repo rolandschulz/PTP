@@ -37,7 +37,6 @@ public class JobAttributes {
 	public static final int IO_FORWARDING_STDOUT = 0x02;
 	public static final int IO_FORWARDING_STDERR = 0x04;
 	
-	private static final String CONSOLE_ATTR_ID = "console";
 	private static final String DEBUG_EXEC_NAME_ATTR_ID = "debugExecName";
 	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath";
 	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs";
@@ -53,10 +52,6 @@ public class JobAttributes {
 	private static final String SUBID_ATTR_ID = "jobSubId";
 	private static final String WORKING_DIR_ATTR_ID = "workingDir";
 
-	private final static BooleanAttributeDefinition consoleAttrDef = 
-		new BooleanAttributeDefinition(CONSOLE_ATTR_ID, CONSOLE_ATTR_ID, 
-				"Console display option", false, false);
-	
 	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
 				"Debugger Arguments", true, null);
@@ -132,7 +127,6 @@ public class JobAttributes {
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
-					consoleAttrDef,
 					debugArgsAttrDef,
 					debugExecNameAttrDef,
 					debugExecPathAttrDef,
@@ -148,10 +142,6 @@ public class JobAttributes {
 					subIdAttrDef, 
 					workingDirAttrDef,
 				};
-	}
-
-	public static BooleanAttributeDefinition getConsoleAttributeDefinition() {
-		return consoleAttrDef;
 	}
 
 	public static ArrayAttributeDefinition<String> getEnvironmentAttributeDefinition() {
