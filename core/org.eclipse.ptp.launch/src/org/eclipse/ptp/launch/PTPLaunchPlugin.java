@@ -51,36 +51,69 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 
 	//The shared instance.
 	private static PTPLaunchPlugin plugin;
-	//Resource bundle.
-	private ResourceBundle resourceBundle;
-
-	private final Map<Class, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories =
-		new HashMap<Class, AbstractRMLaunchConfigurationFactory>();
 	
 	/**
-	 * The constructor.
+	 * Convenience method to create an error dialog given an IStatus.
+	 * 
+	 * @param message
+	 * @param status
 	 */
-	public PTPLaunchPlugin() {
-		super();
-		plugin = this;
+	public static void errorDialog(String message, IStatus status) {
+		log(status);
+		Shell shell = getActiveWorkbenchShell();
+		if (shell != null) {
+			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
+		}
 	}
 
 	/**
-	 * This method is called upon plug-in activation
+	 * Convenience method to create an error dialog given a message and Throwable.
+	 * 
+	 * @param message
+	 * @param t
 	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		retrieveRMLaunchConfigurationFactories();
+	public static void errorDialog(String message, Throwable t) {
+		log(t);
+		Shell shell = getActiveWorkbenchShell();
+		if (shell != null) {
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null); //$NON-NLS-1$	
+			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
+		}
+	}
+	
+	/**
+	 * Convenience method to get the currently active page
+	 * 
+	 * @return currently active page
+	 */
+	public static IWorkbenchPage getActivePage() {
+		IWorkbenchWindow w = getActiveWorkbenchWindow();
+		if (w != null) {
+			return w.getActivePage();
+		}
+		return null;
 	}
 
 	/**
-	 * This method is called when the plug-in is stopped
+	 * Returns the active workbench shell or <code>null</code> if none
+	 * 
+	 * @return the active workbench shell or <code>null</code> if none
 	 */
-	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
-		rmLaunchConfigurationFactories.clear();
-		plugin = null;
-		resourceBundle = null;
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getShell();
+		}
+		return null;
+	}
+
+	/**
+	 * Convenience method to get the currently active workbench window
+	 * 
+	 * @return currently active workbench window
+	 */
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 
 	/**
@@ -90,14 +123,15 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 	
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null) {
-			// If the default instance is not yet initialized,
-			// return a static identifier. This identifier must
-			// match the plugin id defined in plugin.xml
-			return PLUGIN_ID;
-		}
-		return getDefault().getBundle().getSymbolicName();
+	/**
+	 * Returns an image descriptor for the image file at the given
+	 * plug-in relative path.
+	 *
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.launch", path);
 	}    
 
 	/**
@@ -114,6 +148,65 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
+	 * Get a unique identifier for this plugin
+	 * 
+	 * @return unique identifier
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			// If the default instance is not yet initialized,
+			// return a static identifier. This identifier must
+			// match the plugin id defined in plugin.xml
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
+
+	/**
+	 * Logs the specified status with this plug-in's log.
+	 * 
+	 * @param status
+	 *            status to log
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	
+	/**
+	 * Logs an internal error with the specified throwable
+	 * 
+	 * @param e
+	 *            the exception to be logged
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
+	}	
+	
+	/**
+	 * Logs an internal error with the specified message.
+	 * 
+	 * @param message
+	 *            the error message to log
+	 */
+	public static void logErrorMessage(String message) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
+	}	
+	
+	// Resource bundle.
+	private ResourceBundle resourceBundle;
+	// Map of resource managers to launch configuration factories
+	private final Map<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories =
+		new HashMap<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory>();
+
+	/**
+	 * The constructor.
+	 */
+	public PTPLaunchPlugin() {
+		super();
+		plugin = this;
+	}
+
+	/**
 	 * Returns the plugin's resource bundle,
 	 */
 	public ResourceBundle getResourceBundle() {
@@ -127,92 +220,10 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.launch", path);
-	}
-	
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}	
-	
-	public static IWorkbenchPage getActivePage() {
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null) {
-			return w.getActivePage();
-		}
-		return null;
-	}	
-	
-	/**
-	 * Logs the specified status with this plug-in's log.
+	 * Find the launch configuration factory for a resource manager
 	 * 
-	 * @param status
-	 *            status to log
-	 */
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-	/**
-	 * Logs an internal error with the specified message.
-	 * 
-	 * @param message
-	 *            the error message to log
-	 */
-	public static void logErrorMessage(String message) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
-	}
-
-	/**
-	 * Logs an internal error with the specified throwable
-	 * 
-	 * @param e
-	 *            the exception to be logged
-	 */
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
-	}
-
-	
-	public static void errorDialog(String message, IStatus status) {
-		log(status);
-		Shell shell = getActiveWorkbenchShell();
-		if (shell != null) {
-			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
-		}
-	}
-
-	public static void errorDialog(String message, Throwable t) {
-		log(t);
-		Shell shell = getActiveWorkbenchShell();
-		if (shell != null) {
-			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null); //$NON-NLS-1$	
-			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
-		}
-	}
-
-
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-
-	/**
-	 * @param rm
-	 * @return
+	 * @param rm resource manager
+	 * @return launch configuration factory
 	 */
 	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManager rm) {
 		if (rm == null) {
@@ -220,13 +231,29 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		}
 		return rmLaunchConfigurationFactories.get(rm.getClass());
 	}
+
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		retrieveRMLaunchConfigurationFactories();
+	}
 	
 	/**
-	 * 
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		rmLaunchConfigurationFactories.clear();
+		plugin = null;
+		resourceBundle = null;
+	}
+	
+	/**
+	 * Find all launch configuration factory extensions that have been registered
 	 */
 	private void retrieveRMLaunchConfigurationFactories() {
-
-    	System.out.println("In retrieveRMLaunchConfigurationFactories");
     	rmLaunchConfigurationFactories.clear();
     	
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -243,14 +270,12 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 				IConfigurationElement ce = elements[i];
 				try {
 					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce.createExecutableExtension("class");
-					Class resourceManagerClass = factory.getResourceManagerClass();
+					Class<? extends IResourceManager> resourceManagerClass = factory.getResourceManagerClass();
 					rmLaunchConfigurationFactories.put(resourceManagerClass, factory);
-					System.out.println("RM Launch Config factory: " + factory + " for class: " + resourceManagerClass);
 				} catch (CoreException e) {
 					log(e);
 				}
 			}
 		}
-	   	System.out.println("leaving retrieveRMLaunchConfigurationFactories");
     }
 }
