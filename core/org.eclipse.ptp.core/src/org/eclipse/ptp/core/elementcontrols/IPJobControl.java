@@ -20,6 +20,7 @@ package org.eclipse.ptp.core.elementcontrols;
 
 import java.util.Collection;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 
@@ -60,4 +61,11 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	 * @param processes to remove
 	 */
 	public void removeProcesses(Collection<IPProcessControl> processes);
+	
+	/**
+	 * Set the launch configuration that was used to launch this job.
+	 * 
+	 * @param configuration
+	 */
+	public void setLaunchConfiguration(ILaunchConfiguration configuration);
 }

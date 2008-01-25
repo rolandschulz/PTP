@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
@@ -50,6 +51,13 @@ public interface IPJob extends IPElement {
 	public void addElementListener(IJobListener listener);
 
 	/**
+	 * Get the launch configuration that was used to launch this job
+	 * 
+	 * @return launch configuration
+	 */
+	public ILaunchConfiguration getLaunchConfiguration();
+
+	/**
 	 * Find a Process in this Job by its ID. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
@@ -59,17 +67,6 @@ public interface IPJob extends IPElement {
 	 * @see IPProcess
 	 */
 	public IPProcess getProcessById(String id);
-
-	/**
-	 * Finds a Process in by its String index. A process index is a
-	 * zero-based index of all processes in the job. Returns the Process
-	 * object if found, else returns <code>null</code>.
-	 * 
-	 * @param number
-	 *            The Process index to search for
-	 * @return The Process object if found, else <code>null</code>
-	 */
-	public IPProcess getProcessByIndex(String number);
 	
 	/**
 	 * Finds a Process in by its integer index. A process index is a
@@ -82,6 +79,17 @@ public interface IPJob extends IPElement {
 	 */
 	public IPProcess getProcessByIndex(int number);
 
+	/**
+	 * Finds a Process in by its String index. A process index is a
+	 * zero-based index of all processes in the job. Returns the Process
+	 * object if found, else returns <code>null</code>.
+	 * 
+	 * @param number
+	 *            The Process index to search for
+	 * @return The Process object if found, else <code>null</code>
+	 */
+	public IPProcess getProcessByIndex(String number);
+	
 	/**
 	 * Returns an array of the Processes comprised by this Job. Might return
 	 * <code>null</code> if no Processes have yet been assigned.
@@ -96,7 +104,7 @@ public interface IPJob extends IPElement {
 	 * @return IPQueue
 	 */
 	public IPQueue getQueue();
-	
+
 	/**
 	 * Returns the state of the job
 	 * 
@@ -117,7 +125,7 @@ public interface IPJob extends IPElement {
 	 * @return 
 	 */
 	public boolean isTerminated();
-
+	
 	/**
 	 * Remove a listener for child events.
 	 * 

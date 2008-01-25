@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -53,6 +54,7 @@ public class PJob extends Parent implements IPJobControl {
 	private final ListenerList childListeners = new ListenerList();
 	private HashMap<String, IPProcessControl> indexMap = 
 		new HashMap<String, IPProcessControl>();
+	private ILaunchConfiguration configuration;
 	
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
@@ -70,7 +72,6 @@ public class PJob extends Parent implements IPJobControl {
 			addAttribute(debugFlag);
 		}
 	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)
 	 */
@@ -117,6 +118,13 @@ public class PJob extends Parent implements IPJobControl {
 		
 		fireNewProcesses(processes);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getLaunchConfiguration()
+	 */
+	public synchronized ILaunchConfiguration getLaunchConfiguration() {
+		return configuration;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessById(java.lang.String)
@@ -127,7 +135,6 @@ public class PJob extends Parent implements IPJobControl {
 			return (IPProcessControl) element;
 		return null;
 	}
-
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(int)
@@ -136,6 +143,7 @@ public class PJob extends Parent implements IPJobControl {
 		return indexMap.get(String.valueOf(index));
 	}
 
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(java.lang.String)
 	 */
@@ -168,14 +176,14 @@ public class PJob extends Parent implements IPJobControl {
 	public IPQueue getQueue() {
 		return getQueueControl();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#getQueueControl()
 	 */
 	public IPQueueControl getQueueControl() {
 		return (IPQueueControl) getParent();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getState()
 	 */
@@ -242,6 +250,13 @@ public class PJob extends Parent implements IPJobControl {
 		debug.setValue(true);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#setLaunchConfiguration(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public synchronized void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		this.configuration = configuration;
+	}
+
 	/**
 	 * Notify listeners when a job attribute has changed.
 	 * 
@@ -253,6 +268,20 @@ public class PJob extends Parent implements IPJobControl {
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((IJobListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Send IChangedProcessEvent to registered listeners
+	 * 
+	 * @param nodes
+	 */
+	private void fireChangedProcesses(Collection<IPProcess> processes) {
+		IChangedProcessEvent e = 
+			new ChangedProcessEvent(this, processes);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
 
@@ -269,7 +298,7 @@ public class PJob extends Parent implements IPJobControl {
 			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
-
+	
 	/**
 	 * Notify listeners when the collection of processes are removed.
 	 * 
@@ -278,20 +307,6 @@ public class PJob extends Parent implements IPJobControl {
 	private void fireRemoveProcesses(Collection<IPProcess> processes) {
 		IRemoveProcessEvent e = 
 			new RemoveProcessEvent(this, processes);
-		
-		for (Object listener : childListeners.getListeners()) {
-			((IJobChildListener)listener).handleEvent(e);
-		}
-	}
-	
-	/**
-	 * Send IChangedProcessEvent to registered listeners
-	 * 
-	 * @param nodes
-	 */
-	private void fireChangedProcesses(Collection<IPProcess> processes) {
-		IChangedProcessEvent e = 
-			new ChangedProcessEvent(this, processes);
 		
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener)listener).handleEvent(e);
