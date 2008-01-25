@@ -94,6 +94,8 @@ public class PMainTab extends PLaunchConfigurationTab {
 	            handleProjectButtonSelected();
 			} else if (source == appButton) {
 	            handleApplicationButtonSelected();
+	        } else if (source == consoleButton) {
+	            updateLaunchConfigurationDialog();
 	        }
 	    }
     }
@@ -172,6 +174,7 @@ public class PMainTab extends PLaunchConfigurationTab {
 
 		consoleButton = createCheckButton(mainComp, LaunchMessages.getResourceString("PMainTab.Console")); //$NON-NLS-1$
 		consoleButton.setSelection(false);
+		consoleButton.addSelectionListener(listener);
    }
 
 	/* (non-Javadoc)
@@ -195,7 +198,8 @@ public class PMainTab extends PLaunchConfigurationTab {
         try {
             projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
             appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, EMPTY_STRING));
-
+            consoleButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false));
+            
             resourceManager = getResourceManager(configuration);
 			if (resourceManager == null) {
 				setErrorMessage(LaunchMessages
