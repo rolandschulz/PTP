@@ -17,13 +17,14 @@ package org.eclipse.ptp.ui.consoles;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -89,14 +90,20 @@ public class ConsoleManager implements IModelManagerChildListener,
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 	 */
 	public void handleEvent(INewJobEvent e) {
-		synchronized (consoles) {
-			for (IPJob job: e.getJobs()) {
-				BooleanAttribute console = job.getAttribute(JobAttributes.getConsoleAttributeDefinition());
-				if (console != null && console.getValue()) {
+		for (IPJob job: e.getJobs()) {
+			ILaunchConfiguration configuration = job.getLaunchConfiguration();
+			try {
+				if (configuration != null &&
+						configuration.getAttribute(
+							IPTPLaunchConfigurationConstants.ATTR_CONSOLE, 
+							false)) {
 					JobConsole jc = new JobConsole(job);
 					job.addChildListener(jc);
-					consoles.put(job, jc);
+					synchronized (consoles) {
+						consoles.put(job, jc);
+					}
 				}
+			} catch (CoreException e1) {
 			}
 		}
 	}
