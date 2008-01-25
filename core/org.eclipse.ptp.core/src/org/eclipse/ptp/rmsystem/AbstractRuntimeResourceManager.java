@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -83,9 +84,17 @@ public abstract class AbstractRuntimeResourceManager extends
 	public enum JobSubState {SUBMITTED, COMPLETED, ERROR}
 	
 	private class JobSubmission {
-		private IPJob			job = null;
-		private JobSubState		state = JobSubState.SUBMITTED;
-		private String			reason;
+		private IPJob					job = null;
+		private JobSubState				state = JobSubState.SUBMITTED;
+		private String					reason;
+		private ILaunchConfiguration	configuration;
+		
+		/**
+		 * @return the configuration
+		 */
+		public ILaunchConfiguration getLaunchConfiguration() {
+			return configuration;
+		}
 		
 		/**
 		 * @return the reason for the error
@@ -109,19 +118,26 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		/**
+		 * @param configuaration the configuration to set
+		 */
+		public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+			this.configuration = configuration;
+		}
+		
+		/**
 		 * @param reason the reason for the error
 		 */
 		public void setErrorReason(String reason) {
 			this.reason = reason;
 		}
-		
+
 		/**
 		 * @param job the job to set
 		 */
 		public void setJob(IPJob job) {
 			this.job = job;
 		}
-		
+
 		/**
 		 * @param error the error to set
 		 */
@@ -129,6 +145,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			this.state = state;
 		}
 	}
+	
 	private enum RMState {STARTING, STARTED, STOPPING, STOPPED, ERROR}
 	
 	private IRuntimeSystem runtimeSystem;
@@ -298,6 +315,7 @@ public abstract class AbstractRuntimeResourceManager extends
 							JobSubmission sub = jobSubmissions.get(jobSubAttr.getValue());
 							if (sub != null && sub.getState() == JobSubState.SUBMITTED) {
 								sub.setJob(job);
+								job.setLaunchConfiguration(sub.getLaunchConfiguration());
 								sub.setState(JobSubState.COMPLETED);
 								subCondition.signalAll();
 							}
@@ -946,7 +964,11 @@ public abstract class AbstractRuntimeResourceManager extends
 		return true;
 	}
 	
-	protected IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	protected IPJob doSubmitJob(ILaunchConfiguration configuration, 
+			AttributeManager attrMgr, IProgressMonitor monitor) 
 			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -954,10 +976,11 @@ public abstract class AbstractRuntimeResourceManager extends
 		subLock.lock();
 		try {
 			String jobSubId = runtimeSystem.submitJob(attrMgr);
-			jobSubmissions.put(jobSubId, new JobSubmission());
+			JobSubmission sub = new JobSubmission();
+			sub.setLaunchConfiguration(configuration);
+			jobSubmissions.put(jobSubId, sub);
 			
 			while (!monitor.isCanceled()) {
-				JobSubmission sub = jobSubmissions.get(jobSubId);
 				if (sub.getState() != JobSubState.SUBMITTED) {
 					break;
 				}
@@ -968,34 +991,27 @@ public abstract class AbstractRuntimeResourceManager extends
 				}
 			}
 			
-			JobSubmission sub = jobSubmissions.remove(jobSubId);
 			IPJob job = null;
 			
-			if (sub != null) {
-				switch (sub.getState()) {
-				case SUBMITTED:
-					if (monitor.isCanceled()) {
-						/*
-						 * The job submission process itself can't be canceled, so
-						 * this will just cancel the job once it is queued.
-						 * 
-						 * If job is null, then we must wait for the submission to
-						 * complete and the job to be created (this will need to happen
-						 * in a thread).
-						 */
-						//FIXME: implement this
-					}
-					break;
-					
-				case COMPLETED:
-					job = sub.getJob();
-					break;
-					
-				case ERROR:
-					throw new CoreException(new Status(IStatus.ERROR, 
-							PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-							sub.getErrorReason(), null));
-				}
+			switch (sub.getState()) {
+			case SUBMITTED:
+				/*
+				 * The job submission process itself can't be canceled, so
+				 * this will just cause the submitJob command to return a null.
+				 * The job will still eventually get created.
+				 */
+				break;
+				
+			case COMPLETED:
+				jobSubmissions.remove(jobSubId);
+				job = sub.getJob();
+				break;
+				
+			case ERROR:
+				jobSubmissions.remove(jobSubId);
+				throw new CoreException(new Status(IStatus.ERROR, 
+						PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+						sub.getErrorReason(), null));
 			}
 			return job;
 		}
@@ -1005,6 +1021,9 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doTerminateJob(org.eclipse.ptp.core.elements.IPJob)
+	 */
 	protected void doTerminateJob(IPJob job) throws CoreException {
 		runtimeSystem.terminateJob(job);
 	}

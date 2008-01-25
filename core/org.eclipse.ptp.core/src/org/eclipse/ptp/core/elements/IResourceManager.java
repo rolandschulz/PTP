@@ -21,6 +21,7 @@ package org.eclipse.ptp.core.elements;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
@@ -159,12 +160,14 @@ public interface IResourceManager extends IPElement,
 	 * Submit a job. The attribute manager must contain the appropriate attributes for
 	 * a successful job launch (e.g. the queue, etc.)
 	 * 
+	 * @param configuration launch configuration used to submit the job. Can be null.
 	 * @param attrMgr attribute manager containing the job launch attributes
 	 * @param monitor progress monitor
 	 * @return a job object representing the submitted job
 	 * @throws CoreException
 	 */
-	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) 
+	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, 
+			IProgressMonitor monitor) 
 		throws CoreException;
 
 	/**
