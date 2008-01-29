@@ -240,7 +240,7 @@ public class FileTools implements IRemoteFileTools {
 	}
 
 	String removeTrailingSlash(String path) {
-		if (path.endsWith("/")) { //$NON-NLS-1$
+		if (!path.equals("/") && path.endsWith("/")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return path.substring(0, path.length() - 1);
 		} else {
 			return path;
