@@ -18,11 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+
 /**
  * Represents to request getting info threads
  * @author clement
  *
  */
 public interface IPDIGetInfoThreadsRequest extends IPDIEventRequest {
-
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public String[] getThreadIds(BitList qTasks) throws PDIException;
 }

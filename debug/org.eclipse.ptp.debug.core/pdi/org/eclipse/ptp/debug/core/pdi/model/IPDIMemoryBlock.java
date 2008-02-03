@@ -22,6 +22,7 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
 
 /**
  * A contiguous segment of memory in an execution context.
@@ -41,22 +42,26 @@ public interface IPDIMemoryBlock extends IPDISessionObject {
 	public static final byte VALID = 0x02;
 
 	/**
-	 * Returns the start address of this memory block
-	 * @return the start address of this memory block
+	 * @return
 	 */
-	BigInteger getStartAddress();
+	public IPDIDataReadMemoryInfo getDataReadMemoryInfo();
 	
 	/**
-	 * Returns the length of this memory block in bytes
-	 * @return the length of this memory block in bytes
-	 */	
-	long getLength();
+	 * @return
+	 */
+	public String getExpression();
 
 	/**
-	 * Returns the size of each memory word in bytes
-	 * @return The size of each memory word in bytes
+	 * Returns this memory byte's attribute as a bit mask.
+	 * The method throw IndexOutOfBoundsException if the offset is out of range of the block.
+	 * @return this memory byte's attribute as a bit mask
 	 */
-	int getWordSize();
+	public byte getFlags(int offset);
+
+	/**
+	 * @param m
+	 */
+	public void setDataReadMemoryInfo(IPDIDataReadMemoryInfo m);
 
 	/**
 	 * Returns the values of the bytes currently contained in this this memory block.
@@ -68,12 +73,41 @@ public interface IPDIMemoryBlock extends IPDISessionObject {
 	byte[] getBytes() throws PDIException;
 
 	/**
-	 * Returns this memory byte's attribute as a bit mask.
-	 * The method throw IndexOutOfBoundsException if the offset is out of range of the block.
-	 * @return this memory byte's attribute as a bit mask
-	 */
-	public byte getFlags(int offset);
+	 * Returns the length of this memory block in bytes
+	 * @return the length of this memory block in bytes
+	 */	
+	long getLength();
 
+	/**
+	 * Returns the start address of this memory block
+	 * @return the start address of this memory block
+	 */
+	BigInteger getStartAddress();
+
+	/**
+	 * Returns the size of each memory word in bytes
+	 * @return The size of each memory word in bytes
+	 */
+	int getWordSize();
+
+	/**
+	 * Determines whether the block does not update
+	 * @return true if the block does not update
+	 */
+	boolean isFrozen();
+	
+	/**
+	 * Refresh the data, this may cause events to be trigger if the data values changed.
+	 * @throws PDIException on failure
+	 */
+	void refresh() throws PDIException;
+	
+	/**
+	 * A memoryBlock set frozen means that the block will not update and check for new data
+	 * @param frozen the block is frozen by default
+	 */
+	void setFrozen(boolean frozen);
+	
 	/**
 	 * Sets the value of the bytes in this memory block at the specified offset within this memory block to the specified bytes.
 	 * The offset is zero based.
@@ -87,22 +121,4 @@ public interface IPDIMemoryBlock extends IPDISessionObject {
 	 * </ul>
 	 */
 	void setValue(long offset, byte[] bytes) throws PDIException;
-
-	/**
-	 * Determines whether the block does not update
-	 * @return true if the block does not update
-	 */
-	boolean isFrozen();
-
-	/**
-	 * A memoryBlock set frozen means that the block will not update and check for new data
-	 * @param frozen the block is frozen by default
-	 */
-	void setFrozen(boolean frozen);
-
-	/**
-	 * Refresh the data, this may cause events to be trigger if the data values changed.
-	 * @throws PDIException on failure
-	 */
-	void refresh() throws PDIException;
 }

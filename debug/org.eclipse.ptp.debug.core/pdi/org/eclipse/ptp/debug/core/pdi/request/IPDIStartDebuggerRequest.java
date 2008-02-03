@@ -23,6 +23,6 @@ package org.eclipse.ptp.debug.core.pdi.request;
  * @author clement
  *
  */
-public interface IPDIStartDebuggerRequest extends IPDIEventRequest {
+public interface IPDIStartDebuggerRequest extends IPDIInternalEventRequest {
 
 }

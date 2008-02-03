@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.model;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -30,44 +31,75 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  */
 public interface IPDIMultiExpressions extends IPDISessionObject {
 	/**
-	 * Returns status of this expression
-	 * @return status of this expression
-	 */
-	boolean isEnabled();
-	/**
-	 * Returns expression text
-	 * @return expression text
-	 */
-	String getExpressionText();
-	/**
 	 * Stores an expression
 	 * @param expression Expression
 	 */
-	void addExpression(IPDIExpression expression);
+	public void addExpression(IPDIExpression expression);
 	
 	/**
-	 * Remove an expression from store
-	 * @param expression an expression going to be removed
+	 * @param tasks
+	 * @param monitor
 	 */
-	void removeExpression(IPDIExpression expression);
+	public void cleanExpressionsValue(BitList tasks, IProgressMonitor monitor);
 	
-	/**
-	 * Remove an expression from store
-	 * @param tasks BitList
-	 */
-	void removeExpression(BitList tasks);
-	
-	/**
-	 * Returns an array of expressions
-	 * @return an array of expressions
-	 */
-	IPDIExpression[] getExpressions();
-
 	/**
 	 * Returns the value of this expression.
 	 * @param expression an expression for getting value
 	 * @return the value of this expression
 	 * @throws PDIException on failure
 	 */
-	IAIF getAIF(IPDIExpression expression) throws PDIException;
+	public IAIF getAIF(IPDIExpression expression) throws PDIException;
+	
+	/**
+	 * @param task
+	 * @return
+	 */
+	public IPDIExpression getExpression(int task);
+	
+	/**
+	 * Returns an array of expressions
+	 * @return an array of expressions
+	 */
+	public IPDIExpression[] getExpressions();
+
+	/**
+	 * Returns expression text
+	 * @return expression text
+	 */
+	public String getExpressionText();
+	
+	/**
+	 * Returns status of this expression
+	 * @return status of this expression
+	 */
+	public boolean isEnabled();
+	
+	/**
+	 * Remove an expression from store
+	 * @param tasks BitList
+	 */
+	public void removeExpression(BitList tasks);
+	
+	/**
+	 * Remove an expression from store
+	 * @param expression an expression going to be removed
+	 */
+	public void removeExpression(IPDIExpression expression);
+	
+	/**
+	 * @param enabled
+	 */
+	public void setEnabled(boolean enabled);
+	
+	/**
+	 * 
+	 */
+	public void shutdown();
+
+	/**
+	 * @param tasks
+	 * @param monitor
+	 * @throws PDIException
+	 */
+	public void updateExpressionsValue(BitList tasks, IProgressMonitor monitor) throws PDIException;
 }

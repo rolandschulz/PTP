@@ -912,7 +912,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			if (!session.isReady())
 				return;
 			
-			IPDIListStackFramesRequest request = session.getPDISession().getRequestFactory().getStackFramesRequest(tasks, low, high);
+			IPDIListStackFramesRequest request = session.getPDISession().getRequestFactory().getListStackFramesRequest(session.getPDISession(), 
+					tasks, low, high);
 			try {
 				session.getPDISession().getEventRequestManager().addEventRequest(request);
 				Map<BitList, Object> map = request.getResultMap(tasks);

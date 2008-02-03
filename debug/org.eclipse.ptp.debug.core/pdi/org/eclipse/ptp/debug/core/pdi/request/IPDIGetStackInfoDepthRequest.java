@@ -18,11 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+
 /**
  * Represents to request getting stack info depth
  * @author clement
  *
  */
 public interface IPDIGetStackInfoDepthRequest extends IPDIEventRequest {
-
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public int getDepth(BitList qTasks) throws PDIException;
 }

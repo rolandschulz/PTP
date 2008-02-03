@@ -18,11 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor;
+
 /**
  * Represents to request a list of signals
  * @author clement
  *
  */
 public interface IPDIListSignalsRequest extends IPDIEventRequest {
-
+	public IPDISignalDescriptor[] getSignals(BitList qTasks) throws PDIException;
 }

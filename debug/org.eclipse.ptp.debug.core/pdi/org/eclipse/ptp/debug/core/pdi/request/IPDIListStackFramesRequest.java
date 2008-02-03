@@ -18,10 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
+
 /**
  * Represents to request a list of stackframes
  * @author clement
  *
  */
 public interface IPDIListStackFramesRequest extends IPDIInternalEventRequest {
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public IPDIStackFrameDescriptor[] getStackFrames(BitList qTasks) throws PDIException;
 }

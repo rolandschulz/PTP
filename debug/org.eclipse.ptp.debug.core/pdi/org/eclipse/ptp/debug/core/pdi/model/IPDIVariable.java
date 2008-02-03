@@ -27,45 +27,30 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public interface IPDIVariable extends IPDIVariableDescriptor {
 	/**
-	 * Determines whether the value of this variable could be edited
-	 * @return true if the value of this variable could be edited
-	 * @throws PDIException on failure
-	 */
-	boolean isEditable() throws PDIException;
-	
-	/**
-	 * Sets value of this variable by given expression
-	 * @param expression an expression to generate a new AIF value
-	 * @throws PDIException on failure
-	 */
-	void setValue(String expression) throws PDIException;
-	
-	/**
 	 * Remove the variable from the manager list
 	 * @throws PDIException on failure
 	 */
-	void dispose() throws PDIException;
+	public void dispose() throws PDIException;
 	
 	/**
 	 * Determines whether both variables are the same
 	 * @param variable IPDIVariable for comparing
 	 * @return true if given variable is same as the current variable
 	 */
-	boolean equals(IPDIVariable variable);
+	public boolean equals(IPDIVariable variable);
 	
 	/**
-	 * Returns the number of children of this variable
-	 * @return the number of children of this variable
-	 * @throws PDIException on failure
+	 * @param varid
+	 * @return
 	 */
-	int getChildrenNumber() throws PDIException;
+	public IPDIVariable getChild(String varid);
 	
 	/**
 	 * Returns an array of IPDIVariables of the children of current variable or empty array if nothing
 	 * @return an array of IPDIVariables of the children of current variable
 	 * @throws PDIException on failure
 	 */
-	IPDIVariable[] getChildren() throws PDIException;
+	public IPDIVariable[] getChildren() throws PDIException;
 	
 	/**
 	 * Returns an array of IPDIVariables of the children of current variable by given a range  or empty array if nothing
@@ -74,10 +59,31 @@ public interface IPDIVariable extends IPDIVariableDescriptor {
 	 * @return an array of IPDIVariable of the children of current variable
 	 * @throws PDIException on failure
 	 */
-	IPDIVariable[] getChildren(int findex, int psize) throws PDIException;
+	public IPDIVariable[] getChildren(int findex, int psize) throws PDIException;
+	
+	/**
+	 * Returns the number of children of this variable
+	 * @return the number of children of this variable
+	 * @throws PDIException on failure
+	 */
+	public int getChildrenNumber() throws PDIException;
+	
+	/**
+	 * Determines whether the value of this variable could be edited
+	 * @return true if the value of this variable could be edited
+	 * @throws PDIException on failure
+	 */
+	public boolean isEditable() throws PDIException;
 	
 	/**
 	 * Resets value of the current variable
 	 */
-	void resetValue();
+	public void resetValue();
+	
+	/**
+	 * Sets value of this variable by given expression
+	 * @param expression an expression to generate a new AIF value
+	 * @throws PDIException on failure
+	 */
+	public void setValue(String expression) throws PDIException;
 }

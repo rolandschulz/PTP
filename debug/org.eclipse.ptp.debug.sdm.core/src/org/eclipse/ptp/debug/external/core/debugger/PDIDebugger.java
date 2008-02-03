@@ -26,11 +26,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
-import org.eclipse.ptp.debug.core.pdi.IPDIErrorInfo;
 import org.eclipse.ptp.debug.core.pdi.IPDILocation;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint;
@@ -38,7 +39,6 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
-import org.eclipse.ptp.debug.external.core.ExtFormat;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
@@ -71,15 +71,15 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				sessionHandleEvents();
 				return true;
 			}
-			disconnection(null);
+			disconnect(null);
 			return false;
 		}
 		catch (IOException e) {
-			disconnection(null);
+			disconnect(null);
 			throw new PDIException(null, "Error on connecting proxy: " + e.getMessage());
 		}
 	}
-	public void disconnection(Observer observer) throws PDIException {
+	public void disconnect(Observer observer) throws PDIException {
 		stopDebugger();
 	}
 	public int getDebuggerPort(int timeout) throws PDIException {

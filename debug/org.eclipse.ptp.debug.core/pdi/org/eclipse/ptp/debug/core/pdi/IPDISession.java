@@ -20,16 +20,29 @@ package org.eclipse.ptp.debug.core.pdi;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IRequestFactory;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventRequestManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDISignalManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDISourceManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIThreadManager;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
 
 /**
  * Represents a debug session
  * @author clement
  *
  */
-public interface IPDISession extends IPDIExecuteManagement {
+public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	public static final int CONNECTING = 1;  
 	public static final int CONNECTED = 2;
 	public static final int STARTED = 3;
@@ -37,147 +50,22 @@ public interface IPDISession extends IPDIExecuteManagement {
 	public static final int EXITED = 5;
 	
 	/**
-	 * Returns request factory
-	 * @return request factory
+	 * @param tasks
 	 */
-	IRequestFactory getRequestFactory();
+	public void processRunningEvent(BitList tasks);
 	
 	/**
-	 * Shutdown this session 
-	 * @param force whether force to terminate debugger 
+	 * @return
 	 */
-	void shutdown(boolean force);
-	
-	/** 
-	 * Returns job id associated with this session
-	 * @return job id
-	 */
-	String getJobID();
+	public IPDISourceManager getSourceManager();
 	
 	/**
-	 * Causes this session to exit
-	 * @throws PDIException on failure
+	 * @param tasks
+	 * @param thread_id
+	 * @param vars
 	 */
-	void exit() throws PDIException;
+	public void processSupsendedEvent(BitList tasks, final int thread_id, final String[] vars);
 
-	/**
-	 * Returns the event request manager for this session
-	 * @return IPDIEventRequestManager the event request manager for this session
-	 */
-	IPDIEventRequestManager getEventRequestManager();
-	
-	/**
-	 * Returns the event manager for this session
-	 * @return IPDIEventManager the event request manager for this session
-	 */
-	IPDIEventManager getEventManager();
-
-	/**
-	 * Returns the task manager for this session
-	 * @return IPDITaskManager the task manager for this session
-	 */
-	IPDITaskManager getTaskManager();
-
-	/**
-	 * Returns the breakpoint manager for this session
-	 * @return IPDIBreakpointManager the breakpoint manager for this session
-	 */
-	IPDIBreakpointManager getBreakpointManager();
-
-	/**
-	 * Returns the register manager for this session
-	 * @return IPDIRegisterManager the register manager for this session
-	 */
-	IPDIRegisterManager getRegisterManager();
-
-	/**
-	 * Returns the memory manager for this session
-	 * @return IPDIMemoryManager the memory manager for this session
-	 */
-	IPDIMemoryManager getMemoryManager();
-
-	/**
-	 * Returns the target manager for this session
-	 * @return IPDITargetManager the target manager for this session
-	 */
-	IPDITargetManager getTargetManager();
-
-	/**
-	 * Returns the variable manager for this session
-	 * @return IPDIVariableManager the variable manager for this session
-	 */
-	IPDIVariableManager getVariableManager();
-	
-	/**
-	 * Returns the thread manager for this session
-	 * @return IPDIThreadManager the thread manager for this session
-	 */
-	IPDIThreadManager getThreadManager();
-
-	/**
-	 * Returns the expression manager for this session
-	 * @return IPDIExpressionManager the expression manager for this session
-	 */
-	IPDIExpressionManager getExpressionManager();
-	
-	/**
-	 * Returns the signal manager for this session
-	 * @return IPDISignalManager the signal manager for this session
-	 */
-	IPDISignalManager getSignalManager();
-	
-	/**
-	 * Returns a debugger for this session
-	 * @return a debugger for this session
-	 */
-	IPDIDebugger getDebugger();
-	
-	/**
-	 * Returns debug target on given task id or null if target is not registered
-	 * @param tid task id
-	 * @return debug target
-	 * @throws PDIException on failure
-	 */
-	IPDITarget findTarget(BitList task) throws PDIException;
-	
-	/**
-	 * Set status for session
-	 * @param status status of current session
-	 */
-	void setStatus(int status);
-	
-	/**
-	 * Returns current status of this session
-	 * @return current status of this session
-	 */
-	int getStatus();
-	
-	/**
-	 * Returns whether this target/thread is currently suspended.
-	 * @param tasks target process
-	 * @return whether this target/thread is currently suspended
-	 */
-	boolean isSuspended(BitList tasks);
-	
-	/**
-	 * Returns whether this target/thread is currently terminated.
-	 * @param tasks target process
-	 * @return whether this target/thread is currently terminated
-	 */
-	boolean isTerminated(BitList tasks);
-	
-	/**
-	 * Returns all tasks of this session
-	 * @return all tasks of this session
-	 */
-	BitList getTasks();
-	
-	/**
-	 * Returns total tasks in this session
-	 * @return total tasks in this session
-	 */
-	int getTotalTasks();
-	
 	/**
 	 * @param monitor
 	 * @param app
@@ -186,17 +74,183 @@ public interface IPDISession extends IPDIExecuteManagement {
 	 * @param args
 	 * @throws PDIException on failure
 	 */
-	void connectToDebugger(IProgressMonitor monitor, String app, String path, String dir, String[] args) throws PDIException;
+	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String dir, String[] args) throws PDIException;
+	
+	/**
+	 * Causes this session to exit
+	 * @throws PDIException on failure
+	 */
+	public void exit() throws PDIException;
+	
+	/**
+	 * Returns debug target on given task id or null if target is not registered
+	 * @param tid task id
+	 * @return debug target
+	 * @throws PDIException on failure
+	 */
+	public IPDITarget findTarget(BitList task) throws PDIException;
+
+	/**
+	 * Returns the breakpoint manager for this session
+	 * @return IPDIBreakpointManager the breakpoint manager for this session
+	 */
+	public IPDIBreakpointManager getBreakpointManager();
+
+	/**
+	 * Returns a debugger for this session
+	 * @return a debugger for this session
+	 */
+	public IPDIDebugger getDebugger();
+		
+	/**
+	 * Get the factory to create events for this session
+	 * 
+	 * @return
+	 */
+	public IPDIEventFactory getEventFactory();
+	
+	/**
+	 * Returns the event manager for this session
+	 * @return IPDIEventManager the event request manager for this session
+	 */
+	public IPDIEventManager getEventManager();
+	
+	/**
+	 * Returns the event request manager for this session
+	 * @return IPDIEventRequestManager the event request manager for this session
+	 */
+	public IPDIEventRequestManager getEventRequestManager();
+	
+	/**
+	 * Returns the expression manager for this session
+	 * @return IPDIExpressionManager the expression manager for this session
+	 */
+	public IPDIExpressionManager getExpressionManager();
+
+	/** 
+	 * Returns job id associated with this session
+	 * @return job id
+	 */
+	public String getJobID();
+	
+	/**
+	 * Returns the memory manager for this session
+	 * @return IPDIMemoryManager the memory manager for this session
+	 */
+	public IPDIMemoryManager getMemoryManager();
+
+	/**
+	 * Get the factory to create model elements for this session
+	 * 
+	 * @return
+	 */
+	public IPDIModelFactory getModelFactory();
+
+	/**
+	 * Returns the register manager for this session
+	 * @return IPDIRegisterManager the register manager for this session
+	 */
+	public IPDIRegisterManager getRegisterManager();
+
+	/**
+	 * Returns request factory
+	 * @return request factory
+	 */
+	public IPDIRequestFactory getRequestFactory();
+
+	/**
+	 * Returns the signal manager for this session
+	 * @return IPDISignalManager the signal manager for this session
+	 */
+	public IPDISignalManager getSignalManager();
+
+	/**
+	 * Returns current status of this session
+	 * @return current status of this session
+	 */
+	public int getStatus();
+	
+	/**
+	 * Returns the target manager for this session
+	 * @return IPDITargetManager the target manager for this session
+	 */
+	public IPDITargetManager getTargetManager();
+
+	/**
+	 * Returns the task manager for this session
+	 * @return IPDITaskManager the task manager for this session
+	 */
+	public IPDITaskManager getTaskManager();
+	
+	/**
+	 * Returns all tasks of this session
+	 * @return all tasks of this session
+	 */
+	public BitList getTasks();
+	
+	/**
+	 * Returns the thread manager for this session
+	 * @return IPDIThreadManager the thread manager for this session
+	 */
+	public IPDIThreadManager getThreadManager();
+	
+	/**
+	 * @return
+	 */
+	public long getTimeout();
+	
+	/**
+	 * Returns total tasks in this session
+	 * @return total tasks in this session
+	 */
+	public int getTotalTasks();
+	
+	/**
+	 * Returns the variable manager for this session
+	 * @return IPDIVariableManager the variable manager for this session
+	 */
+	public IPDIVariableManager getVariableManager();
+	
+	/**
+	 * Returns whether this target/thread is currently suspended.
+	 * @param tasks target process
+	 * @return whether this target/thread is currently suspended
+	 */
+	public boolean isSuspended(BitList tasks);
+	
+	/**
+	 * Returns whether this target/thread is currently terminated.
+	 * @param tasks target process
+	 * @return whether this target/thread is currently terminated
+	 */
+	public boolean isTerminated(BitList tasks);
+	
+	/**
+	 * @param runnable
+	 */
+	public void queueRunnable(Runnable runnable);
 	
 	/**
 	 * Sets a timeout for request
 	 */
-	void setRequestTimeout(long timeout);
+	public void setRequestTimeout(long timeout);
+	
+	/**
+	 * Set status for session
+	 * @param status status of current session
+	 */
+	public void setStatus(int status);
+	
+	/**
+	 * Shutdown this session 
+	 * @param force whether force to terminate debugger 
+	 */
+	public void shutdown(boolean force);
 	
 	/**
 	 * Checks whether request tasks can do step return
 	 * @param tasks
 	 * @throws PDIException
 	 */
-	void validateStepReturn(BitList tasks) throws PDIException;	
+	public void validateStepReturn(BitList tasks) throws PDIException;	
 }

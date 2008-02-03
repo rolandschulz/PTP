@@ -18,11 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
+
 /**
  * Represents to request setting thread select
  * @author clement
  *
  */
 public interface IPDISetThreadSelectRequest extends IPDIEventRequest {
-
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public IPDIStackFrameDescriptor getStackFrame(BitList qTasks) throws PDIException;
+	
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public int getThreadId(BitList qTasks) throws PDIException;
 }
