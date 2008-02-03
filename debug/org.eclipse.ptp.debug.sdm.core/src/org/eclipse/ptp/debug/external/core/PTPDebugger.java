@@ -35,8 +35,12 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.Session;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIManagerFactory;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
 import org.eclipse.ptp.debug.external.core.debugger.PDIDebugger;
-import org.eclipse.ptp.debug.internal.core.pdi.Session;
 
 /**
  * @author clement
@@ -44,6 +48,10 @@ import org.eclipse.ptp.debug.internal.core.pdi.Session;
  */
 public class PTPDebugger implements IPTPDebugger {
 	private IPDIDebugger pdiDebugger = null;
+	private IPDIModelFactory modelFactory = null;
+	private IPDIManagerFactory managerFactory = null;
+	private IPDIEventFactory eventFactory = null;
+	private IPDIRequestFactory requestFactory = null;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPTPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
@@ -54,6 +62,18 @@ public class PTPDebugger implements IPTPDebugger {
 		}
 		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
+		}
+		if (modelFactory == null) {
+			modelFactory = new SDMModelFactory();
+		}
+		if (managerFactory == null) {
+			managerFactory = new SDMManagerFactory();
+		}
+		if (eventFactory == null) {
+			eventFactory = new SDMEventFactory();
+		}
+		if (requestFactory == null) {
+			requestFactory = new SDMRequestFactory();
 		}
 		return createSession(timeout, launch, corefile, monitor);
 	}
@@ -96,7 +116,8 @@ public class PTPDebugger implements IPTPDebugger {
 		IPJob job = launch.getPJob();
 		int job_size = getJobSize(job);
 		try {
-			return new Session(launch.getLaunchConfiguration(), timeout, getDebugger(), job.getID(), job_size);
+			return new Session(managerFactory, requestFactory, eventFactory, modelFactory,
+					launch.getLaunchConfiguration(), timeout, getDebugger(), job.getID(), job_size);
 		}
 		catch (PDIException e) {
 			throw newCoreException(e);

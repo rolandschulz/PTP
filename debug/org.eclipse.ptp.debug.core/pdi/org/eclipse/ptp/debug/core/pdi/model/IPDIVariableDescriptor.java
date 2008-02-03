@@ -29,44 +29,84 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  */
 public interface IPDIVariableDescriptor extends IPDISessionObject {
 	/**
-	 * Returns the name of this variable
-	 * @return the name of this variable
+	 * Determines whether both descriptors are the same
+	 * @param variable IPDIVariableDescriptor for comparing
+	 * @return true if given descriptors is same as the current descriptors
 	 */
-	String getName();
-
+	public boolean equalDescriptors(IPDIVariableDescriptor variable);
+	
 	/**
 	 * Returns AIF of this variable
 	 * @return AIF of this variable
 	 * @throws PDIException on failure
 	 */
-	IAIF getAIF() throws PDIException;
+	public IAIF getAIF() throws PDIException;
 	
 	/**
-	 * Sets IAIF to this variable
-	 * @param aif AIF object
+	 * Returns the end position
+	 * @return the end position
 	 */
-	void setAIF(IAIF aif);
+	public int getCastingArrayEnd();
+
 	
 	/**
-	 * Returns the type name of this variable descriptor
-	 * @return the type name of this variable descriptor
-	 * @throws PDIException on failure
+	 * Returns the start position
+	 * @return the start position
 	 */
-	String getTypeName() throws PDIException;
+	public int getCastingArrayStart();
+
+	/**
+	 * @return
+	 */
+	public String[] getCastingTypes();
 	
 	/**
-	 * Returns the size of this variable descriptor
-	 * @return the size of this variable descriptor
-	 * @throws PDIException on failure
+	 * Returns the full name of this variable
+	 * @return the name of this variable
 	 */
-	int sizeof() throws PDIException;
+	public String getFullName();
+	
+	/**
+	 * Returns the name of this variable
+	 * @return the name of this variable
+	 */
+	public String getName();
+	
+	/**
+	 * @return
+	 */
+	public int getPosition();
 	
 	/**
 	 * Return the qualified name of this variable descriptor
 	 * @return the qualified name of this variable descriptor
 	 * @throws PDIException on failure
 	 */
-	String getQualifiedName() throws PDIException;
+	public String getQualifiedName() throws PDIException;
+	
+	/**
+	 * @return
+	 */
+	public int getStackDepth();
+	
+	/**
+	 * @return
+	 * @throws PDIException
+	 */
+	public IPDIStackFrame getStackFrame() throws PDIException;
+	
+	/**
+	 * @return
+	 * @throws PDIException
+	 */
+	public IPDIThread getThread() throws PDIException;
+	
+	/**
+	 * Returns the type name of this variable descriptor
+	 * @return the type name of this variable descriptor
+	 * @throws PDIException on failure
+	 */
+	public String getTypeName() throws PDIException;
 	
 	/**
 	 * Consider the variable object as an Array of type and rang [start, start + length - 1]
@@ -75,7 +115,7 @@ public interface IPDIVariableDescriptor extends IPDISessionObject {
 	 * @return IPDIVariableDescriptor
 	 * @throws PDIException on failure
 	 */
-	IPDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws PDIException;
+	public IPDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws PDIException;
 	
 	/**
 	 *  Consider the variable object as a type
@@ -83,35 +123,36 @@ public interface IPDIVariableDescriptor extends IPDISessionObject {
 	 * @return IPDIVariableDescriptor
 	 * @throws PDIException on failure
 	 */
-	IPDIVariableDescriptor getVariableDescriptorAsType(String type) throws PDIException;
-	
-	/**
-	 * Sets start position of casting array
-	 * @param start position to start
-	 */
-	void setCastingArrayStart(int start);
-	
-	/**
-	 * Returns the start position
-	 * @return the start position
-	 */
-	int getCastingArrayStart();
-	
-	/**
-	 * Sets end position of casting array
-	 * @param end position to end
-	 */
-	void setCastingArrayEnd(int end);
-	
-	/**
-	 * Returns the end position
-	 * @return the end position
-	 */
-	int getCastingArrayEnd();
+	public IPDIVariableDescriptor getVariableDescriptorAsType(String type) throws PDIException;
 
 	/**
 	 * Returns an unique id of this variable
 	 * @return an unique id of this variable
 	 */
-	String getVarId();
+	public String getVarId();
+	
+	/**
+	 * Sets IAIF to this variable
+	 * @param aif AIF object
+	 */
+	public void setAIF(IAIF aif);
+	
+	/**
+	 * Sets end position of casting array
+	 * @param end position to end
+	 */
+	public void setCastingArrayEnd(int end);
+	
+	/**
+	 * Sets start position of casting array
+	 * @param start position to start
+	 */
+	public void setCastingArrayStart(int start);
+	
+	/**
+	 * Returns the size of this variable descriptor
+	 * @return the size of this variable descriptor
+	 * @throws PDIException on failure
+	 */
+	public int sizeof() throws PDIException;
 }

@@ -29,12 +29,41 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public interface IPDITarget extends IPDISourceManagement, IPDISharedLibraryManagement, IPDISessionObject {
 	/**
+	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
+	 * ChangedEvent will also be trigger when the variable is assign a new value.
+	 * DestroyedEvent is fired when the variable is out of scope and automatically
+	 * removed from the manager list.
+	 * 
+	 * @param varDesc IPDIGlobalVariableDescriptor
+	 * @return IPDIGlobalVariable
+	 * @throws PDIException on failure
+	 */
+	public IPDIGlobalVariable createGlobalVariable(IPDIGlobalVariableDescriptor varDesc) throws PDIException;
+	
+	/**
+	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
+	 * ChangedEvent will also be trigger when the variable is assign a new value.
+	 * DestroyedEvent is fired when the variable is out of scope and automatically
+	 * removed from the manager list.
+	 * @param varDesc IPDThreadStorageDesc
+	 * @return IPDIRegister
+	 * @throws PDIException on failure
+	 */
+	public IPDIRegister createRegister(IPDIRegisterDescriptor varDesc) throws PDIException;
+	
+	/**
 	 * Evaluates the expression specified by the given string. Returns the evaluation result as a String.
 	 * @param - expression string to be evaluated
 	 * @return the result of the evaluation
 	 * @throws PDIException on failure
 	 */
-	String evaluateExpressionToString(IPDIStackFrame context, String expressionText) throws PDIException;
+	public String evaluateExpressionToString(IPDIStackFrame context, String expressionText) throws PDIException;
+	
+	/**
+	 * Returns the currently selected thread.
+	 * @return the currently selected thread
+	 */
+	public IPDIThread getCurrentThread() throws PDIException;
 	
 	/**
 	 * A static/global variable in a particular function or file,
@@ -59,54 +88,52 @@ public interface IPDITarget extends IPDISourceManagement, IPDISharedLibraryManag
 	 * @return IPDIGlobalVariableDescriptor
 	 * @throws PDIException on failure
 	 */
-	IPDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws PDIException;
-	
-	/**
-	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
-	 * ChangedEvent will also be trigger when the variable is assign a new value.
-	 * DestroyedEvent is fired when the variable is out of scope and automatically
-	 * removed from the manager list.
-	 * 
-	 * @param varDesc IPDIGlobalVariableDescriptor
-	 * @return IPDIGlobalVariable
-	 * @throws PDIException on failure
-	 */
-	IPDIGlobalVariable createGlobalVariable(IPDIGlobalVariableDescriptor varDesc) throws PDIException;
+	public IPDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws PDIException;
 	
 	/**
 	 * Return the register groups.
 	 * @return IPDIRegisterGroup[]
 	 * @throws PDIException on failure
 	 */
-	IPDIRegisterGroup[] getRegisterGroups() throws PDIException;
-
-	/**
-	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
-	 * ChangedEvent will also be trigger when the variable is assign a new value.
-	 * DestroyedEvent is fired when the variable is out of scope and automatically
-	 * removed from the manager list.
-	 * @param varDesc IPDThreadStorageDesc
-	 * @return IPDIRegister
-	 * @throws PDIException on failure
-	 */
-	IPDIRegister createRegister(IPDIRegisterDescriptor varDesc) throws PDIException;
+	public IPDIRegisterGroup[] getRegisterGroups() throws PDIException;
 
 	/**
 	 * Returns the Runtime options for this target debug session.
 	 * @return the configuration description
 	 */
-	IPDIRuntimeOptions getRuntimeOptions();
-	
+	public IPDIRuntimeOptions getRuntimeOptions();
+
 	/**
 	 * Returns the threads contained in this target. An empty collection is returned if this target contains no threads.
 	 * @return a collection of threads
 	 * @throws PDIException on failure
 	 */
-	IPDIThread[] getThreads() throws PDIException;
+	public IPDIThread[] getThreads() throws PDIException;
 	
 	/**
-	 * Returns the currently selected thread.
-	 * @return the currently selected thread
+	 * 
 	 */
-	IPDIThread getCurrentThread() throws PDIException;	
+	public void lockTarget();
+	
+	/**
+	 * 
+	 */
+	public void releaseTarget();
+	
+	/**
+	 * @param pthread
+	 * @param doUpdate
+	 * @throws PDIException
+	 */
+	public void setCurrentThread(IPDIThread pthread, boolean doUpdate) throws PDIException;
+	
+	/**
+	 * @param state
+	 */
+	public void setSupended(boolean state);
+	
+	/**
+	 * @param newThreadId
+	 */
+	public void updateState(int newThreadId);
 }

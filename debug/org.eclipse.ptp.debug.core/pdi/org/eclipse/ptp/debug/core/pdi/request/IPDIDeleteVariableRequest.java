@@ -23,6 +23,6 @@ package org.eclipse.ptp.debug.core.pdi.request;
  * @author clement
  *
  */
-public interface IPDIDeleteVariableRequest extends IPDIEventRequest {
+public interface IPDIDeleteVariableRequest extends IPDIInternalEventRequest {
 
 }

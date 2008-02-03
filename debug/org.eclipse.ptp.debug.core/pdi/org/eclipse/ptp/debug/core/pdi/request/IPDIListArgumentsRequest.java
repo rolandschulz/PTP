@@ -18,11 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+
 /**
  * Represents to request a list of arguments
  * @author clement
  *
  */
 public interface IPDIListArgumentsRequest extends IPDIEventRequest {
+
+	/**
+	 * @param tasks
+	 * @return
+	 */
+	public String[] getArguments(BitList tasks) throws PDIException;
 
 }

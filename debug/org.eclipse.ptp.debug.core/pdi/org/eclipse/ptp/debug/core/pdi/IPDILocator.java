@@ -18,11 +18,41 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
+import java.math.BigInteger;
+
 /**
  * Represents the information of file, function, line, address
  * @author clement
  *
  */
 public interface IPDILocator extends IPDIFileLocation, IPDILineLocation, IPDIFunctionLocation, IPDIAddressLocation {
+	/**
+	 * @param oAddress
+	 * @return
+	 */
+	public boolean equalAddress(BigInteger oAddress);
 
+	/**
+	 * @param oFile
+	 * @return
+	 */
+	public boolean equalFile(String oFile);
+
+	/**
+	 * @param oFunction
+	 * @return
+	 */
+	public boolean equalFunction(String oFunction);
+
+	/**
+	 * @param oLine
+	 * @return
+	 */
+	public boolean equalLine(int oLine);
+
+	/**
+	 * @param locator
+	 * @return
+	 */
+	public boolean equals(IPDILocator locator);
 }

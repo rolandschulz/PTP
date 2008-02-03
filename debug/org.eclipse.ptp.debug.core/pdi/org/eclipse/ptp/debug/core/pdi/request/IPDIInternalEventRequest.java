@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 
@@ -28,7 +29,31 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  *
  */
 public interface IPDIInternalEventRequest extends IPDIEventRequest {
-	Object getResult(BitList  qTasks) throws PDIException;
-	Map<BitList, Object> getResultMap(BitList qTasks) throws PDIException;
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public Object getResult(BitList  qTasks) throws PDIException;
+	
+	/**
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public Map<BitList, Object> getResultMap(BitList qTasks) throws PDIException;
+	
+	/**
+	 * @param qTasks
+	 * @throws PDIException
+	 */
+	public void waitUntilCompleted(BitList qTasks) throws PDIException;
+	
+	/**
+	 * @param qTasks
+	 * @param monitor
+	 * @throws PDIException
+	 */
+	public void waitUntilCompleted(BitList qTasks, IProgressMonitor monitor) throws PDIException;
 }
 

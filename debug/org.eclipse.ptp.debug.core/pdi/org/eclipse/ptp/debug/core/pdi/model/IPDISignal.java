@@ -28,42 +28,53 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public interface IPDISignal extends IPDISessionObject {
 	/**
-	 * Returns the name of this signal.
-	 * @return the name of this signal
-	 */
-	String getName();
-	
-	/**
 	 * Returns the meaning of this signal.
 	 * @return the meaning of this signal
 	 */
-	String getDescription();
-
+	public String getDescription();
+	
 	/**
-	 * if false means program will see the signal.
-	 * Otherwise program does not know.
-	 * @return boolean
+	 * Returns the name of this signal.
+	 * @return the name of this signal
 	 */
-	boolean isIgnore();
-
-	/**
-	 * Means reenter debugger if this signal happens
-	 * Method  isStopSet.
-	 * @return boolean
-	 */
-	boolean isStopSet();
-
-	/**
-	 * Continue program giving it this signal.
-	 * @throws PDIException on failure
-	 */
-	void signal() throws PDIException ;
-
+	public String getName();
+	
 	/**
 	 * Change the way debugger handles this signal.
 	 * @param ignore - if true the debugger should not allow your program to see this signal
 	 * @param stop - if true the debugger should stop your program when this signal happens
 	 * @throws PDIException on failure
 	 */
-	void handle(boolean ignore, boolean stop) throws PDIException;
+	public void handle(boolean ignore, boolean stop) throws PDIException;
+
+	/**
+	 * if false means program will see the signal.
+	 * Otherwise program does not know.
+	 * @return boolean
+	 */
+	public boolean isIgnore();
+
+	/**
+	 * Means reenter debugger if this signal happens
+	 * Method  isStopSet.
+	 * @return boolean
+	 */
+	public boolean isStopSet();
+
+	/**
+	 * @param desc
+	 */
+	public void setDescriptor(IPDISignalDescriptor desc);
+
+	/**
+	 * @param isIgnore
+	 * @param isStop
+	 */
+	public void setHandle(boolean isIgnore, boolean isStop);
+	
+	/**
+	 * Continue program giving it this signal.
+	 * @throws PDIException on failure
+	 */
+	public void signal() throws PDIException;
 }

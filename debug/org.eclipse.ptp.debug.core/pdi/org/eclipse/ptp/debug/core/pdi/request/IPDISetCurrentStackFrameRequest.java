@@ -23,6 +23,6 @@ package org.eclipse.ptp.debug.core.pdi.request;
  * @author clement
  *
  */
-public interface IPDISetCurrentStackFrameRequest extends IPDIEventRequest {
+public interface IPDISetCurrentStackFrameRequest extends IPDIInternalEventRequest {
 
 }
