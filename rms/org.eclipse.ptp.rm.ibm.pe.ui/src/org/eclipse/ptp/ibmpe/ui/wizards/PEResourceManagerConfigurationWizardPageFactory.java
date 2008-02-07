@@ -37,7 +37,8 @@ public class PEResourceManagerConfigurationWizardPageFactory extends
 	}
 
 	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
-		return new RMConfigurationWizardPage[]{new PEResourceManagerConfigurationWizardPage(wizard)};
+		return new RMConfigurationWizardPage[]{new PEResourceManagerConfigurationWizardPage(wizard), 
+						       new PEResourceManagerOptionWizardPage(wizard)};
 	}
 
 	public Class<PEResourceManagerFactory> getRMFactoryClass() {

@@ -30,42 +30,56 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 
-public class PEPreferenceManager {
-	private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy";
-	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
-	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
-	
-	public static int getDefaultOptions() {
-		return OPTIONS;
+public class PEPreferenceManager
+{
+    private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy";
+    private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
+    private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
+
+    public static int getDefaultOptions()
+    {
+	return OPTIONS;
+    }
+
+    public static String getDefaultProxyExecutablePath()
+    {
+	return PROXY_EXECUTABLE_PATH;
+    }
+
+    public static Preferences getPreferences()
+    {
+	return Activator.getDefault().getPluginPreferences();
+    }
+
+    public static void savePreferences()
+    {
+	Activator.getDefault().savePluginPreferences();
+    }
+
+    public static void initializePreferences()
+    {
+	Preferences preferences = Activator.getDefault().getPluginPreferences();
+
+	String server = "";
+
+	if (PROXY_EXECUTABLE_PATH != null) {
+	    server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
+	} else {
+	    server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
+	    if (server == null) {
+		server = "";
+	    }
 	}
 
-	public static String getDefaultProxyExecutablePath() {
-		return PROXY_EXECUTABLE_PATH;
-	}
-
-	public static Preferences getPreferences() {
-		return Activator.getDefault().getPluginPreferences();
-	}
-	
-	public static void savePreferences() {
-		Activator.getDefault().savePluginPreferences();
-	}
-	
-	public static void initializePreferences() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		
-		String server = "";
-			
-		if (PROXY_EXECUTABLE_PATH != null) {
-			server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
-		} else {
-			server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
-			if (server == null) {
-				server = "";
-			}
-       }
-		
-		preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
-		preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
-	}
+	preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
+	preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
+	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_OPTION, PEPreferenceConstants.OPTION_NO);
+	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_MODE, "d");
+	preferences.setDefault(PEPreferenceConstants.JOB_POLL_INTERVAL, "30");
+	preferences.setDefault(PEPreferenceConstants.NODE_MIN_POLL_INTERVAL, "30");
+	preferences.setDefault(PEPreferenceConstants.NODE_MAX_POLL_INTERVAL, "120");
+	preferences.setDefault(PEPreferenceConstants.LIBRARY_OVERRIDE, "");
+	preferences.setDefault(PEPreferenceConstants.RUN_MINIPROXY, PEPreferenceConstants.OPTION_YES);
+	preferences.setDefault(PEPreferenceConstants.TRACE_LEVEL, PEPreferenceConstants.TRACE_NOTHING);
+    }
 }

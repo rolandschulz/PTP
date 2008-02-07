@@ -12,6 +12,7 @@
 	<topic label="Introduction"  href="html/PEMainHelp.html#introduction"> 
 	</topic>
 	<topic label="Requirements" href="html/PEMainHelp.html#requirements"></topic>
+	<topic label="Installation" href="html/PEMainHelp.html#installation"></topic>
 	<topic label="Getting Started" href="html/PEMainHelp.html#starting"></topic>
 	<topic label="Running an application" href="html/PEMainHelp.html#running"></topic>
 	<topic label="Redirecting stdio" href="html/PEMainHelp.html#redirection"></topic>

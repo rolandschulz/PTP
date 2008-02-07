@@ -24,9 +24,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.ibmpe.core.rmsystem;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.ibmpe.core.PEPreferenceManager;
+import org.eclipse.ptp.ibmpe.core.PEPreferenceConstants;
+import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
@@ -38,13 +42,12 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
-	public IResourceManagerConfiguration copyConfiguration(
-			IResourceManagerConfiguration configuration) {
-		return (IResourceManagerConfiguration)configuration.clone();
+	public IResourceManagerConfiguration copyConfiguration(IResourceManagerConfiguration configuration) {
+	    return (IResourceManagerConfiguration) configuration.clone();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
@@ -56,14 +59,29 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration()
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		return new PEResourceManagerConfiguration(this);
+		PEResourceManagerConfiguration conf = new PEResourceManagerConfiguration(this);
+		
+		Preferences preferences = PEPreferenceManager.getPreferences();
+		
+		conf.setProxyServerPath(preferences.getString(PreferenceConstants.PROXY_PATH));
+		conf.setOptions(preferences.getInt(PreferenceConstants.OPTIONS));
+		conf.setDebugLevel(preferences.getString(PEPreferenceConstants.TRACE_LEVEL));
+		conf.setJobPollInterval(preferences.getString(PEPreferenceConstants.JOB_POLL_INTERVAL));
+		conf.setLibraryOverride(preferences.getString(PEPreferenceConstants.LIBRARY_OVERRIDE));
+		conf.setLoadLevelerMode(preferences.getString(PEPreferenceConstants.LOAD_LEVELER_MODE));
+		conf.setNodeMaxPollInterval(preferences.getString(PEPreferenceConstants.NODE_MAX_POLL_INTERVAL));
+		conf.setNodeMinPollInterval(preferences.getString(PEPreferenceConstants.NODE_MIN_POLL_INTERVAL));
+		conf.setRunMiniproxy(preferences.getString(PEPreferenceConstants.RUN_MINIPROXY));
+		conf.setUseLoadLeveler(preferences.getString(PEPreferenceConstants.LOAD_LEVELER_OPTION));
+
+		return conf;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
 	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
 		return PEResourceManagerConfiguration.load(this, memento);
