@@ -18,18 +18,63 @@
 <p>This plugin allows you to run a parallel application using IBM Parallel Environment from within the PTP framework. 
 In addition to running applications, you can monitor their status, control their execution, and view their stdio
 output from within PTP.</p>
+<p>Optionally, you can use IBM Tivoli WorkloadScheduler LoadLeveler to manage your application's access to system resources</p>
+<p>This plugin consists of two parts. The first is the Eclipse PTP plugin code which is responsible for the PTP views 
+presented to the user and the user's interaction with those views. The second part is a resource manage (proxy), which is
+responsible for communicating with the PTP PE plugin code, invoking the parallel application, and reporting application
+status to the PTP PE plugin.</p>
 <h2><A name=requirements></A>Requirements</h2>
 <p>In addition to having Eclipse and PTP installed, you need to have the following software packages installed.</p>
 <ul>
 <li>CDT 4.0, available from the Eclipse download site</li>
 <li>Parallel Environment 4.3.1 or later, available from IBM</li>
 <li>LAPI 2.4.4.0 or later, available from IBM</li>
+<li>IBM Tivoli WorkloadScheduler LoadLeveler 3.4 or later, available from IBM, if you plan to use LoadLeveler to manage your application's
+access to system resources</li> 
 </ul>
-<p>See the IBM Parallel Environment for AIX and Linux Installation Guide, available at 
+<p>You should review the following information about Parallel Environment installation and usage
+<ul>
+<li>
 <a href="http://publib.boulder.ibm.com/epubs/pdf/am101m00.pdf">
-http://publib.boulder.ibm.com/epubs/pdf/am101m00.pdf</a> for specific Parallel Environment installation requirements.</p>
+IBM Parallel Environment for AIX and Linux Installation Guide</a>a>
+</li>
+<li>
+<a href="http://publib.boulder.ibm.com/epubs/pdf/am102m00.pdf">
+IBM Parallel Environment for AIX 5L and Linux Operation and Use, Vol 1, Using the Parallel Operating Environment</a>
+</li>
+</ul>
+<p>If you are using LoadLeveler to manage your application's access to system resources, then you should review the following
+LoadLeveler documentation</p>
+<ul>
+<li>
+<a href="http://publib.boulder.ibm.com/epubs/pdf/am2in206.pdf">
+Tivoli Workload Scheduler LoadLeveler V3.4 Installation Guide</a>
+</li>
+<li>
+<a href="http://publib.boulder.ibm.com/epubs/pdf/am2ug305.pdf">
+Tivoli Workload Scheduler LoadLeveler V3.4 Using and Administering Guide</a>
+</li>
+<li>
+<a href="http://publib.boulder.ibm.com/epubs/pdf/am2mg105.pdf">
+Tivoli Workload Scheduler LoadLeveler V3.4 Diagnosis and Messages Guide</a>
+</li>
+</ul>
+<h2><A name=installation></A>Installation</h2>
+If you will be running applications using PE with a host list and not using LoadLeveler to manage resource allocation,
+then installation is complete once you complete the PTP plugin installation procedures. If you plan to use LoadLeveler 
+to manage resource allocation, then you will need to rebuild the Parallel Environment proxy by following these steps
+<ol>
+<li>Make sure you have installed LoadLeveler and that the llapi.h include file exists on your system.
+It normally is located in the ./full/include directory within a LoadLeveler installation. 
+LoadLeveler is normally installed in /usr/lpp/LoadL on AIX systems and in /opt/ibmll/LoadL on Linux systems. LoadLeveler may also be 
+installed in a private directory if you choose to do so.
+<li>cd to the org.eclipse.ptp.ibmpe.proxy directory inside your plugins directory.</li>
+<li>Invoke the configure script in that directory with the <b>--with-ll-header</b> flag, specifying the path to
+the directory containing llapi.h. (Use <b>configure --help</b> to see a complete list of configure script options)</li>
+<li>Invoke <b>make</b> in the same directory.
+</ol>
 <h2><A name=starting></A>Getting Started</h2>
-<p>Define an appropriate project, either a C/C++ project using CDT or a FORTRAN project, using Photran. You can define 
+<p>Define an appropriate project, either a C/C++ project using CDT, or a FORTRAN project using Photran. You can define 
 either a standard make project or a managed make project.</p>
 <p>When you define the project, you should specify the project location as a directory which is shared among all nodes 
 where the parallel application will run to ensure Parallel Environment has access to the executable on all nodes. The 
@@ -58,19 +103,54 @@ be specified by clicking the settings for the linker.</p>
 preferences for Parallel Environment and specify the required resource manager. This setup needs to only be done once.</p>
 <p>You specify the default preferences by opening the preferences dialog, opening the <b>PTP</b> node, opening the
 <b>Resource Managers</b> node, and then clicking the <b>Parallel Environment</b> entry. The PE preferences panel is displayed. Here,
-you specify the default path for a resource manager to be used for Parallel Environment.</p>
+you specify the default settings for a resource manager to be used for Parallel Environment.</p>
 <img src="images/pe_preferences.jpg">
+<p>The settings that can be specified here are:</p>
+<ul>
+<li>The pathname to the PE proxy executable. This proxy handles the interaction between the Eclipse PTP session and your 
+parallel applications.</li>
+<li>Multiplexing options</li>
+<li>Whether the proxy is started manually or is started automatically when Eclipse is started</li>
+<li>Whether LoadLeveler is used to manage access to system resources</li>
+<li>If LoadLeveler is used:</li>
+<ul>
+<li>Whether PTP forces LoadLeveler to operate in multi-cluster mode, single (local) cluster mode, or to use the mode 
+LoadLeveler was configured for</li>
+<li>The minimum interval that the proxy will poll LoadLeveler to query node status</li>
+<li>The maximum interval that the proxy will poll LoadLeveler to query node status</li>
+<li>The interval that the proxy will poll LoadLeveler for job status</li>
+<li>Alternate directory for the LoadLaveler interface library. This option is useful if LoadLeveler is not installed
+on the node where the proxy runs, and you have installed your own copy of the LoadLeveler interface library libllapi</li>
+<li>Whether a second proxy process is started when the PTP PE proxy shuts down. This second proxy is useful in cases where
+an application writes data to STDIO. If the PE PTP proxy shuts down without starting the second proxy, then the application
+may suspend since there is no process intercepting the STDIO output from the application. If this option is selected,
+a second, smaller, proxy is started. This second proxy intercepts the STDIO output from the application and writes it to
+files in /tmp. This prevents the application from blocking when the pipes connected to the application's STDIO
+file descriptors are full.</li>
+<li>Specify the level of tracing performed by the proxy. This option is useful when attempting to diagnose problems
+with the PTP PE plugin</li>
+</ul>
 <p>Once you have set up preferences, create the resource manager for Parallel Environment. To do this, right-click in the
-resource managers view and selecting <b>Add Resource Manager</b> from the menu. A resource manager wizard will be 
-displayed. Select <b>PE</b> from the list of resource manager types and click next. The next panel displayed configures
-the PE resource manager. Select the Remote service provider and proxy server location from the dropdown lists. You can
+resource managers view and select <b>Add Resource Manager</b> from the menu. A resource manager wizard will be 
+displayed. Select <b>PE</b> from the list of resource manager types and click next.</p> 
+<p>The next panel displayed is the first wizard panel which configures the PE resource manager.</p>
+<img src="images/pe_proxy_config_1.jpg">
+<p>This panel is the standard PTP wizard resource manager configuration wizard panel which specifies the location and
+connection attributes for a proxy.</p>
+<p>Select the Remote service provider and proxy server location from the dropdown lists. You can
 also create a new proxy server location by clicking the <b>New</b> button in this pane. Specify the path to the proxy 
 server executable, or just accept the value filled in as default from the preferences panel. Uncheck the <b>Launch server 
-manually</b> and click next again. On the final page of the resource configuration manager wizard, either accept the 
+manually</b> and click next again to proceed to the next wizard panel</p> 
+<img src="images/pe_proxy_config_2.jpg">
+<p>This panel is used to specify the proxy options for this particular resource manager configuration. Most of the
+options on this panel are identical with the corresponding option in the PE plugin preferences panel.
+This panel has one additional option, which specifies whether the proxy execution is to be suspended immediately after 
+it starts. This option is intended to be used in debugging the proxy in cases where it is necessary to suspend proxy 
+execution before the first command sent to the proxy is processed, so that a debugger can be attached to the proxy process</p>
+<p>Once the fields on this panel have been filled in, click next to proceed to the next wizard panel</p>
+<p>On the final page of the resource configuration manager wizard, either accept the 
 default resource manager name, or uncheck the checkbox and enter a name and description for the resource manager. 
 Then click finish to create the resource manager entry.</p>
-<p>The image below shows the PE proxy configuration panel of the resource manager wizard.</p>
-<img src="images/pe_proxy_config.jpg">
 <p>You may have as many resource managers defined as you require for your system configuration.</p>
 <p>Once you have defined a resource manager, you must start it before it can run a parallel application using that
 resource manager. To start a resource manager, right-click over the name of the resource manager in the resource manager 
@@ -79,6 +159,9 @@ manager will turn green.</p>
 <p>If necessary, you can stop a resource manager by right-clicking over its name in the resource manager and selecting 
 <b>Stop resource manager</b> from the popup menu. Normally, a resource manger will shutdown automatically when PTP is
 shutdown, and if it was running when PTP was shutdown, then it will automatically start when PTP is started again.</p>
+<p>You can edit resource manager configuration for a resource manager that is in the stopped state by double clicking
+the resource manager name or by right clicking the resource manager name and selecting <b>Edit Resource Manager</b> 
+from the drop down menu.</p>
 <h2><A name=running></A>Running a Parallel Application</h2>
 <p>Once an application has been compiled, the first step in running the application is to be sure the resource manager for 
 Parallel Environment is running on the node where you intend to start the application. To do this, check the resource 
@@ -98,10 +181,10 @@ settings required by the application. If you are using Parallel Environment in b
 not set any Parallel Environment environment variables (starting with MP_) in the Environment tab and not specify any
 options specific to the <b>poe</b> command in the Arguments tab, since those settings may conflict with settings in the
 Parallel tab and cause application invocation to fail.</p>
-<p>The <b>Parallel</b> tab is the tab where invocation options unique to Parallel Environment are specified. When it is initially displayed,
+<p>The <b>Resources</b> tab is the tab where invocation options unique to Parallel Environment are specified. When it is initially displayed,
 it will appear as follows.</p>
 <img src="images/pe_run_config.jpg">
-<p>The first step is to select a resource manager from the dropdown list at the top of the parallel tab. This list contains
+<p>The first step is to select a resource manager from the dropdown list at the top of the resources tab. This list contains
 entries for each running resource manager. The <b>Select queue</b> dropdown can be ignored since there are no job queues
 used by the Parallel Environment resource manager. (The queue dropdown will be removed in the future).<p>
 <p>The next step is to select the run mode for the resource manager by checking or unchecking the <b>Advanced Mode</b>
@@ -159,6 +242,8 @@ redirected to a file.</p>
 <li>Applications cannot read input from stdin at this time</li>
 <li>Debugging applications is not supported at this time</li>
 <li>All pathnames specified in the Parallel tab of the launch configuration must be absolute pathnames</li>
+<li>When using LoadLeveler, you can only viw stdout and stderr output for applications started by you using this plugin. 
+You cannot view output from other applications even though you can see their process icons in the PTP jobs view.</li> 
 </ul>
 </body>
 </html>

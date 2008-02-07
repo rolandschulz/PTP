@@ -24,6 +24,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ibmpe.ui.wizards;
 
+import org.eclipse.ptp.ibmpe.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
@@ -31,9 +32,9 @@ public final class PEResourceManagerConfigurationWizardPage extends
 	AbstractRemoteResourceManagerConfigurationWizardPage {
 	
 	public PEResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, "PE Proxy Configuration");
-		setTitle("PE Proxy Configuration");
-		setDescription("Enter information to connect to a PE proxy server");
+		super(wizard, Messages.getString("PEDialogs.ConfigurationTitle"));
+		setTitle(Messages.getString("PEDialogs.ConfigurationTitle"));
+		setDescription(Messages.getString("PEDialogs.Configuration"));
 	}
 
 }
