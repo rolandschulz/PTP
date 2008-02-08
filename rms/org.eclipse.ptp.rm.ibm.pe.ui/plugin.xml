@@ -10,7 +10,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.ibmpe.ui.preferences.PEPreferencePage"
+            class="org.eclipse.ptp.rm.ibm.pe.ui.preferences.PEPreferencePage"
             id="org.eclipse.ptp.ibmpe.ui.preferences.PEPreferencePage"
             name="Parallel Environment">
       </page>
@@ -18,13 +18,13 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.ibmpe.ui.wizards.PEResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.ibm.pe.ui.wizards.PEResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.ibmpe.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfiguration">
       <launchConfiguration
-            class="org.eclipse.ptp.ibmpe.ui.rmLaunchConfiguration.PERMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.ibm.pe.ui.rmLaunchConfiguration.PERMLaunchConfigurationFactory"
             id="org.eclipse.ptp.ibmpe.ui.launchConfiguration"/>
    </extension>
 

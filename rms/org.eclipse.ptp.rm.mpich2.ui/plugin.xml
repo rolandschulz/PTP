@@ -6,7 +6,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.mpich2.ui.preferences.MPICH2PreferencePage"
+            class="org.eclipse.ptp.rm.mpich2.ui.preferences.MPICH2PreferencePage"
             id="org.eclipse.ptp.mpich2.ui.preferences.MPICH2PreferencePage"
             name="MPICH2">
       </page>
@@ -14,7 +14,7 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.mpich2.ui.wizards.MPICH2ResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.mpich2.ui.wizards.MPICH2ResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.mpich2.ui.configurationWizard"/>
    </extension>
 

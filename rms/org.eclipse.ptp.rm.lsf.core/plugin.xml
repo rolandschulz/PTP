@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.core.resourcemanager">
       <resourcemanager
-            class="org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManagerFactory"
+            class="org.eclipse.ptp.rm.lsf.core.rmsystem.LSFResourceManagerFactory"
             id="org.eclipse.ptp.lsf.core.resourcemanager"/>
    </extension>
 

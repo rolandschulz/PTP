@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP Proxy Server for LSF
-Bundle-SymbolicName: org.eclipse.ptp.lsf.proxy
+Bundle-SymbolicName: org.eclipse.ptp.rm.lsf.proxy
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org

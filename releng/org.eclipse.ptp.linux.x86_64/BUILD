@@ -2,7 +2,7 @@
 #
 # This script is used to build proxy plugins in the workspace
 #
-RMS="orte mpich2 ibmpe ibmll"
+RMS="orte mpich2 ibm.pe ibm.ll"
 
 KNOWN_PLUGINS="\
 	org.eclipse.ptp.utils*\
@@ -19,7 +19,7 @@ fi
 
 for rms in $RMS
 do
-	KNOWN_PLUGINS="$KNOWN_PLUGINS org.eclipse.ptp.$rms.proxy*"
+	KNOWN_PLUGINS="$KNOWN_PLUGINS org.eclipse.ptp.rm.$rms.proxy*"
 done
 
 cd $PARENT

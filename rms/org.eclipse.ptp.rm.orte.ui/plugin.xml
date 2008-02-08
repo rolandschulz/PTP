@@ -6,7 +6,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.orte.ui.preferences.ORTEPreferencePage"
+            class="org.eclipse.ptp.rm.orte.ui.preferences.ORTEPreferencePage"
             id="org.eclipse.ptp.orte.ui.preferences.OMPIPreferencePage"
             name="Open RTE">
       </page>
@@ -14,13 +14,13 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.orte.ui.wizards.ORTEResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.orte.ui.wizards.ORTEResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.orte.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfiguration">
       <launchConfiguration
-            class="org.eclipse.ptp.orte.ui.rmLaunchConfiguration.ORTERMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.orte.ui.rmLaunchConfiguration.ORTERMLaunchConfigurationFactory"
             id="org.eclipse.ptp.orte.ui.launchConfiguration"/>
    </extension>
 

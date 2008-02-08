@@ -34,27 +34,27 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.ibmpe.core"
+         id="org.eclipse.ptp.rm.ibm.pe.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ibmpe.help"
+         id="org.eclipse.ptp.rm.ibm.pe.help"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ibmpe.proxy"
+         id="org.eclipse.ptp.rm.ibm.pe.proxy"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ptp.ibmpe.ui"
+         id="org.eclipse.ptp.rm.ibm.pe.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

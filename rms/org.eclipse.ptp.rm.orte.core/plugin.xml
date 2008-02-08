@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.core.resourcemanager">
       <resourcemanager
-            class="org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory"
+            class="org.eclipse.ptp.rm.orte.core.rmsystem.ORTEResourceManagerFactory"
             id="org.eclipse.ptp.orte.core.resourcemanager"/>
    </extension>
 

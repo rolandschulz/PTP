@@ -4,21 +4,21 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.lsf.ui.wizards.LSFResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.lsf.ui.wizards.LSFResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.lsf.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.lsf.ui.preferences.LSFPreferencePage"
+            class="org.eclipse.ptp.rm.lsf.ui.preferences.LSFPreferencePage"
             id="org.eclipse.ptp.lsf.ui.LSFPreferencePage"
             name="LSF"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfiguration">
       <launchConfiguration
-            class="org.eclipse.ptp.lsf.ui.rmLaunchConfiguration.LSFRMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.lsf.ui.rmLaunchConfiguration.LSFRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.lsf.ui.launchConfiguration">
       </launchConfiguration>
    </extension>

@@ -6,7 +6,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.ibmll.ui.preferences.IBMLLPreferencePage"
+            class="org.eclipse.ptp.rm.ibm.ll.ui.preferences.IBMLLPreferencePage"
             id="org.eclipse.ptp.ibmll.ui.preferences.IBMLLPreferencePage"
             name="LoadLeveler">
       </page>
@@ -14,13 +14,13 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.ibmll.ui.wizards.IBMLLResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.ibm.ll.ui.wizards.IBMLLResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.ibmll.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfiguration">
       <launchConfiguration
-            class="org.eclipse.ptp.ibmll.ui.rmLaunchConfiguration.IBMLLRMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration.IBMLLRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.ibmll.ui.launchConfiguration"/>
    </extension>
 

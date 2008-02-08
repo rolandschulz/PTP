@@ -1,15 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LSF Resource Manager UI Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.lsf.ui;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.lsf.ui;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.lsf.ui.Activator
+Bundle-Activator: org.eclipse.ptp.rm.lsf.ui.Activator
 Bundle-Vendor: Los Alamos National Laboratory
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.core,
- org.eclipse.ptp.lsf.core,
+ org.eclipse.ptp.rm.lsf.core,
  org.eclipse.debug.ui,
  org.eclipse.ptp.ui,
  org.eclipse.ptp.launch,

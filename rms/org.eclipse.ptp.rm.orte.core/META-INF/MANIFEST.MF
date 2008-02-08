@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ORTE Core Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.orte.core;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.orte.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.orte.core.Activator
+Bundle-Activator: org.eclipse.ptp.rm.orte.core.Activator
 Bundle-Vendor: Los Alamos National Laboratory
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,5 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remote,
  org.eclipse.ptp.rm.remote
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.orte.core,
- org.eclipse.ptp.orte.core.rmsystem
+Export-Package: org.eclipse.ptp.rm.orte.core,
+ org.eclipse.ptp.rm.orte.core.rmsystem

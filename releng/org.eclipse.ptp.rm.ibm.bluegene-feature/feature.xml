@@ -31,21 +31,21 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.bluegene.core"
+         id="org.eclipse.ptp.rm.ibm.bluegene.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.bluegene.proxy"
+         id="org.eclipse.ptp.rm.ibm.bluegene.proxy"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.bluegene.ui"
+         id="org.eclipse.ptp.rm.ibm.bluegene.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

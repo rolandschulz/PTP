@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: IBMLL Core Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.ibmll.core;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.ll.core;singleton:=true
 Bundle-Version: 2.0.0
-Bundle-Activator: org.eclipse.ptp.ibmll.core.Activator
+Bundle-Activator: org.eclipse.ptp.rm.ibm.ll.core.Activator
 Bundle-Vendor: International Business Machines Corporation
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,5 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.remote,
  org.eclipse.ptp.remote
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.ibmll.core,
- org.eclipse.ptp.ibmll.core.rmsystem
+Export-Package: org.eclipse.ptp.rm.ibm.ll.core,
+ org.eclipse.ptp.rm.ibm.ll.core.rmsystem

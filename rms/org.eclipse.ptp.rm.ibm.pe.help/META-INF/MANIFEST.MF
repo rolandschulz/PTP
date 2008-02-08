@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Help Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.ibmpe.help; singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.pe.help;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: org.eclipse.ptp.ibmpe.help.Activator
+Bundle-Activator: org.eclipse.ptp.rm.ibm.pe.help.Activator
 Bundle-Vendor: IBM
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime

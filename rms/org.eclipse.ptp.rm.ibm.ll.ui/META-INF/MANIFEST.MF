@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: IBMLL Resource Manager UI Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.ibmll.ui;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.ll.ui;singleton:=true
 Bundle-Version: 2.0.0
-Bundle-Activator: org.eclipse.ptp.ibmll.ui.Activator
+Bundle-Activator: org.eclipse.ptp.rm.ibm.ll.ui.Activator
 Bundle-Vendor: Los Alamos National Laboratory
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.ptp.ui,
- org.eclipse.ptp.ibmll.core,
+ org.eclipse.ptp.rm.ibm.ll.core,
  org.eclipse.ptp.launch,
  org.eclipse.debug.core,
  org.eclipse.ptp.remote,
  org.eclipse.ptp.rm.remote,
  org.eclipse.core.filesystem
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.ibmll.ui,
- org.eclipse.ptp.ibmll.ui.preferences
+Export-Package: org.eclipse.ptp.rm.ibm.ll.ui,
+ org.eclipse.ptp.rm.ibm.ll.ui.preferences

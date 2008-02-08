@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LSF Core Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.lsf.core;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.lsf.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.lsf.core.Activator
+Bundle-Activator: org.eclipse.ptp.rm.lsf.core.Activator
 Bundle-Vendor: Los Alamos National Laboratory
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,5 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.remote,
  org.eclipse.ptp.proxy.protocol
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.lsf.core,
- org.eclipse.ptp.lsf.core.rmsystem
+Export-Package: org.eclipse.ptp.rm.lsf.core,
+ org.eclipse.ptp.rm.lsf.core.rmsystem

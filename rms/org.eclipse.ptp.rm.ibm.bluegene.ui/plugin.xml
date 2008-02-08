@@ -6,7 +6,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.bluegene.ui.preferences.BGPreferencePage"
+            class="org.eclipse.ptp.rm.ibm.bluegene.ui.preferences.BGPreferencePage"
             id="org.eclipse.ptp.bluegene.ui.preferences.BGPreferencePage"
             name="Blue Gene">
       </page>
@@ -14,13 +14,13 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.bluegene.ui.wizards.BGResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.ibm.bluegene.ui.wizards.BGResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.bluegene.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfiguration">
       <launchConfiguration
-            class="org.eclipse.ptp.orte.bluegene.rmLaunchConfiguration.BGRMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.ibm.bluegene.ui.rmLaunchConfiguration.BGRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.bluegene.ui.launchConfiguration"/>
    </extension>
 
