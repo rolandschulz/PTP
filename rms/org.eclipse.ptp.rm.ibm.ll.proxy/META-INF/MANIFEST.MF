@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP Proxy Server for LoadLeveler
-Bundle-SymbolicName: org.eclipse.ptp.ibmll.proxy
+Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.ll.proxy
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: IBM
 Require-Bundle: org.eclipse.ptp.proxy,

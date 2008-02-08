@@ -9,7 +9,7 @@
    <extension
          point="org.eclipse.ptp.core.resourcemanager">
       <resourcemanager
-            class="org.eclipse.ptp.ibmpe.core.rmsystem.PEResourceManagerFactory"
+            class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerFactory"
             id="org.eclipse.ptp.ibmpe.core.resourcemanager"/>
    </extension>
 

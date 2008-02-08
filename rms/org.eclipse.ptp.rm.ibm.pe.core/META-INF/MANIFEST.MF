@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Parallel Environment Core Plugin
-Bundle-SymbolicName: org.eclipse.ptp.ibmpe.core;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.pe.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.ibmpe.core.Activator
+Bundle-Activator: org.eclipse.ptp.rm.ibm.pe.core.Activator
 Bundle-Vendor: IBM
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,5 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.remote,
  org.eclipse.ptp.proxy.protocol
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.ibmpe.core,
- org.eclipse.ptp.ibmpe.core.rmsystem
+Export-Package: org.eclipse.ptp.rm.ibm.pe.core,
+ org.eclipse.ptp.rm.ibm.pe.core.rmsystem

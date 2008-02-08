@@ -32,20 +32,20 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.lsf.core"
+         id="org.eclipse.ptp.rm.lsf.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.lsf.proxy"
+         id="org.eclipse.ptp.rm.lsf.proxy"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ptp.lsf.ui"
+         id="org.eclipse.ptp.rm.lsf.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
