@@ -1,4 +1,4 @@
-dnl Copyright (c) 2006, 2007 IBM Corporation, and others.
+dnl Copyright (c) 2006, 2008 IBM Corporation, and others.
 dnl All rights reserved. This program and the accompanying materials
 dnl are made available under the terms of the Eclipse Public License v1.0
 dnl which accompanies this distribution, and is available at
@@ -16,10 +16,6 @@ AM_INIT_AUTOMAKE
 
 AC_CANONICAL_BUILD
 
-dnl
-dnl Eclipse adds version number to end of package when deploying via update site
-dnl
-
 UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
@@ -27,7 +23,6 @@ if test ! -d $UTILS; then
 		AC_MSG_ERROR([utils directory not found])
 	fi
 fi
-
 PROXY="../org.eclipse.ptp.proxy"
 if test ! -d $PROXY; then
 	PROXY="`echo ${PROXY}_${PACKAGE_VERSION}.*`"
@@ -35,6 +30,11 @@ if test ! -d $PROXY; then
 		AC_MSG_ERROR([proxy directory not found])
 	fi
 fi
+
+AC_ARG_WITH(ll-header, AC_HELP_STRING([--with-ll-header=DIR], 
+			[local LoadLeveler header directory @<:@none@:>@]),
+			[llinclude=-I$withval], [llinclude=""])
+lldir="$llinclude -I/opt/ibmll/LoadL/full/include -I/usr/lpp/LoadL/full/include"
 
 dnl
 dnl Check for programs.
@@ -53,7 +53,7 @@ else
 	CFLAGS="$CFLAGS -Wall"
 fi
 
-CFLAGS="$CFLAGS -I$UTILS/include -I$PROXY/include"
+CFLAGS="$CFLAGS -I$UTILS/include -I$PROXY/include $lldir"
 LIBS="$LIBS -L$UTILS -L$PROXY"
 
 dnl
@@ -67,21 +67,22 @@ dnl Check for header files.
 dnl
 
 AC_HEADER_STDC
+AC_CHECK_HEADERS([llapi.h], [CFLAGS="$CFLAGS -DHAVE_LLAPI_H"])
 
 dnl
 dnl Check for types
 dnl
 AC_TYPE_SIGNAL
-
 dnl
 dnl Check for "poe" program
 dnl
 AC_PATH_PROG(POE, [poe], no)
 if test "$ac_cv_path_POE" != no; then
-	AC_DEFINE_UNQUOTED(POE,"$ac_cv_path_POE",[Location of poe program])
+	AC_DEFINE_UNQUOTED(POE, "$ac_cv_path_POE", [Location of poe program])
 else
 	AC_MSG_ERROR([PE not installed, skipping...])
 fi
+
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
