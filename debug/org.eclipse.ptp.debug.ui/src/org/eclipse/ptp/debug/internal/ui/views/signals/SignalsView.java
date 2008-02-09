@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.signals;
 
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.internal.ui.views.IDebugExceptionHandler;
@@ -26,8 +28,6 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractDebugEventHandlerView;
@@ -94,7 +95,7 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 	 * @see org.eclipse.debug.ui.AbstractDebugView#createViewer(org.eclipse.swt.widgets.Composite)
 	 */
 	protected Viewer createViewer(Composite parent) {
-		PTPDebugUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
 		
 		// add tree viewer
 		final SignalsViewer vv = new SignalsViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -220,7 +221,7 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 	 */
 	public void dispose() {
 		getSite().getPage().removeSelectionListener(IDebugUIConstants.ID_DEBUG_VIEW, this);
-		PTPDebugUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(this);
 		super.dispose();
 	}
 }

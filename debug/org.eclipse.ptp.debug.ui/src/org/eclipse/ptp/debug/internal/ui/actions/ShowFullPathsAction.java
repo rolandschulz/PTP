@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -35,10 +35,26 @@ import org.eclipse.swt.custom.BusyIndicator;
  */
 public class ShowFullPathsAction extends ViewFilterAction {
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.ui.actions.ViewFilterAction#getPreferenceKey()
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	protected String getPreferenceKey() {
-		return IPDebugConstants.PREF_SHOW_FULL_PATHS;
+	public void run(IAction action) {
+		final StructuredViewer viewer = getStructuredViewer();
+		IDebugView view = (IDebugView)getView().getAdapter(IDebugView.class);
+		if (view != null) {
+			IDebugModelPresentation pres = view.getPresentation(PTPDebugUIPlugin.getUniqueIdentifier());
+			if (pres != null) {
+				pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, (getValue()?Boolean.TRUE:Boolean.FALSE));
+				BusyIndicator.showWhile(viewer.getControl().getDisplay(), new Runnable() {
+					public void run() {
+						viewer.refresh();
+						Preferences store = getPreferences();
+						String key = getView().getSite().getId() + "." + getPreferenceKey();
+						store.setValue(key, getValue());
+						PTPDebugUIPlugin.getDefault().savePluginPreferences();						
+					}
+				} );
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -49,25 +65,9 @@ public class ShowFullPathsAction extends ViewFilterAction {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 * @see org.eclipse.ptp.debug.internal.ui.actions.ViewFilterAction#getPreferenceKey()
 	 */
-	public void run(IAction action) {
-		final StructuredViewer viewer = getStructuredViewer();
-		IDebugView view = (IDebugView)getView().getAdapter(IDebugView.class);
-		if (view != null) {
-			IDebugModelPresentation pres = view.getPresentation(PTPDebugUIPlugin.getUniqueIdentifier());
-			if ( pres != null ) {
-				pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, (getValue()?Boolean.TRUE:Boolean.FALSE));
-				BusyIndicator.showWhile(viewer.getControl().getDisplay(), new Runnable() {
-					public void run() {
-						viewer.refresh();
-						IPreferenceStore store = getPreferenceStore();
-						String key = getView().getSite().getId() + "." + getPreferenceKey();
-						store.setValue(key, getValue());
-						PTPDebugUIPlugin.getDefault().savePluginPreferences();						
-					}
-				} );
-			}
-		}
+	protected String getPreferenceKey() {
+		return IPDebugConstants.PREF_SHOW_FULL_PATHS;
 	}
 }

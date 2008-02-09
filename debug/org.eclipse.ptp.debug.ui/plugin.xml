@@ -101,12 +101,6 @@
 			id="org.eclipse.ptp.debug.ui.PDebugPreferencePage">
 		</page>
 	</extension>
-	<extension
-		point="org.eclipse.core.runtime.preferences">
-		<initializer
-			class="org.eclipse.ptp.debug.internal.ui.preferences.PreferenceInitializer">
-		</initializer>
-	</extension>
 
    	<!-- perspective //-->
 	<extension

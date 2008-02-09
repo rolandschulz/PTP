@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -47,13 +47,9 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
+	 * @see org.eclipse.ui.IActionDelegate2#dispose()
 	 */
-	public void init(IViewPart view) {
-		this.view = view;
-		action.setChecked(getPreferenceValue(view));
-		run(action);
-	}
+	public void dispose() {}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
@@ -63,14 +59,11 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#dispose()
+	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
-	public void dispose() {}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
-	 */
-	public void runWithEvent(IAction action, Event event) {
+	public void init(IViewPart view) {
+		this.view = view;
+		action.setChecked(getPreferenceValue(view));
 		run(action);
 	}
 
@@ -91,10 +84,17 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 			viewer.addFilter(this);
 		}
 		viewer.refresh();
-		IPreferenceStore store = getPreferenceStore();
+		Preferences store = getPreferences();
 		String key = getView().getSite().getId() + "." + getPreferenceKey(); //$NON-NLS-1$
 		store.setValue(key, action.isChecked());
 		PTPDebugUIPlugin.getDefault().savePluginPreferences();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	 */
+	public void runWithEvent(IAction action, Event event) {
+		run(action);
 	}
 
 	/* (non-Javadoc)
@@ -102,14 +102,22 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {}
 
-	/** Get preference store
+	/** 
+	 * Get preference key
 	 * @return
 	 */
-	protected IPreferenceStore getPreferenceStore() {
-		return PTPDebugUIPlugin.getDefault().getPreferenceStore();
+	protected abstract String getPreferenceKey();
+	
+	/** 
+	 * Get preference store
+	 * @return
+	 */
+	protected Preferences getPreferences() {
+		return PTPDebugUIPlugin.getDefault().getPluginPreferences();
 	}
 	
-	/** Get preference value
+	/** 
+	 * Get preference value
 	 * @param part
 	 * @return
 	 */
@@ -117,7 +125,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		String baseKey = getPreferenceKey();
 		String viewKey = part.getSite().getId();
 		String compositeKey = viewKey + "." + baseKey; //$NON-NLS-1$
-		IPreferenceStore store = getPreferenceStore();
+		Preferences store = getPreferences();
 		boolean value = false;
 		if (store.contains(compositeKey)) {
 			value = store.getBoolean(compositeKey);
@@ -125,21 +133,10 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 			value = store.getBoolean(baseKey);
 		}
 		return value;		
-	}
-	
-	/** Get preference key
-	 * @return
-	 */
-	protected abstract String getPreferenceKey(); 
+	} 
 
-	/** Get view
-	 * @return
-	 */
-	protected IViewPart getView() {
-		return view;
-	}
-	
-	/** Get structured viewer
+	/** 
+	 * Get structured viewer
 	 * @return
 	 */
 	protected StructuredViewer getStructuredViewer() {
@@ -153,10 +150,19 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		return null;
 	}
 	
-	/** Check if action is checked
+	/** 
+	 * Check if action is checked
 	 * @return true is action is checked
 	 */
 	protected boolean getValue() {
 		return action.isChecked();
+	}
+	
+	/** 
+	 * Get view
+	 * @return
+	 */
+	protected IViewPart getView() {
+		return view;
 	}
 }
