@@ -19,24 +19,42 @@
 
 package org.eclipse.ptp.launch;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
+import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -250,6 +268,65 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		resourceBundle = null;
 	}
 	
+	/**
+	 * Find the resource manager that corresponds to the unique name specified in the configuration
+	 * 
+	 * @param configuration launch configuration
+	 * @return resource manager
+	 * @throws CoreException
+	 */
+	public IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager[] rms = universe.getResourceManagers();
+		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+		for (IResourceManager rm : rms) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
+					rm.getUniqueName().equals(rmUniqueName)) {
+				return rm;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Verify that the resource "path" actually exists. This just checks
+	 * that the path references something real.
+	 * 
+	 * @param path
+	 * @param configuration
+	 * @return IPath
+	 * @throws CoreException
+	 */
+	public IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
+		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+		if (rm != null) {
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				if (remoteServices != null) {
+					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+					IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
+					IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+					try {
+						IPath resPath = new Path(path);
+						IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
+						if (res.fetchInfo().exists()) {
+							return resPath;
+						}
+					} catch (IOException e) {
+					}
+				}
+			} else {
+				IPath resPath = new Path(path);
+				if (resPath.toFile().exists()) {
+					return resPath;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Find all launch configuration factory extensions that have been registered
 	 */
