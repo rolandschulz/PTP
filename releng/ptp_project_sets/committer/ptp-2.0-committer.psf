@@ -3,8 +3,6 @@
 <provider id="org.eclipse.team.cvs.core.cvsnature">
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.core,org.eclipse.ptp.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.core,org.eclipse.ptp.debug.core"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.external.core,org.eclipse.ptp.debug.external.core"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.external.ui,org.eclipse.ptp.debug.external.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.ui,org.eclipse.ptp.debug.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.launch,org.eclipse.ptp.launch"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.proxy,org.eclipse.ptp.proxy"/>

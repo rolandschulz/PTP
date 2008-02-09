@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.eclipse.team.cvs.core.cvsnature">
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm.core,org.eclipse.ptp.debug.sdm.core"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm.ui,org.eclipse.ptp.debug.sdm.ui"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm,org.eclipse.ptp.debug.sdm"/>
+</provider>
+</psf>
