@@ -18,17 +18,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core; 
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
  
-public class PTPDebugCorePreferenceInitializer extends AbstractPreferenceInitializer {
-	public PTPDebugCorePreferenceInitializer() {
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
+	public PreferenceInitializer() {
 		super();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 */
 	public void initializeDefaultPreferences() {
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault(IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, IPDIFormat.NATURAL);
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL);
+		Preferences store = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		store.setDefault(IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, IPDIFormat.NATURAL);
+		store.setDefault(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL);
+		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
+		store.setDefault(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, true);
+		store.setDefault(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, false);
 	}
 }
