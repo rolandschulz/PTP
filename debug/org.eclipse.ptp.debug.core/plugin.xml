@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-	<extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension"/>
+	<extension-point id="PDebugger" name="Parallel Tools Core Debugger Extension"/>
 
    <extension
          id="pBreakpointMarker"
@@ -136,7 +136,7 @@
    
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.ptp.debug.internal.core.PTPDebugCorePreferenceInitializer"/>
+      <initializer class="org.eclipse.ptp.debug.internal.core.PreferenceInitializer"/>
    </extension>
 	<extension
 		point="org.eclipse.debug.core.sourcePathComputers">
