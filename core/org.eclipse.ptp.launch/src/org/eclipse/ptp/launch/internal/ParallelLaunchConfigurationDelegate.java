@@ -20,8 +20,6 @@ package org.eclipse.ptp.launch.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -29,27 +27,21 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.IPTPDebugger;
+import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.swt.widgets.Display;
@@ -67,7 +59,7 @@ public class ParallelLaunchConfigurationDelegate
 	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
 	 */
 	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch, 
-			AttributeManager mgr, final IPTPDebugger debugger, IPJob job) {
+			AttributeManager mgr, final IPDebugger debugger, IPJob job) {
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 			launch.setPJob(job);
@@ -81,9 +73,9 @@ public class ParallelLaunchConfigurationDelegate
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								if (monitor.isCanceled())
-									throw new InterruptedException("The job is cancalled."); //$NON-NLS-1$
+									throw new InterruptedException("The job is cancelled."); //$NON-NLS-1$
 								try {
-									long timeout = PTPDebugUIPlugin.getDefault().getPreferenceStore().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
+									long timeout = PTPDebugCorePlugin.getDefault().getPluginPreferences().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
 									//Wait for the incoming debug server connection. This can be canceled by the user.
 									PTPDebugCorePlugin.getDebugModel().createDebugSession(timeout, debugger, launch, project, execPath, monitor);
 								} catch (CoreException e) {
@@ -96,7 +88,12 @@ public class ParallelLaunchConfigurationDelegate
 						} catch (InterruptedException e) {
 							System.out.println("Error completing debug job launch: " + e.getMessage()); //$NON-NLS-1$
 						} catch (InvocationTargetException e) {
-							System.out.println("Error completing debug job launch: " + e.getMessage()); //$NON-NLS-1$
+							String msg = e.getMessage();
+							Throwable t = e.getCause();
+							if (t != null) {
+								msg = t.getMessage();
+							}
+							System.out.println("Error completing debug job launch: " + msg); //$NON-NLS-1$
 						}
 					}
 				});
@@ -125,71 +122,26 @@ public class ParallelLaunchConfigurationDelegate
 		if (monitor.isCanceled()) {
 			return;
 		}
-		IPTPDebugger debugger = null;
+		IPDebugger debugger = null;
 		IPJob job = null;
 		
 		//switch perspective
 		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 		AttributeManager attrManager = getAttributeManager(configuration);
 		try {
-			IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 				monitor.subTask("Configuring debug setting . . ."); //$NON-NLS-1$
 				
 				/*
-				 * FIXME: all this code needs to be moved to the debug.external.core plugin and
-				 * made into an interface.
+				 * Create the debugger extension, then the connection point for the debug server. 
+				 * The debug server is created when the job is launched via the submitJob() command.
 				 */
 				
-				 // Create the debugger extension, then the connection point for the debug server. 
-				 // The debug server is created when the job is launched via the submitJob() command.
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
-				int port = debugger.getDebuggerPort(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
-				
-				String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
-				
-				ArrayList<String> dbgArgs = new ArrayList<String>();
-				dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
-				
-				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
-				if (dbgPath.length() > 0) {
-					dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
-				}
-				
-				String dbgExtraArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
-				if (dbgExtraArgs.length() > 0) {
-					dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
-				}
-				
-				dbgArgs.add("--port=" + port); //$NON-NLS-1$
-			
-				// remote setting
-				String dbgExePath = getDebuggerExePath(configuration);
-				if (dbgExePath == null) {
-					dbgExePath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
-				}
-				verifyDebuggerPath(dbgExePath, configuration);
-				
-				IPath path = new Path(dbgExePath);
-				attrManager.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-				attrManager.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toString()));
-
-				String dbgWD = getDebuggerWorkDirectory(configuration);
-				if (dbgWD != null) {
-					StringAttribute wdAttr = (StringAttribute) attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
-					if (wdAttr != null) {
-						wdAttr.setValueAsString(dbgWD);
-					} else {
-						attrManager.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
-					}
-					attrManager.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
-				}
-				attrManager.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
-				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
+				debugger.initialize(configuration, attrManager);
 			}
 			
 			monitor.worked(10);
