@@ -77,7 +77,6 @@ public class Session implements IPDISession {
 	private NotifyJob notifyJob = null;
 	private IPDIRequestFactory requestFactory;
 	private IPDIEventFactory eventFactory;
-	private IPDIManagerFactory managerFactory;
 	private IPDIModelFactory modelFactory;
 	private final ReentrantLock	waitLock = new ReentrantLock();
 	private ILaunchConfiguration config = null;
@@ -92,7 +91,6 @@ public class Session implements IPDISession {
 		this.job_id = job_id;
 		this.total_tasks = total_tasks;
 		this.notifyJob = new NotifyJob();
-		this.managerFactory = managerFactory;
 		this.requestFactory = requestFactory;
 		this.eventFactory = eventFactory;
 		this.modelFactory = modelFactory;
