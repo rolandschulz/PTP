@@ -29,22 +29,86 @@ import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PSetManager;
 
 public interface IPSession extends IAdaptable {
-	boolean isReady();
-	void dispose();
-	IPDISession getPDISession();
-	IPJob getJob();
-	IPLaunch getLaunch();
-	IPDebugTarget findDebugTarget(BitList tasks);
-	BitList getTasks(int id);
-	BitList getTasks();
+	/**
+	 * @param tasks
+	 * @param refresh
+	 * @param register
+	 */
+	public void createDebugTarget(BitList tasks, boolean refresh, boolean register);
 
-	void deleteDebugTargets(boolean register);
-	void reloadDebugTargets(BitList tasks, boolean refresh, boolean register);
-	void createDebugTarget(BitList tasks, boolean refresh, boolean register);
-	void deleteDebugTarget(BitList tasks, boolean refresh, boolean register);
-	
-	PSetManager getSetManager();
-	PBreakpointManager getBreakpointManager();
-	
-	void forceStoppedDebugger(ProcessAttributes.State state);
+	/**
+	 * @param tasks
+	 * @param refresh
+	 * @param register
+	 */
+	public void deleteDebugTarget(BitList tasks, boolean refresh, boolean register);
+
+	/**
+	 * @param register
+	 */
+	public void deleteDebugTargets(boolean register);
+
+	/**
+	 * 
+	 */
+	public void dispose();
+
+	/**
+	 * @param tasks
+	 * @return
+	 */
+	public IPDebugTarget findDebugTarget(BitList tasks);
+
+	/**
+	 * @param state
+	 */
+	public void forceStoppedDebugger(ProcessAttributes.State state);
+
+	/**
+	 * @return
+	 */
+	public PBreakpointManager getBreakpointManager();
+
+	/**
+	 * @return
+	 */
+	public IPJob getJob();
+
+	/**
+	 * @return
+	 */
+	public IPLaunch getLaunch();
+
+	/**
+	 * @return
+	 */
+	public IPDISession getPDISession();
+
+	/**
+	 * @return
+	 */
+	public PSetManager getSetManager();
+
+	/**
+	 * @return
+	 */
+	public BitList getTasks();
+
+	/**
+	 * @param id
+	 * @return
+	 */
+	public BitList getTasks(int id);
+
+	/**
+	 * @return
+	 */
+	public boolean isReady();
+
+	/**
+	 * @param tasks
+	 * @param refresh
+	 * @param register
+	 */
+	public void reloadDebugTargets(BitList tasks, boolean refresh, boolean register);
 }
