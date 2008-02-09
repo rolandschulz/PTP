@@ -78,10 +78,16 @@ public interface IRMLaunchConfigurationDynamicTab {
 			IResourceManager rm, IPQueue queue) throws CoreException;
 
 	/**
+	 * Get the set of resource manager attributes to be used as launch attributes
+	 * 
+	 * @param rm
+	 *            The resource manager associated with the current launch
+	 *            configuration
 	 * @param queue
-	 * @param rm 
+	 *            The current queue
 	 * @param configuration
-	 * @return
+	 *            The current launch configuration
+	 * @return array of attributes
 	 * @throws CoreException 
 	 */
 	public abstract IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
