@@ -29,10 +29,12 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
-public interface IPTPDebugger {
+public interface IPDebugger {
 	/**
 	 * Create a new debugger session.
 	 * 
@@ -46,11 +48,15 @@ public interface IPTPDebugger {
 	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Get the port for the external debugger to connect to.
+	 * Initialize the debugger. This does whatever is necessary to get the debugger ready
+	 * to start debugging the user application. 
 	 * 
-	 * @param timeout
-	 * @return
+	 * attrMgr contains the attributes that are passed to the submitJob command to launch
+	 * the application under debugger control. Add any additional attributes that are required
+	 * for the debug launch.
+	 * 
+	 * @param configuration launch configuration for the debug session
 	 * @throws CoreException
 	 */
-	public int getDebuggerPort(int timeout) throws CoreException;
+	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
 }

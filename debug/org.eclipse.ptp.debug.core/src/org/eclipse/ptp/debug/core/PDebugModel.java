@@ -116,7 +116,7 @@ public class PDebugModel {
 	 * @return
 	 * @throws CoreException
 	 */
-	public IPSession createDebugSession(long timeout, IPTPDebugger debugger, IPLaunch launch, IProject project, IPath coreFile, IProgressMonitor monitor) throws CoreException {
+	public IPSession createDebugSession(long timeout, IPDebugger debugger, IPLaunch launch, IProject project, IPath coreFile, IProgressMonitor monitor) throws CoreException {
 		PSession session = new PSession(debugger.createDebugSession(timeout, launch, coreFile, monitor), launch, project, monitor);
 		sessionMgr.addSession(launch.getPJob(), session);
 		session.connectToDebugger(monitor);
