@@ -31,15 +31,53 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.core.runtime.CoreException;
 
 public interface IPDebugConfiguration {
-	final static String CPU_NATIVE = "native";
-	
-	IPTPDebugger getDebugger() throws CoreException;
-	String getName();
-	String getID();
-	String getPlatform();
-	String[] getCPUList();
-	String[] getModeList();
-	String[] getCoreFileExtensions();
-	boolean supportsCPU(String cpu);
-	boolean supportsMode(String mode);
+	public final static String CPU_NATIVE = "native";
+
+	/**
+	 * @return
+	 */
+	public String[] getCoreFileExtensions();
+
+	/**
+	 * @return
+	 */
+	public String[] getCPUList();
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
+	public IPDebugger getDebugger() throws CoreException;
+
+	/**
+	 * @return
+	 */
+	public String getID();
+
+	/**
+	 * @return
+	 */
+	public String[] getModeList();
+
+	/**
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * @return
+	 */
+	public String getPlatform();
+
+	/**
+	 * @param cpu
+	 * @return
+	 */
+	public boolean supportsCPU(String cpu);
+
+	/**
+	 * @param mode
+	 * @return
+	 */
+	public boolean supportsMode(String mode);
 }
