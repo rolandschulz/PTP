@@ -34,7 +34,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.PreferencesAdapter;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -56,6 +56,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	private IntegerFieldEditor commandTimeoutField = null;
 	private Button updateVariableOnSuspendButton = null;
 	private Button updateVariableOnChangeButton = null;
+	
 	protected class WidgetListener implements IPropertyChangeListener {
 		public void propertyChange(PropertyChangeEvent event) {
 			setValid(isValid());
@@ -63,17 +64,15 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	}
 	protected WidgetListener listener = new WidgetListener();
 	
-	private IPreferenceStore ptpPreferenceStore;
-		
 	/**
 	 * Constructor
 	 */
 	public PDebugPreferencePage() {
 		super();
-		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 		setDescription(PreferenceMessages.getString("PDebugPreferencePage.desc"));
-		ptpPreferenceStore = PTPDebugCorePlugin.getDefault().getPTPPreferenceStore();
+		setPreferenceStore(new PreferencesAdapter(PTPDebugCorePlugin.getDefault().getPluginPreferences()));
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -107,6 +106,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	 * @param parent
 	 */
 	protected void createOtherDebugSetting(Composite parent) {}
+	
 	/**
 	 * Create view preference settings
 	 * 
@@ -126,6 +126,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 			}
 		});
 	}
+	
 	/**
 	 * Create communication preference settings
 	 * 
@@ -139,7 +140,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		data.horizontalSpan = 2;
 		spacingComposite.setLayoutData(data);
 		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, PreferenceMessages.getString("PDebugPreferencePage.command_timeout"), spacingComposite);
-		commandTimeoutField.setPreferenceStore(getPTPCorePreferenceStore());
+		commandTimeoutField.setPreferenceStore(getPreferenceStore());
 		commandTimeoutField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		commandTimeoutField.setValidRange(IPDebugConstants.MIN_REQUEST_TIMEOUT, IPDebugConstants.MAX_REQUEST_TIMEOUT);
 		String minValue = Integer.toString(IPDebugConstants.MIN_REQUEST_TIMEOUT);
@@ -149,6 +150,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		commandTimeoutField.setPropertyChangeListener(listener);
 		commandTimeoutField.load();
 	}
+	
 	/**
 	 * Create variable preference settings
 	 * 
@@ -159,6 +161,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		updateVariableOnSuspendButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnSuspend"));
 		updateVariableOnChangeButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnChange"));
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -174,6 +177,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		commandTimeoutField.loadDefault();
 		super.performDefaults();
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -181,11 +185,11 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	 */
 	public boolean performOk() {
 		storeValues();
-		PTPDebugUIPlugin.getDefault().savePluginPreferences();
 		PTPDebugCorePlugin.getDefault().savePluginPreferences();
 		refreshView();
 		return true;
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -199,6 +203,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		updateVariableOnSuspendButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
 		updateVariableOnChangeButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
 	 */
@@ -210,6 +215,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		updateVariableOnChangeButton.dispose();
 		super.dispose();
 	}	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -224,6 +230,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, updateVariableOnChangeButton.getSelection());
 		commandTimeoutField.store();
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -238,6 +245,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		}
 		return true;
 	}
+	
 	/**
 	 * Refresh debug breakpoint view
 	 */
@@ -265,8 +273,4 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 			}
 		}
 	}
-		
-	protected IPreferenceStore getPTPCorePreferenceStore() {
-		return ptpPreferenceStore;
-	}	
 }

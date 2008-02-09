@@ -51,13 +51,269 @@ import org.osgi.framework.BundleContext;
  */
 public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui";
-	//The shared instance.
+
 	private static PTPDebugUIPlugin plugin;
+	private static UIDebugManager uiDebugManager = null;
+	
+	/**
+	 * Create a default source locator
+	 * 
+	 * @return default source locator
+	 */
+	public static IPersistableSourceLocator createDefaultSourceLocator() {
+		return new DefaultSourceLocator();
+	}
+	
+	/** 
+	 * Show error dialog
+	 * 
+	 * @param shell
+	 * @param title
+	 * @param s
+	 */
+	public static void errorDialog(Shell shell, String title, IStatus s) {
+		errorDialog(shell, title, s.getMessage(), s);
+	}
+
+	/** 
+	 * Show error dialog
+	 * 
+	 * @param shell
+	 * @param title
+	 * @param message
+	 * @param s
+	 */
+	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
+		if (s != null && message.equals(s.getMessage()))
+			message = null;
+
+		ErrorDialog.openError(shell, title, message, s);
+	}
+	
+    /** 
+	 * Show error dialog
+	 * 
+	 * @param shell
+	 * @param title
+	 * @param message
+	 * @param t
+	 */
+	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
+		IStatus status;
+		if (t instanceof CoreException) {
+			status = ((CoreException)t).getStatus();
+		} else {
+			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within Debug UI: ", t);
+			log(status);	
+		}
+		errorDialog(shell, title, message, status);
+	}	
+
+	/** 
+	 * Show error dialog
+	 * 
+	 * @param shell
+	 * @param title
+	 * @param t
+	 */
+	public static void errorDialog(Shell shell, String title, Throwable t) {
+		errorDialog(shell, title, t.getMessage(), t);
+	}
+	
+	/** 
+	 * Show error dialog
+	 * 
+	 * @param title
+	 * @param s
+	 */
+	public static void errorDialog(String title, IStatus s) {
+		errorDialog(getActiveWorkbenchShell(), title, s.getMessage(), s);
+	}
+	
+	/** 
+	 * Show error dialog
+	 * 
+	 * @param title
+	 * @param t
+	 */
+	public static void errorDialog(String title, Throwable t) {
+		errorDialog(getActiveWorkbenchShell(), title, t.getMessage(), t);
+	}
+
+	/** 
+	 * Get active workbench shell
+	 * 
+	 * @return active workbench shell
+	 */
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getShell();
+		}
+		return null;
+	}
+
+	/** 
+	 * Get active workbench window
+	 * 
+	 * @return active workbench window
+	 */
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+	}
+
+	/**
+	 * @return
+	 */
+	public static PDebugModelPresentation getDebugModelPresentation() {
+		return PDebugModelPresentation.getDefault();
+	}
+
+	/**
+	 * Returns the shared instance.
+	 */
+	public static PTPDebugUIPlugin getDefault() {
+		return plugin;
+	}
+
+	/** 
+	 * Get display
+	 * 
+	 * @return display
+	 */
+	public static Display getDisplay() {
+		Display display= Display.getCurrent();
+		if (display == null) {
+			display= Display.getDefault();
+		}
+		return display;		
+	}
+	
+	/**
+	 * Returns an image descriptor for the image file at the given
+	 * plug-in relative path.
+	 *
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	/**
+	 * Returns the string from the plugin's resource bundle,
+	 * or 'key' if not found.
+	 */
+	public static String getResourceString(String key) {
+		ResourceBundle bundle = PTPDebugUIPlugin.getDefault().getResourceBundle();
+		try {
+			return (bundle != null) ? bundle.getString(key) : key;
+		} catch (MissingResourceException e) {
+			return key;
+		}
+	}	
+	
+	/** 
+	 * Get shell
+	 * 
+	 * @return shell
+	 */
+	public static Shell getShell() {
+		if (getActiveWorkbenchWindow() != null) {
+			return getActiveWorkbenchWindow().getShell();
+		}
+		return null;
+	}
+	
+	/** 
+	 * Get standard display
+	 * 
+	 * @return display
+	 */
+	public static Display getStandardDisplay() {
+		Display display;
+		display = Display.getCurrent();
+		if (display == null)
+			display = Display.getDefault();
+		return display;
+	}
+	
+	public static UIDebugManager getUIDebugManager() {
+		return uiDebugManager;
+	}
+	
+	/** Get unique identifier of plugin
+	 * 
+	 * @return plugin identifier
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			return PLUGIN_ID;
+
+		return getDefault().getBundle().getSymbolicName();
+	}
+	
+	/** 
+	 * Test if the current perspective is the PTP debug perspective
+	 * 
+	 * @return true if the current perspective is the PTP debug perspective
+	 */
+	public static boolean isPTPDebugPerspective() {
+		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG);		
+	}
+	
+	/**
+	 * Test if the current perspective is one supplied by PTP
+	 * 
+	 * @return true if the current perspective is supplied by PTP
+	 */
+	public static boolean isPTPPerspective() {
+		String curID = getCurrentPerspectiveID();
+		if (curID == null)
+			return false;
+		return (curID.equals(IPTPUIConstants.PERSPECTIVE_RUN) || curID.equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG));
+	}
+	
+	/** 
+	 * Log
+	 * 
+	 * @param status
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	
+	/** 
+	 * Log 
+	 * 
+	 * @param msg
+	 */
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
+	
+	/** 
+	 * Log
+	 * 
+	 * @param e
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
+	}
+	
+	/** 
+	 * Get current perspective ID
+	 * 
+	 * @return current perspective ID
+	 */
+	private static String getCurrentPerspectiveID() {
+		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
+	}
+	
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
-	private static UIDebugManager uiDebugManager = null;
 	protected Map<String, IConfigurationElement> fDebuggerPageMap;
-
+	
 	/**
 	 * The constructor.
 	 */
@@ -65,18 +321,37 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		super();
 		plugin = this;
 	}
-    protected void initializeImageRegistry(ImageRegistry reg) {
-    	PDebugImage.initializeImageRegistry(reg);
-    }	
-
-	/** Get unique identifier of plugin
+	
+	/** 
+	 * Get launch debugger tab
+	 * 
+	 * @param debuggerID
 	 * @return
+	 * @throws CoreException
 	 */
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
-			return PLUGIN_ID;
-
-		return getDefault().getBundle().getSymbolicName();
+	public ILaunchConfigurationTab getDebuggerPage(String debuggerID) throws CoreException {
+		if (fDebuggerPageMap == null) {
+			initializeDebuggerPageMap();
+		}
+		IConfigurationElement configElement = (IConfigurationElement)fDebuggerPageMap.get(debuggerID);
+		ILaunchConfigurationTab tab = null;
+		if (configElement != null) {
+			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension("class");
+		}
+		return tab;
+	}
+	
+	/**
+	 * Returns the plugin's resource bundle,
+	 */
+	public ResourceBundle getResourceBundle() {
+		try {
+			if (resourceBundle == null)
+				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.debug.ui.UiPluginResources");
+		} catch (MissingResourceException x) {
+			resourceBundle = null;
+		}
+		return resourceBundle;
 	}
 	
 	/**
@@ -97,197 +372,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		plugin = null;
 		resourceBundle = null;
 	}
-
-	/**
-	 * Returns the shared instance.
-	 */
-	public static PTPDebugUIPlugin getDefault() {
-		return plugin;
-	}
-
-	public static UIDebugManager getUIDebugManager() {
-		return uiDebugManager;
-	}
-
-	/**
-	 * Returns the string from the plugin's resource bundle,
-	 * or 'key' if not found.
-	 */
-	public static String getResourceString(String key) {
-		ResourceBundle bundle = PTPDebugUIPlugin.getDefault().getResourceBundle();
-		try {
-			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
-			return key;
-		}
-	}
-
-	/**
-	 * Returns the plugin's resource bundle,
-	 */
-	public ResourceBundle getResourceBundle() {
-		try {
-			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.debug.ui.UiPluginResources");
-		} catch (MissingResourceException x) {
-			resourceBundle = null;
-		}
-		return resourceBundle;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
 	
-	/** Get active workbench shell
-	 * @return
-	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-	
-	/** Get display
-	 * @return
-	 */
-	public static Display getDisplay() {
-		Display display= Display.getCurrent();
-		if (display == null) {
-			display= Display.getDefault();
-		}
-		return display;		
-	}	
-	
-	/** Get active workbench window
-	 * @return
-	 */
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-	
-	/** Get current perspective ID
-	 * @return
-	 */
-	public static String getCurrentPerspectiveID() {
-		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
-	}
-	/** Is ptp debug perspective
-	 * @return
-	 */
-	public static boolean isPTPDebugPerspective() {
-		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG);		
-	}
-	public static boolean isPTPPerspective() {
-		String curID = getCurrentPerspectiveID();
-		if (curID == null)
-			return false;
-		return (curID.equals(IPTPUIConstants.PERSPECTIVE_RUN) || curID.equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG));
-	}
-	
-	/***** LOG *****/
-	/** Log 
-	 * @param msg
-	 */
-	public static void log(String msg) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
-	}
-	/** Log
-	 * @param status
-	 */
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-	/** Log
-	 * @param e
-	 */
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
-	}
-	/** Show error dialog
-	 * @param title
-	 * @param t
-	 */
-	public static void errorDialog(String title, Throwable t) {
-		errorDialog(getActiveWorkbenchShell(), title, t.getMessage(), t);
-	}
-	/** Show error dialog
-	 * @param shell
-	 * @param title
-	 * @param t
-	 */
-	public static void errorDialog(Shell shell, String title, Throwable t) {
-		errorDialog(shell, title, t.getMessage(), t);
-	}
-	/** Show error dialog
-	 * @param shell
-	 * @param title
-	 * @param message
-	 * @param t
-	 */
-	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
-		IStatus status;
-		if (t instanceof CoreException) {
-			status = ((CoreException)t).getStatus();
-		} else {
-			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within Debug UI: ", t);
-			log(status);	
-		}
-		errorDialog(shell, title, message, status);
-	}
-	/** Show error dialog
-	 * @param title
-	 * @param s
-	 */
-	public static void errorDialog(String title, IStatus s) {
-		errorDialog(getActiveWorkbenchShell(), title, s.getMessage(), s);
-	}
-	/** Show error dialog
-	 * @param shell
-	 * @param title
-	 * @param s
-	 */
-	public static void errorDialog(Shell shell, String title, IStatus s) {
-		errorDialog(shell, title, s.getMessage(), s);
-	}
-	/** Show error dialog
-	 * @param shell
-	 * @param title
-	 * @param message
-	 * @param s
-	 */
-	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
-		if (s != null && message.equals(s.getMessage()))
-			message = null;
-
-		ErrorDialog.openError(shell, title, message, s);
-	}
-	/** Get launch debugger tab
-	 * @param debuggerID
-	 * @return
-	 * @throws CoreException
-	 */
-	public ILaunchConfigurationTab getDebuggerPage(String debuggerID) throws CoreException {
-		if (fDebuggerPageMap == null) {
-			initializeDebuggerPageMap();
-		}
-		IConfigurationElement configElement = (IConfigurationElement)fDebuggerPageMap.get(debuggerID);
-		ILaunchConfigurationTab tab = null;
-		if (configElement != null) {
-			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension("class");
-		}
-		return tab;
-	}
-	/** Initial launch debugger page  
+	/** 
+	 * Initialize launch debugger page  
 	 * 
 	 */
 	protected void initializeDebuggerPageMap() {
@@ -298,33 +385,12 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 			String id = infos[i].getAttribute("debuggerID");
 			fDebuggerPageMap.put(id, infos[i]);
 		}
-	}
-	
-	/** Get standard display
-	 * @return
-	 */
-	public static Display getStandardDisplay() {
-		Display display;
-		display = Display.getCurrent();
-		if (display == null)
-			display = Display.getDefault();
-		return display;
-	}
-	
-	/** Get shell
-	 * @return
-	 */
-	public static Shell getShell() {
-		if (getActiveWorkbenchWindow() != null) {
-			return getActiveWorkbenchWindow().getShell();
-		}
-		return null;
-	}
-	
-	public static PDebugModelPresentation getDebugModelPresentation() {
-		return PDebugModelPresentation.getDefault();
-	}
-	public static IPersistableSourceLocator createDefaultSourceLocator() {
-		return new DefaultSourceLocator();
 	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#initializeImageRegistry(org.eclipse.jface.resource.ImageRegistry)
+	 */
+	protected void initializeImageRegistry(ImageRegistry reg) {
+    	PDebugImage.initializeImageRegistry(reg);
+    }
 }
