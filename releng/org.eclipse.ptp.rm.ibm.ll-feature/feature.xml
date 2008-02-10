@@ -33,27 +33,27 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.ibmll.core"
+         id="org.eclipse.ptp.rm.ibm.ll.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ibmll.help"
+         id="org.eclipse.ptp.rm.ibm.ll.help"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ibmll.proxy"
+         id="org.eclipse.ptp.rm.ibm.ll.proxy"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ptp.ibmll.ui"
+         id="org.eclipse.ptp.rm.ibm.ll.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
