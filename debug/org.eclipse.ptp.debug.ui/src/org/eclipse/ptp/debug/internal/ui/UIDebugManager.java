@@ -130,7 +130,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		debugModel = PTPDebugCorePlugin.getDebugModel();
 		annotationMgr = new PAnnotationManager(this);
-		settingPreference();
+		initializePreferences();
 	}
 	
 	/**
@@ -761,7 +761,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/**
 	 * Initialize preference settings
 	 */
-	private void settingPreference() {
+	private void initializePreferences() {
 		Preferences prefStore = PTPDebugUIPlugin.getDefault().getPluginPreferences();
 		prefRegisterProc0 = prefStore.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0);
 		prefAutoUpdateVarOnSuspend = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
