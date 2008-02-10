@@ -5,9 +5,29 @@ Bundle-SymbolicName: org.eclipse.ptp.debug.sdm.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.debug.sdm.core,
- org.eclipse.ptp.debug.sdm.core.pdi,
- org.eclipse.ptp.debug.sdm.core.proxy
+Export-Package: org.eclipse.ptp.debug.sdm.core;
+  uses:="org.eclipse.ptp.core.attributes,
+   org.eclipse.ptp.debug.core,
+   org.eclipse.ptp.debug.core.pdi.manager,
+   org.eclipse.core.runtime.preferences,
+   org.osgi.framework,
+   org.eclipse.ptp.debug.core.pdi.event,
+   org.eclipse.ptp.debug.core.pdi.request,
+   org.eclipse.ptp.debug.core.launch,
+   org.eclipse.ptp.core.util,
+   org.eclipse.ptp.debug.core.pdi,
+   org.eclipse.core.runtime,
+   org.eclipse.ptp.debug.core.pdi.model,
+   org.eclipse.debug.core",
+ org.eclipse.ptp.debug.sdm.core.pdi;
+  uses:="org.eclipse.ptp.proxy.event,
+   org.eclipse.ptp.debug.sdm.core.proxy,
+   org.eclipse.ptp.debug.core.pdi.model.aif,
+   org.eclipse.ptp.core.util,
+   org.eclipse.ptp.debug.core.pdi,
+   org.eclipse.core.runtime,
+   org.eclipse.ptp.debug.core.pdi.model",
+ org.eclipse.ptp.debug.sdm.core.proxy;uses:="org.eclipse.ptp.core.util,org.eclipse.core.runtime,org.eclipse.ptp.proxy.debug.client"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.ui,
