@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Control;
  * @author Clement chu
  * 
  */
-public class RMPreferencesPage extends AbstractPerferencePage {
+public class RMPreferencesPage extends AbstractPreferencePage {
 	protected Combo remoteServicesCombo;
 		
 	/** Constructor
@@ -75,13 +75,13 @@ public class RMPreferencesPage extends AbstractPerferencePage {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#setValues()
 	 */
 	protected void setValues() {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#storeValues()
 	 */
 	protected void storeValues() {
 	}

@@ -25,7 +25,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.ui.PreferencesAdapter;
-import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
+import org.eclipse.ptp.ui.preferences.AbstractPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
  * @author Clement chu
  *
  */
-public class SDMPreferencePage extends AbstractPerferencePage {
+public class SDMPreferencePage extends AbstractPreferencePage {
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener {
    		public void modifyText(ModifyEvent e) {
 	    		setValid(isValid());        	
@@ -201,7 +201,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#setValues()
 	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
@@ -213,7 +213,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#storeValues()
 	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();

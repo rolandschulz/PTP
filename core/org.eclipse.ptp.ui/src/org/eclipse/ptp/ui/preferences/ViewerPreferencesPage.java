@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Text;
  * @author Clement chu
  * 
  */
-public class ViewerPreferencesPage extends AbstractPerferencePage {
+public class ViewerPreferencesPage extends AbstractPreferencePage {
 	private ViewIntFieldEditor toolTipField = null;
 	private Button tooltipIsWrapButton = null;
 	private Button tooltipShowAllTimeButton = null;
@@ -256,7 +256,7 @@ public class ViewerPreferencesPage extends AbstractPerferencePage {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#setValues()
 	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
@@ -272,7 +272,7 @@ public class ViewerPreferencesPage extends AbstractPerferencePage {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#storeValues()
 	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
