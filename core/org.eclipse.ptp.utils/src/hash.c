@@ -21,6 +21,19 @@
 ** Original copyright by Bob Jenkins, December 1996.
 */
 
+/*
+ * NOTE: This hash implementation is not synchronized across iteration (HashSet/HashGet). If there are two 
+ * threads simultaneously accessing the hash, then one thread may affect the other's access. For instance, 
+ * if thread 1 calls HashGet(), then thread 2 calls HashGet(), then the next time thread 1 calls
+ * HashGet(), it will get the 3rd element in the hash, not the 2nd. Also, if two threads are accessing 
+ * objects in the hash, and freeing data associated with those objects while traversing the hash, then this 
+ * may cause problems where thread 1 frees data that thread 2 is about to access.
+ * 
+ * Applications wishing to use threads to access hashes in this way should provide functions that obtain 
+ * and release a global lock on the hash which prevents any other thread from accessing the hash while 
+ * that lock is held.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
