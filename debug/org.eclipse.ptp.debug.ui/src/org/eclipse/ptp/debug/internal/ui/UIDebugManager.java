@@ -126,7 +126,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	};
 	
 	public UIDebugManager() {
-		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		debugModel = PTPDebugCorePlugin.getDebugModel();
 		annotationMgr = new PAnnotationManager(this);
@@ -520,7 +520,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @see org.eclipse.ptp.ui.managers.JobManager#shutdown()
 	 */
 	public void shutdown() {
-		PTPDebugUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		annotationMgr.shutdown();
 		jobVarMgr.shutdown();
@@ -762,7 +762,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * Initialize preference settings
 	 */
 	private void initializePreferences() {
-		Preferences prefStore = PTPDebugUIPlugin.getDefault().getPluginPreferences();
+		Preferences prefStore = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 		prefRegisterProc0 = prefStore.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0);
 		prefAutoUpdateVarOnSuspend = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
 		prefAutoUpdateVarOnChange = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);

@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionDelegate2;
@@ -113,7 +114,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 	 * @return
 	 */
 	protected Preferences getPreferences() {
-		return PTPDebugUIPlugin.getDefault().getPluginPreferences();
+		return PTPDebugCorePlugin.getDefault().getPluginPreferences();
 	}
 	
 	/** 
