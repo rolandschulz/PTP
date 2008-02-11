@@ -35,7 +35,7 @@ import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.ui.PreferencesAdapter;
-import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
+import org.eclipse.ptp.ui.preferences.AbstractPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
@@ -50,7 +50,7 @@ import org.eclipse.ui.IWorkbenchPage;
 /**
  * @author Clement chu
  */
-public class PDebugPreferencePage extends AbstractPerferencePage {
+public class PDebugPreferencePage extends AbstractPreferencePage {
 	private Button fPathsButton = null;
 	private Button fRegisteredProcessButton = null;
 	private IntegerFieldEditor commandTimeoutField = null;
@@ -193,7 +193,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#setValues()
 	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
@@ -219,7 +219,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#storeValues()
 	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();

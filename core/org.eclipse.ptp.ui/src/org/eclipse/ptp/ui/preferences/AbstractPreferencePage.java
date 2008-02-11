@@ -20,6 +20,7 @@ package org.eclipse.ptp.ui.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -39,7 +40,7 @@ import org.eclipse.ui.IWorkbenchWindow;
  * @author Clement chu
  *
  */
-public abstract class AbstractPerferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public abstract class AbstractPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	protected IWorkbench fWorkbench;
 	
 	/* (non-Javadoc)
@@ -48,13 +49,17 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 	public void init(IWorkbench workbench) {
 		fWorkbench = workbench;
 	}
-	/** Get Workbench
+	
+	/** 
+	 * Get Workbench
 	 * @return
 	 */
 	protected IWorkbench getWorkbench() {
 		return fWorkbench;
 	}
-	/** Create group composite
+	
+	/** 
+	 * Create group composite
 	 * @param parent
 	 * @param numColumns
 	 * @param makeBalance
@@ -78,7 +83,8 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
         return comp;
     }
 	
-	/** Create composite
+	/** 
+	 * Create composite
 	 * @param parent
 	 * @param numColumns
 	 * @return
@@ -90,7 +96,8 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		return composite;
 	}	
 	
-	/** Create check type button
+	/** 
+	 * Create check type button
 	 * @param parent
 	 * @param label
 	 * @return
@@ -98,7 +105,9 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 	protected Button createCheckButton(Composite parent, String label) {
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
 	}
-	/** Create normal button
+	
+	/** 
+	 * Create normal button
 	 * @param parent
 	 * @param label
 	 * @param type
@@ -111,7 +120,8 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		return button;
 	}
 	
-	/** Create combo box
+	/** 
+	 * Create combo box
 	 * @param parent
 	 * @param label
 	 * @param data
@@ -128,7 +138,8 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		return combo;
 	}
 	
-	/** Create label
+	/** 
+	 * Create label
 	 * @param parent
 	 * @param text
 	 * @param widthHint
@@ -147,7 +158,8 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		return label;
 	}	
 	
-	/** Create spacer
+	/** 
+	 * Create spacer
 	 * @param composite
 	 * @param columnSpan
 	 */
@@ -158,7 +170,8 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		label.setLayoutData(gd);
 	}
 		
-	/** Get pages
+	/** 
+	 * Get pages
 	 * @return
 	 */
 	protected IWorkbenchPage[] getPages() {
@@ -176,12 +189,13 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		return (IWorkbenchPage[])pages.toArray(new IWorkbenchPage[0]);
 	}   
 
-	/** Store preference values
-	 * 
+	/** 
+	 * Store preference values
 	 */
 	protected abstract void storeValues();
-	/** Set preference value
-	 * 
+	
+	/** 
+	 * Set preference values
 	 */
 	protected abstract void setValues();
 }
