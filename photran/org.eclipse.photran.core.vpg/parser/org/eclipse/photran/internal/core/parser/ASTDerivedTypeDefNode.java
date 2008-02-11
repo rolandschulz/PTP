@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDerivedTypeDefNode extends ScopingNode
+public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationConstruct
 {
     ASTDerivedTypeDefNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIDeclarationConstruct(this);
         visitor.visitASTDerivedTypeDefNode(this);
     }
 
@@ -47,7 +48,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DERIVED_TYPE_DEF_179)
+        if (getProduction() == Production.DERIVED_TYPE_DEF_180)
             return (ASTDerivedTypeStmtNode)getChild(0);
         else
             return null;
@@ -57,7 +58,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DERIVED_TYPE_DEF_179)
+        if (getProduction() == Production.DERIVED_TYPE_DEF_180)
             return (ASTDerivedTypeBodyNode)getChild(1);
         else
             return null;
@@ -67,7 +68,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DERIVED_TYPE_DEF_179)
+        if (getProduction() == Production.DERIVED_TYPE_DEF_180)
             return (ASTEndTypeStmtNode)getChild(2);
         else
             return null;

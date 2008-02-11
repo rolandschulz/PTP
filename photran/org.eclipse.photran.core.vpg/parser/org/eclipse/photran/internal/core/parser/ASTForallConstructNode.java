@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTForallConstructNode extends InteriorNode
+public class ASTForallConstructNode extends InteriorNode implements IExecutableConstruct, IForallBodyConstruct
 {
     ASTForallConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,8 @@ public class ASTForallConstructNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIExecutableConstruct(this);
+        visitor.visitIForallBodyConstruct(this);
         visitor.visitASTForallConstructNode(this);
     }
 
@@ -47,9 +49,9 @@ public class ASTForallConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_633)
+        if (getProduction() == Production.FORALL_CONSTRUCT_631)
             return (ASTForallConstructStmtNode)getChild(0);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_634)
+        else if (getProduction() == Production.FORALL_CONSTRUCT_632)
             return (ASTForallConstructStmtNode)getChild(0);
         else
             return null;
@@ -59,9 +61,9 @@ public class ASTForallConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_633)
+        if (getProduction() == Production.FORALL_CONSTRUCT_631)
             return (ASTEndForallStmtNode)getChild(1);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_634)
+        else if (getProduction() == Production.FORALL_CONSTRUCT_632)
             return (ASTEndForallStmtNode)getChild(2);
         else
             return null;
@@ -71,9 +73,19 @@ public class ASTForallConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_634)
+        if (getProduction() == Production.FORALL_CONSTRUCT_632)
             return (ASTForallBodyNode)getChild(1);
         else
             return null;
+    }
+
+    public boolean hasForallBody()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORALL_CONSTRUCT_632)
+            return getChild(1) != null;
+        else
+            return false;
     }
 }

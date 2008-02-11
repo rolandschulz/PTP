@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCaseSelectorNode extends InteriorNode
+class ASTCaseSelectorNode extends InteriorNode
 {
     ASTCaseSelectorNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,49 +37,44 @@ public class ASTCaseSelectorNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTCaseSelectorNode(this);
-    }
 
-    public Token getTLparen()
+    public ASTCaseValueRangeListNode getCaseValueRangeListSelector()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_699)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTCaseValueRangeListNode getCaseValueRangeList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_SELECTOR_699)
+        if (getProduction() == Production.CASE_SELECTOR_693)
             return (ASTCaseValueRangeListNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasCaseValueRangeListSelector()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_699)
-            return (Token)getChild(2);
+        if (getProduction() == Production.CASE_SELECTOR_693)
+            return getChild(1) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTDefault()
+    public boolean hasDefaultSelector()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_SELECTOR_700)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CASE_SELECTOR_694)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.CASE_SELECTOR_693 && index == 0)
+            return false;
+        else if (getProduction() == Production.CASE_SELECTOR_693 && index == 2)
+            return false;
+        else
+            return true;
     }
 }

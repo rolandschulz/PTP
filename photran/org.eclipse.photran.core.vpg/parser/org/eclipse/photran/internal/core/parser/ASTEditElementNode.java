@@ -43,73 +43,113 @@ public class ASTEditElementNode extends InteriorNode
         visitor.visitASTEditElementNode(this);
     }
 
-    public Token getTFcon()
+    public Token getFloatConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_888)
+        if (getProduction() == Production.EDIT_ELEMENT_882)
             return (Token)getChild(0);
         else
             return null;
     }
 
-    public Token getTScon()
+    public boolean hasFloatConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_889)
+        if (getProduction() == Production.EDIT_ELEMENT_882)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getStringConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.EDIT_ELEMENT_883)
             return (Token)getChild(0);
         else
             return null;
     }
 
-    public Token getTIdent()
+    public boolean hasStringConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_890)
+        if (getProduction() == Production.EDIT_ELEMENT_883)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getIdentifier()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.EDIT_ELEMENT_884)
             return (Token)getChild(0);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean hasIdentifier()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_891)
+        if (getProduction() == Production.EDIT_ELEMENT_884)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getHollerith()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.EDIT_ELEMENT_885)
             return (Token)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasHollerith()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.EDIT_ELEMENT_885)
+            return getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTFmtSpecNode getFmtSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_891)
+        if (getProduction() == Production.EDIT_ELEMENT_886)
             return (ASTFmtSpecNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasFmtSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EDIT_ELEMENT_891)
-            return (Token)getChild(2);
+        if (getProduction() == Production.EDIT_ELEMENT_886)
+            return getChild(1) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTHcon()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_892)
-            return (Token)getChild(0);
+        if (getProduction() == Production.EDIT_ELEMENT_886 && index == 0)
+            return false;
+        else if (getProduction() == Production.EDIT_ELEMENT_886 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 }

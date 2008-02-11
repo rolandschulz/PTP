@@ -94,37 +94,44 @@ public class ASTEquivalenceObjectListNode extends InteriorNode
         visitor.visitASTEquivalenceObjectListNode(this);
     }
 
-    public ASTEquivalenceObjectNode getEquivalenceObject(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTEquivalenceObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_408)
-            return (ASTEquivalenceObjectNode)node.getChild(0);
-        else if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_409)
-            return (ASTEquivalenceObjectNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTEquivalenceObjectListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_409)
+        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406)
             return (ASTEquivalenceObjectListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public ASTVariableNode getVariable(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTEquivalenceObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_409)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_405)
+            return (ASTVariableNode)((ASTEquivalenceObjectNode)node.getChild(0)).getVariable();
+        else if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406)
+            return (ASTVariableNode)((ASTEquivalenceObjectNode)node.getChild(2)).getVariable();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_405 && index == 0)
+            return true;
+        else if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

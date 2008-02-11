@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSFDummyArgNameNode extends InteriorNode
+class ASTSFDummyArgNameNode extends InteriorNode
 {
     ASTSFDummyArgNameNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,19 +37,22 @@ public class ASTSFDummyArgNameNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSFDummyArgNameNode(this);
-    }
 
-    public ASTNameNode getName()
+    public Token getVariableName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFDUMMY_ARG_NAME_1042)
-            return (ASTNameNode)getChild(0);
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_1038)
+            return (Token)((ASTNameNode)getChild(0)).getName();
         else
             return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_1038 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

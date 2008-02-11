@@ -47,39 +47,49 @@ public class ASTPrefixSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PREFIX_SPEC_993)
+        if (getProduction() == Production.PREFIX_SPEC_989)
             return (ASTTypeSpecNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTRecursive()
+    public boolean hasTypeSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PREFIX_SPEC_994)
-            return (Token)getChild(0);
+        if (getProduction() == Production.PREFIX_SPEC_989)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTPure()
+    public boolean isRecursive()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PREFIX_SPEC_995)
-            return (Token)getChild(0);
+        if (getProduction() == Production.PREFIX_SPEC_990)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTElemental()
+    public boolean isPure()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PREFIX_SPEC_996)
-            return (Token)getChild(0);
+        if (getProduction() == Production.PREFIX_SPEC_991)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    public boolean isElemental()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PREFIX_SPEC_992)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

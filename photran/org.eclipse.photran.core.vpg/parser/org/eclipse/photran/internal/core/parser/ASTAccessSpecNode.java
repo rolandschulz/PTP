@@ -43,23 +43,23 @@ public class ASTAccessSpecNode extends InteriorNode
         visitor.visitASTAccessSpecNode(this);
     }
 
-    public Token getTPublic()
+    public boolean isPublic()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ACCESS_SPEC_288)
-            return (Token)getChild(0);
+        if (getProduction() == Production.ACCESS_SPEC_285)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTPrivate()
+    public boolean isPrivate()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ACCESS_SPEC_289)
-            return (Token)getChild(0);
+        if (getProduction() == Production.ACCESS_SPEC_286)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 }

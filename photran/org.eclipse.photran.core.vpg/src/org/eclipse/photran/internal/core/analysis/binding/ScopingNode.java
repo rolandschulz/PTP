@@ -46,7 +46,6 @@ import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTInternalSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNameNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
@@ -58,6 +57,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeNameNode;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
 import org.eclipse.photran.internal.core.parser.Parser.Production;
@@ -222,52 +222,49 @@ public abstract class ScopingNode extends InteriorNode
     		if (m != null)
     		{
     			if (m.getProgramName() != null)
-    				return m.getProgramName().getTIdent().getTokenRef();
+    				return m.getProgramName().getProgramName().getTokenRef();
     			else
-    				return m.getTProgram().getTokenRef();
+    				return m.getProgramToken().getTokenRef();
     		}
     		else
     		{
 	    		ASTEndProgramStmtNode s = ((ASTMainProgramNode)this).getEndProgramStmt();
-	    		if (s.getTEnd() != null)
-	    			return s.getTEnd().getTokenRef();
-	    		else
-	    			return s.getTEndprogram().getTokenRef();
+	    		return s.getEndToken().getTokenRef();
     		}
     	}
     	else if (this instanceof ASTFunctionSubprogramNode)
     	{
-    		return ((ASTFunctionSubprogramNode)this).getFunctionStmt().getFunctionName().getTIdent().getTokenRef();
+    		return ((ASTFunctionSubprogramNode)this).getFunctionStmt().getFunctionName().getFunctionName().getTokenRef();
     	}
     	else if (this instanceof ASTSubroutineSubprogramNode)
     	{
-    		return ((ASTSubroutineSubprogramNode)this).getSubroutineStmt().getSubroutineName().getTIdent().getTokenRef();
+    		return ((ASTSubroutineSubprogramNode)this).getSubroutineStmt().getSubroutineName().getSubroutineName().getTokenRef();
     	}
     	else if (this instanceof ASTModuleNode)
     	{
-    		return ((ASTModuleNode)this).getModuleStmt().getModuleName().getTIdent().getTokenRef();
+    		return ((ASTModuleNode)this).getModuleStmt().getModuleName().getModuleName().getTokenRef();
     	}
     	else if (this instanceof ASTBlockDataSubprogramNode)
     	{
     		ASTBlockDataStmtNode s = ((ASTBlockDataSubprogramNode)this).getBlockDataStmt();
     		if (s.getBlockDataName() != null)
-    			return s.getBlockDataName().getTIdent().getTokenRef();
+    			return s.getBlockDataName().getBlockDataName().getTokenRef();
     		else
-    			return s.getTBlockdata().getTokenRef();
+    			return s.getBlockDataToken().getTokenRef();
     	}
     	else if (this instanceof ASTDerivedTypeDefNode)
     	{
-    		return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt().getTypeName().getTIdent().getTokenRef();
+    		return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt().getTypeName().getTokenRef();
     	}
     	else if (this instanceof ASTInterfaceBlockNode)
 		{
     		ASTInterfaceStmtNode s = ((ASTInterfaceBlockNode)this).getInterfaceStmt();
 			if (s.getGenericName() != null)
-				return s.getGenericName().getTIdent().getTokenRef();
-			else if (s.getGenericSpec() != null && s.getGenericSpec().getTAssignment() != null)
-				return s.getGenericSpec().getTAssignment().getTokenRef();
+				return s.getGenericName().getGenericName().getTokenRef();
+			else if (s.getGenericSpec() != null && s.getGenericSpec().getEqualsToken() != null)
+				return s.getGenericSpec().getEqualsToken().getTokenRef();
 			else
-				return s.getTInterface().getTokenRef();
+				return s.getInterfaceToken().getTokenRef();
 		}
     	else
     	{
@@ -302,7 +299,7 @@ public abstract class ScopingNode extends InteriorNode
 
     public boolean isInternal()
     {
-    	return getParent() instanceof ASTInternalSubprogramNode;
+    	return getParent() instanceof IInternalSubprogram;
     }
     
     public ImplicitSpec getImplicitSpec()

@@ -43,51 +43,95 @@ public class ASTLogicalConstantNode extends InteriorNode
         visitor.visitASTLogicalConstantNode(this);
     }
 
-    public Token getTTrue()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LOGICAL_CONSTANT_175)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.LOGICAL_CONSTANT_177)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTFalse()
+    public boolean isTrue()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.LOGICAL_CONSTANT_176)
-            return (Token)getChild(0);
+            return getChild(0) != null;
         else if (getProduction() == Production.LOGICAL_CONSTANT_178)
-            return (Token)getChild(0);
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTUnderscore()
+    public boolean isFalse()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.LOGICAL_CONSTANT_177)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.LOGICAL_CONSTANT_178)
-            return (Token)getChild(1);
+            return getChild(0) != null;
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getIntKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LOGICAL_CONSTANT_178)
+            return (Token)((ASTKindParamNode)getChild(2)).getIntKind();
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179)
+            return (Token)((ASTKindParamNode)getChild(2)).getIntKind();
         else
             return null;
     }
 
-    public ASTKindParamNode getKindParam()
+    public boolean hasIntKind()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LOGICAL_CONSTANT_177)
-            return (ASTKindParamNode)getChild(2);
-        else if (getProduction() == Production.LOGICAL_CONSTANT_178)
-            return (ASTKindParamNode)getChild(2);
+        if (getProduction() == Production.LOGICAL_CONSTANT_178)
+            return ((ASTKindParamNode)getChild(2)).hasIntKind();
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179)
+            return ((ASTKindParamNode)getChild(2)).hasIntKind();
+        else
+            return false;
+    }
+
+    public ASTNamedConstantUseNode getNamedConstKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LOGICAL_CONSTANT_178)
+            return (ASTNamedConstantUseNode)((ASTKindParamNode)getChild(2)).getNamedConstKind();
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179)
+            return (ASTNamedConstantUseNode)((ASTKindParamNode)getChild(2)).getNamedConstKind();
         else
             return null;
+    }
+
+    public boolean hasNamedConstKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LOGICAL_CONSTANT_178)
+            return ((ASTKindParamNode)getChild(2)).hasNamedConstKind();
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179)
+            return ((ASTKindParamNode)getChild(2)).hasNamedConstKind();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.LOGICAL_CONSTANT_178 && index == 1)
+            return false;
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.LOGICAL_CONSTANT_178 && index == 2)
+            return true;
+        else if (getProduction() == Production.LOGICAL_CONSTANT_179 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

@@ -43,33 +43,41 @@ public class ASTArrayConstructorNode extends InteriorNode
         visitor.visitASTArrayConstructorNode(this);
     }
 
-    public Token getTLparenslash()
+    public int size()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_CONSTRUCTOR_219)
-            return (Token)getChild(0);
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_220)
+            return (int)((ASTAcValueListNode)getChild(1)).size();
+        else
+            return 0;
+    }
+
+    public ASTAcValueNode getAcValue(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_220)
+            return (ASTAcValueNode)((ASTAcValueListNode)getChild(1)).getAcValue(listIndex1);
         else
             return null;
     }
 
-    public ASTAcValueListNode getAcValueList()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_CONSTRUCTOR_219)
-            return (ASTAcValueListNode)getChild(1);
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_220 && index == 0)
+            return false;
+        else if (getProduction() == Production.ARRAY_CONSTRUCTOR_220 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public Token getTSlashrparen()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_CONSTRUCTOR_219)
-            return (Token)getChild(2);
+        if (getProduction() == Production.ARRAY_CONSTRUCTOR_220 && index == 1)
+            return true;
         else
-            return null;
+            return false;
     }
 }

@@ -43,63 +43,45 @@ public class ASTComponentInitializationNode extends InteriorNode
         visitor.visitASTComponentInitializationNode(this);
     }
 
-    public Token getTEquals()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_INITIALIZATION_210)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_INITIALIZATION_210)
-            return (ASTExprNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTEqgreaterthan()
+    public boolean assignsExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.COMPONENT_INITIALIZATION_211)
-            return (Token)getChild(0);
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTNull()
+    public ASTExpressionNode getAssignedExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.COMPONENT_INITIALIZATION_211)
-            return (Token)getChild(1);
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean assignsNull()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_INITIALIZATION_211)
-            return (Token)getChild(2);
+        if (getProduction() == Production.COMPONENT_INITIALIZATION_212)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTRparen()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_INITIALIZATION_211)
-            return (Token)getChild(3);
+        if (getProduction() == Production.COMPONENT_INITIALIZATION_212 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_INITIALIZATION_212 && index == 2)
+            return false;
+        else if (getProduction() == Production.COMPONENT_INITIALIZATION_212 && index == 3)
+            return false;
         else
-            return null;
+            return true;
     }
 }

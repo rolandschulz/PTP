@@ -99,9 +99,9 @@ public class ASTImplicitSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTImplicitSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.IMPLICIT_SPEC_LIST_395)
+        if (node.getProduction() == Production.IMPLICIT_SPEC_LIST_392)
             return (ASTImplicitSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.IMPLICIT_SPEC_LIST_396)
+        else if (node.getProduction() == Production.IMPLICIT_SPEC_LIST_393)
             return (ASTImplicitSpecNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTImplicitSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_SPEC_LIST_396)
+        if (getProduction() == Production.IMPLICIT_SPEC_LIST_393)
             return (ASTImplicitSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTImplicitSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.IMPLICIT_SPEC_LIST_396)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.IMPLICIT_SPEC_LIST_393 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInvalidEntityDeclNode extends InteriorNodeWithErrorRecoverySymbols
+class ASTInvalidEntityDeclNode extends InteriorNodeWithErrorRecoverySymbols
 {
     ASTInvalidEntityDeclNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,34 +37,17 @@ public class ASTInvalidEntityDeclNode extends InteriorNodeWithErrorRecoverySymbo
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTInvalidEntityDeclNode(this);
-    }
 
     public ASTObjectNameNode getObjectName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
             return (ASTObjectNameNode)getChild(0);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
             return (ASTObjectNameNode)getChild(0);
         else if (getProduction() == Production.INVALID_ENTITY_DECL_ERROR_0)
             return (ASTObjectNameNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTAsterisk()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
-            return (Token)getChild(1);
         else
             return null;
     }
@@ -73,57 +56,85 @@ public class ASTInvalidEntityDeclNode extends InteriorNodeWithErrorRecoverySymbo
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
             return (ASTCharLengthNode)getChild(2);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
             return (ASTCharLengthNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean hasCharLength()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
-            return (Token)getChild(3);
+        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+            return getChild(2) != null;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+            return getChild(2) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTArraySpecNode getArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
             return (ASTArraySpecNode)getChild(4);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
             return (ASTArraySpecNode)getChild(4);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_271)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_272)
-            return (Token)getChild(5);
+        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
+            return getChild(4) != null;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+            return getChild(4) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTInitializationNode getInitialization()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INVALID_ENTITY_DECL_272)
+        if (getProduction() == Production.INVALID_ENTITY_DECL_270)
             return (ASTInitializationNode)getChild(6);
         else
             return null;
+    }
+
+    public boolean hasInitialization()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INVALID_ENTITY_DECL_270)
+            return getChild(6) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.INVALID_ENTITY_DECL_269 && index == 1)
+            return false;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_269 && index == 3)
+            return false;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_269 && index == 5)
+            return false;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270 && index == 1)
+            return false;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270 && index == 3)
+            return false;
+        else if (getProduction() == Production.INVALID_ENTITY_DECL_270 && index == 5)
+            return false;
+        else
+            return true;
     }
 }

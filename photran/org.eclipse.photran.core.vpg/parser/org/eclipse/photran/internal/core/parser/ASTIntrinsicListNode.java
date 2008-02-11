@@ -94,37 +94,44 @@ public class ASTIntrinsicListNode extends InteriorNode
         visitor.visitASTIntrinsicListNode(this);
     }
 
-    public ASTIntrinsicProcedureNameNode getIntrinsicProcedureName(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTIntrinsicListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTRINSIC_LIST_963)
-            return (ASTIntrinsicProcedureNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.INTRINSIC_LIST_964)
-            return (ASTIntrinsicProcedureNameNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTIntrinsicListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTRINSIC_LIST_964)
+        if (getProduction() == Production.INTRINSIC_LIST_960)
             return (ASTIntrinsicListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getIntrinsicProcedureName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTIntrinsicListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTRINSIC_LIST_964)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.INTRINSIC_LIST_959)
+            return (Token)((ASTIntrinsicProcedureNameNode)node.getChild(0)).getIntrinsicProcedureName();
+        else if (node.getProduction() == Production.INTRINSIC_LIST_960)
+            return (Token)((ASTIntrinsicProcedureNameNode)node.getChild(2)).getIntrinsicProcedureName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.INTRINSIC_LIST_960 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.INTRINSIC_LIST_959 && index == 0)
+            return true;
+        else if (getProduction() == Production.INTRINSIC_LIST_960 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

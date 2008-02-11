@@ -13,10 +13,13 @@ package org.eclipse.photran.internal.core.parser;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
 import org.eclipse.photran.internal.core.parser.Parser.*;
+import java.util.Iterator;
 import java.util.List;
 
-public class ASTConditionalBodyNode extends InteriorNode
+public class ASTConditionalBodyNode extends InteriorNode implements  Iterable<IExecutionPartConstruct>
 {
+    protected int count = -1;
+
     ASTConditionalBodyNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
          super(production);
@@ -28,14 +31,63 @@ public class ASTConditionalBodyNode extends InteriorNode
         
     @Override public InteriorNode getASTParent()
     {
-        InteriorNode actualParent = super.getParent();
+        // This is a recursive node in a list, so its logical parent node
+        // is the parent of the first node in the list
+    
+        InteriorNode parent = super.getParent();
+        InteriorNode grandparent = parent == null ? null : parent.getParent();
+        InteriorNode logicalParent = parent;
+        
+        while (parent != null && grandparent != null
+               && parent instanceof ASTConditionalBodyNode
+               && grandparent instanceof ASTConditionalBodyNode
+               && ((ASTConditionalBodyNode)grandparent).getRecursiveNode() == parent)
+        {
+            logicalParent = grandparent;
+            parent = grandparent;
+            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
+        }
+        
+        InteriorNode logicalGrandparent = logicalParent.getParent();
         
         // If a node has been pulled up in an ACST, its physical parent in
         // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
+        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
+            return logicalParent.getASTParent();
         else 
-            return actualParent;
+            return logicalParent;
+    }
+
+    /**
+     * @return the number of ASTConditionalBodyNode nodes in this list
+     */
+    public int size()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
+        
+        if (count >= 0) return count;
+        
+        count = 0;
+        ASTConditionalBodyNode node = this;
+        do
+        {
+            count++;
+            node = node.getRecursiveNode();
+        }
+        while (node != null);
+        
+        return count;
+    }
+    
+    ASTConditionalBodyNode recurseToIndex(int listIndex)
+    {
+        ASTConditionalBodyNode node = this;
+        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
+        {
+            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
+            node = (ASTConditionalBodyNode)node.getRecursiveNode();
+        }
+        return node;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -43,24 +95,58 @@ public class ASTConditionalBodyNode extends InteriorNode
         visitor.visitASTConditionalBodyNode(this);
     }
 
-    public ASTExecutionPartConstructNode getExecutionPartConstruct()
+    public Iterator<IExecutionPartConstruct> iterator()
+    {
+        final int listSize = size() - 1;
+        
+        ASTConditionalBodyNode node = this;
+        for (int depth = listSize-1, i = 0; i < depth; i++)
+            node = (ASTConditionalBodyNode)node.getRecursiveNode();
+
+        final ASTConditionalBodyNode baseNode = node;
+        
+        return new Iterator<IExecutionPartConstruct>()
+        {
+            private ASTConditionalBodyNode node = baseNode;
+            private int index = 0;
+            
+            public boolean hasNext()
+            {
+                return index < listSize;
+            }
+
+            public IExecutionPartConstruct next()
+            {
+                IExecutionPartConstruct result = (IExecutionPartConstruct)node.getChild(1);
+                node = (index == listSize-1 ? null : (ASTConditionalBodyNode)node.parent);
+                index++;
+                return result;
+            }
+
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    private ASTConditionalBodyNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONDITIONAL_BODY_667)
-            return (ASTExecutionPartConstructNode)getChild(0);
-        else if (getProduction() == Production.CONDITIONAL_BODY_668)
-            return (ASTExecutionPartConstructNode)getChild(1);
+        if (getProduction() == Production.CONDITIONAL_BODY_662)
+            return (ASTConditionalBodyNode)getChild(0);
         else
             return null;
     }
 
-    public ASTConditionalBodyNode getConditionalBody()
+    public IExecutionPartConstruct getExecutionPartConstruct(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONDITIONAL_BODY_668)
-            return (ASTConditionalBodyNode)getChild(0);
+        ASTConditionalBodyNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.CONDITIONAL_BODY_662)
+            return (IExecutionPartConstruct)node.getChild(1);
         else
             return null;
     }

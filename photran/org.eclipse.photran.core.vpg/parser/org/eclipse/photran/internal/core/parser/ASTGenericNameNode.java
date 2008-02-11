@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTGenericNameNode extends InteriorNode
+public class ASTGenericNameNode extends InteriorNode implements IAccessId
 {
     ASTGenericNameNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,14 +40,15 @@ public class ASTGenericNameNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIAccessId(this);
         visitor.visitASTGenericNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getGenericName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_NAME_1035)
+        if (getProduction() == Production.GENERIC_NAME_1031)
             return (Token)getChild(0);
         else
             return null;

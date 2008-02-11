@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTGoToKwNode extends InteriorNode
+class ASTGoToKwNode extends InteriorNode
 {
     ASTGoToKwNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,39 +37,16 @@ public class ASTGoToKwNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTGoToKwNode(this);
-    }
 
-    public Token getTGoto()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GO_TO_KW_731)
-            return (Token)getChild(0);
+        if (getProduction() == Production.GO_TO_KW_725 && index == 0)
+            return false;
+        else if (getProduction() == Production.GO_TO_KW_726 && index == 0)
+            return false;
+        else if (getProduction() == Production.GO_TO_KW_726 && index == 1)
+            return false;
         else
-            return null;
-    }
-
-    public Token getTGo()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GO_TO_KW_732)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTTo()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GO_TO_KW_732)
-            return (Token)getChild(1);
-        else
-            return null;
+            return true;
     }
 }

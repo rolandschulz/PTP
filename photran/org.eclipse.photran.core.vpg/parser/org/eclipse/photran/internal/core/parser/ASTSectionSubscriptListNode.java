@@ -99,9 +99,9 @@ public class ASTSectionSubscriptListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSectionSubscriptListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SECTION_SUBSCRIPT_LIST_444)
+        if (node.getProduction() == Production.SECTION_SUBSCRIPT_LIST_442)
             return (ASTSectionSubscriptNode)node.getChild(0);
-        else if (node.getProduction() == Production.SECTION_SUBSCRIPT_LIST_445)
+        else if (node.getProduction() == Production.SECTION_SUBSCRIPT_LIST_443)
             return (ASTSectionSubscriptNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTSectionSubscriptListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SECTION_SUBSCRIPT_LIST_445)
+        if (getProduction() == Production.SECTION_SUBSCRIPT_LIST_443)
             return (ASTSectionSubscriptListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSectionSubscriptListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SECTION_SUBSCRIPT_LIST_445)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.SECTION_SUBSCRIPT_LIST_443 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

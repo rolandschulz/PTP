@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSavedCommonBlockNode extends InteriorNode
+class ASTSavedCommonBlockNode extends InteriorNode
 {
     ASTSavedCommonBlockNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,39 +37,32 @@ public class ASTSavedCommonBlockNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSavedCommonBlockNode(this);
-    }
 
-    public Token getTSlash()
+    public Token getCommonBlockName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVED_COMMON_BLOCK_340)
-            return (Token)getChild(0);
+        if (getProduction() == Production.SAVED_COMMON_BLOCK_337)
+            return (Token)((ASTCommonBlockNameNode)getChild(1)).getCommonBlockName();
         else
             return null;
     }
 
-    public ASTCommonBlockNameNode getCommonBlockName()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVED_COMMON_BLOCK_340)
-            return (ASTCommonBlockNameNode)getChild(1);
+        if (getProduction() == Production.SAVED_COMMON_BLOCK_337 && index == 0)
+            return false;
+        else if (getProduction() == Production.SAVED_COMMON_BLOCK_337 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public Token getTSlash2()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVED_COMMON_BLOCK_340)
-            return (Token)getChild(2);
+        if (getProduction() == Production.SAVED_COMMON_BLOCK_337 && index == 1)
+            return true;
         else
-            return null;
+            return false;
     }
 }

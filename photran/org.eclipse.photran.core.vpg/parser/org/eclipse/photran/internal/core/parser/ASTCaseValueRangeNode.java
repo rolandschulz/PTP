@@ -43,43 +43,55 @@ public class ASTCaseValueRangeNode extends InteriorNode
         visitor.visitASTCaseValueRangeNode(this);
     }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_VALUE_RANGE_703)
-            return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_704)
-            return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_705)
-            return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_706)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.CASE_VALUE_RANGE_697)
+            return (ASTExpressionNode)getChild(0);
+        else if (getProduction() == Production.CASE_VALUE_RANGE_698)
+            return (ASTExpressionNode)getChild(0);
+        else if (getProduction() == Production.CASE_VALUE_RANGE_700)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTColon()
+    public boolean hasLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_VALUE_RANGE_704)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_705)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_706)
-            return (Token)getChild(1);
+        if (getProduction() == Production.CASE_VALUE_RANGE_697)
+            return getChild(0) != null;
+        else if (getProduction() == Production.CASE_VALUE_RANGE_698)
+            return getChild(0) != null;
+        else if (getProduction() == Production.CASE_VALUE_RANGE_700)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getUb()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_VALUE_RANGE_699)
+            return (ASTExpressionNode)getChild(1);
+        else if (getProduction() == Production.CASE_VALUE_RANGE_700)
+            return (ASTExpressionNode)getChild(2);
         else
             return null;
     }
 
-    public ASTExprNode getExpr2()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_VALUE_RANGE_706)
-            return (ASTExprNode)getChild(2);
+        if (getProduction() == Production.CASE_VALUE_RANGE_698 && index == 1)
+            return false;
+        else if (getProduction() == Production.CASE_VALUE_RANGE_699 && index == 0)
+            return false;
+        else if (getProduction() == Production.CASE_VALUE_RANGE_700 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

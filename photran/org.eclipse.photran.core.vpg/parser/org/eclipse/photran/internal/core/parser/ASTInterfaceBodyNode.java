@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInterfaceBodyNode extends InteriorNode
+public class ASTInterfaceBodyNode extends InteriorNode implements IInterfaceSpecification
 {
     ASTInterfaceBodyNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,7 @@ public class ASTInterfaceBodyNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIInterfaceSpecification(this);
         visitor.visitASTInterfaceBodyNode(this);
     }
 
@@ -47,18 +48,8 @@ public class ASTInterfaceBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BODY_943)
+        if (getProduction() == Production.INTERFACE_BODY_939)
             return (ASTFunctionStmtNode)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTFunctionInterfaceRangeNode getFunctionInterfaceRange()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_943)
-            return (ASTFunctionInterfaceRangeNode)getChild(1);
         else
             return null;
     }
@@ -67,19 +58,63 @@ public class ASTInterfaceBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BODY_944)
+        if (getProduction() == Production.INTERFACE_BODY_940)
             return (ASTSubroutineStmtNode)getChild(0);
         else
             return null;
     }
 
-    public ASTSubroutineInterfaceRangeNode getSubroutineInterfaceRange()
+    public ASTSubprogramInterfaceBodyNode getSubprogramInterfaceBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BODY_944)
-            return (ASTSubroutineInterfaceRangeNode)getChild(1);
+        if (getProduction() == Production.INTERFACE_BODY_939)
+            return (ASTSubprogramInterfaceBodyNode)((ASTFunctionInterfaceRangeNode)getChild(1)).getSubprogramInterfaceBody();
+        else if (getProduction() == Production.INTERFACE_BODY_940)
+            return (ASTSubprogramInterfaceBodyNode)((ASTSubroutineInterfaceRangeNode)getChild(1)).getSubprogramInterfaceBody();
         else
             return null;
+    }
+
+    public boolean hasSubprogramInterfaceBody()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_BODY_939)
+            return ((ASTFunctionInterfaceRangeNode)getChild(1)).hasSubprogramInterfaceBody();
+        else if (getProduction() == Production.INTERFACE_BODY_940)
+            return ((ASTSubroutineInterfaceRangeNode)getChild(1)).hasSubprogramInterfaceBody();
+        else
+            return false;
+    }
+
+    public ASTEndFunctionStmtNode getEndFunctionStmt()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_BODY_939)
+            return (ASTEndFunctionStmtNode)((ASTFunctionInterfaceRangeNode)getChild(1)).getEndFunctionStmt();
+        else
+            return null;
+    }
+
+    public ASTEndSubroutineStmtNode getEndSubroutineStmt()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_BODY_940)
+            return (ASTEndSubroutineStmtNode)((ASTSubroutineInterfaceRangeNode)getChild(1)).getEndSubroutineStmt();
+        else
+            return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.INTERFACE_BODY_939 && index == 1)
+            return true;
+        else if (getProduction() == Production.INTERFACE_BODY_940 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

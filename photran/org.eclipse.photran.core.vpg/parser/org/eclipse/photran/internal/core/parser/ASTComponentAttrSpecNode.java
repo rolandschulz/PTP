@@ -43,73 +43,73 @@ public class ASTComponentAttrSpecNode extends InteriorNode
         visitor.visitASTComponentAttrSpecNode(this);
     }
 
-    public Token getTPointer()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_ATTR_SPEC_194)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTDimension()
+    public boolean pointer()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.COMPONENT_ATTR_SPEC_195)
-            return (Token)getChild(0);
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_ATTR_SPEC_195)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTComponentArraySpecNode getComponentArraySpec()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_ATTR_SPEC_195)
-            return (ASTComponentArraySpecNode)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_ATTR_SPEC_195)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTAllocatable()
+    public boolean dimension()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.COMPONENT_ATTR_SPEC_196)
-            return (Token)getChild(0);
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public IComponentArraySpec getComponentArraySpec()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMPONENT_ATTR_SPEC_196)
+            return (IComponentArraySpec)getChild(2);
         else
             return null;
+    }
+
+    public boolean allocatable()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMPONENT_ATTR_SPEC_197)
+            return getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTAccessSpecNode getAccessSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_ATTR_SPEC_197)
+        if (getProduction() == Production.COMPONENT_ATTR_SPEC_198)
             return (ASTAccessSpecNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasAccessSpec()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMPONENT_ATTR_SPEC_198)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.COMPONENT_ATTR_SPEC_196 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_ATTR_SPEC_196 && index == 3)
+            return false;
+        else
+            return true;
     }
 }

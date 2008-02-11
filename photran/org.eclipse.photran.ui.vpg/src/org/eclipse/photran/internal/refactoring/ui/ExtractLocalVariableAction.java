@@ -33,74 +33,79 @@ public class ExtractLocalVariableAction
     extends AbstractFortranRefactoringActionDelegate
     implements IWorkbenchWindowActionDelegate, IEditorActionDelegate
 {
-    public ExtractLocalVariableAction()
+    public ExtractLocalVariableAction(Class refactoringClass, Class wizardClass)
     {
-        super(ExtractLocalVariableRefactoring.class, FortranExtractLocalVariableRefactoringWizard.class);
+        super(refactoringClass, wizardClass);
+        // TODO Auto-generated constructor stub
     }
-    
-    public static class FortranExtractLocalVariableRefactoringWizard extends AbstractFortranRefactoringWizard
-    {
-        protected ExtractLocalVariableRefactoring extractRefactoring;
-        
-        public FortranExtractLocalVariableRefactoringWizard(ExtractLocalVariableRefactoring r)
-        {
-            super(r);
-            this.extractRefactoring = r;
-        }
-
-        protected void doAddUserInputPages()
-        {
-            addPage(new UserInputWizardPage(extractRefactoring.getName())
-            {
-                protected Text nameField, typeField;
-        
-                public void createControl(Composite parent)
-                {
-                    Composite group = new Composite(parent, SWT.NONE);
-                    initializeDialogUnits(group);
-                    setControl(group);
-                    group.setLayout(new GridLayout(2, false));
-                
-                    GridData twoCol = new GridData();
-                    twoCol.horizontalSpan = 2;
-                    
-                    Label lbl = new Label(group, SWT.NONE);
-                    lbl.setText("Type:");
-
-                    typeField = new Text(group, SWT.BORDER);
-                    typeField.setText("");
-                    typeField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-                    typeField.selectAll();
-                    typeField.addModifyListener(new ModifyListener()
-                    {
-                        public void modifyText(ModifyEvent e)
-                        {
-                            extractRefactoring.setType(typeField.getText());
-                        }
-                    });
-
-                    Label lbl2 = new Label(group, SWT.NONE);
-                    lbl2.setText("Name:");
-                    
-                    nameField = new Text(group, SWT.BORDER);
-                    nameField.setText("");
-                    nameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-                    nameField.selectAll();
-                    nameField.addModifyListener(new ModifyListener()
-                    {
-                        public void modifyText(ModifyEvent e)
-                        {
-                            extractRefactoring.setName(nameField.getText());
-                        }
-                    });
-
-                    // Call once for sure, just in case the user doesn't modify the text
-                    extractRefactoring.setType(typeField.getText());
-                    extractRefactoring.setName(nameField.getText());
-                    
-                    typeField.setFocus();
-                }
-            });
-        }
-    }
+//    public ExtractLocalVariableAction()
+//    {
+//        super(ExtractLocalVariableRefactoring.class, FortranExtractLocalVariableRefactoringWizard.class);
+//    }
+//    
+//    public static class FortranExtractLocalVariableRefactoringWizard extends AbstractFortranRefactoringWizard
+//    {
+//        protected ExtractLocalVariableRefactoring extractRefactoring;
+//        
+//        public FortranExtractLocalVariableRefactoringWizard(ExtractLocalVariableRefactoring r)
+//        {
+//            super(r);
+//            this.extractRefactoring = r;
+//        }
+//
+//        protected void doAddUserInputPages()
+//        {
+//            addPage(new UserInputWizardPage(extractRefactoring.getName())
+//            {
+//                protected Text nameField, typeField;
+//        
+//                public void createControl(Composite parent)
+//                {
+//                    Composite group = new Composite(parent, SWT.NONE);
+//                    initializeDialogUnits(group);
+//                    setControl(group);
+//                    group.setLayout(new GridLayout(2, false));
+//                
+//                    GridData twoCol = new GridData();
+//                    twoCol.horizontalSpan = 2;
+//                    
+//                    Label lbl = new Label(group, SWT.NONE);
+//                    lbl.setText("Type:");
+//
+//                    typeField = new Text(group, SWT.BORDER);
+//                    typeField.setText("");
+//                    typeField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//                    typeField.selectAll();
+//                    typeField.addModifyListener(new ModifyListener()
+//                    {
+//                        public void modifyText(ModifyEvent e)
+//                        {
+//                            extractRefactoring.setType(typeField.getText());
+//                        }
+//                    });
+//
+//                    Label lbl2 = new Label(group, SWT.NONE);
+//                    lbl2.setText("Name:");
+//                    
+//                    nameField = new Text(group, SWT.BORDER);
+//                    nameField.setText("");
+//                    nameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//                    nameField.selectAll();
+//                    nameField.addModifyListener(new ModifyListener()
+//                    {
+//                        public void modifyText(ModifyEvent e)
+//                        {
+//                            extractRefactoring.setName(nameField.getText());
+//                        }
+//                    });
+//
+//                    // Call once for sure, just in case the user doesn't modify the text
+//                    extractRefactoring.setType(typeField.getText());
+//                    extractRefactoring.setName(nameField.getText());
+//                    
+//                    typeField.setFocus();
+//                }
+//            });
+//        }
+//    }
 }

@@ -43,13 +43,31 @@ public class ASTLblRefNode extends InteriorNode
         visitor.visitASTLblRefNode(this);
     }
 
-    public ASTLabelNode getLabel()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LBL_REF_738)
-            return (ASTLabelNode)getChild(0);
+        if (getProduction() == Production.LBL_REF_732)
+            return (Token)((ASTLabelNode)getChild(0)).getLabel();
         else
             return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LBL_REF_732)
+            return ((ASTLabelNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.LBL_REF_732 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

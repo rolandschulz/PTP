@@ -43,19 +43,7 @@ public class ASTUnsignedArithmeticConstantNode extends InteriorNode
         visitor.visitASTUnsignedArithmeticConstantNode(this);
     }
 
-    public Token getTIcon()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_162)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_166)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTRcon()
+    public Token getIntConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -67,7 +55,19 @@ public class ASTUnsignedArithmeticConstantNode extends InteriorNode
             return null;
     }
 
-    public Token getTDcon()
+    public boolean hasIntConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_163)
+            return getChild(0) != null;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getRealConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -79,41 +79,139 @@ public class ASTUnsignedArithmeticConstantNode extends InteriorNode
             return null;
     }
 
-    public ASTComplexConstNode getComplexConst()
+    public boolean hasRealConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_164)
+            return getChild(0) != null;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getDblConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_165)
+            return (Token)getChild(0);
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169)
+            return (Token)getChild(0);
+        else
+            return null;
+    }
+
+    public boolean hasDblConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_165)
+            return getChild(0) != null;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTComplexConstNode getComplexConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_166)
             return (ASTComplexConstNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTUnderscore()
+    public boolean hasComplexConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_166)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
-            return (Token)getChild(1);
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getUnsignedArithConstIntKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
+            return (Token)((ASTKindParamNode)getChild(2)).getIntKind();
         else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168)
-            return (Token)getChild(1);
+            return (Token)((ASTKindParamNode)getChild(2)).getIntKind();
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169)
+            return (Token)((ASTKindParamNode)getChild(2)).getIntKind();
         else
             return null;
     }
 
-    public ASTKindParamNode getKindParam()
+    public boolean hasUnsignedArithConstIntKind()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_166)
-            return (ASTKindParamNode)getChild(2);
-        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
-            return (ASTKindParamNode)getChild(2);
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
+            return ((ASTKindParamNode)getChild(2)).hasIntKind();
         else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168)
-            return (ASTKindParamNode)getChild(2);
+            return ((ASTKindParamNode)getChild(2)).hasIntKind();
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169)
+            return ((ASTKindParamNode)getChild(2)).hasIntKind();
+        else
+            return false;
+    }
+
+    public ASTNamedConstantUseNode getUnsignedArithConstNamedConstKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
+            return (ASTNamedConstantUseNode)((ASTKindParamNode)getChild(2)).getNamedConstKind();
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168)
+            return (ASTNamedConstantUseNode)((ASTKindParamNode)getChild(2)).getNamedConstKind();
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169)
+            return (ASTNamedConstantUseNode)((ASTKindParamNode)getChild(2)).getNamedConstKind();
         else
             return null;
+    }
+
+    public boolean hasUnsignedArithConstNamedConstKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167)
+            return ((ASTKindParamNode)getChild(2)).hasNamedConstKind();
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168)
+            return ((ASTKindParamNode)getChild(2)).hasNamedConstKind();
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169)
+            return ((ASTKindParamNode)getChild(2)).hasNamedConstKind();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167 && index == 1)
+            return false;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168 && index == 1)
+            return false;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_167 && index == 2)
+            return true;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_168 && index == 2)
+            return true;
+        else if (getProduction() == Production.UNSIGNED_ARITHMETIC_CONSTANT_169 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

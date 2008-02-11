@@ -99,9 +99,9 @@ public class ASTSubroutineArgListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSubroutineArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_970)
+        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_966)
             return (ASTSubroutineArgNode)node.getChild(0);
-        else if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_971)
+        else if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_967)
             return (ASTSubroutineArgNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTSubroutineArgListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_ARG_LIST_971)
+        if (getProduction() == Production.SUBROUTINE_ARG_LIST_967)
             return (ASTSubroutineArgListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSubroutineArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SUBROUTINE_ARG_LIST_971)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.SUBROUTINE_ARG_LIST_967 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

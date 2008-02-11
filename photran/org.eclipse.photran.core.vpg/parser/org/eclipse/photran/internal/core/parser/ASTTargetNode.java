@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTTargetNode extends InteriorNode
+class ASTTargetNode extends InteriorNode
 {
     ASTTargetNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,18 +37,13 @@ public class ASTTargetNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTTargetNode(this);
-    }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_599)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.TARGET_597)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
@@ -57,7 +52,7 @@ public class ASTTargetNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_599)
+        if (getProduction() == Production.TARGET_597)
             return getChild(0) != null;
         else
             return false;
@@ -67,29 +62,19 @@ public class ASTTargetNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_600)
+        if (getProduction() == Production.TARGET_598)
             return getChild(0) != null;
         else
             return false;
     }
 
-    public Token getTLparen()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TARGET_600)
-            return (Token)getChild(1);
+        if (getProduction() == Production.TARGET_598 && index == 1)
+            return false;
+        else if (getProduction() == Production.TARGET_598 && index == 2)
+            return false;
         else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TARGET_600)
-            return (Token)getChild(2);
-        else
-            return null;
+            return true;
     }
 }

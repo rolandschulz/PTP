@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTVariableNode extends InteriorNode
+public class ASTVariableNode extends InteriorNode implements IDataStmtObject, IInputItem
 {
     ASTVariableNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,8 @@ public class ASTVariableNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIDataStmtObject(this);
+        visitor.visitIInputItem(this);
         visitor.visitASTVariableNode(this);
     }
 
@@ -47,69 +49,117 @@ public class ASTVariableNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_421)
+        if (getProduction() == Production.VARIABLE_419)
             return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.VARIABLE_422)
+        else if (getProduction() == Production.VARIABLE_420)
             return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.VARIABLE_423)
+        else if (getProduction() == Production.VARIABLE_421)
             return (ASTDataRefNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean hasDataRef()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_422)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.VARIABLE_423)
-            return (Token)getChild(1);
+        if (getProduction() == Production.VARIABLE_419)
+            return getChild(0) != null;
+        else if (getProduction() == Production.VARIABLE_420)
+            return getChild(0) != null;
+        else if (getProduction() == Production.VARIABLE_421)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTSectionSubscriptListNode getSectionSubscriptList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_422)
+        if (getProduction() == Production.VARIABLE_420)
             return (ASTSectionSubscriptListNode)getChild(2);
-        else if (getProduction() == Production.VARIABLE_423)
+        else if (getProduction() == Production.VARIABLE_421)
             return (ASTSectionSubscriptListNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasSectionSubscriptList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_422)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.VARIABLE_423)
-            return (Token)getChild(3);
+        if (getProduction() == Production.VARIABLE_420)
+            return getChild(2) != null;
+        else if (getProduction() == Production.VARIABLE_421)
+            return getChild(2) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTSubstringRangeNode getSubstringRange()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_423)
+        if (getProduction() == Production.VARIABLE_421)
             return (ASTSubstringRangeNode)getChild(4);
+        else if (getProduction() == Production.VARIABLE_422)
+            return (ASTSubstringRangeNode)((ASTSubstrConstNode)getChild(0)).getSubstringRange();
         else
             return null;
     }
 
-    public ASTSubstrConstNode getSubstrConst()
+    public boolean hasSubstringRange()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_424)
-            return (ASTSubstrConstNode)getChild(0);
+        if (getProduction() == Production.VARIABLE_421)
+            return getChild(4) != null;
+        else if (getProduction() == Production.VARIABLE_422)
+            return ((ASTSubstrConstNode)getChild(0)).hasSubstringRange();
+        else
+            return false;
+    }
+
+    public Token getStringConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.VARIABLE_422)
+            return (Token)((ASTSubstrConstNode)getChild(0)).getStringConst();
         else
             return null;
+    }
+
+    public boolean hasStringConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.VARIABLE_422)
+            return ((ASTSubstrConstNode)getChild(0)).hasStringConst();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.VARIABLE_420 && index == 1)
+            return false;
+        else if (getProduction() == Production.VARIABLE_420 && index == 3)
+            return false;
+        else if (getProduction() == Production.VARIABLE_421 && index == 1)
+            return false;
+        else if (getProduction() == Production.VARIABLE_421 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.VARIABLE_422 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

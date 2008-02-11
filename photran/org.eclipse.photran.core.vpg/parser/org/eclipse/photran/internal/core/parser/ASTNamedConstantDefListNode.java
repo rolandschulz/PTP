@@ -99,9 +99,9 @@ public class ASTNamedConstantDefListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTNamedConstantDefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMED_CONSTANT_DEF_LIST_367)
+        if (node.getProduction() == Production.NAMED_CONSTANT_DEF_LIST_364)
             return (ASTNamedConstantDefNode)node.getChild(0);
-        else if (node.getProduction() == Production.NAMED_CONSTANT_DEF_LIST_368)
+        else if (node.getProduction() == Production.NAMED_CONSTANT_DEF_LIST_365)
             return (ASTNamedConstantDefNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTNamedConstantDefListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_LIST_368)
+        if (getProduction() == Production.NAMED_CONSTANT_DEF_LIST_365)
             return (ASTNamedConstantDefListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamedConstantDefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMED_CONSTANT_DEF_LIST_368)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.NAMED_CONSTANT_DEF_LIST_365 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

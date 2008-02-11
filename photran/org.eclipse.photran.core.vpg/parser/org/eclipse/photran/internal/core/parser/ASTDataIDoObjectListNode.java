@@ -94,15 +94,15 @@ public class ASTDataIDoObjectListNode extends InteriorNode
         visitor.visitASTDataIDoObjectListNode(this);
     }
 
-    public ASTDataIDoObjectNode getDataIDoObject(int listIndex)
+    public IDataIDoObject getDataIDoObject(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDataIDoObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_IDO_OBJECT_LIST_381)
-            return (ASTDataIDoObjectNode)node.getChild(0);
-        else if (node.getProduction() == Production.DATA_IDO_OBJECT_LIST_382)
-            return (ASTDataIDoObjectNode)node.getChild(2);
+        if (node.getProduction() == Production.DATA_IDO_OBJECT_LIST_378)
+            return (IDataIDoObject)node.getChild(0);
+        else if (node.getProduction() == Production.DATA_IDO_OBJECT_LIST_379)
+            return (IDataIDoObject)node.getChild(2);
         else
             return null;
     }
@@ -111,20 +111,17 @@ public class ASTDataIDoObjectListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_IDO_OBJECT_LIST_382)
+        if (getProduction() == Production.DATA_IDO_OBJECT_LIST_379)
             return (ASTDataIDoObjectListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDataIDoObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_IDO_OBJECT_LIST_382)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.DATA_IDO_OBJECT_LIST_379 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

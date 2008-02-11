@@ -43,67 +43,83 @@ public class ASTAssumedSizeSpecNode extends InteriorNode
         visitor.visitASTAssumedSizeSpecNode(this);
     }
 
-    public Token getTAsterisk()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_314)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
-            return (Token)getChild(4);
-        else
-            return null;
-    }
-
-    public ASTLowerBoundNode getLowerBound()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
-            return (ASTLowerBoundNode)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
-            return (ASTLowerBoundNode)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTColon()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_313)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
     public ASTExplicitShapeSpecListNode getExplicitShapeSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_314)
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
             return (ASTExplicitShapeSpecListNode)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
             return (ASTExplicitShapeSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma()
+    public boolean hasExplicitShapeSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_314)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_315)
-            return (Token)getChild(1);
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
+            return getChild(0) != null;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getLb()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310)
+            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(0)).getLb();
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
+            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(2)).getLb();
         else
             return null;
+    }
+
+    public boolean hasLb()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310)
+            return ((ASTLowerBoundNode)getChild(0)).hasLb();
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
+            return ((ASTLowerBoundNode)getChild(2)).hasLb();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_309 && index == 0)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_310 && index == 1)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_310 && index == 2)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_311 && index == 1)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_311 && index == 2)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 1)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 3)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 4)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310 && index == 0)
+            return true;
+        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTStructureComponentNode extends InteriorNode
+public class ASTStructureComponentNode extends InteriorNode implements IDataIDoObject
 {
     protected int count = -1;
 
@@ -91,6 +91,7 @@ public class ASTStructureComponentNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIDataIDoObject(this);
         visitor.visitASTStructureComponentNode(this);
     }
 
@@ -99,10 +100,21 @@ public class ASTStructureComponentNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTStructureComponentNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.STRUCTURE_COMPONENT_437)
+        if (node.getProduction() == Production.STRUCTURE_COMPONENT_435)
             return (ASTVariableNameNode)node.getChild(0);
         else
             return null;
+    }
+
+    public boolean hasVariableName(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTStructureComponentNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.STRUCTURE_COMPONENT_435)
+            return node.getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTFieldSelectorNode getFieldSelector(int listIndex)
@@ -110,9 +122,9 @@ public class ASTStructureComponentNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTStructureComponentNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.STRUCTURE_COMPONENT_437)
+        if (node.getProduction() == Production.STRUCTURE_COMPONENT_435)
             return (ASTFieldSelectorNode)node.getChild(1);
-        else if (node.getProduction() == Production.STRUCTURE_COMPONENT_438)
+        else if (node.getProduction() == Production.STRUCTURE_COMPONENT_436)
             return (ASTFieldSelectorNode)node.getChild(1);
         else
             return null;
@@ -122,7 +134,7 @@ public class ASTStructureComponentNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STRUCTURE_COMPONENT_438)
+        if (getProduction() == Production.STRUCTURE_COMPONENT_436)
             return (ASTStructureComponentNode)getChild(0);
         else
             return null;

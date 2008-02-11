@@ -17,6 +17,8 @@ import java.util.List;
 
 public class ASTSFExprListNode extends InteriorNode
 {
+    protected int count = -1;
+
     ASTSFExprListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
          super(production);
@@ -28,14 +30,63 @@ public class ASTSFExprListNode extends InteriorNode
         
     @Override public InteriorNode getASTParent()
     {
-        InteriorNode actualParent = super.getParent();
+        // This is a recursive node in a list, so its logical parent node
+        // is the parent of the first node in the list
+    
+        InteriorNode parent = super.getParent();
+        InteriorNode grandparent = parent == null ? null : parent.getParent();
+        InteriorNode logicalParent = parent;
+        
+        while (parent != null && grandparent != null
+               && parent instanceof ASTSFExprListNode
+               && grandparent instanceof ASTSFExprListNode
+               && ((ASTSFExprListNode)grandparent).getRecursiveNode() == parent)
+        {
+            logicalParent = grandparent;
+            parent = grandparent;
+            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
+        }
+        
+        InteriorNode logicalGrandparent = logicalParent.getParent();
         
         // If a node has been pulled up in an ACST, its physical parent in
         // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
+        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
+            return logicalParent.getASTParent();
         else 
-            return actualParent;
+            return logicalParent;
+    }
+
+    /**
+     * @return the number of ASTSFExprListNode nodes in this list
+     */
+    public int size()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
+        
+        if (count >= 0) return count;
+        
+        count = 0;
+        ASTSFExprListNode node = this;
+        do
+        {
+            count++;
+            node = node.getRecursiveNode();
+        }
+        while (node != null);
+        
+        return count;
+    }
+    
+    ASTSFExprListNode recurseToIndex(int listIndex)
+    {
+        ASTSFExprListNode node = this;
+        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
+        {
+            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
+            node = (ASTSFExprListNode)node.getRecursiveNode();
+        }
+        return node;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -43,169 +94,238 @@ public class ASTSFExprListNode extends InteriorNode
         visitor.visitASTSFExprListNode(this);
     }
 
-    public ASTSFExprNode getSFExpr()
+    public ASTExpressionNode getLb(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_554)
-            return (ASTSFExprNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_555)
-            return (ASTSFExprNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_573)
-            return (ASTSFExprNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_574)
-            return (ASTSFExprNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_575)
-            return (ASTSFExprNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_579)
-            return (ASTSFExprNode)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_580)
-            return (ASTSFExprNode)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_581)
-            return (ASTSFExprNode)getChild(2);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_552)
+            return (ASTExpressionNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_553)
+            return (ASTExpressionNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_571)
+            return (ASTExpressionNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_572)
+            return (ASTExpressionNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_573)
+            return (ASTExpressionNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_577)
+            return (ASTExpressionNode)node.getChild(2);
+        else if (node.getProduction() == Production.SFEXPR_LIST_578)
+            return (ASTExpressionNode)node.getChild(2);
+        else if (node.getProduction() == Production.SFEXPR_LIST_579)
+            return (ASTExpressionNode)node.getChild(2);
         else
             return null;
     }
 
-    public Token getTColon()
+    public boolean hasLb(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_554)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_555)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_556)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_557)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_571)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_572)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_574)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_575)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_577)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_578)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_580)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.SFEXPR_LIST_581)
-            return (Token)getChild(3);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_552)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_553)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_571)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_572)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_573)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_577)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_578)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_579)
+            return node.getChild(2) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getUb(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_552)
+            return (ASTExpressionNode)node.getChild(2);
+        else if (node.getProduction() == Production.SFEXPR_LIST_554)
+            return (ASTExpressionNode)node.getChild(1);
+        else if (node.getProduction() == Production.SFEXPR_LIST_570)
+            return (ASTExpressionNode)node.getChild(1);
+        else if (node.getProduction() == Production.SFEXPR_LIST_573)
+            return (ASTExpressionNode)node.getChild(2);
+        else if (node.getProduction() == Production.SFEXPR_LIST_576)
+            return (ASTExpressionNode)node.getChild(3);
+        else if (node.getProduction() == Production.SFEXPR_LIST_579)
+            return (ASTExpressionNode)node.getChild(4);
         else
             return null;
     }
 
-    public ASTExprNode getExpr()
+    public boolean hasUb(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_554)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_555)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.SFEXPR_LIST_556)
-            return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_557)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_572)
-            return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_575)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_578)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.SFEXPR_LIST_581)
-            return (ASTExprNode)getChild(4);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_552)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_554)
+            return node.getChild(1) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_570)
+            return node.getChild(1) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_573)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_576)
+            return node.getChild(3) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_579)
+            return node.getChild(4) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getStep(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_552)
+            return (ASTExpressionNode)node.getChild(4);
+        else if (node.getProduction() == Production.SFEXPR_LIST_553)
+            return (ASTExpressionNode)node.getChild(3);
+        else if (node.getProduction() == Production.SFEXPR_LIST_554)
+            return (ASTExpressionNode)node.getChild(3);
+        else if (node.getProduction() == Production.SFEXPR_LIST_555)
+            return (ASTExpressionNode)node.getChild(2);
         else
             return null;
     }
 
-    public Token getTColon2()
+    public boolean hasStep(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_554)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.SFEXPR_LIST_555)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_556)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SFEXPR_LIST_557)
-            return (Token)getChild(1);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_552)
+            return node.getChild(4) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_553)
+            return node.getChild(3) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_554)
+            return node.getChild(3) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_555)
+            return node.getChild(2) != null;
         else
-            return null;
+            return false;
     }
 
-    public ASTExprNode getExpr2()
+    private ASTSFExprListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_554)
-            return (ASTExprNode)getChild(4);
-        else if (getProduction() == Production.SFEXPR_LIST_556)
-            return (ASTExprNode)getChild(3);
-        else
-            return null;
-    }
-
-    public ASTSFExprListNode getSFExprList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SFEXPR_LIST_576)
+        if (getProduction() == Production.SFEXPR_LIST_574)
             return (ASTSFExprListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma()
+    public ASTSectionSubscriptNode getSectionSubscript(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_576)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_577)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_578)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_579)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_580)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SFEXPR_LIST_581)
-            return (Token)getChild(1);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_574)
+            return (ASTSectionSubscriptNode)node.getChild(2);
         else
             return null;
     }
 
-    public ASTSectionSubscriptNode getSectionSubscript()
+    public ASTSFDummyArgNameListNode getSFDummyArgNameList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_576)
-            return (ASTSectionSubscriptNode)getChild(2);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_575)
+            return (ASTSFDummyArgNameListNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_576)
+            return (ASTSFDummyArgNameListNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_577)
+            return (ASTSFDummyArgNameListNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_578)
+            return (ASTSFDummyArgNameListNode)node.getChild(0);
+        else if (node.getProduction() == Production.SFEXPR_LIST_579)
+            return (ASTSFDummyArgNameListNode)node.getChild(0);
         else
             return null;
     }
 
-    public ASTSFDummyArgNameListNode getSFDummyArgNameList()
+    public boolean hasSFDummyArgNameList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFEXPR_LIST_577)
-            return (ASTSFDummyArgNameListNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_578)
-            return (ASTSFDummyArgNameListNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_579)
-            return (ASTSFDummyArgNameListNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_580)
-            return (ASTSFDummyArgNameListNode)getChild(0);
-        else if (getProduction() == Production.SFEXPR_LIST_581)
-            return (ASTSFDummyArgNameListNode)getChild(0);
+        ASTSFExprListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.SFEXPR_LIST_575)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_576)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_577)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_578)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.SFEXPR_LIST_579)
+            return node.getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.SFEXPR_LIST_552 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_552 && index == 3)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_553 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_553 && index == 2)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_554 && index == 0)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_554 && index == 2)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_555 && index == 0)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_555 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_569 && index == 0)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_570 && index == 0)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_572 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_573 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_574 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_575 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_575 && index == 2)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_576 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_576 && index == 2)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_577 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_578 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_578 && index == 3)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_579 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFEXPR_LIST_579 && index == 3)
+            return false;
+        else
+            return true;
     }
 }

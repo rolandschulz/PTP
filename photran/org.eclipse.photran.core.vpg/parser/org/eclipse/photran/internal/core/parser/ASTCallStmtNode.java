@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCallStmtNode extends InteriorNode
+public class ASTCallStmtNode extends InteriorNode implements IActionStmt
 {
     ASTCallStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,96 +40,113 @@ public class ASTCallStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
         visitor.visitASTCallStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CALL_STMT_967)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.CALL_STMT_968)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.CALL_STMT_969)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTCall()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CALL_STMT_967)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CALL_STMT_968)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CALL_STMT_969)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTSubroutineNameUseNode getSubroutineNameUse()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CALL_STMT_967)
-            return (ASTSubroutineNameUseNode)getChild(2);
-        else if (getProduction() == Production.CALL_STMT_968)
-            return (ASTSubroutineNameUseNode)getChild(2);
-        else if (getProduction() == Production.CALL_STMT_969)
-            return (ASTSubroutineNameUseNode)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CALL_STMT_967)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.CALL_STMT_968)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.CALL_STMT_969)
-            return (Token)getChild(6);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CALL_STMT_968)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.CALL_STMT_969)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CALL_STMT_968)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.CALL_STMT_969)
-            return (Token)getChild(5);
-        else
-            return null;
     }
 
     public ASTSubroutineArgListNode getSubroutineArgList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CALL_STMT_969)
+        if (getProduction() == Production.CALL_STMT_965)
             return (ASTSubroutineArgListNode)getChild(4);
         else
             return null;
+    }
+
+    public boolean hasSubroutineArgList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CALL_STMT_965)
+            return getChild(4) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CALL_STMT_963)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.CALL_STMT_964)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.CALL_STMT_965)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CALL_STMT_963)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.CALL_STMT_964)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.CALL_STMT_965)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public Token getSubroutineName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CALL_STMT_963)
+            return (Token)((ASTSubroutineNameUseNode)getChild(2)).getSubroutineName();
+        else if (getProduction() == Production.CALL_STMT_964)
+            return (Token)((ASTSubroutineNameUseNode)getChild(2)).getSubroutineName();
+        else if (getProduction() == Production.CALL_STMT_965)
+            return (Token)((ASTSubroutineNameUseNode)getChild(2)).getSubroutineName();
+        else
+            return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.CALL_STMT_963 && index == 1)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_963 && index == 3)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_964 && index == 1)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_964 && index == 3)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_964 && index == 4)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_964 && index == 5)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_965 && index == 1)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_965 && index == 3)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_965 && index == 5)
+            return false;
+        else if (getProduction() == Production.CALL_STMT_965 && index == 6)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.CALL_STMT_963 && index == 0)
+            return true;
+        else if (getProduction() == Production.CALL_STMT_963 && index == 2)
+            return true;
+        else if (getProduction() == Production.CALL_STMT_964 && index == 0)
+            return true;
+        else if (getProduction() == Production.CALL_STMT_964 && index == 2)
+            return true;
+        else if (getProduction() == Production.CALL_STMT_965 && index == 0)
+            return true;
+        else if (getProduction() == Production.CALL_STMT_965 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

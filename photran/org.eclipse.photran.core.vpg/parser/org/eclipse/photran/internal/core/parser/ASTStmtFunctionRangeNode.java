@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTStmtFunctionRangeNode extends InteriorNode
+class ASTStmtFunctionRangeNode extends InteriorNode
 {
     ASTStmtFunctionRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,68 +37,15 @@ public class ASTStmtFunctionRangeNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTStmtFunctionRangeNode(this);
-    }
 
-    public Token getTLparen()
+    public ASTExpressionNode getExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1022)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1023)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1022)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1023)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTEquals()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1022)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1023)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1022)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1023)
-            return (ASTExprNode)getChild(4);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1022)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1023)
-            return (Token)getChild(5);
+        if (getProduction() == Production.STMT_FUNCTION_RANGE_1018)
+            return (ASTExpressionNode)getChild(3);
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019)
+            return (ASTExpressionNode)getChild(4);
         else
             return null;
     }
@@ -107,9 +54,31 @@ public class ASTStmtFunctionRangeNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1023)
+        if (getProduction() == Production.STMT_FUNCTION_RANGE_1019)
             return (ASTSFDummyArgNameListNode)getChild(1);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 0)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 1)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 2)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 4)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 0)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 2)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 3)
+            return false;
+        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 5)
+            return false;
+        else
+            return true;
     }
 }

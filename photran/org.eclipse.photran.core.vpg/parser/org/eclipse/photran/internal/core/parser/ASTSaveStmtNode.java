@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSaveStmtNode extends InteriorNode
+public class ASTSaveStmtNode extends InteriorNode implements ISpecificationStmt
 {
     ASTSaveStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,80 +40,81 @@ public class ASTSaveStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitISpecificationStmt(this);
         visitor.visitASTSaveStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public ASTSavedEntityListNode getVariableList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVE_STMT_333)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SAVE_STMT_334)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SAVE_STMT_335)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTSave()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVE_STMT_333)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SAVE_STMT_334)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SAVE_STMT_335)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVE_STMT_333)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SAVE_STMT_334)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.SAVE_STMT_335)
-            return (Token)getChild(5);
-        else
-            return null;
-    }
-
-    public ASTSavedEntityListNode getSavedEntityList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVE_STMT_334)
+        if (getProduction() == Production.SAVE_STMT_331)
             return (ASTSavedEntityListNode)getChild(2);
-        else if (getProduction() == Production.SAVE_STMT_335)
+        else if (getProduction() == Production.SAVE_STMT_332)
             return (ASTSavedEntityListNode)getChild(4);
         else
             return null;
     }
 
-    public Token getTColon()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVE_STMT_335)
-            return (Token)getChild(2);
+        if (getProduction() == Production.SAVE_STMT_330)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.SAVE_STMT_331)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.SAVE_STMT_332)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTColon2()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVE_STMT_335)
-            return (Token)getChild(3);
+        if (getProduction() == Production.SAVE_STMT_330)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.SAVE_STMT_331)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.SAVE_STMT_332)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.SAVE_STMT_330 && index == 1)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_330 && index == 2)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_331 && index == 1)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_331 && index == 3)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_332 && index == 1)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_332 && index == 2)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_332 && index == 3)
+            return false;
+        else if (getProduction() == Production.SAVE_STMT_332 && index == 5)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SAVE_STMT_330 && index == 0)
+            return true;
+        else if (getProduction() == Production.SAVE_STMT_331 && index == 0)
+            return true;
+        else if (getProduction() == Production.SAVE_STMT_332 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

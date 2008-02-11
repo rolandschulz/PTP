@@ -17,24 +17,17 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 public class ASTVisitor
 {
     public void visitASTAcImpliedDoNode(ASTAcImpliedDoNode node) {}
-    public void visitASTAcValueList1Node(ASTAcValueList1Node node) {}
     public void visitASTAcValueListNode(ASTAcValueListNode node) {}
+    public void visitASTAcValueNode(ASTAcValueNode node) {}
     public void visitASTAccessIdListNode(ASTAccessIdListNode node) {}
-    public void visitASTAccessIdNode(ASTAccessIdNode node) {}
     public void visitASTAccessSpecNode(ASTAccessSpecNode node) {}
     public void visitASTAccessStmtNode(ASTAccessStmtNode node) {}
-    public void visitASTActionStmtNode(ASTActionStmtNode node) {}
-    public void visitASTAddOpNode(ASTAddOpNode node) {}
-    public void visitASTAddOperandNode(ASTAddOperandNode node) {}
     public void visitASTAllocatableStmtNode(ASTAllocatableStmtNode node) {}
     public void visitASTAllocateObjectListNode(ASTAllocateObjectListNode node) {}
     public void visitASTAllocateObjectNode(ASTAllocateObjectNode node) {}
     public void visitASTAllocateStmtNode(ASTAllocateStmtNode node) {}
-    public void visitASTAllocatedShapeNode(ASTAllocatedShapeNode node) {}
     public void visitASTAllocationListNode(ASTAllocationListNode node) {}
     public void visitASTAllocationNode(ASTAllocationNode node) {}
-    public void visitASTAndOpNode(ASTAndOpNode node) {}
-    public void visitASTAndOperandNode(ASTAndOperandNode node) {}
     public void visitASTArithmeticIfStmtNode(ASTArithmeticIfStmtNode node) {}
     public void visitASTArrayAllocationListNode(ASTArrayAllocationListNode node) {}
     public void visitASTArrayAllocationNode(ASTArrayAllocationNode node) {}
@@ -42,52 +35,38 @@ public class ASTVisitor
     public void visitASTArrayDeclaratorListNode(ASTArrayDeclaratorListNode node) {}
     public void visitASTArrayDeclaratorNode(ASTArrayDeclaratorNode node) {}
     public void visitASTArrayElementNode(ASTArrayElementNode node) {}
-    public void visitASTArrayNameNode(ASTArrayNameNode node) {}
     public void visitASTArraySpecNode(ASTArraySpecNode node) {}
     public void visitASTAssignStmtNode(ASTAssignStmtNode node) {}
     public void visitASTAssignedGotoStmtNode(ASTAssignedGotoStmtNode node) {}
     public void visitASTAssignmentStmtNode(ASTAssignmentStmtNode node) {}
     public void visitASTAssumedShapeSpecListNode(ASTAssumedShapeSpecListNode node) {}
-    public void visitASTAssumedShapeSpecNode(ASTAssumedShapeSpecNode node) {}
     public void visitASTAssumedSizeSpecNode(ASTAssumedSizeSpecNode node) {}
     public void visitASTAttrSpecNode(ASTAttrSpecNode node) {}
     public void visitASTAttrSpecSeqNode(ASTAttrSpecSeqNode node) {}
     public void visitASTBackspaceStmtNode(ASTBackspaceStmtNode node) {}
-    public void visitASTBlockDataBodyConstructNode(ASTBlockDataBodyConstructNode node) {}
     public void visitASTBlockDataBodyNode(ASTBlockDataBodyNode node) {}
     public void visitASTBlockDataNameNode(ASTBlockDataNameNode node) {}
     public void visitASTBlockDataStmtNode(ASTBlockDataStmtNode node) {}
     public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node) {}
-    public void visitASTBlockDoConstructNode(ASTBlockDoConstructNode node) {}
-    public void visitASTBodyConstructNode(ASTBodyConstructNode node) {}
     public void visitASTBodyNode(ASTBodyNode node) {}
-    public void visitASTBodyPlusInternalsNode(ASTBodyPlusInternalsNode node) {}
     public void visitASTBozLiteralConstantNode(ASTBozLiteralConstantNode node) {}
-    public void visitASTCExprNode(ASTCExprNode node) {}
-    public void visitASTCOperandNode(ASTCOperandNode node) {}
-    public void visitASTCPrimaryNode(ASTCPrimaryNode node) {}
     public void visitASTCallStmtNode(ASTCallStmtNode node) {}
-    public void visitASTCaseBodyConstructNode(ASTCaseBodyConstructNode node) {}
     public void visitASTCaseConstructNode(ASTCaseConstructNode node) {}
-    public void visitASTCaseSelectorNode(ASTCaseSelectorNode node) {}
     public void visitASTCaseStmtNode(ASTCaseStmtNode node) {}
     public void visitASTCaseValueRangeListNode(ASTCaseValueRangeListNode node) {}
     public void visitASTCaseValueRangeNode(ASTCaseValueRangeNode node) {}
-    public void visitASTCharLenParamValueNode(ASTCharLenParamValueNode node) {}
     public void visitASTCharLengthNode(ASTCharLengthNode node) {}
     public void visitASTCharSelectorNode(ASTCharSelectorNode node) {}
     public void visitASTCloseSpecListNode(ASTCloseSpecListNode node) {}
     public void visitASTCloseSpecNode(ASTCloseSpecNode node) {}
     public void visitASTCloseStmtNode(ASTCloseStmtNode node) {}
-    public void visitASTComblockNode(ASTComblockNode node) {}
-    public void visitASTComlistNode(ASTComlistNode node) {}
-    public void visitASTCommaExpNode(ASTCommaExpNode node) {}
-    public void visitASTCommaLoopControlNode(ASTCommaLoopControlNode node) {}
+    public void visitASTCommonBlockListNode(ASTCommonBlockListNode node) {}
     public void visitASTCommonBlockNameNode(ASTCommonBlockNameNode node) {}
+    public void visitASTCommonBlockNode(ASTCommonBlockNode node) {}
+    public void visitASTCommonBlockObjectListNode(ASTCommonBlockObjectListNode node) {}
     public void visitASTCommonBlockObjectNode(ASTCommonBlockObjectNode node) {}
     public void visitASTCommonStmtNode(ASTCommonStmtNode node) {}
     public void visitASTComplexConstNode(ASTComplexConstNode node) {}
-    public void visitASTComponentArraySpecNode(ASTComponentArraySpecNode node) {}
     public void visitASTComponentAttrSpecListNode(ASTComponentAttrSpecListNode node) {}
     public void visitASTComponentAttrSpecNode(ASTComponentAttrSpecNode node) {}
     public void visitASTComponentDeclListNode(ASTComponentDeclListNode node) {}
@@ -96,7 +75,6 @@ public class ASTVisitor
     public void visitASTComponentInitializationNode(ASTComponentInitializationNode node) {}
     public void visitASTComponentNameNode(ASTComponentNameNode node) {}
     public void visitASTComputedGotoStmtNode(ASTComputedGotoStmtNode node) {}
-    public void visitASTConcatOpNode(ASTConcatOpNode node) {}
     public void visitASTConditionalBodyNode(ASTConditionalBodyNode node) {}
     public void visitASTConnectSpecListNode(ASTConnectSpecListNode node) {}
     public void visitASTConnectSpecNode(ASTConnectSpecNode node) {}
@@ -105,39 +83,28 @@ public class ASTVisitor
     public void visitASTContinueStmtNode(ASTContinueStmtNode node) {}
     public void visitASTCycleStmtNode(ASTCycleStmtNode node) {}
     public void visitASTDataIDoObjectListNode(ASTDataIDoObjectListNode node) {}
-    public void visitASTDataIDoObjectNode(ASTDataIDoObjectNode node) {}
     public void visitASTDataImpliedDoNode(ASTDataImpliedDoNode node) {}
     public void visitASTDataRefNode(ASTDataRefNode node) {}
-    public void visitASTDataStmtConstantNode(ASTDataStmtConstantNode node) {}
     public void visitASTDataStmtNode(ASTDataStmtNode node) {}
     public void visitASTDataStmtObjectListNode(ASTDataStmtObjectListNode node) {}
-    public void visitASTDataStmtObjectNode(ASTDataStmtObjectNode node) {}
     public void visitASTDataStmtSetNode(ASTDataStmtSetNode node) {}
     public void visitASTDataStmtValueListNode(ASTDataStmtValueListNode node) {}
     public void visitASTDataStmtValueNode(ASTDataStmtValueNode node) {}
     public void visitASTDatalistNode(ASTDatalistNode node) {}
     public void visitASTDeallocateStmtNode(ASTDeallocateStmtNode node) {}
     public void visitASTDeferredShapeSpecListNode(ASTDeferredShapeSpecListNode node) {}
-    public void visitASTDeferredShapeSpecNode(ASTDeferredShapeSpecNode node) {}
-    public void visitASTDefinedBinaryOpNode(ASTDefinedBinaryOpNode node) {}
-    public void visitASTDefinedOperatorNode(ASTDefinedOperatorNode node) {}
-    public void visitASTDefinedUnaryOpNode(ASTDefinedUnaryOpNode node) {}
-    public void visitASTDerivedTypeBodyConstructNode(ASTDerivedTypeBodyConstructNode node) {}
     public void visitASTDerivedTypeBodyNode(ASTDerivedTypeBodyNode node) {}
     public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node) {}
     public void visitASTDerivedTypeStmtNode(ASTDerivedTypeStmtNode node) {}
     public void visitASTDimensionStmtNode(ASTDimensionStmtNode node) {}
     public void visitASTDoConstructNode(ASTDoConstructNode node) {}
-    public void visitASTDummyArgNameNode(ASTDummyArgNameNode node) {}
     public void visitASTEditElementNode(ASTEditElementNode node) {}
-    public void visitASTElseConstructNode(ASTElseConstructNode node) {}
     public void visitASTElseIfConstructNode(ASTElseIfConstructNode node) {}
+    public void visitASTElseIfPartsNode(ASTElseIfPartsNode node) {}
     public void visitASTElseIfStmtNode(ASTElseIfStmtNode node) {}
-    public void visitASTElsePartNode(ASTElsePartNode node) {}
     public void visitASTElseStmtNode(ASTElseStmtNode node) {}
-    public void visitASTElsewhereConstructNode(ASTElsewhereConstructNode node) {}
-    public void visitASTElsewherePartNode(ASTElsewherePartNode node) {}
-    public void visitASTElsewhereStmtNode(ASTElsewhereStmtNode node) {}
+    public void visitASTElseWhereConstructNode(ASTElseWhereConstructNode node) {}
+    public void visitASTElseWhereStmtNode(ASTElseWhereStmtNode node) {}
     public void visitASTEndBlockDataStmtNode(ASTEndBlockDataStmtNode node) {}
     public void visitASTEndDoStmtNode(ASTEndDoStmtNode node) {}
     public void visitASTEndForallStmtNode(ASTEndForallStmtNode node) {}
@@ -154,52 +121,38 @@ public class ASTVisitor
     public void visitASTEndfileStmtNode(ASTEndfileStmtNode node) {}
     public void visitASTEntityDeclListNode(ASTEntityDeclListNode node) {}
     public void visitASTEntityDeclNode(ASTEntityDeclNode node) {}
-    public void visitASTEntryNameNode(ASTEntryNameNode node) {}
     public void visitASTEntryStmtNode(ASTEntryStmtNode node) {}
-    public void visitASTEquivOpNode(ASTEquivOpNode node) {}
-    public void visitASTEquivOperandNode(ASTEquivOperandNode node) {}
     public void visitASTEquivalenceObjectListNode(ASTEquivalenceObjectListNode node) {}
-    public void visitASTEquivalenceObjectNode(ASTEquivalenceObjectNode node) {}
     public void visitASTEquivalenceSetListNode(ASTEquivalenceSetListNode node) {}
     public void visitASTEquivalenceSetNode(ASTEquivalenceSetNode node) {}
     public void visitASTEquivalenceStmtNode(ASTEquivalenceStmtNode node) {}
-    public void visitASTExecutableConstructNode(ASTExecutableConstructNode node) {}
     public void visitASTExecutableProgramNode(ASTExecutableProgramNode node) {}
-    public void visitASTExecutionPartConstructNode(ASTExecutionPartConstructNode node) {}
     public void visitASTExitStmtNode(ASTExitStmtNode node) {}
     public void visitASTExplicitShapeSpecListNode(ASTExplicitShapeSpecListNode node) {}
     public void visitASTExplicitShapeSpecNode(ASTExplicitShapeSpecNode node) {}
     public void visitASTExprListNode(ASTExprListNode node) {}
-    public void visitASTExprNode(ASTExprNode node) {}
+    public void visitASTExpressionNode(ASTExpressionNode node) {}
     public void visitASTExternalNameListNode(ASTExternalNameListNode node) {}
-    public void visitASTExternalNameNode(ASTExternalNameNode node) {}
     public void visitASTExternalStmtNode(ASTExternalStmtNode node) {}
     public void visitASTFieldSelectorNode(ASTFieldSelectorNode node) {}
     public void visitASTFmtSpecNode(ASTFmtSpecNode node) {}
-    public void visitASTForallBodyConstructNode(ASTForallBodyConstructNode node) {}
     public void visitASTForallBodyNode(ASTForallBodyNode node) {}
     public void visitASTForallConstructNode(ASTForallConstructNode node) {}
     public void visitASTForallConstructStmtNode(ASTForallConstructStmtNode node) {}
-    public void visitASTForallHeaderNode(ASTForallHeaderNode node) {}
     public void visitASTForallStmtNode(ASTForallStmtNode node) {}
     public void visitASTForallTripletSpecListNode(ASTForallTripletSpecListNode node) {}
+    public void visitASTFormatEditNode(ASTFormatEditNode node) {}
     public void visitASTFormatIdentifierNode(ASTFormatIdentifierNode node) {}
     public void visitASTFormatStmtNode(ASTFormatStmtNode node) {}
-    public void visitASTFormateditNode(ASTFormateditNode node) {}
-    public void visitASTFormatsepNode(ASTFormatsepNode node) {}
     public void visitASTFunctionArgListNode(ASTFunctionArgListNode node) {}
     public void visitASTFunctionArgNode(ASTFunctionArgNode node) {}
-    public void visitASTFunctionInterfaceRangeNode(ASTFunctionInterfaceRangeNode node) {}
     public void visitASTFunctionNameNode(ASTFunctionNameNode node) {}
     public void visitASTFunctionParNode(ASTFunctionParNode node) {}
     public void visitASTFunctionParsNode(ASTFunctionParsNode node) {}
-    public void visitASTFunctionPrefixNode(ASTFunctionPrefixNode node) {}
-    public void visitASTFunctionReferenceNode(ASTFunctionReferenceNode node) {}
     public void visitASTFunctionStmtNode(ASTFunctionStmtNode node) {}
     public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node) {}
     public void visitASTGenericNameNode(ASTGenericNameNode node) {}
     public void visitASTGenericSpecNode(ASTGenericSpecNode node) {}
-    public void visitASTGoToKwNode(ASTGoToKwNode node) {}
     public void visitASTGotoStmtNode(ASTGotoStmtNode node) {}
     public void visitASTIfConstructNode(ASTIfConstructNode node) {}
     public void visitASTIfStmtNode(ASTIfStmtNode node) {}
@@ -211,84 +164,57 @@ public class ASTVisitor
     public void visitASTInitializationNode(ASTInitializationNode node) {}
     public void visitASTInputImpliedDoNode(ASTInputImpliedDoNode node) {}
     public void visitASTInputItemListNode(ASTInputItemListNode node) {}
-    public void visitASTInputItemNode(ASTInputItemNode node) {}
     public void visitASTInquireSpecListNode(ASTInquireSpecListNode node) {}
     public void visitASTInquireSpecNode(ASTInquireSpecNode node) {}
     public void visitASTInquireStmtNode(ASTInquireStmtNode node) {}
     public void visitASTIntentParListNode(ASTIntentParListNode node) {}
-    public void visitASTIntentParNode(ASTIntentParNode node) {}
     public void visitASTIntentSpecNode(ASTIntentSpecNode node) {}
     public void visitASTIntentStmtNode(ASTIntentStmtNode node) {}
     public void visitASTInterfaceBlockBodyNode(ASTInterfaceBlockBodyNode node) {}
     public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node) {}
     public void visitASTInterfaceBodyNode(ASTInterfaceBodyNode node) {}
-    public void visitASTInterfaceRangeNode(ASTInterfaceRangeNode node) {}
-    public void visitASTInterfaceSpecificationNode(ASTInterfaceSpecificationNode node) {}
     public void visitASTInterfaceStmtNode(ASTInterfaceStmtNode node) {}
-    public void visitASTInternalSubprogramNode(ASTInternalSubprogramNode node) {}
+    public void visitASTInternalSubprogramsNode(ASTInternalSubprogramsNode node) {}
     public void visitASTIntrinsicListNode(ASTIntrinsicListNode node) {}
-    public void visitASTIntrinsicProcedureNameNode(ASTIntrinsicProcedureNameNode node) {}
     public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node) {}
-    public void visitASTInvalidEntityDeclNode(ASTInvalidEntityDeclNode node) {}
     public void visitASTIoControlSpecListNode(ASTIoControlSpecListNode node) {}
     public void visitASTIoControlSpecNode(ASTIoControlSpecNode node) {}
-    public void visitASTKindParamNode(ASTKindParamNode node) {}
     public void visitASTKindSelectorNode(ASTKindSelectorNode node) {}
     public void visitASTLabelDoStmtNode(ASTLabelDoStmtNode node) {}
-    public void visitASTLabelNode(ASTLabelNode node) {}
-    public void visitASTLblDefNode(ASTLblDefNode node) {}
     public void visitASTLblRefListNode(ASTLblRefListNode node) {}
     public void visitASTLblRefNode(ASTLblRefNode node) {}
-    public void visitASTLengthSelectorNode(ASTLengthSelectorNode node) {}
-    public void visitASTLevel1ExprNode(ASTLevel1ExprNode node) {}
-    public void visitASTLevel2ExprNode(ASTLevel2ExprNode node) {}
-    public void visitASTLevel3ExprNode(ASTLevel3ExprNode node) {}
-    public void visitASTLevel4ExprNode(ASTLevel4ExprNode node) {}
-    public void visitASTLevel5ExprNode(ASTLevel5ExprNode node) {}
     public void visitASTLogicalConstantNode(ASTLogicalConstantNode node) {}
     public void visitASTLoopControlNode(ASTLoopControlNode node) {}
-    public void visitASTLowerBoundNode(ASTLowerBoundNode node) {}
     public void visitASTMainProgramNode(ASTMainProgramNode node) {}
     public void visitASTMaskExprNode(ASTMaskExprNode node) {}
-    public void visitASTMaskedElsewhereConstructNode(ASTMaskedElsewhereConstructNode node) {}
-    public void visitASTMaskedElsewhereStmtNode(ASTMaskedElsewhereStmtNode node) {}
+    public void visitASTMaskedElseWhereConstructNode(ASTMaskedElseWhereConstructNode node) {}
+    public void visitASTMaskedElseWhereStmtNode(ASTMaskedElseWhereStmtNode node) {}
     public void visitASTModuleBodyNode(ASTModuleBodyNode node) {}
     public void visitASTModuleNameNode(ASTModuleNameNode node) {}
     public void visitASTModuleNode(ASTModuleNode node) {}
     public void visitASTModuleProcedureStmtNode(ASTModuleProcedureStmtNode node) {}
     public void visitASTModuleStmtNode(ASTModuleStmtNode node) {}
-    public void visitASTModuleSubprogramNode(ASTModuleSubprogramNode node) {}
-    public void visitASTModuleSubprogramPartConstructNode(ASTModuleSubprogramPartConstructNode node) {}
-    public void visitASTMultOpNode(ASTMultOpNode node) {}
-    public void visitASTMultOperandNode(ASTMultOperandNode node) {}
     public void visitASTNameNode(ASTNameNode node) {}
     public void visitASTNamedConstantDefListNode(ASTNamedConstantDefListNode node) {}
     public void visitASTNamedConstantDefNode(ASTNamedConstantDefNode node) {}
-    public void visitASTNamedConstantNode(ASTNamedConstantNode node) {}
     public void visitASTNamedConstantUseNode(ASTNamedConstantUseNode node) {}
     public void visitASTNamelistGroupNameNode(ASTNamelistGroupNameNode node) {}
-    public void visitASTNamelistGroupObjectNode(ASTNamelistGroupObjectNode node) {}
     public void visitASTNamelistGroupsNode(ASTNamelistGroupsNode node) {}
     public void visitASTNamelistStmtNode(ASTNamelistStmtNode node) {}
-    public void visitASTNotOpNode(ASTNotOpNode node) {}
     public void visitASTNullifyStmtNode(ASTNullifyStmtNode node) {}
     public void visitASTObjectNameNode(ASTObjectNameNode node) {}
     public void visitASTOnlyListNode(ASTOnlyListNode node) {}
     public void visitASTOnlyNode(ASTOnlyNode node) {}
     public void visitASTOpenStmtNode(ASTOpenStmtNode node) {}
+    public void visitASTOperatorNode(ASTOperatorNode node) {}
     public void visitASTOptionalParListNode(ASTOptionalParListNode node) {}
-    public void visitASTOptionalParNode(ASTOptionalParNode node) {}
     public void visitASTOptionalStmtNode(ASTOptionalStmtNode node) {}
-    public void visitASTOrOpNode(ASTOrOpNode node) {}
-    public void visitASTOrOperandNode(ASTOrOperandNode node) {}
     public void visitASTOutputImpliedDoNode(ASTOutputImpliedDoNode node) {}
     public void visitASTOutputItemList1Node(ASTOutputItemList1Node node) {}
     public void visitASTOutputItemListNode(ASTOutputItemListNode node) {}
     public void visitASTParameterStmtNode(ASTParameterStmtNode node) {}
     public void visitASTPauseStmtNode(ASTPauseStmtNode node) {}
-    public void visitASTPointerAssignmentStmtNode(ASTPointerAssignmentStmtNode node) {}
     public void visitASTPointerFieldNode(ASTPointerFieldNode node) {}
-    public void visitASTPointerNameNode(ASTPointerNameNode node) {}
     public void visitASTPointerObjectListNode(ASTPointerObjectListNode node) {}
     public void visitASTPointerObjectNode(ASTPointerObjectNode node) {}
     public void visitASTPointerStmtNode(ASTPointerStmtNode node) {}
@@ -296,39 +222,26 @@ public class ASTVisitor
     public void visitASTPointerStmtObjectNode(ASTPointerStmtObjectNode node) {}
     public void visitASTPositionSpecListNode(ASTPositionSpecListNode node) {}
     public void visitASTPositionSpecNode(ASTPositionSpecNode node) {}
-    public void visitASTPowerOpNode(ASTPowerOpNode node) {}
     public void visitASTPrefixSpecListNode(ASTPrefixSpecListNode node) {}
     public void visitASTPrefixSpecNode(ASTPrefixSpecNode node) {}
     public void visitASTPrimaryNode(ASTPrimaryNode node) {}
     public void visitASTPrintStmtNode(ASTPrintStmtNode node) {}
     public void visitASTPrivateSequenceStmtNode(ASTPrivateSequenceStmtNode node) {}
     public void visitASTProcedureNameListNode(ASTProcedureNameListNode node) {}
-    public void visitASTProcedureNameNode(ASTProcedureNameNode node) {}
     public void visitASTProgramNameNode(ASTProgramNameNode node) {}
     public void visitASTProgramStmtNode(ASTProgramStmtNode node) {}
     public void visitASTProgramUnitNode(ASTProgramUnitNode node) {}
     public void visitASTRdCtlSpecNode(ASTRdCtlSpecNode node) {}
-    public void visitASTRdFmtIdExprNode(ASTRdFmtIdExprNode node) {}
     public void visitASTRdFmtIdNode(ASTRdFmtIdNode node) {}
     public void visitASTRdIoCtlSpecListNode(ASTRdIoCtlSpecListNode node) {}
-    public void visitASTRdUnitIdNode(ASTRdUnitIdNode node) {}
     public void visitASTReadStmtNode(ASTReadStmtNode node) {}
-    public void visitASTRelOpNode(ASTRelOpNode node) {}
     public void visitASTRenameListNode(ASTRenameListNode node) {}
     public void visitASTRenameNode(ASTRenameNode node) {}
     public void visitASTReturnStmtNode(ASTReturnStmtNode node) {}
     public void visitASTRewindStmtNode(ASTRewindStmtNode node) {}
-    public void visitASTSFDataRefNode(ASTSFDataRefNode node) {}
     public void visitASTSFDummyArgNameListNode(ASTSFDummyArgNameListNode node) {}
-    public void visitASTSFDummyArgNameNode(ASTSFDummyArgNameNode node) {}
     public void visitASTSFExprListNode(ASTSFExprListNode node) {}
-    public void visitASTSFExprNode(ASTSFExprNode node) {}
-    public void visitASTSFFactorNode(ASTSFFactorNode node) {}
-    public void visitASTSFPrimaryNode(ASTSFPrimaryNode node) {}
-    public void visitASTSFTermNode(ASTSFTermNode node) {}
-    public void visitASTSFVarNameNode(ASTSFVarNameNode node) {}
     public void visitASTSaveStmtNode(ASTSaveStmtNode node) {}
-    public void visitASTSavedCommonBlockNode(ASTSavedCommonBlockNode node) {}
     public void visitASTSavedEntityListNode(ASTSavedEntityListNode node) {}
     public void visitASTSavedEntityNode(ASTSavedEntityNode node) {}
     public void visitASTScalarMaskExprNode(ASTScalarMaskExprNode node) {}
@@ -336,12 +249,7 @@ public class ASTVisitor
     public void visitASTSectionSubscriptListNode(ASTSectionSubscriptListNode node) {}
     public void visitASTSectionSubscriptNode(ASTSectionSubscriptNode node) {}
     public void visitASTSelectCaseBodyNode(ASTSelectCaseBodyNode node) {}
-    public void visitASTSelectCaseRangeNode(ASTSelectCaseRangeNode node) {}
     public void visitASTSelectCaseStmtNode(ASTSelectCaseStmtNode node) {}
-    public void visitASTSignNode(ASTSignNode node) {}
-    public void visitASTSpecificationPartConstructNode(ASTSpecificationPartConstructNode node) {}
-    public void visitASTSpecificationStmtNode(ASTSpecificationStmtNode node) {}
-    public void visitASTStmtFunctionRangeNode(ASTStmtFunctionRangeNode node) {}
     public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node) {}
     public void visitASTStopStmtNode(ASTStopStmtNode node) {}
     public void visitASTStructureComponentNode(ASTStructureComponentNode node) {}
@@ -349,45 +257,52 @@ public class ASTVisitor
     public void visitASTSubprogramInterfaceBodyNode(ASTSubprogramInterfaceBodyNode node) {}
     public void visitASTSubroutineArgListNode(ASTSubroutineArgListNode node) {}
     public void visitASTSubroutineArgNode(ASTSubroutineArgNode node) {}
-    public void visitASTSubroutineInterfaceRangeNode(ASTSubroutineInterfaceRangeNode node) {}
     public void visitASTSubroutineNameNode(ASTSubroutineNameNode node) {}
-    public void visitASTSubroutineNameUseNode(ASTSubroutineNameUseNode node) {}
     public void visitASTSubroutineParNode(ASTSubroutineParNode node) {}
     public void visitASTSubroutineParsNode(ASTSubroutineParsNode node) {}
-    public void visitASTSubroutinePrefixNode(ASTSubroutinePrefixNode node) {}
     public void visitASTSubroutineStmtNode(ASTSubroutineStmtNode node) {}
     public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node) {}
-    public void visitASTSubscriptNode(ASTSubscriptNode node) {}
     public void visitASTSubscriptTripletNode(ASTSubscriptTripletNode node) {}
-    public void visitASTSubstrConstNode(ASTSubstrConstNode node) {}
     public void visitASTSubstringRangeNode(ASTSubstringRangeNode node) {}
-    public void visitASTTargetNameNode(ASTTargetNameNode node) {}
-    public void visitASTTargetNode(ASTTargetNode node) {}
     public void visitASTTargetObjectListNode(ASTTargetObjectListNode node) {}
     public void visitASTTargetObjectNode(ASTTargetObjectNode node) {}
     public void visitASTTargetStmtNode(ASTTargetStmtNode node) {}
-    public void visitASTThenPartNode(ASTThenPartNode node) {}
     public void visitASTTypeDeclarationStmtNode(ASTTypeDeclarationStmtNode node) {}
     public void visitASTTypeNameNode(ASTTypeNameNode node) {}
     public void visitASTTypeSpecNode(ASTTypeSpecNode node) {}
-    public void visitASTUFExprNode(ASTUFExprNode node) {}
-    public void visitASTUFFactorNode(ASTUFFactorNode node) {}
-    public void visitASTUFPrimaryNode(ASTUFPrimaryNode node) {}
-    public void visitASTUFTermNode(ASTUFTermNode node) {}
     public void visitASTUnitIdentifierNode(ASTUnitIdentifierNode node) {}
     public void visitASTUnsignedArithmeticConstantNode(ASTUnsignedArithmeticConstantNode node) {}
-    public void visitASTUpperBoundNode(ASTUpperBoundNode node) {}
-    public void visitASTUseNameNode(ASTUseNameNode node) {}
     public void visitASTUseStmtNode(ASTUseStmtNode node) {}
-    public void visitASTVariableCommaNode(ASTVariableCommaNode node) {}
     public void visitASTVariableNameNode(ASTVariableNameNode node) {}
     public void visitASTVariableNode(ASTVariableNode node) {}
     public void visitASTWhereBodyConstructBlockNode(ASTWhereBodyConstructBlockNode node) {}
-    public void visitASTWhereBodyConstructNode(ASTWhereBodyConstructNode node) {}
     public void visitASTWhereConstructNode(ASTWhereConstructNode node) {}
     public void visitASTWhereConstructStmtNode(ASTWhereConstructStmtNode node) {}
-    public void visitASTWhereRangeNode(ASTWhereRangeNode node) {}
     public void visitASTWhereStmtNode(ASTWhereStmtNode node) {}
     public void visitASTWriteStmtNode(ASTWriteStmtNode node) {}
+    public void visitIAccessId(IAccessId node) {}
+    public void visitIActionStmt(IActionStmt node) {}
+    public void visitIBlockDataBodyConstruct(IBlockDataBodyConstruct node) {}
+    public void visitIBodyConstruct(IBodyConstruct node) {}
+    public void visitICaseBodyConstruct(ICaseBodyConstruct node) {}
+    public void visitIComponentArraySpec(IComponentArraySpec node) {}
+    public void visitIDataIDoObject(IDataIDoObject node) {}
+    public void visitIDataStmtObject(IDataStmtObject node) {}
+    public void visitIDeclarationConstruct(IDeclarationConstruct node) {}
+    public void visitIDerivedTypeBodyConstruct(IDerivedTypeBodyConstruct node) {}
+    public void visitIExecutableConstruct(IExecutableConstruct node) {}
+    public void visitIExecutionPartConstruct(IExecutionPartConstruct node) {}
+    public void visitIForallBodyConstruct(IForallBodyConstruct node) {}
+    public void visitIInputItem(IInputItem node) {}
+    public void visitIInterfaceSpecification(IInterfaceSpecification node) {}
+    public void visitIInternalSubprogram(IInternalSubprogram node) {}
+    public void visitIModuleBodyConstruct(IModuleBodyConstruct node) {}
+    public void visitIModuleSubprogram(IModuleSubprogram node) {}
+    public void visitIModuleSubprogramPartConstruct(IModuleSubprogramPartConstruct node) {}
+    public void visitIObsoleteActionStmt(IObsoleteActionStmt node) {}
+    public void visitIObsoleteExecutionPartConstruct(IObsoleteExecutionPartConstruct node) {}
+    public void visitISpecificationPartConstruct(ISpecificationPartConstruct node) {}
+    public void visitISpecificationStmt(ISpecificationStmt node) {}
+    public void visitIWhereBodyConstruct(IWhereBodyConstruct node) {}
     public void visitToken(Token token) {}
 }

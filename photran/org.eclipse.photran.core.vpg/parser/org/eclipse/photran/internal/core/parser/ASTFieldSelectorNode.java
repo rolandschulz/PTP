@@ -43,57 +43,67 @@ public class ASTFieldSelectorNode extends InteriorNode
         visitor.visitASTFieldSelectorNode(this);
     }
 
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_439)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
     public ASTSectionSubscriptListNode getSectionSubscriptList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_439)
+        if (getProduction() == Production.FIELD_SELECTOR_437)
             return (ASTSectionSubscriptListNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasSectionSubscriptList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FIELD_SELECTOR_439)
-            return (Token)getChild(2);
+        if (getProduction() == Production.FIELD_SELECTOR_437)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public boolean hasDerivedTypeComponentRef()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FIELD_SELECTOR_437)
+            return getChild(3) != null;
+        else if (getProduction() == Production.FIELD_SELECTOR_438)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getComponentName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FIELD_SELECTOR_437)
+            return (Token)((ASTNameNode)getChild(4)).getName();
+        else if (getProduction() == Production.FIELD_SELECTOR_438)
+            return (Token)((ASTNameNode)getChild(1)).getName();
         else
             return null;
     }
 
-    public Token getTPercent()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_439)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.FIELD_SELECTOR_440)
-            return (Token)getChild(0);
+        if (getProduction() == Production.FIELD_SELECTOR_437 && index == 0)
+            return false;
+        else if (getProduction() == Production.FIELD_SELECTOR_437 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public ASTNameNode getName()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_439)
-            return (ASTNameNode)getChild(4);
-        else if (getProduction() == Production.FIELD_SELECTOR_440)
-            return (ASTNameNode)getChild(1);
+        if (getProduction() == Production.FIELD_SELECTOR_437 && index == 4)
+            return true;
+        else if (getProduction() == Production.FIELD_SELECTOR_438 && index == 1)
+            return true;
         else
-            return null;
+            return false;
     }
 }

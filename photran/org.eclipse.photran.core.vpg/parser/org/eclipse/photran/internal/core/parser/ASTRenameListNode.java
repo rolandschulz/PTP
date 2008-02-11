@@ -99,9 +99,9 @@ public class ASTRenameListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRenameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RENAME_LIST_911)
+        if (node.getProduction() == Production.RENAME_LIST_905)
             return (ASTRenameNode)node.getChild(0);
-        else if (node.getProduction() == Production.RENAME_LIST_912)
+        else if (node.getProduction() == Production.RENAME_LIST_906)
             return (ASTRenameNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTRenameListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_LIST_912)
+        if (getProduction() == Production.RENAME_LIST_906)
             return (ASTRenameListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTRenameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RENAME_LIST_912)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.RENAME_LIST_906 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

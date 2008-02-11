@@ -43,11 +43,11 @@ public class ASTModuleNameNode extends InteriorNode
         visitor.visitASTModuleNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getModuleName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MODULE_NAME_1038)
+        if (getProduction() == Production.MODULE_NAME_1034)
             return (Token)getChild(0);
         else
             return null;

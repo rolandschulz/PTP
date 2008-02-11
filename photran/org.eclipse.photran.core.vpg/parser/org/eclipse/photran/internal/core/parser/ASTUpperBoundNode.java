@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTUpperBoundNode extends InteriorNode
+class ASTUpperBoundNode extends InteriorNode
 {
     ASTUpperBoundNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,19 +37,24 @@ public class ASTUpperBoundNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTUpperBoundNode(this);
-    }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getUb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UPPER_BOUND_306)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.UPPER_BOUND_303)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasUb()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UPPER_BOUND_303)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

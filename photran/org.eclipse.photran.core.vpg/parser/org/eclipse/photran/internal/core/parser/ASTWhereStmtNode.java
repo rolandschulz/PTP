@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTWhereStmtNode extends InteriorNode
+public class ASTWhereStmtNode extends InteriorNode implements IActionStmt, IForallBodyConstruct, IWhereBodyConstruct
 {
     ASTWhereStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,55 +40,18 @@ public class ASTWhereStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
+        visitor.visitIForallBodyConstruct(this);
+        visitor.visitIWhereBodyConstruct(this);
         visitor.visitASTWhereStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_601)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTWhere()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_601)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_601)
-            return (Token)getChild(2);
-        else
-            return null;
     }
 
     public ASTMaskExprNode getMaskExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_STMT_601)
+        if (getProduction() == Production.WHERE_STMT_599)
             return (ASTMaskExprNode)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_601)
-            return (Token)getChild(4);
         else
             return null;
     }
@@ -97,9 +60,49 @@ public class ASTWhereStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_STMT_601)
+        if (getProduction() == Production.WHERE_STMT_599)
             return (ASTAssignmentStmtNode)getChild(5);
         else
             return null;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_STMT_599)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_STMT_599)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.WHERE_STMT_599 && index == 1)
+            return false;
+        else if (getProduction() == Production.WHERE_STMT_599 && index == 2)
+            return false;
+        else if (getProduction() == Production.WHERE_STMT_599 && index == 4)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.WHERE_STMT_599 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

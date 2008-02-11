@@ -43,83 +43,127 @@ public class ASTForallConstructStmtNode extends InteriorNodeWithErrorRecoverySym
         visitor.visitASTForallConstructStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_637)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_638)
-            return (ASTLblDefNode)getChild(0);
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_3)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTForall()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_637)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_638)
-            return (Token)getChild(3);
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_3)
-            return (Token)getChild(1);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4)
-            return (Token)getChild(3);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public ASTForallTripletSpecListNode getForallTripletSpecList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635)
+            return (ASTForallTripletSpecListNode)((ASTForallHeaderNode)getChild(2)).getForallTripletSpecList();
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636)
+            return (ASTForallTripletSpecListNode)((ASTForallHeaderNode)getChild(4)).getForallTripletSpecList();
         else
             return null;
     }
 
-    public ASTForallHeaderNode getForallHeader()
+    public ASTScalarMaskExprNode getScalarMaskExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_637)
-            return (ASTForallHeaderNode)getChild(2);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_638)
-            return (ASTForallHeaderNode)getChild(4);
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635)
+            return (ASTScalarMaskExprNode)((ASTForallHeaderNode)getChild(2)).getScalarMaskExpr();
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636)
+            return (ASTScalarMaskExprNode)((ASTForallHeaderNode)getChild(4)).getScalarMaskExpr();
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasScalarMaskExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_637)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_638)
-            return (Token)getChild(5);
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635)
+            return ((ASTForallHeaderNode)getChild(2)).hasScalarMaskExpr();
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636)
+            return ((ASTForallHeaderNode)getChild(4)).hasScalarMaskExpr();
         else
-            return null;
+            return false;
     }
 
-    public ASTNameNode getName()
+    public Token getName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_638)
-            return (ASTNameNode)getChild(1);
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636)
+            return (Token)((ASTNameNode)getChild(1)).getName();
         else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4)
-            return (ASTNameNode)getChild(1);
+            return (Token)((ASTNameNode)getChild(1)).getName();
         else
             return null;
     }
 
-    public Token getTColon()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_638)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4)
-            return (Token)getChild(2);
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635 && index == 3)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636 && index == 2)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636 && index == 3)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636 && index == 5)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_3 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4 && index == 2)
+            return false;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4 && index == 3)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_635 && index == 2)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636 && index == 1)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_636 && index == 4)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_3 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORALL_CONSTRUCT_STMT_ERROR_4 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

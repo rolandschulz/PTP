@@ -43,45 +43,55 @@ public class ASTArrayAllocationNode extends InteriorNode
         visitor.visitASTArrayAllocationNode(this);
     }
 
-    public ASTArrayNameNode getArrayName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_ALLOCATION_350)
-            return (ASTArrayNameNode)getChild(0);
-        else if (getProduction() == Production.ARRAY_ALLOCATION_351)
-            return (ASTArrayNameNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_ALLOCATION_351)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
     public ASTDeferredShapeSpecListNode getDeferredShapeSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_351)
+        if (getProduction() == Production.ARRAY_ALLOCATION_348)
             return (ASTDeferredShapeSpecListNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasDeferredShapeSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_351)
-            return (Token)getChild(3);
+        if (getProduction() == Production.ARRAY_ALLOCATION_348)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getArrayName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ARRAY_ALLOCATION_347)
+            return (Token)((ASTArrayNameNode)getChild(0)).getArrayName();
+        else if (getProduction() == Production.ARRAY_ALLOCATION_348)
+            return (Token)((ASTArrayNameNode)getChild(0)).getArrayName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ARRAY_ALLOCATION_348 && index == 1)
+            return false;
+        else if (getProduction() == Production.ARRAY_ALLOCATION_348 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ARRAY_ALLOCATION_347 && index == 0)
+            return true;
+        else if (getProduction() == Production.ARRAY_ALLOCATION_348 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

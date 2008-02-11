@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTVariableCommaNode extends InteriorNode
+class ASTVariableCommaNode extends InteriorNode
 {
     ASTVariableCommaNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,30 @@ public class ASTVariableCommaNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTVariableCommaNode(this);
-    }
 
-    public ASTVariableNameNode getVariableName()
+    public Token getVariableName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_COMMA_1060)
-            return (ASTVariableNameNode)getChild(0);
+        if (getProduction() == Production.VARIABLE_COMMA_1056)
+            return (Token)((ASTVariableNameNode)getChild(0)).getVariableName();
         else
             return null;
     }
 
-    public Token getTComma()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.VARIABLE_COMMA_1060)
-            return (Token)getChild(1);
+        if (getProduction() == Production.VARIABLE_COMMA_1056 && index == 1)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.VARIABLE_COMMA_1056 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

@@ -43,33 +43,39 @@ public class ASTRenameNode extends InteriorNode
         visitor.visitASTRenameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getNewName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_915)
+        if (getProduction() == Production.RENAME_909)
             return (Token)getChild(0);
         else
             return null;
     }
 
-    public Token getTEqgreaterthan()
+    public Token getOldName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RENAME_915)
-            return (Token)getChild(1);
+        if (getProduction() == Production.RENAME_909)
+            return (Token)((ASTUseNameNode)getChild(2)).getName();
         else
             return null;
     }
 
-    public ASTUseNameNode getUseName()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RENAME_915)
-            return (ASTUseNameNode)getChild(2);
+        if (getProduction() == Production.RENAME_909 && index == 1)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.RENAME_909 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

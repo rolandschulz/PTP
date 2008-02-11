@@ -94,37 +94,44 @@ public class ASTOptionalParListNode extends InteriorNode
         visitor.visitASTOptionalParListNode(this);
     }
 
-    public ASTOptionalParNode getOptionalPar(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTOptionalParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_323)
-            return (ASTOptionalParNode)node.getChild(0);
-        else if (node.getProduction() == Production.OPTIONAL_PAR_LIST_324)
-            return (ASTOptionalParNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTOptionalParListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.OPTIONAL_PAR_LIST_324)
+        if (getProduction() == Production.OPTIONAL_PAR_LIST_321)
             return (ASTOptionalParListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getVariableName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOptionalParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_324)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.OPTIONAL_PAR_LIST_320)
+            return (Token)((ASTOptionalParNode)node.getChild(0)).getVariableName();
+        else if (node.getProduction() == Production.OPTIONAL_PAR_LIST_321)
+            return (Token)((ASTOptionalParNode)node.getChild(2)).getVariableName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.OPTIONAL_PAR_LIST_321 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.OPTIONAL_PAR_LIST_320 && index == 0)
+            return true;
+        else if (getProduction() == Production.OPTIONAL_PAR_LIST_321 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

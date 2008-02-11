@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCycleStmtNode extends InteriorNode
+public class ASTCycleStmtNode extends InteriorNode implements IActionStmt
 {
     ASTCycleStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,52 +40,67 @@ public class ASTCycleStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
         visitor.visitASTCycleStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CYCLE_STMT_726)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.CYCLE_STMT_727)
-            return (ASTLblDefNode)getChild(0);
+        if (getProduction() == Production.CYCLE_STMT_720)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.CYCLE_STMT_721)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTCycle()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CYCLE_STMT_726)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CYCLE_STMT_727)
-            return (Token)getChild(1);
+        if (getProduction() == Production.CYCLE_STMT_720)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.CYCLE_STMT_721)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public Token getName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CYCLE_STMT_721)
+            return (Token)((ASTNameNode)getChild(2)).getName();
         else
             return null;
     }
 
-    public Token getTEos()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CYCLE_STMT_726)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.CYCLE_STMT_727)
-            return (Token)getChild(3);
+        if (getProduction() == Production.CYCLE_STMT_720 && index == 1)
+            return false;
+        else if (getProduction() == Production.CYCLE_STMT_720 && index == 2)
+            return false;
+        else if (getProduction() == Production.CYCLE_STMT_721 && index == 1)
+            return false;
+        else if (getProduction() == Production.CYCLE_STMT_721 && index == 3)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public ASTNameNode getName()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CYCLE_STMT_727)
-            return (ASTNameNode)getChild(2);
+        if (getProduction() == Production.CYCLE_STMT_720 && index == 0)
+            return true;
+        else if (getProduction() == Production.CYCLE_STMT_721 && index == 0)
+            return true;
+        else if (getProduction() == Production.CYCLE_STMT_721 && index == 2)
+            return true;
         else
-            return null;
+            return false;
     }
 }

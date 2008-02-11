@@ -94,37 +94,44 @@ public class ASTSFDummyArgNameListNode extends InteriorNode
         visitor.visitASTSFDummyArgNameListNode(this);
     }
 
-    public ASTSFDummyArgNameNode getSFDummyArgName(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFDummyArgNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1024)
-            return (ASTSFDummyArgNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1025)
-            return (ASTSFDummyArgNameNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTSFDummyArgNameListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1025)
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1021)
             return (ASTSFDummyArgNameListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getVariableName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSFDummyArgNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1025)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1020)
+            return (Token)((ASTSFDummyArgNameNode)node.getChild(0)).getVariableName();
+        else if (node.getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1021)
+            return (Token)((ASTSFDummyArgNameNode)node.getChild(2)).getVariableName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1021 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1020 && index == 0)
+            return true;
+        else if (getProduction() == Production.SFDUMMY_ARG_NAME_LIST_1021 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

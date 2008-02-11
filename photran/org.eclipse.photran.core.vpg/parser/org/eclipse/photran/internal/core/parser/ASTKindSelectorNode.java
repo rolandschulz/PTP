@@ -43,49 +43,31 @@ public class ASTKindSelectorNode extends InteriorNode
         visitor.visitASTKindSelectorNode(this);
     }
 
-    public Token getTLparen()
+    public ASTExpressionNode getKindExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.KIND_SELECTOR_275)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.KIND_SELECTOR_276)
-            return (Token)getChild(0);
+        if (getProduction() == Production.KIND_SELECTOR_273)
+            return (ASTExpressionNode)getChild(2);
+        else if (getProduction() == Production.KIND_SELECTOR_274)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTKindeq()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.KIND_SELECTOR_275)
-            return (Token)getChild(1);
+        if (getProduction() == Production.KIND_SELECTOR_273 && index == 0)
+            return false;
+        else if (getProduction() == Production.KIND_SELECTOR_273 && index == 1)
+            return false;
+        else if (getProduction() == Production.KIND_SELECTOR_273 && index == 3)
+            return false;
+        else if (getProduction() == Production.KIND_SELECTOR_274 && index == 0)
+            return false;
+        else if (getProduction() == Production.KIND_SELECTOR_274 && index == 2)
+            return false;
         else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.KIND_SELECTOR_275)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.KIND_SELECTOR_276)
-            return (ASTExprNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.KIND_SELECTOR_275)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.KIND_SELECTOR_276)
-            return (Token)getChild(2);
-        else
-            return null;
+            return true;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTKindParamNode extends InteriorNode
+class ASTKindParamNode extends InteriorNode
 {
     ASTKindParamNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,44 @@ public class ASTKindParamNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTKindParamNode(this);
-    }
 
-    public Token getTIcon()
+    public Token getIntKind()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.KIND_PARAM_169)
+        if (getProduction() == Production.KIND_PARAM_170)
             return (Token)getChild(0);
         else
             return null;
     }
 
-    public ASTNamedConstantUseNode getNamedConstantUse()
+    public boolean hasIntKind()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.KIND_PARAM_170)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTNamedConstantUseNode getNamedConstKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.KIND_PARAM_171)
             return (ASTNamedConstantUseNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasNamedConstKind()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.KIND_PARAM_171)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

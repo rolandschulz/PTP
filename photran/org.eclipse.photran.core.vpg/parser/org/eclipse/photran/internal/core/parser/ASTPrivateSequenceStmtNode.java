@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTPrivateSequenceStmtNode extends InteriorNode
+public class ASTPrivateSequenceStmtNode extends InteriorNode implements IDerivedTypeBodyConstruct
 {
     ASTPrivateSequenceStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,44 +40,11 @@ public class ASTPrivateSequenceStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIDerivedTypeBodyConstruct(this);
         visitor.visitASTPrivateSequenceStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_187)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTPrivate()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_187)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_187)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTSequence()
+    public Token getPrivateToken()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -85,5 +52,69 @@ public class ASTPrivateSequenceStmtNode extends InteriorNode
             return (Token)getChild(1);
         else
             return null;
+    }
+
+    public boolean isPrivate()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getSequenceToken()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
+            return (Token)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean isSequence()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188 && index == 0)
+            return true;
+        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

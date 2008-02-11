@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInterfaceBlockNode extends ScopingNode
+public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationConstruct
 {
     ASTInterfaceBlockNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,7 @@ public class ASTInterfaceBlockNode extends ScopingNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIDeclarationConstruct(this);
         visitor.visitASTInterfaceBlockNode(this);
     }
 
@@ -47,19 +48,37 @@ public class ASTInterfaceBlockNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BLOCK_930)
+        if (getProduction() == Production.INTERFACE_BLOCK_926)
             return (ASTInterfaceStmtNode)getChild(0);
         else
             return null;
     }
 
-    public ASTInterfaceRangeNode getInterfaceRange()
+    public ASTInterfaceBlockBodyNode getInterfaceBlockBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BLOCK_930)
-            return (ASTInterfaceRangeNode)getChild(1);
+        if (getProduction() == Production.INTERFACE_BLOCK_926)
+            return (ASTInterfaceBlockBodyNode)((ASTInterfaceRangeNode)getChild(1)).getInterfaceBlockBody();
         else
             return null;
+    }
+
+    public ASTEndInterfaceStmtNode getEndInterfaceStmt()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_BLOCK_926)
+            return (ASTEndInterfaceStmtNode)((ASTInterfaceRangeNode)getChild(1)).getEndInterfaceStmt();
+        else
+            return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.INTERFACE_BLOCK_926 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

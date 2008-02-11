@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFormatsepNode extends InteriorNode
+class ASTFormatsepNode extends InteriorNode
 {
     ASTFormatsepNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,24 @@ public class ASTFormatsepNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTFormatsepNode(this);
-    }
 
-    public Token getTSlash()
+    public boolean slashFormatSep()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATSEP_893)
-            return (Token)getChild(0);
+        if (getProduction() == Production.FORMATSEP_887)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTColon()
+    public boolean colonFormatSep()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMATSEP_894)
-            return (Token)getChild(0);
+        if (getProduction() == Production.FORMATSEP_888)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 }

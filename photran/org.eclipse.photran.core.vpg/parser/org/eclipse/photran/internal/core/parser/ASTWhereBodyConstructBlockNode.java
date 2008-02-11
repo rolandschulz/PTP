@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Iterable<ASTWhereBodyConstructNode>
+public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Iterable<IWhereBodyConstruct>
 {
     protected int count = -1;
 
@@ -95,7 +95,7 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Ite
         visitor.visitASTWhereBodyConstructBlockNode(this);
     }
 
-    public Iterator<ASTWhereBodyConstructNode> iterator()
+    public Iterator<IWhereBodyConstruct> iterator()
     {
         final int listSize = size();
         
@@ -105,7 +105,7 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Ite
 
         final ASTWhereBodyConstructBlockNode baseNode = node;
         
-        return new Iterator<ASTWhereBodyConstructNode>()
+        return new Iterator<IWhereBodyConstruct>()
         {
             private ASTWhereBodyConstructBlockNode node = baseNode;
             private int index = 0;
@@ -115,10 +115,10 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Ite
                 return index < listSize;
             }
 
-            public ASTWhereBodyConstructNode next()
+            public IWhereBodyConstruct next()
             {
                 int child = (index == 0 ? 0 : 1);
-                ASTWhereBodyConstructNode result = (ASTWhereBodyConstructNode)node.getChild(child);
+                IWhereBodyConstruct result = (IWhereBodyConstruct)node.getChild(child);
                 node = (index == listSize-1 ? null : (ASTWhereBodyConstructBlockNode)node.parent);
                 index++;
                 return result;
@@ -131,15 +131,15 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Ite
         };
     }
 
-    public ASTWhereBodyConstructNode getWhereBodyConstruct(int listIndex)
+    public IWhereBodyConstruct getWhereBodyConstruct(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTWhereBodyConstructBlockNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_613)
-            return (ASTWhereBodyConstructNode)node.getChild(0);
-        else if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_614)
-            return (ASTWhereBodyConstructNode)node.getChild(1);
+        if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_611)
+            return (IWhereBodyConstruct)node.getChild(0);
+        else if (node.getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_612)
+            return (IWhereBodyConstruct)node.getChild(1);
         else
             return null;
     }
@@ -148,7 +148,7 @@ public class ASTWhereBodyConstructBlockNode extends InteriorNode implements  Ite
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_614)
+        if (getProduction() == Production.WHERE_BODY_CONSTRUCT_BLOCK_612)
             return (ASTWhereBodyConstructBlockNode)getChild(0);
         else
             return null;

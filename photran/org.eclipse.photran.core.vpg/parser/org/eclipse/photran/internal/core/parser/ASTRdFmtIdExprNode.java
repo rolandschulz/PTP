@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTRdFmtIdExprNode extends InteriorNode
+class ASTRdFmtIdExprNode extends InteriorNode
 {
     ASTRdFmtIdExprNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,39 +37,24 @@ public class ASTRdFmtIdExprNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTRdFmtIdExprNode(this);
-    }
 
-    public Token getTLparen()
+    public ASTExpressionNode getFormatIdExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_FMT_ID_EXPR_788)
-            return (Token)getChild(0);
+        if (getProduction() == Production.RD_FMT_ID_EXPR_782)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public ASTUFExprNode getUFExpr()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_FMT_ID_EXPR_788)
-            return (ASTUFExprNode)getChild(1);
+        if (getProduction() == Production.RD_FMT_ID_EXPR_782 && index == 0)
+            return false;
+        else if (getProduction() == Production.RD_FMT_ID_EXPR_782 && index == 2)
+            return false;
         else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_FMT_ID_EXPR_788)
-            return (Token)getChild(2);
-        else
-            return null;
+            return true;
     }
 }

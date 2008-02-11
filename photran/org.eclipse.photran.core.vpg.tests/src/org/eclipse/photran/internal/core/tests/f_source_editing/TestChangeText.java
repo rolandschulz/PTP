@@ -17,7 +17,7 @@ public class TestChangeText extends AbstractSourceEditorTestCase
         ASTMainProgramNode mainProgram = programUnit1.getMainProgram();
         ASTProgramStmtNode programStmt = mainProgram.getProgramStmt();
         ASTProgramNameNode programName = programStmt.getProgramName();
-        Token proggie = programName.getTIdent();
+        Token proggie = programName.getProgramName();
         
         proggie.setText("p");
         assertEquals(load("hello-2-proggie-shorter.f90"), ast);

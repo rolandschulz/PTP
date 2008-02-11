@@ -43,33 +43,53 @@ public class ASTFormatIdentifierNode extends InteriorNode
         visitor.visitASTFormatIdentifierNode(this);
     }
 
-    public ASTLblRefNode getLblRef()
+    public ASTLblRefNode getFormatLbl()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_808)
+        if (getProduction() == Production.FORMAT_IDENTIFIER_802)
             return (ASTLblRefNode)getChild(0);
         else
             return null;
     }
 
-    public ASTCExprNode getCExpr()
+    public boolean hasFormatLbl()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_809)
-            return (ASTCExprNode)getChild(0);
+        if (getProduction() == Production.FORMAT_IDENTIFIER_802)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getFormatExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORMAT_IDENTIFIER_803)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTAsterisk()
+    public boolean hasFormatExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_810)
-            return (Token)getChild(0);
+        if (getProduction() == Production.FORMAT_IDENTIFIER_803)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    public boolean formatIsAsterisk()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORMAT_IDENTIFIER_804)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

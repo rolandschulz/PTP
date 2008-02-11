@@ -44,6 +44,8 @@ class ASTFunctionRangeNode extends InteriorNode
 
         if (getProduction() == Production.FUNCTION_RANGE_18)
             return (ASTBodyNode)getChild(0);
+        else if (getProduction() == Production.FUNCTION_RANGE_20)
+            return (ASTBodyNode)((ASTBodyPlusInternalsNode)getChild(0)).getBody();
         else
             return null;
     }
@@ -62,13 +64,31 @@ class ASTFunctionRangeNode extends InteriorNode
             return null;
     }
 
-    public ASTBodyPlusInternalsNode getBodyPlusInternals()
+    public ASTContainsStmtNode getContainsStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.FUNCTION_RANGE_20)
-            return (ASTBodyPlusInternalsNode)getChild(0);
+            return (ASTContainsStmtNode)((ASTBodyPlusInternalsNode)getChild(0)).getContainsStmt();
         else
             return null;
+    }
+
+    public ASTInternalSubprogramsNode getInternalSubprograms()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FUNCTION_RANGE_20)
+            return (ASTInternalSubprogramsNode)((ASTBodyPlusInternalsNode)getChild(0)).getInternalSubprograms();
+        else
+            return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.FUNCTION_RANGE_20 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

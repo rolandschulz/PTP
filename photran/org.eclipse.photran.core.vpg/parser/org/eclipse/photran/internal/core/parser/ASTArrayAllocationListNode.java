@@ -99,9 +99,9 @@ public class ASTArrayAllocationListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTArrayAllocationListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ARRAY_ALLOCATION_LIST_348)
+        if (node.getProduction() == Production.ARRAY_ALLOCATION_LIST_345)
             return (ASTArrayAllocationNode)node.getChild(0);
-        else if (node.getProduction() == Production.ARRAY_ALLOCATION_LIST_349)
+        else if (node.getProduction() == Production.ARRAY_ALLOCATION_LIST_346)
             return (ASTArrayAllocationNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTArrayAllocationListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_ALLOCATION_LIST_349)
+        if (getProduction() == Production.ARRAY_ALLOCATION_LIST_346)
             return (ASTArrayAllocationListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTArrayAllocationListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ARRAY_ALLOCATION_LIST_349)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.ARRAY_ALLOCATION_LIST_346 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInquireStmtNode extends InteriorNode
+public class ASTInquireStmtNode extends InteriorNode implements IActionStmt
 {
     ASTInquireStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,106 +40,125 @@ public class ASTInquireStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
         visitor.visitASTInquireStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INQUIRE_STMT_842)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.INQUIRE_STMT_843)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTInquire()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INQUIRE_STMT_842)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.INQUIRE_STMT_843)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INQUIRE_STMT_842)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.INQUIRE_STMT_843)
-            return (Token)getChild(2);
-        else
-            return null;
     }
 
     public ASTInquireSpecListNode getInquireSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_STMT_842)
+        if (getProduction() == Production.INQUIRE_STMT_836)
             return (ASTInquireSpecListNode)getChild(3);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasInquireSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_STMT_842)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.INQUIRE_STMT_843)
-            return (Token)getChild(5);
+        if (getProduction() == Production.INQUIRE_STMT_836)
+            return getChild(3) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTEos()
+    public ASTScalarVariableNode getIoLengthVar()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_STMT_842)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.INQUIRE_STMT_843)
-            return (Token)getChild(7);
-        else
-            return null;
-    }
-
-    public Token getTIolengtheq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INQUIRE_STMT_843)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public ASTScalarVariableNode getScalarVariable()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INQUIRE_STMT_843)
+        if (getProduction() == Production.INQUIRE_STMT_837)
             return (ASTScalarVariableNode)getChild(4);
         else
             return null;
+    }
+
+    public boolean hasIoLengthVar()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INQUIRE_STMT_837)
+            return getChild(4) != null;
+        else
+            return false;
     }
 
     public ASTOutputItemListNode getOutputItemList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_STMT_843)
+        if (getProduction() == Production.INQUIRE_STMT_837)
             return (ASTOutputItemListNode)getChild(6);
         else
             return null;
+    }
+
+    public boolean hasOutputItemList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INQUIRE_STMT_837)
+            return getChild(6) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INQUIRE_STMT_836)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.INQUIRE_STMT_837)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INQUIRE_STMT_836)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.INQUIRE_STMT_837)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.INQUIRE_STMT_836 && index == 1)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_836 && index == 2)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_836 && index == 4)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_836 && index == 5)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_837 && index == 1)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_837 && index == 2)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_837 && index == 3)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_837 && index == 5)
+            return false;
+        else if (getProduction() == Production.INQUIRE_STMT_837 && index == 7)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.INQUIRE_STMT_836 && index == 0)
+            return true;
+        else if (getProduction() == Production.INQUIRE_STMT_837 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

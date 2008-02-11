@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTWhereConstructNode extends InteriorNode
+public class ASTWhereConstructNode extends InteriorNode implements IExecutableConstruct, IForallBodyConstruct, IWhereBodyConstruct
 {
     ASTWhereConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,9 @@ public class ASTWhereConstructNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIExecutableConstruct(this);
+        visitor.visitIForallBodyConstruct(this);
+        visitor.visitIWhereBodyConstruct(this);
         visitor.visitASTWhereConstructNode(this);
     }
 
@@ -47,19 +50,97 @@ public class ASTWhereConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_602)
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
             return (ASTWhereConstructStmtNode)getChild(0);
         else
             return null;
     }
 
-    public ASTWhereRangeNode getWhereRange()
+    public ASTEndWhereStmtNode getEndWhereStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_602)
-            return (ASTWhereRangeNode)getChild(1);
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return (ASTEndWhereStmtNode)((ASTWhereRangeNode)getChild(1)).getEndWhereStmt();
         else
             return null;
+    }
+
+    public boolean hasEndWhereStmt()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return ((ASTWhereRangeNode)getChild(1)).hasEndWhereStmt();
+        else
+            return false;
+    }
+
+    public ASTWhereBodyConstructBlockNode getWhereBodyConstructBlock()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return (ASTWhereBodyConstructBlockNode)((ASTWhereRangeNode)getChild(1)).getWhereBodyConstructBlock();
+        else
+            return null;
+    }
+
+    public boolean hasWhereBodyConstructBlock()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return ((ASTWhereRangeNode)getChild(1)).hasWhereBodyConstructBlock();
+        else
+            return false;
+    }
+
+    public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return (ASTMaskedElseWhereConstructNode)((ASTWhereRangeNode)getChild(1)).getMaskedElseWhereConstruct();
+        else
+            return null;
+    }
+
+    public boolean hasMaskedElseWhereConstruct()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return ((ASTWhereRangeNode)getChild(1)).hasMaskedElseWhereConstruct();
+        else
+            return false;
+    }
+
+    public ASTElseWhereConstructNode getElseWhereConstruct()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return (ASTElseWhereConstructNode)((ASTWhereRangeNode)getChild(1)).getElseWhereConstruct();
+        else
+            return null;
+    }
+
+    public boolean hasElseWhereConstruct()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_600)
+            return ((ASTWhereRangeNode)getChild(1)).hasElseWhereConstruct();
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.WHERE_CONSTRUCT_600 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

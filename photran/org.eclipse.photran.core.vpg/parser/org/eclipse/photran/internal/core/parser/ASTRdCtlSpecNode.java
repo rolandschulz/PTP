@@ -43,43 +43,61 @@ public class ASTRdCtlSpecNode extends InteriorNode
         visitor.visitASTRdCtlSpecNode(this);
     }
 
-    public ASTRdUnitIdNode getRdUnitId()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_CTL_SPEC_775)
-            return (ASTRdUnitIdNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_CTL_SPEC_776)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
     public ASTRdIoCtlSpecListNode getRdIoCtlSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_CTL_SPEC_776)
+        if (getProduction() == Production.RD_CTL_SPEC_770)
             return (ASTRdIoCtlSpecListNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public ASTExpressionNode getReadUnitExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_CTL_SPEC_776)
-            return (Token)getChild(2);
+        if (getProduction() == Production.RD_CTL_SPEC_769)
+            return (ASTExpressionNode)((ASTRdUnitIdNode)getChild(0)).getReadUnitExpr();
         else
             return null;
+    }
+
+    public boolean hasReadUnitExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.RD_CTL_SPEC_769)
+            return ((ASTRdUnitIdNode)getChild(0)).hasReadUnitExpr();
+        else
+            return false;
+    }
+
+    public boolean readUnitIsAsterisk()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.RD_CTL_SPEC_769)
+            return ((ASTRdUnitIdNode)getChild(0)).readUnitIsAsterisk();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.RD_CTL_SPEC_770 && index == 0)
+            return false;
+        else if (getProduction() == Production.RD_CTL_SPEC_770 && index == 2)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.RD_CTL_SPEC_769 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

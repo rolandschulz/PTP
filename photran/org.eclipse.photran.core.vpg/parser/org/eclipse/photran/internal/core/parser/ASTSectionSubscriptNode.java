@@ -43,23 +43,43 @@ public class ASTSectionSubscriptNode extends InteriorNode
         visitor.visitASTSectionSubscriptNode(this);
     }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SECTION_SUBSCRIPT_446)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.SECTION_SUBSCRIPT_444)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SECTION_SUBSCRIPT_444)
+            return getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTSubscriptTripletNode getSubscriptTriplet()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SECTION_SUBSCRIPT_447)
+        if (getProduction() == Production.SECTION_SUBSCRIPT_445)
             return (ASTSubscriptTripletNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasSubscriptTriplet()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SECTION_SUBSCRIPT_445)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

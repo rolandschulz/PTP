@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCharLenParamValueNode extends InteriorNode
+class ASTCharLenParamValueNode extends InteriorNode
 {
     ASTCharLenParamValueNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,34 @@ public class ASTCharLenParamValueNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTCharLenParamValueNode(this);
-    }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getLengthExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_286)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_281)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTAsterisk()
+    public boolean hasLengthExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_287)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_281)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    public boolean isAssumedLength()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CHAR_LEN_PARAM_VALUE_282)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

@@ -94,15 +94,15 @@ public class ASTDataStmtObjectListNode extends InteriorNode
         visitor.visitASTDataStmtObjectListNode(this);
     }
 
-    public ASTDataStmtObjectNode getDataStmtObject(int listIndex)
+    public IDataStmtObject getDataStmtObject(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDataStmtObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_STMT_OBJECT_LIST_375)
-            return (ASTDataStmtObjectNode)node.getChild(0);
-        else if (node.getProduction() == Production.DATA_STMT_OBJECT_LIST_376)
-            return (ASTDataStmtObjectNode)node.getChild(2);
+        if (node.getProduction() == Production.DATA_STMT_OBJECT_LIST_372)
+            return (IDataStmtObject)node.getChild(0);
+        else if (node.getProduction() == Production.DATA_STMT_OBJECT_LIST_373)
+            return (IDataStmtObject)node.getChild(2);
         else
             return null;
     }
@@ -111,20 +111,17 @@ public class ASTDataStmtObjectListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATA_STMT_OBJECT_LIST_376)
+        if (getProduction() == Production.DATA_STMT_OBJECT_LIST_373)
             return (ASTDataStmtObjectListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDataStmtObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_STMT_OBJECT_LIST_376)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.DATA_STMT_OBJECT_LIST_373 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

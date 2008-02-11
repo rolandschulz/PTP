@@ -43,12 +43,12 @@ public class ASTMaskExprNode extends InteriorNode
         visitor.visitASTMaskExprNode(this);
     }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getMaskExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MASK_EXPR_620)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.MASK_EXPR_618)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }

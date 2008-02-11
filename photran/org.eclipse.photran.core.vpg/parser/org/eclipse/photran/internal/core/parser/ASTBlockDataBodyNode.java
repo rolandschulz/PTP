@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<ASTBlockDataBodyConstructNode>
+public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<IBlockDataBodyConstruct>
 {
     protected int count = -1;
 
@@ -95,7 +95,7 @@ public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<ASTB
         visitor.visitASTBlockDataBodyNode(this);
     }
 
-    public Iterator<ASTBlockDataBodyConstructNode> iterator()
+    public Iterator<IBlockDataBodyConstruct> iterator()
     {
         final int listSize = size();
         
@@ -105,7 +105,7 @@ public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<ASTB
 
         final ASTBlockDataBodyNode baseNode = node;
         
-        return new Iterator<ASTBlockDataBodyConstructNode>()
+        return new Iterator<IBlockDataBodyConstruct>()
         {
             private ASTBlockDataBodyNode node = baseNode;
             private int index = 0;
@@ -115,10 +115,10 @@ public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<ASTB
                 return index < listSize;
             }
 
-            public ASTBlockDataBodyConstructNode next()
+            public IBlockDataBodyConstruct next()
             {
                 int child = (index == 0 ? 0 : 1);
-                ASTBlockDataBodyConstructNode result = (ASTBlockDataBodyConstructNode)node.getChild(child);
+                IBlockDataBodyConstruct result = (IBlockDataBodyConstruct)node.getChild(child);
                 node = (index == listSize-1 ? null : (ASTBlockDataBodyNode)node.parent);
                 index++;
                 return result;
@@ -131,15 +131,15 @@ public class ASTBlockDataBodyNode extends InteriorNode implements  Iterable<ASTB
         };
     }
 
-    public ASTBlockDataBodyConstructNode getBlockDataBodyConstruct(int listIndex)
+    public IBlockDataBodyConstruct getBlockDataBodyConstruct(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTBlockDataBodyNode node = recurseToIndex(listIndex);
         if (node.getProduction() == Production.BLOCK_DATA_BODY_34)
-            return (ASTBlockDataBodyConstructNode)node.getChild(0);
+            return (IBlockDataBodyConstruct)node.getChild(0);
         else if (node.getProduction() == Production.BLOCK_DATA_BODY_35)
-            return (ASTBlockDataBodyConstructNode)node.getChild(1);
+            return (IBlockDataBodyConstruct)node.getChild(1);
         else
             return null;
     }

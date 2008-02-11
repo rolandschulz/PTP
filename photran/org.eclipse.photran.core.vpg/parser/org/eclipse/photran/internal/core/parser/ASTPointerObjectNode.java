@@ -47,7 +47,7 @@ public class ASTPointerObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_OBJECT_470)
+        if (getProduction() == Production.POINTER_OBJECT_468)
             return (ASTNameNode)getChild(0);
         else
             return null;
@@ -57,7 +57,7 @@ public class ASTPointerObjectNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_OBJECT_471)
+        if (getProduction() == Production.POINTER_OBJECT_469)
             return (ASTPointerFieldNode)getChild(0);
         else
             return null;

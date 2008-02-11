@@ -99,9 +99,9 @@ public class ASTTargetObjectListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTTargetObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.TARGET_OBJECT_LIST_361)
+        if (node.getProduction() == Production.TARGET_OBJECT_LIST_358)
             return (ASTTargetObjectNode)node.getChild(0);
-        else if (node.getProduction() == Production.TARGET_OBJECT_LIST_362)
+        else if (node.getProduction() == Production.TARGET_OBJECT_LIST_359)
             return (ASTTargetObjectNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTTargetObjectListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_OBJECT_LIST_362)
+        if (getProduction() == Production.TARGET_OBJECT_LIST_359)
             return (ASTTargetObjectListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTTargetObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.TARGET_OBJECT_LIST_362)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.TARGET_OBJECT_LIST_359 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

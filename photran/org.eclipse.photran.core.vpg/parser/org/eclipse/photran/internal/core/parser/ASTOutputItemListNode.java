@@ -43,23 +43,91 @@ public class ASTOutputItemListNode extends InteriorNode
         visitor.visitASTOutputItemListNode(this);
     }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getSingleExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_815)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_809)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
 
-    public ASTOutputItemList1Node getOutputItemList1()
+    public int size()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_816)
-            return (ASTOutputItemList1Node)getChild(0);
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return (int)((ASTOutputItemList1Node)getChild(0)).size();
+        else
+            return 0;
+    }
+
+    public ASTExpressionNode getExpr1(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return (ASTExpressionNode)((ASTOutputItemList1Node)getChild(0)).getExpr1(listIndex1);
         else
             return null;
+    }
+
+    public boolean hasExpr1(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return ((ASTOutputItemList1Node)getChild(0)).hasExpr1(listIndex1);
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getExpr2(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return (ASTExpressionNode)((ASTOutputItemList1Node)getChild(0)).getExpr2(listIndex1);
+        else
+            return null;
+    }
+
+    public boolean hasExpr2(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return ((ASTOutputItemList1Node)getChild(0)).hasExpr2(listIndex1);
+        else
+            return false;
+    }
+
+    public ASTOutputImpliedDoNode getOutputImpliedDo(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return (ASTOutputImpliedDoNode)((ASTOutputItemList1Node)getChild(0)).getOutputImpliedDo(listIndex1);
+        else
+            return null;
+    }
+
+    public boolean hasOutputImpliedDo(int listIndex1)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
+            return ((ASTOutputItemList1Node)getChild(0)).hasOutputImpliedDo(listIndex1);
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_810 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

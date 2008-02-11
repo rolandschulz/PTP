@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutineSubprogramNode extends ScopingNode
+public class ASTSubroutineSubprogramNode extends ScopingNode implements IInternalSubprogram, IModuleSubprogram
 {
     ASTSubroutineSubprogramNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,8 @@ public class ASTSubroutineSubprogramNode extends ScopingNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIModuleSubprogram(this);
+        visitor.visitIInternalSubprogram(this);
         visitor.visitASTSubroutineSubprogramNode(this);
     }
 
@@ -73,12 +75,22 @@ public class ASTSubroutineSubprogramNode extends ScopingNode
             return null;
     }
 
-    public ASTBodyPlusInternalsNode getBodyPlusInternals()
+    public ASTContainsStmtNode getContainsStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTBodyPlusInternalsNode)((ASTSubroutineRangeNode)getChild(1)).getBodyPlusInternals();
+            return (ASTContainsStmtNode)((ASTSubroutineRangeNode)getChild(1)).getContainsStmt();
+        else
+            return null;
+    }
+
+    public ASTInternalSubprogramsNode getInternalSubprograms()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
+            return (ASTInternalSubprogramsNode)((ASTSubroutineRangeNode)getChild(1)).getInternalSubprograms();
         else
             return null;
     }

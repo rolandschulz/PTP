@@ -99,11 +99,11 @@ public class ASTDatalistNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDatalistNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATALIST_371)
+        if (node.getProduction() == Production.DATALIST_368)
             return (ASTDataStmtSetNode)node.getChild(0);
-        else if (node.getProduction() == Production.DATALIST_372)
+        else if (node.getProduction() == Production.DATALIST_369)
             return (ASTDataStmtSetNode)node.getChild(1);
-        else if (node.getProduction() == Production.DATALIST_373)
+        else if (node.getProduction() == Production.DATALIST_370)
             return (ASTDataStmtSetNode)node.getChild(2);
         else
             return null;
@@ -113,22 +113,19 @@ public class ASTDatalistNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DATALIST_372)
+        if (getProduction() == Production.DATALIST_369)
             return (ASTDatalistNode)getChild(0);
-        else if (getProduction() == Production.DATALIST_373)
+        else if (getProduction() == Production.DATALIST_370)
             return (ASTDatalistNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDatalistNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATALIST_373)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.DATALIST_370 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

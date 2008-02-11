@@ -43,33 +43,39 @@ public class ASTFunctionArgNode extends InteriorNode
         visitor.visitASTFunctionArgNode(this);
     }
 
-    public ASTNameNode getName()
+    public ASTExpressionNode getExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_ARG_975)
-            return (ASTNameNode)getChild(0);
+        if (getProduction() == Production.FUNCTION_ARG_971)
+            return (ASTExpressionNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTEquals()
+    public Token getName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_ARG_975)
-            return (Token)getChild(1);
+        if (getProduction() == Production.FUNCTION_ARG_971)
+            return (Token)((ASTNameNode)getChild(0)).getName();
         else
             return null;
     }
 
-    public ASTExprNode getExpr()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_ARG_975)
-            return (ASTExprNode)getChild(2);
+        if (getProduction() == Production.FUNCTION_ARG_971 && index == 1)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.FUNCTION_ARG_971 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

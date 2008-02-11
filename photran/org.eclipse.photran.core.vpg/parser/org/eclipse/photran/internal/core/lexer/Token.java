@@ -421,8 +421,13 @@ public class Token extends CSTNode implements IToken
     
     ///////////////////////////////////////////////////////////////////////////
 
-    public Type getType()
+//    public Type getType()
+//    {
+//		return PhotranVPG.getInstance().getTypeFor(getTokenRef());
+//    }
+    
+    public boolean isIdentifier()
     {
-		return PhotranVPG.getInstance().getTypeFor(getTokenRef());
+        return getTerminal() == Terminal.T_IDENT;
     }
 }

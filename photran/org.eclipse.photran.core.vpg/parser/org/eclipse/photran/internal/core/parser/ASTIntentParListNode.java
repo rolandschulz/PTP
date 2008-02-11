@@ -94,37 +94,44 @@ public class ASTIntentParListNode extends InteriorNode
         visitor.visitASTIntentParListNode(this);
     }
 
-    public ASTIntentParNode getIntentPar(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTIntentParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTENT_PAR_LIST_318)
-            return (ASTIntentParNode)node.getChild(0);
-        else if (node.getProduction() == Production.INTENT_PAR_LIST_319)
-            return (ASTIntentParNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTIntentParListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTENT_PAR_LIST_319)
+        if (getProduction() == Production.INTENT_PAR_LIST_316)
             return (ASTIntentParListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getVariableName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTIntentParListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTENT_PAR_LIST_319)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.INTENT_PAR_LIST_315)
+            return (Token)((ASTIntentParNode)node.getChild(0)).getVariableName();
+        else if (node.getProduction() == Production.INTENT_PAR_LIST_316)
+            return (Token)((ASTIntentParNode)node.getChild(2)).getVariableName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.INTENT_PAR_LIST_316 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.INTENT_PAR_LIST_315 && index == 0)
+            return true;
+        else if (getProduction() == Production.INTENT_PAR_LIST_316 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

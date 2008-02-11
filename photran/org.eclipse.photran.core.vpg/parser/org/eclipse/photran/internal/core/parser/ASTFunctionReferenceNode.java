@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFunctionReferenceNode extends InteriorNode
+class ASTFunctionReferenceNode extends InteriorNode
 {
     ASTFunctionReferenceNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,55 +37,62 @@ public class ASTFunctionReferenceNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTFunctionReferenceNode(this);
-    }
 
     public ASTNameNode getName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_965)
+        if (getProduction() == Production.FUNCTION_REFERENCE_961)
             return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_966)
+        else if (getProduction() == Production.FUNCTION_REFERENCE_962)
             return (ASTNameNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean hasName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_965)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_966)
-            return (Token)getChild(1);
+        if (getProduction() == Production.FUNCTION_REFERENCE_961)
+            return getChild(0) != null;
+        else if (getProduction() == Production.FUNCTION_REFERENCE_962)
+            return getChild(0) != null;
         else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_REFERENCE_965)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_966)
-            return (Token)getChild(3);
-        else
-            return null;
+            return false;
     }
 
     public ASTFunctionArgListNode getFunctionArgList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_966)
+        if (getProduction() == Production.FUNCTION_REFERENCE_962)
             return (ASTFunctionArgListNode)getChild(2);
         else
             return null;
+    }
+
+    public boolean hasFunctionArgList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FUNCTION_REFERENCE_962)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.FUNCTION_REFERENCE_961 && index == 1)
+            return false;
+        else if (getProduction() == Production.FUNCTION_REFERENCE_961 && index == 2)
+            return false;
+        else if (getProduction() == Production.FUNCTION_REFERENCE_962 && index == 1)
+            return false;
+        else if (getProduction() == Production.FUNCTION_REFERENCE_962 && index == 3)
+            return false;
+        else
+            return true;
     }
 }

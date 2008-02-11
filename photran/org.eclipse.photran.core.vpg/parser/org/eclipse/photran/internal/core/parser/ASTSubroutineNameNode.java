@@ -43,11 +43,11 @@ public class ASTSubroutineNameNode extends InteriorNode
         visitor.visitASTSubroutineNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getSubroutineName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_NAME_1044)
+        if (getProduction() == Production.SUBROUTINE_NAME_1040)
             return (Token)getChild(0);
         else
             return null;

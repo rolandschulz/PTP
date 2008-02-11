@@ -12,6 +12,8 @@ package org.eclipse.photran.internal.core.analysis.types;
 
 import java.io.Serializable;
 
+import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTSectionSubscriptListNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 
 /**
@@ -58,20 +60,20 @@ public abstract class Type implements Serializable
     
     public static Type parse(ASTTypeSpecNode node)
     {
-        if (node.getTInteger() != null)
+        if (node.isInteger())
             return Type.INTEGER;
-        else if (node.getTReal() != null)
+        else if (node.isReal())
             return Type.REAL;
-        else if (node.getTDouble() != null || node.getTDoubleprecision() != null)
+        else if (node.isDouble())
             return Type.DOUBLEPRECISION;
-        else if (node.getTComplex() != null)
+        else if (node.isComplex())
             return Type.COMPLEX;
-        else if (node.getTLogical() != null)
+        else if (node.isLogical())
             return Type.LOGICAL;
-        else if (node.getTCharacter() != null)
+        else if (node.isCharacter())
             return Type.CHARACTER;
-        else if (node.getTType() != null)
-            return new DerivedType(node.getTypeName().getTIdent().getText());
+        else if (node.isDerivedType())
+            return new DerivedType(node.getTypeName().getText());
         else
             throw new Error("Unexpected case parsing <TypeSpec> node");
     }
@@ -240,4 +242,16 @@ public abstract class Type implements Serializable
             return p.ifUnclassified(this);
         }
     };
+
+    public Type resolveSectionSubscriptList(ASTSectionSubscriptListNode list) throws TypeError
+    {
+        // TODO Implement
+        throw new TypeError(null, "NOT IMPLEMENTED");
+    }
+
+    public Type getTypeOfComponent(Token componentName) throws TypeError
+    {
+        // TODO Implement
+        throw new TypeError(null, "NOT IMPLEMENTED");
+    }
 }

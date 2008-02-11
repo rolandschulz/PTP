@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<ASTDerivedTypeBodyConstructNode>
+public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<IDerivedTypeBodyConstruct>
 {
     protected int count = -1;
 
@@ -95,7 +95,7 @@ public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<AS
         visitor.visitASTDerivedTypeBodyNode(this);
     }
 
-    public Iterator<ASTDerivedTypeBodyConstructNode> iterator()
+    public Iterator<IDerivedTypeBodyConstruct> iterator()
     {
         final int listSize = size();
         
@@ -105,7 +105,7 @@ public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<AS
 
         final ASTDerivedTypeBodyNode baseNode = node;
         
-        return new Iterator<ASTDerivedTypeBodyConstructNode>()
+        return new Iterator<IDerivedTypeBodyConstruct>()
         {
             private ASTDerivedTypeBodyNode node = baseNode;
             private int index = 0;
@@ -115,10 +115,10 @@ public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<AS
                 return index < listSize;
             }
 
-            public ASTDerivedTypeBodyConstructNode next()
+            public IDerivedTypeBodyConstruct next()
             {
                 int child = (index == 0 ? 0 : 1);
-                ASTDerivedTypeBodyConstructNode result = (ASTDerivedTypeBodyConstructNode)node.getChild(child);
+                IDerivedTypeBodyConstruct result = (IDerivedTypeBodyConstruct)node.getChild(child);
                 node = (index == listSize-1 ? null : (ASTDerivedTypeBodyNode)node.parent);
                 index++;
                 return result;
@@ -131,15 +131,15 @@ public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<AS
         };
     }
 
-    public ASTDerivedTypeBodyConstructNode getDerivedTypeBodyConstruct(int listIndex)
+    public IDerivedTypeBodyConstruct getDerivedTypeBodyConstruct(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDerivedTypeBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DERIVED_TYPE_BODY_180)
-            return (ASTDerivedTypeBodyConstructNode)node.getChild(0);
-        else if (node.getProduction() == Production.DERIVED_TYPE_BODY_181)
-            return (ASTDerivedTypeBodyConstructNode)node.getChild(1);
+        if (node.getProduction() == Production.DERIVED_TYPE_BODY_181)
+            return (IDerivedTypeBodyConstruct)node.getChild(0);
+        else if (node.getProduction() == Production.DERIVED_TYPE_BODY_182)
+            return (IDerivedTypeBodyConstruct)node.getChild(1);
         else
             return null;
     }
@@ -148,7 +148,7 @@ public class ASTDerivedTypeBodyNode extends InteriorNode implements  Iterable<AS
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DERIVED_TYPE_BODY_181)
+        if (getProduction() == Production.DERIVED_TYPE_BODY_182)
             return (ASTDerivedTypeBodyNode)getChild(0);
         else
             return null;

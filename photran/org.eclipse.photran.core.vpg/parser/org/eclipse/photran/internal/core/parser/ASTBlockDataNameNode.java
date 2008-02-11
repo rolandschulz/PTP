@@ -43,13 +43,23 @@ public class ASTBlockDataNameNode extends InteriorNode
         visitor.visitASTBlockDataNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getBlockDataName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_NAME_1027)
+        if (getProduction() == Production.BLOCK_DATA_NAME_1023)
             return (Token)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasBlockDataName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.BLOCK_DATA_NAME_1023)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

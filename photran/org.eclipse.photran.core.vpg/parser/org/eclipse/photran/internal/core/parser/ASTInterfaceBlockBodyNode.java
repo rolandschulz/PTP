@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable<ASTInterfaceSpecificationNode>
+public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable<IInterfaceSpecification>
 {
     protected int count = -1;
 
@@ -95,7 +95,7 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable
         visitor.visitASTInterfaceBlockBodyNode(this);
     }
 
-    public Iterator<ASTInterfaceSpecificationNode> iterator()
+    public Iterator<IInterfaceSpecification> iterator()
     {
         final int listSize = size();
         
@@ -105,7 +105,7 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable
 
         final ASTInterfaceBlockBodyNode baseNode = node;
         
-        return new Iterator<ASTInterfaceSpecificationNode>()
+        return new Iterator<IInterfaceSpecification>()
         {
             private ASTInterfaceBlockBodyNode node = baseNode;
             private int index = 0;
@@ -115,10 +115,10 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable
                 return index < listSize;
             }
 
-            public ASTInterfaceSpecificationNode next()
+            public IInterfaceSpecification next()
             {
                 int child = (index == 0 ? 0 : 1);
-                ASTInterfaceSpecificationNode result = (ASTInterfaceSpecificationNode)node.getChild(child);
+                IInterfaceSpecification result = (IInterfaceSpecification)node.getChild(child);
                 node = (index == listSize-1 ? null : (ASTInterfaceBlockBodyNode)node.parent);
                 index++;
                 return result;
@@ -131,15 +131,15 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable
         };
     }
 
-    public ASTInterfaceSpecificationNode getInterfaceSpecification(int listIndex)
+    public IInterfaceSpecification getInterfaceSpecification(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInterfaceBlockBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_932)
-            return (ASTInterfaceSpecificationNode)node.getChild(0);
-        else if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_933)
-            return (ASTInterfaceSpecificationNode)node.getChild(1);
+        if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_928)
+            return (IInterfaceSpecification)node.getChild(0);
+        else if (node.getProduction() == Production.INTERFACE_BLOCK_BODY_929)
+            return (IInterfaceSpecification)node.getChild(1);
         else
             return null;
     }
@@ -148,7 +148,7 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode implements  Iterable
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_BLOCK_BODY_933)
+        if (getProduction() == Production.INTERFACE_BLOCK_BODY_929)
             return (ASTInterfaceBlockBodyNode)getChild(0);
         else
             return null;

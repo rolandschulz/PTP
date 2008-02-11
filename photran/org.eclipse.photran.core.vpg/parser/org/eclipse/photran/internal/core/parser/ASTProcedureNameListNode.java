@@ -94,37 +94,44 @@ public class ASTProcedureNameListNode extends InteriorNode
         visitor.visitASTProcedureNameListNode(this);
     }
 
-    public ASTProcedureNameNode getProcedureName(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTProcedureNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.PROCEDURE_NAME_LIST_952)
-            return (ASTProcedureNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.PROCEDURE_NAME_LIST_953)
-            return (ASTProcedureNameNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTProcedureNameListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PROCEDURE_NAME_LIST_953)
+        if (getProduction() == Production.PROCEDURE_NAME_LIST_949)
             return (ASTProcedureNameListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getProcedureName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTProcedureNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.PROCEDURE_NAME_LIST_953)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.PROCEDURE_NAME_LIST_948)
+            return (Token)((ASTProcedureNameNode)node.getChild(0)).getProcedureName();
+        else if (node.getProduction() == Production.PROCEDURE_NAME_LIST_949)
+            return (Token)((ASTProcedureNameNode)node.getChild(2)).getProcedureName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.PROCEDURE_NAME_LIST_949 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.PROCEDURE_NAME_LIST_948 && index == 0)
+            return true;
+        else if (getProduction() == Production.PROCEDURE_NAME_LIST_949 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

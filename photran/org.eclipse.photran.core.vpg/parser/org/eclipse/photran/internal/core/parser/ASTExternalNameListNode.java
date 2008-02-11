@@ -94,37 +94,44 @@ public class ASTExternalNameListNode extends InteriorNode
         visitor.visitASTExternalNameListNode(this);
     }
 
-    public ASTExternalNameNode getExternalName(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTExternalNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EXTERNAL_NAME_LIST_959)
-            return (ASTExternalNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.EXTERNAL_NAME_LIST_960)
-            return (ASTExternalNameNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTExternalNameListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXTERNAL_NAME_LIST_960)
+        if (getProduction() == Production.EXTERNAL_NAME_LIST_956)
             return (ASTExternalNameListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getExternalName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTExternalNameListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EXTERNAL_NAME_LIST_960)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.EXTERNAL_NAME_LIST_955)
+            return (Token)((ASTExternalNameNode)node.getChild(0)).getExternalName();
+        else if (node.getProduction() == Production.EXTERNAL_NAME_LIST_956)
+            return (Token)((ASTExternalNameNode)node.getChild(2)).getExternalName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.EXTERNAL_NAME_LIST_956 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.EXTERNAL_NAME_LIST_955 && index == 0)
+            return true;
+        else if (getProduction() == Production.EXTERNAL_NAME_LIST_956 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEquivalenceObjectNode extends InteriorNode
+class ASTEquivalenceObjectNode extends InteriorNode
 {
     ASTEquivalenceObjectNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,17 +37,12 @@ public class ASTEquivalenceObjectNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTEquivalenceObjectNode(this);
-    }
 
     public ASTVariableNode getVariable()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_OBJECT_410)
+        if (getProduction() == Production.EQUIVALENCE_OBJECT_407)
             return (ASTVariableNode)getChild(0);
         else
             return null;

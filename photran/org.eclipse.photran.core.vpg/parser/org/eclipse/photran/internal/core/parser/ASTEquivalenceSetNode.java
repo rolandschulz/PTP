@@ -43,53 +43,43 @@ public class ASTEquivalenceSetNode extends InteriorNode
         visitor.visitASTEquivalenceSetNode(this);
     }
 
-    public Token getTLparen()
+    public ASTEquivalenceObjectListNode getEquivalentObjects()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_SET_407)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTEquivalenceObjectNode getEquivalenceObject()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_SET_407)
-            return (ASTEquivalenceObjectNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTComma()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_SET_407)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public ASTEquivalenceObjectListNode getEquivalenceObjectList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_SET_407)
+        if (getProduction() == Production.EQUIVALENCE_SET_404)
             return (ASTEquivalenceObjectListNode)getChild(3);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public ASTVariableNode getInitialVariable()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_SET_407)
-            return (Token)getChild(4);
+        if (getProduction() == Production.EQUIVALENCE_SET_404)
+            return (ASTVariableNode)((ASTEquivalenceObjectNode)getChild(1)).getVariable();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 0)
+            return false;
+        else if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 2)
+            return false;
+        else if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 4)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

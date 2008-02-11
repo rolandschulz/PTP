@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSignNode extends InteriorNode
+class ASTSignNode extends InteriorNode
 {
     ASTSignNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,24 @@ public class ASTSignNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSignNode(this);
-    }
 
-    public Token getTPlus()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SIGN_129)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTMinus()
+    public boolean hasPlusSign()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SIGN_130)
-            return (Token)getChild(0);
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    public boolean hasMinusSign()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SIGN_131)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

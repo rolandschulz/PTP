@@ -43,45 +43,55 @@ public class ASTPointerStmtObjectNode extends InteriorNode
         visitor.visitASTPointerStmtObjectNode(this);
     }
 
-    public ASTPointerNameNode getPointerName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_STMT_OBJECT_356)
-            return (ASTPointerNameNode)getChild(0);
-        else if (getProduction() == Production.POINTER_STMT_OBJECT_357)
-            return (ASTPointerNameNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_STMT_OBJECT_357)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
     public ASTDeferredShapeSpecListNode getDeferredShapeSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_STMT_OBJECT_357)
+        if (getProduction() == Production.POINTER_STMT_OBJECT_354)
             return (ASTDeferredShapeSpecListNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasDeferredShapeSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_STMT_OBJECT_357)
-            return (Token)getChild(3);
+        if (getProduction() == Production.POINTER_STMT_OBJECT_354)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getPointerName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.POINTER_STMT_OBJECT_353)
+            return (Token)((ASTPointerNameNode)getChild(0)).getPointerName();
+        else if (getProduction() == Production.POINTER_STMT_OBJECT_354)
+            return (Token)((ASTPointerNameNode)getChild(0)).getPointerName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.POINTER_STMT_OBJECT_354 && index == 1)
+            return false;
+        else if (getProduction() == Production.POINTER_STMT_OBJECT_354 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.POINTER_STMT_OBJECT_353 && index == 0)
+            return true;
+        else if (getProduction() == Production.POINTER_STMT_OBJECT_354 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

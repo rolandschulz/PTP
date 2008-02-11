@@ -43,11 +43,11 @@ public class ASTNamelistGroupNameNode extends InteriorNode
         visitor.visitASTNamelistGroupNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getNamelistGroupName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_GROUP_NAME_1039)
+        if (getProduction() == Production.NAMELIST_GROUP_NAME_1035)
             return (Token)getChild(0);
         else
             return null;

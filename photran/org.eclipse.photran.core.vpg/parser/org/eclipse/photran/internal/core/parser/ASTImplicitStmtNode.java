@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTImplicitStmtNode extends InteriorNode
+public class ASTImplicitStmtNode extends InteriorNode implements ISpecificationPartConstruct
 {
     ASTImplicitStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,28 +40,17 @@ public class ASTImplicitStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitISpecificationPartConstruct(this);
         visitor.visitASTImplicitStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getImplicitToken()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_393)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.IMPLICIT_STMT_394)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTImplicit()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IMPLICIT_STMT_393)
+        if (getProduction() == Production.IMPLICIT_STMT_390)
             return (Token)getChild(1);
-        else if (getProduction() == Production.IMPLICIT_STMT_394)
+        else if (getProduction() == Production.IMPLICIT_STMT_391)
             return (Token)getChild(1);
         else
             return null;
@@ -71,31 +60,73 @@ public class ASTImplicitStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_393)
+        if (getProduction() == Production.IMPLICIT_STMT_390)
             return (ASTImplicitSpecListNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasImplicitSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_393)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.IMPLICIT_STMT_394)
-            return (Token)getChild(3);
+        if (getProduction() == Production.IMPLICIT_STMT_390)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public boolean isImplicitNone()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.IMPLICIT_STMT_391)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.IMPLICIT_STMT_390)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.IMPLICIT_STMT_391)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTNone()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_STMT_394)
-            return (Token)getChild(2);
+        if (getProduction() == Production.IMPLICIT_STMT_390)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.IMPLICIT_STMT_391)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.IMPLICIT_STMT_390 && index == 3)
+            return false;
+        else if (getProduction() == Production.IMPLICIT_STMT_391 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.IMPLICIT_STMT_390 && index == 0)
+            return true;
+        else if (getProduction() == Production.IMPLICIT_STMT_391 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

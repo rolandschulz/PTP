@@ -94,37 +94,57 @@ public class ASTLblRefListNode extends InteriorNode
         visitor.visitASTLblRefListNode(this);
     }
 
-    public ASTLblRefNode getLblRef(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTLblRefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.LBL_REF_LIST_736)
-            return (ASTLblRefNode)node.getChild(0);
-        else if (node.getProduction() == Production.LBL_REF_LIST_737)
-            return (ASTLblRefNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTLblRefListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LBL_REF_LIST_737)
+        if (getProduction() == Production.LBL_REF_LIST_731)
             return (ASTLblRefListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getLabel(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTLblRefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.LBL_REF_LIST_737)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.LBL_REF_LIST_730)
+            return (Token)((ASTLblRefNode)node.getChild(0)).getLabel();
+        else if (node.getProduction() == Production.LBL_REF_LIST_731)
+            return (Token)((ASTLblRefNode)node.getChild(2)).getLabel();
         else
             return null;
+    }
+
+    public boolean hasLabel(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTLblRefListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.LBL_REF_LIST_730)
+            return ((ASTLblRefNode)node.getChild(0)).hasLabel();
+        else if (node.getProduction() == Production.LBL_REF_LIST_731)
+            return ((ASTLblRefNode)node.getChild(2)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.LBL_REF_LIST_731 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.LBL_REF_LIST_730 && index == 0)
+            return true;
+        else if (getProduction() == Production.LBL_REF_LIST_731 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

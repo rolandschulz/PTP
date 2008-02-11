@@ -43,43 +43,51 @@ public class ASTArrayDeclaratorNode extends InteriorNode
         visitor.visitASTArrayDeclaratorNode(this);
     }
 
-    public ASTVariableNameNode getVariableName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_DECLARATOR_345)
-            return (ASTVariableNameNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_DECLARATOR_345)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
     public ASTArraySpecNode getArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_DECLARATOR_345)
+        if (getProduction() == Production.ARRAY_DECLARATOR_342)
             return (ASTArraySpecNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_DECLARATOR_345)
-            return (Token)getChild(3);
+        if (getProduction() == Production.ARRAY_DECLARATOR_342)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getVariableName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ARRAY_DECLARATOR_342)
+            return (Token)((ASTVariableNameNode)getChild(0)).getVariableName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ARRAY_DECLARATOR_342 && index == 1)
+            return false;
+        else if (getProduction() == Production.ARRAY_DECLARATOR_342 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ARRAY_DECLARATOR_342 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

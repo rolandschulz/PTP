@@ -43,95 +43,85 @@ public class ASTWhereConstructStmtNode extends InteriorNode
         visitor.visitASTWhereConstructStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTNameNode getName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (ASTNameNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTColon()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTWhere()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
     public ASTMaskExprNode getMaskExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
             return (ASTMaskExprNode)getChild(5);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614)
             return (ASTMaskExprNode)getChild(3);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
-            return (Token)getChild(4);
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_615)
-            return (Token)getChild(7);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_616)
-            return (Token)getChild(5);
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public Token getWhereConstructName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
+            return (Token)((ASTNameNode)getChild(1)).getName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 2)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 3)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 4)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 6)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 7)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 1)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 2)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 4)
+            return false;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 5)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 0)
+            return true;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 1)
+            return true;
+        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

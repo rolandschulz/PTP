@@ -43,45 +43,55 @@ public class ASTTargetObjectNode extends InteriorNode
         visitor.visitASTTargetObjectNode(this);
     }
 
-    public ASTTargetNameNode getTargetName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TARGET_OBJECT_363)
-            return (ASTTargetNameNode)getChild(0);
-        else if (getProduction() == Production.TARGET_OBJECT_364)
-            return (ASTTargetNameNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TARGET_OBJECT_364)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
     public ASTArraySpecNode getArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_OBJECT_364)
+        if (getProduction() == Production.TARGET_OBJECT_361)
             return (ASTArraySpecNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_OBJECT_364)
-            return (Token)getChild(3);
+        if (getProduction() == Production.TARGET_OBJECT_361)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getTargetName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.TARGET_OBJECT_360)
+            return (Token)((ASTTargetNameNode)getChild(0)).getTargetName();
+        else if (getProduction() == Production.TARGET_OBJECT_361)
+            return (Token)((ASTTargetNameNode)getChild(0)).getTargetName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.TARGET_OBJECT_361 && index == 1)
+            return false;
+        else if (getProduction() == Production.TARGET_OBJECT_361 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.TARGET_OBJECT_360 && index == 0)
+            return true;
+        else if (getProduction() == Production.TARGET_OBJECT_361 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

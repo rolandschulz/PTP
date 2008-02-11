@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCaseConstructNode extends InteriorNode
+public class ASTCaseConstructNode extends InteriorNode implements IExecutableConstruct
 {
     ASTCaseConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,6 +40,7 @@ public class ASTCaseConstructNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIExecutableConstruct(this);
         visitor.visitASTCaseConstructNode(this);
     }
 
@@ -47,19 +48,47 @@ public class ASTCaseConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_CONSTRUCT_682)
+        if (getProduction() == Production.CASE_CONSTRUCT_676)
             return (ASTSelectCaseStmtNode)getChild(0);
         else
             return null;
     }
 
-    public ASTSelectCaseRangeNode getSelectCaseRange()
+    public ASTSelectCaseBodyNode getSelectCaseBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_CONSTRUCT_682)
-            return (ASTSelectCaseRangeNode)getChild(1);
+        if (getProduction() == Production.CASE_CONSTRUCT_676)
+            return (ASTSelectCaseBodyNode)((ASTSelectCaseRangeNode)getChild(1)).getSelectCaseBody();
         else
             return null;
+    }
+
+    public boolean hasSelectCaseBody()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_CONSTRUCT_676)
+            return ((ASTSelectCaseRangeNode)getChild(1)).hasSelectCaseBody();
+        else
+            return false;
+    }
+
+    public ASTEndSelectStmtNode getEndSelectStmt()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_CONSTRUCT_676)
+            return (ASTEndSelectStmtNode)((ASTSelectCaseRangeNode)getChild(1)).getEndSelectStmt();
+        else
+            return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.CASE_CONSTRUCT_676 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

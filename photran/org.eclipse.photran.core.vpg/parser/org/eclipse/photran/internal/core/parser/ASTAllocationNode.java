@@ -47,21 +47,39 @@ public class ASTAllocationNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATION_460)
+        if (getProduction() == Production.ALLOCATION_458)
             return (ASTAllocateObjectNode)getChild(0);
-        else if (getProduction() == Production.ALLOCATION_461)
+        else if (getProduction() == Production.ALLOCATION_459)
             return (ASTAllocateObjectNode)getChild(0);
         else
             return null;
     }
 
-    public ASTAllocatedShapeNode getAllocatedShape()
+    public boolean hasAllocatedShape()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATION_461)
-            return (ASTAllocatedShapeNode)getChild(1);
+        if (getProduction() == Production.ALLOCATION_459)
+            return ((ASTAllocatedShapeNode)getChild(1)).hasAllocatedShape();
+        else
+            return false;
+    }
+
+    public ASTSectionSubscriptListNode getSectionSubscriptList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ALLOCATION_459)
+            return (ASTSectionSubscriptListNode)((ASTAllocatedShapeNode)getChild(1)).getSectionSubscriptList();
         else
             return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ALLOCATION_459 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

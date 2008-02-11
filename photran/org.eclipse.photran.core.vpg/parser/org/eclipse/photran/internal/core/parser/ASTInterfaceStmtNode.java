@@ -43,29 +43,15 @@ public class ASTInterfaceStmtNode extends InteriorNode
         visitor.visitASTInterfaceStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getInterfaceToken()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_936)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.INTERFACE_STMT_937)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.INTERFACE_STMT_938)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTInterface()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_STMT_936)
+        if (getProduction() == Production.INTERFACE_STMT_932)
             return (Token)getChild(1);
-        else if (getProduction() == Production.INTERFACE_STMT_937)
+        else if (getProduction() == Production.INTERFACE_STMT_933)
             return (Token)getChild(1);
-        else if (getProduction() == Production.INTERFACE_STMT_938)
+        else if (getProduction() == Production.INTERFACE_STMT_934)
             return (Token)getChild(1);
         else
             return null;
@@ -75,33 +61,91 @@ public class ASTInterfaceStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_936)
+        if (getProduction() == Production.INTERFACE_STMT_932)
             return (ASTGenericNameNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasGenericName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_936)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.INTERFACE_STMT_937)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.INTERFACE_STMT_938)
-            return (Token)getChild(2);
+        if (getProduction() == Production.INTERFACE_STMT_932)
+            return getChild(2) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTGenericSpecNode getGenericSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTERFACE_STMT_937)
+        if (getProduction() == Production.INTERFACE_STMT_933)
             return (ASTGenericSpecNode)getChild(2);
         else
             return null;
+    }
+
+    public boolean hasGenericSpec()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_STMT_933)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_STMT_932)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.INTERFACE_STMT_933)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.INTERFACE_STMT_934)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.INTERFACE_STMT_932)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.INTERFACE_STMT_933)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.INTERFACE_STMT_934)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.INTERFACE_STMT_932 && index == 3)
+            return false;
+        else if (getProduction() == Production.INTERFACE_STMT_933 && index == 3)
+            return false;
+        else if (getProduction() == Production.INTERFACE_STMT_934 && index == 2)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.INTERFACE_STMT_932 && index == 0)
+            return true;
+        else if (getProduction() == Production.INTERFACE_STMT_933 && index == 0)
+            return true;
+        else if (getProduction() == Production.INTERFACE_STMT_934 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

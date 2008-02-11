@@ -99,9 +99,9 @@ public class ASTOnlyListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOnlyListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ONLY_LIST_913)
+        if (node.getProduction() == Production.ONLY_LIST_907)
             return (ASTOnlyNode)node.getChild(0);
-        else if (node.getProduction() == Production.ONLY_LIST_914)
+        else if (node.getProduction() == Production.ONLY_LIST_908)
             return (ASTOnlyNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTOnlyListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_LIST_914)
+        if (getProduction() == Production.ONLY_LIST_908)
             return (ASTOnlyListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTOnlyListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ONLY_LIST_914)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.ONLY_LIST_908 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

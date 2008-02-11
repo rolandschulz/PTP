@@ -43,199 +43,295 @@ public class ASTConnectSpecNode extends InteriorNode
         visitor.visitASTConnectSpecNode(this);
     }
 
-    public Token getTUniteq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_750)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
     public ASTUnitIdentifierNode getUnitIdentifier()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_750)
+        if (getProduction() == Production.CONNECT_SPEC_744)
             return (ASTUnitIdentifierNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTErreq()
+    public boolean hasUnitIdentifier()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_751)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CONNECT_SPEC_744)
+            return getChild(1) != null;
         else
-            return null;
+            return false;
     }
 
-    public ASTLblRefNode getLblRef()
+    public ASTLblRefNode getErrLbl()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_751)
+        if (getProduction() == Production.CONNECT_SPEC_745)
             return (ASTLblRefNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTFileeq()
+    public boolean hasErrLbl()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_745)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getFileExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_746)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean hasFileExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_746)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getStatusExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_747)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean hasStatusExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_747)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getAccessExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_748)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean hasAccessExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_748)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getFormExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_749)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean hasFormExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_749)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getReclExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_750)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean hasReclExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_750)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getBlankExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_751)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public boolean hasBlankExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_751)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTScalarVariableNode getIoStatVar()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.CONNECT_SPEC_752)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTCExprNode getCExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_752)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_753)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_754)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_755)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_757)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_759)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_760)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_761)
-            return (ASTCExprNode)getChild(1);
-        else if (getProduction() == Production.CONNECT_SPEC_762)
-            return (ASTCExprNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTStatuseq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_753)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTAccesseq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_754)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTFormeq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_755)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTRecleq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_756)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_756)
-            return (ASTExprNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTBlankeq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_757)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTIostateq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_758)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTScalarVariableNode getScalarVariable()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONNECT_SPEC_758)
             return (ASTScalarVariableNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTPositioneq()
+    public boolean hasIoStatVar()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_759)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CONNECT_SPEC_752)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getPositionExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_753)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTActioneq()
+    public boolean hasPositionExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_760)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CONNECT_SPEC_753)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getActionExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_754)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTDelimeq()
+    public boolean hasActionExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_761)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CONNECT_SPEC_754)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getDelimExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_755)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTPadeq()
+    public boolean hasDelimExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONNECT_SPEC_762)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CONNECT_SPEC_755)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getPadExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_756)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
+    }
+
+    public boolean hasPadExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CONNECT_SPEC_756)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.CONNECT_SPEC_744 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_745 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_746 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_747 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_748 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_749 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_750 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_751 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_752 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_753 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_754 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_755 && index == 0)
+            return false;
+        else if (getProduction() == Production.CONNECT_SPEC_756 && index == 0)
+            return false;
+        else
+            return true;
     }
 }

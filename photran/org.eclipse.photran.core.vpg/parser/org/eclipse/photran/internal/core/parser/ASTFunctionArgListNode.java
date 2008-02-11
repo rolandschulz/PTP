@@ -99,11 +99,11 @@ public class ASTFunctionArgListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFunctionArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_ARG_LIST_972)
+        if (node.getProduction() == Production.FUNCTION_ARG_LIST_968)
             return (ASTFunctionArgNode)node.getChild(0);
-        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_973)
+        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_969)
             return (ASTFunctionArgNode)node.getChild(2);
-        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_974)
+        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_970)
             return (ASTFunctionArgNode)node.getChild(2);
         else
             return null;
@@ -114,32 +114,40 @@ public class ASTFunctionArgListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFunctionArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_ARG_LIST_973)
+        if (node.getProduction() == Production.FUNCTION_ARG_LIST_969)
             return (ASTSectionSubscriptListNode)node.getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public boolean hasSectionSubscriptList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTFunctionArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_ARG_LIST_973)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_974)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.FUNCTION_ARG_LIST_969)
+            return node.getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
     private ASTFunctionArgListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_ARG_LIST_974)
+        if (getProduction() == Production.FUNCTION_ARG_LIST_970)
             return (ASTFunctionArgListNode)getChild(0);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.FUNCTION_ARG_LIST_969 && index == 1)
+            return false;
+        else if (getProduction() == Production.FUNCTION_ARG_LIST_970 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

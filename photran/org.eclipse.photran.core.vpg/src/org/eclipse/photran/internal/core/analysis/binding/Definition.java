@@ -24,8 +24,8 @@ import org.eclipse.photran.internal.core.parser.ASTAccessSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
-import org.eclipse.photran.internal.core.parser.ASTInternalSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
 
 import bz.over.vpg.TokenRef;
@@ -138,7 +138,7 @@ public class Definition implements Serializable
     private boolean isInternal()
     {
         for (CSTNode parent = tokenRef.findToken().getParent(); parent != null; parent = parent.getParent())
-            if (parent instanceof ASTInternalSubprogramNode)
+            if (parent instanceof IInternalSubprogram)
                 return true;
         
         return false;
@@ -342,9 +342,9 @@ public class Definition implements Serializable
 
     void setVisibility(ASTAccessSpecNode accessSpec)
     {
-        if (accessSpec.getTPublic() != null)
+        if (accessSpec.isPublic())
             this.visibility = Visibility.PUBLIC;
-        else if (accessSpec.getTPrivate() != null)
+        else if (accessSpec.isPrivate())
             this.visibility = Visibility.PRIVATE;
     }
     

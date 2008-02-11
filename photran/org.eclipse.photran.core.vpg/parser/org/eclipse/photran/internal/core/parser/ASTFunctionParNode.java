@@ -43,13 +43,21 @@ public class ASTFunctionParNode extends InteriorNode
         visitor.visitASTFunctionParNode(this);
     }
 
-    public ASTDummyArgNameNode getDummyArgName()
+    public Token getVariableName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PAR_988)
-            return (ASTDummyArgNameNode)getChild(0);
+        if (getProduction() == Production.FUNCTION_PAR_984)
+            return (Token)((ASTDummyArgNameNode)getChild(0)).getVariableName();
         else
             return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.FUNCTION_PAR_984 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

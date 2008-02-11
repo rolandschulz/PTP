@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEquivalenceStmtNode extends InteriorNode
+public class ASTEquivalenceStmtNode extends InteriorNode implements ISpecificationStmt
 {
     ASTEquivalenceStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,46 +40,55 @@ public class ASTEquivalenceStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitISpecificationStmt(this);
         visitor.visitASTEquivalenceStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_STMT_404)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTEquivalence()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_STMT_404)
-            return (Token)getChild(1);
-        else
-            return null;
     }
 
     public ASTEquivalenceSetListNode getEquivalenceSetList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_STMT_404)
+        if (getProduction() == Production.EQUIVALENCE_STMT_401)
             return (ASTEquivalenceSetListNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTEos()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EQUIVALENCE_STMT_404)
-            return (Token)getChild(3);
+        if (getProduction() == Production.EQUIVALENCE_STMT_401)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.EQUIVALENCE_STMT_401)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.EQUIVALENCE_STMT_401 && index == 1)
+            return false;
+        else if (getProduction() == Production.EQUIVALENCE_STMT_401 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.EQUIVALENCE_STMT_401 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

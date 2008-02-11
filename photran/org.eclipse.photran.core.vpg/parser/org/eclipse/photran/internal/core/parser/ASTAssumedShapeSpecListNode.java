@@ -94,74 +94,91 @@ public class ASTAssumedShapeSpecListNode extends InteriorNode
         visitor.visitASTAssumedShapeSpecListNode(this);
     }
 
-    public ASTLowerBoundNode getLowerBound(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTAssumedShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_298)
-            return (ASTLowerBoundNode)node.getChild(0);
-        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_299)
-            return (ASTLowerBoundNode)node.getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTColon(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTAssumedShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_298)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_299)
-            return (Token)node.getChild(3);
-        else
-            return null;
-    }
-
     public ASTDeferredShapeSpecListNode getDeferredShapeSpecList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAssumedShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_299)
+        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296)
             return (ASTDeferredShapeSpecListNode)node.getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public boolean hasDeferredShapeSpecList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAssumedShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_299)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_300)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296)
+            return node.getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
     private ASTAssumedShapeSpecListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_300)
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_297)
             return (ASTAssumedShapeSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public ASTAssumedShapeSpecNode getAssumedShapeSpec(int listIndex)
+    public ASTExpressionNode getLb(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAssumedShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_300)
-            return (ASTAssumedShapeSpecNode)node.getChild(2);
+        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_295)
+            return (ASTExpressionNode)((ASTLowerBoundNode)node.getChild(0)).getLb();
+        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296)
+            return (ASTExpressionNode)((ASTLowerBoundNode)node.getChild(2)).getLb();
+        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_297)
+            return (ASTExpressionNode)((ASTAssumedShapeSpecNode)node.getChild(2)).getLb();
         else
             return null;
+    }
+
+    public boolean hasLb(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTAssumedShapeSpecListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_295)
+            return ((ASTLowerBoundNode)node.getChild(0)).hasLb();
+        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296)
+            return ((ASTLowerBoundNode)node.getChild(2)).hasLb();
+        else if (node.getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_297)
+            return ((ASTAssumedShapeSpecNode)node.getChild(2)).hasLb();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_295 && index == 1)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296 && index == 1)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296 && index == 3)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_297 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_295 && index == 0)
+            return true;
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_296 && index == 2)
+            return true;
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_LIST_297 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

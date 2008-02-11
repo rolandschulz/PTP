@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTExplicitShapeSpecListNode extends InteriorNode
+public class ASTExplicitShapeSpecListNode extends InteriorNode implements IComponentArraySpec
 {
     protected int count = -1;
 
@@ -91,6 +91,7 @@ public class ASTExplicitShapeSpecListNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIComponentArraySpec(this);
         visitor.visitASTExplicitShapeSpecListNode(this);
     }
 
@@ -99,9 +100,9 @@ public class ASTExplicitShapeSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTExplicitShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_301)
+        if (node.getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_298)
             return (ASTExplicitShapeSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_302)
+        else if (node.getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_299)
             return (ASTExplicitShapeSpecNode)node.getChild(2);
         else
             return null;
@@ -111,20 +112,17 @@ public class ASTExplicitShapeSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_302)
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_299)
             return (ASTExplicitShapeSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTExplicitShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_302)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_LIST_299 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

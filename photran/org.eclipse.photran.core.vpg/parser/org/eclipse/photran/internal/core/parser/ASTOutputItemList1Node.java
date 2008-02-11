@@ -94,47 +94,56 @@ public class ASTOutputItemList1Node extends InteriorNode
         visitor.visitASTOutputItemList1Node(this);
     }
 
-    public ASTExprNode getExpr(int listIndex)
+    public ASTExpressionNode getExpr1(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOutputItemList1Node node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_817)
-            return (ASTExprNode)node.getChild(0);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_818)
-            return (ASTExprNode)node.getChild(0);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_820)
-            return (ASTExprNode)node.getChild(2);
+        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_811)
+            return (ASTExpressionNode)node.getChild(0);
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_812)
+            return (ASTExpressionNode)node.getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public boolean hasExpr1(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOutputItemList1Node node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_817)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_818)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_820)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_821)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_811)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_812)
+            return node.getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getExpr2(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTOutputItemList1Node node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_811)
+            return (ASTExpressionNode)node.getChild(2);
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_814)
+            return (ASTExpressionNode)node.getChild(2);
         else
             return null;
     }
 
-    public ASTExprNode getExpr2(int listIndex)
+    public boolean hasExpr2(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOutputItemList1Node node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_817)
-            return (ASTExprNode)node.getChild(2);
+        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_811)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_814)
+            return node.getChild(2) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTOutputImpliedDoNode getOutputImpliedDo(int listIndex)
@@ -142,25 +151,54 @@ public class ASTOutputItemList1Node extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTOutputItemList1Node node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_818)
+        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_812)
             return (ASTOutputImpliedDoNode)node.getChild(2);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_819)
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_813)
             return (ASTOutputImpliedDoNode)node.getChild(0);
-        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_821)
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_815)
             return (ASTOutputImpliedDoNode)node.getChild(2);
         else
             return null;
+    }
+
+    public boolean hasOutputImpliedDo(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTOutputItemList1Node node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_812)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_813)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.OUTPUT_ITEM_LIST_1_815)
+            return node.getChild(2) != null;
+        else
+            return false;
     }
 
     private ASTOutputItemList1Node getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_1_820)
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_1_814)
             return (ASTOutputItemList1Node)getChild(0);
-        else if (getProduction() == Production.OUTPUT_ITEM_LIST_1_821)
+        else if (getProduction() == Production.OUTPUT_ITEM_LIST_1_815)
             return (ASTOutputItemList1Node)getChild(0);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.OUTPUT_ITEM_LIST_1_811 && index == 1)
+            return false;
+        else if (getProduction() == Production.OUTPUT_ITEM_LIST_1_812 && index == 1)
+            return false;
+        else if (getProduction() == Production.OUTPUT_ITEM_LIST_1_814 && index == 1)
+            return false;
+        else if (getProduction() == Production.OUTPUT_ITEM_LIST_1_815 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

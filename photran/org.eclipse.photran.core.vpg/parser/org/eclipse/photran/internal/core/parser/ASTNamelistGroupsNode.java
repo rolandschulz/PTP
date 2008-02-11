@@ -94,92 +94,91 @@ public class ASTNamelistGroupsNode extends InteriorNode
         visitor.visitASTNamelistGroupsNode(this);
     }
 
-    public Token getTSlash(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_399)
-            return (Token)node.getChild(0);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_400)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_401)
-            return (Token)node.getChild(2);
-        else
-            return null;
-    }
-
-    public ASTNamelistGroupNameNode getNamelistGroupName(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_399)
-            return (ASTNamelistGroupNameNode)node.getChild(1);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_400)
-            return (ASTNamelistGroupNameNode)node.getChild(2);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_401)
-            return (ASTNamelistGroupNameNode)node.getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTSlash2(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_399)
-            return (Token)node.getChild(2);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_400)
-            return (Token)node.getChild(3);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_401)
-            return (Token)node.getChild(4);
-        else
-            return null;
-    }
-
-    public ASTNamelistGroupObjectNode getNamelistGroupObject(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_399)
-            return (ASTNamelistGroupObjectNode)node.getChild(3);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_400)
-            return (ASTNamelistGroupObjectNode)node.getChild(4);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_401)
-            return (ASTNamelistGroupObjectNode)node.getChild(5);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_402)
-            return (ASTNamelistGroupObjectNode)node.getChild(2);
-        else
-            return null;
-    }
-
     private ASTNamelistGroupsNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMELIST_GROUPS_400)
+        if (getProduction() == Production.NAMELIST_GROUPS_397)
             return (ASTNamelistGroupsNode)getChild(0);
-        else if (getProduction() == Production.NAMELIST_GROUPS_401)
+        else if (getProduction() == Production.NAMELIST_GROUPS_398)
             return (ASTNamelistGroupsNode)getChild(0);
-        else if (getProduction() == Production.NAMELIST_GROUPS_402)
+        else if (getProduction() == Production.NAMELIST_GROUPS_399)
             return (ASTNamelistGroupsNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public Token getNamelistGroupName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_401)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_402)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.NAMELIST_GROUPS_396)
+            return (Token)((ASTNamelistGroupNameNode)node.getChild(1)).getNamelistGroupName();
+        else if (node.getProduction() == Production.NAMELIST_GROUPS_397)
+            return (Token)((ASTNamelistGroupNameNode)node.getChild(2)).getNamelistGroupName();
+        else if (node.getProduction() == Production.NAMELIST_GROUPS_398)
+            return (Token)((ASTNamelistGroupNameNode)node.getChild(3)).getNamelistGroupName();
         else
             return null;
+    }
+
+    public Token getNamelistGroupObjectVariableName(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.NAMELIST_GROUPS_396)
+            return (Token)((ASTNamelistGroupObjectNode)node.getChild(3)).getVariableName();
+        else if (node.getProduction() == Production.NAMELIST_GROUPS_397)
+            return (Token)((ASTNamelistGroupObjectNode)node.getChild(4)).getVariableName();
+        else if (node.getProduction() == Production.NAMELIST_GROUPS_398)
+            return (Token)((ASTNamelistGroupObjectNode)node.getChild(5)).getVariableName();
+        else if (node.getProduction() == Production.NAMELIST_GROUPS_399)
+            return (Token)((ASTNamelistGroupObjectNode)node.getChild(2)).getVariableName();
+        else
+            return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 0)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 2)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 1)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 3)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 1)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 2)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 4)
+            return false;
+        else if (getProduction() == Production.NAMELIST_GROUPS_399 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 1)
+            return true;
+        else if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 3)
+            return true;
+        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 2)
+            return true;
+        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 4)
+            return true;
+        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 3)
+            return true;
+        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 5)
+            return true;
+        else if (getProduction() == Production.NAMELIST_GROUPS_399 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

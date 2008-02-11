@@ -47,79 +47,75 @@ public class ASTForallTripletSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640)
             return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641)
             return (ASTNameNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTEquals()
+    public ASTExpressionNode getStepExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
-            return (Token)getChild(1);
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641)
+            return (ASTExpressionNode)getChild(6);
         else
             return null;
     }
 
-    public ASTSubscriptNode getSubscript()
+    public ASTExpressionNode getLbSubscriptExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
-            return (ASTSubscriptNode)getChild(2);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
-            return (ASTSubscriptNode)getChild(2);
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640)
+            return (ASTExpressionNode)((ASTSubscriptNode)getChild(2)).getSubscriptExpr();
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641)
+            return (ASTExpressionNode)((ASTSubscriptNode)getChild(2)).getSubscriptExpr();
         else
             return null;
     }
 
-    public Token getTColon()
+    public ASTExpressionNode getUbSubscriptExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
-            return (Token)getChild(3);
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640)
+            return (ASTExpressionNode)((ASTSubscriptNode)getChild(4)).getSubscriptExpr();
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641)
+            return (ASTExpressionNode)((ASTSubscriptNode)getChild(4)).getSubscriptExpr();
         else
             return null;
     }
 
-    public ASTSubscriptNode getSubscript2()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_642)
-            return (ASTSubscriptNode)getChild(4);
-        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
-            return (ASTSubscriptNode)getChild(4);
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640 && index == 3)
+            return false;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641 && index == 3)
+            return false;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641 && index == 5)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public Token getTColon2()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
-            return (Token)getChild(5);
+        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640 && index == 2)
+            return true;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_640 && index == 4)
+            return true;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641 && index == 2)
+            return true;
+        else if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_641 && index == 4)
+            return true;
         else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_TRIPLET_SPEC_LIST_643)
-            return (ASTExprNode)getChild(6);
-        else
-            return null;
+            return false;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTStopStmtNode extends InteriorNode
+public class ASTStopStmtNode extends InteriorNode implements IActionStmt
 {
     ASTStopStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,68 +40,105 @@ public class ASTStopStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
         visitor.visitASTStopStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getIntConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STOP_STMT_741)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.STOP_STMT_742)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.STOP_STMT_743)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTStop()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STOP_STMT_741)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.STOP_STMT_742)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.STOP_STMT_743)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STOP_STMT_741)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.STOP_STMT_742)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.STOP_STMT_743)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTIcon()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STOP_STMT_742)
+        if (getProduction() == Production.STOP_STMT_736)
             return (Token)getChild(2);
         else
             return null;
     }
 
-    public Token getTScon()
+    public boolean hasIntConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STOP_STMT_743)
+        if (getProduction() == Production.STOP_STMT_736)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getStringConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.STOP_STMT_737)
             return (Token)getChild(2);
         else
             return null;
+    }
+
+    public boolean hasStringConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.STOP_STMT_737)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.STOP_STMT_735)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.STOP_STMT_736)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.STOP_STMT_737)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.STOP_STMT_735)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.STOP_STMT_736)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.STOP_STMT_737)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.STOP_STMT_735 && index == 1)
+            return false;
+        else if (getProduction() == Production.STOP_STMT_735 && index == 2)
+            return false;
+        else if (getProduction() == Production.STOP_STMT_736 && index == 1)
+            return false;
+        else if (getProduction() == Production.STOP_STMT_736 && index == 3)
+            return false;
+        else if (getProduction() == Production.STOP_STMT_737 && index == 1)
+            return false;
+        else if (getProduction() == Production.STOP_STMT_737 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.STOP_STMT_735 && index == 0)
+            return true;
+        else if (getProduction() == Production.STOP_STMT_736 && index == 0)
+            return true;
+        else if (getProduction() == Production.STOP_STMT_737 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

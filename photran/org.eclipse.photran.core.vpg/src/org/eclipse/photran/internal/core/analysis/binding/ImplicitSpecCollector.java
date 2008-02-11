@@ -50,7 +50,7 @@ class ImplicitSpecCollector extends BindingCollector
     	if (node.getImplicitSpecList() != null)
     		implicitSpec = new ImplicitSpec(node.getImplicitSpecList());
     	
-    	try { vpg.setScopeImplicitSpec(node.getTImplicit().getEnclosingScope(), implicitSpec); }
+    	try { vpg.setScopeImplicitSpec(node.getImplicitToken().getEnclosingScope(), implicitSpec); }
     	catch (Exception e) { throw new Error(e); }
     }
 

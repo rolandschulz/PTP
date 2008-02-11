@@ -43,11 +43,11 @@ public class ASTCommonBlockNameNode extends InteriorNode
         visitor.visitASTCommonBlockNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getCommonBlockName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMON_BLOCK_NAME_1028)
+        if (getProduction() == Production.COMMON_BLOCK_NAME_1024)
             return (Token)getChild(0);
         else
             return null;

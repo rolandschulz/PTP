@@ -43,13 +43,23 @@ public class ASTEndNameNode extends InteriorNode
         visitor.visitASTEndNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getEndName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_NAME_1031)
+        if (getProduction() == Production.END_NAME_1027)
             return (Token)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasEndName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.END_NAME_1027)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

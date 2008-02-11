@@ -99,7 +99,7 @@ public class ASTCloseSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTCloseSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CLOSE_SPEC_LIST_764)
+        if (node.getProduction() == Production.CLOSE_SPEC_LIST_758)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
@@ -110,9 +110,9 @@ public class ASTCloseSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTCloseSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CLOSE_SPEC_LIST_765)
+        if (node.getProduction() == Production.CLOSE_SPEC_LIST_759)
             return (ASTCloseSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.CLOSE_SPEC_LIST_766)
+        else if (node.getProduction() == Production.CLOSE_SPEC_LIST_760)
             return (ASTCloseSpecNode)node.getChild(2);
         else
             return null;
@@ -122,20 +122,17 @@ public class ASTCloseSpecListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CLOSE_SPEC_LIST_766)
+        if (getProduction() == Production.CLOSE_SPEC_LIST_760)
             return (ASTCloseSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTCloseSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.CLOSE_SPEC_LIST_766)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.CLOSE_SPEC_LIST_760 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

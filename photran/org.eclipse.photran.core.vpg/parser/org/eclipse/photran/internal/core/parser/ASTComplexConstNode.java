@@ -43,53 +43,35 @@ public class ASTComplexConstNode extends InteriorNode
         visitor.visitASTComplexConstNode(this);
     }
 
-    public Token getTLparen()
+    public ASTExpressionNode getRealPart()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPLEX_CONST_174)
-            return (Token)getChild(0);
+        if (getProduction() == Production.COMPLEX_CONST_175)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public ASTExprNode getRealPart()
+    public ASTExpressionNode getComplexPart()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPLEX_CONST_174)
-            return (ASTExprNode)getChild(1);
+        if (getProduction() == Production.COMPLEX_CONST_175)
+            return (ASTExpressionNode)getChild(3);
         else
             return null;
     }
 
-    public Token getTComma()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPLEX_CONST_174)
-            return (Token)getChild(2);
+        if (getProduction() == Production.COMPLEX_CONST_175 && index == 0)
+            return false;
+        else if (getProduction() == Production.COMPLEX_CONST_175 && index == 2)
+            return false;
+        else if (getProduction() == Production.COMPLEX_CONST_175 && index == 4)
+            return false;
         else
-            return null;
-    }
-
-    public ASTExprNode getComplexPart()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPLEX_CONST_174)
-            return (ASTExprNode)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPLEX_CONST_174)
-            return (Token)getChild(4);
-        else
-            return null;
+            return true;
     }
 }

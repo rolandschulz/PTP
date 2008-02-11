@@ -43,89 +43,113 @@ public class ASTEndSubroutineStmtNode extends InteriorNode
         visitor.visitASTEndSubroutineStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1012)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1013)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1014)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1015)
-            return (ASTLblDefNode)getChild(0);
+        if (getProduction() == Production.END_SUBROUTINE_STMT_1007)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1008)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1009)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1010)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTEnd()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1014)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1015)
-            return (Token)getChild(1);
+        if (getProduction() == Production.END_SUBROUTINE_STMT_1007)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1008)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1009)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1010)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public Token getEndName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.END_SUBROUTINE_STMT_1009)
+            return (Token)((ASTEndNameNode)getChild(2)).getEndName();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
+            return (Token)((ASTEndNameNode)getChild(3)).getEndName();
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasEndName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1012)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1013)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1014)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1015)
-            return (Token)getChild(4);
+        if (getProduction() == Production.END_SUBROUTINE_STMT_1009)
+            return ((ASTEndNameNode)getChild(2)).hasEndName();
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011)
+            return ((ASTEndNameNode)getChild(3)).hasEndName();
         else
-            return null;
+            return false;
     }
 
-    public Token getTEndsubroutine()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SUBROUTINE_STMT_1012)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1013)
-            return (Token)getChild(1);
+        if (getProduction() == Production.END_SUBROUTINE_STMT_1007 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1007 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1008 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1008 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1009 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1009 && index == 3)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1010 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1010 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1010 && index == 3)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011 && index == 4)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public ASTEndNameNode getEndName()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SUBROUTINE_STMT_1013)
-            return (ASTEndNameNode)getChild(2);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1015)
-            return (ASTEndNameNode)getChild(3);
+        if (getProduction() == Production.END_SUBROUTINE_STMT_1007 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1008 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1009 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1009 && index == 2)
+            return true;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1010 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_SUBROUTINE_STMT_1011 && index == 3)
+            return true;
         else
-            return null;
-    }
-
-    public Token getTSubroutine()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SUBROUTINE_STMT_1014)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.END_SUBROUTINE_STMT_1015)
-            return (Token)getChild(2);
-        else
-            return null;
+            return false;
     }
 }

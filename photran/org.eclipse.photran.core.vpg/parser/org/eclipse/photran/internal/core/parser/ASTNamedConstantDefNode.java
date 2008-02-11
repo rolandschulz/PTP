@@ -43,33 +43,39 @@ public class ASTNamedConstantDefNode extends InteriorNode
         visitor.visitASTNamedConstantDefNode(this);
     }
 
-    public ASTNamedConstantNode getNamedConstant()
+    public ASTExpressionNode getInitializationExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_369)
-            return (ASTNamedConstantNode)getChild(0);
+        if (getProduction() == Production.NAMED_CONSTANT_DEF_366)
+            return (ASTExpressionNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTEquals()
+    public Token getNamedConstant()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_369)
-            return (Token)getChild(1);
+        if (getProduction() == Production.NAMED_CONSTANT_DEF_366)
+            return (Token)((ASTNamedConstantNode)getChild(0)).getNamedConstant();
         else
             return null;
     }
 
-    public ASTExprNode getExpr()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_369)
-            return (ASTExprNode)getChild(2);
+        if (getProduction() == Production.NAMED_CONSTANT_DEF_366 && index == 1)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.NAMED_CONSTANT_DEF_366 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

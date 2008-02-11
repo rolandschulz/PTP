@@ -47,18 +47,18 @@ public class ASTElseIfConstructNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_CONSTRUCT_663)
+        if (getProduction() == Production.ELSE_IF_CONSTRUCT_660)
             return (ASTElseIfStmtNode)getChild(0);
         else
             return null;
     }
 
-    public ASTThenPartNode getThenPart()
+    public ASTConditionalBodyNode getElseIfBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_CONSTRUCT_663)
-            return (ASTThenPartNode)getChild(1);
+        if (getProduction() == Production.ELSE_IF_CONSTRUCT_660)
+            return (ASTConditionalBodyNode)getChild(1);
         else
             return null;
     }

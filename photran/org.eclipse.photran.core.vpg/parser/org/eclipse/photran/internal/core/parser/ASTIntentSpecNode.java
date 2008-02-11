@@ -43,37 +43,43 @@ public class ASTIntentSpecNode extends InteriorNode
         visitor.visitASTIntentSpecNode(this);
     }
 
-    public Token getTIn()
+    public boolean isIntentIn()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTENT_SPEC_290)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.INTENT_SPEC_293)
-            return (Token)getChild(0);
+        if (getProduction() == Production.INTENT_SPEC_287)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTOut()
+    public boolean isIntentOut()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTENT_SPEC_291)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.INTENT_SPEC_293)
-            return (Token)getChild(1);
+        if (getProduction() == Production.INTENT_SPEC_288)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTInout()
+    public boolean isIntentInOut()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INTENT_SPEC_292)
-            return (Token)getChild(0);
+        if (getProduction() == Production.INTENT_SPEC_289)
+            return getChild(0) != null;
+        else if (getProduction() == Production.INTENT_SPEC_290)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.INTENT_SPEC_290 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

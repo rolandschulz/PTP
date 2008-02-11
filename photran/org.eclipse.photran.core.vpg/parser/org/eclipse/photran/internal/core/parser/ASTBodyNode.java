@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTBodyNode extends InteriorNode implements  Iterable<ASTBodyConstructNode>
+public class ASTBodyNode extends InteriorNode implements  Iterable<IBodyConstruct>
 {
     protected int count = -1;
 
@@ -95,7 +95,7 @@ public class ASTBodyNode extends InteriorNode implements  Iterable<ASTBodyConstr
         visitor.visitASTBodyNode(this);
     }
 
-    public Iterator<ASTBodyConstructNode> iterator()
+    public Iterator<IBodyConstruct> iterator()
     {
         final int listSize = size();
         
@@ -105,7 +105,7 @@ public class ASTBodyNode extends InteriorNode implements  Iterable<ASTBodyConstr
 
         final ASTBodyNode baseNode = node;
         
-        return new Iterator<ASTBodyConstructNode>()
+        return new Iterator<IBodyConstruct>()
         {
             private ASTBodyNode node = baseNode;
             private int index = 0;
@@ -115,10 +115,10 @@ public class ASTBodyNode extends InteriorNode implements  Iterable<ASTBodyConstr
                 return index < listSize;
             }
 
-            public ASTBodyConstructNode next()
+            public IBodyConstruct next()
             {
                 int child = (index == 0 ? 0 : 1);
-                ASTBodyConstructNode result = (ASTBodyConstructNode)node.getChild(child);
+                IBodyConstruct result = (IBodyConstruct)node.getChild(child);
                 node = (index == listSize-1 ? null : (ASTBodyNode)node.parent);
                 index++;
                 return result;
@@ -131,15 +131,15 @@ public class ASTBodyNode extends InteriorNode implements  Iterable<ASTBodyConstr
         };
     }
 
-    public ASTBodyConstructNode getBodyConstruct(int listIndex)
+    public IBodyConstruct getBodyConstruct(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTBodyNode node = recurseToIndex(listIndex);
         if (node.getProduction() == Production.BODY_13)
-            return (ASTBodyConstructNode)node.getChild(0);
+            return (IBodyConstruct)node.getChild(0);
         else if (node.getProduction() == Production.BODY_14)
-            return (ASTBodyConstructNode)node.getChild(1);
+            return (IBodyConstruct)node.getChild(1);
         else
             return null;
     }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCommaLoopControlNode extends InteriorNode
+class ASTCommaLoopControlNode extends InteriorNode
 {
     ASTCommaLoopControlNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,31 +37,36 @@ public class ASTCommaLoopControlNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTCommaLoopControlNode(this);
-    }
-
-    public Token getTComma()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMMA_LOOP_CONTROL_717)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
 
     public ASTLoopControlNode getLoopControl()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMA_LOOP_CONTROL_717)
+        if (getProduction() == Production.COMMA_LOOP_CONTROL_711)
             return (ASTLoopControlNode)getChild(1);
-        else if (getProduction() == Production.COMMA_LOOP_CONTROL_718)
+        else if (getProduction() == Production.COMMA_LOOP_CONTROL_712)
             return (ASTLoopControlNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasLoopControl()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMMA_LOOP_CONTROL_711)
+            return getChild(1) != null;
+        else if (getProduction() == Production.COMMA_LOOP_CONTROL_712)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.COMMA_LOOP_CONTROL_711 && index == 0)
+            return false;
+        else
+            return true;
     }
 }

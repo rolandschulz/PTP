@@ -43,23 +43,45 @@ public class ASTCommonBlockObjectNode extends InteriorNode
         visitor.visitASTCommonBlockObjectNode(this);
     }
 
-    public ASTVariableNameNode getVariableName()
+    public Token getVariableName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMON_BLOCK_OBJECT_419)
-            return (ASTVariableNameNode)getChild(0);
+        if (getProduction() == Production.COMMON_BLOCK_OBJECT_417)
+            return (Token)((ASTVariableNameNode)getChild(0)).getVariableName();
+        else if (getProduction() == Production.COMMON_BLOCK_OBJECT_418)
+            return (Token)((ASTArrayDeclaratorNode)getChild(0)).getVariableName();
         else
             return null;
     }
 
-    public ASTArrayDeclaratorNode getArrayDeclarator()
+    public ASTArraySpecNode getArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMON_BLOCK_OBJECT_420)
-            return (ASTArrayDeclaratorNode)getChild(0);
+        if (getProduction() == Production.COMMON_BLOCK_OBJECT_418)
+            return (ASTArraySpecNode)((ASTArrayDeclaratorNode)getChild(0)).getArraySpec();
         else
             return null;
+    }
+
+    public boolean hasArraySpec()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMMON_BLOCK_OBJECT_418)
+            return ((ASTArrayDeclaratorNode)getChild(0)).hasArraySpec();
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.COMMON_BLOCK_OBJECT_417 && index == 0)
+            return true;
+        else if (getProduction() == Production.COMMON_BLOCK_OBJECT_418 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

@@ -43,23 +43,33 @@ public class ASTSavedEntityNode extends InteriorNode
         visitor.visitASTSavedEntityNode(this);
     }
 
-    public ASTVariableNameNode getVariableName()
+    public Token getVariableName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVED_ENTITY_338)
-            return (ASTVariableNameNode)getChild(0);
+        if (getProduction() == Production.SAVED_ENTITY_335)
+            return (Token)((ASTVariableNameNode)getChild(0)).getVariableName();
         else
             return null;
     }
 
-    public ASTSavedCommonBlockNode getSavedCommonBlock()
+    public Token getCommonBlockName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SAVED_ENTITY_339)
-            return (ASTSavedCommonBlockNode)getChild(0);
+        if (getProduction() == Production.SAVED_ENTITY_336)
+            return (Token)((ASTSavedCommonBlockNode)getChild(0)).getCommonBlockName();
         else
             return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SAVED_ENTITY_335 && index == 0)
+            return true;
+        else if (getProduction() == Production.SAVED_ENTITY_336 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

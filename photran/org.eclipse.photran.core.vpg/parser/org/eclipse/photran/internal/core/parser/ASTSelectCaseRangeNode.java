@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSelectCaseRangeNode extends InteriorNode
+class ASTSelectCaseRangeNode extends InteriorNode
 {
     ASTSelectCaseRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,34 @@ public class ASTSelectCaseRangeNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSelectCaseRangeNode(this);
-    }
 
     public ASTSelectCaseBodyNode getSelectCaseBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_RANGE_683)
+        if (getProduction() == Production.SELECT_CASE_RANGE_677)
             return (ASTSelectCaseBodyNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasSelectCaseBody()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SELECT_CASE_RANGE_677)
+            return getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTEndSelectStmtNode getEndSelectStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_RANGE_683)
+        if (getProduction() == Production.SELECT_CASE_RANGE_677)
             return (ASTEndSelectStmtNode)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_RANGE_684)
+        else if (getProduction() == Production.SELECT_CASE_RANGE_678)
             return (ASTEndSelectStmtNode)getChild(0);
         else
             return null;

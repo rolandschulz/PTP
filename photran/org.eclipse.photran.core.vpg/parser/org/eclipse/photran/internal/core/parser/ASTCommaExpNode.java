@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCommaExpNode extends InteriorNode
+class ASTCommaExpNode extends InteriorNode
 {
     ASTCommaExpNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,22 @@ public class ASTCommaExpNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTCommaExpNode(this);
-    }
 
-    public Token getTComma()
+    public ASTExpressionNode getExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMMA_EXP_735)
-            return (Token)getChild(0);
+        if (getProduction() == Production.COMMA_EXP_729)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public ASTExprNode getExpr()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMMA_EXP_735)
-            return (ASTExprNode)getChild(1);
+        if (getProduction() == Production.COMMA_EXP_729 && index == 0)
+            return false;
         else
-            return null;
+            return true;
     }
 }

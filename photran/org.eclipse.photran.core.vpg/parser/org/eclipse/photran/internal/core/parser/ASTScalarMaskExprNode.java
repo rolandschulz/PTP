@@ -43,13 +43,21 @@ public class ASTScalarMaskExprNode extends InteriorNode
         visitor.visitASTScalarMaskExprNode(this);
     }
 
-    public ASTMaskExprNode getMaskExpr()
+    public ASTExpressionNode getMaskExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SCALAR_MASK_EXPR_641)
-            return (ASTMaskExprNode)getChild(0);
+        if (getProduction() == Production.SCALAR_MASK_EXPR_639)
+            return (ASTExpressionNode)((ASTMaskExprNode)getChild(0)).getMaskExpr();
         else
             return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SCALAR_MASK_EXPR_639 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

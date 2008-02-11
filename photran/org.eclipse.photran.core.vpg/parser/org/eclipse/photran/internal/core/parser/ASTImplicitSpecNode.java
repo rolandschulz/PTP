@@ -47,17 +47,17 @@ public class ASTImplicitSpecNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_SPEC_397)
+        if (getProduction() == Production.IMPLICIT_SPEC_394)
             return (ASTTypeSpecNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTXImpl()
+    public Token getCharRanges()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IMPLICIT_SPEC_397)
+        if (getProduction() == Production.IMPLICIT_SPEC_394)
             return (Token)getChild(1);
         else
             return null;

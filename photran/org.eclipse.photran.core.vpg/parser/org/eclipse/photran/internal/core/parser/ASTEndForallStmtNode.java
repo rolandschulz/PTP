@@ -43,83 +43,103 @@ public class ASTEndForallStmtNode extends InteriorNode
         visitor.visitASTEndForallStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_FORALL_STMT_650)
-            return (ASTLblDefNode)getChild(0);
+        if (getProduction() == Production.END_FORALL_STMT_648)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.END_FORALL_STMT_649)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.END_FORALL_STMT_650)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.END_FORALL_STMT_651)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_FORALL_STMT_652)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.END_FORALL_STMT_653)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTEnd()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_FORALL_STMT_650)
-            return (Token)getChild(1);
+        if (getProduction() == Production.END_FORALL_STMT_648)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.END_FORALL_STMT_649)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.END_FORALL_STMT_650)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.END_FORALL_STMT_651)
-            return (Token)getChild(1);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else
-            return null;
+            return false;
     }
 
-    public Token getTForall()
+    public Token getEndName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_FORALL_STMT_650)
-            return (Token)getChild(2);
+        if (getProduction() == Production.END_FORALL_STMT_649)
+            return (Token)((ASTEndNameNode)getChild(3)).getEndName();
         else if (getProduction() == Production.END_FORALL_STMT_651)
-            return (Token)getChild(2);
+            return (Token)((ASTEndNameNode)getChild(2)).getEndName();
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasEndName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_FORALL_STMT_650)
-            return (Token)getChild(3);
+        if (getProduction() == Production.END_FORALL_STMT_649)
+            return ((ASTEndNameNode)getChild(3)).hasEndName();
         else if (getProduction() == Production.END_FORALL_STMT_651)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.END_FORALL_STMT_652)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.END_FORALL_STMT_653)
-            return (Token)getChild(3);
+            return ((ASTEndNameNode)getChild(2)).hasEndName();
         else
-            return null;
+            return false;
     }
 
-    public ASTEndNameNode getEndName()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_FORALL_STMT_651)
-            return (ASTEndNameNode)getChild(3);
-        else if (getProduction() == Production.END_FORALL_STMT_653)
-            return (ASTEndNameNode)getChild(2);
+        if (getProduction() == Production.END_FORALL_STMT_648 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_648 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_648 && index == 3)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_649 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_649 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_649 && index == 4)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_650 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_650 && index == 2)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_651 && index == 1)
+            return false;
+        else if (getProduction() == Production.END_FORALL_STMT_651 && index == 3)
+            return false;
         else
-            return null;
+            return true;
     }
 
-    public Token getTEndforall()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_FORALL_STMT_652)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.END_FORALL_STMT_653)
-            return (Token)getChild(1);
+        if (getProduction() == Production.END_FORALL_STMT_648 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_FORALL_STMT_649 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_FORALL_STMT_649 && index == 3)
+            return true;
+        else if (getProduction() == Production.END_FORALL_STMT_650 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_FORALL_STMT_651 && index == 0)
+            return true;
+        else if (getProduction() == Production.END_FORALL_STMT_651 && index == 2)
+            return true;
         else
-            return null;
+            return false;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAssumedShapeSpecNode extends InteriorNode
+class ASTAssumedShapeSpecNode extends InteriorNode
 {
     ASTAssumedShapeSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,31 +37,42 @@ public class ASTAssumedShapeSpecNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTAssumedShapeSpecNode(this);
-    }
 
-    public ASTLowerBoundNode getLowerBound()
+    public ASTExpressionNode getLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_307)
-            return (ASTLowerBoundNode)getChild(0);
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304)
+            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(0)).getLb();
         else
             return null;
     }
 
-    public Token getTColon()
+    public boolean hasLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_307)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_308)
-            return (Token)getChild(0);
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304)
+            return ((ASTLowerBoundNode)getChild(0)).hasLb();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304 && index == 1)
+            return false;
+        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_305 && index == 0)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

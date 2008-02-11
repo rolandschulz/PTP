@@ -19,6 +19,7 @@ import org.eclipse.photran.internal.core.parser.ASTAllocatableStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayAllocationListNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorListNode;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentParListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamedConstantDefListNode;
@@ -54,9 +55,9 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTIntentStmtNode(ASTIntentStmtNode node)
     {
-        ASTIntentParListNode list = node.getIntentParList();
+        ASTIntentParListNode list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getIntentPar(i).getDummyArgName().getTIdent());
+            bind(list.getVariableName(i));
     }
 
     // # R521
@@ -71,9 +72,9 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTOptionalStmtNode(ASTOptionalStmtNode node)
     {
-        ASTOptionalParListNode list = node.getOptionalParList();
+        ASTOptionalParListNode list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getOptionalPar(i).getDummyArgName().getTIdent());
+            bind(list.getVariableName(i));
     }
 
     // # R522
@@ -97,9 +98,9 @@ class SpecificationCollector extends BindingCollector
 
         for (int i = 0; i < list.size(); i++)
         {
-            if (list.getAccessId(i).getGenericName() != null)
+            if (list.getAccessId(i) instanceof ASTGenericNameNode)
             {
-                List<PhotranTokenRef> bindings = bind(list.getAccessId(i).getGenericName().getTIdent());
+                List<PhotranTokenRef> bindings = bind(((ASTGenericNameNode)list.getAccessId(i)).getGenericName());
 
                 try
                 {
@@ -136,15 +137,15 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTSaveStmtNode(ASTSaveStmtNode node)
     {
-        ASTSavedEntityListNode list = node.getSavedEntityList();
+        ASTSavedEntityListNode list = node.getVariableList();
         if (list == null) return;
         for (int i = 0; i < list.size(); i++)
         {
             ASTSavedEntityNode entity = list.getSavedEntity(i);
             if (entity.getVariableName() != null)
-                bind(entity.getVariableName().getTIdent());
-            else if (entity.getSavedCommonBlock() != null)
-                bind(entity.getSavedCommonBlock().getCommonBlockName().getTIdent());
+                bind(entity.getVariableName());
+            else if (entity.getCommonBlockName() != null)
+                bind(entity.getCommonBlockName());
         }
     }
 
@@ -163,7 +164,7 @@ class SpecificationCollector extends BindingCollector
         final ASTArrayDeclaratorListNode decls = node.getArrayDeclaratorList();
         for (int i = 0; i < decls.size(); i++)
         {
-            List<PhotranTokenRef> bindings = bind(decls.getArrayDeclarator(i).getVariableName().getTIdent());
+            List<PhotranTokenRef> bindings = bind(decls.getArrayDeclarator(i).getVariableName());
 
             try
             {
@@ -197,7 +198,7 @@ class SpecificationCollector extends BindingCollector
     {
         ASTArrayAllocationListNode list = node.getArrayAllocationList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getArrayAllocation(i).getArrayName().getTIdent());
+            bind(list.getArrayAllocation(i).getArrayName());
     }
 
     // # R528 /* <ObjectName> renamed to <PointerName> to simplify Sem. Anal. */
@@ -218,7 +219,7 @@ class SpecificationCollector extends BindingCollector
     {
         ASTPointerStmtObjectListNode list = node.getPointerStmtObjectList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getPointerStmtObject(i).getPointerName().getTIdent());
+            bind(list.getPointerStmtObject(i).getPointerName());
     }
 
     //
@@ -241,7 +242,7 @@ class SpecificationCollector extends BindingCollector
     {
         ASTTargetObjectListNode list = node.getTargetObjectList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getTargetObject(i).getTargetName().getTIdent());
+            bind(list.getTargetObject(i).getTargetName());
     }
 
     // # R530
@@ -259,6 +260,6 @@ class SpecificationCollector extends BindingCollector
     {
         ASTNamedConstantDefListNode list = node.getNamedConstantDefList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getNamedConstantDef(i).getNamedConstant().getTIdent());
+            bind(list.getNamedConstantDef(i).getNamedConstant());
     }
 }

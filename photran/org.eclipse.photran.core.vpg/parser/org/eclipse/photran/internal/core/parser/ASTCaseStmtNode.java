@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols
+public class ASTCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols implements ICaseBodyConstruct
 {
     ASTCaseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,68 +40,123 @@ public class ASTCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitICaseBodyConstruct(this);
         visitor.visitASTCaseStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_693)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.CASE_STMT_694)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.CASE_STMT_ERROR_15)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTCase()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_693)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CASE_STMT_694)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CASE_STMT_ERROR_15)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTCaseSelectorNode getCaseSelector()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_693)
-            return (ASTCaseSelectorNode)getChild(2);
-        else if (getProduction() == Production.CASE_STMT_694)
-            return (ASTCaseSelectorNode)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_693)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.CASE_STMT_694)
-            return (Token)getChild(4);
-        else
-            return null;
     }
 
     public ASTNameNode getName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_694)
+        if (getProduction() == Production.CASE_STMT_688)
             return (ASTNameNode)getChild(3);
         else
             return null;
+    }
+
+    public boolean hasName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_STMT_688)
+            return getChild(3) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_STMT_687)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.CASE_STMT_688)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.CASE_STMT_ERROR_15)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_STMT_687)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.CASE_STMT_688)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.CASE_STMT_ERROR_15)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public ASTCaseValueRangeListNode getCaseValueRangeListSelector()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_STMT_687)
+            return (ASTCaseValueRangeListNode)((ASTCaseSelectorNode)getChild(2)).getCaseValueRangeListSelector();
+        else if (getProduction() == Production.CASE_STMT_688)
+            return (ASTCaseValueRangeListNode)((ASTCaseSelectorNode)getChild(2)).getCaseValueRangeListSelector();
+        else
+            return null;
+    }
+
+    public boolean hasCaseValueRangeListSelector()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_STMT_687)
+            return ((ASTCaseSelectorNode)getChild(2)).hasCaseValueRangeListSelector();
+        else if (getProduction() == Production.CASE_STMT_688)
+            return ((ASTCaseSelectorNode)getChild(2)).hasCaseValueRangeListSelector();
+        else
+            return false;
+    }
+
+    public boolean hasDefaultSelector()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CASE_STMT_687)
+            return ((ASTCaseSelectorNode)getChild(2)).hasDefaultSelector();
+        else if (getProduction() == Production.CASE_STMT_688)
+            return ((ASTCaseSelectorNode)getChild(2)).hasDefaultSelector();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.CASE_STMT_687 && index == 1)
+            return false;
+        else if (getProduction() == Production.CASE_STMT_687 && index == 3)
+            return false;
+        else if (getProduction() == Production.CASE_STMT_688 && index == 1)
+            return false;
+        else if (getProduction() == Production.CASE_STMT_688 && index == 4)
+            return false;
+        else if (getProduction() == Production.CASE_STMT_ERROR_15 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.CASE_STMT_687 && index == 0)
+            return true;
+        else if (getProduction() == Production.CASE_STMT_687 && index == 2)
+            return true;
+        else if (getProduction() == Production.CASE_STMT_688 && index == 0)
+            return true;
+        else if (getProduction() == Production.CASE_STMT_688 && index == 2)
+            return true;
+        else if (getProduction() == Production.CASE_STMT_ERROR_15 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

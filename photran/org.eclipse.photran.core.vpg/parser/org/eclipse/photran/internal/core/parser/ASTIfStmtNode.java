@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTIfStmtNode extends InteriorNodeWithErrorRecoverySymbols
+public class ASTIfStmtNode extends InteriorNodeWithErrorRecoverySymbols implements IActionStmt
 {
     ASTIfStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,26 +40,15 @@ public class ASTIfStmtNode extends InteriorNodeWithErrorRecoverySymbols
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
         visitor.visitASTIfStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_STMT_681)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.IF_STMT_ERROR_10)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
     }
 
     public Token getTIf()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_STMT_681)
+        if (getProduction() == Production.IF_STMT_675)
             return (Token)getChild(1);
         else if (getProduction() == Production.IF_STMT_ERROR_10)
             return (Token)getChild(1);
@@ -67,43 +56,67 @@ public class ASTIfStmtNode extends InteriorNodeWithErrorRecoverySymbols
             return null;
     }
 
-    public Token getTLparen()
+    public ASTExpressionNode getGuardingExpression()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_STMT_681)
-            return (Token)getChild(2);
+        if (getProduction() == Production.IF_STMT_675)
+            return (ASTExpressionNode)getChild(3);
         else
             return null;
     }
 
-    public ASTExprNode getExpr()
+    public IActionStmt getActionStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_STMT_681)
-            return (ASTExprNode)getChild(3);
+        if (getProduction() == Production.IF_STMT_675)
+            return (IActionStmt)getChild(5);
         else
             return null;
     }
 
-    public Token getTRparen()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_STMT_681)
-            return (Token)getChild(4);
+        if (getProduction() == Production.IF_STMT_675)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.IF_STMT_ERROR_10)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public ASTActionStmtNode getActionStmt()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.IF_STMT_681)
-            return (ASTActionStmtNode)getChild(5);
+        if (getProduction() == Production.IF_STMT_675)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.IF_STMT_ERROR_10)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.IF_STMT_675 && index == 2)
+            return false;
+        else if (getProduction() == Production.IF_STMT_675 && index == 4)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.IF_STMT_675 && index == 0)
+            return true;
+        else if (getProduction() == Production.IF_STMT_ERROR_10 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

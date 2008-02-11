@@ -43,171 +43,175 @@ public class ASTSelectCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols
         visitor.visitASTSelectCaseStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public ASTExpressionNode getSelectionExpression()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SELECT_CASE_STMT_690)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (ASTLblDefNode)getChild(0);
+        if (getProduction() == Production.SELECT_CASE_STMT_683)
+            return (ASTExpressionNode)getChild(5);
+        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+            return (ASTExpressionNode)getChild(3);
+        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+            return (ASTExpressionNode)getChild(6);
+        else if (getProduction() == Production.SELECT_CASE_STMT_686)
+            return (ASTExpressionNode)getChild(4);
+        else
+            return null;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SELECT_CASE_STMT_683)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.SELECT_CASE_STMT_686)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public ASTNameNode getName()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (ASTNameNode)getChild(1);
+        if (getProduction() == Production.SELECT_CASE_STMT_683)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.SELECT_CASE_STMT_684)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.SELECT_CASE_STMT_686)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (ASTNameNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTColon()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTSelectcase()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_690)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return (Token)getChild(3);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_690)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (ASTExprNode)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_690)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (ASTExprNode)getChild(6);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (ASTExprNode)getChild(4);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.SELECT_CASE_STMT_690)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (Token)getChild(7);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (Token)getChild(5);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_689)
-            return (Token)getChild(7);
-        else if (getProduction() == Production.SELECT_CASE_STMT_690)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (Token)getChild(8);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (Token)getChild(6);
-        else
-            return null;
-    }
-
-    public Token getTSelect()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (Token)getChild(1);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (Token)getChild(3);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
-            return (Token)getChild(1);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public Token getSelectConstructName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SELECT_CASE_STMT_683)
+            return (Token)((ASTNameNode)getChild(1)).getName();
+        else if (getProduction() == Production.SELECT_CASE_STMT_685)
+            return (Token)((ASTNameNode)getChild(1)).getName();
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
+            return (Token)((ASTNameNode)getChild(1)).getName();
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
+            return (Token)((ASTNameNode)getChild(1)).getName();
         else
             return null;
     }
 
-    public Token getTCase()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_691)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_692)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
-            return (Token)getChild(2);
+        if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 2)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 3)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 4)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 6)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 7)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 1)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 2)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 4)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 5)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 2)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 3)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 4)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 5)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 7)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 8)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 1)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 2)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 3)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 5)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 6)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 2)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 3)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12 && index == 1)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 2)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 3)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 4)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14 && index == 1)
+            return false;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14 && index == 2)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 1)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 1)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 1)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 0)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 1)
+            return true;
+        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

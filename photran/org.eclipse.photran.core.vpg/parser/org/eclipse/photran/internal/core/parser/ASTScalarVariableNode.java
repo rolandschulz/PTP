@@ -43,23 +43,55 @@ public class ASTScalarVariableNode extends InteriorNode
         visitor.visitASTScalarVariableNode(this);
     }
 
-    public ASTVariableNameNode getVariableName()
+    public Token getVariableName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SCALAR_VARIABLE_427)
-            return (ASTVariableNameNode)getChild(0);
+        if (getProduction() == Production.SCALAR_VARIABLE_425)
+            return (Token)((ASTVariableNameNode)getChild(0)).getVariableName();
+        else if (getProduction() == Production.SCALAR_VARIABLE_426)
+            return (Token)((ASTArrayElementNode)getChild(0)).getVariableName();
         else
             return null;
     }
 
-    public ASTArrayElementNode getArrayElement()
+    public ASTSectionSubscriptListNode getSectionSubscriptList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SCALAR_VARIABLE_428)
-            return (ASTArrayElementNode)getChild(0);
+        if (getProduction() == Production.SCALAR_VARIABLE_426)
+            return (ASTSectionSubscriptListNode)((ASTArrayElementNode)getChild(0)).getSectionSubscriptList();
         else
             return null;
+    }
+
+    public ASTStructureComponentNode getStructureComponent()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SCALAR_VARIABLE_426)
+            return (ASTStructureComponentNode)((ASTArrayElementNode)getChild(0)).getStructureComponent();
+        else
+            return null;
+    }
+
+    public boolean hasStructureComponent()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SCALAR_VARIABLE_426)
+            return ((ASTArrayElementNode)getChild(0)).hasStructureComponent();
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SCALAR_VARIABLE_425 && index == 0)
+            return true;
+        else if (getProduction() == Production.SCALAR_VARIABLE_426 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

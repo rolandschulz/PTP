@@ -99,27 +99,25 @@ public class ASTRdIoCtlSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRdIoCtlSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_779)
+        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_773)
             return (ASTUnitIdentifierNode)node.getChild(0);
-        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_780)
+        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_774)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    public boolean hasUnitIdentifier(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRdIoCtlSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_779)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_780)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_782)
-            return (Token)node.getChild(1);
+        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_773)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_774)
+            return node.getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTIoControlSpecNode getIoControlSpec(int listIndex)
@@ -127,14 +125,29 @@ public class ASTRdIoCtlSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRdIoCtlSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_779)
+        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_773)
             return (ASTIoControlSpecNode)node.getChild(2);
-        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_781)
+        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_775)
             return (ASTIoControlSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_782)
+        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_776)
             return (ASTIoControlSpecNode)node.getChild(2);
         else
             return null;
+    }
+
+    public boolean hasIoControlSpec(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTRdIoCtlSpecListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_773)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_775)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_776)
+            return node.getChild(2) != null;
+        else
+            return false;
     }
 
     public ASTFormatIdentifierNode getFormatIdentifier(int listIndex)
@@ -142,19 +155,42 @@ public class ASTRdIoCtlSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTRdIoCtlSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_780)
+        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_774)
             return (ASTFormatIdentifierNode)node.getChild(2);
         else
             return null;
+    }
+
+    public boolean hasFormatIdentifier(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTRdIoCtlSpecListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.RD_IO_CTL_SPEC_LIST_774)
+            return node.getChild(2) != null;
+        else
+            return false;
     }
 
     private ASTRdIoCtlSpecListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_IO_CTL_SPEC_LIST_782)
+        if (getProduction() == Production.RD_IO_CTL_SPEC_LIST_776)
             return (ASTRdIoCtlSpecListNode)getChild(0);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.RD_IO_CTL_SPEC_LIST_773 && index == 1)
+            return false;
+        else if (getProduction() == Production.RD_IO_CTL_SPEC_LIST_774 && index == 1)
+            return false;
+        else if (getProduction() == Production.RD_IO_CTL_SPEC_LIST_776 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

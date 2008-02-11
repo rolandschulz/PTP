@@ -43,21 +43,11 @@ public class ASTProgramStmtNode extends InteriorNode
         visitor.visitASTProgramStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public Token getProgramToken()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PROGRAM_STMT_895)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTProgram()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PROGRAM_STMT_895)
+        if (getProduction() == Production.PROGRAM_STMT_889)
             return (Token)getChild(1);
         else
             return null;
@@ -67,19 +57,45 @@ public class ASTProgramStmtNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PROGRAM_STMT_895)
+        if (getProduction() == Production.PROGRAM_STMT_889)
             return (ASTProgramNameNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTEos()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PROGRAM_STMT_895)
-            return (Token)getChild(3);
+        if (getProduction() == Production.PROGRAM_STMT_889)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.PROGRAM_STMT_889)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.PROGRAM_STMT_889 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.PROGRAM_STMT_889 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

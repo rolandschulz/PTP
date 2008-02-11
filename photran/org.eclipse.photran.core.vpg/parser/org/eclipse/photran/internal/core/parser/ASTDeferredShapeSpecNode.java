@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDeferredShapeSpecNode extends InteriorNode
+class ASTDeferredShapeSpecNode extends InteriorNode
 {
     ASTDeferredShapeSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,19 +37,12 @@ public class ASTDeferredShapeSpecNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTDeferredShapeSpecNode(this);
-    }
 
-    public Token getTColon()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_311)
-            return (Token)getChild(0);
+        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_308 && index == 0)
+            return false;
         else
-            return null;
+            return true;
     }
 }

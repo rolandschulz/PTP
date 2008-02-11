@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTForallStmtNode extends InteriorNode
+public class ASTForallStmtNode extends InteriorNode implements IActionStmt, IForallBodyConstruct
 {
     ASTForallStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,74 +40,120 @@ public class ASTForallStmtNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIActionStmt(this);
+        visitor.visitIForallBodyConstruct(this);
         visitor.visitASTForallStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public ASTAssignmentStmtNode getAssignment()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_STMT_654)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FORALL_STMT_655)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTForall()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_STMT_654)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.FORALL_STMT_655)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTForallHeaderNode getForallHeader()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_STMT_654)
-            return (ASTForallHeaderNode)getChild(2);
-        else if (getProduction() == Production.FORALL_STMT_655)
-            return (ASTForallHeaderNode)getChild(2);
-        else
-            return null;
-    }
-
-    public ASTAssignmentStmtNode getAssignmentStmt()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_STMT_654)
+        if (getProduction() == Production.FORALL_STMT_652)
+            return (ASTAssignmentStmtNode)getChild(3);
+        else if (getProduction() == Production.FORALL_STMT_653)
             return (ASTAssignmentStmtNode)getChild(3);
         else
             return null;
     }
 
-    public Token getTEos()
+    public boolean hasAssignment()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_STMT_654)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.FORALL_STMT_655)
-            return (Token)getChild(4);
+        if (getProduction() == Production.FORALL_STMT_652)
+            return getChild(3) != null;
+        else if (getProduction() == Production.FORALL_STMT_653)
+            return getChild(3) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORALL_STMT_652)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.FORALL_STMT_653)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public ASTPointerAssignmentStmtNode getPointerAssignmentStmt()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_STMT_655)
-            return (ASTPointerAssignmentStmtNode)getChild(3);
+        if (getProduction() == Production.FORALL_STMT_652)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.FORALL_STMT_653)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public ASTForallTripletSpecListNode getForallTripletSpecList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORALL_STMT_652)
+            return (ASTForallTripletSpecListNode)((ASTForallHeaderNode)getChild(2)).getForallTripletSpecList();
+        else if (getProduction() == Production.FORALL_STMT_653)
+            return (ASTForallTripletSpecListNode)((ASTForallHeaderNode)getChild(2)).getForallTripletSpecList();
         else
             return null;
+    }
+
+    public ASTScalarMaskExprNode getScalarMaskExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORALL_STMT_652)
+            return (ASTScalarMaskExprNode)((ASTForallHeaderNode)getChild(2)).getScalarMaskExpr();
+        else if (getProduction() == Production.FORALL_STMT_653)
+            return (ASTScalarMaskExprNode)((ASTForallHeaderNode)getChild(2)).getScalarMaskExpr();
+        else
+            return null;
+    }
+
+    public boolean hasScalarMaskExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORALL_STMT_652)
+            return ((ASTForallHeaderNode)getChild(2)).hasScalarMaskExpr();
+        else if (getProduction() == Production.FORALL_STMT_653)
+            return ((ASTForallHeaderNode)getChild(2)).hasScalarMaskExpr();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.FORALL_STMT_652 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORALL_STMT_652 && index == 4)
+            return false;
+        else if (getProduction() == Production.FORALL_STMT_653 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORALL_STMT_653 && index == 4)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.FORALL_STMT_652 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORALL_STMT_652 && index == 2)
+            return true;
+        else if (getProduction() == Production.FORALL_STMT_653 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORALL_STMT_653 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

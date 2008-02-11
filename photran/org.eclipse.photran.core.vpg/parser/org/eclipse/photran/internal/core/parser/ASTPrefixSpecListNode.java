@@ -136,9 +136,9 @@ public class ASTPrefixSpecListNode extends InteriorNode implements  Iterable<AST
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPrefixSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.PREFIX_SPEC_LIST_991)
+        if (node.getProduction() == Production.PREFIX_SPEC_LIST_987)
             return (ASTPrefixSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.PREFIX_SPEC_LIST_992)
+        else if (node.getProduction() == Production.PREFIX_SPEC_LIST_988)
             return (ASTPrefixSpecNode)node.getChild(1);
         else
             return null;
@@ -148,7 +148,7 @@ public class ASTPrefixSpecListNode extends InteriorNode implements  Iterable<AST
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PREFIX_SPEC_LIST_992)
+        if (getProduction() == Production.PREFIX_SPEC_LIST_988)
             return (ASTPrefixSpecListNode)getChild(0);
         else
             return null;

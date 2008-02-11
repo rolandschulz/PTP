@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutineInterfaceRangeNode extends InteriorNode
+class ASTSubroutineInterfaceRangeNode extends InteriorNode
 {
     ASTSubroutineInterfaceRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,34 @@ public class ASTSubroutineInterfaceRangeNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSubroutineInterfaceRangeNode(this);
-    }
 
     public ASTSubprogramInterfaceBodyNode getSubprogramInterfaceBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_947)
+        if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_943)
             return (ASTSubprogramInterfaceBodyNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasSubprogramInterfaceBody()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_943)
+            return getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTEndSubroutineStmtNode getEndSubroutineStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_947)
+        if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_943)
             return (ASTEndSubroutineStmtNode)getChild(1);
-        else if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_948)
+        else if (getProduction() == Production.SUBROUTINE_INTERFACE_RANGE_944)
             return (ASTEndSubroutineStmtNode)getChild(0);
         else
             return null;

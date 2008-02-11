@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFunctionPrefixNode extends InteriorNode
+class ASTFunctionPrefixNode extends InteriorNode
 {
     ASTFunctionPrefixNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,31 +37,34 @@ public class ASTFunctionPrefixNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTFunctionPrefixNode(this);
-    }
-
-    public Token getTFunction()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_PREFIX_989)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.FUNCTION_PREFIX_990)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
 
     public ASTPrefixSpecListNode getPrefixSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PREFIX_990)
+        if (getProduction() == Production.FUNCTION_PREFIX_986)
             return (ASTPrefixSpecListNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasPrefixSpecList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FUNCTION_PREFIX_986)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.FUNCTION_PREFIX_985 && index == 0)
+            return false;
+        else if (getProduction() == Production.FUNCTION_PREFIX_986 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

@@ -99,10 +99,21 @@ public class ASTInquireSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInquireSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_844)
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_838)
             return (ASTUnitIdentifierNode)node.getChild(0);
         else
             return null;
+    }
+
+    public boolean hasUnitIdentifier(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTInquireSpecListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_838)
+            return node.getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTInquireSpecNode getInquireSpec(int listIndex)
@@ -110,32 +121,42 @@ public class ASTInquireSpecListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTInquireSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_845)
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_839)
             return (ASTInquireSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.INQUIRE_SPEC_LIST_846)
+        else if (node.getProduction() == Production.INQUIRE_SPEC_LIST_840)
             return (ASTInquireSpecNode)node.getChild(2);
         else
             return null;
+    }
+
+    public boolean hasInquireSpec(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTInquireSpecListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_839)
+            return node.getChild(0) != null;
+        else if (node.getProduction() == Production.INQUIRE_SPEC_LIST_840)
+            return node.getChild(2) != null;
+        else
+            return false;
     }
 
     private ASTInquireSpecListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.INQUIRE_SPEC_LIST_846)
+        if (getProduction() == Production.INQUIRE_SPEC_LIST_840)
             return (ASTInquireSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTInquireSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.INQUIRE_SPEC_LIST_846)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.INQUIRE_SPEC_LIST_840 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

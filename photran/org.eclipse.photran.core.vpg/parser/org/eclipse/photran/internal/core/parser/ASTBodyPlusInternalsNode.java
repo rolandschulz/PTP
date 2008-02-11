@@ -15,10 +15,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTBodyPlusInternalsNode extends InteriorNode
+class ASTBodyPlusInternalsNode extends InteriorNode
 {
-    protected int count = -1;
-
     ASTBodyPlusInternalsNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
          super(production);
@@ -30,115 +28,46 @@ public class ASTBodyPlusInternalsNode extends InteriorNode
         
     @Override public InteriorNode getASTParent()
     {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTBodyPlusInternalsNode
-               && grandparent instanceof ASTBodyPlusInternalsNode
-               && ((ASTBodyPlusInternalsNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
+        InteriorNode actualParent = super.getParent();
         
         // If a node has been pulled up in an ACST, its physical parent in
         // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
         else 
-            return logicalParent;
+            return actualParent;
     }
 
-    /**
-     * @return the number of ASTBodyPlusInternalsNode nodes in this list
-     */
-    public int size()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTBodyPlusInternalsNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
-    }
-    
-    ASTBodyPlusInternalsNode recurseToIndex(int listIndex)
-    {
-        ASTBodyPlusInternalsNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTBodyPlusInternalsNode)node.getRecursiveNode();
-        }
-        return node;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTBodyPlusInternalsNode(this);
-    }
-
-    public ASTBodyNode getBody(int listIndex)
+    public ASTBodyNode getBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        ASTBodyPlusInternalsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.BODY_PLUS_INTERNALS_52)
-            return (ASTBodyNode)node.getChild(0);
+        if (getProduction() == Production.BODY_PLUS_INTERNALS_52)
+            return (ASTBodyNode)getChild(0);
         else
             return null;
     }
 
-    public ASTContainsStmtNode getContainsStmt(int listIndex)
+    public ASTContainsStmtNode getContainsStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        ASTBodyPlusInternalsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.BODY_PLUS_INTERNALS_52)
-            return (ASTContainsStmtNode)node.getChild(1);
-        else if (node.getProduction() == Production.BODY_PLUS_INTERNALS_53)
-            return (ASTContainsStmtNode)node.getChild(0);
+        if (getProduction() == Production.BODY_PLUS_INTERNALS_52)
+            return (ASTContainsStmtNode)getChild(1);
+        else if (getProduction() == Production.BODY_PLUS_INTERNALS_53)
+            return (ASTContainsStmtNode)getChild(0);
         else
             return null;
     }
 
-    public ASTInternalSubprogramNode getInternalSubprogram(int listIndex)
+    public ASTInternalSubprogramsNode getInternalSubprograms()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        ASTBodyPlusInternalsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.BODY_PLUS_INTERNALS_52)
-            return (ASTInternalSubprogramNode)node.getChild(2);
-        else if (node.getProduction() == Production.BODY_PLUS_INTERNALS_53)
-            return (ASTInternalSubprogramNode)node.getChild(1);
-        else if (node.getProduction() == Production.BODY_PLUS_INTERNALS_54)
-            return (ASTInternalSubprogramNode)node.getChild(1);
-        else
-            return null;
-    }
-
-    private ASTBodyPlusInternalsNode getRecursiveNode()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BODY_PLUS_INTERNALS_54)
-            return (ASTBodyPlusInternalsNode)getChild(0);
+        if (getProduction() == Production.BODY_PLUS_INTERNALS_52)
+            return (ASTInternalSubprogramsNode)getChild(2);
+        else if (getProduction() == Production.BODY_PLUS_INTERNALS_53)
+            return (ASTInternalSubprogramsNode)getChild(1);
         else
             return null;
     }

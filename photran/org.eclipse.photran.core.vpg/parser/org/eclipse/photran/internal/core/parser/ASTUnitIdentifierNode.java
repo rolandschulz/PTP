@@ -43,23 +43,33 @@ public class ASTUnitIdentifierNode extends InteriorNode
         visitor.visitASTUnitIdentifierNode(this);
     }
 
-    public ASTUFExprNode getUFExpr()
+    public ASTExpressionNode getExpression()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UNIT_IDENTIFIER_744)
-            return (ASTUFExprNode)getChild(0);
+        if (getProduction() == Production.UNIT_IDENTIFIER_738)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTAsterisk()
+    public boolean hasExpression()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.UNIT_IDENTIFIER_745)
-            return (Token)getChild(0);
+        if (getProduction() == Production.UNIT_IDENTIFIER_738)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
+    }
+
+    public boolean hasAsterisk()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.UNIT_IDENTIFIER_739)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

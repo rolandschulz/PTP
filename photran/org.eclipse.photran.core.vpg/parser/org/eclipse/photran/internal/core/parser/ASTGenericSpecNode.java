@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTGenericSpecNode extends InteriorNode
+public class ASTGenericSpecNode extends InteriorNode implements IAccessId
 {
     ASTGenericSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,70 +40,61 @@ public class ASTGenericSpecNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIAccessId(this);
         visitor.visitASTGenericSpecNode(this);
     }
 
-    public Token getTOperator()
+    public boolean isDefinedOperator()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_955)
-            return (Token)getChild(0);
+        if (getProduction() == Production.GENERIC_SPEC_951)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTOperatorNode getDefinedOperator()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.GENERIC_SPEC_951)
+            return (ASTOperatorNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean isAssignmentOperator()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_955)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.GENERIC_SPEC_956)
-            return (Token)getChild(1);
+        if (getProduction() == Production.GENERIC_SPEC_952)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
-    public ASTDefinedOperatorNode getDefinedOperator()
+    public Token getEqualsToken()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.GENERIC_SPEC_955)
-            return (ASTDefinedOperatorNode)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_955)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.GENERIC_SPEC_956)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTAssignment()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_956)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTEquals()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_956)
+        if (getProduction() == Production.GENERIC_SPEC_952)
             return (Token)getChild(2);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.GENERIC_SPEC_951 && index == 1)
+            return false;
+        else if (getProduction() == Production.GENERIC_SPEC_951 && index == 3)
+            return false;
+        else if (getProduction() == Production.GENERIC_SPEC_952 && index == 1)
+            return false;
+        else if (getProduction() == Production.GENERIC_SPEC_952 && index == 3)
+            return false;
+        else
+            return true;
     }
 }

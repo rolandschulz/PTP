@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTRdUnitIdNode extends InteriorNode
+class ASTRdUnitIdNode extends InteriorNode
 {
     ASTRdUnitIdNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,53 +37,48 @@ public class ASTRdUnitIdNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTRdUnitIdNode(this);
-    }
 
-    public Token getTLparen()
+    public ASTExpressionNode getReadUnitExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_777)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.RD_UNIT_ID_778)
-            return (Token)getChild(0);
+        if (getProduction() == Production.RD_UNIT_ID_771)
+            return (ASTExpressionNode)getChild(1);
         else
             return null;
     }
 
-    public ASTUFExprNode getUFExpr()
+    public boolean hasReadUnitExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_777)
-            return (ASTUFExprNode)getChild(1);
+        if (getProduction() == Production.RD_UNIT_ID_771)
+            return getChild(1) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTRparen()
+    public boolean readUnitIsAsterisk()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.RD_UNIT_ID_777)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.RD_UNIT_ID_778)
-            return (Token)getChild(2);
+        if (getProduction() == Production.RD_UNIT_ID_772)
+            return getChild(1) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTAsterisk()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_UNIT_ID_778)
-            return (Token)getChild(1);
+        if (getProduction() == Production.RD_UNIT_ID_771 && index == 0)
+            return false;
+        else if (getProduction() == Production.RD_UNIT_ID_771 && index == 2)
+            return false;
+        else if (getProduction() == Production.RD_UNIT_ID_772 && index == 0)
+            return false;
+        else if (getProduction() == Production.RD_UNIT_ID_772 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 }

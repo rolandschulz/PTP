@@ -43,139 +43,215 @@ public class ASTLabelDoStmtNode extends InteriorNode
         visitor.visitASTLabelDoStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_710)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_711)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_712)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_713)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_714)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_715)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.LABEL_DO_STMT_716)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTDo()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_710)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_711)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_712)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_713)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_714)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_715)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_716)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
     public ASTLblRefNode getLblRef()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_709)
+        if (getProduction() == Production.LABEL_DO_STMT_703)
             return (ASTLblRefNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_710)
+        else if (getProduction() == Production.LABEL_DO_STMT_704)
             return (ASTLblRefNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_713)
+        else if (getProduction() == Production.LABEL_DO_STMT_707)
             return (ASTLblRefNode)getChild(4);
-        else if (getProduction() == Production.LABEL_DO_STMT_714)
+        else if (getProduction() == Production.LABEL_DO_STMT_708)
             return (ASTLblRefNode)getChild(4);
         else
             return null;
     }
 
-    public ASTCommaLoopControlNode getCommaLoopControl()
+    public boolean hasLblRef()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (ASTCommaLoopControlNode)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_711)
-            return (ASTCommaLoopControlNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_713)
-            return (ASTCommaLoopControlNode)getChild(5);
-        else if (getProduction() == Production.LABEL_DO_STMT_715)
-            return (ASTCommaLoopControlNode)getChild(4);
+        if (getProduction() == Production.LABEL_DO_STMT_703)
+            return getChild(2) != null;
+        else if (getProduction() == Production.LABEL_DO_STMT_704)
+            return getChild(2) != null;
+        else if (getProduction() == Production.LABEL_DO_STMT_707)
+            return getChild(4) != null;
+        else if (getProduction() == Production.LABEL_DO_STMT_708)
+            return getChild(4) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTEos()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (Token)getChild(4);
+        if (getProduction() == Production.LABEL_DO_STMT_703)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_704)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_705)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_706)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_707)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_708)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_709)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.LABEL_DO_STMT_710)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_711)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.LABEL_DO_STMT_712)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_713)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.LABEL_DO_STMT_714)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.LABEL_DO_STMT_715)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.LABEL_DO_STMT_716)
-            return (Token)getChild(4);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public ASTNameNode getName()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_713)
-            return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_714)
-            return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_715)
-            return (ASTNameNode)getChild(1);
-        else if (getProduction() == Production.LABEL_DO_STMT_716)
-            return (ASTNameNode)getChild(1);
+        if (getProduction() == Production.LABEL_DO_STMT_703)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_704)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_705)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_706)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_707)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_708)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_709)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.LABEL_DO_STMT_710)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public ASTLoopControlNode getLoopControl()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LABEL_DO_STMT_703)
+            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(3)).getLoopControl();
+        else if (getProduction() == Production.LABEL_DO_STMT_705)
+            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(2)).getLoopControl();
+        else if (getProduction() == Production.LABEL_DO_STMT_707)
+            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(5)).getLoopControl();
+        else if (getProduction() == Production.LABEL_DO_STMT_709)
+            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(4)).getLoopControl();
         else
             return null;
     }
 
-    public Token getTColon()
+    public boolean hasLoopControl()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_713)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_714)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_715)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_716)
-            return (Token)getChild(2);
+        if (getProduction() == Production.LABEL_DO_STMT_703)
+            return ((ASTCommaLoopControlNode)getChild(3)).hasLoopControl();
+        else if (getProduction() == Production.LABEL_DO_STMT_705)
+            return ((ASTCommaLoopControlNode)getChild(2)).hasLoopControl();
+        else if (getProduction() == Production.LABEL_DO_STMT_707)
+            return ((ASTCommaLoopControlNode)getChild(5)).hasLoopControl();
+        else if (getProduction() == Production.LABEL_DO_STMT_709)
+            return ((ASTCommaLoopControlNode)getChild(4)).hasLoopControl();
+        else
+            return false;
+    }
+
+    public Token getDoConstructName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LABEL_DO_STMT_707)
+            return (Token)((ASTNameNode)getChild(1)).getName();
+        else if (getProduction() == Production.LABEL_DO_STMT_708)
+            return (Token)((ASTNameNode)getChild(1)).getName();
+        else if (getProduction() == Production.LABEL_DO_STMT_709)
+            return (Token)((ASTNameNode)getChild(1)).getName();
+        else if (getProduction() == Production.LABEL_DO_STMT_710)
+            return (Token)((ASTNameNode)getChild(1)).getName();
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.LABEL_DO_STMT_703 && index == 1)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_703 && index == 4)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_704 && index == 1)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_704 && index == 3)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 1)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 3)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_706 && index == 1)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_706 && index == 2)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 2)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 3)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 6)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 2)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 3)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 5)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 2)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 3)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 5)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 2)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 3)
+            return false;
+        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 4)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.LABEL_DO_STMT_703 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_703 && index == 3)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_704 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 2)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_706 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 1)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 5)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 1)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 1)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 4)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 0)
+            return true;
+        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

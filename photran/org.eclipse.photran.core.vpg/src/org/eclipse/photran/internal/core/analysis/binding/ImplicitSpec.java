@@ -82,7 +82,7 @@ public class ImplicitSpec implements Serializable
                 // <T_xImplicitSpec> ::= <xTypeSpec> T_xImpl
                 
                 Type type = Type.parse(implicitSpec.getTypeSpec());
-                Token impl = implicitSpec.getTXImpl();
+                Token impl = implicitSpec.getCharRanges();
                 setRangesToType(impl, type);
             }
 

@@ -94,85 +94,170 @@ public class ASTDataRefNode extends InteriorNode
         visitor.visitASTDataRefNode(this);
     }
 
-    public ASTNameNode getVarName(int listIndex)
+    private ASTDataRefNode getRecursiveNode()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.DATA_REF_429)
+            return (ASTDataRefNode)getChild(0);
+        else if (getProduction() == Production.DATA_REF_430)
+            return (ASTDataRefNode)getChild(0);
+        else if (getProduction() == Production.SFDATA_REF_433)
+            return (ASTDataRefNode)getChild(0);
+        else if (getProduction() == Production.SFDATA_REF_434)
+            return (ASTDataRefNode)getChild(0);
+        else
+            return null;
+    }
+
+    public boolean hasDerivedTypeComponentName(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTDataRefNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.DATA_REF_429)
+            return node.getChild(1) != null;
+        else if (node.getProduction() == Production.DATA_REF_430)
+            return node.getChild(4) != null;
+        else if (node.getProduction() == Production.SFDATA_REF_431)
+            return node.getChild(1) != null;
+        else if (node.getProduction() == Production.SFDATA_REF_433)
+            return node.getChild(1) != null;
+        else if (node.getProduction() == Production.SFDATA_REF_434)
+            return node.getChild(4) != null;
+        else
+            return false;
+    }
+
+    public ASTSectionSubscriptListNode getPrimarySectionSubscriptList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDataRefNode node = recurseToIndex(listIndex);
         if (node.getProduction() == Production.DATA_REF_430)
-            return (ASTNameNode)node.getChild(0);
-        else
-            return null;
-    }
-
-    private ASTDataRefNode getRecursiveNode()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_REF_431)
-            return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.DATA_REF_432)
-            return (ASTDataRefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTPercent(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_REF_431)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.DATA_REF_432)
-            return (Token)node.getChild(4);
-        else
-            return null;
-    }
-
-    public ASTNameNode getComponentName(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_REF_431)
-            return (ASTNameNode)node.getChild(2);
-        else if (node.getProduction() == Production.DATA_REF_432)
-            return (ASTNameNode)node.getChild(5);
-        else
-            return null;
-    }
-
-    public Token getTLparen(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_REF_432)
-            return (Token)node.getChild(1);
-        else
-            return null;
-    }
-
-    public ASTSectionSubscriptListNode getSectionSubscriptList(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_REF_432)
+            return (ASTSectionSubscriptListNode)node.getChild(2);
+        else if (node.getProduction() == Production.SFDATA_REF_432)
+            return (ASTSectionSubscriptListNode)node.getChild(2);
+        else if (node.getProduction() == Production.SFDATA_REF_434)
             return (ASTSectionSubscriptListNode)node.getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen(int listIndex)
+    public boolean hasPrimarySectionSubscriptList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTDataRefNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DATA_REF_432)
-            return (Token)node.getChild(3);
+        if (node.getProduction() == Production.DATA_REF_430)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.SFDATA_REF_432)
+            return node.getChild(2) != null;
+        else if (node.getProduction() == Production.SFDATA_REF_434)
+            return node.getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getName(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTDataRefNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.DATA_REF_428)
+            return (Token)((ASTNameNode)node.getChild(0)).getName();
+        else if (node.getProduction() == Production.SFDATA_REF_431)
+            return (Token)((ASTNameNode)node.getChild(0)).getName();
+        else if (node.getProduction() == Production.SFDATA_REF_432)
+            return (Token)((ASTNameNode)node.getChild(0)).getName();
         else
             return null;
+    }
+
+    public Token getComponentName(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTDataRefNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.DATA_REF_429)
+            return (Token)((ASTNameNode)node.getChild(2)).getName();
+        else if (node.getProduction() == Production.DATA_REF_430)
+            return (Token)((ASTNameNode)node.getChild(5)).getName();
+        else if (node.getProduction() == Production.SFDATA_REF_431)
+            return (Token)((ASTNameNode)node.getChild(2)).getName();
+        else if (node.getProduction() == Production.SFDATA_REF_433)
+            return (Token)((ASTNameNode)node.getChild(2)).getName();
+        else if (node.getProduction() == Production.SFDATA_REF_434)
+            return (Token)((ASTNameNode)node.getChild(5)).getName();
+        else
+            return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.SFDATA_REF_432 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_432 && index == 3)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_434 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_434 && index == 3)
+            return false;
+        else if (getProduction() == Production.DATA_REF_430 && index == 1)
+            return false;
+        else if (getProduction() == Production.DATA_REF_430 && index == 3)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_432 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_432 && index == 3)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_434 && index == 1)
+            return false;
+        else if (getProduction() == Production.SFDATA_REF_434 && index == 3)
+            return false;
+        else if (getProduction() == Production.DATA_REF_430 && index == 1)
+            return false;
+        else if (getProduction() == Production.DATA_REF_430 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.SFDATA_REF_431 && index == 0)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_431 && index == 2)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_432 && index == 0)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_433 && index == 2)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_434 && index == 5)
+            return true;
+        else if (getProduction() == Production.DATA_REF_428 && index == 0)
+            return true;
+        else if (getProduction() == Production.DATA_REF_429 && index == 2)
+            return true;
+        else if (getProduction() == Production.DATA_REF_430 && index == 5)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_431 && index == 0)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_431 && index == 2)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_432 && index == 0)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_433 && index == 2)
+            return true;
+        else if (getProduction() == Production.SFDATA_REF_434 && index == 5)
+            return true;
+        else if (getProduction() == Production.DATA_REF_428 && index == 0)
+            return true;
+        else if (getProduction() == Production.DATA_REF_429 && index == 2)
+            return true;
+        else if (getProduction() == Production.DATA_REF_430 && index == 5)
+            return true;
+        else
+            return false;
     }
 }

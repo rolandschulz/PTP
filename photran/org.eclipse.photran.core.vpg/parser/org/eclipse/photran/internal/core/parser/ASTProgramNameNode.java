@@ -43,11 +43,11 @@ public class ASTProgramNameNode extends InteriorNode
         visitor.visitASTProgramNameNode(this);
     }
 
-    public Token getTIdent()
+    public Token getProgramName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PROGRAM_NAME_1041)
+        if (getProduction() == Production.PROGRAM_NAME_1037)
             return (Token)getChild(0);
         else
             return null;

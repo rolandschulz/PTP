@@ -43,17 +43,7 @@ public class ASTBozLiteralConstantNode extends InteriorNode
         visitor.visitASTBozLiteralConstantNode(this);
     }
 
-    public Token getTBcon()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_171)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTOcon()
+    public Token getBinaryConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -63,7 +53,17 @@ public class ASTBozLiteralConstantNode extends InteriorNode
             return null;
     }
 
-    public Token getTZcon()
+    public boolean hasBinaryConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_172)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getOctalConst()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -71,5 +71,35 @@ public class ASTBozLiteralConstantNode extends InteriorNode
             return (Token)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasOctalConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_173)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getHexConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_174)
+            return (Token)getChild(0);
+        else
+            return null;
+    }
+
+    public boolean hasHexConst()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_174)
+            return getChild(0) != null;
+        else
+            return false;
     }
 }

@@ -43,23 +43,31 @@ public class ASTSubroutineParNode extends InteriorNode
         visitor.visitASTSubroutineParNode(this);
     }
 
-    public ASTDummyArgNameNode getDummyArgName()
+    public boolean isAsterisk()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_PAR_1009)
-            return (ASTDummyArgNameNode)getChild(0);
+        if (getProduction() == Production.SUBROUTINE_PAR_1006)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getVariableName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SUBROUTINE_PAR_1005)
+            return (Token)((ASTDummyArgNameNode)getChild(0)).getVariableName();
         else
             return null;
     }
 
-    public Token getTAsterisk()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_PAR_1010)
-            return (Token)getChild(0);
+        if (getProduction() == Production.SUBROUTINE_PAR_1005 && index == 0)
+            return true;
         else
-            return null;
+            return false;
     }
 }

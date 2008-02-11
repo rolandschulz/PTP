@@ -43,7 +43,7 @@ public class ASTCharLengthNode extends InteriorNode
         visitor.visitASTCharLengthNode(this);
     }
 
-    public Token getTLparen()
+    public Token getConstIntLength()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -53,33 +53,61 @@ public class ASTCharLengthNode extends InteriorNode
             return null;
     }
 
-    public ASTCharLenParamValueNode getCharLenParamValue()
+    public boolean hasConstIntLength()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.CHAR_LENGTH_284)
-            return (ASTCharLenParamValueNode)getChild(1);
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getLengthExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CHAR_LENGTH_283)
+            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(1)).getLengthExpr();
         else
             return null;
     }
 
-    public Token getTRparen()
+    public boolean hasLengthExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LENGTH_284)
-            return (Token)getChild(2);
+        if (getProduction() == Production.CHAR_LENGTH_283)
+            return ((ASTCharLenParamValueNode)getChild(1)).hasLengthExpr();
         else
-            return null;
+            return false;
     }
 
-    public Token getTIcon()
+    public boolean isAssumedLength()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_LENGTH_285)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CHAR_LENGTH_283)
+            return ((ASTCharLenParamValueNode)getChild(1)).isAssumedLength();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.CHAR_LENGTH_283 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_LENGTH_283 && index == 2)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.CHAR_LENGTH_283 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

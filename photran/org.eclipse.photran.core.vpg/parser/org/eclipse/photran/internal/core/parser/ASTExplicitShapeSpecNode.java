@@ -43,35 +43,67 @@ public class ASTExplicitShapeSpecNode extends InteriorNode
         visitor.visitASTExplicitShapeSpecNode(this);
     }
 
-    public ASTLowerBoundNode getLowerBound()
+    public ASTExpressionNode getLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_303)
-            return (ASTLowerBoundNode)getChild(0);
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300)
+            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(0)).getLb();
         else
             return null;
     }
 
-    public Token getTColon()
+    public boolean hasLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_303)
-            return (Token)getChild(1);
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300)
+            return ((ASTLowerBoundNode)getChild(0)).hasLb();
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getUb()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300)
+            return (ASTExpressionNode)((ASTUpperBoundNode)getChild(2)).getUb();
+        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_301)
+            return (ASTExpressionNode)((ASTUpperBoundNode)getChild(0)).getUb();
         else
             return null;
     }
 
-    public ASTUpperBoundNode getUpperBound()
+    public boolean hasUb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_303)
-            return (ASTUpperBoundNode)getChild(2);
-        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_304)
-            return (ASTUpperBoundNode)getChild(0);
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300)
+            return ((ASTUpperBoundNode)getChild(2)).hasUb();
+        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_301)
+            return ((ASTUpperBoundNode)getChild(0)).hasUb();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300 && index == 0)
+            return true;
+        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_300 && index == 2)
+            return true;
+        else if (getProduction() == Production.EXPLICIT_SHAPE_SPEC_301 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutinePrefixNode extends InteriorNode
+class ASTSubroutinePrefixNode extends InteriorNode
 {
     ASTSubroutinePrefixNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,31 +37,34 @@ public class ASTSubroutinePrefixNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSubroutinePrefixNode(this);
-    }
-
-    public Token getTSubroutine()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_PREFIX_1005)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_PREFIX_1006)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
 
     public ASTPrefixSpecListNode getPrefixSpecList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_PREFIX_1006)
+        if (getProduction() == Production.SUBROUTINE_PREFIX_1002)
             return (ASTPrefixSpecListNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasPrefixSpecList()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SUBROUTINE_PREFIX_1002)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.SUBROUTINE_PREFIX_1001 && index == 0)
+            return false;
+        else if (getProduction() == Production.SUBROUTINE_PREFIX_1002 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

@@ -43,33 +43,23 @@ public class ASTSubstringRangeNode extends InteriorNode
         visitor.visitASTSubstringRangeNode(this);
     }
 
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBSTRING_RANGE_429)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
     public ASTSubscriptTripletNode getSubscriptTriplet()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSTRING_RANGE_429)
+        if (getProduction() == Production.SUBSTRING_RANGE_427)
             return (ASTSubscriptTripletNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTRparen()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBSTRING_RANGE_429)
-            return (Token)getChild(2);
+        if (getProduction() == Production.SUBSTRING_RANGE_427 && index == 0)
+            return false;
+        else if (getProduction() == Production.SUBSTRING_RANGE_427 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 }

@@ -47,9 +47,7 @@ public class ASTComponentDeclNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_202)
-            return (ASTComponentNameNode)getChild(0);
-        else if (getProduction() == Production.COMPONENT_DECL_203)
+        if (getProduction() == Production.COMPONENT_DECL_203)
             return (ASTComponentNameNode)getChild(0);
         else if (getProduction() == Production.COMPONENT_DECL_204)
             return (ASTComponentNameNode)getChild(0);
@@ -63,103 +61,135 @@ public class ASTComponentDeclNode extends InteriorNode
             return (ASTComponentNameNode)getChild(0);
         else if (getProduction() == Production.COMPONENT_DECL_209)
             return (ASTComponentNameNode)getChild(0);
+        else if (getProduction() == Production.COMPONENT_DECL_210)
+            return (ASTComponentNameNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public IComponentArraySpec getComponentArraySpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_202)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_203)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_206)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_207)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTComponentArraySpecNode getComponentArraySpec()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_DECL_202)
-            return (ASTComponentArraySpecNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_203)
-            return (ASTComponentArraySpecNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_206)
-            return (ASTComponentArraySpecNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_207)
-            return (ASTComponentArraySpecNode)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_DECL_202)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.COMPONENT_DECL_203)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.COMPONENT_DECL_206)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.COMPONENT_DECL_207)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTAsterisk()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPONENT_DECL_202)
-            return (Token)getChild(4);
+        if (getProduction() == Production.COMPONENT_DECL_203)
+            return (IComponentArraySpec)getChild(2);
         else if (getProduction() == Production.COMPONENT_DECL_204)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.COMPONENT_DECL_206)
-            return (Token)getChild(4);
+            return (IComponentArraySpec)getChild(2);
+        else if (getProduction() == Production.COMPONENT_DECL_207)
+            return (IComponentArraySpec)getChild(2);
         else if (getProduction() == Production.COMPONENT_DECL_208)
-            return (Token)getChild(1);
+            return (IComponentArraySpec)getChild(2);
         else
             return null;
+    }
+
+    public boolean hasComponentArraySpec()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMPONENT_DECL_203)
+            return getChild(2) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_204)
+            return getChild(2) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_207)
+            return getChild(2) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_208)
+            return getChild(2) != null;
+        else
+            return false;
     }
 
     public ASTCharLengthNode getCharLength()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_202)
+        if (getProduction() == Production.COMPONENT_DECL_203)
             return (ASTCharLengthNode)getChild(5);
-        else if (getProduction() == Production.COMPONENT_DECL_204)
+        else if (getProduction() == Production.COMPONENT_DECL_205)
             return (ASTCharLengthNode)getChild(2);
-        else if (getProduction() == Production.COMPONENT_DECL_206)
+        else if (getProduction() == Production.COMPONENT_DECL_207)
             return (ASTCharLengthNode)getChild(5);
-        else if (getProduction() == Production.COMPONENT_DECL_208)
+        else if (getProduction() == Production.COMPONENT_DECL_209)
             return (ASTCharLengthNode)getChild(2);
         else
             return null;
+    }
+
+    public boolean hasCharLength()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMPONENT_DECL_203)
+            return getChild(5) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_205)
+            return getChild(2) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_207)
+            return getChild(5) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_209)
+            return getChild(2) != null;
+        else
+            return false;
     }
 
     public ASTComponentInitializationNode getComponentInitialization()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.COMPONENT_DECL_202)
+        if (getProduction() == Production.COMPONENT_DECL_203)
             return (ASTComponentInitializationNode)getChild(6);
-        else if (getProduction() == Production.COMPONENT_DECL_203)
-            return (ASTComponentInitializationNode)getChild(4);
         else if (getProduction() == Production.COMPONENT_DECL_204)
-            return (ASTComponentInitializationNode)getChild(3);
+            return (ASTComponentInitializationNode)getChild(4);
         else if (getProduction() == Production.COMPONENT_DECL_205)
+            return (ASTComponentInitializationNode)getChild(3);
+        else if (getProduction() == Production.COMPONENT_DECL_206)
             return (ASTComponentInitializationNode)getChild(1);
         else
             return null;
+    }
+
+    public boolean hasComponentInitialization()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.COMPONENT_DECL_203)
+            return getChild(6) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_204)
+            return getChild(4) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_205)
+            return getChild(3) != null;
+        else if (getProduction() == Production.COMPONENT_DECL_206)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.COMPONENT_DECL_203 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_203 && index == 3)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_203 && index == 4)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_204 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_204 && index == 3)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_205 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_207 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_207 && index == 3)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_207 && index == 4)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_208 && index == 1)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_208 && index == 3)
+            return false;
+        else if (getProduction() == Production.COMPONENT_DECL_209 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

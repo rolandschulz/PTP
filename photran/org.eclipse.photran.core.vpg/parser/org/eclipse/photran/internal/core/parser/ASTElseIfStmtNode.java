@@ -43,157 +43,161 @@ public class ASTElseIfStmtNode extends InteriorNodeWithErrorRecoverySymbols
         visitor.visitASTElseIfStmtNode(this);
     }
 
-    public ASTLblDefNode getLblDef()
+    public ASTExpressionNode getGuardingExpression()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (ASTLblDefNode)getChild(0);
+        if (getProduction() == Production.ELSE_IF_STMT_665)
+            return (ASTExpressionNode)getChild(3);
+        else if (getProduction() == Production.ELSE_IF_STMT_666)
+            return (ASTExpressionNode)getChild(3);
+        else if (getProduction() == Production.ELSE_IF_STMT_667)
+            return (ASTExpressionNode)getChild(4);
+        else if (getProduction() == Production.ELSE_IF_STMT_668)
+            return (ASTExpressionNode)getChild(4);
+        else
+            return null;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ELSE_IF_STMT_665)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.ELSE_IF_STMT_666)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.ELSE_IF_STMT_667)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.ELSE_IF_STMT_668)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.ELSE_IF_STMT_ERROR_7)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8)
-            return (ASTLblDefNode)getChild(0);
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
         else
             return null;
     }
 
-    public Token getTElseif()
+    public boolean hasLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (Token)getChild(1);
+        if (getProduction() == Production.ELSE_IF_STMT_665)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.ELSE_IF_STMT_666)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.ELSE_IF_STMT_667)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.ELSE_IF_STMT_668)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.ELSE_IF_STMT_ERROR_7)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (ASTExprNode)getChild(4);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (ASTExprNode)getChild(4);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (Token)getChild(5);
-        else
-            return null;
-    }
-
-    public Token getTThen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (Token)getChild(6);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_671)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (Token)getChild(7);
-        else if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (Token)getChild(7);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (Token)getChild(8);
-        else
-            return null;
-    }
-
-    public ASTEndNameNode getEndName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_672)
-            return (ASTEndNameNode)getChild(6);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (ASTEndNameNode)getChild(7);
-        else
-            return null;
-    }
-
-    public Token getTElse()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (Token)getChild(1);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
         else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8)
-            return (Token)getChild(1);
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    public Token getEndName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ELSE_IF_STMT_666)
+            return (Token)((ASTEndNameNode)getChild(6)).getEndName();
+        else if (getProduction() == Production.ELSE_IF_STMT_668)
+            return (Token)((ASTEndNameNode)getChild(7)).getEndName();
         else
             return null;
     }
 
-    public Token getTIf()
+    public boolean hasEndName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ELSE_IF_STMT_673)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_674)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8)
-            return (Token)getChild(2);
+        if (getProduction() == Production.ELSE_IF_STMT_666)
+            return ((ASTEndNameNode)getChild(6)).hasEndName();
+        else if (getProduction() == Production.ELSE_IF_STMT_668)
+            return ((ASTEndNameNode)getChild(7)).hasEndName();
         else
-            return null;
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ELSE_IF_STMT_665 && index == 1)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_665 && index == 2)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_665 && index == 4)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_665 && index == 5)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_665 && index == 6)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 1)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 2)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 4)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 5)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 7)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 1)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 2)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 3)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 5)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 6)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 7)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 1)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 2)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 3)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 5)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 6)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 8)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_7 && index == 1)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8 && index == 1)
+            return false;
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8 && index == 2)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.ELSE_IF_STMT_665 && index == 0)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 0)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_666 && index == 6)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_667 && index == 0)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 0)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_668 && index == 7)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_7 && index == 0)
+            return true;
+        else if (getProduction() == Production.ELSE_IF_STMT_ERROR_8 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

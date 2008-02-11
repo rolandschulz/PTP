@@ -99,9 +99,9 @@ public class ASTAllocationListNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAllocationListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ALLOCATION_LIST_458)
+        if (node.getProduction() == Production.ALLOCATION_LIST_456)
             return (ASTAllocationNode)node.getChild(0);
-        else if (node.getProduction() == Production.ALLOCATION_LIST_459)
+        else if (node.getProduction() == Production.ALLOCATION_LIST_457)
             return (ASTAllocationNode)node.getChild(2);
         else
             return null;
@@ -111,20 +111,17 @@ public class ASTAllocationListNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATION_LIST_459)
+        if (getProduction() == Production.ALLOCATION_LIST_457)
             return (ASTAllocationListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTAllocationListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ALLOCATION_LIST_459)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.ALLOCATION_LIST_457 && index == 1)
+            return false;
         else
-            return null;
+            return true;
     }
 }

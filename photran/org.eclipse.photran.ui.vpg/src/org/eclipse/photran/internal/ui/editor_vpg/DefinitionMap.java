@@ -86,40 +86,40 @@ public final class DefinitionMap
             {
                 ASTProgramStmtNode ps = node.getProgramStmt();
                 if (ps != null && ps.getProgramName() != null)
-                    name = ps.getProgramName().getTIdent().getText();
+                    name = ps.getProgramName().getProgramName().getText();
             }
     
             @Override public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
             {
-                name = node.getFunctionStmt().getFunctionName().getTIdent().getText();
+                name = node.getFunctionStmt().getFunctionName().getFunctionName().getText();
             }
     
             @Override public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
             {
-                name = node.getSubroutineStmt().getSubroutineName().getTIdent().getText();
+                name = node.getSubroutineStmt().getSubroutineName().getSubroutineName().getText();
             }
     
             @Override public void visitASTModuleNode(ASTModuleNode node)
             {
-                name = node.getModuleStmt().getModuleName().getTIdent().getText();
+                name = node.getModuleStmt().getModuleName().getModuleName().getText();
             }
     
             @Override public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
             {
                 ASTBlockDataNameNode name = node.getBlockDataStmt().getBlockDataName();
                 if (name != null)
-                    this.name = name.getTIdent().getText();
+                    this.name = name.getBlockDataName().getText();
             }
     
             @Override public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
             {
-                name = node.getDerivedTypeStmt().getTypeName().getTIdent().getText();
+                name = node.getDerivedTypeStmt().getTypeName().getText();
             }
     
             @Override public void visitASTInterfaceStmtNode(ASTInterfaceStmtNode node)
             {
                 if (node.getGenericName() != null)
-                    name = node.getGenericName().getTIdent().getText();
+                    name = node.getGenericName().getGenericName().getText();
             }
         }
         

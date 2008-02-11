@@ -77,14 +77,26 @@ public class ASTMainProgramNode extends ScopingNode
             return null;
     }
 
-    public ASTBodyPlusInternalsNode getBodyPlusInternals()
+    public ASTContainsStmtNode getContainsStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.MAIN_PROGRAM_8)
-            return (ASTBodyPlusInternalsNode)((ASTMainRangeNode)getChild(0)).getBodyPlusInternals();
+            return (ASTContainsStmtNode)((ASTMainRangeNode)getChild(0)).getContainsStmt();
         else if (getProduction() == Production.MAIN_PROGRAM_9)
-            return (ASTBodyPlusInternalsNode)((ASTMainRangeNode)getChild(1)).getBodyPlusInternals();
+            return (ASTContainsStmtNode)((ASTMainRangeNode)getChild(1)).getContainsStmt();
+        else
+            return null;
+    }
+
+    public ASTInternalSubprogramsNode getInternalSubprograms()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.MAIN_PROGRAM_8)
+            return (ASTInternalSubprogramsNode)((ASTMainRangeNode)getChild(0)).getInternalSubprograms();
+        else if (getProduction() == Production.MAIN_PROGRAM_9)
+            return (ASTInternalSubprogramsNode)((ASTMainRangeNode)getChild(1)).getInternalSubprograms();
         else
             return null;
     }

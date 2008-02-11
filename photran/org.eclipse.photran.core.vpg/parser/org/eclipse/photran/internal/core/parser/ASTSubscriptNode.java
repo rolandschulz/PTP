@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubscriptNode extends InteriorNode
+class ASTSubscriptNode extends InteriorNode
 {
     ASTSubscriptNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,18 +37,13 @@ public class ASTSubscriptNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSubscriptNode(this);
-    }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getSubscriptExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_443)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.SUBSCRIPT_441)
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }

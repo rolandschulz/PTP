@@ -42,10 +42,11 @@ import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTBodyConstructNode;
+import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBodyNode;
-import org.eclipse.photran.internal.core.parser.ASTExprNode;
+import org.eclipse.photran.internal.core.parser.ASTExpressionNode;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
 import org.eclipse.photran.internal.core.parser.Parser.Nonterminal;
@@ -230,7 +231,7 @@ public abstract class FortranRefactoring extends Refactoring
      * No semantic analysis is done; it is only necessary that the
      * program be syntactically correct.
      */
-    protected ASTBodyConstructNode parseLiteralStatement(String string)
+    protected IBodyConstruct parseLiteralStatement(String string)
     {
         return parseLiteralStatementSequence(string).getBodyConstruct(0);
     }
@@ -278,10 +279,10 @@ public abstract class FortranRefactoring extends Refactoring
      * No semantic analysis is done; it is only necessary that the
      * program be syntactically correct.
      */
-    protected ASTExprNode parseLiteralExpression(String string)
+    protected ASTExpressionNode parseLiteralExpression(String string)
     {
-        ASTBodyConstructNode stmt = parseLiteralStatement("x = " + string);
-        return stmt.getExecutableConstruct().getAssignmentStmt().getExpr();
+        IBodyConstruct stmt = parseLiteralStatement("x = " + string);
+        return ((ASTAssignmentStmtNode)stmt).getExpr();
     }
 
     // USER INTERACTION ///////////////////////////////////////////////////////
@@ -477,7 +478,7 @@ public abstract class FortranRefactoring extends Refactoring
     protected static class StatementSequence
     {
         public ASTBodyNode body = null;
-        public List<ASTBodyConstructNode> statements = new ArrayList<ASTBodyConstructNode>();
+        public List<IBodyConstruct> statements = new ArrayList<IBodyConstruct>();
     }
     
     protected StatementSequence findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
@@ -489,10 +490,10 @@ public abstract class FortranRefactoring extends Refactoring
         
         for (int i = 0; i < stmtSeq.body.size(); i++)
         {
-            ASTBodyConstructNode thisBodyConstruct = stmtSeq.body.getBodyConstruct(i);
+            IBodyConstruct thisBodyConstruct = stmtSeq.body.getBodyConstruct(i);
             
-            Token firstToken = findFirstTokenIn(thisBodyConstruct);
-            Token lastToken = findLastTokenIn(thisBodyConstruct);
+            Token firstToken = findFirstTokenIn((InteriorNode)thisBodyConstruct);
+            Token lastToken = findLastTokenIn((InteriorNode)thisBodyConstruct);
             
             boolean containsStart = OffsetLength.contains(selection.getOffset(), selection.getLength(), firstToken.getFileOffset(), firstToken.getLength());
             boolean containsEnd = OffsetLength.contains(selection.getOffset(), selection.getLength(), lastToken.getFileOffset(), lastToken.getLength());

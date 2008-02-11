@@ -13,9 +13,10 @@ package org.eclipse.photran.internal.core.parser;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
 import org.eclipse.photran.internal.core.parser.Parser.*;
+import java.util.Iterator;
 import java.util.List;
 
-public class ASTSelectCaseBodyNode extends InteriorNode
+public class ASTSelectCaseBodyNode extends InteriorNode implements  Iterable<ICaseBodyConstruct>
 {
     protected int count = -1;
 
@@ -94,13 +95,51 @@ public class ASTSelectCaseBodyNode extends InteriorNode
         visitor.visitASTSelectCaseBodyNode(this);
     }
 
-    public ASTCaseStmtNode getCaseStmt(int listIndex)
+    public Iterator<ICaseBodyConstruct> iterator()
+    {
+        final int listSize = size();
+        
+        ASTSelectCaseBodyNode node = this;
+        for (int depth = listSize-1, i = 0; i < depth; i++)
+            node = (ASTSelectCaseBodyNode)node.getRecursiveNode();
+
+        final ASTSelectCaseBodyNode baseNode = node;
+        
+        return new Iterator<ICaseBodyConstruct>()
+        {
+            private ASTSelectCaseBodyNode node = baseNode;
+            private int index = 0;
+            
+            public boolean hasNext()
+            {
+                return index < listSize;
+            }
+
+            public ICaseBodyConstruct next()
+            {
+                int child = (index == 0 ? 0 : 1);
+                ICaseBodyConstruct result = (ICaseBodyConstruct)node.getChild(child);
+                node = (index == listSize-1 ? null : (ASTSelectCaseBodyNode)node.parent);
+                index++;
+                return result;
+            }
+
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    public ICaseBodyConstruct getCaseBodyConstruct(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTSelectCaseBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SELECT_CASE_BODY_685)
-            return (ASTCaseStmtNode)node.getChild(0);
+        if (node.getProduction() == Production.SELECT_CASE_BODY_679)
+            return (ICaseBodyConstruct)node.getChild(0);
+        else if (node.getProduction() == Production.SELECT_CASE_BODY_680)
+            return (ICaseBodyConstruct)node.getChild(1);
         else
             return null;
     }
@@ -109,19 +148,8 @@ public class ASTSelectCaseBodyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SELECT_CASE_BODY_686)
+        if (getProduction() == Production.SELECT_CASE_BODY_680)
             return (ASTSelectCaseBodyNode)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTCaseBodyConstructNode getCaseBodyConstruct(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSelectCaseBodyNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SELECT_CASE_BODY_686)
-            return (ASTCaseBodyConstructNode)node.getChild(1);
         else
             return null;
     }

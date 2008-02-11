@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTProcedureNameNode extends InteriorNode
+class ASTProcedureNameNode extends InteriorNode
 {
     ASTProcedureNameNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,17 +37,12 @@ public class ASTProcedureNameNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTProcedureNameNode(this);
-    }
 
-    public Token getTIdent()
+    public Token getProcedureName()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PROCEDURE_NAME_954)
+        if (getProduction() == Production.PROCEDURE_NAME_950)
             return (Token)getChild(0);
         else
             return null;

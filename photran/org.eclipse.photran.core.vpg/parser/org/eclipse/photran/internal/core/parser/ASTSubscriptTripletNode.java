@@ -43,91 +43,81 @@ public class ASTSubscriptTripletNode extends InteriorNode
         visitor.visitASTSubscriptTripletNode(this);
     }
 
-    public Token getTColon()
+    public ASTExpressionNode getUb()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_447)
+            return (ASTExpressionNode)getChild(1);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
+            return (ASTExpressionNode)getChild(2);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
+            return (ASTExpressionNode)getChild(2);
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
+            return (ASTExpressionNode)getChild(1);
+        else
+            return null;
+    }
+
+    public ASTExpressionNode getLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SUBSCRIPT_TRIPLET_448)
-            return (Token)getChild(0);
+            return (ASTExpressionNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
-            return (Token)getChild(0);
+            return (ASTExpressionNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
-            return (Token)getChild(1);
+            return (ASTExpressionNode)getChild(0);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_455)
-            return (Token)getChild(0);
+            return (ASTExpressionNode)getChild(0);
         else
             return null;
     }
 
-    public ASTExprNode getExpr()
+    public ASTExpressionNode getStep()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_449)
-            return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
-            return (ASTExprNode)getChild(0);
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_450)
+            return (ASTExpressionNode)getChild(4);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
-            return (ASTExprNode)getChild(0);
+            return (ASTExpressionNode)getChild(3);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (ASTExprNode)getChild(0);
+            return (ASTExpressionNode)getChild(3);
         else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
-            return (ASTExprNode)getChild(0);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
-            return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_455)
-            return (ASTExprNode)getChild(2);
+            return (ASTExpressionNode)getChild(2);
         else
             return null;
     }
 
-    public ASTExprNode getExpr2()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_451)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (ASTExprNode)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
-            return (ASTExprNode)getChild(3);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
-            return (ASTExprNode)getChild(3);
+        if (getProduction() == Production.SUBSCRIPT_TRIPLET_446 && index == 0)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_447 && index == 0)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_448 && index == 1)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_449 && index == 1)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450 && index == 1)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_450 && index == 3)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451 && index == 1)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_451 && index == 2)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452 && index == 0)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_452 && index == 2)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453 && index == 0)
+            return false;
+        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453 && index == 1)
+            return false;
         else
-            return null;
-    }
-
-    public Token getTColon2()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_453)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_454)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.SUBSCRIPT_TRIPLET_455)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr3()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBSCRIPT_TRIPLET_452)
-            return (ASTExprNode)getChild(4);
-        else
-            return null;
+            return true;
     }
 }

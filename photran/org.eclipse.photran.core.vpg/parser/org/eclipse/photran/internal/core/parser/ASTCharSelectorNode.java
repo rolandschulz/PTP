@@ -43,117 +43,163 @@ public class ASTCharSelectorNode extends InteriorNode
         visitor.visitASTCharSelectorNode(this);
     }
 
-    public ASTLengthSelectorNode getLengthSelector()
+    public ASTExpressionNode getKindExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_277)
-            return (ASTLengthSelectorNode)getChild(0);
+        if (getProduction() == Production.CHAR_SELECTOR_276)
+            return (ASTExpressionNode)getChild(5);
+        else if (getProduction() == Production.CHAR_SELECTOR_277)
+            return (ASTExpressionNode)getChild(4);
+        else if (getProduction() == Production.CHAR_SELECTOR_278)
+            return (ASTExpressionNode)getChild(2);
         else
             return null;
     }
 
-    public Token getTLparen()
+    public boolean hasKindExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (Token)getChild(0);
+        if (getProduction() == Production.CHAR_SELECTOR_276)
+            return getChild(5) != null;
+        else if (getProduction() == Production.CHAR_SELECTOR_277)
+            return getChild(4) != null;
+        else if (getProduction() == Production.CHAR_SELECTOR_278)
+            return getChild(2) != null;
+        else
+            return false;
+    }
+
+    public Token getConstIntLength()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CHAR_SELECTOR_275)
+            return (Token)((ASTCharLengthNode)getChild(1)).getConstIntLength();
+        else
+            return null;
+    }
+
+    public boolean hasConstIntLength()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CHAR_SELECTOR_275)
+            return ((ASTCharLengthNode)getChild(1)).hasConstIntLength();
+        else
+            return false;
+    }
+
+    public ASTExpressionNode getLengthExpr()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.CHAR_SELECTOR_275)
+            return (ASTExpressionNode)((ASTCharLengthNode)getChild(1)).getLengthExpr();
+        else if (getProduction() == Production.CHAR_SELECTOR_276)
+            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(2)).getLengthExpr();
+        else if (getProduction() == Production.CHAR_SELECTOR_277)
+            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(2)).getLengthExpr();
         else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (Token)getChild(0);
+            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(2)).getLengthExpr();
         else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.CHAR_SELECTOR_281)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.CHAR_SELECTOR_282)
-            return (Token)getChild(0);
+            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(1)).getLengthExpr();
         else
             return null;
     }
 
-    public Token getTLeneq()
+    public boolean hasLengthExpr()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (Token)getChild(1);
+        if (getProduction() == Production.CHAR_SELECTOR_275)
+            return ((ASTCharLengthNode)getChild(1)).hasLengthExpr();
+        else if (getProduction() == Production.CHAR_SELECTOR_276)
+            return ((ASTCharLenParamValueNode)getChild(2)).hasLengthExpr();
+        else if (getProduction() == Production.CHAR_SELECTOR_277)
+            return ((ASTCharLenParamValueNode)getChild(2)).hasLengthExpr();
         else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.CHAR_SELECTOR_281)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTCharLenParamValueNode getCharLenParamValue()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (ASTCharLenParamValueNode)getChild(2);
-        else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (ASTCharLenParamValueNode)getChild(2);
-        else if (getProduction() == Production.CHAR_SELECTOR_281)
-            return (ASTCharLenParamValueNode)getChild(2);
-        else if (getProduction() == Production.CHAR_SELECTOR_282)
-            return (ASTCharLenParamValueNode)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTComma()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (Token)getChild(3);
-        else
-            return null;
-    }
-
-    public Token getTKindeq()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (Token)getChild(4);
+            return ((ASTCharLenParamValueNode)getChild(2)).hasLengthExpr();
         else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return (Token)getChild(1);
+            return ((ASTCharLenParamValueNode)getChild(1)).hasLengthExpr();
         else
-            return null;
+            return false;
     }
 
-    public ASTExprNode getExpr()
+    public boolean isAssumedLength()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (ASTExprNode)getChild(5);
+        if (getProduction() == Production.CHAR_SELECTOR_275)
+            return ((ASTCharLengthNode)getChild(1)).isAssumedLength();
+        else if (getProduction() == Production.CHAR_SELECTOR_276)
+            return ((ASTCharLenParamValueNode)getChild(2)).isAssumedLength();
+        else if (getProduction() == Production.CHAR_SELECTOR_277)
+            return ((ASTCharLenParamValueNode)getChild(2)).isAssumedLength();
         else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (ASTExprNode)getChild(4);
+            return ((ASTCharLenParamValueNode)getChild(2)).isAssumedLength();
         else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return (ASTExprNode)getChild(2);
+            return ((ASTCharLenParamValueNode)getChild(1)).isAssumedLength();
         else
-            return null;
+            return false;
     }
 
-    public Token getTRparen()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (Token)getChild(5);
-        else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.CHAR_SELECTOR_281)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.CHAR_SELECTOR_282)
-            return (Token)getChild(2);
+        if (getProduction() == Production.CHAR_SELECTOR_275 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 1)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 3)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 4)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 6)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 1)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 3)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 5)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_278 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_278 && index == 1)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_278 && index == 3)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 1)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 3)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_280 && index == 0)
+            return false;
+        else if (getProduction() == Production.CHAR_SELECTOR_280 && index == 2)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.CHAR_SELECTOR_275 && index == 1)
+            return true;
+        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 2)
+            return true;
+        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 2)
+            return true;
+        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 2)
+            return true;
+        else if (getProduction() == Production.CHAR_SELECTOR_280 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

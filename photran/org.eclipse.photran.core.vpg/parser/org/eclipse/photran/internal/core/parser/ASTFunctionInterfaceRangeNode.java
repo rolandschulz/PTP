@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFunctionInterfaceRangeNode extends InteriorNode
+class ASTFunctionInterfaceRangeNode extends InteriorNode
 {
     ASTFunctionInterfaceRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,29 +37,34 @@ public class ASTFunctionInterfaceRangeNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTFunctionInterfaceRangeNode(this);
-    }
 
     public ASTSubprogramInterfaceBodyNode getSubprogramInterfaceBody()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_945)
+        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_941)
             return (ASTSubprogramInterfaceBodyNode)getChild(0);
         else
             return null;
+    }
+
+    public boolean hasSubprogramInterfaceBody()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_941)
+            return getChild(0) != null;
+        else
+            return false;
     }
 
     public ASTEndFunctionStmtNode getEndFunctionStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_945)
+        if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_941)
             return (ASTEndFunctionStmtNode)getChild(1);
-        else if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_946)
+        else if (getProduction() == Production.FUNCTION_INTERFACE_RANGE_942)
             return (ASTEndFunctionStmtNode)getChild(0);
         else
             return null;

@@ -145,7 +145,7 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
                 @Override
                 public void visitASTImplicitStmtNode(ASTImplicitStmtNode node)
                 {
-                    if (node.getTImplicit().getEnclosingScope() == scope)
+                    if (node.getImplicitToken().getEnclosingScope() == scope)
                         throw new Notification(node);
                 }
             });

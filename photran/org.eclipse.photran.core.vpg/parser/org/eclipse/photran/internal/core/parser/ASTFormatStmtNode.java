@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
+public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols implements IExecutionPartConstruct, ISpecificationPartConstruct
 {
     ASTFormatStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,80 +40,92 @@ public class ASTFormatStmtNode extends InteriorNodeWithErrorRecoverySymbols
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitISpecificationPartConstruct(this);
+        visitor.visitIExecutionPartConstruct(this);
         visitor.visitASTFormatStmtNode(this);
-    }
-
-    public ASTLblDefNode getLblDef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_STMT_872)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FORMAT_STMT_873)
-            return (ASTLblDefNode)getChild(0);
-        else if (getProduction() == Production.FORMAT_STMT_ERROR_16)
-            return (ASTLblDefNode)getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTFormat()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_STMT_872)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.FORMAT_STMT_873)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.FORMAT_STMT_ERROR_16)
-            return (Token)getChild(1);
-        else
-            return null;
-    }
-
-    public Token getTLparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_STMT_872)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.FORMAT_STMT_873)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public Token getTRparen()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_STMT_872)
-            return (Token)getChild(3);
-        else if (getProduction() == Production.FORMAT_STMT_873)
-            return (Token)getChild(4);
-        else
-            return null;
-    }
-
-    public Token getTEos()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_STMT_872)
-            return (Token)getChild(4);
-        else if (getProduction() == Production.FORMAT_STMT_873)
-            return (Token)getChild(5);
-        else
-            return null;
     }
 
     public ASTFmtSpecNode getFmtSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_STMT_873)
+        if (getProduction() == Production.FORMAT_STMT_867)
             return (ASTFmtSpecNode)getChild(3);
         else
             return null;
+    }
+
+    public boolean hasFmtSpec()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORMAT_STMT_867)
+            return getChild(3) != null;
+        else
+            return false;
+    }
+
+    public Token getLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORMAT_STMT_866)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.FORMAT_STMT_867)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else if (getProduction() == Production.FORMAT_STMT_ERROR_16)
+            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
+        else
+            return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.FORMAT_STMT_866)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.FORMAT_STMT_867)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else if (getProduction() == Production.FORMAT_STMT_ERROR_16)
+            return ((ASTLblDefNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.FORMAT_STMT_866 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_866 && index == 2)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_866 && index == 3)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_866 && index == 4)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_867 && index == 1)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_867 && index == 2)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_867 && index == 4)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_867 && index == 5)
+            return false;
+        else if (getProduction() == Production.FORMAT_STMT_ERROR_16 && index == 1)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.FORMAT_STMT_866 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORMAT_STMT_867 && index == 0)
+            return true;
+        else if (getProduction() == Production.FORMAT_STMT_ERROR_16 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

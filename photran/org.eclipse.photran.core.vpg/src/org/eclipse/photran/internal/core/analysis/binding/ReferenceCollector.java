@@ -19,10 +19,11 @@ import org.eclipse.photran.internal.core.parser.ASTArrayElementNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignedGotoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTCOperandNode;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTComlistNode;
+import org.eclipse.photran.internal.core.parser.ASTCommonBlockListNode;
+import org.eclipse.photran.internal.core.parser.ASTCommonBlockObjectListNode;
+import org.eclipse.photran.internal.core.parser.ASTCommonBlockObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCycleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDataImpliedDoNode;
@@ -31,7 +32,7 @@ import org.eclipse.photran.internal.core.parser.ASTDataStmtValueNode;
 import org.eclipse.photran.internal.core.parser.ASTEditElementNode;
 import org.eclipse.photran.internal.core.parser.ASTElseIfStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTElseStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTElsewhereStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTElseWhereStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndForallStmtNode;
@@ -48,26 +49,21 @@ import org.eclipse.photran.internal.core.parser.ASTExitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFieldSelectorNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionArgListNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionParsNode;
-import org.eclipse.photran.internal.core.parser.ASTFunctionReferenceNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTInputImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTIoControlSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTLoopControlNode;
-import org.eclipse.photran.internal.core.parser.ASTMaskedElsewhereStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTMaskedElseWhereStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleProcedureStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamedConstantUseNode;
-import org.eclipse.photran.internal.core.parser.ASTNamelistGroupObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistGroupsNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTOutputImpliedDoNode;
-import org.eclipse.photran.internal.core.parser.ASTPointerAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerFieldNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
-import org.eclipse.photran.internal.core.parser.ASTSFDataRefNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
-import org.eclipse.photran.internal.core.parser.ASTSFPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStructureComponentNode;
@@ -76,7 +72,6 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineArgListNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineParsNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
-import org.eclipse.photran.internal.core.parser.ASTUFPrimaryNode;
 import org.eclipse.photran.internal.core.parser.Parser.Nonterminal;
 
 /**
@@ -93,7 +88,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTNamedConstantUseNode(ASTNamedConstantUseNode node)
     {
-        bind(node.getTIdent());
+        bind(node.getName());
     }
 
     // # R430
@@ -103,7 +98,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndTypeStmtNode(ASTEndTypeStmtNode node)
     {
-        if (node.getTypeName() != null) bind(node.getTypeName().getTIdent());
+        if (node.getTypeName() != null) bind(node.getTypeName().getTypeName());
     }
 
     // # R431
@@ -111,7 +106,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTStructureConstructorNode(ASTStructureConstructorNode node)
     {
-        bind(node.getTypeName().getTIdent());
+        bind(node.getTypeName().getTypeName());
     }
 
     // # R434
@@ -123,7 +118,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTAcImpliedDoNode(ASTAcImpliedDoNode node)
     {
-        bind(node.getImpliedDoVariable().getTIdent());
+        bind(node.getImpliedDoVariable().getImpliedDoVariable());
     }
 
     // # R502
@@ -144,7 +139,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTTypeSpecNode(ASTTypeSpecNode node)
     {
-        if (node.getTypeName() != null) bind(node.getTypeName().getTIdent());
+        if (node.getTypeName() != null) bind(node.getTypeName());
     }
 
     // # R535 <Expr> must be scalar-int-expr
@@ -154,7 +149,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTDataImpliedDoNode(ASTDataImpliedDoNode node)
     {
-        bind(node.getImpliedDoVariable().getTIdent());
+        bind(node.getImpliedDoVariable());
     }
 
     // <DataStmtValue> ::=
@@ -164,7 +159,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTDataStmtValueNode(ASTDataStmtValueNode node)
     {
-        if (node.getNamedConstantUse() != null) bind(node.getNamedConstantUse().getTIdent());
+        if (node.hasNamedConstKind()) bind(node.getNamedConstKind().getName());
     }
 
     // # R544
@@ -185,8 +180,7 @@ class ReferenceCollector extends BindingCollector
         ASTNamelistGroupsNode groups = node.getNamelistGroups();
         for (int i = 0; i < groups.size(); i++)
         {
-            ASTNamelistGroupObjectNode object = groups.getNamelistGroupObject(i);
-            bind(object.getVariableName().getTIdent());
+            bind(groups.getNamelistGroupObjectVariableName(i));
         }
     }
 
@@ -212,31 +206,32 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTCommonStmtNode(ASTCommonStmtNode node)
     {
-        ASTComlistNode list = node.getComlist();
+        ASTCommonBlockListNode list = node.getCommonBlockList();
         if (list == null) return;
+        
         for (int i = 0; i < list.size(); i++)
         {
-            if (list.getCommonBlockObject(i) != null)
+            ASTCommonBlockObjectListNode objects = list.getCommonBlock(i).getCommonBlockObjectList();
+            for (int j = 0; j < objects.size(); j++)
             {
-                if (list.getCommonBlockObject(i).getVariableName() != null)
+                ASTCommonBlockObjectNode obj = objects.getCommonBlockObject(i);
+                
+                List<PhotranTokenRef> bindings = bind(obj.getVariableName());
+                
+                if (obj.hasArraySpec())
                 {
-                    bind(list.getCommonBlockObject(i).getVariableName().getTIdent());
-                }
-                else if (list.getCommonBlockObject(i).getArrayDeclarator() != null)
-                {
-                	try
-                	{
-		                List<PhotranTokenRef> bindings = bind(list.getCommonBlockObject(i).getArrayDeclarator().getVariableName().getTIdent());
-		                for (PhotranTokenRef tr : bindings)
-		                {
-		                	Definition def = vpg.getDefinitionFor(tr);
-		                	def.setArraySpec(list.getCommonBlockObject(i).getArrayDeclarator().getArraySpec());
-		                	vpg.setDefinitionFor(tr, def);
-		                }
+                    try
+                    {
+                        for (PhotranTokenRef tr : bindings)
+                        {
+                            Definition def = vpg.getDefinitionFor(tr);
+                            def.setArraySpec(obj.getArraySpec());
+                            vpg.setDefinitionFor(tr, def);
+                        }
                     }
                     catch (Exception e)
                     {
-                    	throw new Error(e);
+                        throw new Error(e);
                     }
                 }
             }
@@ -249,7 +244,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTScalarVariableNode(ASTScalarVariableNode node)
     {
-        if (node.getVariableName() != null) bind(node.getVariableName().getTIdent());
+        if (node.getVariableName() != null) bind(node.getVariableName());
     }
 
     // # R612
@@ -264,34 +259,19 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTDataRefNode(ASTDataRefNode node)
     {
+        
     	for (int i = 0; i < node.size(); i++)
         {
-            // <Variable> is the only context where a <DataRef> does not refer to a member of a derived type 
-            if (node.getVarName(i) != null)
+            if (node.getName(i) != null)
             {
+                // <Variable> is the only context where a <DataRef> does not refer to a member of a derived type 
             	if (node.getParent().getNonterminal() == Nonterminal.VARIABLE)
-            		bind(node.getVarName(i).getTIdent());
+            		bind(node.getName(i));
             	else
-            		dontbind(node.getVarName(i).getTIdent());
+            		dontbind(node.getName(i));
             }
             if (node.getComponentName(i) != null)
-                dontbind(node.getComponentName(i).getTIdent());
-        }
-    }
-    
-    // <SFDataRef> ::=
-    // varName:<Name> T_PERCENT componentName:<Name>
-    // | varName:<Name> T_LPAREN <SectionSubscriptList> T_RPAREN
-    // | @:<SFDataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT componentName:<Name>
-
-    @Override public void visitASTSFDataRefNode(ASTSFDataRefNode node)
-    {
-        for (int i = 0; i < node.size(); i++)
-        {
-            if (node.getVarName(i) != null)
-                bind(node.getVarName(i).getTIdent());
-            if (node.getComponentName(i) != null)
-                dontbind(node.getComponentName(i).getTIdent());
+                dontbind(node.getComponentName(i));
         }
     }
 
@@ -305,7 +285,7 @@ class ReferenceCollector extends BindingCollector
     {
         for (int i = 0; i < node.size(); i++)
             if (node.getVariableName(i) != null)
-                bind(node.getVariableName(i).getTIdent());
+                bind(node.getVariableName(i).getVariableName());
     }
 
     // <FieldSelector> ::=
@@ -314,7 +294,7 @@ class ReferenceCollector extends BindingCollector
     
     @Override public void visitASTFieldSelectorNode(ASTFieldSelectorNode node)
     {
-        dontbind(node.getName().getTIdent());
+        dontbind(node.getComponentName());
     }
     
     // # R615
@@ -324,7 +304,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTArrayElementNode(ASTArrayElementNode node)
     {
-        if (node.getVariableName() != null) bind(node.getVariableName().getTIdent());
+        if (node.getVariableName() != null) bind(node.getVariableName());
     }
 
     // <AllocateObject> ::=
@@ -335,7 +315,7 @@ class ReferenceCollector extends BindingCollector
     {
         for (int i = 0; i < node.size(); i++)
             if (node.getVariableName(i) != null)
-                bind(node.getVariableName(i).getTIdent());
+                bind(node.getVariableName(i).getVariableName());
     }
 
     // # R630
@@ -352,19 +332,19 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTPointerObjectNode(ASTPointerObjectNode node)
     {
         if (node.getName() != null)
-            bind(node.getName().getTIdent());
+            bind(node.getName().getName());
         else
         {
             ASTPointerFieldNode list = node.getPointerField();
             for (int i = 0; i < list.size(); i++)
             {
                 if (list.getName(i) != null)
-                    bind(list.getName(i).getTIdent());
-                if (list.getName2(i) != null)
-                    dontbind(list.getName2(i).getTIdent());
+                    bind(list.getName(i).getName());
+                if (list.getComponentName(i) != null)
+                    dontbind(list.getComponentName(i));
                 if (list.getSFDummyArgNameList(i) != null)
                     for (int j = 0; j < list.getSFDummyArgNameList(i).size(); j++)
-                        bind(list.getSFDummyArgNameList(i).getSFDummyArgName(j).getName().getTIdent());
+                        bind(list.getSFDummyArgNameList(i).getVariableName(j));
             }
         }
     }
@@ -386,39 +366,21 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTPrimaryNode(ASTPrimaryNode node)
     {
-        if (node.getName() != null) bind(node.getName().getTIdent());
-    }
+        if (node.getName() != null) bind(node.getName().getName());
 
-    // <COperand> ::=
-    // T_SCON
-    // | <Name> ( T_LPAREN <SectionSubscriptList> T_RPAREN )?
-    // | <Name> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )?
-    // | <FunctionReference>
-
-    @Override public void visitASTCOperandNode(ASTCOperandNode node)
-    {
-        if (node.getName() != null) bind(node.getName().getTIdent());
-    }
-
-    // # dirk rossow: added <SubstringRange> to allow: write(text(1)(2:20),*) 'hello'
-    // <UFPrimary> ::=
-    // T_ICON
-    // | T_SCON
-    // | <FunctionReference>
-    // | <Name> ( T_LPAREN <SectionSubscriptList> T_RPAREN ( <SubstringRange> )? )?
-    // | <Name> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN ( <SubstringRange> )? )?
-    // | T_LPAREN <UFExpr> T_RPAREN
-
-    @Override public void visitASTUFPrimaryNode(ASTUFPrimaryNode node)
-    {
-        if (node.getName() != null) bind(node.getName().getTIdent());
+        ASTFunctionArgListNode list = node.getFunctionArgList();
+        if (list != null)
+            for (int i = 0; i < list.size(); i++)
+                if (list.getFunctionArg(i) != null)
+                    dontbind(list.getFunctionArg(i).getName());
     }
 
     @Override public void visitASTSFExprListNode(ASTSFExprListNode node)
     {
-        if (node.getSFDummyArgNameList() != null)
-            for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
-                bind(node.getSFDummyArgNameList().getSFDummyArgName(j).getName().getTIdent());
+        for (int i = 0; i < node.size(); i++)
+            if (node.hasSFDummyArgNameList(i))
+                for (int j = 0; j < node.getSFDummyArgNameList(i).size(); j++)
+                    bind(node.getSFDummyArgNameList(i).getVariableName(j));
     }
     
     // # R735 - JO - Macro substituted
@@ -434,56 +396,28 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTAssignmentStmtNode(ASTAssignmentStmtNode node)
     {
-        bind(node.getName().getTIdent());
-        if (node.getSFDummyArgNameList() != null)
-            for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
-                bind(node.getSFDummyArgNameList().getSFDummyArgName(j).getName().getTIdent());
-    }
-
-    // <SFPrimary> ::=
-    // <ArrayConstructor>
-    // | T_ICON
-    // | <SFVarName>
-    // | <SFDataRef>
-    // | <FunctionReference>
-    // | T_LPAREN <Expr> T_RPAREN
-
-    @Override public void visitASTSFPrimaryNode(ASTSFPrimaryNode node)
-    {
-        if (node.getSFVarName() != null) bind(node.getSFVarName().getName().getTIdent());
-    }
-
-    // # R736
-    // <PointerAssignmentStmt> ::=
-    // <LblDef> <Name> T_EQGREATERTHAN <Target> T_EOS
-    // | <LblDef> <Name> T_PERCENT <DataRef> T_EQGREATERTHAN <Target> T_EOS
-    // | <LblDef> <Name> T_LPAREN <SFExprList> T_RPAREN T_PERCENT <DataRef> T_EQGREATERTHAN <Target> T_EOS
-    // | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <DataRef> T_EQGREATERTHAN <Target> T_EOS
-
-    @Override public void visitASTPointerAssignmentStmtNode(ASTPointerAssignmentStmtNode node)
-    {
-        bind(node.getName().getTIdent());
-        if (node.getSFDummyArgNameList() != null)
-            for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
-                bind(node.getSFDummyArgNameList().getSFDummyArgName(j).getName().getTIdent());
+        bind(node.getLhsVariableName());
+        if (node.hasLhsNameList())
+            for (int j = 0; j < node.getLhsNameList().size(); j++)
+                bind(node.getLhsNameList().getVariableName(j));
     }
 
     // # R744
     // <MaskedElsewhereStmt> ::=
     // <LblDef> T_ELSEWHERE T_LPAREN <MaskExpr> T_RPAREN ( <EndName> )? T_EOS
 
-    @Override public void visitASTMaskedElsewhereStmtNode(ASTMaskedElsewhereStmtNode node)
+    @Override public void visitASTMaskedElseWhereStmtNode(ASTMaskedElseWhereStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R745
     // <ElsewhereStmt> ::=
     // <LblDef> T_ELSEWHERE ( <EndName> )? T_EOS
 
-    @Override public void visitASTElsewhereStmtNode(ASTElsewhereStmtNode node)
+    @Override public void visitASTElseWhereStmtNode(ASTElseWhereStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R746
@@ -493,7 +427,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndWhereStmtNode(ASTEndWhereStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R753
@@ -503,7 +437,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndForallStmtNode(ASTEndForallStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R804
@@ -515,7 +449,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTElseIfStmtNode(ASTElseIfStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R805
@@ -525,7 +459,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTElseStmtNode(ASTElseStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R806
@@ -535,7 +469,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndIfStmtNode(ASTEndIfStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R810
@@ -545,7 +479,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTCaseStmtNode(ASTCaseStmtNode node)
     {
-        if (node.getName() != null) bind(node.getName().getTIdent());
+        if (node.getName() != null) bind(node.getName().getName());
     }
 
     // # R811
@@ -555,7 +489,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndSelectStmtNode(ASTEndSelectStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // <LoopControl> ::=
@@ -565,7 +499,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTLoopControlNode(ASTLoopControlNode node)
     {
-        if (node.getVariableName() != null) bind(node.getVariableName().getTIdent());
+        if (node.getLoopVariableName() != null) bind(node.getLoopVariableName());
     }
 
     // # R825
@@ -575,7 +509,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndDoStmtNode(ASTEndDoStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R834
@@ -584,7 +518,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTCycleStmtNode(ASTCycleStmtNode node)
     {
-        if (node.getName() != null) bind(node.getName().getTIdent());
+        if (node.getName() != null) bind(node.getName());
     }
 
     // # R835
@@ -593,7 +527,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTExitStmtNode(ASTExitStmtNode node)
     {
-        if (node.getName() != null) bind(node.getName().getTIdent());
+        if (node.getName() != null) bind(node.getName());
     }
 
     // <IoControlSpec> ::=
@@ -610,7 +544,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTIoControlSpecNode(ASTIoControlSpecNode node)
     {
-        if (node.getNamelistGroupName() != null) bind(node.getNamelistGroupName().getTIdent());
+        if (node.getNamelistGroupName() != null) bind(node.getNamelistGroupName().getNamelistGroupName());
     }
 
     // # R916
@@ -620,7 +554,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTInputImpliedDoNode(ASTInputImpliedDoNode node)
     {
-        bind(node.getImpliedDoVariable().getTIdent());
+        bind(node.getImpliedDoVariable());
     }
 
     // <OutputImpliedDo> ::=
@@ -631,7 +565,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTOutputImpliedDoNode(ASTOutputImpliedDoNode node)
     {
-        bind(node.getImpliedDoVariable().getTIdent());
+        bind(node.getImpliedDoVariable());
     }
 
     // <EditElement> ::=
@@ -643,7 +577,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEditElementNode(ASTEditElementNode node)
     {
-        if (node.getTIdent() != null) bind(node.getTIdent()); // TODO: Is ANY correct?
+        if (node.getIdentifier() != null) bind(node.getIdentifier()); // TODO: Is ANY correct?
     }
 
     // # R1103
@@ -654,7 +588,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndProgramStmtNode(ASTEndProgramStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R1106
@@ -665,7 +599,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndModuleStmtNode(ASTEndModuleStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R1114
@@ -678,7 +612,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndBlockDataStmtNode(ASTEndBlockDataStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R1204
@@ -688,7 +622,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndInterfaceStmtNode(ASTEndInterfaceStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName().getEndName());
     }
 
     // # R1206
@@ -705,32 +639,7 @@ class ReferenceCollector extends BindingCollector
     {
         ASTProcedureNameListNode list = node.getProcedureNameList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getProcedureName(i).getTIdent());
-    }
-
-    // # R1210
-    // <FunctionReference> ::=
-    // <Name> T_LPAREN T_RPAREN
-    // | <Name> T_LPAREN <FunctionArgList> T_RPAREN
-    //
-    // # R1212
-    // # Functions initially recognized as arrays resolved semantically
-    // <FunctionArgList> ::=
-    // <FunctionArg>
-    // | @:<FunctionArgList> T_COMMA <FunctionArg>
-    // | <SectionSubscriptList> T_COMMA <FunctionArg>
-    //
-    // <FunctionArg> ::= <Name> T_EQUALS <Expr>
-
-    @Override public void visitASTFunctionReferenceNode(ASTFunctionReferenceNode node)
-    {
-        bind(node.getName().getTIdent());
-
-        ASTFunctionArgListNode list = node.getFunctionArgList();
-        if (list != null)
-            for (int i = 0; i < list.size(); i++)
-                if (list.getFunctionArg(i) != null)
-                    dontbind(list.getFunctionArg(i).getName().getTIdent());
+            bind(list.getProcedureName(i));
     }
 
     // # R1211
@@ -753,13 +662,13 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTCallStmtNode(ASTCallStmtNode node)
     {
-        bind(node.getSubroutineNameUse().getTIdent());
+        bind(node.getSubroutineName());
 
         ASTSubroutineArgListNode list = node.getSubroutineArgList();
         if (list != null)
             for (int i = 0; i < list.size(); i++)
                 if (list.getSubroutineArg(i) != null && list.getSubroutineArg(i).getName() != null)
-                    dontbind(list.getSubroutineArg(i).getName().getTIdent());
+                    dontbind(list.getSubroutineArg(i).getName());
     }
 
     // # R1217 chain rule deleted
@@ -795,10 +704,10 @@ class ReferenceCollector extends BindingCollector
         ASTFunctionParsNode list = node.getFunctionPars();
         if (list != null)
             for (int i = 0; i < list.size(); i++)
-                bindAsParam(list.getFunctionPar(i).getDummyArgName().getTIdent());
+                bindAsParam(list.getFunctionPar(i).getVariableName());
         
-        if (node.getTResult() != null)
-            bind(node.getName().getTIdent());
+        if (node.hasResultClause())
+            bind(node.getResultName());
     }
 
     // # R1220
@@ -809,7 +718,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndFunctionStmtNode(ASTEndFunctionStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R1222
@@ -837,8 +746,8 @@ class ReferenceCollector extends BindingCollector
         {
             ASTSubroutineParsNode list = node.getSubroutinePars();
             for (int i = 0; i < list.size(); i++)
-                if (list.getSubroutinePar(i).getDummyArgName() != null)
-                    bindAsParam(list.getSubroutinePar(i).getDummyArgName().getTIdent());
+                if (list.getSubroutinePar(i) != null)
+                    bindAsParam(list.getSubroutinePar(i).getVariableName());
         }
     }
 
@@ -850,7 +759,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTEndSubroutineStmtNode(ASTEndSubroutineStmtNode node)
     {
-        if (node.getEndName() != null) bind(node.getEndName().getTIdent());
+        if (node.getEndName() != null) bind(node.getEndName());
     }
 
     // # R1228
@@ -871,12 +780,12 @@ class ReferenceCollector extends BindingCollector
     {
         // Assume this is actually an assignment statement instead of a statement function
         
-        //addDefinition(node.getName().getTIdent(), Type.UNKNOWN);
-        bind(node.getName().getTIdent());
+        //addDefinition(node.getName(), Type.UNKNOWN);
+        bind(node.getName().getName());
 
-        if (node.getStmtFunctionRange().getSFDummyArgNameList() != null)
-            for (int j = 0; j < node.getStmtFunctionRange().getSFDummyArgNameList().size(); j++)
-                bind(node.getStmtFunctionRange().getSFDummyArgNameList().getSFDummyArgName(j).getName().getTIdent());
+        if (node.getSFDummyArgNameList() != null)
+            for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
+                bind(node.getSFDummyArgNameList().getVariableName(j));
     }
 
     // #/* Assign Statement */
@@ -885,7 +794,7 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTAssignStmtNode(ASTAssignStmtNode node)
     {
-        bind(node.getVariableName().getTIdent());
+        bind(node.getVariableName());
     }
 
     // #/* Assigned GOTO Statement */
@@ -898,9 +807,6 @@ class ReferenceCollector extends BindingCollector
 
     @Override public void visitASTAssignedGotoStmtNode(ASTAssignedGotoStmtNode node)
     {
-        if (node.getVariableName() != null)
-            bind(node.getVariableName().getTIdent());
-        else
-            bind(node.getVariableComma().getVariableName().getTIdent());
+        bind(node.getVariableName());
     }
 }

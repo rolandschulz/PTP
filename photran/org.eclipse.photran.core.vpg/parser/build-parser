@@ -13,6 +13,10 @@ java -Xmx256M -jar $SRCDIR/ludwig.jar \
 	-shift T_COMMA "<IoControlSpecList>" \
 	-reduce "<SFVarName>" "<SFDummyArgName>" \
 	-package "org.eclipse.photran.internal.core.parser" \
+	-prec "<DeferredShapeSpecList> > <AssumedShapeSpec>" \
+	-prec "<BodyPlusInternals> > <Label>, T_ICON" \
+	-prec "<LblDef>, <Label>, T_ICON > <ConditionalBody>, <ElseIfConstruct>" \
+	-shift T_IDENT "<CommonBlock>" \
 	-imports "import org.eclipse.photran.internal.core.lexer.*; \
                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;" \
 	-onError "throw new Exception(\"Syntax error: Unexpected \" + lookahead.getTerminal().toString() + \" (\" + (lookahead.getFile()==null ? \"\" : lookahead.getFile().getName() + \", \") + \"line \" + lookahead.getLine() + \", column \" + lookahead.getCol() + \")\");" \
@@ -33,7 +37,7 @@ echo Applying patches...
 
 patch Parser.java <$SRCDIR/Parser.patch
 
-for file in Parser.java AST*Node.java; do
+for file in Parser.java AST*Node.java AST*Base.java; do
   sed -e 's/getCSTParent/getParent/g' $file >$file.x
   mv -f $file.x $file
 done

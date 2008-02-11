@@ -24,7 +24,6 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTOnlyListNode;
 import org.eclipse.photran.internal.core.parser.ASTRenameListNode;
-import org.eclipse.photran.internal.core.parser.ASTUseNameNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
@@ -90,7 +89,7 @@ public class ModuleLoader extends BindingCollector
     {
         try
         {
-        	vpg.markFileAsImportingModule(fileContainingUseStmt, node.getName().getTIdent().getText());
+        	vpg.markFileAsImportingModule(fileContainingUseStmt, node.getModuleName().getText());
 
 	        if (this.shouldImportModules)
 	        	loadModule(node);
@@ -105,7 +104,7 @@ public class ModuleLoader extends BindingCollector
 	private void loadModule(ASTUseStmtNode node) throws Exception
 	{
 		this.useStmt = node;
-		this.moduleNameToken = useStmt.getName().getTIdent();
+		this.moduleNameToken = useStmt.getModuleName();
 		this.moduleName = PhotranVPG.canonicalizeIdentifier(moduleNameToken.getText());
 		
 		progressMonitor.subTask("Loading module " + moduleName + "...");
@@ -131,7 +130,7 @@ public class ModuleLoader extends BindingCollector
                 @Override
                 public void visitASTModuleNode(ASTModuleNode node)
                 {
-                    String thisModule = PhotranVPG.canonicalizeIdentifier(node.getModuleStmt().getModuleName().getTIdent().getText());
+                    String thisModule = PhotranVPG.canonicalizeIdentifier(node.getModuleStmt().getModuleName().getModuleName().getText());
                     if (thisModule.equals(moduleName))
                     	throw new Notification(node);
                 }
@@ -149,7 +148,7 @@ public class ModuleLoader extends BindingCollector
     	List<IFile> files = vpg.findFilesThatExportModule(moduleName);
         if (files.isEmpty())
         {
-            vpg.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTIdent().getTokenRef());
+            vpg.logError("There are no files that export a module named " + moduleName, useStmt.getModuleName().getTokenRef());
             return;
         }
 
@@ -158,7 +157,7 @@ public class ModuleLoader extends BindingCollector
         {
             vpg.logError("The module " + moduleName + " could not be found in any of the"
             			+ " folders in the module paths for this project.  However, it was found in a folder not in the"
-            			+ " module path.", useStmt.getName().getTIdent().getTokenRef());
+            			+ " module path.", useStmt.getModuleName().getTokenRef());
             return;
         }
         
@@ -204,9 +203,9 @@ public class ModuleLoader extends BindingCollector
 		ASTModuleNode moduleNode = findModuleIn(file);
 		if (moduleNode == null) return; // Shouldn't happen if VPG is up to date
 		
-		bind(useStmt.getName().getTIdent(), moduleNode.getRepresentativeToken());
+		bind(useStmt.getModuleName(), moduleNode.getRepresentativeToken());
 		
-		ScopingNode newScope = useStmt.getTUse().getEnclosingScope();
+		ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
 		
 		for (Definition def : moduleNode.getAllPublicDefinitions())
 			if (shouldImportDefinition(def))
@@ -229,7 +228,7 @@ public class ModuleLoader extends BindingCollector
 		{
 			for (int i = 0; i < renameList.size(); i++)
 			{
-				String entityBeingRenamed = PhotranVPG.canonicalizeIdentifier(renameList.getRename(i).getUseName().getTIdent().getText());
+				String entityBeingRenamed = PhotranVPG.canonicalizeIdentifier(renameList.getRename(i).getOldName().getText());
 				if (def.matches(entityBeingRenamed))
 						return false;
 			}
@@ -240,9 +239,9 @@ public class ModuleLoader extends BindingCollector
 		{
 	        for (int i = 0; i < onlyList.size(); i++)
 	        {
-	        	ASTUseNameNode useName = onlyList.getOnly(i).getUseName();
-	        	String entityToImport = useName == null ? null : PhotranVPG.canonicalizeIdentifier(useName.getTIdent().getText());
-	        	boolean isRenamed = onlyList.getOnly(i).getTIdent() != null;
+	        	Token useName = onlyList.getOnly(i).getOldName();
+	        	String entityToImport = useName == null ? null : PhotranVPG.canonicalizeIdentifier(useName.getText());
+	        	boolean isRenamed = onlyList.getOnly(i).isRenamed();
 	        	
 	            if (def.matches(entityToImport) && !isRenamed) return true;
 	        }
@@ -257,8 +256,8 @@ public class ModuleLoader extends BindingCollector
 		
 		for (int i = 0; i < renameList.size(); i++)
         {
-            Token newName = renameList.getRename(i).getTIdent();
-            Token oldName = renameList.getRename(i).getUseName().getTIdent();
+            Token newName = renameList.getRename(i).getNewName();
+            Token oldName = renameList.getRename(i).getOldName();
             
             bindPossiblyRenamedIdentifier(newName, oldName, moduleNode);
         }
@@ -270,9 +269,8 @@ public class ModuleLoader extends BindingCollector
 		
 		for (int i = 0; i < onlyList.size(); i++)
         {
-            Token newName = onlyList.getOnly(i).getTIdent();
-            ASTUseNameNode useName = onlyList.getOnly(i).getUseName();
-            Token oldName = useName == null ? null : useName.getTIdent();
+            Token newName = onlyList.getOnly(i).getNewName();
+            Token oldName = onlyList.getOnly(i).getOldName();
             
             if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleNode);
         }

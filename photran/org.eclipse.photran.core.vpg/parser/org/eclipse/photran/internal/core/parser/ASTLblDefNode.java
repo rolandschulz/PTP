@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTLblDefNode extends InteriorNode
+class ASTLblDefNode extends InteriorNode
 {
     ASTLblDefNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,19 +37,32 @@ public class ASTLblDefNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTLblDefNode(this);
-    }
 
-    public ASTLabelNode getLabel()
+    public Token getLabel()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LBL_DEF_1049)
-            return (ASTLabelNode)getChild(0);
+        if (getProduction() == Production.LBL_DEF_1045)
+            return (Token)((ASTLabelNode)getChild(0)).getLabel();
         else
             return null;
+    }
+
+    public boolean hasLabel()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.LBL_DEF_1045)
+            return ((ASTLabelNode)getChild(0)).hasLabel();
+        else
+            return false;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.LBL_DEF_1045 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

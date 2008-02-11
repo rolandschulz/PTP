@@ -47,41 +47,61 @@ public class ASTOnlyNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_916)
+        if (getProduction() == Production.ONLY_910)
             return (ASTGenericSpecNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTIdent()
+    public boolean hasGenericSpec()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_917)
+        if (getProduction() == Production.ONLY_910)
+            return getChild(0) != null;
+        else
+            return false;
+    }
+
+    public Token getNewName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ONLY_911)
             return (Token)getChild(0);
         else
             return null;
     }
 
-    public Token getTEqgreaterthan()
+    public boolean isRenamed()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ONLY_917)
-            return (Token)getChild(1);
+        if (getProduction() == Production.ONLY_911)
+            return getChild(1) != null;
+        else
+            return false;
+    }
+
+    public Token getOldName()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        if (getProduction() == Production.ONLY_911)
+            return (Token)((ASTUseNameNode)getChild(2)).getName();
+        else if (getProduction() == Production.ONLY_912)
+            return (Token)((ASTUseNameNode)getChild(0)).getName();
         else
             return null;
     }
 
-    public ASTUseNameNode getUseName()
+    @Override protected boolean childIsPulledUp(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ONLY_917)
-            return (ASTUseNameNode)getChild(2);
-        else if (getProduction() == Production.ONLY_918)
-            return (ASTUseNameNode)getChild(0);
+        if (getProduction() == Production.ONLY_911 && index == 2)
+            return true;
+        else if (getProduction() == Production.ONLY_912 && index == 0)
+            return true;
         else
-            return null;
+            return false;
     }
 }

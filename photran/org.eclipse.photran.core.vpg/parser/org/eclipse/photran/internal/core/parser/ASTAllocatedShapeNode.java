@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAllocatedShapeNode extends InteriorNode
+class ASTAllocatedShapeNode extends InteriorNode
 {
     ASTAllocatedShapeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -37,39 +37,32 @@ public class ASTAllocatedShapeNode extends InteriorNode
         else 
             return actualParent;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTAllocatedShapeNode(this);
-    }
 
-    public Token getTLparen()
+    public boolean hasAllocatedShape()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATED_SHAPE_462)
-            return (Token)getChild(0);
+        if (getProduction() == Production.ALLOCATED_SHAPE_460)
+            return getChild(0) != null;
         else
-            return null;
+            return false;
     }
 
     public ASTSectionSubscriptListNode getSectionSubscriptList()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ALLOCATED_SHAPE_462)
+        if (getProduction() == Production.ALLOCATED_SHAPE_460)
             return (ASTSectionSubscriptListNode)getChild(1);
         else
             return null;
     }
 
-    public Token getTRparen()
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ALLOCATED_SHAPE_462)
-            return (Token)getChild(2);
+        if (getProduction() == Production.ALLOCATED_SHAPE_460 && index == 2)
+            return false;
         else
-            return null;
+            return true;
     }
 }

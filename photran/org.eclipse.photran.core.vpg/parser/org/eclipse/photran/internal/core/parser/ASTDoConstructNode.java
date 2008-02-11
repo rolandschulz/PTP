@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDoConstructNode extends InteriorNode
+public class ASTDoConstructNode extends InteriorNode implements IExecutableConstruct
 {
     ASTDoConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
@@ -40,16 +40,25 @@ public class ASTDoConstructNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIExecutableConstruct(this);
         visitor.visitASTDoConstructNode(this);
     }
 
-    public ASTBlockDoConstructNode getBlockDoConstruct()
+    public ASTLabelDoStmtNode getLabelDoStmt()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DO_CONSTRUCT_707)
-            return (ASTBlockDoConstructNode)getChild(0);
+        if (getProduction() == Production.DO_CONSTRUCT_701)
+            return (ASTLabelDoStmtNode)((ASTBlockDoConstructNode)getChild(0)).getLabelDoStmt();
         else
             return null;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.DO_CONSTRUCT_701 && index == 0)
+            return true;
+        else
+            return false;
     }
 }

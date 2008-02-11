@@ -15,7 +15,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDeferredShapeSpecListNode extends InteriorNode
+public class ASTDeferredShapeSpecListNode extends InteriorNode implements IComponentArraySpec
 {
     protected int count = -1;
 
@@ -91,40 +91,35 @@ public class ASTDeferredShapeSpecListNode extends InteriorNode
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
+        visitor.visitIComponentArraySpec(this);
         visitor.visitASTDeferredShapeSpecListNode(this);
-    }
-
-    public ASTDeferredShapeSpecNode getDeferredShapeSpec(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDeferredShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_309)
-            return (ASTDeferredShapeSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_310)
-            return (ASTDeferredShapeSpecNode)node.getChild(2);
-        else
-            return null;
     }
 
     private ASTDeferredShapeSpecListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_310)
+        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_307)
             return (ASTDeferredShapeSpecListNode)getChild(0);
         else
             return null;
     }
 
-    public Token getTComma(int listIndex)
+    @Override protected boolean shouldVisitChild(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTDeferredShapeSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_310)
-            return (Token)node.getChild(1);
+        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_307 && index == 1)
+            return false;
         else
-            return null;
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_306 && index == 0)
+            return true;
+        else if (getProduction() == Production.DEFERRED_SHAPE_SPEC_LIST_307 && index == 2)
+            return true;
+        else
+            return false;
     }
 }

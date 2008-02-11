@@ -94,27 +94,14 @@ public class ASTAttrSpecSeqNode extends InteriorNode
         visitor.visitASTAttrSpecSeqNode(this);
     }
 
-    public Token getTComma(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTAttrSpecSeqNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ATTR_SPEC_SEQ_234)
-            return (Token)node.getChild(0);
-        else if (node.getProduction() == Production.ATTR_SPEC_SEQ_235)
-            return (Token)node.getChild(1);
-        else
-            return null;
-    }
-
     public ASTAttrSpecNode getAttrSpec(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTAttrSpecSeqNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ATTR_SPEC_SEQ_234)
+        if (node.getProduction() == Production.ATTR_SPEC_SEQ_232)
             return (ASTAttrSpecNode)node.getChild(1);
-        else if (node.getProduction() == Production.ATTR_SPEC_SEQ_235)
+        else if (node.getProduction() == Production.ATTR_SPEC_SEQ_233)
             return (ASTAttrSpecNode)node.getChild(2);
         else
             return null;
@@ -124,9 +111,19 @@ public class ASTAttrSpecSeqNode extends InteriorNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ATTR_SPEC_SEQ_235)
+        if (getProduction() == Production.ATTR_SPEC_SEQ_233)
             return (ASTAttrSpecSeqNode)getChild(0);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.ATTR_SPEC_SEQ_232 && index == 0)
+            return false;
+        else if (getProduction() == Production.ATTR_SPEC_SEQ_233 && index == 1)
+            return false;
+        else
+            return true;
     }
 }

@@ -99,25 +99,12 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_472)
+        if (node.getProduction() == Production.POINTER_FIELD_470)
             return (ASTNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.POINTER_FIELD_473)
+        else if (node.getProduction() == Production.POINTER_FIELD_471)
             return (ASTNameNode)node.getChild(0);
-        else if (node.getProduction() == Production.POINTER_FIELD_474)
+        else if (node.getProduction() == Production.POINTER_FIELD_472)
             return (ASTNameNode)node.getChild(0);
-        else
-            return null;
-    }
-
-    public Token getTLparen(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_472)
-            return (Token)node.getChild(1);
-        else if (node.getProduction() == Production.POINTER_FIELD_473)
-            return (Token)node.getChild(1);
         else
             return null;
     }
@@ -127,53 +114,38 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_472)
+        if (node.getProduction() == Production.POINTER_FIELD_470)
             return (ASTSFExprListNode)node.getChild(2);
         else
             return null;
     }
 
-    public Token getTRparen(int listIndex)
+    public boolean hasSFExprList(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_472)
-            return (Token)node.getChild(3);
-        else if (node.getProduction() == Production.POINTER_FIELD_473)
-            return (Token)node.getChild(3);
+        if (node.getProduction() == Production.POINTER_FIELD_470)
+            return node.getChild(2) != null;
         else
-            return null;
+            return false;
     }
 
-    public Token getTPercent(int listIndex)
+    public boolean hasDerivedTypeComponentRef(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_472)
-            return (Token)node.getChild(4);
+        if (node.getProduction() == Production.POINTER_FIELD_470)
+            return node.getChild(4) != null;
+        else if (node.getProduction() == Production.POINTER_FIELD_471)
+            return node.getChild(4) != null;
+        else if (node.getProduction() == Production.POINTER_FIELD_472)
+            return node.getChild(1) != null;
         else if (node.getProduction() == Production.POINTER_FIELD_473)
-            return (Token)node.getChild(4);
-        else if (node.getProduction() == Production.POINTER_FIELD_474)
-            return (Token)node.getChild(1);
+            return ((ASTFieldSelectorNode)node.getChild(1)).hasDerivedTypeComponentRef();
         else
-            return null;
-    }
-
-    public ASTNameNode getName2(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_472)
-            return (ASTNameNode)node.getChild(5);
-        else if (node.getProduction() == Production.POINTER_FIELD_473)
-            return (ASTNameNode)node.getChild(5);
-        else if (node.getProduction() == Production.POINTER_FIELD_474)
-            return (ASTNameNode)node.getChild(2);
-        else
-            return null;
+            return false;
     }
 
     public ASTSFDummyArgNameListNode getSFDummyArgNameList(int listIndex)
@@ -181,30 +153,97 @@ public class ASTPointerFieldNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_473)
+        if (node.getProduction() == Production.POINTER_FIELD_471)
             return (ASTSFDummyArgNameListNode)node.getChild(2);
         else
             return null;
+    }
+
+    public boolean hasSFDummyArgNameList(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTPointerFieldNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.POINTER_FIELD_471)
+            return node.getChild(2) != null;
+        else
+            return false;
     }
 
     private ASTPointerFieldNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_FIELD_475)
+        if (getProduction() == Production.POINTER_FIELD_473)
             return (ASTPointerFieldNode)getChild(0);
         else
             return null;
     }
 
-    public ASTFieldSelectorNode getFieldSelector(int listIndex)
+    public Token getComponentName(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         ASTPointerFieldNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POINTER_FIELD_475)
-            return (ASTFieldSelectorNode)node.getChild(1);
+        if (node.getProduction() == Production.POINTER_FIELD_470)
+            return (Token)((ASTNameNode)node.getChild(5)).getName();
+        else if (node.getProduction() == Production.POINTER_FIELD_471)
+            return (Token)((ASTNameNode)node.getChild(5)).getName();
+        else if (node.getProduction() == Production.POINTER_FIELD_472)
+            return (Token)((ASTNameNode)node.getChild(2)).getName();
+        else if (node.getProduction() == Production.POINTER_FIELD_473)
+            return (Token)((ASTFieldSelectorNode)node.getChild(1)).getComponentName();
         else
             return null;
+    }
+
+    public ASTSectionSubscriptListNode getSectionSubscriptList(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTPointerFieldNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.POINTER_FIELD_473)
+            return (ASTSectionSubscriptListNode)((ASTFieldSelectorNode)node.getChild(1)).getSectionSubscriptList();
+        else
+            return null;
+    }
+
+    public boolean hasSectionSubscriptList(int listIndex)
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+
+        ASTPointerFieldNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.POINTER_FIELD_473)
+            return ((ASTFieldSelectorNode)node.getChild(1)).hasSectionSubscriptList();
+        else
+            return false;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.POINTER_FIELD_470 && index == 1)
+            return false;
+        else if (getProduction() == Production.POINTER_FIELD_470 && index == 3)
+            return false;
+        else if (getProduction() == Production.POINTER_FIELD_471 && index == 1)
+            return false;
+        else if (getProduction() == Production.POINTER_FIELD_471 && index == 3)
+            return false;
+        else
+            return true;
+    }
+
+    @Override protected boolean childIsPulledUp(int index)
+    {
+        if (getProduction() == Production.POINTER_FIELD_470 && index == 5)
+            return true;
+        else if (getProduction() == Production.POINTER_FIELD_471 && index == 5)
+            return true;
+        else if (getProduction() == Production.POINTER_FIELD_472 && index == 2)
+            return true;
+        else if (getProduction() == Production.POINTER_FIELD_473 && index == 1)
+            return true;
+        else
+            return false;
     }
 }

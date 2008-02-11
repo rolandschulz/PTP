@@ -17,6 +17,8 @@ import java.util.List;
 
 public class ASTAcValueListNode extends InteriorNode
 {
+    protected int count = -1;
+
     ASTAcValueListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
     {
          super(production);
@@ -28,14 +30,63 @@ public class ASTAcValueListNode extends InteriorNode
         
     @Override public InteriorNode getASTParent()
     {
-        InteriorNode actualParent = super.getParent();
+        // This is a recursive node in a list, so its logical parent node
+        // is the parent of the first node in the list
+    
+        InteriorNode parent = super.getParent();
+        InteriorNode grandparent = parent == null ? null : parent.getParent();
+        InteriorNode logicalParent = parent;
+        
+        while (parent != null && grandparent != null
+               && parent instanceof ASTAcValueListNode
+               && grandparent instanceof ASTAcValueListNode
+               && ((ASTAcValueListNode)grandparent).getRecursiveNode() == parent)
+        {
+            logicalParent = grandparent;
+            parent = grandparent;
+            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
+        }
+        
+        InteriorNode logicalGrandparent = logicalParent.getParent();
         
         // If a node has been pulled up in an ACST, its physical parent in
         // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
+        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
+            return logicalParent.getASTParent();
         else 
-            return actualParent;
+            return logicalParent;
+    }
+
+    /**
+     * @return the number of ASTAcValueListNode nodes in this list
+     */
+    public int size()
+    {
+        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
+        
+        if (count >= 0) return count;
+        
+        count = 0;
+        ASTAcValueListNode node = this;
+        do
+        {
+            count++;
+            node = node.getRecursiveNode();
+        }
+        while (node != null);
+        
+        return count;
+    }
+    
+    ASTAcValueListNode recurseToIndex(int listIndex)
+    {
+        ASTAcValueListNode node = this;
+        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
+        {
+            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
+            node = (ASTAcValueListNode)node.getRecursiveNode();
+        }
+        return node;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -43,23 +94,34 @@ public class ASTAcValueListNode extends InteriorNode
         visitor.visitASTAcValueListNode(this);
     }
 
-    public ASTExprNode getExpr()
+    public ASTAcValueNode getAcValue(int listIndex)
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.AC_VALUE_LIST_220)
-            return (ASTExprNode)getChild(0);
+        ASTAcValueListNode node = recurseToIndex(listIndex);
+        if (node.getProduction() == Production.AC_VALUE_LIST_221)
+            return (ASTAcValueNode)node.getChild(0);
+        else if (node.getProduction() == Production.AC_VALUE_LIST_222)
+            return (ASTAcValueNode)node.getChild(2);
         else
             return null;
     }
 
-    public ASTAcValueList1Node getAcValueList1()
+    private ASTAcValueListNode getRecursiveNode()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.AC_VALUE_LIST_221)
-            return (ASTAcValueList1Node)getChild(0);
+        if (getProduction() == Production.AC_VALUE_LIST_222)
+            return (ASTAcValueListNode)getChild(0);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.AC_VALUE_LIST_222 && index == 1)
+            return false;
+        else
+            return true;
     }
 }
