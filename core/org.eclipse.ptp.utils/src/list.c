@@ -17,6 +17,19 @@
  * LA-CC 04-115
  ******************************************************************************/
 
+/*
+ * NOTE: This list implementation is not synchronized across list iteration. If there are two threads 
+ * simultaneously accessing the list, then one thread may affect the other's list access. For instance, 
+ * if thread 1 calls GetNextElement(), then thread 2 calls GetListElelemt(), then the next time thread 1 calls
+ * GetListElement(), it will get the 3rd element in the list, not the 2nd. Also, if two threads are accessing 
+ * objects in the list, and freeing data associated with those objects while traversing the list, then this 
+ * may cause problems where thread 1 frees data that thread 2 is about to access.
+ * 
+ * Applications wishing to use threads to access lists in this way should provide functions that obtain 
+ * and release a global lock on the list which prevents any other thread from accessing the list while 
+ * that lock is held.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
