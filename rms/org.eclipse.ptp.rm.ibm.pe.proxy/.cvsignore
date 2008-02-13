@@ -4,3 +4,4 @@ stamp-h1
 .deps
 config.status
 ptp_ibmpe_proxy
+Makefile
