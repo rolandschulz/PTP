@@ -67,8 +67,7 @@ public class JobManager extends AbstractUIManager {
 			for (IPProcess proc : job.getProcesses()) {
 				if (proc == null || set.contains(proc.getID()))
 					continue;
-				System.err.println("@@@@@@@@@@!!! ADD JOB PROCESS CREATED: " + proc.getProcessIndex() + " @@@@@@@@@@@@@@");
-				elements.add(createProcessElement(set, proc.getID(), proc.getProcessIndex()));
+				elements.add(createProcessElement(set, proc.getID(), proc.getProcessIndex(), proc));
 			}
 			set.addElements(elements.toArray(new IElement[0]));
 		}
@@ -81,8 +80,7 @@ public class JobManager extends AbstractUIManager {
 		IPJob job = proc.getJob();
 		IElementSet set = createElementHandler(job).getSetRoot();
 		if (!set.contains(proc.getID())) {
-			//System.err.println("@@@@@@@@@@ ADD PROCESS CREATED: " + proc.getProcessIndex() + " @@@@@@@@@@@@@@");
-			set.addElements(new IElement[] { createProcessElement(set, proc.getID(), proc.getProcessIndex()) });
+			set.addElements(new IElement[] { createProcessElement(set, proc.getID(), proc.getProcessIndex(), proc) });
 		}
 	}
 
@@ -465,8 +463,8 @@ public class JobManager extends AbstractUIManager {
 	 * @param taskID
 	 * @return
 	 */
-	protected IElement createProcessElement(IElementSet set, String key, String taskID) {
-		return new Element(set, key, taskID) {
+	protected IElement createProcessElement(IElementSet set, String key, String taskID, IPProcess process) {
+		return new Element(set, key, taskID, process) {
 			public int compareTo(IElement e) {
 				return new Integer(getName()).compareTo(new Integer(e.getName()));
 			}

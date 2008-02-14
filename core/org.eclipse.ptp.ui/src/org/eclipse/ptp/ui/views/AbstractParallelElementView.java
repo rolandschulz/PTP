@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -51,7 +50,9 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * @author clement chu
  * 
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView implements IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider, ISelectionChangedListener {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IIconCanvasActionListener,
+		IToolTipProvider, IImageProvider, IContentProvider, ISelectionChangedListener {
+
 	protected final String DEFAULT_TITLE = "Parallel";
 	protected IManager manager = null;
 	// Set
@@ -65,7 +66,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected IconRefreshWorkbenchJob iconreFreshJob = new IconRefreshWorkbenchJob();
 	
 	private boolean debug = false;
-	
+
 	/**
 	 * update preference setting 
 	 */
@@ -174,7 +175,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
 		canvas.addSelectionChangedListener(this);
-		getSite().setSelectionProvider(canvas);
+		//getSite().setSelectionProvider(canvas);
 		return composite;
 	}
 	/* (non-Javadoc)
@@ -410,7 +411,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public ISelection getSelection() {
 		return canvas.getSelection();
 	}
-    public void selectionChanged(SelectionChangedEvent event) {}
     
 	class IconRefreshWorkbenchJob extends WorkbenchJob {
 		private final ReentrantLock	waitLock = new ReentrantLock();

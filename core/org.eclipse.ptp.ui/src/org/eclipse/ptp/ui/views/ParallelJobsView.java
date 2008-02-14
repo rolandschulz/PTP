@@ -24,16 +24,21 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -95,7 +100,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * Additional changes Greg Watson
  * 
  */
-public class ParallelJobsView extends AbstractParallelSetView {
+public class ParallelJobsView extends AbstractParallelSetView implements ISelectionProvider {
 	private final class JobChildListener implements IJobChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
@@ -355,7 +360,6 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	public static final String BOTH_VIEW = "0";
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
-	protected String current_view = BOTH_VIEW;
 	
 	/*
 	 * Model listeners
@@ -372,8 +376,11 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	private boolean debug = false;
 	
 	/*
-	 * Currently selected element
+	 * Element selection
 	 */
+	private ISelection selection = null;
+	private ListenerList listeners = new ListenerList();
+	protected String current_view = BOTH_VIEW;
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 
 	/*
@@ -398,12 +405,19 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		super(manager);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		listeners.add(listener);
+	}
+	
 	/**
 	 * @param job
 	 */
 	public void changeJobRefresh(IPJob job) {
 		changeJobRefresh(job , false);
-	}
+	} 	
 	
 	/**
 	 * @param job
@@ -502,7 +516,7 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	public void doubleClick(IElement element) {
 		openProcessViewer(getJobManager().findProcess(element.getID()));
 	}
-	
+    
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
@@ -558,6 +572,16 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getSelection()
+	 */
+	public ISelection getSelection() {
+    	if (selection == null) {
+    		return StructuredSelection.EMPTY;
+    	}
+    	return selection;
+    }
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java.lang.Object)
 	 */
 	public String[] getToolTipText(Object obj) {
@@ -586,6 +610,13 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		listeners.remove(listener);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
 	 */
 	public void repaint(boolean all) {
@@ -598,6 +629,15 @@ public class ParallelJobsView extends AbstractParallelSetView {
 	}
 	
 	/* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+     */
+    public void selectionChanged(SelectionChangedEvent event) {
+    	// Selection change could come from either the jobTableViewer of the elementViewComposite
+    	selection = event.getSelection();
+    	setSelection(selection);
+    }
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#setFocus()
 	 */
 	public void setFocus() {
@@ -607,6 +647,22 @@ public class ParallelJobsView extends AbstractParallelSetView {
 			changeJobRefresh(null);
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
+	public void setSelection(ISelection selection) {
+        final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
+        Object[] array = listeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.selectionChanged(e);
+                }
+            });
+        }
+    }
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
@@ -740,7 +796,8 @@ public class ParallelJobsView extends AbstractParallelSetView {
 		// IPropertySource, or support IPropertySource.class as an adapter type
 		// in its AdapterFactory.
 		// ----------------------------------------------------------------------
-		getSite().setSelectionProvider(jobTableViewer);
+		jobTableViewer.addSelectionChangedListener(this);
+		getSite().setSelectionProvider(this);
 		
 		createJobContextMenu();
 		elementViewComposite = createElementView(sashForm);

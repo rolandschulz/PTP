@@ -18,60 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.ptp.core.elements.IPElement;
+
 /**
  * @author clement chu
  *
  */
-public class Element implements IElement {
+public class Element extends PlatformObject implements IElement {
 	protected String id = "0";
 	protected String name = "";
 	protected boolean registered = false;
 	protected IElement parent = null;
+	protected IPElement pElement = null;
 	
-	/** Constructor
+	/** 
+	 * Constructor
 	 * @param parent Parent element
 	 * @param id element ID
 	 * @param name element name
 	 */
-	public Element(IElement parent, String id, String name) {
+	public Element(IElement parent, String id, String name, IPElement pElement) {
 		this.parent = parent;
 		this.id = id;
 		this.name = name;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IElement#getParent()
-	 */
-	public IElement getParent() {
-		return parent;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IElement#getID()
-	 */
-	public String getID() {
-		return id;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IElement#getName()
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IElement#isRegistered()
-	 */
-	public boolean isRegistered() {
-		return registered;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IElement#setRegistered(boolean)
-	 */
-	public void setRegistered(boolean registered) {
-		this.registered = registered;
+		this.pElement = pElement;
 	}
 	
 	/* (non-Javadoc)
@@ -84,7 +55,50 @@ public class Element implements IElement {
 			return null;
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	public int compareTo(IElement e) {
 		return getName().compareTo(e.getName());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getID()
+	 */
+	public String getID() {
+		return id;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getName()
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getParent()
+	 */
+	public IElement getParent() {
+		return parent;
+	}
+	
+	public IPElement getPElement() {
+		return pElement;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#isRegistered()
+	 */
+	public boolean isRegistered() {
+		return registered;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#setRegistered(boolean)
+	 */
+	public void setRegistered(boolean registered) {
+		this.registered = registered;
 	}
 }
