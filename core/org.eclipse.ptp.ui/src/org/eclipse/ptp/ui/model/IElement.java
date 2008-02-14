@@ -18,38 +18,53 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.ptp.core.elements.IPElement;
+
 /**
  * @author clement chu
  *
  */
-public interface IElement extends Cloneable, Comparable<IElement> {
-	/**Get parent
-	 * @return element
+public interface IElement extends Cloneable, Comparable<IElement>, IAdaptable {
+	/** 
+	 * Clone a new element
+	 * @return cloned element
 	 */
-	public IElement getParent();
+	public IElement cloneElement();
 
-	/** Get element name
-	 * @return name of element
-	 */
-	public String getName();
-	
-	/** Get element ID
+	/** 
+	 * Get element ID
 	 * @return element ID in string format
 	 */
 	public String getID();
+	
+	/** 
+	 * Get element name
+	 * @return name of element
+	 */
+	public String getName();
 
-	/** Is element registered
+	/**
+	 * Get parent
+	 * @return element
+	 */
+	public IElement getParent();
+	
+	/**
+	 * Get the core model element associated with this element.
+	 * @return IPElement
+	 */
+	public IPElement getPElement();
+	
+	/** 
+	 * Is element registered
 	 * @return true if element is registered
 	 */
 	public boolean isRegistered();
 	
-	/** Set element to register or not
+	/** 
+	 * Set element to register or not
 	 * @param registered is register
 	 */
 	public void setRegistered(boolean registered);
-	
-	/** Clone a new element
-	 * @return cloned element
-	 */
-	public IElement cloneElement();
 }

@@ -24,6 +24,7 @@ package org.eclipse.ptp.internal.ui.adapters;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 public class PropertyAdapterFactory implements IAdapterFactory {
@@ -36,6 +37,9 @@ public class PropertyAdapterFactory implements IAdapterFactory {
 			}
 			if (adaptableObject instanceof IPElement) {
 				return new PElementPropertySource((IPElement)adaptableObject);
+			}
+			if (adaptableObject instanceof IElement) {
+				return new PElementPropertySource(((IElement)adaptableObject).getPElement());
 			}
 		}
 		return null;

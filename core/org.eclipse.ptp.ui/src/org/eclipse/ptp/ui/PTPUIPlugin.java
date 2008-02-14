@@ -40,6 +40,7 @@ import org.eclipse.ptp.ui.consoles.ConsoleManager;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -215,6 +216,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		IAdapterManager manager = Platform.getAdapterManager();
 		IAdapterFactory factory = new PropertyAdapterFactory();
 		manager.registerAdapters(factory, IPElement.class);
+		manager.registerAdapters(factory, IElement.class);
 		factory = new WorkbenchAdapterAdapterFactory();
 		manager.registerAdapters(factory, IPElement.class);
 	}

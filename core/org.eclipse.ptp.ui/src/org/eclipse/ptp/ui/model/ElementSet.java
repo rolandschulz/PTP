@@ -34,7 +34,7 @@ public class ElementSet extends Element implements IElementSet {
 	private int number_of_elements = 0;
 	
 	public ElementSet(IElement parent, String id, String name) {
-		super(parent, id, name);
+		super(parent, id, name, null);
 	}
 	public boolean isRootSet() {
 		return (id.equals(IElementHandler.SET_ROOT_ID));

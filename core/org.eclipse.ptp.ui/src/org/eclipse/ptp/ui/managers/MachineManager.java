@@ -67,7 +67,7 @@ public class MachineManager extends AbstractUIManager {
 			List<IElement> elements = new ArrayList<IElement>();
 			IElementSet set = handler.getSetRoot();
 			for (IPNode node : mac.getNodes()) {
-				elements.add(createNodeElement(set, node.getID(), node.getName()));
+				elements.add(createNodeElement(set, node.getID(), node.getName(), node));
 			}
 			set.addElements(elements.toArray(new IElement[0]));
 		}
@@ -80,7 +80,7 @@ public class MachineManager extends AbstractUIManager {
 		addMachine(node.getMachine());
 		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
 		IElementSet set = elementHandler.getSetRoot();
-		set.addElements(new IElement[] { createNodeElement(set, node.getID(), node.getName()) });
+		set.addElements(new IElement[] { createNodeElement(set, node.getID(), node.getName(), node) });
 	}
 	
 	/* (non-Javadoc)
@@ -383,8 +383,8 @@ public class MachineManager extends AbstractUIManager {
 	 * @param name
 	 * @return
 	 */
-	protected IElement createNodeElement(IElementSet set, String key, String name) {
-		return new Element(set, key, name) {
+	protected IElement createNodeElement(IElementSet set, String key, String name, IPNode node) {
+		return new Element(set, key, name, node) {
 			public int compareTo(IElement e) {
 				return getID().compareTo(e.getID());
 			}
