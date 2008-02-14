@@ -10,7 +10,7 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.environment.launcher.macros;
 
-import org.eclipse.cdt.core.cdtvariables.ICdtVariable;
+import org.eclipse.cdt.managedbuilder.macros.IBuildMacro;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
@@ -30,7 +30,7 @@ public interface ILaunchConfigurationVariableSupplier {
 	 * @return the reference to the ICdtVariable interface representing 
 	 * the variable of a given name or null if the variable of that name is not defined
 	 */
-	public ICdtVariable getVariable(String variableName,
+	public IBuildMacro getVariable(String variableName,
 			ILaunchConfiguration launchConfiguration);
 
 	/**
@@ -38,6 +38,6 @@ public interface ILaunchConfigurationVariableSupplier {
 	 * @param launchConfiguration launch configuration
 	 * @return the ICdtVariable[] array representing defined variables 
 	 */
-	public ICdtVariable[] getVariables(ILaunchConfiguration launchConfiguration);
+	public IBuildMacro[] getVariables(ILaunchConfiguration launchConfiguration);
 
 }
