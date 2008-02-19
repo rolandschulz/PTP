@@ -22,8 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
@@ -51,10 +49,6 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
  * View for displaying details about an individual process
  */
 public class ParallelProcessView extends AbstractTextEditor implements IProcessListener {
-	private Label rankLabel = null;
-	private Label nodeLabel = null;
-	private Label jobLabel = null;
-	private Label totalLabel = null;
 	private Label pidLabel = null;
 	private Label statusLabel = null;
 	private Text outputText = null;
@@ -159,25 +153,12 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		detailsSection.setText("Process details");
 		detailsSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Composite detailsContainer = createClientContainer(detailsSection, toolkit, 3, true, 2, 2);
-		rankLabel = toolkit.createLabel(detailsContainer, null);
-		rankLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		nodeLabel = toolkit.createLabel(detailsContainer, null);
-		nodeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		totalLabel = toolkit.createLabel(detailsContainer, null);
-		totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		pidLabel = toolkit.createLabel(detailsContainer, null);
 		pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		jobLabel = toolkit.createLabel(detailsContainer, null);
-		jobLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Composite statusContainer = createClientContainer(detailsContainer, toolkit, 3, true, 0, 0);
 		statusContainer.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 3));
 		statusLabel = toolkit.createLabel(statusContainer, null);
 		statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		/*
-		dynamicLabel = toolkit.createLabel(statusContainer, null);
-		dynamicLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		*/
 		
 		detailsSection.setClient(detailsContainer);
 	}
@@ -221,31 +202,14 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 * Initialize the view
 	 */
 	public void initialText() {
-		rankLabel.setText("Index: N/A");
-		totalLabel.setText("Total: N/A");
-		nodeLabel.setText("Node: N/A");
 		pidLabel.setText("PID: N/A");
 		statusLabel.setText("Status: N/A");
 		outputText.setText("N/A");
 		
 		if (process != null) {
-			rankLabel.setText("Index: " + process.getProcessIndex());
-			final IPJob job = process.getJob();
-			String jobName = "none";
-			if (job != null) {
-				jobName = job.getName();
-			}
-			jobLabel.setText("Job: " + jobName);
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getState());
-			if (job != null) {
-				totalLabel.setText("Total: " + job.size());
-			}
-			IPNode node = process.getNode();
-			if (node != null) {
-				nodeLabel.setText("Node: " + node.getName());
-			}
-			
+
 			/*
 			 * Set initial output text
 			 */
@@ -300,10 +264,11 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}
@@ -312,16 +277,15 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#updateStatusField(java.lang.String)
 	 */
 	protected void updateStatusField(String category) {
-		if (category == null)
+		if (category == null) {
 			return;
+		}
 		IStatusField field = getStatusField(category);
 		if (field != null) {
 			String text = null;
-			if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(category))
+			if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(category)) {
 				text = pidLabel.getText();
-			else if (ITextEditorActionConstants.STATUS_CATEGORY_ELEMENT_STATE.equals(category))
-				text = rankLabel.getText();
-			else if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_MODE.equals(category)) {
+			} else if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_MODE.equals(category)) {
 				if (process != null) {
 					text = process.getState().toString();
 				}
