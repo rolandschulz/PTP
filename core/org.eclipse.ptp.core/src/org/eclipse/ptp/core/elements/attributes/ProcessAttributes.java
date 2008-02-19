@@ -40,23 +40,23 @@ public class ProcessAttributes {
 	private static final String NODEID_ATTR_ID = "processNodeId";
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Process State",
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State",
 				"Execution state of a process", true, State.STARTING);
 	
 	private final static IntegerAttributeDefinition pidAttrDef = 
-		new IntegerAttributeDefinition(PID_ATTR_ID, "Process PID", 
+		new IntegerAttributeDefinition(PID_ATTR_ID, "PID", 
 				"Operating system process ID", true, 0);
 	
 	private final static IntegerAttributeDefinition exitCodeAttrDef = 
-		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Process Exit Code", 
+		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Exit Code", 
 				"Operating system exit code", true, 0);
 	
 	private final static IntegerAttributeDefinition indexAttrDef = 
-		new IntegerAttributeDefinition(INDEX_ATTR_ID, "Process Index", 
+		new IntegerAttributeDefinition(INDEX_ATTR_ID, "Index", 
 				"Zero-based index of process (e.g. MPI rank)", true, 0);
 	
 	private final static StringAttributeDefinition signalNameAttrDef = 
-		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Process Signal", 
+		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Exit Signal", 
 				"Name of signal that caused process termination", true, "");
 	
 	private final static StringAttributeDefinition stdoutAttrDef = 
