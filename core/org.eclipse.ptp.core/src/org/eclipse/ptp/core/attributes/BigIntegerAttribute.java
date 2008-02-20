@@ -42,11 +42,11 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		this(definition, BigInteger.valueOf(value));
 	}
 
-	public BigInteger getValue() {
+	public synchronized BigInteger getValue() {
 		return value;
 	}
 	
-	public String getValueAsString() {
+	public synchronized String getValueAsString() {
 		return value.toString();
 	}
 
@@ -63,14 +63,14 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		}
 	}
 
-	public void setValue(BigInteger value) throws IllegalValueException {
+	public synchronized void setValue(BigInteger value) throws IllegalValueException {
 		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
 			throw new IllegalValueException("The set valid range does not include the new value");
 		}
 		this.value = value;
 	}
 
-	public void setValue(Integer ivalue) throws IllegalValueException {
+	public synchronized void setValue(Integer ivalue) throws IllegalValueException {
 		BigInteger value = BigInteger.valueOf(ivalue);
 		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
 			throw new IllegalValueException("The set valid range does not include the new value");
@@ -78,7 +78,7 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		this.value = value;
 	}
 
-	public void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		try {
 			BigInteger value = new BigInteger(string);
 			if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
@@ -100,17 +100,17 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 	}
 
     @Override
-    protected int doCompareTo(BigIntegerAttribute other) {
+    protected synchronized int doCompareTo(BigIntegerAttribute other) {
         return value.compareTo(other.value);
     }
 
     @Override
-    protected boolean doEquals(BigIntegerAttribute other) {
+    protected synchronized boolean doEquals(BigIntegerAttribute other) {
         return value.equals(other.value);
     }
 
     @Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 }

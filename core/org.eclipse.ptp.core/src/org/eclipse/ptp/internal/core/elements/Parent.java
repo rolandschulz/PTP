@@ -19,7 +19,6 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -67,13 +66,6 @@ public abstract class Parent extends PElement {
 	 */
 	protected IPElementControl[] getChildren() {
 		return getElementInfo().getChildren();
-	}
-
-	/**
-	 * @return
-	 */
-	protected Collection<IPElementControl> getCollection() {
-		return getElementInfo().getCollection();
 	}
 
 	/**

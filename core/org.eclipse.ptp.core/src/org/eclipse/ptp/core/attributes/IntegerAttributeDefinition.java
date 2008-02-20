@@ -22,14 +22,16 @@ package org.eclipse.ptp.core.attributes;
 public final class IntegerAttributeDefinition
 extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 
-	private Integer minValue = 0;
-	private Integer maxValue = Integer.MAX_VALUE;
-	private Integer defaultValue;
+	private final Integer minValue;
+	private final Integer maxValue;
+	private final Integer defaultValue;
 
 	public IntegerAttributeDefinition(final String uniqueId, final String name, 
 			final String description, final boolean display, final Integer defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
+		this.minValue = 0;
+		this.maxValue = Integer.MAX_VALUE;
 	}
 
 	public IntegerAttributeDefinition(final String uniqueId, final String name, 

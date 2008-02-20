@@ -22,7 +22,7 @@ package org.eclipse.ptp.core.attributes;
 public final class StringAttributeDefinition
 extends AbstractAttributeDefinition<String,StringAttribute,StringAttributeDefinition> {
 
-	private String defaultValue;
+	private final String defaultValue;
 	
 	public StringAttributeDefinition(final String uniqueId, final String name, 
 			final String description, final boolean display, final String defaultValue) {

@@ -33,11 +33,11 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 		setValueAsString(initialValue);
 	}
 
-	public Integer getValue() {
+	public synchronized Integer getValue() {
 		return value.intValue();
 	}
 	
-	public String getValueAsString() {
+	public synchronized String getValueAsString() {
 		return value.toString();
 	}
 
@@ -54,14 +54,14 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 		}
 	}
 
-	public void setValue(Integer value) throws IllegalValueException {
+	public synchronized void setValue(Integer value) throws IllegalValueException {
 		if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
 			throw new IllegalValueException("The set valid range does not include the new value");
 		}
 		this.value = value;
 	}
 
-	public void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		try {
 			Integer value = Integer.valueOf(string);
 			if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
@@ -83,17 +83,17 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 	}
 
     @Override
-    protected int doCompareTo(IntegerAttribute other) {
+    protected synchronized int doCompareTo(IntegerAttribute other) {
         return value.compareTo(other.value);
     }
 
     @Override
-    protected boolean doEquals(IntegerAttribute other) {
+    protected synchronized boolean doEquals(IntegerAttribute other) {
         return value.equals(other.value);
     }
 
     @Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 }

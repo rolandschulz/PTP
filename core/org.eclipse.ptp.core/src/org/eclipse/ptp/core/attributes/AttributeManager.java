@@ -24,7 +24,7 @@ import java.util.Map;
  *
  */
 public class AttributeManager {
-	private Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map = 
+	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map = 
 		Collections.synchronizedMap(new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>());
 	
 	public AttributeManager() {

@@ -22,14 +22,14 @@ package org.eclipse.ptp.core.attributes;
 public final class StringAttribute
 extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 
-	private StringBuffer value = new StringBuffer();
+	private final StringBuffer value = new StringBuffer();
 
 	public StringAttribute(StringAttributeDefinition description, String initialValue) {
 		super(description);
 		setValueAsString(initialValue);
 	}
 
-	public String getValue() {
+	public synchronized String getValue() {
 		return value.toString();
 	}
 	
@@ -51,7 +51,7 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
     /* (non-Javadoc)
      * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
      */
-    public void setValueAsString(String string) {
+    public synchronized void setValueAsString(String string) {
     	if (string == null) {
     		string = "";
     	}
@@ -59,17 +59,17 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 	}
 
     @Override
-    protected int doCompareTo(StringAttribute other) {
+    protected synchronized int doCompareTo(StringAttribute other) {
         return value.toString().compareTo(other.value.toString());
     }
 
     @Override
-    protected boolean doEquals(StringAttribute other) {
+    protected synchronized boolean doEquals(StringAttribute other) {
         return value.equals(other.value);
     }
 
 	@Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 }

@@ -29,7 +29,7 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 	private Date maxDate = new Date(Long.MAX_VALUE);
 	
 	private final DateFormat outputDateFormat;
-	private Date defaultValue;
+	private final Date defaultValue;
 
 	public DateAttributeDefinition(final String uniqueId, final String name, 
 			final String description, final boolean display, 
@@ -64,11 +64,11 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 		return new DateAttribute(this, value);
 	}
 
-	public Date getMaxDate() {
+	public synchronized Date getMaxDate() {
 		return maxDate;
 	}
 
-	public Date getMinDate() {
+	public synchronized Date getMinDate() {
 		return minDate;
 	}
 	
@@ -76,7 +76,7 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 		return outputDateFormat;
 	}
 
-	public void setValidRange(Date minDate, Date maxDate) throws IllegalValueException {
+	public synchronized void setValidRange(Date minDate, Date maxDate) throws IllegalValueException {
 		if (minDate == null) {
 			this.minDate = new Date(Long.MIN_VALUE);
 		}

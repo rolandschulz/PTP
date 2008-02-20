@@ -33,11 +33,11 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 		this.value = Boolean.valueOf(initialValue);
 	}
 	
-	public Boolean getValue() {
+	public synchronized Boolean getValue() {
 		return value.booleanValue();
 	}
 	
-	public String getValueAsString() {
+	public synchronized String getValueAsString() {
 		return value.toString();
 	}
 
@@ -48,11 +48,11 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 		return false;
 	}
 
-	public void setValue(Boolean value) {
+	public synchronized void setValue(Boolean value) {
 		this.value = value;
 	}
 
-	public void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		if (!isValid(string)) {
 			throw new IllegalValueException(string + " is not a legal Boolean");
 		}
@@ -60,17 +60,17 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 	}
 
     @Override
-    protected int doCompareTo(BooleanAttribute other) {
+    protected synchronized int doCompareTo(BooleanAttribute other) {
         return value.compareTo(other.value);
     }
 
     @Override
-    protected boolean doEquals(BooleanAttribute other) {
+    protected synchronized boolean doEquals(BooleanAttribute other) {
         return value.equals(other.value);
     }
 
     @Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 

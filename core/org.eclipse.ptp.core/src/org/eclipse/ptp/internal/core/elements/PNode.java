@@ -53,7 +53,6 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	
 	private final ListenerList elementListeners = new ListenerList();
-
 	private final ListenerList childListeners = new ListenerList();
 
 	public PNode(String id, IPMachineControl mac, IAttribute<?,?,?>[] attrs) {
@@ -74,6 +73,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	public void addChildListener(INodeChildListener listener) {
 		childListeners.add(listener);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#addElementListener(org.eclipse.ptp.core.elements.listeners.INodeListener)
 	 */
@@ -84,7 +84,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#addProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
 	 */
-	public synchronized void addProcesses(Collection<IPProcessControl> processControls) {
+	public void addProcesses(Collection<IPProcessControl> processControls) {
 		List<IPProcess> procs = new ArrayList<IPProcess>(processControls.size());
 		Set<IPJob> jobs = new HashSet<IPJob>();
 		
@@ -137,8 +137,9 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	public IPMachineControl getMachineControl() {
 		IPElementControl current = this;
 		do {
-			if (current instanceof IPMachineControl)
+			if (current instanceof IPMachineControl) {
 				return (IPMachineControl) current;
+			}
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
@@ -157,10 +158,11 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getProcessControls()
 	 */
-	public synchronized Collection<IPProcessControl> getProcessControls() {
+	public Collection<IPProcessControl> getProcessControls() {
+		IPElementControl[] children = getChildren();
 		List<IPProcessControl> processes =
-			new ArrayList<IPProcessControl>(getCollection().size());
-		for (IPElementControl element : getCollection()) {
+			new ArrayList<IPProcessControl>(children.length);
+		for (IPElementControl element : children) {
 			processes.add((IPProcessControl)element);
 		}
 		return processes;
@@ -202,7 +204,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
 	 */
 	public void handleEvent(INewProcessEvent e) {
-		// TODO Auto-generated method stub
+		// Do nothing
 	}
 
 	/* (non-Javadoc)
@@ -222,7 +224,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#removeProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
 	 */
-	public synchronized void removeProcesses(Collection<IPProcessControl> processControls) {
+	public void removeProcesses(Collection<IPProcessControl> processControls) {
 		List<IPProcess> processes = new ArrayList<IPProcess>(processControls.size());
 		
 		for (IPProcessControl process : processControls) {

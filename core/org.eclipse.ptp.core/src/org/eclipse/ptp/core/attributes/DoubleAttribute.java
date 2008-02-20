@@ -33,11 +33,11 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 		setValueAsString(initialValue);
 	}
 
-	public Double getValue() {
+	public synchronized Double getValue() {
 		return value;
 	}
 	
-	public String getValueAsString() {
+	public synchronized String getValueAsString() {
 		return value.toString();
 	}
 	
@@ -51,14 +51,14 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 		}
 	}
 
-	public void setValue(Double value) throws IllegalValueException {
+	public synchronized void setValue(Double value) throws IllegalValueException {
 		if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
 			throw new IllegalValueException("The set valid range does not include the new value");
 		}
 		this.value = value;
 	}
 
-	public void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		try {
 			Double value = Double.valueOf(string);
 			if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
@@ -80,17 +80,17 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 	}
 
     @Override
-    protected int doCompareTo(DoubleAttribute other) {
+    protected synchronized int doCompareTo(DoubleAttribute other) {
         return value.compareTo(other.value);
     }
 
     @Override
-    protected boolean doEquals(DoubleAttribute other) {
+    protected synchronized boolean doEquals(DoubleAttribute other) {
         return value.equals(other.value);
     }
 
     @Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 

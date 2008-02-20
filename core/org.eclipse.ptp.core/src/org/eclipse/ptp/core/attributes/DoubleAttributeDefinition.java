@@ -22,14 +22,16 @@ package org.eclipse.ptp.core.attributes;
 public final class DoubleAttributeDefinition
 extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefinition> {
 
-	private Double minValue = Double.NEGATIVE_INFINITY;
-	private Double maxValue = Double.POSITIVE_INFINITY;
-	private Double defaultValue;
+	private final Double minValue;
+	private final Double maxValue;
+	private final Double defaultValue;
 
 	public DoubleAttributeDefinition(final String uniqueId, final String name, 
 			final String description, final boolean display, final Double defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
+		this.minValue = Double.NEGATIVE_INFINITY;
+		this.maxValue = Double.POSITIVE_INFINITY;
 	}
 
 	public DoubleAttributeDefinition(final String uniqueId, final String name, 

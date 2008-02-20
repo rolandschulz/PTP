@@ -19,7 +19,7 @@ import java.util.List;
 public final class ArrayAttributeDefinition<T extends Comparable<? super T>>
 extends AbstractAttributeDefinition<List<? extends T>,ArrayAttribute<T>,ArrayAttributeDefinition<T>> {
 
-	private List<T> defaultValue;
+	private final List<T> defaultValue;
 
 	public <U extends T> ArrayAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final U[] defaultValue) {

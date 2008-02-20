@@ -17,19 +17,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public final class ArrayAttribute<T extends Comparable<? super T>> 
-extends AbstractAttribute<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
+public final class ArrayAttribute<T extends Comparable<? super T>> extends
+		AbstractAttribute<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
 
 	private List<T> value;
 
-	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition,
-			List<U> initialValue) {
+	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition, List<U> initialValue) {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public ArrayAttribute(ArrayAttributeDefinition<T> definition, String initialValue)
-	throws IllegalValueException {
+	public ArrayAttribute(ArrayAttributeDefinition<T> definition, String initialValue) throws IllegalValueException {
 		super(definition);
 		setValueAsString(initialValue);
 	}
@@ -39,26 +37,43 @@ extends AbstractAttribute<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDe
 		setValue(initialValue);
 	}
 
-	public <U extends T> void addAll(U[] value) {
+	/**
+	 * @param <U>
+	 * @param value
+	 */
+	public synchronized <U extends T> void addAll(U[] value) {
 		if (value != null) {
 			this.value.addAll(Arrays.asList(value));
 		}
 	}
-	
-	public <U extends T> void addAll(List<U> value) {
+
+	/**
+	 * @param <U>
+	 * @param value
+	 */
+	public synchronized <U extends T> void addAll(List<U> value) {
 		if (value != null) {
 			this.value.addAll(value);
 		}
 	}
-	
-	public List<T> getValue() {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
+	 */
+	public synchronized List<T> getValue() {
 		return Collections.unmodifiableList(value);
 	}
 
-	public String getValueAsString() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
+	 */
+	public synchronized String getValueAsString() {
 		return Arrays.toString(value.toArray());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
+	 */
 	public boolean isValid(String string) {
 		try {
 			@SuppressWarnings("unused")
@@ -69,65 +84,81 @@ extends AbstractAttribute<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDe
 		return true;
 	}
 
-	public void setValue(List<? extends T> value) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 */
+	public synchronized void setValue(List<? extends T> value) {
 		if (value != null) {
 			this.value = new ArrayList<T>(value);
-		}
-		else {
+		} else {
 			this.value = new ArrayList<T>();
 		}
 	}
 
-	public <U extends T> void setValue(U[] value) {
+	/**
+	 * @param <U>
+	 * @param value
+	 */
+	public synchronized <U extends T> void setValue(U[] value) {
 		if (value != null) {
-			this.value = Arrays.asList((T[])value.clone());
-		}
-		else {
+			this.value = Arrays.asList((T[]) value.clone());
+		} else {
 			this.value = new ArrayList<T>();
 		}
 	}
-	
-    public void setValueAsString(String string) throws IllegalValueException {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
+	 */
+	public void setValueAsString(String string) throws IllegalValueException {
 		String[] values = string.split("");
 		try {
-			setValue((T[])values);
+			setValue((T[]) values);
 		} catch (ClassCastException e) {
 			throw new IllegalValueException(e);
 		}
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
-     */
-    @Override
-    protected int doCompareTo(ArrayAttribute<T> other) {
-    	// This is a lexicographic compare.
-    	
-        int results = 0;
-        Iterator<T> it1 = value.iterator();
-        Iterator<T> it2 = other.value.iterator();
-        while (it1.hasNext() && it2.hasNext()) {
-        	T o1 = it1.next();
-        	T o2 = it2.next();
-        	results = o1.compareTo(o2);
-        	if (results != 0) {
-        		return results;
-        	}
-        }
-        // If they compared the same up to here
-        // then the lexicographic compare is based
-        // on their sizes, the shortest
-        // one is less than the longer one.
-        return value.size() - other.value.size();
-    }
-
-    @Override
-    protected boolean doEquals(ArrayAttribute<T> other) {
-        return value.equals(other.value);
-    }
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
+	 */
 	@Override
-    protected int doHashCode() {
-        return value.hashCode();
-    }
+	protected synchronized int doCompareTo(ArrayAttribute<T> other) {
+		// This is a lexicographic compare.
+
+		int results = 0;
+		Iterator<T> it1 = value.iterator();
+		Iterator<T> it2 = other.value.iterator();
+		while (it1.hasNext() && it2.hasNext()) {
+			T o1 = it1.next();
+			T o2 = it2.next();
+			results = o1.compareTo(o2);
+			if (results != 0) {
+				return results;
+			}
+		}
+		// If they compared the same up to here
+		// then the lexicographic compare is based
+		// on their sizes, the shortest
+		// one is less than the longer one.
+		return value.size() - other.value.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse.ptp.core.attributes.AbstractAttribute)
+	 */
+	@Override
+	protected synchronized boolean doEquals(ArrayAttribute<T> other) {
+		return value.equals(other.value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doHashCode()
+	 */
+	@Override
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
 }

@@ -27,7 +27,7 @@ public final class EnumeratedAttributeDefinition<E extends Enum<E>>
 extends AbstractAttributeDefinition<E,EnumeratedAttribute<E>,EnumeratedAttributeDefinition<E>> {
 
 	private final E defaultValue;
-	final Class<E> enumClass;
+	private final Class<E> enumClass;
 
     public EnumeratedAttributeDefinition(final String uniqueId,
 			final String name, final String description, final boolean display, 
