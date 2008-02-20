@@ -22,13 +22,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -240,9 +239,8 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * 
 	 * @param attrs
 	 */
-	private void fireChangedNode(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
-		INodeChangeEvent e = 
-			new NodeChangeEvent(this, attrs);
+	private void fireChangedNode(AttributeManager attrs) {
+		INodeChangeEvent e = new NodeChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((INodeListener)listener).handleEvent(e);
@@ -293,7 +291,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(AttributeManager attrs) {
 		fireChangedNode(attrs);
 	}
 

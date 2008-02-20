@@ -20,7 +20,6 @@ package org.eclipse.ptp.internal.core.elements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -30,14 +29,12 @@ import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
-public abstract class PElement extends PlatformObject implements IPElementControl,
-  Comparable<IPElementControl> {
+public abstract class PElement extends PlatformObject implements IPElementControl, Comparable<IPElementControl> {
 
 	private PElementInfo elementInfo = null;
 	protected AttributeManager attributeValues = new AttributeManager();
 	protected String elementId = null;
 	protected IPElementControl elementParent;
-
 	protected int elementType;
 
 	protected PElement(String id, IPElementControl parent, int type, IAttribute<?,?,?>[] attrs) {
@@ -61,7 +58,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public void addAttributes(IAttribute<?,?,?>[] attribs) {
 		attributeValues.addAttributes(attribs);
-		doAddAttributeHook(new AttributeManager(attribs).getMap());
+		doAddAttributeHook(new AttributeManager(attribs));
 	}
 
 	/* (non-Javadoc)
@@ -88,8 +85,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
 	 */
-	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	A getAttribute(D attrDef) {
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getAttribute(D attrDef) {
 		return attributeValues.getAttribute(attrDef);
 	}
 	
@@ -104,14 +100,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeKeys()
 	 */
 	public IAttributeDefinition<?,?,?>[] getAttributeKeys() {
-		return attributeValues.getKeySet().toArray(new IAttributeDefinition[0]);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeMap()
-	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributeMap() {
-		return attributeValues.getMap();
+		return attributeValues.getKeys();
 	}
 	
 	/* (non-Javadoc)
@@ -181,7 +170,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return getName();
 	}
 
-	protected abstract void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map);
+	protected abstract void doAddAttributeHook(AttributeManager attrs);
 	
 	/**
 	 * Find the element info for this element

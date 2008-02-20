@@ -19,17 +19,15 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -238,10 +236,9 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void setState(State state) {
 		EnumeratedAttribute<State> procState = getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		procState.setValue(state);
-		Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map = 
-			new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
-		map.put(ProcessAttributes.getStateAttributeDefinition(), procState);
-		fireChangedProcess(map);
+		AttributeManager attrs = new AttributeManager();
+		attrs.addAttribute(procState);
+		fireChangedProcess(attrs);
 	}
 	
 	/* (non-Javadoc)
@@ -265,9 +262,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * 
 	 * @param attrs
 	 */
-	private void fireChangedProcess(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
-		IProcessChangeEvent e = 
-			new ProcessChangeEvent(this, attrs);
+	private void fireChangedProcess(AttributeManager attrs) {
+		IProcessChangeEvent e = new ProcessChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((IProcessListener)listener).handleEvent(e);
@@ -297,8 +293,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
-		StringAttribute attr = (StringAttribute) attrs.get(ProcessAttributes.getStdoutAttributeDefinition());
+	protected void doAddAttributeHook(AttributeManager attrs) {
+		StringAttribute attr = attrs.getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
 		if (attr != null) {
 			addOutput(attr.getValue());
 		}

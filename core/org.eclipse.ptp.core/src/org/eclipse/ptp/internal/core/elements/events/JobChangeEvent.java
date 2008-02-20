@@ -19,10 +19,7 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Map;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 
@@ -33,9 +30,9 @@ import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 public class JobChangeEvent implements IJobChangeEvent {
 
 	private final IPJob job;
-	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attributes;
+	private final AttributeManager attributes;
 
-	public JobChangeEvent(IPJob job, Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	public JobChangeEvent(IPJob job, AttributeManager attrs) {
 		this.job = job;
 		this.attributes = attrs;
 	}
@@ -43,7 +40,7 @@ public class JobChangeEvent implements IJobChangeEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IJobChangedEvent#getAttributes()
 	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributes() {
+	public AttributeManager getAttributes() {
 		return attributes;
 	}
 

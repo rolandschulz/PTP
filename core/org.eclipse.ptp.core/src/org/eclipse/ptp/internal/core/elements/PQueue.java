@@ -21,12 +21,11 @@ package org.eclipse.ptp.internal.core.elements;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
@@ -204,9 +203,8 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * 
 	 * @param attrs attributes that have changed
 	 */
-	private void fireChangedQueue(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
-		IQueueChangeEvent e = 
-			new QueueChangeEvent(this, attrs);
+	private void fireChangedQueue(AttributeManager attrs) {
+		IQueueChangeEvent e = new QueueChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((IQueueListener)listener).handleEvent(e);
@@ -245,7 +243,7 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(AttributeManager attrs) {
 		fireChangedQueue(attrs);
 	}
 

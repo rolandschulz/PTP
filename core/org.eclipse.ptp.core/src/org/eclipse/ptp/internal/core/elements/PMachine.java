@@ -21,12 +21,11 @@ package org.eclipse.ptp.internal.core.elements;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -39,14 +38,14 @@ import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IMachineChangeEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.INewNodeEvent;
-import org.eclipse.ptp.core.elements.listeners.IMachineListener;
+import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
+import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 import org.eclipse.ptp.internal.core.elements.events.ChangedNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
-import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
+import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
 
 public class PMachine extends Parent implements IPMachineControl {
 	private final ListenerList elementListeners = new ListenerList();
@@ -220,7 +219,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	/**
 	 * @param attrs
 	 */
-	private void fireChangedMachine(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	private void fireChangedMachine(AttributeManager attrs) {
 		IMachineChangeEvent e = 
 			new MachineChangeEvent(this, attrs);
 		
@@ -273,7 +272,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(AttributeManager attrs) {
 		fireChangedMachine(attrs);
 	}
 

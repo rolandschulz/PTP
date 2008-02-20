@@ -18,10 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -31,6 +29,9 @@ import org.eclipse.ptp.core.elements.IPElement;
  *  
  */
 public abstract class Parent extends PElement {
+	/**
+	 * @param elements
+	 */
 	public static void sort(IPElementControl elements[]) {
 		Arrays.sort(elements);
 	}
@@ -39,43 +40,52 @@ public abstract class Parent extends PElement {
 		super(id, parent, type, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
+	 */
 	public boolean hasChildren() {
 		return getElementInfo().hasChildren();
 	}
 
+	/**
+	 * @param member
+	 */
 	protected void addChild(IPElementControl member) {
 		getElementInfo().addChild(member);
 	}
 
+	/**
+	 * @param key
+	 * @return
+	 */
 	protected IPElementControl findChild(String key) {
 		return getElementInfo().findChild(key);
 	}
 
+	/**
+	 * @return
+	 */
 	protected IPElementControl[] getChildren() {
 		return getElementInfo().getChildren();
 	}
 
-	protected List<PElement> getChildrenOfType(int type) {
-		IPElementControl[] children = getChildren();
-		int size = children.length;
-		ArrayList<PElement> list = new ArrayList<PElement>(size);
-		for (int i = 0; i < size; ++i) {
-			PElement elt = (PElement) children[i];
-			if (elt.getElementType() == type) {
-				list.add(elt);
-			}
-		}
-		return list;
-	}
-
+	/**
+	 * @return
+	 */
 	protected Collection<IPElementControl> getCollection() {
 		return getElementInfo().getCollection();
 	}
 
+	/**
+	 * @param member
+	 */
 	protected void removeChild(IPElement member) {
 		getElementInfo().removeChild(member);
 	}
 
+	/**
+	 * 
+	 */
 	protected void removeChildren() {
 		getElementInfo().removeChildren();
 	}

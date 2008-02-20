@@ -22,14 +22,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
@@ -262,9 +261,8 @@ public class PJob extends Parent implements IPJobControl {
 	 * 
 	 * @param attrs
 	 */
-	private void fireChangedJob(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
-		IJobChangeEvent e = 
-			new JobChangeEvent(this, attrs);
+	private void fireChangedJob(AttributeManager attrs) {
+		IJobChangeEvent e = new JobChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((IJobListener)listener).handleEvent(e);
@@ -317,7 +315,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attribs) {
+	protected void doAddAttributeHook(AttributeManager attribs) {
 		fireChangedJob(attribs);
 	}
 }

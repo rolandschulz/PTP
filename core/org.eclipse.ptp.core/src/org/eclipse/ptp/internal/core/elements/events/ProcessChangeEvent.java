@@ -19,10 +19,7 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Map;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 
@@ -33,10 +30,9 @@ import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 public class ProcessChangeEvent implements IProcessChangeEvent {
 
 	private final IPProcess process;
-	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attributes;
+	private final AttributeManager attributes;
 
-	public ProcessChangeEvent(IPProcess process, 
-			Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	public ProcessChangeEvent(IPProcess process, AttributeManager attrs) {
 		this.process = process;
 		this.attributes = attrs;
 	}
@@ -44,7 +40,7 @@ public class ProcessChangeEvent implements IProcessChangeEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IProcessChangedEvent#getAttributes()
 	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributes() {
+	public AttributeManager getAttributes() {
 		return attributes;
 	}
 

@@ -457,8 +457,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		/*
 		 * Update attributes from the new configuration
 		 */
-		Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrMap = 
-			new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
+		AttributeManager attrs = new AttributeManager();
 		
 		StringAttributeDefinition nameAttrDef =
 			ElementAttributes.getNameAttributeDefinition();
@@ -466,7 +465,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		if (nameAttr != null) {
 			try {
 				nameAttr.setValue(config.getName());
-				attrMap.put(nameAttrDef, nameAttr);
+				attrs.addAttribute(nameAttr);
 			} catch (IllegalValueException e) {
 			}
 		}
@@ -476,12 +475,12 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		if (descAttr != null) {
 			try {
 				descAttr.setValue(config.getDescription());
-				attrMap.put(descAttrDef, descAttr);
+				attrs.addAttribute(descAttr);
 			} catch (IllegalValueException e) {
 			}
 		}
 		
-		fireResourceManagerChanged(attrMap);
+		fireResourceManagerChanged(attrs);
 	}
 	
 	/*
@@ -563,7 +562,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * 
 	 * @param attrs attributes that have changed
 	 */
-	private void fireResourceManagerChanged(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	private void fireResourceManagerChanged(AttributeManager attrs) {
 		IResourceManagerChangeEvent e = 
 			new ResourceManagerChangeEvent(this, attrs);
     	
@@ -745,7 +744,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(AttributeManager attrs) {
 		fireResourceManagerChanged(attrs);
 	}
 	
@@ -1088,10 +1087,9 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		EnumeratedAttribute<State> stateAttr = getStateAttribute();
 		if (stateAttr.getValue() != state) {
 			stateAttr.setValue(state);
-			Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map =
-				new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
-			map.put(stateAttr.getDefinition(), stateAttr);
-			fireResourceManagerChanged(map);
+			AttributeManager attrs = new AttributeManager();
+			attrs.addAttribute(stateAttr);
+			fireResourceManagerChanged(attrs);
 		}
 	}
 

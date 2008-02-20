@@ -19,10 +19,7 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Map;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.events.IMachineChangeEvent;
 
@@ -33,9 +30,9 @@ import org.eclipse.ptp.core.elements.events.IMachineChangeEvent;
 public class MachineChangeEvent implements IMachineChangeEvent {
 
 	private final IPMachine machine;
-	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attributes;
+	private final AttributeManager attributes;
 
-	public MachineChangeEvent(IPMachine machine, Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	public MachineChangeEvent(IPMachine machine, AttributeManager attrs) {
 		this.machine = machine;
 		this.attributes = attrs;
 	}
@@ -43,7 +40,7 @@ public class MachineChangeEvent implements IMachineChangeEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedEvent#getAttributes()
 	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributes() {
+	public AttributeManager getAttributes() {
 		return attributes;
 	}
 

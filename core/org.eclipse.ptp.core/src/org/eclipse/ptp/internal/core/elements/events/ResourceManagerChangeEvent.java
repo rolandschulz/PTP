@@ -19,10 +19,7 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Map;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 
@@ -33,10 +30,10 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 public class ResourceManagerChangeEvent implements IResourceManagerChangeEvent {
 
 	private final IResourceManager rm;
-	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attributes;
+	private final AttributeManager attributes;
 
 	public ResourceManagerChangeEvent(IResourceManager rm,
-			Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+			AttributeManager attrs) {
 		this.rm = rm;
 		this.attributes = attrs;
 	}
@@ -44,7 +41,7 @@ public class ResourceManagerChangeEvent implements IResourceManagerChangeEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getAttributes()
 	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributes() {
+	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
