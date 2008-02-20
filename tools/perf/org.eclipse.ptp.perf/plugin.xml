@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="perfdatamanager" name="Performance Data Manager" schema="schema/perfdatamanager.exsd"/>
+   <extension-point id="perfworkflow" name="Performance Workflow Definition" schema="schema/perfworkflow.exsd"/>
+   <extension-point id="perfconfigurationtab" name="Performance Configuration Tab" schema="schema/perfconfigurationtab.exsd"/>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+         <launchConfigurationType
+			name="Performance Analysis"
+			delegate="org.eclipse.ptp.perf.internal.PerformanceLaunchConfigurationDelegate"
+			sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+			sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
+			modes="profile"
+			public="true"
+			id="org.eclipse.ptp.tau.performance.performancelaunch">
+		</launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.perf.ui.PerformanceLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.tau.performance.launchConfigurationTabGroup"
+            type="org.eclipse.ptp.tau.performance.performancelaunch">
+         <launchMode
+               description="Build C, C++ or Fortran applications with performance analysis tools.  Launch as sequential programs or use the command line for parallel execution."
+               mode="profile"/>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.perf.preferences.PerformancePreferencePage"
+            id="org.eclipse.ptp.perf.performanceToolsMainpage"
+            name="Performance Tools"/>
+      <page
+            category="org.eclipse.ptp.perf.performanceToolsMainpage"
+            class="org.eclipse.ptp.perf.preferences.PerfToolLocPreferencePage"
+            id="org.eclipse.ptp.perf.preferences.PerfPreferencePage"
+            name="Tool Configuration"/> 
+   </extension>
+ <extension
+       point="org.eclipse.ui.perspectiveExtensions">
+    <perspectiveExtension targetID="org.eclipse.cdt.ui.CPerspective">
+       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+    </perspectiveExtension>
+    <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+    </perspectiveExtension>
+    <perspectiveExtension targetID="org.eclipse.ptp.ui.PTPRunPerspective">
+       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+    </perspectiveExtension>
+    <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
+       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+    </perspectiveExtension>
+    <perspectiveExtension targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+    </perspectiveExtension>
+    <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+    </perspectiveExtension>
+   </extension>
+</plugin>
