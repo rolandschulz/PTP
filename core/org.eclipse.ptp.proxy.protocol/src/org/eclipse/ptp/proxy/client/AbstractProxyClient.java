@@ -133,6 +133,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sendCommand(java.lang.String)
 	 */
 	public void sendCommand(IProxyCommand cmd) throws IOException {
+		if (!isReady()) {
+			throw new IOException("channel is not ready to send");
+		}
 		ProxyPacket packet = new ProxyPacket(cmd);
 		packet.send(sessOutput);
 	}
@@ -256,11 +259,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	public void sessionFinish() throws IOException {
 		synchronized (state) {
-			SessionState oldState = state;
-			
-			state = SessionState.SHUTTING_DOWN;
-			
-			switch (oldState) {
+			switch (state) {
 			case WAITING:
 				if (acceptThread.isAlive()) {
 					/*
@@ -269,10 +268,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					 */
 					acceptThread.interrupt();
 				}
+				state = SessionState.SHUTTING_DOWN;
 				break;
 			case CONNECTED:
 				try {
 					sessSock.close();
+					state = SessionState.SHUTTING_DOWN;
 				} catch (IOException e) {
 					state = SessionState.SHUTDOWN;
 				} 
@@ -286,6 +287,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				// TODO: start shutdown timeout
 				try {
 					sendCommand(cmd);
+					state = SessionState.SHUTTING_DOWN;
 				} catch (IOException e) {
 					// Tell event thread to exit
 					state = SessionState.SHUTDOWN;
