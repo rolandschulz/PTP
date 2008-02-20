@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="TestPAPI Action Set"
+            visible="true"
+            id="org.eclipse.ptp.tau.papitest.actionSet">
+         <menu
+               label="&amp;PAPI"
+               id="PAPIMenu">
+            <separator
+                  name="sampleGroup">
+            </separator>
+         </menu>
+         <action
+               label="&amp;Test PAPI"
+               class="org.eclipse.ptp.perf.tau.papitest.actions.TestPAPI"
+               tooltip="Test PAPI Selector"
+               menubarPath="PAPIMenu/sampleGroup"
+               id="org.eclipse.ptp.tau.papitest.actions.TestPAPI">
+         </action>
+      </actionSet>
+   </extension>
+
+</plugin>
