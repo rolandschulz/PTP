@@ -48,7 +48,7 @@ import org.eclipse.ptp.internal.core.elements.events.ProcessChangeEvent;
 public class PProcess extends Parent implements IPProcessControl {
 
 	private final ListenerList elementListeners = new ListenerList();
-	private OutputTextFile outputFile = null;
+	private final OutputTextFile outputFile;
 	private String outputDirPath = null;
 	private int storeLines = 0;
 
@@ -122,7 +122,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#addNode(org.eclipse.ptp.core.elements.IPNode)
 	 */
-	public void addNode(IPNode node) {
+	public synchronized void addNode(IPNode node) {
 		this.node = (IPNodeControl) node;
 	}
 	
@@ -162,7 +162,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getNode()
 	 */
-	public IPNode getNode() {
+	public synchronized IPNode getNode() {
 		return this.node;
 	}
 	
@@ -226,7 +226,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#removeNode()
 	 */
-	public void removeNode() {
+	public synchronized void removeNode() {
 		node = null;
 	}
 	

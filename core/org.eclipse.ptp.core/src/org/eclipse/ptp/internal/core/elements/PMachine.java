@@ -49,7 +49,6 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
 
 public class PMachine extends Parent implements IPMachineControl {
 	private final ListenerList elementListeners = new ListenerList();
-
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = "undefined";
     
@@ -104,7 +103,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util.Collection)
 	 */
-	public synchronized void addNodes(Collection<IPNodeControl> nodeControls) {
+	public void addNodes(Collection<IPNodeControl> nodeControls) {
 		assert(getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).getValue().equals(getNodes().length));
 		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
 		
@@ -126,27 +125,29 @@ public class PMachine extends Parent implements IPMachineControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getArch()
 	 */
-	public String getArch() {
+	public synchronized String getArch() {
 		return arch;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
 	 */
-	public synchronized IPNode getNodeById(String id) {
+	public IPNode getNodeById(String id) {
 		IPElementControl element = findChild(id);
-		if (element != null)
+		if (element != null) {
 			return (IPNodeControl) element;
+		}
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#getNodeControls()
 	 */
-	public synchronized Collection<IPNodeControl> getNodeControls() {
+	public Collection<IPNodeControl> getNodeControls() {
+		IPElementControl[] children = getChildren();
 		List<IPNodeControl> nodes =
-			new ArrayList<IPNodeControl>(getCollection().size());
-		for (IPElementControl element : getCollection()) {
+			new ArrayList<IPNodeControl>(children.length);
+		for (IPElementControl element : children) {
 			nodes.add((IPNodeControl)element);
 		}
 		return nodes;
@@ -205,7 +206,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#setArch(java.lang.String)
 	 */
-	public void setArch(String arch) {
+	public synchronized void setArch(String arch) {
 		this.arch = arch;
 	}
 

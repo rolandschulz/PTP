@@ -67,7 +67,7 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 		return dateFormats;
 	}
 
-	protected Calendar value = Calendar.getInstance();
+	protected final Calendar value = Calendar.getInstance();
 	
 	public DateAttribute(DateAttributeDefinition definition, Date initialValue) throws IllegalValueException {
 		super(definition);

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,74 +29,122 @@ import org.eclipse.ptp.core.elements.IPElement;
  *
  */
 public class PElementInfo {
-	private Map<String, IPElementControl> fChildren = new HashMap<String, IPElementControl>();
-
-	protected IPElementControl element;
+	private final Map<String, IPElementControl> fChildren = 
+		Collections.synchronizedMap(new HashMap<String, IPElementControl>());
+	protected final IPElementControl element;
 
 	public PElementInfo(IPElementControl element) {
 		this.element = element;
 	}
 
-	public IPElementControl getElement() {
-		return element;
-	}
-
+	/**
+	 * Add a child to this element
+	 * 
+	 * @param member
+	 */
 	public void addChild(IPElementControl member) {
 		fChildren.put(member.getID(), member);
 	}
 
-	public void removeChild(IPElement member) {
-		fChildren.remove(member.getID());
-	}
-
-	public IPElementControl findChild(String key) {
-		if (fChildren.containsKey(key))
-			return (IPElementControl) fChildren.get(key);
-		return null;
-	}
-
-	public IPElementControl[] getChildren() {
-		synchronized (fChildren) {
-			 return (IPElementControl[]) fChildren.values().toArray(
-					new IPElementControl[size()]);
-		}
-	}
-
-	public Collection<IPElementControl> getCollection() {
-		synchronized (fChildren) {
-			return fChildren.values();
-		}
-	}
-
-	public boolean includesChild(IPElementControl child) {
-		if (fChildren.containsKey(child.getID()))
-			return true;
-		return false;
-	}
-
-	public void removeChildren() {
-		fChildren.clear();
-	}
-
-	public void setChildren(IPElementControl[] children) {
-		for (IPElementControl element : children) {
-			fChildren.put(element.getID(), element);
-		}
-	}
-
-	public boolean hasChildren() {
-		return size() > 0;
-	}
-
-	public int size() {
-		return fChildren.size();
-	}
-
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	public Object clone() {
 		try {
 			return super.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new Error();
 		}
+	}
+
+	/**
+	 * Find child with corresponding key
+	 * 
+	 * @param key
+	 * @return child
+	 */
+	public IPElementControl findChild(String key) {
+		synchronized (fChildren) {
+			if (fChildren.containsKey(key)) {
+				return (IPElementControl) fChildren.get(key);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get all children of this element
+	 * 
+	 * @return children
+	 */
+	public IPElementControl[] getChildren() {
+		 return (IPElementControl[]) fChildren.values().toArray(new IPElementControl[size()]);
+	}
+
+	/**
+	 * Get the element
+	 * 
+	 * @return element
+	 */
+	public IPElementControl getElement() {
+		return element;
+	}
+
+	/**
+	 * Check if this element has any children
+	 * 
+	 * @return true if we have children
+	 */
+	public boolean hasChildren() {
+		return size() > 0;
+	}
+
+	/**
+	 * Check if child is one of ours
+	 * 
+	 * @param child
+	 * @return true if child is one of ours
+	 */
+	public boolean includesChild(IPElementControl child) {
+		if (fChildren.containsKey(child.getID())) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Remove child
+	 * 
+	 * @param member
+	 */
+	public void removeChild(IPElement member) {
+		fChildren.remove(member.getID());
+	}
+
+	/**
+	 * Remove all children
+	 */
+	public void removeChildren() {
+		fChildren.clear();
+	}
+
+	/**
+	 * Add children
+	 * 
+	 * @param children
+	 */
+	public void setChildren(IPElementControl[] children) {
+		for (IPElementControl element : children) {
+			fChildren.put(element.getID(), element);
+		}
+	}
+
+	/**
+	 * Return number of children
+	 * 
+	 * @return number of children
+	 */
+	public int size() {
+		return fChildren.size();
 	}
 }

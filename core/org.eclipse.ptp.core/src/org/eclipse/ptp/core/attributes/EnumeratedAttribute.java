@@ -27,8 +27,8 @@ import java.util.List;
  * @author rsqrd
  *
  */
-public final class EnumeratedAttribute<E extends Enum<E>>
-extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
+public final class EnumeratedAttribute<E extends Enum<E>> extends
+		AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
 
 	private E value;
 
@@ -81,21 +81,21 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	/**
      * @return
      */
-    public E getValue() {
+    public synchronized E getValue() {
         return value;
     }
 		
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
-	public String getValueAsString() {
+	public synchronized String getValueAsString() {
 		return value.toString();
 	}
 	
 	/**
 	 * @return the valueIndex
 	 */
-	public int getValueIndex() {
+	public synchronized int getValueIndex() {
 		return value.ordinal();
 	}
 
@@ -113,7 +113,7 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	/**
 	 * @param value
 	 */
-	public void setValue(E value) {
+	public synchronized void setValue(E value) {
 		this.value = value;
 	}
 
@@ -121,7 +121,7 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	 * @param valueIndex
 	 * @throws IllegalValueException
 	 */
-	public void setValue(int valueIndex) throws IllegalValueException {
+	public synchronized void setValue(int valueIndex) throws IllegalValueException {
 		final List<? extends E> enumerations = getEnumerations();
 		if (valueIndex < 0 || valueIndex >= enumerations.size()) {
 			throw new IllegalValueException("valueIndex is out of range");
@@ -132,7 +132,7 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
-	public void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		Class<E> enumClass = getDefinition().getEnumClass();
         E eval;
         try {
@@ -144,17 +144,17 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	}
 
     @Override
-    protected int doCompareTo(EnumeratedAttribute<E> other) {
+    protected synchronized int doCompareTo(EnumeratedAttribute<E> other) {
         return value.compareTo(other.value);
     }
 
     @Override
-    protected boolean doEquals(EnumeratedAttribute<E> other) {
+    protected synchronized boolean doEquals(EnumeratedAttribute<E> other) {
         return value == other.value;
     }
 
     @Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 }

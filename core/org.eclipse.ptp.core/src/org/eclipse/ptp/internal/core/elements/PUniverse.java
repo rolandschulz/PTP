@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,8 +38,7 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	}
 	private int nextResourceManagerId = 1;
 	private final List<IResourceManagerControl> resourceManagers =
-		new LinkedList<IResourceManagerControl>();
-	
+		Collections.synchronizedList(new LinkedList<IResourceManagerControl>());
 	protected String NAME_TAG = "universe ";
 	
 	public PUniverse() {
@@ -50,33 +50,35 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#addResourceManager(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl)
 	 */
-	public synchronized void addResourceManager(IResourceManagerControl addedManager) {
+	public void addResourceManager(IResourceManagerControl addedManager) {
 		resourceManagers.add(addedManager);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#addResourceManagers(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl[])
 	 */
-	public synchronized void addResourceManagers(IResourceManagerControl[] addedManagers) {
-		for (int i=0; i<addedManagers.length; ++i) {
-			addResourceManager(addedManagers[i]);
+	public void addResourceManagers(IResourceManagerControl[] addedManagers) {
+		for (IResourceManagerControl rm : addedManagers) {
+			addResourceManager(rm);
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#getNextResourceManagerId()
 	 */
-	public int getNextResourceManagerId() {
+	public synchronized int getNextResourceManagerId() {
 		return (nextResourceManagerId++ << RMID_SHIFT);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPUniverse#findResourceManagerById(java.lang.String)
 	 */
-	public synchronized IResourceManager getResourceManager(String id) {
-		for (IResourceManager resourceManager : resourceManagers) {
-			if (resourceManager.getID().equals(id)) {
-				return resourceManager;
+	public IResourceManager getResourceManager(String id) {
+		synchronized (resourceManagers) {
+			for (IResourceManager resourceManager : resourceManagers) {
+				if (resourceManager.getID().equals(id)) {
+					return resourceManager;
+				}
 			}
 		}
 		return null;
@@ -85,14 +87,14 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#getResourceManagerControls()
 	 */
-	public synchronized IResourceManagerControl[] getResourceManagerControls() {
+	public IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers.toArray(new IResourceManagerControl[0]);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPUniverse#getResourceManagers()
 	 */
-	public synchronized IResourceManager[] getResourceManagers() {
+	public IResourceManager[] getResourceManagers() {
 		return (IResourceManager[]) getResourceManagerControls();
 	}
 
@@ -106,7 +108,7 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManager(org.eclipse.ptp.core.elements.IResourceManager)
 	 */
-	public synchronized void removeResourceManager(IResourceManager removedManager) {
+	public void removeResourceManager(IResourceManager removedManager) {
 		resourceManagers.remove(removedManager);
 	}
 
@@ -114,8 +116,8 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManagers(org.eclipse.ptp.core.elements.IResourceManager[])
 	 */
 	public void removeResourceManagers(IResourceManager[] removedRMs) {
-		for (int i=0; i<removedRMs.length; ++i) {
-			removeResourceManager(removedRMs[i]);
+		for (IResourceManager rm : removedRMs) {
+			removeResourceManager(rm);
 		}
 	}
 

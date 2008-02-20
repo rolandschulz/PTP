@@ -29,8 +29,7 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	 * @param definition
 	 * @throws IllegalValueException
 	 */
-	public StringSetAttribute(StringSetAttributeDefinition definition)
-	throws IllegalValueException {
+	public StringSetAttribute(StringSetAttributeDefinition definition) throws IllegalValueException {
 		super(definition);
 		setValueAsString(definition.getDefaultValue());
 	}
@@ -40,8 +39,7 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	 * @param valueIn
 	 * @throws IllegalValueException
 	 */
-	public StringSetAttribute(StringSetAttributeDefinition definition,
-			String valueIn) throws IllegalValueException {
+	public StringSetAttribute(StringSetAttributeDefinition definition, String valueIn) throws IllegalValueException {
 		super(definition);
 		setValueAsString(valueIn);
 	}
@@ -56,11 +54,11 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
-	public String getValueAsString() {
+	public synchronized String getValueAsString() {
 		return value;
 	}
 
-	public int getValueIndex() {
+	public synchronized int getValueIndex() {
         return getDefinition().getValues().indexOf(value);
     }
 
@@ -83,7 +81,7 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
     /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
-	public void setValueAsString(String valueIn) throws IllegalValueException {
+	public synchronized void setValueAsString(String valueIn) throws IllegalValueException {
 		if (!isValid(valueIn)) {
 			throw new IllegalValueException("value: " + valueIn +
 					" is not in StringSetAttribute: " +	getDefinition().getName());
@@ -97,12 +95,12 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
     }
 
 	@Override
-    protected boolean doEquals(StringSetAttribute other) {
+    protected synchronized boolean doEquals(StringSetAttribute other) {
         return value.equals(other.value);
     }
 
 	@Override
-    protected int doHashCode() {
+    protected synchronized int doHashCode() {
         return value.hashCode();
     }
 

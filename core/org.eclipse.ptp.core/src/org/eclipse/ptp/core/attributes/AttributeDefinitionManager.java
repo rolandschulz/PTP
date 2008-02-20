@@ -20,13 +20,14 @@ package org.eclipse.ptp.core.attributes;
 
 import java.math.BigInteger;
 import java.text.DateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class AttributeDefinitionManager {
-
-	private final HashMap<String, IAttributeDefinition<?,?,?>> attributeDefs =
-		new HashMap<String, IAttributeDefinition<?,?,?>>();
+	private final Map<String, IAttributeDefinition<?,?,?>> attributeDefs =
+		Collections.synchronizedMap(new HashMap<String, IAttributeDefinition<?,?,?>>());
 
 	public AttributeDefinitionManager() {
 	}
@@ -37,8 +38,10 @@ public class AttributeDefinitionManager {
 	 * @param attr
 	 */
 	public void setAttributeDefinition(IAttributeDefinition<?,?,?> attrDef) {
-		if (!attributeDefs.containsKey(attrDef.getId())) {
-			attributeDefs.put(attrDef.getId(), attrDef);
+		synchronized (attributeDefs) {
+			if (!attributeDefs.containsKey(attrDef.getId())) {
+				attributeDefs.put(attrDef.getId(), attrDef);
+			}
 		}
 	}
 	
@@ -74,10 +77,11 @@ public class AttributeDefinitionManager {
 	 * @param description
 	 * @param defaultValue
 	 * @return
+	 * @throws IllegalValueException 
 	 */
 	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final BigInteger defaultValue) {
-
+			final String name, final String description, final boolean display, final BigInteger defaultValue) 
+			throws IllegalValueException {
 		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name,
 				description, display, defaultValue);
 		setAttributeDefinition(def);
@@ -159,9 +163,10 @@ public class AttributeDefinitionManager {
 	 * @param description
 	 * @param defaultValue
 	 * @return
+	 * @throws IllegalValueException 
 	 */
 	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, final Double defaultValue) {
+			final String description, final boolean display, final Double defaultValue) throws IllegalValueException {
 		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, 
 				description, display, defaultValue);
 		setAttributeDefinition(def);
@@ -209,9 +214,10 @@ public class AttributeDefinitionManager {
 	 * @param description
 	 * @param defaultValue
 	 * @return
+	 * @throws IllegalValueException 
 	 */
 	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final Integer defaultValue) {
+			final String name, final String description, final boolean display, final Integer defaultValue) throws IllegalValueException {
 		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name,
 				description, display, defaultValue);
 		setAttributeDefinition(def);

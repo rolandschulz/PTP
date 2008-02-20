@@ -116,8 +116,9 @@ public class PQueue extends Parent implements IPQueueControl {
 	 */
 	public IPJobControl getJobControl(String job_id) {
 		IPElementControl element = findChild(job_id);
-		if (element != null)
+		if (element != null) {
 			return (IPJobControl) element;
+		}
 		return null;
 	}
 
@@ -125,9 +126,10 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControls()
 	 */
 	public Collection<IPJobControl> getJobControls() {
+		IPElementControl[] children = getChildren();
 		List<IPJobControl> jobs =
-			new ArrayList<IPJobControl>(getCollection().size());
-		for (IPElementControl element : getCollection()) {
+			new ArrayList<IPJobControl>(children.length);
+		for (IPElementControl element : children) {
 			jobs.add((IPJobControl)element);
 		}
 		return jobs;	

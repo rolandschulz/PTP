@@ -24,14 +24,16 @@ import java.math.BigInteger;
 public final class BigIntegerAttributeDefinition
 extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefinition> {
 
-	private BigInteger minValue = BigInteger.ZERO;
-	private BigInteger maxValue = BigInteger.valueOf(Long.MAX_VALUE);
-	private BigInteger defaultValue;
+	private final BigInteger minValue;
+	private final BigInteger maxValue;
+	private final BigInteger defaultValue;
 
 	public BigIntegerAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final BigInteger defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
+		this.minValue = BigInteger.ZERO;
+		this.maxValue = BigInteger.valueOf(Long.MAX_VALUE);
 	}
 
 	public BigIntegerAttributeDefinition(final String uniqueId, final String name,

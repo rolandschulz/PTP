@@ -20,8 +20,10 @@ package org.eclipse.ptp.internal.core.elements;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -51,10 +53,10 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 public class PJob extends Parent implements IPJobControl {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private HashMap<String, IPProcessControl> indexMap = 
-		new HashMap<String, IPProcessControl>();
+	private final Map<String, IPProcessControl> indexMap = 
+		Collections.synchronizedMap(new HashMap<String, IPProcessControl>());
 	private ILaunchConfiguration configuration;
-	
+
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
@@ -128,17 +130,18 @@ public class PJob extends Parent implements IPJobControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessById(java.lang.String)
 	 */
-	public synchronized IPProcess getProcessById(String id) {
+	public IPProcess getProcessById(String id) {
 		IPElementControl element = findChild(id);
-		if (element != null)
+		if (element != null) {
 			return (IPProcessControl) element;
+		}
 		return null;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(int)
 	 */
-	public synchronized IPProcess getProcessByIndex(int index) {
+	public IPProcess getProcessByIndex(int index) {
 		return indexMap.get(String.valueOf(index));
 	}
 
@@ -146,17 +149,18 @@ public class PJob extends Parent implements IPJobControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(java.lang.String)
 	 */
-	public synchronized IPProcess getProcessByIndex(String index) {
+	public IPProcess getProcessByIndex(String index) {
 		return indexMap.get(index);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#getProcessControls()
 	 */
-	public synchronized Collection<IPProcessControl> getProcessControls() {
+	public Collection<IPProcessControl> getProcessControls() {
+		IPElementControl[] children = getChildren();
 		List<IPProcessControl> processes =
-			new ArrayList<IPProcessControl>(getCollection().size());
-		for (IPElementControl element : getCollection()) {
+			new ArrayList<IPProcessControl>(children.length);
+		for (IPElementControl element : children) {
 			processes.add((IPProcessControl)element);
 		}
 		return processes;

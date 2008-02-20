@@ -22,7 +22,7 @@ package org.eclipse.ptp.core.attributes;
 public final class BooleanAttributeDefinition
 extends AbstractAttributeDefinition<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 
-	private Boolean defaultValue;
+	private final Boolean defaultValue;
 	
 	public BooleanAttributeDefinition(final String uniqueId, final String name, 
 			final String description, final boolean display, final Boolean defaultValue) {

@@ -25,17 +25,18 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable<IPElementControl> {
 
-	private PElementInfo elementInfo = null;
-	protected AttributeManager attributeValues = new AttributeManager();
-	protected String elementId = null;
-	protected IPElementControl elementParent;
-	protected int elementType;
+	private final PElementInfo elementInfo = new PElementInfo(this);
+	protected final AttributeManager attributeValues = new AttributeManager();
+	protected final String elementId;
+	protected final IPElementControl elementParent;
+	protected final int elementType;
 
 	protected PElement(String id, IPElementControl parent, int type, IAttribute<?,?,?>[] attrs) {
 		elementId = id;
@@ -135,9 +136,9 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @see org.eclipse.ptp.core.elements.IPElement#getName()
 	 */
 	public String getName() {
-		IAttribute<?,?,?> attr = attributeValues.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		StringAttribute attr = attributeValues.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (attr != null) {
-			return attr.getValueAsString();
+			return attr.getValue();
 		}
 		return getID();
 	}
@@ -178,8 +179,6 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @return PElementInfo
 	 */
 	protected PElementInfo getElementInfo() {
-		if (elementInfo == null)
-			elementInfo = new PElementInfo(this);
 		return elementInfo;
 	}
 }
