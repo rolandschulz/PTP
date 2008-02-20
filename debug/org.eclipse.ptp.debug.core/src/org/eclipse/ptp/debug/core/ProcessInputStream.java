@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
@@ -120,16 +120,18 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
      * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
      */
     public void handleEvent(IProcessChangeEvent e) {
-		IAttribute<?,?,?> attr = e.getAttributes().get(ProcessAttributes.getStateAttributeDefinition());
-		if (attr != null) {
-			ProcessAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+		EnumeratedAttribute<ProcessAttributes.State> stateAttr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		if (stateAttr != null) {
+			ProcessAttributes.State state = stateAttr.getValue();
 			if (state == State.EXITED || state == State.EXITED_SIGNALLED || state == State.ERROR) {
 				close();
 			}
 		} 
-		attr = e.getAttributes().get(ProcessAttributes.getStdoutAttributeDefinition());
-		if (attr != null) {
-			addInput(attr.getValueAsString() + "\n");
+		
+		StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
+		if (stdoutAttr != null) {
+			addInput(stdoutAttr.getValue() + "\n");
 		}
-	}
+
+    }
 }

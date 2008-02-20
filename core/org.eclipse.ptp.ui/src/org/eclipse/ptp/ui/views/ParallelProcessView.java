@@ -21,10 +21,9 @@ package org.eclipse.ptp.ui.views;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.ui.UIUtils;
@@ -223,15 +222,15 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	public void handleEvent(final IProcessChangeEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				IAttribute<?,?,?> attr = e.getAttributes().get(ProcessAttributes.getStateAttributeDefinition());
-				if (attr != null) {
-					ProcessAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+				EnumeratedAttribute<ProcessAttributes.State> stateAttr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
+				if (stateAttr != null) {
+					ProcessAttributes.State state = stateAttr.getValue();
 					statusLabel.setText("Status: " + state.toString());
 				} 
 				
-				attr = e.getAttributes().get(ProcessAttributes.getStdoutAttributeDefinition());
-				if (attr != null) {
-					outputText.append(attr.getValueAsString() + "\n");
+				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
+				if (stdoutAttr != null) {
+					outputText.append(stdoutAttr.getValue() + "\n");
 				}
 			}
 		});

@@ -14,7 +14,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -142,9 +141,9 @@ public class RuntimeProcess implements IProcess, IJobListener {
 
 	@SuppressWarnings("unchecked")
 	public void handleEvent(IJobChangeEvent e) {
-		IAttribute<?,?,?> attr = e.getAttributes().get(JobAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<JobAttributes.State> attr = e.getAttributes().getAttribute(JobAttributes.getStateAttributeDefinition());
 		if (attr != null) {
-			JobAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+			JobAttributes.State state = attr.getValue();
 			if (state == State.TERMINATED || state == State.ERROR) {
 				terminated();
 			}

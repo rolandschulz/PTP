@@ -19,10 +19,7 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Map;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 
@@ -33,9 +30,9 @@ import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 public class QueueChangeEvent implements IQueueChangeEvent {
 
 	private final IPQueue queue;
-	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attributes;
+	private final AttributeManager attributes;
 
-	public QueueChangeEvent(IPQueue queue, Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+	public QueueChangeEvent(IPQueue queue, AttributeManager attrs) {
 		this.queue = queue;
 		this.attributes = attrs;
 	}
@@ -43,7 +40,7 @@ public class QueueChangeEvent implements IQueueChangeEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedEvent#getAttributes()
 	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributes() {
+	public AttributeManager getAttributes() {
 		return attributes;
 	}
 

@@ -17,10 +17,7 @@
 package org.eclipse.ptp.core.elements.events;
 
 
-import java.util.Map;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPProcess;
 
 /**
@@ -36,7 +33,7 @@ public interface IProcessChangeEvent {
 	 * 
 	 * @return changed attributes
 	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>  getAttributes();
+	public AttributeManager getAttributes();
 	
 	/**
 	 * Get the source of the event

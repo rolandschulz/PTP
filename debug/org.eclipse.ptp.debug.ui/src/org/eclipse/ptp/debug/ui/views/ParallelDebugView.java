@@ -458,7 +458,7 @@ public class ParallelDebugView extends ParallelJobsView {
     	ISelection selection = event.getSelection();
     	if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
     		IStructuredSelection structSelection = (IStructuredSelection)selection;
-    		if (structSelection.size() == 1) {
+    		if (structSelection.size() == 1 && structSelection.getFirstElement() instanceof IElement) {
 	    		IElement element = (IElement)structSelection.getFirstElement();
 	    		if (element.isRegistered()) {
 					try {
