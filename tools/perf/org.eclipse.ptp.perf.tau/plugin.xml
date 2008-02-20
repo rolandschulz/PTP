@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.perf.perfdatamanager">
+      <PerformanceDataManager
+            class="org.eclipse.ptp.perf.tau.TAUPerformanceDataManager">
+      </PerformanceDataManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.perf.perfconfigurationtab">
+      <perfconfigurationtab
+            class="org.eclipse.ptp.perf.tau.TAUAnalysisTab">
+      </perfconfigurationtab>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.perf.perfworkflow">
+      <workflowDefinitionXML
+            XMLFile="toolxml/tau_tool.xml">
+      </workflowDefinitionXML>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.perf.performanceToolsMainpage"
+            class="org.eclipse.ptp.perf.tau.TAUPrefPage"
+            id="org.eclipse.ptp.tau.tauconfigpage"
+            name="TAU Configuration">
+      </page>
+   </extension>
+
+</plugin>

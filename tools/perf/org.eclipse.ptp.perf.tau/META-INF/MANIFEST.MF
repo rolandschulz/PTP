@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tau Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.perf.tau;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.perf.tau.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui,
+ org.eclipse.ptp.perf.tau.papiselect,
+ org.eclipse.ptp.perf.tau.perfdmf,
+ org.eclipse.ptp.perf.toolopts,
+ org.eclipse.ptp.perf,
+ org.eclipse.cdt.managedbuilder.core
+Eclipse-LazyStart: true

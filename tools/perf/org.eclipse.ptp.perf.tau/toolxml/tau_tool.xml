@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tool name="TAU">
+	<compile replace="true">
+		<CC command="tau_cc.sh" group="tau"/>
+		<CXX command="tau_cxx.sh" group="tau"/>
+		<F90 command="tau_f90.sh" group="tau"/>
+		<allcompilers group="tau">
+		<optionpane title="Tau Compiler" prependwith="-tau_options=" enclosewith="'" seperatewith=" " virtual="true">
+			<togoption label="Verbose" optname="-optVerbose" tooltip="Turn on verbose debugging message"/>
+			<togoption label="KeepFiles" optname="-optKeepFiles" tooltip="Does not remove intermediate .pdb and .inst.* files"/>
+			<togoption label="TauSelectFile" optname="-optTauSelectFile" tooltip="Specify selective instrumentation file for tau_instrumentor">
+				<optvalue type="file"/>
+			</togoption>
+			<togoption label="DetectMemoryLeaks" optname="-optDetectMemoryLeaks" tooltip="Track mallocs/frees using TAU's memory wrapper"/>
+			<togoption label="PdtGnuFortranParser" optname="-optPdtGnuFortranParser" tooltip="Specify the GNU gfortran PDT parser gfparse instead of f95parse"/>
+			<togoption label="PdtDir" optname="-optPdtDir" tooltip="PDT architecture directory. Typically $(PDTDIR)/$(PDTARCHDIR)">
+				<optvalue type="dir"/>
+			</togoption>
+			<togoption label="PdtF95Opts" optname="-optPdtF95Opts" tooltip="Options for Fortran parser in PDT (f95parse)">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtF95Reset" optname="-optPdtF95Reset" tooltip="Reset options to the Fortran parser to the given list">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtCOpts" optname="-optPdtCOpts" tooltip="Options for C parser in PDT (cparse). Typically $(TAU_MPI_INCLUDE) $(TAU_INCLUDE) $(TAU_DEFS)">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtCReset" optname="-optPdtCReset" tooltip="Reset options to the C parser to the given list">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtCxxOpts" optname="-optPdtCxxOpts" tooltip="Options for C++ parser in PDT (cxxparse). Typically $(TAU_MPI_INCLUDE) $(TAU_INCLUDE) $(TAU_DEFS)">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtCxxReset" optname="-optPdtCxxReset" tooltip="Reset options to the C++ parser to the given list">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtF90Parser" optname="-optPdtF90Parser" tooltip="Specify a different Fortran parser. For e.g., f90parse instead of f95parse">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PdtUser" optname="-optPdtUser" tooltip="Optional arguments for parsing source code">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="TauInstr" optname="-optTauInstr" tooltip="Specify location of tau_instrumentor. Typically $(TAUROOT)/$(CONFIG_ARCH)/bin/tau_instrumentor">
+				<optvalue type="file"/>
+			</togoption>
+			<togoption label="PreProcess" optname="-optPreProcess" tooltip="Preprocess the source code before parsing. Uses /usr/bin/cpp -P by default."/>
+			<togoption label="CPP" optname="-optCPP" tooltip="Specify an alternative preprocessor and pre-process the sources.">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="CPPOpts" optname="-optCPPOpts" tooltip="Specify additional options to the C pre-processor.">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="CPPReset" optname="-optCPPReset" tooltip="Reset C preprocessor options to the specified list.">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="PDBFile" optname="-optPDBFile" tooltip="Specify PDB file for tau_instrumentor. Skips parsing stage.">
+				<optvalue type="file"/>
+			</togoption>
+			<togoption label="Tau" optname="-optTau" tooltip="Specify options for tau_instrumentor">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="Compile" optname="-optCompile" tooltip="Options passed to the compiler by the user.">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="TauDefs" optname="-optTauDefs" tooltip="Options passed to the compiler by TAU. Typically $(TAU_DEFS)">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="TauIncludes" optname="-optTauIncludes" tooltip="Options passed to the compiler by TAU. Typically $(TAU_MPI_INCLUDE) $(TAU_INCLUDE)">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="IncludeMemory" optname="-optIncludeMemory" tooltip="Flags for replacement of malloc/free. Typically -I$(TAU_DIR)/include/Memory">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="Reset" optname="-optReset" tooltip="Reset options to the compiler to the given list">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="Linking" optname="-optLinking" tooltip="Options passed to the linker. Typically $(TAU_MPI_FLIBS) $(TAU_LIBS) $(TAU_CXXLIBS)">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="LinkReset" optname="-optLinkReset" tooltip="Reset options to the linker to the given list">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="TauCC" optname="-optTauCC" tooltip="Specifies the C compiler used by TAU">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="OpariTool" optname="-optOpariTool" tooltip="Specifies the location of the Opari tool">
+				<optvalue type="file"/>
+			</togoption>
+			<togoption label="OpariDir" optname="-optOpariDir" tooltip="Specifies the location of the Opari directory">
+				<optvalue type="dir"/>
+			</togoption>
+			<togoption label="OpariOpts" optname="-optOpariOpts" tooltip="Specifies optional arguments to the Opari tool">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="OpariReset" optname="-optOpariReset" tooltip="Resets options passed to the Opari tool">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="NoMpi" optname="-optNoMpi" tooltip="Removes -l*mpi* libraries during linking (default)"/>
+			<togoption label="Mpi" optname="-optMpi" tooltip="Does not remove -l*mpi* libraries during linking"/>
+			<togoption label="NoRevert" optname="-optNoRevert" tooltip="Exit on error. Does not revert to the original compilation rule on error."/>
+			<togoption label="Revert" optname="-optRevert" tooltip="Revert to the original compilation rule on error (default)."/>
+			<togoption label="AppCC" optname="-optAppCC" tooltip="pecifies the fallback C compiler.">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="AppCXX" optname="-optAppCXX" tooltip="Specifies the fallback CXX compiler.">
+				<optvalue type="text"/>
+			</togoption>
+			<togoption label="AppF90" optname="-optAppF90" tooltip="Specifies the fallback F90 compiler.">
+				<optvalue type="text"/>
+			</togoption>
+		</optionpane>
+		<optionpane title="tau_makefile" virtual="true"/>
+		<optionpane title="selective_instrumentation_arg" virtual="true"/>
+		</allcompilers>
+	</compile>
+	<analyze>
+		<utility command="process-TAU-data" group="internal"/>
+	</analyze>
+</tool>
