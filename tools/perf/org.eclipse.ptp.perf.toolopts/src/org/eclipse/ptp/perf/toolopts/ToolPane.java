@@ -90,7 +90,24 @@ public class ToolPane {
 		optString = new StringBuffer(this.prependOpts).append(this.encloseOpts);
 		for (int i = 0; i < options.length; i++) {
 			if (options[i].unitCheck.getSelection())
+			{
 				optString.append(options[i].optionLine).append(this.separateOpts);
+				if(options[i].argbox!=null)
+				{
+					options[i].argbox.setEnabled(true);
+					if(options[i].browser!=null)
+						options[i].browser.setEnabled(true);
+				}
+			}
+			else
+			{
+				if(options[i].argbox!=null)
+				{
+					options[i].argbox.setEnabled(false);
+					if(options[i].browser!=null)
+						options[i].browser.setEnabled(false);
+				}
+			}
 		}
 		optString.append(this.encloseOpts);
 	}
