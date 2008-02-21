@@ -280,7 +280,7 @@ public class ToolPane {
 		configID=name+".performance.options.configuration_id";
 	}
 	
-	protected void setOptions(List toptions)
+	protected void setOptions(List<ToolOption> toptions)
 	{
 		options = new ToolOption[toptions.size()];
 		toptions.toArray(options);

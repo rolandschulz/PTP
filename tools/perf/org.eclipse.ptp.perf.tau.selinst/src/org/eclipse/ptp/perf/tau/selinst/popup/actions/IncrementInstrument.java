@@ -75,7 +75,7 @@ public class IncrementInstrument implements IEditorActionDelegate {
 		insertregs = ts.getStartLine()+1;
 		insertstops= ts.getEndLine()+1;
 
-		LinkedHashSet instlines = new LinkedHashSet();
+		LinkedHashSet<String> instlines = new LinkedHashSet<String>();
 		Selector selectinst = new Selector(cele.getCProject().getResource().getLocation().toOSString());
 		String mainLine=getPhaseTimeLine(cele.getElementName(),insertregs,insertstops);
 		

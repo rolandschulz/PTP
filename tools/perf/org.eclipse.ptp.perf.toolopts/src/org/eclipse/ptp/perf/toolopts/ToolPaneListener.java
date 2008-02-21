@@ -35,6 +35,7 @@ public class ToolPaneListener implements ModifyListener, SelectionListener {
 		thisTool = tool;
 	}
 
+	@SuppressWarnings("unused")
 	private ToolPaneListener() {
 		
 	}

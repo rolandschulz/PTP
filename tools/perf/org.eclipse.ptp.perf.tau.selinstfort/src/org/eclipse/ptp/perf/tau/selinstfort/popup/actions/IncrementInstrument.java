@@ -63,7 +63,7 @@ public class IncrementInstrument implements IEditorActionDelegate {
 		insertregs = ts.getStartLine()+1;
 		insertstops= ts.getEndLine()+1;
 		
-		LinkedHashSet instlines = new LinkedHashSet();
+		LinkedHashSet<String> instlines = new LinkedHashSet<String>();
 		
 		String mainLine=org.eclipse.ptp.perf.tau.selinst.popup.actions.IncrementInstrument.getPhaseTimeLine(textEditor.getIFile().getName(),insertregs,insertstops);
 		

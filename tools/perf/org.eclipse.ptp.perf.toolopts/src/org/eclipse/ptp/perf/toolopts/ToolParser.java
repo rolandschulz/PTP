@@ -76,6 +76,29 @@ public class ToolParser extends DefaultHandler{
 	private static final String DEFAULT = "default";
 	private static final String DEFSTATE = "defstate";
 	
+
+	private static final String ENCLOSEVALS="enclosevalues";
+	/**
+	 * The entire string of generated values will be enclosed in this string)
+	 * tag: enclosevalues
+	 * TODO: create enclose start and enclose end values? (e.g for parentheses)
+	 */
+	private static final String ENCLOSEWITH="enclosewith";
+	
+	/**
+	 * A string put between all generated options
+	 */
+	private static final String SEPARATEWITH="separatewith";
+	
+	/**
+	 * A string prepended to the string of generated options
+	 */
+	private static final String PREPENDWITH="prependwith";
+	/**
+	 * The string between a flag and an associated option
+	 */
+	private static final String SEPARATEVAL="separatevalues";
+	
 	/**
 	 * Element to specify an argument to a compiler, run utility or analysis tool
 	 */
@@ -97,31 +120,31 @@ public class ToolParser extends DefaultHandler{
 	 */
 	private boolean inAnalysis=false;
 	
-	private Stack tagStack = new Stack();
-	protected ArrayList performanceTools= new ArrayList();
+	private Stack<String> tagStack = new Stack<String>();
+	protected ArrayList<PerformanceTool> performanceTools= new ArrayList<PerformanceTool>();
 	private PerformanceTool currentTool;
 	/**
 	 * Contains the list of tool panes for the current tool app
 	 */
-	private ArrayList toolPanes;// = new ArrayList();
+	private ArrayList<ToolPane> toolPanes;// = new ArrayList();
 	private ToolPane currentPane;
 	
 	/**
 	 * Contains the list of tool apps (compilers, exec utils or analysis tools) for the current subheading
 	 */
-	private ArrayList toolApps;
+	private ArrayList<ToolApp> toolApps;
 	/**
 	 * Contains the list of argument strings for the current tool.
 	 */
-	private ArrayList currentArgs;
+	private ArrayList<String> currentArgs;
 	/**
 	 * The tool app currently being worked on
 	 */
 	private ToolApp currentApp;
 	
-	private ArrayList toolOptions;
+	private ArrayList<ToolOption> toolOptions;
 	private ToolOption actOpt;
-	private Stack content = new Stack();
+	private Stack<StringBuffer> content = new Stack<StringBuffer>();
 	
 	public void characters(char[] chars, int start, int len)
 	{
@@ -177,12 +200,12 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(EXECUTE)&&!inExecution)
 		{
 			inExecution=true;
-			toolApps=new ArrayList();
+			toolApps=new ArrayList<ToolApp>();
 		}
 		else if(name.equals(ANALYZE)&&!inAnalysis)
 		{
 			inAnalysis=true;
-			toolApps=new ArrayList();
+			toolApps=new ArrayList<ToolApp>();
 		}
 		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(ALLCOMP)||name.equals(UTILITY))
 		{
@@ -200,7 +223,7 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(ARGUMENT))
 		{
 			if(currentArgs==null)
-				currentArgs=new ArrayList();
+				currentArgs=new ArrayList<String>();
 			currentArgs.add(getAttribute("value",atts));
 		}
 		else if(name.equals(OPTIONPANE))
@@ -208,23 +231,33 @@ public class ToolParser extends DefaultHandler{
 			boolean virtual=getBooleanAttribute("virtual",false,atts);
 			//TODO: Make -absolutely- certain that nothing ever tries to greate a UI instance of a virtual pane!
 			
-			toolOptions=new ArrayList();
+			toolOptions=new ArrayList<ToolOption>();
 			currentPane=new ToolPane(virtual);
 			currentPane.setName(getAttribute("title",atts));
-			int optdex = atts.getIndex("prependwith");
+			int optdex = atts.getIndex(PREPENDWITH);
 			if(optdex>=0)
 			{
 				currentPane.prependOpts=atts.getValue(optdex);
 			}
-			optdex = atts.getIndex("enclosewith");
+			optdex = atts.getIndex(ENCLOSEWITH);
 			if(optdex>=0)
 			{
 				currentPane.encloseOpts=atts.getValue(optdex);
 			}
-			optdex = atts.getIndex("seperatewith");
+			optdex = atts.getIndex(SEPARATEWITH);
 			if(optdex>=0)
 			{
 				currentPane.separateOpts=atts.getValue(optdex);
+			}
+			optdex = atts.getIndex(ENCLOSEVALS);
+			if(optdex>=0)
+			{
+				currentPane.encloseValues=atts.getValue(optdex);
+			}
+			optdex = atts.getIndex(SEPARATEVAL);
+			if(optdex>=0)
+			{
+				currentPane.separateNameValue=atts.getValue(optdex);
 			}
 		}
 		else if(name.equals(TOGOPT))
@@ -352,7 +385,7 @@ public class ToolParser extends DefaultHandler{
 			if(toolOptions!=null)
 			{
 				if(toolPanes==null)
-					toolPanes=new ArrayList();
+					toolPanes=new ArrayList<ToolPane>();
 				currentPane.setOptions(toolOptions);
 				toolPanes.add(currentPane);
 			}
@@ -509,7 +542,7 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(EXECUTE)&&!inExecution)
 		{
 			inExecution=true;
-			toolApps=new ArrayList();
+			toolApps=new ArrayList<ToolApp>();
 		}
 		else if(name.equals(UTILITY)&&!inExecUtil)
 		{
@@ -519,7 +552,7 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(ANALYZE)&&!inAnalysis)
 		{
 			inAnalysis=true;
-			toolApps=new ArrayList();
+			toolApps=new ArrayList<ToolApp>();
 		}
 		else if((name.equals(PROCESS)||name.equals(VIEW))&&!inAnaTool)
 		{
@@ -528,7 +561,7 @@ public class ToolParser extends DefaultHandler{
 		}
 		else if(name.equals(ARGUMENT))
 		{
-			currentArgs=new ArrayList();
+			currentArgs=new ArrayList<String>();
 		}
 		else if(name.equals(OPTIONPANE))
 		{
@@ -543,19 +576,19 @@ public class ToolParser extends DefaultHandler{
 				}
 			}
 			
-			toolOptions=new ArrayList();
+			toolOptions=new ArrayList<ToolOption>();
 			currentPane=new ToolPane(virtual);
-			optdex = atts.getIndex("prependwith");
+			optdex = atts.getIndex(PREPENDWITH);
 			if(optdex>=0)
 			{
 				currentPane.prependOpts=atts.getValue(optdex);
 			}
-			optdex = atts.getIndex("enclosewith");
+			optdex = atts.getIndex(ENCLOSEWITH);
 			if(optdex>=0)
 			{
 				currentPane.encloseOpts=atts.getValue(optdex);
 			}
-			optdex = atts.getIndex("seperatewith");
+			optdex = atts.getIndex(SEPARATEWITH);
 			if(optdex>=0)
 			{
 				currentPane.separateOpts=atts.getValue(optdex);
@@ -694,7 +727,7 @@ public class ToolParser extends DefaultHandler{
 			if(toolOptions!=null)
 			{
 				if(toolPanes==null)
-					toolPanes=new ArrayList();
+					toolPanes=new ArrayList<ToolPane>();
 				currentPane.setName(content.peek().toString().trim());
 				currentPane.setOptions(toolOptions);
 				toolPanes.add(currentPane);

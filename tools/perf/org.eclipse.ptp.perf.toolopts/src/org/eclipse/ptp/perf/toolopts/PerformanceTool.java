@@ -49,7 +49,7 @@ public class PerformanceTool {
 	protected ToolApp allCompilers=null;
 	
 	//public String compilerPathFinder=null;
-	public Map groupApp=null;
+	public Map<String, String> groupApp=null;
 	
 	/**
 	 * If true the actual executable is an argument passed to one or more additional utilities
@@ -68,7 +68,7 @@ public class PerformanceTool {
 	
 	public PerformanceTool()
 	{
-		groupApp=new HashMap();
+		groupApp=new HashMap<String, String>();
 	}
 	
 	

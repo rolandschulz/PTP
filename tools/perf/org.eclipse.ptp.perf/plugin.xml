@@ -13,15 +13,15 @@
 			sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
 			modes="profile"
 			public="true"
-			id="org.eclipse.ptp.tau.performance.performancelaunch">
+			id="org.eclipse.ptp.perf.tau.performance.performancelaunch">
 		</launchConfigurationType>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="org.eclipse.ptp.perf.ui.PerformanceLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.tau.performance.launchConfigurationTabGroup"
-            type="org.eclipse.ptp.tau.performance.performancelaunch">
+            id="org.eclipse.ptp.perf.tau.performance.launchConfigurationTabGroup"
+            type="org.eclipse.ptp.perf.tau.performance.performancelaunch">
          <launchMode
                description="Build C, C++ or Fortran applications with performance analysis tools.  Launch as sequential programs or use the command line for parallel execution."
                mode="profile"/>

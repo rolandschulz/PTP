@@ -18,10 +18,7 @@
 package org.eclipse.ptp.perf;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +94,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @param panes
 	 * @param paneList
 	 */
-	private static void insertPanes(ToolPane[] panes, List paneList)
+	private static void insertPanes(ToolPane[] panes, List<ToolPane> paneList)
 	{
 		if(panes!=null&&panes.length>0)
 		{
@@ -116,7 +113,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ToolPane[] getToolPanes()
 	{
-		ArrayList paneList = new ArrayList();
+		ArrayList<ToolPane> paneList = new ArrayList<ToolPane>();
 		ToolPane[] panes = null;
 		
 		if(tools.length<=0)

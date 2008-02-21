@@ -67,27 +67,27 @@ public class Clear implements IObjectActionDelegate {
 		/**
 		 * The iterator over all selected elements
 		 */
-		Iterator selit = selection.iterator();
+		Iterator<ICElement> selit = selection.iterator();
 		/**
 		 * The list of selected files
 		 */
-		HashSet selfiles=new HashSet();
+		HashSet<String> selfiles=new HashSet<String>();
 		/**
 		 * The list of selected routines
 		 */
-		HashSet selrouts=new HashSet();
+		HashSet<String> selrouts=new HashSet<String>();
 		/**
 		 * List of file-level 'simple' selection commands
 		 */
-		HashSet clearFileSelSec=new HashSet();
+		HashSet<String> clearFileSelSec=new HashSet<String>();
 		/**
 		 * List of routine-level 'simple' selection commands
 		 */
-		HashSet clearRoutSelSec=new HashSet();
+		HashSet<String> clearRoutSelSec=new HashSet<String>();
 		/**
 		 * List of other, old-style instrumentation commands to clear
 		 */
-		HashSet clearOtherSelSec=new HashSet();
+		HashSet<String> clearOtherSelSec=new HashSet<String>();
 		/**
 		 * The component of the selection line after the variable selection type
 		 */
@@ -96,7 +96,7 @@ public class Clear implements IObjectActionDelegate {
 		int tot=0;
 		while(selit.hasNext())
 		{
-			cbit=(ICElement)selit.next();
+			cbit=selit.next();
 			type = cbit.getElementType();
 			//For Selected Routines:
 			if(type==ICElement.C_FUNCTION)

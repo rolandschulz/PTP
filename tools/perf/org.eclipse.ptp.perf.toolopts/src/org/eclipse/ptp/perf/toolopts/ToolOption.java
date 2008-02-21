@@ -17,8 +17,6 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.toolopts;
 
-import java.util.ArrayList;
-
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
@@ -94,7 +92,8 @@ public class ToolOption {
 	
 	protected Combo combopt;
 	
-	protected ArrayList subopts;
+	//This will eventually be used to hold subordinate options.
+//	protected ArrayList subopts;
 
 	
 	/*

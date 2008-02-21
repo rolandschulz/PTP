@@ -107,8 +107,8 @@ public class BuildLaunchUtils {
 
 		Shell ourshell = PlatformUI.getWorkbench().getDisplay()
 				.getActiveShell();
-		Iterator eIt = null;
-		Map.Entry me = null;
+		Iterator<Map.Entry<String,String>> eIt = null;
+		Map.Entry<String,String> me = null;
 		String entry=null;
 
 		for (int i = 0; i < tools.length; i++) 
@@ -116,8 +116,8 @@ public class BuildLaunchUtils {
 			eIt = tools[i].groupApp.entrySet().iterator();
 			while (eIt.hasNext()) 
 			{
-				me = (Map.Entry) eIt.next();
-				entry=(String) me.getKey();
+				me = eIt.next();
+				entry=me.getKey();
 				
 				if(entry.equals("internal"))
 					continue;

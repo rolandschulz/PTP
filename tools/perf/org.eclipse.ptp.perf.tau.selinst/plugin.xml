@@ -4,105 +4,105 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
-            id="org.eclipse.ptp.tau.selinst.SelectiveInstPopup"
+            id="org.eclipse.ptp.perf.tau.selinst.SelectiveInstPopup"
             nameFilter="*"
             objectClass="org.eclipse.cdt.core.model.ICElement">
          <menu
-               id="org.eclipse.ptp.tau.selinst.menu2"
+               id="org.eclipse.ptp.perf.tau.selinst.menu2"
                label="Selective Instrumentation"
                path="additions">
-            <separator name="org.eclipse.ptp.tau.selinst.separator2"/>
+            <separator name="org.eclipse.ptp.perf.tau.selinst.separator2"/>
          </menu>
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.Clear"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.clear"
+               id="org.eclipse.ptp.perf.tau.selinst.clear"
                label="Clear"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.instloops"
+               id="org.eclipse.ptp.perf.tau.selinst.instloops"
                label="Instrument Loops"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.instio"
+               id="org.eclipse.ptp.perf.tau.selinst.instio"
                label="Instrument I/O"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.instmemory"
+               id="org.eclipse.ptp.perf.tau.selinst.instmemory"
                label="Instrument Memory"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
                <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.dyntime"
+               id="org.eclipse.ptp.perf.tau.selinst.dyntime"
                label="Dynamic Timer"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
                <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.stattime"
+               id="org.eclipse.ptp.perf.tau.selinst.stattime"
                label="Static Timer"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
                <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.dynphase"
+               id="org.eclipse.ptp.perf.tau.selinst.dynphase"
                label="Dynamic Phase"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
                <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.statphase"
+               id="org.eclipse.ptp.perf.tau.selinst.statphase"
                label="Static Phase"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.excludeselect"
+               id="org.eclipse.ptp.perf.tau.selinst.excludeselect"
                label="Exclude"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.SelectiveInstrument"
                enablesFor="+"
-               id="org.eclipse.ptp.tau.selinst.includeselect"
+               id="org.eclipse.ptp.perf.tau.selinst.includeselect"
                label="Include"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu2/group1"/>
       </objectContribution>
       <viewerContribution
-            id="org.eclipse.ptp.tau.selinst.AddAtomicEvent"
+            id="org.eclipse.ptp.perf.tau.selinst.AddAtomicEvent"
             targetID="#CEditorContext">
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.AtomicInstrument"
                enablesFor="*"
-               id="org.eclipse.ptp.tau.selinst.te.Select"
+               id="org.eclipse.ptp.perf.tau.selinst.te.Select"
                label="Insert TAU Atomic User Defined Event"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu1/group1">
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu1/group1">
             <selection class="org.eclipse.jface.text.ITextSelection"/>
          </action>
          <menu
-               id="org.eclipse.ptp.tau.selinst.menu1"
+               id="org.eclipse.ptp.perf.tau.selinst.menu1"
                label="Selective Instrumentation"
                path="additions"/>
       </viewerContribution>
       <viewerContribution
-            id="org.eclipse.ptp.tau.selinst.AddIncrementalEvent"
+            id="org.eclipse.ptp.perf.tau.selinst.AddIncrementalEvent"
             targetID="#CEditorContext">
          <action
                class="org.eclipse.ptp.perf.tau.selinst.popup.actions.IncrementInstrument"
                enablesFor="*"
-               id="org.eclipse.ptp.tau.selinst.te.SelectInstFunc"
+               id="org.eclipse.ptp.perf.tau.selinst.te.SelectInstFunc"
                label="Insert TAU Interval (start/stop) User Defined Event"
-               menubarPath="org.eclipse.ptp.tau.selinst.menu1/group1">
+               menubarPath="org.eclipse.ptp.perf.tau.selinst.menu1/group1">
             <selection class="org.eclipse.jface.text.ITextSelection"/>
          </action>
          <menu
-               id="org.eclipse.ptp.tau.selinst.menu1"
+               id="org.eclipse.ptp.perf.tau.selinst.menu1"
                label="Selective Instrumentation"
                path="additions"/>
       </viewerContribution>

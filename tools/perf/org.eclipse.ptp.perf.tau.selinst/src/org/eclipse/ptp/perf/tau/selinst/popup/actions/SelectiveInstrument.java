@@ -66,9 +66,9 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 			return;
 		}
 		ICElement cbit=null;
-		Iterator selit = selection.iterator();
-		HashSet selfiles=new HashSet();
-		HashSet selrouts=new HashSet();
+		Iterator<Object> selit = selection.iterator();
+		HashSet<String> selfiles=new HashSet<String>();
+		HashSet<String> selrouts=new HashSet<String>();
 		int type;
 		String selType="";
 		int incex=-1;

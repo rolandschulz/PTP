@@ -35,9 +35,9 @@ public class PapiSelect {
 	public static final int PRESET=0;
 	public static final int NATIVE=1;
 	
-	private LinkedHashSet avCounters=null;
-	private Vector counterNames=new Vector(256);
-	private Vector counterDefs=new Vector(256);
+	private LinkedHashSet<String> avCounters=null;
+	private Vector<String> counterNames=new Vector<String>(256);
+	private Vector<String> counterDefs=new Vector<String>(256);
 	private String location="";
 	private int countType=0;
 	
@@ -61,10 +61,10 @@ public class PapiSelect {
 	/**
 	 * Given a list of already selected and already rejected counters, returns all available remaining counters
 	 * */
-	public LinkedHashSet getGrey(Object[] checked, Object[] greyed){
-		LinkedHashSet active = new LinkedHashSet();
-		LinkedHashSet greyset = new LinkedHashSet();
-		LinkedHashSet notgrey = new LinkedHashSet(avCounters);
+	public LinkedHashSet<Object> getGrey(Object[] checked, Object[] greyed){
+		LinkedHashSet<Object> active = new LinkedHashSet<Object>();
+		LinkedHashSet<Object> greyset = new LinkedHashSet<Object>();
+		LinkedHashSet<String> notgrey = new LinkedHashSet<String>(avCounters);
 		
 		if(checked.length>0)
 			active.addAll(Arrays.asList(checked));
@@ -87,7 +87,7 @@ public class PapiSelect {
 	 * Gets the list of available counters
 	 * @return available counters
 	 */
-	public LinkedHashSet getAvail(){
+	public LinkedHashSet<String> getAvail(){
 		return avCounters;
 	}
 	
@@ -95,14 +95,14 @@ public class PapiSelect {
 	 * Gets the list of counter definitions in the same order as returned by getCounterNames
 	 * @return counter definitions
 	 */
-	public Vector getCounterDefs(){
+	public Vector<String> getCounterDefs(){
 		return counterDefs;
 	}
 	/**
 	 * Gets the list of counter names in the same order as returned by getCounterDefs
 	 * @return counter names
 	 */
-	public Vector getCounterNames(){
+	public Vector<String> getCounterNames(){
 		return counterNames;
 	}
 	
@@ -113,7 +113,7 @@ public class PapiSelect {
 		String papi_avail=location+File.separator+"papi_avail";
 		String s = null;
 		
-		LinkedHashSet avail = new LinkedHashSet();
+		LinkedHashSet<String> avail = new LinkedHashSet<String>();
 		String holdcounter=null;
 		
 		try {
@@ -161,7 +161,7 @@ public class PapiSelect {
 		String papi_avail=location+File.separator+"papi_native_avail";
 		String s = null;
 		
-		LinkedHashSet avail = new LinkedHashSet();
+		LinkedHashSet<String> avail = new LinkedHashSet<String>();
 		String holdcounter=null;
 		try {
 			Process p = Runtime.getRuntime().exec(papi_avail, null, null);
@@ -203,7 +203,7 @@ public class PapiSelect {
 	/**
 	 * Returns the set of counters rejected given the selected set
 	 * */
-	private LinkedHashSet getRejects(LinkedHashSet selected)
+	private LinkedHashSet<String> getRejects(LinkedHashSet<Object> selected)
 	{
 		int entryIndex=14;
 		int entryLines=1;
@@ -221,7 +221,7 @@ public class PapiSelect {
 		String papi_event_chooser = location+File.separator+"papi_event_chooser "+counterString;
 		if(selected!=null && selected.size()>0)
 		{
-			Iterator itsel=selected.iterator();
+			Iterator<Object> itsel=selected.iterator();
 			while(itsel.hasNext())
 			{
 				papi_event_chooser += " "+(String)itsel.next();
@@ -229,11 +229,11 @@ public class PapiSelect {
 		}
 		else
 		{
-			return new LinkedHashSet(1);
+			return new LinkedHashSet<String>(1);
 		}
 		
 		String s=null;
-		LinkedHashSet result = new LinkedHashSet(avCounters);
+		LinkedHashSet<String> result = new LinkedHashSet<String>(avCounters);
 		result.removeAll(selected);
 		try {
 			Process p = Runtime.getRuntime().exec(papi_event_chooser, null, null);

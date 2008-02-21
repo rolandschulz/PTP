@@ -199,12 +199,12 @@ public class PapiListSelectionDialog extends SelectionDialog {
 				TableColumn column2 = new TableColumn(table, SWT.NONE);
 				column2.setText("Definition");
 				TableItem item;
-				Vector cNames = papiCon.getCounterNames();
-				Vector cDefs = papiCon.getCounterDefs();
+				Vector<String> cNames = papiCon.getCounterNames();
+				Vector<String> cDefs = papiCon.getCounterDefs();
 				for (int i = 0; i < cNames.size(); i++) {
 					item = new TableItem(table, SWT.NONE);
-					item.setText(new String[] { (String) cNames.get(i),
-							(String) cDefs.get(i) });
+					item.setText(new String[] { cNames.get(i),
+							cDefs.get(i) });
 				}
 				column1.pack();
 				column2.pack();
@@ -257,12 +257,12 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			if (listViewer.getChecked(element)) {
 				// Get the list of unchecked, un-gray elements that are excluded
 				// by the currently checked ones
-				LinkedHashSet allgrey = papiCon.getGrey(listViewer
+				LinkedHashSet<Object> allgrey = papiCon.getGrey(listViewer
 						.getCheckedElements(), listViewer.getGrayedElements());
 				// Add the current gray elements to the new ones
 				allgrey.addAll(Arrays.asList(listViewer.getGrayedElements()));
 				listViewer.setGrayedElements(allgrey.toArray());
-				LinkedHashSet checkall = new LinkedHashSet();
+				LinkedHashSet<Object> checkall = new LinkedHashSet<Object>();
 				// Check all of the checked -and- all of the gray elements (only
 				// un-gray checked elements are actually selected)
 				checkall.addAll(Arrays.asList(listViewer.getCheckedElements()));
@@ -271,9 +271,9 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			}
 			// If a previously unchecked element is checked
 			else {
-				LinkedHashSet allgrey = new LinkedHashSet(Arrays
+				LinkedHashSet<Object> allgrey = new LinkedHashSet<Object>(Arrays
 						.asList(listViewer.getGrayedElements()));
-				LinkedHashSet maybegood = new LinkedHashSet(Arrays
+				LinkedHashSet<Object> maybegood = new LinkedHashSet<Object>(Arrays
 						.asList(listViewer.getCheckedElements()));
 				// This is all of the currently checked but not-grey elements
 				maybegood.removeAll(allgrey);
@@ -283,7 +283,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 				// The revised grey elements and the selected elements are all
 				// checked.
 				listViewer.setGrayedElements(allgrey.toArray());
-				LinkedHashSet checkall = new LinkedHashSet(maybegood);
+				LinkedHashSet<Object> checkall = new LinkedHashSet<Object>(maybegood);
 				checkall.addAll(allgrey);
 				listViewer.setCheckedElements(checkall.toArray());
 			}
@@ -362,7 +362,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 
 		// Build a list of selected children.
 		if (children != null) {
-			ArrayList list = new ArrayList();
+			ArrayList<Object> list = new ArrayList<Object>();
 			for (int i = 0; i < children.length; ++i) {
 				Object element = children[i];
 				// Return all checked but not grayed elements

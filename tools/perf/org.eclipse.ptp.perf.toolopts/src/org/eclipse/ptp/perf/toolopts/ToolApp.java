@@ -128,7 +128,7 @@ public class ToolApp {
 //	}
 	
 	/**
-	 * Returns the space-seperated string of arguments stored by this tool 
+	 * Returns the space-separated string of arguments stored by this tool 
 	 * @return
 	 */
 	private String getArgs()
@@ -146,7 +146,7 @@ public class ToolApp {
 	}
 	
 	/**
-	 * Retrieves the space-seperated string of arguments stored as configuration variables by this tool's associated tool panes
+	 * Retrieves the space-separated string of arguments stored as configuration variables by this tool's associated tool panes
 	 * @param configuration
 	 * @return
 	 * @throws CoreException

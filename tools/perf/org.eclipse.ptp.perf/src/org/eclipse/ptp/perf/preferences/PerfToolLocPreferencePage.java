@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -122,27 +121,27 @@ public class PerfToolLocPreferencePage extends PreferencePage implements IWorkbe
 
 	public PerfToolLocPreferencePage() {
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		Iterator eIt = null;
+		Iterator<Map.Entry<String,String>> eIt = null;
 		String me = null;
 		PerformanceTool[] tools=Activator.getTools();
-		Set groups = new LinkedHashSet();
+		Set<String> groups = new LinkedHashSet<String>();
 		for (int i = 0; i < tools.length; i++) 
 		{
 			eIt = tools[i].groupApp.entrySet().iterator();
 			while (eIt.hasNext()) 
 			{
-				me = ((Map.Entry) eIt.next()).getKey().toString();
+				me = (eIt.next()).getKey().toString();
 				if(!me.equals("internal"))
 					groups.add(me);
 			}
 		}
 		
 		toolGroups=new BinDirPanel[groups.size()];
-		Iterator gIt=groups.iterator();
+		Iterator<String> gIt=groups.iterator();
 		int i=0;
 		while(gIt.hasNext())
 		{
-			toolGroups[i]=new BinDirPanel((String)gIt.next());
+			toolGroups[i]=new BinDirPanel(gIt.next());
 			i++;
 		}
 	}

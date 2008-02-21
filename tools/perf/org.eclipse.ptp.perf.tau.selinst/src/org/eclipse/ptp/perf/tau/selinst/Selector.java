@@ -38,11 +38,11 @@ import org.eclipse.cdt.core.model.IFunctionDeclaration;
 public class Selector {
 	
 
-	private LinkedHashSet routInc;
-	private LinkedHashSet routEx;
-	private LinkedHashSet fileInc;
-	private LinkedHashSet fileEx;
-	private LinkedHashSet instSec;
+	private LinkedHashSet<String> routInc;
+	private LinkedHashSet<String> routEx;
+	private LinkedHashSet<String> fileInc;
+	private LinkedHashSet<String> fileEx;
+	private LinkedHashSet<String> instSec;
 	private String selString;
 	
 	/**
@@ -50,11 +50,11 @@ public class Selector {
 	 * @param path path to the selective instrumentation file to be used or created
 	 */
 	public Selector(String path){
-		routInc=new LinkedHashSet();
-		routEx=new LinkedHashSet();
-		fileInc=new LinkedHashSet();
-		fileEx=new LinkedHashSet();
-		instSec=new LinkedHashSet();
+		routInc=new LinkedHashSet<String>();
+		routEx=new LinkedHashSet<String>();
+		fileInc=new LinkedHashSet<String>();
+		fileEx=new LinkedHashSet<String>();
+		instSec=new LinkedHashSet<String>();
 		selString=path+File.separator+"tau.selective";
 		readSelFile();
 		
@@ -104,7 +104,7 @@ public class Selector {
 	 * file and removes them from its exclude list if they are present
 	 * @param incfiles The set of routines to be included
 	 */
-	public void includeFile(HashSet incfiles){
+	public void includeFile(HashSet<String> incfiles){
 		fileInc.addAll(incfiles);
 		fileEx.removeAll(incfiles);
 		writeSelFile();
@@ -115,7 +115,7 @@ public class Selector {
 	 * file and removes them from its include list if they are present
 	 * @param exfiles The set of routines to be excluded
 	 */
-	public void excludeFile(HashSet exfiles){
+	public void excludeFile(HashSet<String> exfiles){
 		fileEx.addAll(exfiles);
 		fileInc.removeAll(exfiles);
 		writeSelFile();
@@ -126,7 +126,7 @@ public class Selector {
 	 * file and removes them from its exclude list if they are present
 	 * @param incrouts The set of routines to be included
 	 */
-	public void includeRout(HashSet incrouts){
+	public void includeRout(HashSet<String> incrouts){
 		routInc.addAll(incrouts);
 		routEx.removeAll(incrouts);
 		writeSelFile();
@@ -137,7 +137,7 @@ public class Selector {
 	 * file and removes them from its include list if they are present
 	 * @param exrouts The set of routines to be excluded
 	 */
-	public void excludeRout(HashSet exrouts){
+	public void excludeRout(HashSet<String> exrouts){
 		routEx.addAll(exrouts);
 		routInc.removeAll(exrouts);
 		writeSelFile();
@@ -147,7 +147,7 @@ public class Selector {
 	 * Adds the given list of instrumentation commands to this object's selective instrumentation file
 	 * @param instlines The list of instrument commands to add
 	 */
-	public void addInst(HashSet instlines){
+	public void addInst(HashSet<String> instlines){
 		instSec.addAll(instlines);
 		writeSelFile();
 	}
@@ -156,7 +156,7 @@ public class Selector {
 	 * Removes the given set of 'instrument' and/or 'exclude' file commands from this Selector's selective instrumentation file
 	 * @param remfile The set of 'instrument' and/or 'eclude' file commands to be removed
 	 */
-	public void clearFile(HashSet remfile){
+	public void clearFile(HashSet<String> remfile){
 		fileInc.removeAll(remfile);
 		fileEx.removeAll(remfile);
 		
@@ -167,7 +167,7 @@ public class Selector {
 	 * Removes the given set of 'instrument' and/or 'exclude' routine commands from this Selector's selective instrumentation file
 	 * @param remrouts The set of 'instrument' and/or 'eclude' routine commands to be removed
 	 */
-	public void clearRout(HashSet remrouts){
+	public void clearRout(HashSet<String> remrouts){
 		routInc.removeAll(remrouts);
 		routEx.removeAll(remrouts);
 		
@@ -175,11 +175,11 @@ public class Selector {
 	}
 	
 	
-	public void clearInstrumentSection(HashSet elementNames)
+	public void clearInstrumentSection(HashSet<String> elementNames)
 	{
-		Iterator elementIt=elementNames.iterator();
-		Iterator selectiveIt;
-		HashSet toRemove=new HashSet();
+		Iterator<String> elementIt=elementNames.iterator();
+		Iterator<String> selectiveIt;
+		HashSet<String> toRemove=new HashSet<String>();
 		String curElement="";
 		String curSelLine="";
 		while(elementIt.hasNext())
@@ -188,7 +188,7 @@ public class Selector {
 			selectiveIt=instSec.iterator();
 			while(selectiveIt.hasNext())
 			{
-				curSelLine=(String)selectiveIt.next();
+				curSelLine=selectiveIt.next();
 				if(curSelLine.indexOf(curElement)>=0)
 				{
 					toRemove.add(curSelLine);
@@ -205,11 +205,11 @@ public class Selector {
 	 * 'selective instrumentation' section from this Selector's selective instrumentation file
 	 * @param remlines The set of selective instrumentation commands to be removed
 	 */
-	public void clearGenInst(HashSet remlines){
+	public void clearGenInst(HashSet<String> remlines){
 		try{
-		Iterator remit = remlines.iterator();
-		Iterator removal;
-		HashSet removethese=new HashSet();
+		Iterator<String> remit = remlines.iterator();
+		Iterator<String> removal;
+		HashSet<String> removethese=new HashSet<String>();
 		String remtem ="";
 		String remcan = "";
 		while(remit.hasNext())
@@ -218,7 +218,7 @@ public class Selector {
 			removal = instSec.iterator();
 			while(removal.hasNext())
 			{
-				remcan=(String)removal.next();
+				remcan=removal.next();
 				if(remcan.indexOf(remtem)==0)
 				{
 					removethese.add(remcan);
@@ -234,7 +234,7 @@ public class Selector {
 	 * Removes the given set of 'instrument' commands from this Selector's selective instrumentation file
 	 * @param remlines The set of 'instrument' commands to be removed
 	 */
-	public void remInst(HashSet remlines){
+	public void remInst(HashSet<String> remlines){
 		
 		instSec.removeAll(remlines);
 		writeSelFile();
@@ -329,46 +329,46 @@ public class Selector {
 			if(routEx.size()>0)
 			{
 				out.write("BEGIN_EXCLUDE_LIST\n");
-				Iterator routExIt=routEx.iterator();
+				Iterator<String> routExIt=routEx.iterator();
 				while(routExIt.hasNext())
-					out.write((String)routExIt.next()+"\n");
+					out.write(routExIt.next()+"\n");
 				out.write("END_EXCLUDE_LIST\n");
 			}
 		
 			if(routInc.size()>0)
 			{
 				out.write("BEGIN_INCLUDE_LIST\n");
-				Iterator routIncIt = routInc.iterator();
+				Iterator<String> routIncIt = routInc.iterator();
 				
 				while(routIncIt.hasNext())
-					out.write((String)routIncIt.next()+"\n");
+					out.write(routIncIt.next()+"\n");
 				out.write("END_INCLUDE_LIST\n");
 			}
 		
 			if(fileEx.size()>0)
 			{
 				out.write("BEGIN_FILE_EXCLUDE_LIST\n");
-				Iterator fileExIt = fileEx.iterator();
+				Iterator<String> fileExIt = fileEx.iterator();
 				while(fileExIt.hasNext())
-					out.write((String)fileExIt.next()+"\n");
+					out.write(fileExIt.next()+"\n");
 				out.write("END_FILE_EXCLUDE_LIST\n");
 			}
 		
 			if(fileInc.size()>0)
 			{
 				out.write("BEGIN_FILE_INCLUDE_LIST\n");
-				Iterator fileIncIt = fileInc.iterator();
+				Iterator<String> fileIncIt = fileInc.iterator();
 				while(fileIncIt.hasNext())
-					out.write((String)fileIncIt.next()+"\n");
+					out.write(fileIncIt.next()+"\n");
 				out.write("END_FILE_INCLUDE_LIST\n");
 			}
 			
 			if(instSec.size()>0)
 			{
 				out.write("BEGIN_INSTRUMENT_SECTION\n");
-				Iterator instSecIt=instSec.iterator();
+				Iterator<String> instSecIt=instSec.iterator();
 				while(instSecIt.hasNext())
-					out.write((String)instSecIt.next()+"\n");
+					out.write(instSecIt.next()+"\n");
 				out.write("END_INSTRUMENT_SECTION\n");
 			}
 			out.close();

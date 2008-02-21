@@ -103,7 +103,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 	private String apppathattrib=null;
 	private ILaunchConfiguration configuration=null;
 	
-	private Map IOMap=null;
+	private Map<String, String> IOMap=null;
 	
 	
 	/**
@@ -124,7 +124,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 		outputLocation=projectLocation;
 		
 		this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL, (String)null));
-		IOMap=new HashMap();
+		IOMap=new HashMap<String, String>();
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
 	}
 

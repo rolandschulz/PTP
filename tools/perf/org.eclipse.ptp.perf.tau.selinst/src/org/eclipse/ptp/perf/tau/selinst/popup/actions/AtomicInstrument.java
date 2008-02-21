@@ -105,7 +105,7 @@ public class AtomicInstrument implements IEditorActionDelegate {
 		String testinc = incdialog.getValue();
 		
 		String fixline = testline.replaceAll("\\W", "");
-		LinkedHashSet instlines = new LinkedHashSet();
+		LinkedHashSet<String> instlines = new LinkedHashSet<String>();
 		String regline = "TAU_REGISTER_EVENT(TAU__"+fixline+", \\\""+testline+"\\\");";
 		String evtline = "TAU_EVENT(TAU__"+fixline+", "+testinc+");";
 		String nosselregline = "file =\""+cele.getElementName()+"\" line="+insertregs+" code=\""+regline+" "+evtline+"\"";

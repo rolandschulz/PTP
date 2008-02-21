@@ -522,7 +522,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //	 * @see ILaunchConfigurationTab#getImage()
 //	 */
 //	public Image getImage() {
-//		return LaunchImages.getImage("org.eclipse.ptp.tau.core.tauLogo.gif");
+//		return LaunchImages.getImage("org.eclipse.ptp.perf.tau.core.tauLogo.gif");
 //	}
 
 	/**

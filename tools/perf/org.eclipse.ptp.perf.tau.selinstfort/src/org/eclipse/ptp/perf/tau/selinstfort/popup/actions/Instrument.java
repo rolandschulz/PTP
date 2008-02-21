@@ -104,7 +104,7 @@ public class Instrument implements IEditorActionDelegate {
 		String testinc = incdialog.getValue();
 		
 		String fixline = "TAU_"+testline.replaceAll("\\W", "");
-		LinkedHashSet instlines = new LinkedHashSet();
+		LinkedHashSet<String> instlines = new LinkedHashSet<String>();
 		String initline1= "      integer "+fixline+"(2) / 0, 0 /";
 		String initline2= "      save "+fixline;
 		String regline =  "      call TAU_REGISTER_EVENT("+fixline+", \'"+testline+"\')";

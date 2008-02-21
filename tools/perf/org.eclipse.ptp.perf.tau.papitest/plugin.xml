@@ -7,7 +7,7 @@
       <actionSet
             label="TestPAPI Action Set"
             visible="true"
-            id="org.eclipse.ptp.tau.papitest.actionSet">
+            id="org.eclipse.ptp.perf.tau.papitest.actionSet">
          <menu
                label="&amp;PAPI"
                id="PAPIMenu">
@@ -20,7 +20,7 @@
                class="org.eclipse.ptp.perf.tau.papitest.actions.TestPAPI"
                tooltip="Test PAPI Selector"
                menubarPath="PAPIMenu/sampleGroup"
-               id="org.eclipse.ptp.tau.papitest.actions.TestPAPI">
+               id="org.eclipse.ptp.perf.tau.papitest.actions.TestPAPI">
          </action>
       </actionSet>
    </extension>
