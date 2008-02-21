@@ -224,22 +224,22 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	/**
 	 * The list of all available makefiles
 	 */
-	protected LinkedHashSet allmakefiles = null;
+	protected LinkedHashSet<String> allmakefiles = null;
 
 	/**
 	 * The list of all selected makefiles
 	 */
-	protected LinkedHashSet selmakefiles = null;
+	protected LinkedHashSet<String> selmakefiles = null;
 
 	/**
 	 * The list of all available options found among all available TAU makefiles
 	 */
-	protected LinkedHashSet allopts = null;
+	protected LinkedHashSet<String> allopts = null;
 
 	/**
 	 * The list of all selected makefile options
 	 */
-	protected LinkedHashSet selopts = null;
+	protected LinkedHashSet<String> selopts = null;
 
 	protected Combo makecombo = null;
 	
@@ -255,9 +255,9 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	 */
 	private String tlpath = null;
 
-	protected Map archvarmap = null;
+	protected Map<String, Object> archvarmap = null;
 
-	protected Map varmap = null;
+	protected Map<String, Object> varmap = null;
 	
 	//TODO:  This isn't generic.  We need to get this pane explicitly
 	protected final ToolPane tauOpts = Activator.getTool("TAU").getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
@@ -395,7 +395,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	 */
 	private void reinitMakeChecks() {
 
-		LinkedHashSet goodopts = new LinkedHashSet(allopts.size());
+		LinkedHashSet<String> goodopts = new LinkedHashSet<String>(allopts.size());
 		String holdmake = null;
 		String check = null;
 
@@ -403,15 +403,15 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 			goodopts.addAll(allopts);
 		} else {
 
-			Iterator makes = allmakefiles.iterator();
+			Iterator<String> makes = allmakefiles.iterator();
 			boolean allgood = true;
 			while (makes.hasNext()) {
-				holdmake = (String) makes.next();
+				holdmake = makes.next();
 
-				Iterator opts = selopts.iterator();
+				Iterator<String> opts = selopts.iterator();
 
 				while (opts.hasNext()) {
-					check = (String) opts.next();
+					check = opts.next();
 
 					if (holdmake.indexOf("-" + check) <= 0) {
 						allgood = false;
@@ -494,8 +494,8 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 			pstore.setValue(ITAULaunchConfigurationConstants.TAU_ARCH_PATH, checkArch);
 		}*/
 
-		allmakefiles = new LinkedHashSet();
-		allopts = new LinkedHashSet();
+		allmakefiles = new LinkedHashSet<String>();
+		allopts = new LinkedHashSet<String>();
 		String name = null;
 		if(mfiles==null)return;
 		for (int i = 0; i < mfiles.length; i++) {
@@ -552,9 +552,9 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 			/*If there are valid makefiles, put each one in the fresh combobox*/
 			if ((selmakefiles != null) && (selmakefiles.size() > 0)) {
-				Iterator i = selmakefiles.iterator();
+				Iterator<String> i = selmakefiles.iterator();
 				while (i.hasNext()) {
-					adding = (String) i.next();
+					adding = i.next();
 					/*
 					 * We want to select the minimal (shortest) makefile by default
 					 */
@@ -604,19 +604,19 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	 * contain every option in selopts
 	 */
 	private void selectMakefiles() {
-		selmakefiles = new LinkedHashSet();
-		Iterator allit = allmakefiles.iterator();
+		selmakefiles = new LinkedHashSet<String>();
+		Iterator<String> allit = allmakefiles.iterator();
 		String curmake = "";
 		String curopt = "";
 		// Look at each makefile individually
 		while (allit.hasNext()) {
-			Iterator nameit = selopts.iterator();
+			Iterator<String> nameit = selopts.iterator();
 			// Assume the makefile meets the desired criteria
 			boolean hasall = true;
-			curmake = (String) allit.next();
+			curmake = allit.next();
 			// Look at each option in the selected options
 			while (nameit.hasNext()) {
-				curopt = (String) nameit.next();
+				curopt = nameit.next();
 				// If the makefile is missing a required option, mark it a
 				// failure and keep checking
 				if (curmake.indexOf("-" + curopt) <= 0) {
@@ -904,7 +904,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				ITAULaunchConfigurationConstants.SELECT_FILE, "");
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.ENVVARS,
-				(Map) null);
+				(Map<String, Object>) null);
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,
 				"");
@@ -918,7 +918,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 
-			selopts = new LinkedHashSet();
+			selopts = new LinkedHashSet<String>();
 			
 			initMakefiles();
 			initMakeChecks();
@@ -992,7 +992,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 					ITAULaunchConfigurationConstants.PORTAL, false));
 
 			varmap = archvarmap = configuration.getAttribute(
-					ITAULaunchConfigurationConstants.ENVVARS, (Map) null);
+					ITAULaunchConfigurationConstants.ENVVARS, (Map<String,Object>) null);
 
 			Activator.getDefault().getPluginPreferences().setDefault("TAUCheckForAutoOptions",true);
 			
@@ -1018,6 +1018,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		for(int i=0;i<dbs.length;i++)
 		{
 			dbCombo.add(dbs[i]);
+			//System.out.println(dbs[i]);
 		}
 		
 		if(selected==null||dbCombo.indexOf(selected)<0)
@@ -1056,18 +1057,18 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				|| ((varmap != null) && (archvarmap == null))
 				|| ((varmap != null) && (archvarmap != null) && !varmap
 						.equals(archvarmap))) {
-			Map envvars = null;
+			Map<String, Object> envvars = null;
 
 			try {
 				envvars = configuration.getAttribute(
-						ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
+						ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, Object>) null);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
 
 			if ((envvars != null) && (envvars.size() > 0)
 					&& (archvarmap != null) && (archvarmap.size() > 0)) {
-				Iterator archit = archvarmap.keySet().iterator();
+				Iterator<String> archit = archvarmap.keySet().iterator();
 				while (archit.hasNext()) {
 					envvars.remove(archit.next());
 				}
@@ -1075,7 +1076,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 			if ((varmap != null) && (varmap.size() > 0)) {
 				if (envvars == null) {
-					envvars = new HashMap();
+					envvars = new HashMap<String, Object>();
 				}
 				envvars.putAll(varmap);
 			}
@@ -1128,7 +1129,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKENAME, tauMakeName);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex()));
 		
-		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, PerfDMFView.extractDatabaseName(dbCombo.getItem(dbCombo.getSelectionIndex())));
+		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, dbCombo.getItem(dbCombo.getSelectionIndex()));
 		
 		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.TOOLCONFNAME+"TAU", "_"+tauMakeName.substring(tauMakeName.lastIndexOf(".")+1));
 		//.setDefault("TAUCheckForAutoOptions",true);
@@ -1266,12 +1267,12 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				Object[] selected = papidialog.getResult();
 
 				if ((selected != null) && (selected.length > 0)) {
-					LinkedHashSet selset = new LinkedHashSet(Arrays
+					LinkedHashSet<Object> selset = new LinkedHashSet<Object>(Arrays
 							.asList(selected));
 
-					varmap = new HashMap(selset.size());
+					varmap = new HashMap<String, Object>(selset.size());
 					varmap.put("COUNTER1", "GET_TIME_OF_DAY");
-					Iterator varit = selset.iterator();
+					Iterator<Object> varit = selset.iterator();
 					int counter = 2;
 					while (varit.hasNext()) {
 						varmap.put("COUNTER" + counter, varit.next());

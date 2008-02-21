@@ -87,7 +87,8 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 		return parent;
 	}
 
-	private void loadSaved()
+	/*This may be unused...*/
+	protected void loadSaved()
 	{
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		

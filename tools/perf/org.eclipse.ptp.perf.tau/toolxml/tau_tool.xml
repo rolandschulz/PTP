@@ -5,7 +5,7 @@
 		<CXX command="tau_cxx.sh" group="tau"/>
 		<F90 command="tau_f90.sh" group="tau"/>
 		<allcompilers group="tau">
-		<optionpane title="Tau Compiler" prependwith="-tau_options=" enclosewith="'" seperatewith=" " virtual="true">
+		<optionpane title="Tau Compiler" prependwith="-tau_options=" enclosewith="'" separatewith=" " virtual="true">
 			<togoption label="Verbose" optname="-optVerbose" tooltip="Turn on verbose debugging message"/>
 			<togoption label="KeepFiles" optname="-optKeepFiles" tooltip="Does not remove intermediate .pdb and .inst.* files"/>
 			<togoption label="TauSelectFile" optname="-optTauSelectFile" tooltip="Specify selective instrumentation file for tau_instrumentor">

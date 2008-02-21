@@ -24,16 +24,15 @@ import java.io.FilenameFilter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.perf.AbstractPerformanceDataManager;
-import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
 import org.eclipse.ptp.perf.tau.perfdmf.PerfDMFUIPlugin;
+import org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
-	private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+	//private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 	/**
 	 * Returns the TAU makefile associated with the supplied launch configuration
 	 * @param configuration
@@ -103,7 +102,7 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			boolean runtauinc = configuration.getAttribute(ITAULaunchConfigurationConstants.TAUINC, false);
 			boolean keepprofs = configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false);
 			boolean useportal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
-			manageProfiles(directory, projname, projtype, tbpath, configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null), now, keepprofs,useportal, runtauinc);
+			manageProfiles(directory, projname, projtype, tbpath, PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null)), now, keepprofs,useportal, runtauinc);
 			
 		}
 		
@@ -192,7 +191,8 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 						System.out.println(tauinc);
 						try{
 							String[] cmd = {"sh", "-c", tauinc};
-							Process p = Runtime.getRuntime().exec(cmd);
+							//Process p = 
+							Runtime.getRuntime().exec(cmd);
 						}
 						catch (Exception e) {e.printStackTrace();}
 					}

@@ -6,14 +6,14 @@
          point="org.eclipse.ui.views">
       <category
             name="Performance Analysis"
-            id="org.eclipse.ptp.tau.perfdmf">
+            id="org.eclipse.ptp.perf.tau.perfdmf">
       </category>
       <view
             name="Performance Data Manager"
             icon="icons/tauLogo.gif"
-            category="org.eclipse.ptp.tau.perfdmf"
+            category="org.eclipse.ptp.perf.tau.perfdmf"
             class="org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView"
-            id="org.eclipse.ptp.tau.perfdmf.views.PerfDMFView">
+            id="org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView">
       </view>
    </extension>
    <extension
@@ -24,7 +24,7 @@
                ratio="0.5"
                relative="org.eclipse.ui.views.TaskList"
                relationship="right"
-               id="org.eclipse.ptp.tau.perfdmf.views.PerfDMFView">
+               id="org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView">
          </view>
       </perspectiveExtension>
    </extension>

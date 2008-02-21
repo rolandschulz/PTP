@@ -118,7 +118,7 @@ public class PerfDMFView extends ViewPart {
         private Object userObject;
         private TreeNode parent;
 
-        private ArrayList children = new ArrayList();
+        private ArrayList<TreeNode> children = new ArrayList<TreeNode>();
 
         public TreeNode(String name, Object userObject) {
             this.name = name;
@@ -164,7 +164,7 @@ public class PerfDMFView extends ViewPart {
         }
 
         public TreeNode[] getChildren() {
-            return (TreeNode[]) children.toArray(new TreeNode[children.size()]);
+            return children.toArray(new TreeNode[children.size()]);
         }
 
         public boolean hasChildren() {
@@ -225,14 +225,14 @@ public class PerfDMFView extends ViewPart {
      */
     public static String[] getDatabaseNames()
     {
-    	 List dbs = Database.getDatabases();
+    	 List<Database> dbs = Database.getDatabases();
     	 
     	 if(dbs.size()==0)
     		 return null;
     	 
     	 String[] names = new String[dbs.size()];
     	 
-    	 Iterator dit = dbs.iterator();
+    	 Iterator<Database> dit = dbs.iterator();
     	 int i=0;
          while(dit.hasNext())
          {
@@ -279,7 +279,7 @@ public class PerfDMFView extends ViewPart {
      */
     public Database getDatabase(String name)
     {
-    	 List dbs = Database.getDatabases();
+    	 List<Database> dbs = Database.getDatabases();
          if (dbs.size() < 1) {
              // do something
              //throw new FileNotFoundException("perfdmf.cfg not found");
@@ -287,7 +287,7 @@ public class PerfDMFView extends ViewPart {
          	return null;
          }
          
-         Iterator dit = dbs.iterator();
+         Iterator<Database> dit = dbs.iterator();
          
          while(dit.hasNext())
          {
@@ -465,20 +465,20 @@ public class PerfDMFView extends ViewPart {
                 //dbApi.initialize(perfdmf, false);
 
 
-                for (Iterator it = dbApi.getApplicationList().iterator(); it.hasNext();) {
+                for (Iterator<Application> it = dbApi.getApplicationList().iterator(); it.hasNext();) {
                     Application app = (Application) it.next();
                     dbApi.setApplication(app);
                     System.out.println("> " + app.getName());
 
                     TreeNode root = new TreeNode(app.getName(), app);
-                    for (Iterator it2 = dbApi.getExperimentList().iterator(); it2.hasNext();) {
+                    for (Iterator<Experiment> it2 = dbApi.getExperimentList().iterator(); it2.hasNext();) {
                         Experiment exp = (Experiment) it2.next();
                         dbApi.setExperiment(exp);
                         System.out.println("-> " + exp.getName());
 
                         TreeNode tp = new TreeNode(exp.getName(), exp);
 
-                        for (Iterator it3 = dbApi.getTrialList().iterator(); it3.hasNext();) {
+                        for (Iterator<Trial> it3 = dbApi.getTrialList().iterator(); it3.hasNext();) {
                             Trial trial = (Trial) it3.next();
                             System.out.println("--> " + trial.getName());
                             TreeNode to = new TreeNode(trial.getName(), trial);

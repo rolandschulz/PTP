@@ -46,7 +46,7 @@ public class LaunchImages {
 	
 	// The plugin registry
 	private static ImageRegistry imageRegistry = null;
-	private static HashMap avoidSWTErrorMap = null;
+	private static HashMap<String, ImageDescriptor> avoidSWTErrorMap = null;
 
 	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif";
 	public static final String IMG_ANALYSIS_TAB = NAME_PREFIX + "tauLogo.gif";//parallel_tab.gif
@@ -75,7 +75,7 @@ public class LaunchImages {
 	private static ImageRegistry getImageRegistry() {
 		if (imageRegistry == null) {
 			imageRegistry = new ImageRegistry();
-			for (Iterator iter = avoidSWTErrorMap.keySet().iterator(); iter.hasNext();) {
+			for (Iterator<String> iter = avoidSWTErrorMap.keySet().iterator(); iter.hasNext();) {
 				String key = (String) iter.next();
 				imageRegistry.put(key, (ImageDescriptor) avoidSWTErrorMap.get(key));
 			}
@@ -88,7 +88,7 @@ public class LaunchImages {
 		try {
 			ImageDescriptor result = ImageDescriptor.createFromURL(makeIconFileURL(name.substring(NAME_PREFIX_LENGTH)));
 			if (avoidSWTErrorMap == null) {
-				avoidSWTErrorMap = new HashMap(); 
+				avoidSWTErrorMap = new HashMap<String, ImageDescriptor>(); 
 			}
 			avoidSWTErrorMap.put(name, result);
 			if (imageRegistry != null) {

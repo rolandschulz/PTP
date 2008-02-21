@@ -24,7 +24,7 @@
       <page
             category="org.eclipse.ptp.perf.performanceToolsMainpage"
             class="org.eclipse.ptp.perf.tau.TAUPrefPage"
-            id="org.eclipse.ptp.tau.tauconfigpage"
+            id="org.eclipse.ptp.perf.tau.tauconfigpage"
             name="TAU Configuration">
       </page>
    </extension>
