@@ -28,7 +28,6 @@ package org.eclipse.ptp.debug.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -45,7 +44,7 @@ public interface IPDebugger {
 	 * @return
 	 * @throws CoreException
 	 */
-	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor) throws CoreException;
+	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException;
 
 	/**
 	 * Initialize the debugger. This does whatever is necessary to get the debugger ready
