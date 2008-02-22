@@ -24,7 +24,6 @@ import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueArray;
-import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
@@ -34,12 +33,18 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 	private AbstractPVariable fParent = null;
 
 	public AbstractPValue(AbstractPVariable parent) {
-		super((PSession)parent.getSession(), parent.getTasks());
+		super(parent.getSession(), parent.getTasks());
 		fParent = parent;
 	}
-	public AbstractPVariable getParentVariable() {
-		return fParent;
-	}
+
+	/**
+	 * 
+	 */
+	public abstract void dispose();
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPValue#evaluateAsExpression(org.eclipse.ptp.debug.core.model.IPStackFrame)
+	 */
 	public String evaluateAsExpression(IPStackFrame frame) {
 		String valueString = "";
 		AbstractPVariable parent = getParentVariable();
@@ -50,25 +55,40 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 					if (value instanceof IAIFValueArray) {
 						//TODO if value is array, show nothing.  Prevent no value for partial aif
 						valueString = "";
-					}
-					else {
+					} else {
 						valueString = value.getValueString();
 						if (valueString == null || valueString.length() == 0)
 							valueString = frame.evaluateExpressionToString(parent.getExpressionString());
 					}
-				}
-				catch (AIFException e) {
+				} catch (AIFException e) {
 					valueString = e.getMessage();
-				}
-				catch (DebugException e) {
+				} catch (DebugException e) {
 					valueString = e.getMessage();
 				}
 			}
 		}
 		return valueString;
 	}
-	abstract protected void setChanged(boolean changed);
-	abstract public void dispose();
-	abstract protected void reset();
-	abstract protected void preserve();
+
+	/**
+	 * @return
+	 */
+	public AbstractPVariable getParentVariable() {
+		return fParent;
+	}
+
+	/**
+	 * 
+	 */
+	protected abstract void preserve();
+
+	/**
+	 * 
+	 */
+	protected abstract void reset();
+
+	/**
+	 * @param changed
+	 */
+	protected abstract void setChanged(boolean changed);
 }

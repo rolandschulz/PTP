@@ -51,88 +51,155 @@ import org.eclipse.ptp.debug.core.model.PDebugElementState;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
-import org.eclipse.ptp.debug.internal.core.PSession;
 
 public abstract class PDebugElement extends PlatformObject implements IPDebugElement, IPDebugElementStatus {
+	/**
+	 * @param message
+	 * @throws DebugException
+	 */
+	public static void notSupported(String message) throws DebugException {
+		throwDebugException(message, DebugException.NOT_SUPPORTED, null);
+	}
+
+	/**
+	 * @param message
+	 * @param e
+	 * @throws DebugException
+	 */
+	public static void requestFailed(String message, Exception e) throws DebugException {
+		requestFailed(message, e, DebugException.REQUEST_FAILED);
+	}
+
+	/**
+	 * @param message
+	 * @param e
+	 * @param code
+	 * @throws DebugException
+	 */
+	public static void requestFailed(String message, Throwable e, int code) throws DebugException {
+		throwDebugException(message, code, e);
+	}
+
+	/**
+	 * @param message
+	 * @param e
+	 * @throws DebugException
+	 */
+	public static void targetRequestFailed(String message, PDIException e) throws DebugException {
+		requestFailed(MessageFormat.format("Target request failed: {0}.", new Object[] { message }), e,
+				DebugException.TARGET_REQUEST_FAILED);
+	}
+
+	/**
+	 * @param message
+	 * @param e
+	 * @throws DebugException
+	 */
+	public static void targetRequestFailed(String message, Throwable e) throws DebugException {
+		throwDebugException(MessageFormat.format("Target request failed: {0}.", new Object[] { message }),
+				DebugException.TARGET_REQUEST_FAILED, e);
+	}
+
+	/**
+	 * @param message
+	 * @param code
+	 * @param exception
+	 * @throws DebugException
+	 */
+	protected static void throwDebugException(String message, int code, Throwable exception) throws DebugException {
+		throw new DebugException(new Status(IStatus.ERROR, PDebugModel.getPluginIdentifier(), code, message, exception));
+	}
+
 	private int fSeverity = IPDebugElementStatus.OK;
+
 	private String fMessage = null;
 	private PDebugElementState fState = PDebugElementState.UNDEFINED;
 	private PDebugElementState fOldState = PDebugElementState.UNDEFINED;
 	private Object fCurrentStateInfo = null;
-	protected PSession fSession = null;
-	protected BitList tasks = null;
+	protected final IPSession fSession;
+	protected final BitList tasks;
 
-	public PDebugElement(PSession session, BitList tasks) {
+	public PDebugElement(IPSession session, BitList tasks) {
 		fSession = session;
 		this.tasks = tasks;
 	}
-	public String getModelIdentifier() {
-		return PDebugModel.getPluginIdentifier();
-	}
-	protected void logError(Exception e) {
-		DebugPlugin.log(e);
-	}
-	protected void logError(String message) {
-		DebugPlugin.logMessage(message, null);
-	}
-	protected void fireEvent(DebugEvent event) {
-		DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
-	}
-	protected void fireEventSet(DebugEvent[] events) {
-		DebugPlugin.getDefault().fireDebugEventSet(events);
-	}
-	public void fireCreationEvent() {
-		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
-	}
-	public DebugEvent createCreateEvent() {
-		return new DebugEvent(this, DebugEvent.CREATE);
-	}
-	public void fireResumeEvent(int detail) {
-		fireEvent(new DebugEvent(this, DebugEvent.RESUME, detail));
-	}
-	public DebugEvent createResumeEvent(int detail) {
-		return new DebugEvent(this, DebugEvent.RESUME, detail);
-	}
-	public void fireSuspendEvent(int detail) {
-		fireEvent(new DebugEvent(this, DebugEvent.SUSPEND, detail));
-	}
-	public DebugEvent createSuspendEvent(int detail) {
-		return new DebugEvent(this, DebugEvent.SUSPEND, detail);
-	}
-	public void fireTerminateEvent() {
-		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
-	}
-	public DebugEvent createTerminateEvent() {
-		return new DebugEvent(this, DebugEvent.TERMINATE);
-	}
-	public void fireChangeEvent(int detail) {
-		fireEvent(new DebugEvent(this, DebugEvent.CHANGE, detail));
-	}
+
+	/**
+	 * @param detail
+	 * @return
+	 */
 	public DebugEvent createChangeEvent(int detail) {
 		return new DebugEvent(this, DebugEvent.CHANGE, detail);
 	}
-	public static void requestFailed(String message, Exception e) throws DebugException {
-		requestFailed(message, e, DebugException.REQUEST_FAILED);
+
+	/**
+	 * @return
+	 */
+	public DebugEvent createCreateEvent() {
+		return new DebugEvent(this, DebugEvent.CREATE);
 	}
-	public static void targetRequestFailed(String message, PDIException e) throws DebugException {
-		requestFailed(MessageFormat.format("Target request failed: {0}.", new Object[] { message }), e, DebugException.TARGET_REQUEST_FAILED);
+
+	/**
+	 * @param detail
+	 * @return
+	 */
+	public DebugEvent createResumeEvent(int detail) {
+		return new DebugEvent(this, DebugEvent.RESUME, detail);
 	}
-	public static void requestFailed(String message, Throwable e, int code) throws DebugException {
-		throwDebugException(message, code, e);
+
+	/**
+	 * @param detail
+	 * @return
+	 */
+	public DebugEvent createSuspendEvent(int detail) {
+		return new DebugEvent(this, DebugEvent.SUSPEND, detail);
 	}
-	public static void targetRequestFailed(String message, Throwable e) throws DebugException {
-		throwDebugException(MessageFormat.format("Target request failed: {0}.", new Object[] { message }), DebugException.TARGET_REQUEST_FAILED, e);
+
+	/**
+	 * @return
+	 */
+	public DebugEvent createTerminateEvent() {
+		return new DebugEvent(this, DebugEvent.TERMINATE);
 	}
-	public static void notSupported(String message) throws DebugException {
-		throwDebugException(message, DebugException.NOT_SUPPORTED, null);
+
+	/**
+	 * @param detail
+	 */
+	public void fireChangeEvent(int detail) {
+		fireEvent(new DebugEvent(this, DebugEvent.CHANGE, detail));
 	}
-	protected static void throwDebugException(String message, int code, Throwable exception) throws DebugException {
-		throw new DebugException(new Status(IStatus.ERROR, PDebugModel.getPluginIdentifier(), code, message, exception));
+
+	/**
+	 * 
+	 */
+	public void fireCreationEvent() {
+		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 	}
-	protected void infoMessage(Throwable e) {
-		IStatus newStatus = new Status(IStatus.INFO, PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e.getMessage(), null);
-		PDebugUtils.info(newStatus, getDebugTarget());
+
+	/**
+	 * @param detail
+	 */
+	public void fireResumeEvent(int detail) {
+		fireEvent(new DebugEvent(this, DebugEvent.RESUME, detail));
 	}
+
+	/**
+	 * @param detail
+	 */
+	public void fireSuspendEvent(int detail) {
+		fireEvent(new DebugEvent(this, DebugEvent.SUSPEND, detail));
+	}
+
+	/**
+	 * 
+	 */
+	public void fireTerminateEvent() {
+		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IDebugElement.class))
 			return this;
@@ -151,64 +218,187 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 
 		return super.getAdapter(adapter);
 	}
-	protected void setStatus(int severity, String message) {
-		fSeverity = severity;
-		fMessage = message;
-		if (fMessage != null)
-			fMessage.trim();
-	}
-	protected void resetStatus() {
-		fSeverity = IPDebugElementStatus.OK;
-		fMessage = null;
-	}
-	public boolean isOK() {
-		return (fSeverity == IPDebugElementStatus.OK);
-	}
-	public int getSeverity() {
-		return fSeverity;
-	}
-	public String getMessage() {
-		return fMessage;
-	}
-	public PDebugElementState getState() {
-		return fState;
-	}
-	protected synchronized void setState(PDebugElementState state) throws IllegalArgumentException {
-		fOldState = fState;
-		fState = state;
-	}
-	protected synchronized void restoreState() {
-		fState = fOldState;
-	}
-	public Object getCurrentStateInfo() {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getCurrentStateInfo()
+	 */
+	public synchronized Object getCurrentStateInfo() {
 		return fCurrentStateInfo;
 	}
-	protected void setCurrentStateInfo(Object currentStateInfo) {
-		fCurrentStateInfo = currentStateInfo;
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
+	 */
+	public IDebugTarget getDebugTarget() {
+		// return fSession.findDebugTarget(getTasks());
+		return fSession.getLaunch().getDebugTarget(getID());
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getID()
+	 */
+	public int getID() {
+		return tasks.nextSetBit(0);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
+	 */
 	public ILaunch getLaunch() {
 		return fSession.getLaunch();
 	}
-	public BitList getTasks() {
-		return tasks;
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElementStatus#getMessage()
+	 */
+	public String getMessage() {
+		return fMessage;
 	}
-	public IPSession getSession() {
-		return fSession;
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
+	 */
+	public String getModelIdentifier() {
+		return PDebugModel.getPluginIdentifier();
 	}
+
+	/**
+	 * @return
+	 */
 	public IPDISession getPDISession() {
 		return fSession.getPDISession();
 	}
+
+	/**
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDITarget getPDITarget() throws PDIException {
 		IPDebugTarget debugTarget = fSession.findDebugTarget(getTasks());
-		if (debugTarget == null)
+		if (debugTarget == null) {
 			throw new PDIException(getTasks(), "No PDITarget found");
+		}
 		return debugTarget.getPDITarget();
 	}
-	public IDebugTarget getDebugTarget() {
-		//return fSession.findDebugTarget(getTasks());
-		return fSession.getLaunch().getDebugTarget(getID());
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getSession()
+	 */
+	public IPSession getSession() {
+		return fSession;
 	}
-	public int getID() {
-		return tasks.nextSetBit(0);
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElementStatus#getSeverity()
+	 */
+	public synchronized int getSeverity() {
+		return fSeverity;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getState()
+	 */
+	public PDebugElementState getState() {
+		synchronized (fState) {
+			return fState;
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public BitList getTasks() {
+		return tasks;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPDebugElementStatus#isOK()
+	 */
+	public synchronized boolean isOK() {
+		return (fSeverity == IPDebugElementStatus.OK);
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireEvent(DebugEvent event) {
+		DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
+	}
+
+	/**
+	 * @param events
+	 */
+	protected void fireEventSet(DebugEvent[] events) {
+		DebugPlugin.getDefault().fireDebugEventSet(events);
+	}
+
+	/**
+	 * @param e
+	 */
+	protected void infoMessage(Throwable e) {
+		IStatus newStatus = new Status(IStatus.INFO, PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e
+				.getMessage(), null);
+		PDebugUtils.info(newStatus, getDebugTarget());
+	}
+
+	/**
+	 * @param e
+	 */
+	protected void logError(Exception e) {
+		DebugPlugin.log(e);
+	}
+
+	/**
+	 * @param message
+	 */
+	protected void logError(String message) {
+		DebugPlugin.logMessage(message, null);
+	}
+
+	/**
+	 * 
+	 */
+	protected synchronized void resetStatus() {
+		fSeverity = IPDebugElementStatus.OK;
+		fMessage = null;
+	}
+
+	/**
+	 * 
+	 */
+	protected void restoreState() {
+		synchronized (fState) {
+			fState = fOldState;
+		}
+	}
+
+	/**
+	 * @param currentStateInfo
+	 */
+	protected synchronized void setCurrentStateInfo(Object currentStateInfo) {
+		fCurrentStateInfo = currentStateInfo;
+	}
+
+	/**
+	 * @param state
+	 * @throws IllegalArgumentException
+	 */
+	protected void setState(PDebugElementState state) throws IllegalArgumentException {
+		synchronized (fState) {
+			fOldState = fState;
+			fState = state;
+		}
+	}
+
+	/**
+	 * @param severity
+	 * @param message
+	 */
+	protected synchronized void setStatus(int severity, String message) {
+		fSeverity = severity;
+		fMessage = message;
+		if (fMessage != null) {
+			fMessage.trim();
+		}
 	}
 }
