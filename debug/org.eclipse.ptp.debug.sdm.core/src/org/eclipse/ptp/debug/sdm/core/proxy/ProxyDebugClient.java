@@ -88,8 +88,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	/**
 	 * Wait for the debugger to connect. We will receive a connected event
 	 * when the debug server actually connects, or a timeout event if the server
-	 * fails to connect. If the user cancels the wait, we call doShutdown() to
-	 * terminate the debugger connection.
+	 * fails to connect.
 	 * 
 	 * @param monitor
 	 * @return true on successful connection, false otherwise
@@ -103,13 +102,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		waitLock.lock();
 		try {
 			if (state == DebugProxyState.CONNECTING) {
-				while (state != DebugProxyState.CONNECTED && !timeout && !monitor.isCanceled()) {
+				while (state == DebugProxyState.CONNECTING && !timeout && !monitor.isCanceled()) {
 					waiting = true;
 					try {
 						//added to wait for 1000
 						waitCondition.await(1000, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is cancelled
+						// Expect to be interrupted if monitor is canceled
 						monitor.setCanceled(true);
 					}
 				}
@@ -117,7 +116,9 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 					throw new IOException("Timeout waiting for debugger to connect");
 				}
 				if (monitor.isCanceled()) {
-					doShutdown();
+					return false;
+				}
+				if (state != DebugProxyState.CONNECTED) {
 					return false;
 				}
 			}

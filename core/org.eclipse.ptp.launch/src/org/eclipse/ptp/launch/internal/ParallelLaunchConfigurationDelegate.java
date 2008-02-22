@@ -74,8 +74,10 @@ public class ParallelLaunchConfigurationDelegate
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								if (monitor.isCanceled())
+								if (monitor.isCanceled()) {
 									throw new InterruptedException("The job is cancelled."); //$NON-NLS-1$
+								}
+								monitor.beginTask("Debugger has started, waiting for connection...", 1); //$NON-NLS-1$
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch, project, execPath);
 
@@ -146,12 +148,13 @@ public class ParallelLaunchConfigurationDelegate
 				
 				/*
 				 * Create the debugger extension, then the connection point for the debug server. 
-				 * The debug server is created when the job is launched via the submitJob() command.
+				 * The debug server is launched via the submitJob() command.
 				 */
 				
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
-				debugger.initialize(configuration, attrManager);
+				debugger.initialize(attrManager);
+				debugger.getLaunchAttributes(configuration, attrManager);
 			}
 			
 			monitor.worked(10);
