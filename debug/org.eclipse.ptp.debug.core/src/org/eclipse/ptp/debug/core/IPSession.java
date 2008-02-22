@@ -18,24 +18,36 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
-import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
-import org.eclipse.ptp.debug.internal.core.PSetManager;
 
 public interface IPSession extends IAdaptable {
+	/**
+	 * @param monitor
+	 * @param app
+	 * @param path
+	 * @param cwd
+	 * @param args
+	 * @throws CoreException
+	 */
+	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String cwd, String[] args) throws CoreException;
+
 	/**
 	 * @param tasks
 	 * @param refresh
 	 * @param register
 	 */
 	public void createDebugTarget(BitList tasks, boolean refresh, boolean register);
-
+	
 	/**
 	 * @param tasks
 	 * @param refresh
@@ -60,6 +72,13 @@ public interface IPSession extends IAdaptable {
 	public IPDebugTarget findDebugTarget(BitList tasks);
 
 	/**
+	 * @param change
+	 * @param breakpoint
+	 * @param info
+	 */
+	public void fireDebugEvent(int change, int breakpoint, IPDebugInfo info);
+
+	/**
 	 * @param state
 	 */
 	public void forceStoppedDebugger(ProcessAttributes.State state);
@@ -67,17 +86,28 @@ public interface IPSession extends IAdaptable {
 	/**
 	 * @return
 	 */
-	public PBreakpointManager getBreakpointManager();
+	public IPBreakpointManager getBreakpointManager();
 
+	/**
+	 * @param tasks
+	 * @return
+	 */
+	public IPDebugInfo getDebugInfo(BitList tasks);
+	
 	/**
 	 * @return
 	 */
 	public IPJob getJob();
-
+	
 	/**
 	 * @return
 	 */
 	public IPLaunch getLaunch();
+	
+	/**
+	 * @return
+	 */
+	public IPMemoryManager getMemoryManager();
 
 	/**
 	 * @return
@@ -87,7 +117,22 @@ public interface IPSession extends IAdaptable {
 	/**
 	 * @return
 	 */
-	public PSetManager getSetManager();
+	public IProject getProject();
+
+	/**
+	 * @return
+	 */
+	public IPRegisterManager getRegisterManager();
+
+	/**
+	 * @return
+	 */
+	public IPSetManager getSetManager();
+
+	/**
+	 * @return
+	 */
+	public IPSignalManager getSignalManager();
 
 	/**
 	 * @return
@@ -99,7 +144,7 @@ public interface IPSession extends IAdaptable {
 	 * @return
 	 */
 	public BitList getTasks(int id);
-
+	
 	/**
 	 * @return
 	 */
