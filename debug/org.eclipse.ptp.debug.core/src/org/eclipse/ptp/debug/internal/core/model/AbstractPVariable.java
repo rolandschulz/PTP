@@ -21,25 +21,50 @@ package org.eclipse.ptp.debug.internal.core.model;
 import org.eclipse.ptp.debug.core.model.IEnableDisableTarget;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPVariable;
-import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public abstract class AbstractPVariable extends PDebugElement implements IPVariable {
 	private PDebugElement fParent;
 
 	public AbstractPVariable(PDebugElement parent) {
-		super((PSession)parent.getSession(), parent.getTasks());
+		super(parent.getSession(), parent.getTasks());
 		setParent(parent);
 	}
-	protected PDebugElement getParent() {
-		return fParent;
+
+	/**
+	 * 
+	 */
+	public abstract void dispose();
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java.lang.Class)
+	 */
+	public Object getAdapter(Class adapter) {
+		if (adapter.equals(IEnableDisableTarget.class))
+			return this;
+		return super.getAdapter(adapter);
 	}
+
+	/**
+	 * @param parent
+	 */
 	private void setParent(PDebugElement parent) {
 		fParent = parent;
 	}
+
+	/**
+	 * @return
+	 */
+	protected PDebugElement getParent() {
+		return fParent;
+	}
+
+	/**
+	 * @return
+	 */
 	protected IPStackFrame getStackFrame() {
 		PDebugElement parent = getParent();
 		if (parent instanceof AbstractPValue) {
@@ -51,13 +76,19 @@ public abstract class AbstractPVariable extends PDebugElement implements IPVaria
 			return (PStackFrame) parent;
 		return null;
 	}
-	public Object getAdapter(Class adapter) {
-		if (adapter.equals(IEnableDisableTarget.class))
-			return this;
-		return super.getAdapter(adapter);
-	}
-	public abstract void dispose();
-	protected abstract void resetValue();
-	protected abstract void setChanged(boolean changed);
+
+	/**
+	 * 
+	 */
 	protected abstract void preserve();
+
+	/**
+	 * 
+	 */
+	protected abstract void resetValue();
+
+	/**
+	 * @param changed
+	 */
+	protected abstract void setChanged(boolean changed);
 }
