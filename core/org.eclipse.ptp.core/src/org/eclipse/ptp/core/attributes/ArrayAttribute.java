@@ -13,7 +13,6 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -61,7 +60,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
 	 */
 	public synchronized List<T> getValue() {
-		return Collections.unmodifiableList(value);
+		return value;
 	}
 
 	/* (non-Javadoc)
