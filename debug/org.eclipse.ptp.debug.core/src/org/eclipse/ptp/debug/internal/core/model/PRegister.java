@@ -287,7 +287,7 @@ public class PRegister extends PVariable implements IPRegister {
 			frame = getCurrentStackFrame();
 		return frame;
 	}
-	protected PStackFrame getCurrentStackFrame() {
+	protected IPStackFrame getCurrentStackFrame() {
 		return fSession.getRegisterManager().getCurrentFrame(getTasks());
 	}
 	protected void createOriginal(IPDIVariableDescriptor vo) {
