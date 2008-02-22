@@ -122,24 +122,41 @@ public class ToolMaker {
 		comp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		createVerticalSpacer(comp, 3);
 		
-		pane.showOpts = new Text(comp,SWT.BORDER|SWT.WRAP|SWT.MULTI|SWT.V_SCROLL);
-		GridData showOptGD = new GridData();
-		showOptGD.horizontalAlignment=SWT.FILL;
-		showOptGD.verticalAlignment=SWT.FILL;
-		showOptGD.horizontalSpan=3;
-		showOptGD.grabExcessHorizontalSpace=true;
-		//showOptGD.grabExcessVerticalSpace=true;
-		showOptGD.minimumHeight=pane.showOpts.getLineHeight()*3;
-		showOptGD.heightHint=pane.showOpts.getLineHeight()*3;
+		if(pane.displayOptions)
+		{
+			pane.showOpts = new Text(comp,SWT.BORDER|SWT.WRAP|SWT.MULTI|SWT.V_SCROLL);
+			GridData showOptGD = new GridData();
+			showOptGD.horizontalAlignment=SWT.FILL;
+			showOptGD.verticalAlignment=SWT.FILL;
+			showOptGD.horizontalSpan=3;
+			showOptGD.grabExcessHorizontalSpace=true;
+			//showOptGD.grabExcessVerticalSpace=true;
+			showOptGD.minimumHeight=pane.showOpts.getLineHeight()*3;
+			showOptGD.heightHint=pane.showOpts.getLineHeight()*3;
 
-		pane.showOpts.setEditable(false);
-		pane.showOpts.setLayoutData(showOptGD);
-		
+			pane.showOpts.setEditable(false);
+			pane.showOpts.setLayoutData(showOptGD);
+		}
 		for(int i=0;i<pane.options.length;i++)
 		{
 			displayToolOption(comp,pane.options[i], pane.browseListener,checkListener);
 		}
 		createVerticalSpacer(comp, 3);
+	}
+	
+	private static void initializeCheckLabel(Composite comp, ToolOption toolOpt)
+	{
+		if(!toolOpt.required)
+		{
+			toolOpt.unitCheck = createCheckButton(comp, toolOpt.optLabel);
+			toolOpt.unitCheck.setToolTipText(toolOpt.toolTip);
+		}
+		else
+		{
+			toolOpt.reqLabel=new Label(comp, SWT.NONE);
+			toolOpt.reqLabel.setText(toolOpt.optLabel);
+			toolOpt.reqLabel.setToolTipText(toolOpt.toolTip);
+		}
 	}
 	
 	/**
@@ -151,16 +168,11 @@ public class ToolMaker {
 	 */
 	protected static void displayToolOption(Composite comp, ToolOption toolOpt, SelectionListener browseListener, ToolPaneListener checkListener){
 		if (toolOpt.type == ToolOption.BOOL) {
-			toolOpt.unitCheck = createCheckButton(comp, toolOpt.optLabel);
-			toolOpt.unitCheck.setToolTipText(toolOpt.toolTip);
+			initializeCheckLabel(comp,toolOpt);
 			new Label(comp, SWT.NULL);
 			new Label(comp, SWT.NULL);
 		} else if (toolOpt.type == ToolOption.TEXT) {
-			//argComp = new Composite(comp, SWT.NONE);
-			//argComp.setLayout(createGridLayout(2, false, 0, 0));
-			//argComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			toolOpt.unitCheck = createCheckButton(comp, toolOpt.optLabel);
-			toolOpt.unitCheck.setToolTipText(toolOpt.toolTip);
+			initializeCheckLabel(comp,toolOpt);
 
 			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
 			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -169,11 +181,7 @@ public class ToolMaker {
 
 			new Label(comp, SWT.NULL);
 		} else {
-			//argComp = new Composite(comp, SWT.NONE);
-			//argComp.setLayout(createGridLayout(3, false, 0, 0));
-			//argComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			toolOpt.unitCheck = createCheckButton(comp, toolOpt.optLabel);
-			toolOpt.unitCheck.setToolTipText(toolOpt.toolTip);
+			initializeCheckLabel(comp,toolOpt);
 
 			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
 			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -183,13 +191,8 @@ public class ToolMaker {
 			toolOpt.browser = createPushButton(comp, "Browse");
 			if(browseListener!=null)
 				toolOpt.browser.addSelectionListener(browseListener);
-			//if (type == DIR) {
-				//					browser.addSelectionListener(listener);
-			//} else if (type == FILE) {
-				//browser.addSelectionListener(listener);
-			//}
 		}
-		if(checkListener!=null)
+		if(checkListener!=null&&toolOpt.unitCheck!=null)
 			toolOpt.unitCheck.addSelectionListener(checkListener);
 	}
 	

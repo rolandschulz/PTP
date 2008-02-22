@@ -19,6 +19,7 @@ package org.eclipse.ptp.perf.toolopts;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -36,9 +37,14 @@ public class ToolOption {
 	public static final int SUBOPT = 6;
 	
 	/**
-	 * The check button to activate/deactivate this option
+	 * The check button to activate/deactivate this option if it is optional
 	 */
 	protected Button unitCheck;
+	
+	/**
+	 * The label used if this option is required
+	 */
+	protected Label reqLabel;
 	
 	/**
 	 * Holds/displays text arguments if any
@@ -89,6 +95,12 @@ public class ToolOption {
 	 * otherwise use whitespace.
 	 */
 	protected boolean useEquals;
+	
+
+	/**
+	 * If true this option is always used and has just a title rather than a checkbox
+	 */
+	public boolean required = false;
 	
 	protected Combo combopt;
 	

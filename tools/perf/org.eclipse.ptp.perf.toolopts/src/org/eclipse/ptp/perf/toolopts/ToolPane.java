@@ -89,7 +89,7 @@ public class ToolPane {
 		
 		optString = new StringBuffer(this.prependOpts).append(this.encloseOpts);
 		for (int i = 0; i < options.length; i++) {
-			if (options[i].unitCheck.getSelection())
+			if (options[i].unitCheck==null||options[i].unitCheck.getSelection())
 			{
 				optString.append(options[i].optionLine).append(this.separateOpts);
 				if(options[i].argbox!=null)
@@ -146,7 +146,8 @@ public class ToolPane {
 	{
 		String arg="";
 		for(int i=0;i<options.length;i++){
-			options[i].unitCheck.setSelection(configuration.getAttribute(options[i].confDefString,options[i].defState));
+			if(options[i].unitCheck!=null)
+				options[i].unitCheck.setSelection(configuration.getAttribute(options[i].confDefString,options[i].defState));
 			if(options[i].usesTextBox())
 			{
 				arg = configuration.getAttribute(options[i].confArgString, options[i].defText);
@@ -176,7 +177,8 @@ public class ToolPane {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration)
 	{
 		for(int i =0; i < options.length;i++){
-			configuration.setAttribute(options[i].confDefString, options[i].unitCheck.getSelection());
+			if(options[i].unitCheck!=null)
+				configuration.setAttribute(options[i].confDefString, options[i].unitCheck.getSelection());
 			if(options[i].usesTextBox())
 				configuration.setAttribute(options[i].confArgString, options[i].argbox.getText());
 		}
@@ -235,6 +237,11 @@ public class ToolPane {
 	 */
 	protected ToolPaneListener checkListener;
 
+	/**
+	 * If true, the showOpts options display is used.
+	 */
+	public boolean displayOptions=true;
+	
 	/**
 	 * The text box that shows the selected/defined options in this pane
 	 */

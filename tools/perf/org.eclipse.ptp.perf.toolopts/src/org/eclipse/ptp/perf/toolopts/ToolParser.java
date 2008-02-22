@@ -76,6 +76,18 @@ public class ToolParser extends DefaultHandler{
 	private static final String DEFAULT = "default";
 	private static final String DEFSTATE = "defstate";
 	
+	/**
+	 * Use of this attribute in a tool option indicates it is always activated
+	 * Default is false.
+	 */
+	private static final String REQUIRED="required";
+	
+	/**
+	 * Use of this attribute in an options pane indicates the options-tally display will be provided
+	 * Defaults to true.
+	 */
+	private static final String DISPLAYOPTIONS="displayoptions";
+	
 
 	private static final String ENCLOSEVALS="enclosevalues";
 	/**
@@ -259,6 +271,14 @@ public class ToolParser extends DefaultHandler{
 			{
 				currentPane.separateNameValue=atts.getValue(optdex);
 			}
+			optdex = atts.getIndex(DISPLAYOPTIONS);
+			if(optdex>=0)
+			{
+				String abool=atts.getValue(optdex);
+				abool=abool.toLowerCase();
+				if(abool.equals("false"));
+					currentPane.displayOptions=false;
+			}
 		}
 		else if(name.equals(TOGOPT))
 		{
@@ -268,6 +288,7 @@ public class ToolParser extends DefaultHandler{
 			actOpt.optName=getAttribute(NAME,atts);
 			actOpt.toolTip=getAttribute(TIP,atts);
 			actOpt.defState=getBooleanAttribute(DEFSTATE,false,atts);
+			actOpt.required=getBooleanAttribute(REQUIRED,false,atts);
 		}
 		else if(name.equals(VALUE))
 		{
