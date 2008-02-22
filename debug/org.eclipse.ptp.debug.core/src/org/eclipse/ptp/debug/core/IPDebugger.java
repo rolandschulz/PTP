@@ -48,14 +48,21 @@ public interface IPDebugger {
 
 	/**
 	 * Initialize the debugger. This does whatever is necessary to get the debugger ready
-	 * to start debugging the user application. 
+	 * to start debugging the user application. The attrMgr argument can supply attributes
+	 * from a previously submitted job that may be used to initialize the debug session.
 	 * 
-	 * attrMgr contains the attributes that are passed to the submitJob command to launch
-	 * the application under debugger control. Add any additional attributes that are required
-	 * for the debug launch.
+	 * @param attrMgr attribute manager containing attributes for launch
+	 * @throws CoreException if the debugger cannot be initialized
+	 */
+	public void initialize(AttributeManager attrMgr) throws CoreException;
+	
+	/**
+	 * Using the supplied ILaunchConfiguration, add the required attributes to attrMgr 
+	 * need to be passed to the submitJob command to launch the application under debugger control. 
 	 * 
 	 * @param configuration launch configuration for the debug session
+	 * @param attrMgr attribute manager containing attributes for launch
 	 * @throws CoreException
 	 */
-	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
+	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
 }

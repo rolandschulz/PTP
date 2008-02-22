@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -82,19 +83,40 @@ public class SDMDebugger implements IPDebugger {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException {
-		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
+	public void initialize(AttributeManager attrMgr) throws CoreException {
+		ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
 		
-		int port;
+		if (dbgArgsAttr == null) {
+			dbgArgsAttr = JobAttributes.getDebuggerArgumentsAttributeDefinition().create();
+			attrMgr.addAttribute(dbgArgsAttr);
+		}
+
+		List<String> dbgArgs = dbgArgsAttr.getValue();
+
 		try {
-			port = getDebugger().getDebuggerPort(0);
+			getDebugger().initialize(dbgArgs);
 		} catch (PDIException e) {
 			throw newCoreException(e);
 		}
+	}
+		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#getLaunchAttributes(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
+	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException {
+		ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
+		
+		if (dbgArgsAttr == null) {
+			dbgArgsAttr = JobAttributes.getDebuggerArgumentsAttributeDefinition().create();
+			attrMgr.addAttribute(dbgArgsAttr);
+		}
+		
+		List<String> dbgArgs = dbgArgsAttr.getValue();
+
+		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
 		
 		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
 		
-		ArrayList<String> dbgArgs = new ArrayList<String>();
 		dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
 		dbgArgs.add("--debugger=" + store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
 		
@@ -107,8 +129,6 @@ public class SDMDebugger implements IPDebugger {
 		if (dbgExtraArgs.length() > 0) {
 			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
 		}
-		
-		dbgArgs.add("--port=" + port); //$NON-NLS-1$
 	
 		// remote setting
 		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);;
@@ -131,7 +151,6 @@ public class SDMDebugger implements IPDebugger {
 			}
 			attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
 		}
-		attrMgr.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
 		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 	}
 	

@@ -94,12 +94,12 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 	
 	/**
-	 * Create the debugger connection.
+	 * Initialize the debugger connection.
 	 * 
 	 * @throws IOException
 	 */
-	public void doConnect(int timeout) throws IOException {
-		sessionCreate(timeout);
+	public void doInitialize(int port) throws IOException {
+		sessionCreate(port, 0);
 		state = DebugProxyState.CONNECTING;
 	}
 	

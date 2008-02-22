@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
+import java.util.List;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +29,14 @@ import org.eclipse.ptp.core.util.BitList;
  * @author clement
  *
  */
-public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManagement, IPDIVariableManagement, IPDISignalManagement, IPDIStackframeManagement, IPDIThreadManagement, IPDIMemoryBlockManagement {
+public interface IPDIDebugger extends 
+			IPDIBreakpointManagement, 
+			IPDIExecuteManagement, 
+			IPDIVariableManagement, 
+			IPDISignalManagement, 
+			IPDIStackframeManagement, 
+			IPDIThreadManagement, 
+			IPDIMemoryBlockManagement {
 	/**
 	 * Requests a special command for specify process
 	 * @param tasks target process
@@ -43,17 +51,10 @@ public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManag
 	 * @throws PDIException on failure
 	 */
 	public void disconnect(Observer observer) throws PDIException;
-
-	/**
-	 * Returns available debugging port number within given time
-	 * @param timeout
-	 * @return port number
-	 * @throws PDIException on failure
-	 */
-	public int getDebuggerPort(int timeout) throws PDIException;
 	
 	/**
 	 * Returns an action when error occurred
+	 * 
 	 * @param errorCode error code
 	 * @return an action when error occurred
 	 */
@@ -61,6 +62,7 @@ public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManag
 	
 	/**
 	 * Connects debugger and adds observer to debugger
+	 * 
 	 * @param monitor
 	 * @return true if connection is established
 	 * @throws PDIException on failure
@@ -69,19 +71,32 @@ public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManag
 	
 	/**
 	 * Register observer for notify event from sdm
+	 * 
 	 * @param observer
 	 */
 	public void register(Observer observer);
 	
 	/**
 	 * Starts debugger
+	 * 
 	 * @throws PDIException on failure
 	 */
 	public void startDebugger(String app, String path, String dir, String[] args) throws PDIException;
 	
 	/**
 	 * Stops debugger
+	 * 
 	 * @throws PDIException on failure
 	 */
 	public void stopDebugger() throws PDIException;
+	
+	/**
+	 * Initialize the debugger. If args is an empty list, attempt to initialize the debugger
+	 * and add any necessary arguments to the list. If args is not empty, then attempt to
+	 * initialize the debugger using the supplied arguments.
+	 * 
+	 * @param args debugger arguments
+	 * @throws PDIException
+	 */
+	public void initialize(List<String> args) throws PDIException;
 }

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.sdm.core.pdi;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -68,7 +69,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugCLIHandle(tasks, command);
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on sending generic command: " + e.getMessage());
+			throw new PDIException(null, "Error on sending generic command: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -80,7 +81,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			setDataReadMemoryCommand(tasks, offset, address, getFormat(wordFormat), wordSize, rows, cols, asChar);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting data read memory: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting data read memory: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -92,7 +93,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			setDataWriteMemoryCommand(tasks, offset, address, getFormat(wordFormat), wordSize, value);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting data write memory: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting data write memory: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -103,7 +104,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugDataEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on evaluating data expression: " + e.getMessage());
+			throw new PDIException(tasks, "Error on evaluating data expression: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -114,7 +115,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugDeleteBreakpoint(tasks, bpid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on deleting breakpoint: " + e.getMessage());
+			throw new PDIException(tasks, "Error on deleting breakpoint: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -125,7 +126,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugVariableDelete(tasks, var);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on deleting variable: " + e.getMessage());
+			throw new PDIException(tasks, "Error on deleting variable: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -143,20 +144,36 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on evaluating expression: " + e.getMessage());
+			throw new PDIException(tasks, "Error on evaluating expression: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#getDebuggerPort(int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#initialize(java.util.List)
 	 */
-	public int getDebuggerPort(int timeout) throws PDIException {
-		try {
-			doConnect(timeout);
-		} catch (IOException e) {
-			throw new PDIException(null, "Error on getting proxy port number: " + e.getMessage());
+	public void initialize(List<String> args) throws PDIException {
+		int port = 0;
+		
+		/*
+		 * If there is an existing port specified, use it if possible.
+		 */
+		for (String arg : args) {
+			if (arg.startsWith("--port=")) {
+				try {
+					port = Integer.parseInt(arg.substring(7, arg.length()));
+				} catch (NumberFormatException e) {
+				}
+				break;
+			}
 		}
-		return getSessionPort();
+		
+		try {
+			doInitialize(port);
+		} catch (IOException e) {
+			throw new PDIException(null, "Error on getting proxy port number: " + e.getMessage()); //$NON-NLS-1$
+		}
+		
+		args.add("--port=" + getSessionPort()); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -203,7 +220,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			return false;
 		} catch (IOException e) {
 			disconnect(null);
-			throw new PDIException(null, "Error on connecting proxy: " + e.getMessage());
+			throw new PDIException(null, "Error on connecting proxy: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -214,7 +231,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugListArguments(tasks, low, high);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing arguments: " + e.getMessage());
+			throw new PDIException(tasks, "Error on listing arguments: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -225,7 +242,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugListGlobalVariables(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing global variables: " + e.getMessage());
+			throw new PDIException(tasks, "Error on listing global variables: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -236,7 +253,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugListInfoThreads(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing thread info: " + e.getMessage());
+			throw new PDIException(tasks, "Error on listing thread info: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -247,7 +264,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugListLocalVariables(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing local variables: " + e.getMessage());
+			throw new PDIException(tasks, "Error on listing local variables: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -258,7 +275,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugListSignals(tasks, name);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing signal: " + e.getMessage());
+			throw new PDIException(tasks, "Error on listing signal: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -269,7 +286,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugListStackframes(tasks, low, depth);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing stack frames: " + e.getMessage());
+			throw new PDIException(tasks, "Error on listing stack frames: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -284,7 +301,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse.ptp.core.util.BitList)
 	 */
 	public void restart(BitList tasks) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - restart() yet");
+		throw new PDIException(null, "Not implement PDIDebugger - restart() yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -294,7 +311,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugGo(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on resuming tasks: " + e.getMessage());
+			throw new PDIException(tasks, "Error on resuming tasks: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -302,14 +319,14 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
 	public void resume(BitList tasks, IPDILocation location) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDILocation) yet");
+		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDILocation) yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
 	public void resume(BitList tasks, IPDISignal signal) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDISignal) yet");
+		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDISignal) yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -319,7 +336,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting aif: " + e.getMessage());
+			throw new PDIException(tasks, "Error on getting aif: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -331,7 +348,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugGetPartialAIF(tasks, expr, key, listChildren, express);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting partial aif: " + e.getMessage());
+			throw new PDIException(tasks, "Error on getting partial aif: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -342,7 +359,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugSignalInfo(tasks, arg);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting signal info: " + e.getMessage());
+			throw new PDIException(tasks, "Error on getting signal info: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -353,7 +370,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugStackInfoDepth(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting stack info depth: " + e.getMessage());
+			throw new PDIException(tasks, "Error on getting stack info depth: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -364,7 +381,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugGetType(tasks, var);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting variable type: " + e.getMessage());
+			throw new PDIException(tasks, "Error on getting variable type: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -375,7 +392,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugSetThreadSelect(tasks, tid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting thread id: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting thread id: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -383,7 +400,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setAddressBreakpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint)
 	 */
 	public void setAddressBreakpoint(BitList tasks, IPDIAddressBreakpoint bpt) throws PDIException {
-		throw new PDIException(tasks, "Not implement PDIDebugger - setAddressBreakpoint() yet");
+		throw new PDIException(tasks, "Not implement PDIDebugger - setAddressBreakpoint() yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -393,7 +410,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugConditionBreakpoint(tasks, bpid, condition);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting condition breakpoint: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting condition breakpoint: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -404,7 +421,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugSetCurrentStackframe(tasks, level);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting current stack frame level: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting current stack frame level: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -418,7 +435,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			else
 				debugDisableBreakpoint(tasks, bpid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting enabling breakpoint: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting enabling breakpoint: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -426,7 +443,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setExceptionpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint)
 	 */
 	public void setExceptionpoint(BitList tasks, IPDIExceptionpoint bpt) throws PDIException {
-		throw new PDIException(tasks, "Not implement PDIDebugger - setExceptionpoint() yet");
+		throw new PDIException(tasks, "Not implement PDIDebugger - setExceptionpoint() yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -447,7 +464,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 					.getLocator().getFunction(), (condition != null ? condition.getExpression() : ""),
 					(condition != null ? condition.getIgnoreCount() : 0), 0);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting function breakpoint: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting function breakpoint: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -466,10 +483,10 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			// getFilename(bpt.getLocator().getFile()) + ", line: " +
 			// bpt.getLocator().getLineNumber());
 			debugSetLineBreakpoint(tasks, id, bpt.isTemporary(), bpt.isHardware(), getFilename(bpt.getLocator().getFile()), bpt
-					.getLocator().getLineNumber(), (condition != null ? condition.getExpression() : ""),
+					.getLocator().getLineNumber(), (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0), 0);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting line breakpoint: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting line breakpoint: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -487,10 +504,10 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				id = newBreakpointId();
 				bpt.setBreakpointID(id);
 			}
-			debugSetWatchpoint(tasks, id, expression, access, read, (condition != null ? condition.getExpression() : ""),
+			debugSetWatchpoint(tasks, id, expression, access, read, (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0));
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting wacthpoint: " + e.getMessage());
+			throw new PDIException(tasks, "Error on setting wacthpoint: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -508,7 +525,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugStartSession(app, path, dir, args);
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on starting debugger: " + e.getMessage());
+			throw new PDIException(null, "Error on starting debugger: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -519,7 +536,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_INTO);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on stepping into: " + e.getMessage());
+			throw new PDIException(tasks, "Error on stepping into: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -527,7 +544,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction(org.eclipse.ptp.core.util.BitList, int)
 	 */
 	public void stepIntoInstruction(BitList tasks, int count) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepIntoInstruction() yet");
+		throw new PDIException(null, "Not implement PDIDebugger - stepIntoInstruction() yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -537,7 +554,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_OVER);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on stepping over: " + e.getMessage());
+			throw new PDIException(tasks, "Error on stepping over: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -545,14 +562,14 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction(org.eclipse.ptp.core.util.BitList, int)
 	 */
 	public void stepOverInstruction(BitList tasks, int count) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepOverInstruction() yet");
+		throw new PDIException(null, "Not implement PDIDebugger - stepOverInstruction() yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
 	 */
 	public void stepReturn(BitList tasks, IAIF aif) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepReturn(IAIF) yet");
+		throw new PDIException(null, "Not implement PDIDebugger - stepReturn(IAIF) yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -562,7 +579,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_FINISH);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on stepping return: " + e.getMessage());
+			throw new PDIException(tasks, "Error on stepping return: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -570,7 +587,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
 	public void stepUntil(BitList tasks, IPDILocation location) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepUntil(IPDILocation) yet");
+		throw new PDIException(null, "Not implement PDIDebugger - stepUntil(IPDILocation) yet"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -580,7 +597,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			doShutdown();
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on stopping debugger: " + e.getMessage());
+			throw new PDIException(null, "Error on stopping debugger: " + e.getMessage()); //$NON-NLS-1$
 		} finally {
 			proxyNotifier.deleteObservers();
 			finalize();
@@ -594,7 +611,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugInterrupt(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on suspending tasks: " + e.getMessage());
+			throw new PDIException(tasks, "Error on suspending tasks: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -605,7 +622,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugTerminate(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on terminating tasks: " + e.getMessage());
+			throw new PDIException(tasks, "Error on terminating tasks: " + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -618,7 +635,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	private String getFilename(String fullPath) {
 		IPath path = new Path(fullPath);
 		if (path.isEmpty())
-			return "";
+			return ""; //$NON-NLS-1$
 		return path.lastSegment();
 	}
 
@@ -631,26 +648,26 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	private String getFormat(int wordFormat) {
 		switch (wordFormat) {
 		case ExtFormat.UNSIGNED:
-			return "u";
+			return "u"; //$NON-NLS-1$
 		case ExtFormat.FLOAT:
-			return "f";
+			return "f"; //$NON-NLS-1$
 		case ExtFormat.ADDRESS:
-			return "a";
+			return "a"; //$NON-NLS-1$
 		case ExtFormat.INSTRUCTION:
-			return "i";
+			return "i"; //$NON-NLS-1$
 		case ExtFormat.CHAR:
-			return "c";
+			return "c"; //$NON-NLS-1$
 		case ExtFormat.STRING:
-			return "s";
+			return "s"; //$NON-NLS-1$
 		case ExtFormat.DECIMAL:
-			return "d";
+			return "d"; //$NON-NLS-1$
 		case ExtFormat.BINARY:
-			return "t";
+			return "t"; //$NON-NLS-1$
 		case ExtFormat.OCTAL:
-			return "o";
+			return "o"; //$NON-NLS-1$
 		case ExtFormat.HEXADECIMAL:
 		default:
-			return "x";
+			return "x"; //$NON-NLS-1$
 		}
 	}
 
