@@ -193,7 +193,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyMessageEvent)
 	 */
 	public void handleEvent(IProxyMessageEvent e) {
-		System.out.println("debug: received error event");
+		System.out.println("debug: received message event");
 		waitLock.lock();
 		try {
 			if (state == DebugProxyState.DISCONNECTING) {
