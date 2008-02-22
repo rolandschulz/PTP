@@ -23,11 +23,8 @@ import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
@@ -64,15 +61,9 @@ public class SDMDebugger implements IPDebugger {
 	private IPDIRequestFactory requestFactory = null;
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath)
 	 */
-	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor) throws CoreException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
+	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException {
 		if (modelFactory == null) {
 			modelFactory = new SDMModelFactory();
 		}
@@ -85,7 +76,7 @@ public class SDMDebugger implements IPDebugger {
 		if (requestFactory == null) {
 			requestFactory = new SDMRequestFactory();
 		}
-		return createSession(timeout, launch, corefile, monitor);
+		return createSession(timeout, launch, corefile);
 	}
 	
 	/* (non-Javadoc)
@@ -193,7 +184,7 @@ public class SDMDebugger implements IPDebugger {
 	 * @return Session
 	 * @throws CoreException
 	 */
-	protected Session createSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor) throws CoreException {
+	protected Session createSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException {
 		IPJob job = launch.getPJob();
 		int job_size = getJobSize(job);
 		try {
