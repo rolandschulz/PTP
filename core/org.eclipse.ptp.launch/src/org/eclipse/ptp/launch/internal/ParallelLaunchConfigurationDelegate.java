@@ -20,6 +20,7 @@ package org.eclipse.ptp.launch.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -36,9 +37,10 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
-import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPDebugger;
+import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
@@ -59,7 +61,7 @@ public class ParallelLaunchConfigurationDelegate
 	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
 	 */
 	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch, 
-			AttributeManager mgr, final IPDebugger debugger, IPJob job) {
+			AttributeManager mgr, final IPDebugger debugger, final IPJob job) {
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 			launch.setPJob(job);
@@ -75,18 +77,25 @@ public class ParallelLaunchConfigurationDelegate
 								if (monitor.isCanceled())
 									throw new InterruptedException("The job is cancelled."); //$NON-NLS-1$
 								try {
-									long timeout = PTPDebugCorePlugin.getDefault().getPluginPreferences().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
-									//Wait for the incoming debug server connection. This can be canceled by the user.
-									PTPDebugCorePlugin.getDebugModel().createDebugSession(timeout, debugger, launch, project, execPath, monitor);
+									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch, project, execPath);
+
+									String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValueAsString();
+									String path = job.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValueAsString();
+									String cwd = job.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValueAsString();
+									List<String> args = job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
+
+									session.connectToDebugger(monitor, app, path, cwd, args.toArray(new String[args.size()]));
 								} catch (CoreException e) {
 									throw new InvocationTargetException(e);
+								} finally {
+									monitor.done();
 								}
 							}
 						};
 						try {
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
 						} catch (InterruptedException e) {
-							System.out.println("Error completing debug job launch: " + e.getMessage()); //$NON-NLS-1$
+							System.out.println("Debug job launch interrupted: " + e.getMessage()); //$NON-NLS-1$
 						} catch (InvocationTargetException e) {
 							String msg = e.getMessage();
 							Throwable t = e.getCause();
@@ -94,6 +103,7 @@ public class ParallelLaunchConfigurationDelegate
 								msg = t.getMessage();
 							}
 							System.out.println("Error completing debug job launch: " + msg); //$NON-NLS-1$
+							PTPLaunchPlugin.errorDialog("Error completing debug job launch", t);
 						}
 					}
 				});
