@@ -30,19 +30,88 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
  * @author Clement chu
  * 
  */
-public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IResumeWithoutSignal, IPDebugElement, ITargetProperties, ISteppingModeTarget {
-	BitList getTasks();
-	void dispose();
+public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IResumeWithoutSignal, IPDebugElement,
+		ITargetProperties, ISteppingModeTarget {
+	/**
+	 * @param name
+	 * @param descriptors
+	 */
+	public void addRegisterGroup(String name, IPRegisterDescriptor[] descriptors);
 
-	boolean isLittleEndian();
-	boolean isPostMortem();
-	boolean hasSignals() throws DebugException;
-	IPSignal[] getSignals() throws DebugException;
-	IPRegisterDescriptor[] getRegisterDescriptors() throws DebugException;
-	void addRegisterGroup(String name, IPRegisterDescriptor[] descriptors);
-	void removeRegisterGroups(IRegisterGroup[] groups);
-	void modifyRegisterGroup(IPPersistableRegisterGroup group, IPRegisterDescriptor[] descriptors);
-	void restoreDefaultRegisterGroups();
-	BigInteger getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException;
-	IPDITarget getPDITarget();
+	/**
+	 * @param globalVariableDescriptor
+	 * @return
+	 */
+	public IPGlobalVariable createGlobalVariable(IPGlobalVariableDescriptor globalVariableDescriptor) throws DebugException;
+
+	/**
+	 * 
+	 */
+	public void dispose();
+
+	/**
+	 * @param content
+	 */
+	public void fireChangeEvent(int content);
+
+	/**
+	 * @param breakpoint
+	 * @return
+	 * @throws DebugException
+	 */
+	public BigInteger getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException;
+
+	/**
+	 * @return
+	 */
+	public IPDITarget getPDITarget();
+
+	/**
+	 * @return
+	 * @throws DebugException
+	 */
+	public IPRegisterDescriptor[] getRegisterDescriptors() throws DebugException;
+
+	/**
+	 * @return
+	 * @throws DebugException
+	 */
+	public IPSignal[] getSignals() throws DebugException;
+
+	/**
+	 * @return
+	 */
+	public BitList getTasks();
+
+	/**
+	 * @return
+	 * @throws DebugException
+	 */
+	public boolean hasSignals() throws DebugException;
+
+	/**
+	 * @return
+	 */
+	public boolean isLittleEndian();
+
+	/**
+	 * @return
+	 */
+	public boolean isPostMortem();
+
+	/**
+	 * @param group
+	 * @param descriptors
+	 */
+	public void modifyRegisterGroup(IPPersistableRegisterGroup group, IPRegisterDescriptor[] descriptors);
+
+	/**
+	 * @param groups
+	 */
+	public void removeRegisterGroups(IRegisterGroup[] groups);
+
+	/**
+	 * 
+	 */
+	public void restoreDefaultRegisterGroups();
 }
