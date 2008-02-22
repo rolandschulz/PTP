@@ -20,41 +20,81 @@ package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
-import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
  */
 public class PSignal extends PDebugElement implements IPSignal {
-	private IPDISignal pdiSignal;
+	private final IPDISignal pdiSignal;
 
-	public PSignal(PSession session, BitList tasks, IPDISignal pdiSignal) {
+	public PSignal(IPSession session, BitList tasks, IPDISignal pdiSignal) {
 		super(session, tasks);
 		this.pdiSignal = pdiSignal;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#canModify()
+	 */
+	public boolean canModify() {
+		// TODO add canModify method to IPDISignal
+		return true;
+	}
+
+	/**
+	 * 
+	 */
+	public void dispose() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#getDescription()
+	 */
 	public String getDescription() throws DebugException {
 		return getPDISignal().getDescription();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#getName()
+	 */
 	public String getName() throws DebugException {
 		return getPDISignal().getName();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#isPassEnabled()
+	 */
 	public boolean isPassEnabled() throws DebugException {
 		return !getPDISignal().isIgnore();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#isStopEnabled()
+	 */
 	public boolean isStopEnabled() throws DebugException {
 		return getPDISignal().isStopSet();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#setPassEnabled(boolean)
+	 */
 	public void setPassEnabled(boolean enable) throws DebugException {
 		handle(enable, isStopEnabled());
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#setStopEnabled(boolean)
+	 */
 	public void setStopEnabled(boolean enable) throws DebugException {
 		handle(isPassEnabled(), enable);
 	}
-	public void dispose() {
-	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPSignal#signal()
+	 */
 	public void signal() throws DebugException {
 		try {
 			getPDISession().resume(getTasks(), getPDISignal());
@@ -62,9 +102,12 @@ public class PSignal extends PDebugElement implements IPSignal {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
-	protected IPDISignal getPDISignal() {
-		return pdiSignal;
-	}
+
+	/**
+	 * @param pass
+	 * @param stop
+	 * @throws DebugException
+	 */
 	private void handle(boolean pass, boolean stop) throws DebugException {
 		try {
 			getPDISignal().handle(!pass, stop);
@@ -72,8 +115,11 @@ public class PSignal extends PDebugElement implements IPSignal {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
-	public boolean canModify() {
-		// TODO add canModify method to IPDISignal
-		return true;
+
+	/**
+	 * @return
+	 */
+	protected IPDISignal getPDISignal() {
+		return pdiSignal;
 	}
 }
