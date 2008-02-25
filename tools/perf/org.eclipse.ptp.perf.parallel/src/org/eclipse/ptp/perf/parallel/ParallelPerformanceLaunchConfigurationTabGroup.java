@@ -24,6 +24,7 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.eclipse.ptp.launch.ui.PArgumentsTab;
 import org.eclipse.ptp.launch.ui.PCommonTab;
 import org.eclipse.ptp.launch.ui.PDebuggerTab;
@@ -41,16 +42,18 @@ public class ParallelPerformanceLaunchConfigurationTabGroup extends AbstractLaun
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ArrayList<AbstractPerformanceConfigurationTab> perfTabs=Activator.getPerfTabs();
-		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[7+perfTabs.size()];
+		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[8+perfTabs.size()];
 		tabs[0]=new ParallelPerfRecompMainTab();
-		tabs[1]=new PArgumentsTab();
-		tabs[2]=new EnvironmentTab();
-		tabs[3]=new ResourcesTab();
-		tabs[4]=new PerformanceAnalysisTab(true);
-		tabs[5]=new PDebuggerTab(false);
+		tabs[1]=new ResourcesTab();
+		tabs[2]=new PDebuggerTab(false);
+		tabs[3]=new PArgumentsTab();
+		tabs[4]=new SourceLookupTab();
+		tabs[5]=new EnvironmentTab();
 		tabs[6]=new PCommonTab();
+		tabs[7]=new PerformanceAnalysisTab(true);
+		
 		Iterator<AbstractPerformanceConfigurationTab> perfIt=perfTabs.iterator();
-		int tabDex=7;
+		int tabDex=8;
 		while(perfIt.hasNext())
 		{
 			tabs[tabDex]=perfIt.next();

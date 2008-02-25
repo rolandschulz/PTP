@@ -65,6 +65,8 @@ public class TAUPortalUploadDialog extends Dialog {
 
 	private static final int RESET_ID = IDialogConstants.NO_TO_ALL_ID + 1;
 
+	private Text urlField;
+	
 	  private Text usernameField;
 
 	  private Text passwordField;
@@ -73,6 +75,7 @@ public class TAUPortalUploadDialog extends Dialog {
 	  
 	  private Combo workspaceCombo;
 	  
+	  private String url="";
 	  private String uname="";
 	  private String pwd="";
 	  private File ppk=null;
@@ -92,12 +95,21 @@ public class TAUPortalUploadDialog extends Dialog {
 	    GridLayout layout = (GridLayout) comp.getLayout();
 	    layout.numColumns = 2;
 
+	    Label pwdLabel=new Label(comp,SWT.RIGHT);
+	    pwdLabel.setText("TAU Portal URL: ");
+	    
+	    urlField=new Text(comp,SWT.SINGLE|SWT.BORDER);
+	    GridData data = new GridData(GridData.FILL_HORIZONTAL);
+	    urlField.setLayoutData(data);
+	    urlField.setText("https://tau.nic.uoregon.edu");
+	    
 	    Label usernameLabel = new Label(comp, SWT.RIGHT);
 	    usernameLabel.setText("TAU Portal Username: ");
 
 	    usernameField = new Text(comp, SWT.SINGLE | SWT.BORDER);
-	    GridData data = new GridData(GridData.FILL_HORIZONTAL);
+	    data = new GridData(GridData.FILL_HORIZONTAL);
 	    usernameField.setLayoutData(data);
+	    
 
 	    Label passwordLabel = new Label(comp, SWT.RIGHT);
 	    passwordLabel.setText("TAU Portal Password: ");
@@ -109,6 +121,7 @@ public class TAUPortalUploadDialog extends Dialog {
 	    
 	    SelectionListener subListen = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				url=urlField.getText();
 				uname=usernameField.getText();
 				pwd=passwordField.getText();
 				if(uname.length()==0||pwd.length()==0)
@@ -119,7 +132,7 @@ public class TAUPortalUploadDialog extends Dialog {
 					return;
 				}
 				
-				String workspaces = getWorkspaces(uname,pwd);
+				String workspaces = getWorkspaces(url,uname,pwd);
 
 				if(workspaces.equals("NO_VALID_WORKSPACES"))
 				{
@@ -194,7 +207,7 @@ public class TAUPortalUploadDialog extends Dialog {
 	    		}
 	    		
 	    		try {
-					String success = uploadPPK(uname, pwd, workspaceCombo.getItem(workspaceCombo.getSelectionIndex()), ppk);
+					String success = uploadPPK(url,uname, pwd, workspaceCombo.getItem(workspaceCombo.getSelectionIndex()), ppk);
 					if(success.indexOf("ERROR")>=0)
 					{
 						portalStatus.setText(success);
@@ -292,14 +305,14 @@ public class TAUPortalUploadDialog extends Dialog {
      * @param pwd Password
      * @return
      */
-    private static String getWorkspaces(String uname, String pwd)
+    private static String getWorkspaces(String url,String uname, String pwd)
     {
     	String pwd2;
 		try {
 			pwd2 = SHA1(pwd);
 		
 		
-		String portalURL="https://tau.nic.uoregon.edu/trial/list_workspaces";
+		String portalURL=url+"/trial/list_workspaces";
 		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(uname,"UTF-8");
 		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8");
 		
@@ -327,11 +340,11 @@ public class TAUPortalUploadDialog extends Dialog {
      * @return
      * @throws Exception
      */
-	private static String uploadPPK(String usr, String pwd, String workspace, File ppkFile) throws Exception {
+	private static String uploadPPK(String url, String usr, String pwd, String workspace, File ppkFile) throws Exception {
 		
 		String pwd2 = SHA1(pwd);
 		
-		String portalURL="https://tau.nic.uoregon.edu/trial/batch_upload";
+		String portalURL=url+"/trial/batch_upload";
 		String ppkName = ppkFile.getName();
 		ppkName=ppkName.substring(0, ppkName.lastIndexOf('.'));
 		
