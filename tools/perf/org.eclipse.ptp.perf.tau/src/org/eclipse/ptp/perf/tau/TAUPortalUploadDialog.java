@@ -28,6 +28,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.StringTokenizer;
@@ -267,7 +268,19 @@ public class TAUPortalUploadDialog extends Dialog {
      * @throws Exception
      */
     static private void trustHttpsCertificates() throws Exception {
-        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+    	
+    	Class sslProvider=null;
+    	boolean goodProvider=true;
+    	try{
+    	sslProvider=Class.forName("com.sun.net.ssl.internal.ssl.Provider");
+    	}catch(ClassNotFoundException e){goodProvider=false;}
+    	
+    	if(!goodProvider)
+    	{
+    		sslProvider=Class.forName("com.ibm.jsse.IBMJSSEProvider");
+    	}
+    	
+        Security.addProvider((Provider)sslProvider.newInstance());//new com.ibm.jsse.IBMJSSEProvider());//com.sun.net.ssl.internal.ssl.Provider());
         //Create a trust manager that does not validate certificate chains:
         TrustManager[] trustAllCerts = new TrustManager[] {
             new X509TrustManager() {

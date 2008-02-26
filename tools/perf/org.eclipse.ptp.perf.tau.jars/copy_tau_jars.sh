@@ -16,6 +16,7 @@ cp "$1"/tools/src/contrib/jcommon-0.9.6.jar .
 cp "$1"/tools/src/contrib/jargs.jar .
 cp "$1"/tools/src/contrib/jfreechart-0.9.21.jar .
 cp "$1"/tools/src/contrib/jgraph.jar .
+cp "$1"/tools/src/contrib/jython.jar .
 cp "$1"/tools/src/contrib/jogl/jogl.jar .
 cp "$1"/tools/src/contrib/xerces.jar .
 cp "$1"/tools/src/paraprof/bin/paraprof.jar .

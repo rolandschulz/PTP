@@ -732,7 +732,8 @@ public class PerfDMFView extends ViewPart {
             dirs[0] = new File(directory);
 
             //TODO: This is a kludge.  Find out how to make this work across systems.
-            System.setProperty("javax.xml.transform.TransformerFactory", "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+            if(System.getProperty("os.name").toLowerCase().trim().indexOf("aix")<0)
+            	System.setProperty("javax.xml.transform.TransformerFactory", "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
             
             DataSource dataSource = UtilFncs.initializeDataSource(dirs, 0, false);
             dataSource.load();
