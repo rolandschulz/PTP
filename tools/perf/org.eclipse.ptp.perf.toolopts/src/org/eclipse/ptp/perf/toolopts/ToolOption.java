@@ -102,6 +102,11 @@ public class ToolOption {
 	 */
 	public boolean required = false;
 	
+	/**
+	 * If false this option can not be seen or manipulated in the UI.
+	 */
+	public boolean visible=true;
+	
 	protected Combo combopt;
 	
 	//This will eventually be used to hold subordinate options.

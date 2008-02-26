@@ -131,7 +131,8 @@ public class ToolPane {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration)
 	{
 		for(int i=0;i<options.length;i++){
-			configuration.setAttribute(options[i].confDefString , options[i].defState);
+			if(options[i].visible&&!options[i].required)
+				configuration.setAttribute(options[i].confDefString , options[i].defState);
 			if(options[i].usesTextBox())
 				configuration.setAttribute(options[i].confArgString, options[i].defText);
 		}

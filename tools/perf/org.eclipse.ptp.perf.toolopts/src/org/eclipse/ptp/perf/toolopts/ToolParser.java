@@ -83,6 +83,12 @@ public class ToolParser extends DefaultHandler{
 	private static final String REQUIRED="required";
 	
 	/**
+	 * Use of this attribute in a tool option indicates that it is not visible
+	 * and always used.
+	 */
+	private static final String VISIBLE="visible";
+	
+	/**
 	 * Use of this attribute in an options pane indicates the options-tally display will be provided
 	 * Defaults to true.
 	 */
@@ -276,7 +282,7 @@ public class ToolParser extends DefaultHandler{
 			{
 				String abool=atts.getValue(optdex);
 				abool=abool.toLowerCase();
-				if(abool.equals("false"));
+				if(abool.equals("false"))
 					currentPane.displayOptions=false;
 			}
 		}
@@ -289,6 +295,7 @@ public class ToolParser extends DefaultHandler{
 			actOpt.toolTip=getAttribute(TIP,atts);
 			actOpt.defState=getBooleanAttribute(DEFSTATE,false,atts);
 			actOpt.required=getBooleanAttribute(REQUIRED,false,atts);
+			actOpt.visible=getBooleanAttribute(VISIBLE,true,atts);
 		}
 		else if(name.equals(VALUE))
 		{

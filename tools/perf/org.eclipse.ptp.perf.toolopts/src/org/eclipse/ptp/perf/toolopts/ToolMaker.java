@@ -137,11 +137,26 @@ public class ToolMaker {
 			pane.showOpts.setEditable(false);
 			pane.showOpts.setLayoutData(showOptGD);
 		}
+		
+		Composite invis=new Composite(comp, SWT.NONE);
+		invis.setVisible(false);
+		
+		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
+	    gridData.horizontalSpan = 3;
+	    gridData.horizontalAlignment = GridData.FILL;
+	    invis.setLayoutData(gridData);
+		
+		
 		for(int i=0;i<pane.options.length;i++)
 		{
-			displayToolOption(comp,pane.options[i], pane.browseListener,checkListener);
+			if(pane.options[i].visible)
+				displayToolOption(comp,pane.options[i], pane.browseListener,checkListener);
+			else
+				displayToolOption(invis,pane.options[i], pane.browseListener,checkListener);
 		}
-		createVerticalSpacer(comp, 3);
+		invis.setSize(0, 0);
+		invis.moveBelow(null);
+		//createVerticalSpacer(comp, 3);
 	}
 	
 	private static void initializeCheckLabel(Composite comp, ToolOption toolOpt)
