@@ -52,8 +52,7 @@ public abstract class AbstractPerformanceDataManager {
 	 * @param projectLocation The location of the project with respect to the local filesystem
 	 * @throws CoreException
 	 */
-	public void process(String projname, ILaunchConfiguration configuration, String projectLocation)throws CoreException
-	{};
+	public abstract void process(String projname, ILaunchConfiguration configuration, String projectLocation)throws CoreException;
 	public abstract void view();
 	
 }
