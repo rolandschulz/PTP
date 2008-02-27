@@ -9,10 +9,10 @@ public class DebugUtil {
 	private static final String PROXY_SERVER_DEBUG_LEVEL_OPTION = "org.eclipse.ptp.core/debug/proxy/server/debug_level";
 	private static final String RM_TRACING_OPTION = "org.eclipse.ptp.core/debug/rm/tracing";
 
-	public static boolean PROTOCOL_TRACING;
-	public static boolean PROXY_CLIENT_TRACING;
-	public static int PROXY_SERVER_DEBUG_LEVEL;
-	public static boolean RM_TRACING;
+	public static boolean PROTOCOL_TRACING = false;
+	public static boolean PROXY_CLIENT_TRACING = false;
+	public static int PROXY_SERVER_DEBUG_LEVEL = 0;
+	public static boolean RM_TRACING = false;;
 
 	public static void configurePluginDebugOptions() {
 		if (PTPCorePlugin.getDefault().isDebugging()) {
