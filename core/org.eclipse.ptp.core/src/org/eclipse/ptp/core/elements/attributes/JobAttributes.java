@@ -46,6 +46,7 @@ public class JobAttributes {
 	private static final String ENV_ATTR_ID = "env";
 	private static final String EXEC_NAME_ATTR_ID = "execName";
 	private static final String EXEC_PATH_ATTR_ID = "execPath";
+	private static final String FOCUS_FLAG_ATTR_ID = "focus";
 	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding";
 	private static final String LAUNCHED_BY_PTP_FLAG_ATTR_ID = "launchedByPTP";
 	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
@@ -90,6 +91,10 @@ public class JobAttributes {
 	private final static StringAttributeDefinition execPathAttrDef = 
 		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path",
 				"Path of executable to be launched", true, "");
+
+	private final static BooleanAttributeDefinition focusFlagAttrDef = 
+		new BooleanAttributeDefinition(FOCUS_FLAG_ATTR_ID, "Job Focus Flag",
+				"Job should obtain focus when displayed", true, true);
 
 	private final static IntegerAttributeDefinition ioForwardingAttrDef = 
 		new IntegerAttributeDefinition(IO_FORWARDING_ATTR_ID, "I/O Forwarding", 
@@ -159,6 +164,7 @@ public class JobAttributes {
 				envAttrDef,
 				execNameAttrDef, 
 				execPathAttrDef,
+				focusFlagAttrDef,
 				ioForwardingAttrDef,
 				launchedByPTPFlagAttrDef,
 				numProcsAttrDef,
@@ -180,6 +186,10 @@ public class JobAttributes {
 
 	public static StringAttributeDefinition getExecutablePathAttributeDefinition() {
 		return execPathAttrDef;
+	}
+
+	public static BooleanAttributeDefinition getFocusFlagAttributeDefinition() {
+		return focusFlagAttrDef;
 	}
 
 	public static BooleanAttributeDefinition getLaunchedByPTPFlagAttributeDefinition() {
