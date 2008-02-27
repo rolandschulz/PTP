@@ -41,6 +41,7 @@ import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.utils.DebugUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -187,6 +188,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		DebugUtil.configurePluginDebugOptions();
 		registerAdapterFactories();
 		retrieveConfigurationWizardPageFactories();
 		machineManager = new MachineManager();
