@@ -114,26 +114,12 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	private static IAttribute<?, ?, ?>[] getDefaultAttributes(IResourceManagerConfiguration config) {
 		ArrayList<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
-
-		StringAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
-		attrs.add(nameAttr);
-
-		StringAttribute idAttr = ElementAttributes.getIdAttributeDefinition().create(config.getUniqueName());
-		attrs.add(idAttr);
-
-		StringAttribute descAttr = ResourceManagerAttributes.getDescriptionAttributeDefinition().create(config.getDescription());
-		attrs.add(descAttr);
-
-		StringAttribute typeAttr = ResourceManagerAttributes.getTypeAttributeDefinition().create(config.getType());
-		attrs.add(typeAttr);
-
-		EnumeratedAttribute<State> stateAttr = ResourceManagerAttributes.getStateAttributeDefinition().create(
-				ResourceManagerAttributes.State.STOPPED);
-		attrs.add(stateAttr);
-
-		StringAttribute rmIDAttr = ResourceManagerAttributes.getRmIDAttributeDefinition().create(config.getUniqueName());
-		attrs.add(rmIDAttr);
-
+		attrs.add(ElementAttributes.getNameAttributeDefinition().create(config.getName()));
+		attrs.add(ElementAttributes.getIdAttributeDefinition().create(config.getUniqueName()));
+		attrs.add(ResourceManagerAttributes.getDescriptionAttributeDefinition().create(config.getDescription()));
+		attrs.add(ResourceManagerAttributes.getTypeAttributeDefinition().create(config.getType()));
+		attrs.add(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.STOPPED));
+		attrs.add(ResourceManagerAttributes.getRmIDAttributeDefinition().create(config.getUniqueName()));
 		return attrs.toArray(new IAttribute<?, ?, ?>[0]);
 	}
 
