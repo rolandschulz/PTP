@@ -8,6 +8,7 @@
 package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -15,6 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteServices;
@@ -35,12 +37,23 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
+public class PEResourceManagerOptionDialog extends TitleAreaDialog
 {
+    private static final String SUSPEND_AT_STARTUP_OPTION = "--suspend_at_startup ";
+    private static final String USE_LOADLEVELER_OPTION = "--useloadleveler ";
+    private static final String MULTICLUSTER_OPTION = "--multicluster";
+    private static final String NODE_POLL_MIN_OPTION = "--node_polling_min";
+    private static final String NODE_POLL_MAX_OPTION = "--node_polling_max";
+    private static final String JOB_POLL_OPTION = "--job_polling";
+    private static final String LIB_OVERRIDE_OPTION = "--lib_override";
+    private static final String TRACE_OPTION = "--trace";
+    private static final String RUN_MINIPROXY_OPTION = "--runMiniproxy";
     private Composite optionsPane;
     private Button loadLevelerOption;
     private Button suspendOption;
@@ -65,6 +78,8 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
     private Label nodePollMinLabel;
     private Label nodePollMaxLabel;
     private Label jobPollLabel;
+    private Shell parentShell;
+    private String proxyOptions;
     private PEResourceManagerConfiguration config;
     private RMConfigurationWizard confWizard;
     private IRemoteServices remoteService;
@@ -95,29 +110,29 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 	    if (e.getSource() == libOverrideBrowse) {
 		String selectedFile;
 
-		selectedFile = remoteService.getFileManager(remoteConnection).browseDirectory(PEResourceManagerOptionWizardPage.this.getShell(),
+		selectedFile = remoteService.getFileManager(remoteConnection).browseDirectory(PEResourceManagerOptionDialog.this.parentShell,
 			Messages.getString("PEDialogs.librarySelectorTitle"), "/").toString();
 		if (selectedFile != null) {
 		    libOverridePath.setText(selectedFile);
 		}
 	    } else {
-		performOk(e.getSource());
+		validateInput(e.getSource());
 	    }
 	}
 
 	public void modifyText(ModifyEvent e)
 	{
-	    performOk(e.getSource());
+	    validateInput(e.getSource());
 	}
     }
 
-    public PEResourceManagerOptionWizardPage(RMConfigurationWizard wizard)
+    public PEResourceManagerOptionDialog(Shell parent, RMConfigurationWizard wizard, String initialOptions)
     {
-	super(wizard, Messages.getString("PEDialogs.InvocationOptionsTitle"));
-	setTitle(Messages.getString("PEDialogs.InvocationOptionsTitle"));
-	setDescription(Messages.getString("PEDialogs.InvocationOptions"));
-	confWizard = getConfigurationWizard();
+	super(parent);
+	parentShell = parent;
+	confWizard = wizard;
 	config = (PEResourceManagerConfiguration) confWizard.getConfiguration();
+	create();
     }
 
     /**
@@ -136,8 +151,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
      * 
      * @param parent - The parent widget for this class
      */
-    @Override
-    public void createControl(Composite parent)
+    protected Control createDialogArea(Composite parent)
     {
 	GridLayout layout;
 	GridLayout libPathLayout;
@@ -146,6 +160,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 	Preferences preferences;
 	String preferenceValue;
 
+	setTitle(Messages.getString("PEDialogs.InvocationOptionsTitle"));
 	eventMonitor = new EventMonitor();
 	preferences = getPreferences();
 	optionsPane = new Composite(parent, SWT.NONE);
@@ -298,8 +313,8 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 	debugLevel.addSelectionListener(eventMonitor);
 		// Ensure that the starting values for this dialog are valid and that options contained in this
 		// dialog are stored in the option string even if no changes are made.
-	performOk(null);
-	setControl(optionsPane);
+	validateInput(null);
+	return optionsPane;
     }
 
     	/**
@@ -326,21 +341,20 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
      * 
      * @return Status indicating successful completion
      */
-    protected boolean performOk(Object eventSource)
+    protected boolean validateInput(Object eventSource)
     {
-	String options;
 	String traceOpt;
 
-	options = "";
+	proxyOptions = "";
 	setErrorMessage(null);
 	if (loadLevelerOption.getSelection()) {
 	    String widgetValue;
 	    String multiclusterMode;
 	    int interval;
 
-	    options = options + "--useloadleveler=y ";
+	    proxyOptions = proxyOptions + USE_LOADLEVELER_OPTION + "=y";
 	    config.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
-	    options = options + "--multicluster=";
+	    proxyOptions = proxyOptions + MULTICLUSTER_OPTION + "=";
 	    if (llModeDefault.getSelection()) {
 		multiclusterMode = "d";
 	    } else if (llModeLocal.getSelection()) {
@@ -348,7 +362,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 	    } else {
 		multiclusterMode = "y";
 	    }
-	    options = options + multiclusterMode + " ";
+	    proxyOptions = proxyOptions + multiclusterMode + " ";
 	    config.setLoadLevelerMode(multiclusterMode);
 	    widgetValue = nodePollMinInterval.getText().trim();
 	    if (widgetValue.length() > 0) {
@@ -359,7 +373,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 		    setErrorMessage(Messages.getString("PEDialogs.invalidMinPollInterval"));
 		    return false;
 		}
-		options = options + "--node_polling_min=" + widgetValue + " ";
+		proxyOptions = proxyOptions + NODE_POLL_MIN_OPTION + "=" + widgetValue + " ";
 	    }
 	    config.setNodeMinPollInterval(widgetValue);
 	    widgetValue = nodePollMaxInterval.getText().trim();
@@ -371,7 +385,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 		    setErrorMessage(Messages.getString("PEDialogs.invalidMaxPollInterval"));
 		    return false;
 		}
-		options = options + "--node_polling_max=" + widgetValue + " ";
+		proxyOptions = proxyOptions + NODE_POLL_MAX_OPTION + "=" + widgetValue + " ";
 	    }
 	    config.setNodeMaxPollInterval(widgetValue);
 	    widgetValue = jobPollInterval.getText().trim();
@@ -383,7 +397,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 		    setErrorMessage(Messages.getString("PEDialogs.invalidJobPollInterval"));
 		    return false;
 		}
-		options = options + "--job_polling=" + widgetValue + " ";
+		proxyOptions = proxyOptions + JOB_POLL_OPTION + "=" + widgetValue + " ";
 	    }
 	    config.setJobPollInterval(widgetValue);
 	    widgetValue = libOverridePath.getText().trim();
@@ -410,7 +424,7 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 		catch (IOException e) {
 		    setErrorMessage(Messages.getString("Invalid.remoteConnectionError") + " " + e.getMessage());
 		}
-		options = options + "--lib_override=" + widgetValue + " ";
+		proxyOptions = proxyOptions + LIB_OVERRIDE_OPTION + "=" + widgetValue + " ";
 	    }
 	    config.setLibraryOverride(widgetValue);
 	} else {
@@ -418,22 +432,69 @@ public class PEResourceManagerOptionWizardPage extends RMConfigurationWizardPage
 	}
 	traceOpt = debugLevel.getText();
 	if (traceOpt.length() > 0) {
-	    options = options + "--trace=" + traceOpt + " ";
+	    proxyOptions = proxyOptions + TRACE_OPTION + "=" + traceOpt + " ";
 	    config.setDebugLevel(traceOpt);
 	}
 	if (suspendOption.getSelection()) {
-	    options = options + "--suspend_at_startup ";
+	    proxyOptions = proxyOptions + SUSPEND_AT_STARTUP_OPTION;
 	    config.setSuspendProxy(PEPreferenceConstants.OPTION_YES);
 	} else {
 	    config.setSuspendProxy(PEPreferenceConstants.OPTION_NO);
 	}
 	if (runMiniproxy.getSelection()) {
-	    options = options + "--runMiniproxy ";
+	    proxyOptions = proxyOptions + RUN_MINIPROXY_OPTION + " ";
 	    config.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
 	} else {
 	    config.setRunMiniproxy(PEPreferenceConstants.OPTION_NO);
 	}
-	config.setInvocationOptions(options);
+	config.setInvocationOptions(proxyOptions);
 	return true;
+    }
+    
+    public String getValue()
+    {
+	return proxyOptions;
+    }
+    
+    public void setInitialOptions(String initialOptions)
+    {
+	StringTokenizer options;
+	
+	options = new StringTokenizer(initialOptions, " ");
+	config.setSuspendProxy(PEPreferenceConstants.OPTION_NO);
+	config.setRunMiniproxy(PEPreferenceConstants.OPTION_NO);
+	while (options.hasMoreTokens()) {
+	    String currentToken[];
+	    
+	    currentToken = options.nextToken().split("=");
+	    if (currentToken.length == 1) {
+		if (currentToken[0].equals(SUSPEND_AT_STARTUP_OPTION)) {
+		    config.setSuspendProxy(PEPreferenceConstants.OPTION_YES);
+		}
+		else if (currentToken[0].equals(RUN_MINIPROXY_OPTION)) {
+		    config.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
+		}    
+	    }
+	    else {
+		if (currentToken[0].equals(USE_LOADLEVELER_OPTION)) {
+		    config.setUseLoadLeveler(currentToken[1]);
+		}
+		else if (currentToken[0].equals(MULTICLUSTER_OPTION)) {
+		    config.setLoadLevelerMode(currentToken[1]);
+		}
+		else if (currentToken[0].equals(NODE_POLL_MIN_OPTION)) {
+		    config.setNodeMinPollInterval(currentToken[1]);
+		}
+		else if (currentToken[0].equals(NODE_POLL_MAX_OPTION)) {
+		    config.setNodeMaxPollInterval(currentToken[1]);
+		}
+		else if (currentToken[0].equals(JOB_POLL_OPTION)) {
+		    config.setJobPollInterval(currentToken[1]);
+		}
+		else if (currentToken[0].equals(LIB_OVERRIDE_OPTION)) {
+		    config.setLibraryOverride(currentToken[1]);
+		}
+	    }
+	}
     }
 }
