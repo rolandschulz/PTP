@@ -72,16 +72,6 @@ public class PJob extends Parent implements IPJobControl {
 			debugFlag = JobAttributes.getDebugFlagAttributeDefinition().create();
 			addAttribute(debugFlag);
 		}
-		BooleanAttribute focusFlag = getAttribute(JobAttributes.getFocusFlagAttributeDefinition());
-		if (focusFlag == null) {
-			focusFlag = JobAttributes.getFocusFlagAttributeDefinition().create();
-			addAttribute(focusFlag);
-		}
-		BooleanAttribute consoleFlag = getAttribute(JobAttributes.getConsoleFlagAttributeDefinition());
-		if (consoleFlag == null) {
-			consoleFlag = JobAttributes.getConsoleFlagAttributeDefinition().create();
-			addAttribute(consoleFlag);
-		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)

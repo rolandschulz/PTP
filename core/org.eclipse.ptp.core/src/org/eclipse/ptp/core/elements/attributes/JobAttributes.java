@@ -37,7 +37,6 @@ public class JobAttributes {
 	public static final int IO_FORWARDING_STDOUT = 0x02;
 	public static final int IO_FORWARDING_STDERR = 0x04;
 	
-	private static final String CONSOLE_FLAG_ATTR_ID = "console";
 	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs";
 	private static final String DEBUG_EXEC_NAME_ATTR_ID = "debugExecName";
 	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath";
@@ -46,7 +45,6 @@ public class JobAttributes {
 	private static final String ENV_ATTR_ID = "env";
 	private static final String EXEC_NAME_ATTR_ID = "execName";
 	private static final String EXEC_PATH_ATTR_ID = "execPath";
-	private static final String FOCUS_FLAG_ATTR_ID = "focus";
 	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding";
 	private static final String LAUNCHED_BY_PTP_FLAG_ATTR_ID = "launchedByPTP";
 	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
@@ -55,10 +53,6 @@ public class JobAttributes {
 	private static final String STATE_ATTR_ID = "jobState";
 	private static final String SUBID_ATTR_ID = "jobSubId";
 	private static final String WORKING_DIR_ATTR_ID = "workingDir";
-
-	private final static BooleanAttributeDefinition consoleFlagAttrDef = 
-		new BooleanAttributeDefinition(CONSOLE_FLAG_ATTR_ID, "Console Enabled", 
-				"Enable console on launch", true, false);
 
 	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
@@ -91,10 +85,6 @@ public class JobAttributes {
 	private final static StringAttributeDefinition execPathAttrDef = 
 		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path",
 				"Path of executable to be launched", true, "");
-
-	private final static BooleanAttributeDefinition focusFlagAttrDef = 
-		new BooleanAttributeDefinition(FOCUS_FLAG_ATTR_ID, "Job Focus Flag",
-				"Job should obtain focus when displayed", true, true);
 
 	private final static IntegerAttributeDefinition ioForwardingAttrDef = 
 		new IntegerAttributeDefinition(IO_FORWARDING_ATTR_ID, "I/O Forwarding", 
@@ -129,10 +119,6 @@ public class JobAttributes {
 				"Working directory where executable will run", true, "");
 
 
-	public static BooleanAttributeDefinition getConsoleFlagAttributeDefinition() {
-		return consoleFlagAttrDef;
-	}
-
 	public static BooleanAttributeDefinition getDebugFlagAttributeDefinition() {
 		return debugFlagAttrDef;
 	}
@@ -155,7 +141,6 @@ public class JobAttributes {
 	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
-				consoleFlagAttrDef,
 				debugArgsAttrDef,
 				debugExecNameAttrDef,
 				debugExecPathAttrDef,
@@ -164,7 +149,6 @@ public class JobAttributes {
 				envAttrDef,
 				execNameAttrDef, 
 				execPathAttrDef,
-				focusFlagAttrDef,
 				ioForwardingAttrDef,
 				launchedByPTPFlagAttrDef,
 				numProcsAttrDef,
@@ -186,10 +170,6 @@ public class JobAttributes {
 
 	public static StringAttributeDefinition getExecutablePathAttributeDefinition() {
 		return execPathAttrDef;
-	}
-
-	public static BooleanAttributeDefinition getFocusFlagAttributeDefinition() {
-		return focusFlagAttrDef;
 	}
 
 	public static BooleanAttributeDefinition getLaunchedByPTPFlagAttributeDefinition() {
