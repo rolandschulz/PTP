@@ -308,17 +308,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
     
 	/**
-     * Get the console display option
-     * 
-	 * @param configuration
-	 * @return console option
-	 * @throws CoreException
-	 */
-	protected static boolean getConsoleDisplayOption(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false);
-	}
-	
-	/**
 	 * Get the debugger executable path
 	 * 
 	 * @param configuration
@@ -539,9 +528,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 		}
 		
-		Boolean console = getConsoleDisplayOption(configuration);
-		attrMgr.addAttribute(JobAttributes.getConsoleFlagAttributeDefinition().create(console));
-
 		/*
 		 * Collect attributes from Resources tab
 		 */
