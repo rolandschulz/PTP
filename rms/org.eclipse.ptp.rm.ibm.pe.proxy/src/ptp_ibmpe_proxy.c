@@ -592,7 +592,7 @@ static enum_launch_attr enum_attrs[] = {
      "Specify if PE diagnostic messages are logged", "no", "yes|no"},
     {"MP_PRINTENV", ATTR_ALWAYS_ALLOWED, "Print Environment",
      "Specify if PE environment variables are printed (MP_PRINTENV)", "no", "yes|no"},
-    {"MP_PRIORITY_LOG", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+    {"MP_PRIORITY_LOG", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Log Co-scheduler Messages",
      "Specify if messages are logged to co-scheduler log (MP_PRIORITY_LOG)", "yes", "yes|no"},
     {"MP_INFOLEVEL", ATTR_ALWAYS_ALLOWED, "Message Level",
      "Specify level of PE message reporting (MP_INFOLEVEL)", "Warning",
@@ -645,7 +645,7 @@ static enum_launch_attr enum_attrs[] = {
      "Specify if fastest collective algorithm is used (MP_CC_SCRATCH_BUF)", "yes", "yes|no"},
     {"MP_CSS_INTERRUPT", ATTR_ALWAYS_ALLOWED, "Packets Generate Interrupts",
      "Specify if arriving packets generate interrupts (MP_CSS_INTERRUPT)", "no", "yes|no"},
-    {"MP_PRIORITY_NTP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+    {"MP_PRIORITY_NTP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Coscheduler disables NTP",
      "Specify if PE co-scheduler turns NTP off (MP_PRIORITY_NTP)", "no", "yes|no"},
     {"MP_SHARED_MEMORY", ATTR_ALWAYS_ALLOWED, "Use Shared Memory",
      "Specify is shared memory used for communication (MP_SHARED_MEMORY)", "yes", "yes|no"},
@@ -5076,6 +5076,7 @@ main(int argc, char *argv[])
     int rc;
     int debug;
     char *cp;
+    int n;
 
     strcpy(miniproxy_path, argv[0]);
     cp = strrchr(miniproxy_path, '/');
@@ -5178,78 +5179,6 @@ main(int argc, char *argv[])
 		    sleep(1);
 		}
 	    }
-	}
-	else {
-	    *cp = '\0';
-	    if (strcmp(argv[n], "--proxy") == 0) {
-		proxy_str = cp + 1;
-		n = n + 1;
-	    }
-	    else if (strcmp(argv[n], "--port") == 0) {
-		port = atoi(cp + 1);
-		n = n + 1;
-	    }
-	    else if (strcmp(argv[n], "--host") == 0) {
-		host = cp + 1;
-		n = n + 1;
-	    }
-	    else if (strcmp(argv[n], "--useloadleveler") == 0) {
-		use_load_leveler = 1;
-		n = n + 1;
-	    }
-	    else if (strcmp(argv[n], "--trace") == 0) {
-		if (strcmp(argv[n + 1], "Function") == 0) {
-		    state_trace = 1;
-		    state_trace_detail = 0;
-		}
-		else if (strcmp(argv[n + 1], "Detail") == 0) {
-		    state_trace = 1;
-		    state_trace_detail = 1;
-		    state_info = 1;
-		}
-		else if (strcmp(argv[n + 1], "None") == 0) {
-		    state_trace = 0;
-		    state_trace_detail = 0;
-		}
-		else {
-		    print_message(FATAL_MESSAGE, "Incorrect trace level '%s'\n", optarg);
-		    return 1;
-		}
-		n = n + 1;
-	    }
-	    else if (strcmp(argv[n], "--debug") == 0) {
-	    }
-	    else if (strcmp(argv[n], "--lib-override") == 0) {
-		user_libpath = strdup(argv[n + 1]);
-	    }
-	    else if (strcmp(argv[n], "--multicluster") == 0) {
-		if (strncmp(argv[n + 1], "y", 1) == 0) {
-		    multicluster_status = 1;
-		}
-		else if (strncmp(argv[n + 1], "n", 1) == 0) {
-		    multicluster_status = 0;
-		}
-		else {
-		    multicluster_status = -1;
-		}
-	    }
-	    else if (strcmp(argv[n], "--template-write") == 0) {
-		if (strncmp(argv[n + 1], "y", 1) == 0) {
-		    state_template = 1;
-		}
-		else {
-		    state_template = 0;
-		}
-	    }
-	    else if (strcmp(argv[n], "--node-polling-min") == 0) {
-		min_node_sleep_seconds = atoi(argv[n + 1]);
-	    }
-	    else if (strcmp(argv[n], "--node-polling-max") == 0) {
-		max_node_sleep_seconds = atoi(argv[n + 1]);
-	    }
-	    else if (strcmp(argv[n], "--job-polling") == 0) {
-		jobsleep_seconds = atoi(argv[n + 1]);
-	    }
 	    else if (strcmp(argv[n], "--runMiniproxy") == 0) {
 		run_miniproxy = 1;
 	    }
@@ -5261,6 +5190,74 @@ main(int argc, char *argv[])
 		exit(1);
 	    }
 	}
+	else {
+	    *cp = '\0';
+	    if (strcmp(argv[n], "--proxy") == 0) {
+		proxy_str = cp + 1;
+	    }
+	    else if (strcmp(argv[n], "--port") == 0) {
+		port = atoi(cp + 1);
+	    }
+	    else if (strcmp(argv[n], "--host") == 0) {
+		host = cp + 1;
+	    }
+	    else if (strcmp(argv[n], "--trace") == 0) {
+		if (strcmp(cp + 1, "Function") == 0) {
+		    state_trace = 1;
+		    state_trace_detail = 0;
+		}
+		else if (strcmp(cp + 1, "Detail") == 0) {
+		    state_trace = 1;
+		    state_trace_detail = 1;
+		    state_info = 1;
+		}
+		else if (strcmp(cp + 1, "None") == 0) {
+		    state_trace = 0;
+		    state_trace_detail = 0;
+		}
+		else {
+		    print_message(FATAL_MESSAGE, "Incorrect trace level '%s'\n", argv[n + 1]);
+		    return 1;
+		}
+	    }
+	    else if (strcmp(argv[n], "--useloadleveler") == 0) {
+		use_load_leveler = 1;
+	    }
+	    else if (strcmp(argv[n], "--lib-override") == 0) {
+		user_libpath = strdup(cp + 1);
+	    }
+	    else if (strcmp(argv[n], "--multicluster") == 0) {
+		if (strncmp(cp + 1, "y", 1) == 0) {
+		    multicluster_status = 1;
+		}
+		else if (strncmp(cp + 1, "n", 1) == 0) {
+		    multicluster_status = 0;
+		}
+		else {
+		    multicluster_status = -1;
+		}
+	    }
+	    else if (strcmp(argv[n], "--node_polling_min") == 0) {
+		min_node_sleep_seconds = atoi(cp + 1);
+	    }
+	    else if (strcmp(argv[n], "--node_polling_max") == 0) {
+		max_node_sleep_seconds = atoi(cp + 1);
+	    }
+	    else if (strcmp(argv[n], "--job_polling") == 0) {
+		job_sleep_seconds = atoi(cp + 1);
+	    }
+	    else if (strcmp(argv[n], "--debug") == 0) {
+		/* Do nothing */
+	    }
+	    else {
+		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
+		print_message(FATAL_MESSAGE,
+			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
+			      argv[0]);
+		exit(1);
+	    }
+	}
+	n = n + 1;
     }
 #endif
     if (use_load_leveler) {
