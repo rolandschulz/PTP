@@ -48,6 +48,7 @@ public interface IPTPUIConstants {
     public static final String IUIVIEWGROUP = "viewgroup";
     public static final String IUIZOOMGROUP = "zoomgroup";
     public static final String IUIEMPTYGROUP = "emptygroup";
+    public static final String IUIJOBGROUP = "jobgroup";
  	
 	public static final int INTERNAL_ERROR = 150;
 	public static final int STATUS_CODE_QUESTION = 10000;
