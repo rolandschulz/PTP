@@ -33,7 +33,12 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include"
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+	CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt -I$UTILS/include"
+else
+	CFLAGS="$CFLAGS -Wall -I$UTILS/include"
+fi
 LIBS="$LIBS -L$UTILS"
 
 dnl
