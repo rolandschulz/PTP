@@ -24,17 +24,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.swt.widgets.Shell;
 
 public final class PEResourceManagerConfigurationWizardPage extends
 	AbstractRemoteResourceManagerConfigurationWizardPage {
 	
+    private RMConfigurationWizard configWizard;
+    
 	public PEResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("PEDialogs.ConfigurationTitle"));
 		setTitle(Messages.getString("PEDialogs.ConfigurationTitle"));
 		setDescription(Messages.getString("PEDialogs.Configuration"));
+		configWizard = wizard;
+	}
+	
+	protected String createOptionsDialog(Shell shell, String initialOptions) {
+	    PEResourceManagerOptionDialog dialog;
+	    
+	    dialog = new PEResourceManagerOptionDialog(shell, configWizard, initialOptions);
+	    dialog.setInitialOptions(initialOptions);
+		if (dialog.open() == Dialog.OK) {
+			return dialog.getValue();
+		}
+	    return initialOptions;
 	}
 
 }
