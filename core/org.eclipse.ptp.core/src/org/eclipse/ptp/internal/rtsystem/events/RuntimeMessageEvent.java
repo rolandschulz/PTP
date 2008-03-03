@@ -53,6 +53,11 @@ public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 		AttributeManager attrs = new AttributeManager();
 		attrs.addAttribute(MessageAttributes.getLevelAttributeDefinition().create(level));
 		attrs.addAttribute(MessageAttributes.getTextAttributeDefinition().create(text));
+		try {
+			attrs.addAttribute(MessageAttributes.getCodeAttributeDefinition().create());
+		} catch (IllegalValueException e) {
+		}
+		this.attributes = attrs;
 	}
 	
 	/* (non-Javadoc)
