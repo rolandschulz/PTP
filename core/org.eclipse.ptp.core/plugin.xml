@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="resourcemanager" name="Resource Manager" schema="schema/resourcemanager.exsd"/>
+   <extension-point id="resourceManagers" name="Resource Managers" schema="schema/resourceManagers.exsd"/>
 
 		
 </plugin>

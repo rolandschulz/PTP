@@ -310,10 +310,13 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
 	}
 	
+	public static final String PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID = "debuggerConfigurations";
+	public static final String DEBUGGERID_ELEMENT = "debuggerID";
+
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	protected Map<String, IConfigurationElement> fDebuggerPageMap;
-	
+
 	/**
 	 * The constructor.
 	 */
@@ -379,10 +382,10 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	protected void initializeDebuggerPageMap() {
 		fDebuggerPageMap = new HashMap<String, IConfigurationElement>(10);
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, "PDebuggerPage");
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID);
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 		for(int i = 0; i < infos.length; i++) {
-			String id = infos[i].getAttribute("debuggerID");
+			String id = infos[i].getAttribute(DEBUGGERID_ELEMENT);
 			fDebuggerPageMap.put(id, infos[i]);
 		}
 	}	

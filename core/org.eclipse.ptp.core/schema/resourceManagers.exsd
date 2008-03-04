@@ -3,17 +3,17 @@
 <schema targetNamespace="org.eclipse.ptp.core">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.core" id="resourcemanager" name="Resource Manager"/>
+         <meta.schema plugin="org.eclipse.ptp.core" id="resourceManagers" name="PTP Resource Managers"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows plug-ins to contribute a resource manager factory for creating new instances of a resource manager.
       </documentation>
    </annotation>
 
    <element name="extension">
       <complexType>
          <sequence>
-            <element ref="resourcemanager" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="resourceManager" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -42,7 +42,7 @@
       </complexType>
    </element>
 
-   <element name="resourcemanager">
+   <element name="resourceManager">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -69,7 +69,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         2.0
       </documentation>
    </annotation>
 

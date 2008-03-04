@@ -13,12 +13,12 @@ package org.eclipse.ptp.debug.ui;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
  
 /**
- * Interface for debugger pages contributed via the "CDebuggerPage" 
+ * Interface for debugger pages contributed via the "debuggerConfiguration" 
  * extension point.
  * 
  * @since 3.1
  */
-public interface IPDebuggerPage extends ILaunchConfigurationTab {
+public interface IPDebuggerConfigurationPage extends ILaunchConfigurationTab {
 
 	/**
 	 * Allows the page to initialize itself after being created. 

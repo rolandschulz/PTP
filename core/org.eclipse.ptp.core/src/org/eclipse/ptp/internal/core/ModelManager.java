@@ -54,6 +54,8 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public class ModelManager implements IModelManager {
+	public final static String EXTENSION_POINT_ID = "resourceManagers"; //$NON-NLS-1$
+	
 	private class RMStartupJob extends Job {
 		private IResourceManagerControl resourceManager;
 		
@@ -131,7 +133,7 @@ public class ModelManager implements IModelManager {
 		final ArrayList<AbstractResourceManagerFactory> factoryList = new ArrayList<AbstractResourceManagerFactory>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.core.resourcemanager");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPCorePlugin.getUniqueIdentifier(), EXTENSION_POINT_ID);
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {

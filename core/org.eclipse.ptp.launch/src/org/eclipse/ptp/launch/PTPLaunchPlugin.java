@@ -65,7 +65,8 @@ import org.osgi.framework.BundleContext;
  * The main plugin class to be used in the desktop.
  */
 public class PTPLaunchPlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.eclipse.ptp.launch";
+    public static final String PLUGIN_ID = "org.eclipse.ptp.launch"; //$NON-NLS-1$
+    public static final String EXTENSION_POINT_ID = "rmLaunchConfigurations"; //$NON-NLS-1$
 
 	//The shared instance.
 	private static PTPLaunchPlugin plugin;
@@ -334,7 +335,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
     	rmLaunchConfigurationFactories.clear();
     	
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID + ".rmLaunchConfiguration");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {
