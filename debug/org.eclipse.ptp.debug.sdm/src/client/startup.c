@@ -19,7 +19,6 @@
 
 #include "config.h"
 
-#include <mpi.h>
 #include <getopt.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -27,6 +26,7 @@
 #include "backend.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
+#include "runtime.h"
 
 #define DEFAULT_BACKEND	"gdb-mi"
 #define DEFAULT_PROXY	"tcp"
@@ -159,16 +159,10 @@ main(int argc, char *argv[])
 		goto error_out;
 	}
 	
-	/*
-	 * Become an MPI program
-	 */
 error_out:
 	DEBUG_PRINTS(DEBUG_LEVEL_STARTUP, "starting MPI\n");
 	
-	MPI_Init(&argc, &argv);
-	
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	runtime_init(&size, &rank);
 	
 	DEBUG_SET_RANK(rank);
 	
@@ -181,7 +175,7 @@ error_out:
 	if (fatal_error) {
 		if (rank == 0)
 			print_error_msg();
-		MPI_Finalize();
+		runtime_finalize();
 		return 1;
 	}
 		
@@ -202,7 +196,7 @@ error_out:
 
 	DEBUG_PRINTS(DEBUG_LEVEL_STARTUP, "all finished\n");
 	
-	MPI_Finalize();
+	runtime_finalize();
 	
 	return 0;
 }

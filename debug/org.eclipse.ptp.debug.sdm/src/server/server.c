@@ -122,22 +122,16 @@ setenviron(char *str, int val)
 void
 server(int nprocs, int my_id, int job_id, dbg_backend *dbgr)
 {
-	char **		env = NULL;
+	char **		env;
 	
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "starting server on [%d,%d,%d]\n", my_id, nprocs, job_id);
-	
-	if (job_id >= 0) {
-		env = (char **)malloc(4 * sizeof(char **));
-		asprintf(&env[0], "OMPI_MCA_ns_nds_jobid=%d", job_id);
-		asprintf(&env[1], "OMPI_MCA_ns_nds_vpid=%d", my_id);
-		asprintf(&env[2], "OMPI_MCA_ns_nds_num_procs=%d", nprocs-1);
-		env[3] = NULL;
-	}
 	
 	ClntSvrInit(nprocs, my_id);
 	ClntSvrRegisterCompletionCallback(ClntSvrSendReply);
 	ClntSvrRegisterLocalCmdCallback(do_normal_command, (void *)dbgr);
 	ClntSvrRegisterInterruptCmdCallback(do_int_command, (void *)dbgr);
+	
+	runtime_setup_environment(nprocs-1, my_id, job_id, &env);
 	
 	svr_init(dbgr, event_callback, NULL, env);
 	

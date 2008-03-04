@@ -50,7 +50,6 @@
 
 #include <sys/time.h>
 
-#include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -61,6 +60,7 @@
 #include "bitset.h"
 #include "list.h"
 #include "hash.h"
+#include "runtime.h"
 
 #define ELAPSED_TIME(t1, t2)	(((t1.tv_sec - t2.tv_sec) * 1000000) + (t1.tv_usec - t2.tv_usec))
 #define TIMER_RUNNING			0
@@ -560,8 +560,8 @@ ClntSvrSendReply(bitset *mask, char *msg, void *data)
 	hdr[0] = HashCompute(msg, strlen(msg));
 	hdr[1] = len;
 
-	MPI_Send(hdr, 2, MPI_UNSIGNED, parent, TAG_NORMAL, MPI_COMM_WORLD);
-	MPI_Send(reply_buf, hdr[1], MPI_CHAR, parent, TAG_NORMAL, MPI_COMM_WORLD);
+	runtime_send((char *)hdr, sizeof(hdr), parent, TAG_NORMAL);
+	runtime_send(reply_buf, hdr[1], parent, TAG_NORMAL);
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sent reply <(%x,%d),'%s...'>\n", this, hdr[0], hdr[1], reply_buf);
 	
@@ -587,7 +587,7 @@ send_to_children(bitset *mask, int tag, int timeout, char *msg)
 	for (sibs = bitset_dup(children); (child_id = bitset_firstset(sibs)) != -1; bitset_unset(sibs, child_id)) {
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sibs is %s\n", this, bitset_to_set(sibs));
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending (%s, %d, '%s...') to %d\n", this, tag==TAG_INTERRUPT ? "interrupt" : "normal", len, buf, child_id);
-		MPI_Send(buf, len, MPI_CHAR, child_id, tag, MPI_COMM_WORLD); // TODO: handle fatal errors
+		runtime_send(buf, len, child_id, tag); // TODO: handle fatal errors
 	}
 		
 	free(buf);
@@ -604,30 +604,29 @@ send_to_children(bitset *mask, int tag, int timeout, char *msg)
 static void
 check_for_messages(int ignore_parent)
 {
-	int				flag;
-	int				recv_id;
+	int				avail;
+	int				source;
+	int				tag;
 	int				timeout;
 	int				len;
 	char *			buf;
 	char *			msg;
 	bitset *		mask;
 	unsigned int	hdr[2];
-	MPI_Status		stat;
 	request *		req;
 
-	MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &stat);
+	runtime_probe(&avail, &source, &tag, &len);
 
-	if (flag != 0) {
-		if (stat.MPI_SOURCE == parent) {
+	if (avail != 0) {
+		if (source == parent) {
 			if (ignore_parent)
 				return;
 				
 			/*
 			 * Receive command message from the parent
 			 */
-			MPI_Get_count(&stat, MPI_CHAR, &len);
 			buf = (char *)malloc(len);
-			MPI_Recv(buf, len, MPI_CHAR, parent, stat.MPI_TAG, MPI_COMM_WORLD, &stat);
+			runtime_recv(buf, len, parent, &tag);
 			
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got message from parent (%d, '%s...')\n", this, len, buf);
 			
@@ -636,7 +635,7 @@ check_for_messages(int ignore_parent)
 			/*
 			 * Process request and forward to children if there are any
 			 */
-			if (stat.MPI_TAG == TAG_NORMAL)
+			if (tag == TAG_NORMAL)
 				new_request(mask, msg, timeout, NULL);
 			else
 				interrupt_all_requests(mask);
@@ -665,12 +664,14 @@ check_for_messages(int ignore_parent)
 			 * 
 			 */
 			 
-			recv_id = stat.MPI_SOURCE;
+			tag = TAG_NORMAL;
 
 			/*
 			 * First get header
 			 */
-			MPI_Recv(hdr, 2, MPI_UNSIGNED, recv_id, TAG_NORMAL, MPI_COMM_WORLD, &stat);
+			runtime_recv((char *)hdr, sizeof(hdr), source, &tag);
+			
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got header (%d,%d)\n", this, hdr[0], hdr[1]);
 			
 			len = hdr[1];
 			buf = (char *)malloc(len);
@@ -678,11 +679,11 @@ check_for_messages(int ignore_parent)
 			/*
 			 * Next get the remainder of the message
 			 */
-			MPI_Recv(buf, len, MPI_CHAR, recv_id, TAG_NORMAL, MPI_COMM_WORLD, &stat);
+			runtime_recv(buf, len, source, &tag);
 			
 			unpack_buffer(buf, len, &mask, &timeout, &msg);
 			
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got reply from child %d (%x, %s, '%s')\n", this, recv_id, hdr[0], bitset_to_set(mask), msg);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got reply from child %d (%x, %s, '%s')\n", this, source, hdr[0], bitset_to_set(mask), msg);
 			
 			/*
 			 * Find the request this reply is for.
