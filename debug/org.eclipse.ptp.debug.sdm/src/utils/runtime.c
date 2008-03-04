@@ -17,6 +17,10 @@
  */
 
 #include <mpi.h>
+#include <stdlib.h>
+
+#include "compat.h"
+#include "runtime.h"
 
 static MPI_Status *last_status;
 static int argc = 1;
