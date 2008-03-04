@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="rmLaunchConfiguration" name="Resource Manager Launch Configuration" schema="schema/rmLaunchConfiguration.exsd"/>
+   <extension-point id="rmLaunchConfigurations" name="Resource Manager Launch Configurations" schema="schema/rmLaunchConfigurations.exsd"/>
 	<extension
 		point="org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType

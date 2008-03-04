@@ -2,20 +2,20 @@
 <?eclipse version="3.0"?>
 <plugin>
      <extension
-         point="org.eclipse.ptp.debug.core.PDebugger">
-      <debugger
-            platform="*"
-            name="%SDM.name"
-            modes="run"
-            cpu="*"
-            class="org.eclipse.ptp.debug.sdm.core.SDMDebugger"
-            id="org.eclipse.ptp.debug.sdm">
-      </debugger>
-   </extension>
-     <extension
            point="org.eclipse.core.runtime.preferences">
         <initializer
               class="org.eclipse.ptp.debug.sdm.core.PreferenceInitializer">
         </initializer>
+     </extension>
+     <extension
+           point="org.eclipse.ptp.debug.core.parallelDebuggers">
+        <paralleldebugger
+              class="org.eclipse.ptp.debug.sdm.core.SDMDebugger"
+              cpu="*"
+              id="org.eclipse.ptp.debug.sdm"
+              modes="run"
+              name="%SDM.name"
+              platform="*">
+        </paralleldebugger>
      </extension>
 </plugin>

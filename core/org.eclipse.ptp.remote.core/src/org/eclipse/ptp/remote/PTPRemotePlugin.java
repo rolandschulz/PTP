@@ -44,6 +44,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	}
 
 	public static final String PLUGIN_ID = "org.eclipse.ptp.remote"; //$NON-NLS-1$
+	public static final String EXTENSION_POINT_ID = "remoteServices"; //$NON-NLS-1$
 	
 	// The shared instance
 	private static PTPRemotePlugin plugin;
@@ -266,7 +267,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 */
 	private Map<String, RemoteServicesProxy> retrieveRemoteServices() {
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID + ".remoteServices");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		Map<String, RemoteServicesProxy> services = new HashMap<String, RemoteServicesProxy>(5);
@@ -278,10 +279,9 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 			{
 				RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
 				if (proxy.initialize()) {
-					System.out.println("Adding remote service: " + proxy.getId() + "(" + proxy.getName() + ")");
 					services.put(proxy.getId(), proxy);
 				} else {
-					System.out.println("Failed to initialize remote service: " + proxy.getId() + "(" + proxy.getName() + ")");
+					log("Failed to initialize remote service: " + proxy.getId() + "(" + proxy.getName() + ")");  //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
 				}
 			}
 		}

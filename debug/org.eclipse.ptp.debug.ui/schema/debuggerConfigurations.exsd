@@ -3,17 +3,17 @@
 <schema targetNamespace="org.eclipse.ptp.debug.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.debug.ui" id="PDebuggerPage" name="PTP Debugger Page"/>
+         <meta.schema plugin="org.eclipse.ptp.debug.ui" id="debuggerConfigurations" name="Debugger Configuration Pages"/>
       </appInfo>
       <documentation>
-         This extension point provides a mechanism for contributing UI for org.eclipse.ptp.debug.ui.PDebuggerPage extensions.
+         This extension point provides a mechanism for contributing UI for org.eclipse.ptp.debug.ui.IPDebuggerConfigurationPage extensions.
       </documentation>
    </annotation>
 
    <element name="extension">
       <complexType>
          <sequence>
-            <element ref="debuggerPage" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="debuggerConfiguration" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -42,7 +42,7 @@
       </complexType>
    </element>
 
-   <element name="debuggerPage">
+   <element name="debuggerConfiguration">
       <complexType>
          <attribute name="id" type="string">
             <annotation>
@@ -61,10 +61,10 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  specifies a fully qualified name of a Java class that implements &amp;lt;code&amp;gt;IPDebuggerPage&amp;lt;/code&amp;gt;
+                  specifies a fully qualified name of a Java class that implements &amp;lt;code&amp;gt;IPDebuggerConfigurationPage&amp;lt;/code&amp;gt;
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.debug.ui.IPDebuggerPage"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.debug.ui.ILaunchConfigurationTab"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -76,7 +76,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         1.1
+         2.0
       </documentation>
    </annotation>
 

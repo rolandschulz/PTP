@@ -2,8 +2,8 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.core.resourcemanager">
-      <resourcemanager
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
             class="org.eclipse.ptp.rm.orte.core.rmsystem.ORTEResourceManagerFactory"
             id="org.eclipse.ptp.orte.core.resourcemanager"/>
    </extension>

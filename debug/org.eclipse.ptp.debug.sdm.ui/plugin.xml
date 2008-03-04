@@ -11,10 +11,11 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.debug.ui.PDebuggerPage">
-      <debuggerPage
+         point="org.eclipse.ptp.debug.ui.debuggerConfigurations">
+      <debuggerConfiguration
             class="org.eclipse.ptp.debug.sdm.internal.ui.SDMPage"
             debuggerID="org.eclipse.ptp.debug.sdm"
-            id="org.eclipse.ptp.debug.sdm.SDMPage"/>
+            id="org.eclipse.ptp.debug.sdm.SDMPage">
+      </debuggerConfiguration>
    </extension>
 </plugin>

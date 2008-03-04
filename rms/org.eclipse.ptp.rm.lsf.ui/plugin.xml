@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.ui.rmconfiguration">
+         point="org.eclipse.ptp.ui.rmConfigurations">
       <configurationWizard
             class="org.eclipse.ptp.rm.lsf.ui.wizards.LSFResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.lsf.ui.configurationWizard"/>
@@ -16,7 +16,7 @@
             name="LSF"/>
    </extension>
    <extension
-         point="org.eclipse.ptp.launch.rmLaunchConfiguration">
+         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.lsf.ui.rmLaunchConfiguration.LSFRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.lsf.ui.launchConfiguration">

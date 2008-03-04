@@ -123,7 +123,7 @@ public class PTPDebugCorePlugin extends AbstractUIPlugin {
 	 */
 	public static final Object FAMILY_EVENT = new Object();
 	
-	public static final String PDEBUGGER_EXTENSION_POINT_ID = "PDebugger";
+	public static final String PDEBUGGER_EXTENSION_POINT_ID = "parallelDebuggers";
 	public static final String DEBUGGER_ELEMENT = "debugger";
 
 	private static PTPDebugCorePlugin plugin;

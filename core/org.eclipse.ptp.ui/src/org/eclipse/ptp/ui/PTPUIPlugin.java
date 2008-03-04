@@ -20,7 +20,6 @@
 package org.eclipse.ptp.ui;
 
 import java.util.HashMap;
-import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -53,8 +52,9 @@ import org.osgi.framework.BundleContext;
  * The main PTP user interface plugin.
  */
 public class PTPUIPlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.eclipse.ptp.ui";
-
+    public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
+    public static final String EXTENSION_POINT_ID = "rmConfigurations"; //$NON-NLS-1$
+    
 	//The shared instance.
 	private static PTPUIPlugin plugin;
 	
@@ -136,12 +136,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @param e exception used to generate message
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e)); //$NON-NLS-1$
 	}
 
 	//Resource bundle.
-	private ResourceBundle resourceBundle;
-
 	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
 	
 	private AbstractUIManager machineManager = null;	
@@ -208,7 +206,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		jobManager = null;
 		consoleManager = null;
 		plugin = null;
-		resourceBundle = null;
 	}
 	
 	/**
@@ -230,7 +227,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
     	configurationWizardPageFactories.clear();
     	
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.ui.rmconfiguration");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-	<extension-point id="PDebugger" name="Parallel Tools Core Debugger Extension"/>
+ <extension-point id="parallelDebuggers" name="Parallel Debuggers" schema="schema/paralleldebugger.exsd"/>
 
    <extension
          id="pBreakpointMarker"

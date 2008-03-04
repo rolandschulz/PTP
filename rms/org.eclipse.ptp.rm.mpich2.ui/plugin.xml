@@ -12,7 +12,7 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmconfiguration">
+         point="org.eclipse.ptp.ui.rmConfigurations">
       <configurationWizard
             class="org.eclipse.ptp.rm.mpich2.ui.wizards.MPICH2ResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.mpich2.ui.configurationWizard"/>

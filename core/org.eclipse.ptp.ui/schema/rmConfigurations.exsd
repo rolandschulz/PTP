@@ -3,10 +3,10 @@
 <schema targetNamespace="org.eclipse.ptp.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.ui" id="rmconfuration" name="Resource Manager Configuration Wizard Pages"/>
+         <meta.schema plugin="org.eclipse.ptp.ui" id="rmConfigurations" name="Resource Manager Configuration Wizard Pages"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows plug-ins to contribute a resource manager wizard that is used to configure a new resource manager.
       </documentation>
    </annotation>
 
@@ -76,7 +76,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         2.0
       </documentation>
    </annotation>
 

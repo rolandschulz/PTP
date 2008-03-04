@@ -12,13 +12,13 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmconfiguration">
+         point="org.eclipse.ptp.ui.rmConfigurations">
       <configurationWizard
             class="org.eclipse.ptp.rm.ibm.ll.ui.wizards.IBMLLResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.ibmll.ui.configurationWizard"/>
    </extension>
    <extension
-         point="org.eclipse.ptp.launch.rmLaunchConfiguration">
+         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration.IBMLLRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.ibmll.ui.launchConfiguration"/>

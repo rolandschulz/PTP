@@ -1,21 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ptp.launch">
+<schema targetNamespace="org.eclipse.ptp.debug.core">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.launch" id="rmLaunchConfiguration" name="ResourceManagerLaunchConfiguration"/>
+         <meta.schema plugin="org.eclipse.ptp.debug.core" id="parallelDebuggers" name="Parallel Debuggers"/>
       </appInfo>
       <documentation>
-         This extension point allows plug-ins to contribute
-resource manager specific launch configuration
-information to the ParallelTab launch tab.
+         This extension point allows plug-ins to contribute a parallel debugger implementation.
       </documentation>
    </annotation>
 
    <element name="extension">
       <complexType>
          <sequence>
-            <element ref="launchConfiguration"/>
+            <element ref="debugger" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -44,26 +42,47 @@ information to the ParallelTab launch tab.
       </complexType>
    </element>
 
-   <element name="launchConfiguration">
+   <element name="debugger">
       <complexType>
-         <attribute name="name" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.debug.core.IPDebugger"/>
                </appInfo>
             </annotation>
          </attribute>
          <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="cpu" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="platform" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string" use="required">
             <annotation>
                <documentation>
                   
@@ -78,7 +97,7 @@ information to the ParallelTab launch tab.
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         2.0
       </documentation>
    </annotation>
 
