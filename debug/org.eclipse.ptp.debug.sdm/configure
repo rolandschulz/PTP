@@ -700,7 +700,7 @@ EGREP
 PTPDBGJNI_TRUE
 PTPDBGJNI_FALSE
 LIBOBJS
-OMPI_INFO
+ORTED
 subdirs
 LTLIBOBJS'
 ac_subst_files=''
@@ -5506,16 +5506,16 @@ fi
 done
 
 
-# Extract the first word of "ompi_info", so it can be a program name with args.
-set dummy ompi_info; ac_word=$2
+# Extract the first word of "orted", so it can be a program name with args.
+set dummy orted; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_OMPI_INFO+set}" = set; then
+if test "${ac_cv_path_ORTED+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $OMPI_INFO in
+  case $ORTED in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_OMPI_INFO="$OMPI_INFO" # Let the user override the test with a path.
+  ac_cv_path_ORTED="$ORTED" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -5525,7 +5525,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_OMPI_INFO="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_ORTED="$as_dir/$ac_word$ac_exec_ext"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -5533,24 +5533,26 @@ done
 done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_OMPI_INFO" && ac_cv_path_OMPI_INFO="no"
+  test -z "$ac_cv_path_ORTED" && ac_cv_path_ORTED="no"
   ;;
 esac
 fi
-OMPI_INFO=$ac_cv_path_OMPI_INFO
-if test -n "$OMPI_INFO"; then
-  { echo "$as_me:$LINENO: result: $OMPI_INFO" >&5
-echo "${ECHO_T}$OMPI_INFO" >&6; }
+ORTED=$ac_cv_path_ORTED
+if test -n "$ORTED"; then
+  { echo "$as_me:$LINENO: result: $ORTED" >&5
+echo "${ECHO_T}$ORTED" >&6; }
 else
   { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
 fi
 
 
-if test "$ac_cv_path_OMPI_INFO" = no; then
-	{ { echo "$as_me:$LINENO: error: SDM currently requires Open MPI to be installed." >&5
-echo "$as_me: error: SDM currently requires Open MPI to be installed." >&2;}
-   { (exit 1); exit 1; }; }
+if test "$ac_cv_path_ORTED" != no; then
+
+cat >>confdefs.h <<\_ACEOF
+#define OMPI 1
+_ACEOF
+
 fi
 
 
@@ -6295,7 +6297,7 @@ EGREP!$EGREP$ac_delim
 PTPDBGJNI_TRUE!$PTPDBGJNI_TRUE$ac_delim
 PTPDBGJNI_FALSE!$PTPDBGJNI_FALSE$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
-OMPI_INFO!$OMPI_INFO$ac_delim
+ORTED!$ORTED$ac_delim
 subdirs!$subdirs$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF

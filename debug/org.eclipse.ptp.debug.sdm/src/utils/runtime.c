@@ -147,7 +147,8 @@ int
 runtime_setup_environment(int nprocs, int id, int job_id, char ***envp)
 {
 	char **	env = NULL;
-	
+
+#ifdef OMPI
 	if (job_id >= 0) {
 		env = (char **)malloc(4 * sizeof(char **));
 		asprintf(&env[0], "OMPI_MCA_ns_nds_jobid=%d", job_id);
@@ -155,6 +156,9 @@ runtime_setup_environment(int nprocs, int id, int job_id, char ***envp)
 		asprintf(&env[2], "OMPI_MCA_ns_nds_num_procs=%d", nprocs);
 		env[3] = NULL;
 	}
+#else /* OMPI */
+#warning Debugging is not supported on this architecture
+#endif /* OMPI */
 	
 	*envp = env;
 	
