@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,16 +55,21 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	public IStructuredSelection getSelection(ExecutionEvent event) {
 		
 		
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if (selection instanceof IStructuredSelection) {
-			this.selection = (IStructuredSelection) selection;
+		ISelection curSel = HandlerUtil.getCurrentSelection(event);
+		if (curSel instanceof IStructuredSelection) {
+			selection = (IStructuredSelection) curSel;
+		}
+		if(selection == null) {
+			selection = AnalysisDropdownHandler.getInstance().getLastSelection();
 		}
 		// If there isn't a current selection appropriate for us,
 		// get the last one used in any analysis.
-		if (this.selection == null) {
-			this.selection = AnalysisDropdownHandler.getLastAnalysisSelection();
+		// Since we now register as a selection listener,
+		// I doubt this is ever utilized.
+		if (selection == null) {
+			selection = AnalysisDropdownHandler.getLastAnalysisSelection();
 		}
-		return this.selection;
+		return selection;
 	
 	}
 

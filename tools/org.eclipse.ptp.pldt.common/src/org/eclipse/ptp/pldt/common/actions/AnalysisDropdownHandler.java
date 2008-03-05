@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,10 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.pldt.common.CommonPlugin;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 
@@ -26,14 +30,40 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * to appear beneath it, but  this itself can do something useful
  * by repeating the last-initiated submenu action.  ("Do the last thing again")
  * 
+ * This class also acts as a single point to cache the current structured selection
+ * so that when a menu item is selected, the current selection can be accessed.
+ * 
  * @author tibbitts
  *
  */
-public class AnalysisDropdownHandler extends AbstractHandler {
+public class AnalysisDropdownHandler extends AbstractHandler implements ISelectionListener {
 	static protected RunAnalyseHandler lastAnalysisHandler=null;
 	static protected IStructuredSelection lastAnalysisSelection=null;
+	protected IStructuredSelection lastSelection;
+	protected static AnalysisDropdownHandler instance=null;
 	private static final boolean traceOn=false;
 
+	/**
+	 * Constructor: set singleton instance, and set up selection listener to 
+	 * listen for selections so we can report them more efficiently
+	 * than relying on HandlerUtil.getCurrentSelection();
+	 * if the current selection isn't a structured selection (e.g. editor selection or something
+	 * we don't care about) then we want the last structured selection.
+	 */
+	public AnalysisDropdownHandler(){
+		if(traceOn)System.out.println("AnalysisDropdownHandler() ctor... should not be >1 of these");
+		assert(instance==null);  // we presume this is a singleton
+		instance=this;
+		// register to be notified of future selections
+		ISelectionService ss=CommonPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getSelectionService();
+		ss.addSelectionListener(this);
+		// and cache the selection that was in effect now.
+		ISelection sel= ss.getSelection();
+		if(sel instanceof IStructuredSelection) {
+			lastSelection=(IStructuredSelection)sel;
+			if(traceOn)System.out.println("  ...got initial selection.");
+		}
+	}
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -69,6 +99,35 @@ public class AnalysisDropdownHandler extends AbstractHandler {
 	}
 	public static IStructuredSelection getLastAnalysisSelection(){
 		return lastAnalysisSelection;
+	}
+
+	/**
+	 * Implemented for SelectionListener interface:
+	 * Listen for selection changes and cache the ones that might be
+	 * interesting to us.
+	 */
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		if(selection instanceof IStructuredSelection) {
+			lastSelection=(IStructuredSelection)selection;
+			if(traceOn)System.out.println("ADDH.selectionChanged, got structured selection");
+		}
+		
+	}
+	/**
+	 * The last structured selection seen
+	 * @return
+	 */
+	public IStructuredSelection getLastSelection() {
+		return lastSelection;
+	}
+	/**
+	 * Get the singleton instance of this class, probably for accessing its
+	 * knowledge about the current/last selection of interest.
+	 * 
+	 * @return
+	 */
+	public static AnalysisDropdownHandler getInstance() {
+		return instance;
 	}
 
 }
