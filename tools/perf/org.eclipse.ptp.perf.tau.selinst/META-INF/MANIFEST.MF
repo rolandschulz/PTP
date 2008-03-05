@@ -15,3 +15,4 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: false
 Export-Package: org.eclipse.ptp.perf.tau.selinst,
  org.eclipse.ptp.perf.tau.selinst.popup.actions
+Bundle-Vendor: University of Oregon

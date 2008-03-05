@@ -20,3 +20,4 @@ Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.perf,
  org.eclipse.ptp.perf.internal,
  org.eclipse.ptp.perf.ui
+Bundle-Vendor: University of Oregon

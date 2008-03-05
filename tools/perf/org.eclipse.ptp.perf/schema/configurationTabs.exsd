@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.perf">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.perf" id="perfconfigurationtab" name="Performance Configuration Tab"/>
+         <meta.schema plugin="org.eclipse.ptp.perf" id="configurationTabs" name="Performance Configuration Tabs"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]

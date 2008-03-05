@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.perf">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.perf" id="perfdatamanager" name="Performance Data Manager"/>
+         <meta.schema plugin="org.eclipse.ptp.perf" id="dataManagers" name="Performance Data Managers"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]

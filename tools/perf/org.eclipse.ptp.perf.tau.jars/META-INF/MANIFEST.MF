@@ -34,3 +34,4 @@ Export-Package: edu.uoregon.tau.common,
  edu.uoregon.tau.perfdmf.database,
  edu.uoregon.tau.perfdmf.loader,
  edu.uoregon.tau.vis
+Bundle-Vendor: University of Oregon
