@@ -40,7 +40,7 @@ import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
-	private IRemoteConnection connection;
+	private IRemoteConnection connection = null;
 	private AbstractRemoteResourceManagerConfiguration config;
 
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
@@ -75,7 +75,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		} catch (IOException e) {
 			PTPCorePlugin.log(e);
 		}
-		if (connection.isOpen()) {
+		if (connection != null && connection.isOpen()) {
 			connection.close(monitor);
 		}
 	}
