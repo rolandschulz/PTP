@@ -70,82 +70,97 @@ public class ArgumentParser {
 		StringCharacterIterator iterator = new StringCharacterIterator(commandline);
 	    
 		for (iterator.first(); iterator.current() != CharacterIterator.DONE; iterator.next()) {
-	    	
-	    	char currentChar = iterator.current();
-	    	
-	    	if (Character.isWhitespace(currentChar)) {
-	    		// Skip white space
+
+			// Restart to skip white space
+	    	if (Character.isWhitespace(iterator.current())) {
 	    		continue;
 	    	}
 	    	
 	    	// Read token
 	    	StringBuffer buffer = new StringBuffer();
-	    	for (; iterator.current() != CharacterIterator.DONE; iterator.next()) {
+	    	token_reader: for (; iterator.current() != CharacterIterator.DONE; iterator.next()) {
 	    		char tokenChar = iterator.current();
-		    	if (Character.isWhitespace(tokenChar)) {
-		    		break;
+		    	
+	    		// A white space terminates the token
+	    		if (Character.isWhitespace(tokenChar)) {
+		    		break token_reader;
 		    	}
+		    	
+	    		// Handle character that composes the token
 	    		switch (tokenChar) {
 	    		case '"':
 	    		{
+	    			/*
+	    			 * Read all text within double quotes or until end of string. Allows escaping.
+	    			 */
 	    			iterator.next(); // Skip quote
-	    			while ((iterator.current() != CharacterIterator.DONE) && (iterator.current() != '"')) {
+	    			quoted_reader: while ((iterator.current() != CharacterIterator.DONE) && (iterator.current() != '"')) {
 	    				char innerChar = iterator.current();
 	    				switch (innerChar) {
 	    				case '\\':
 	    					char nextChar = iterator.next();
 	    					switch (nextChar) {
 	    					case CharacterIterator.DONE:
-	    						break;
+	    						break quoted_reader;
 	    					case '"':
 	    						// Add the character, but remove the escape
 	    						buffer.append(nextChar);
 	    						iterator.next();
-	    						continue;
+	    						continue quoted_reader;
 	    					default:
 	    						// Add the character and keep escape
 	    						buffer.append(innerChar);
 	    						buffer.append(nextChar);
 	    						iterator.next();
-	    						continue;
+	    						continue quoted_reader;
 	    					}
 	    				default:
 	    					buffer.append(innerChar);
 	    					iterator.next();
-	    					continue;
+	    					continue quoted_reader;
 	    				}
 	    			}
+	    			continue token_reader;
 	    		}
 	    		case '\'':
 	    		{
-	    			iterator.next(); // Skip quote
+	    			/*
+	    			 * Read all text within single quotes or until end of string. No escaping.
+	    			 */
+	    			iterator.next(); // Skip the quote
 	    			while ((iterator.current() != CharacterIterator.DONE) && (iterator.current() != '\'')) {
 	    				buffer.append(iterator.current());
 	    				iterator.next();
 	    			}
-	    			continue;
+	    			continue token_reader;
 	    		}
 	    		case '\\':
 	    		{
+	    			/*
+	    			 * Read escaped char.
+	    			 */
 	    			char nextChar = iterator.next();
 	    			switch (nextChar) {
 	    			case CharacterIterator.DONE:
-	    				break;
+	    				break token_reader;
 	    			case '\n':
-	    				// Ignore
-	    				continue;
+	    				// Ignore newline. Both lines are concatenated.
+	    				continue token_reader;
 	    			default:
 	    				// Add the character, but remove the escape
 	    				buffer.append(nextChar);
-	    				continue;
+	    				continue token_reader;
 	    			}
 	    		}
 	    		default:
+	    			/*
+	    			 * Any other char, add to the buffer.
+	    			 */
 	    			buffer.append(tokenChar);
-	    			continue;
+	    			continue token_reader;
 	    		}
 	    	}
-	    	result.add(buffer.toString());
+	    	result.add(buffer.toString()); 	
 	    }
 		return result;
 	}
@@ -304,6 +319,7 @@ public class ArgumentParser {
 	 */
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
+		buffer.append("<");
 		Iterator iterator = this.tokens.iterator();
 		boolean first = true;
 		while (iterator.hasNext()) {
@@ -315,47 +331,84 @@ public class ArgumentParser {
 			}
 			buffer.append(token);
 		}
+		buffer.append(">");
 		return buffer.toString();
 	}
 	
 	public static void main(String[] args) {
-		ArgumentParser parser = new ArgumentParser("teste", new String[] {"oi", "tudo!", "tudo bem?"});
+		ArgumentParser parser = new ArgumentParser("foobar", new String[] {"arg1", "arg2", "arg\\3", "arg\"4", "arg'5", "more arguments"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		System.out.println(parser.getCommandLine(false));
 		System.out.println(parser.getCommandLine(true));
 		
-		parser = new ArgumentParser(" teste"); System.out.println(parser);
-		parser = new ArgumentParser("teste "); System.out.println(parser);
-		parser = new ArgumentParser("teste"); System.out.println(parser);
-		parser = new ArgumentParser("teste a"); System.out.println(parser);
-		parser = new ArgumentParser("teste  a"); System.out.println(parser);
-		parser = new ArgumentParser("teste a "); System.out.println(parser);
-		parser = new ArgumentParser("teste	a"); System.out.println(parser);
-		parser = new ArgumentParser("teste a	"); System.out.println(parser);
-		parser = new ArgumentParser("teste	a	"); System.out.println(parser);
-		parser = new ArgumentParser("teste a b"); System.out.println(parser);
-		parser = new ArgumentParser("teste a b "); System.out.println(parser);
-		parser = new ArgumentParser("teste a b c "); System.out.println(parser);
-		parser = new ArgumentParser("teste\\ a b"); System.out.println(parser);
-		parser = new ArgumentParser("teste \\ab"); System.out.println(parser);
-		parser = new ArgumentParser("teste a\\ b\\ c "); System.out.println(parser);
-		parser = new ArgumentParser("teste a\\'c b"); System.out.println(parser);
-		parser = new ArgumentParser("teste a\\\"c b"); System.out.println(parser);
-		parser = new ArgumentParser("teste a 'b c' d"); System.out.println(parser);		
-		parser = new ArgumentParser("teste a 'b\\e' d"); System.out.println(parser);		
-		parser = new ArgumentParser("teste a 'b c d"); System.out.println(parser);		
-		parser = new ArgumentParser("teste a \"b c\" d"); System.out.println(parser);		
-		parser = new ArgumentParser("teste a \"b c\"d"); System.out.println(parser);	
+		parser = new ArgumentParser(" foo"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo "); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo  a"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a "); System.out.println(parser); //$NON-NLS-1$
+		System.out.println();
+		parser = new ArgumentParser(" foo a"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser(" foo a "); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser(" foo   a "); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo	a"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a	"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo	a	"); System.out.println(parser); //$NON-NLS-1$
+		System.out.println();
+		parser = new ArgumentParser("foo a b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a b "); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a b c "); System.out.println(parser); //$NON-NLS-1$
+		System.out.println();
+		parser = new ArgumentParser("foo\\ a b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo \\ab"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a\\ b\\ c "); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("\\foo a b c "); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a b c\\"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \\b c"); System.out.println(parser); //$NON-NLS-1$
+		System.out.println();
+		parser = new ArgumentParser("foo a\\'c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a\\\"c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \\'c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \\\"c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a\\' c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a\\\" c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \\' c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \\\" c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a c b\\'"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a c b\\\""); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a c b \\'"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("foo a c b \\\""); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("\\'foo a c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("\\\"foo a c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("\\' foo a c b"); System.out.println(parser); //$NON-NLS-1$
+		parser = new ArgumentParser("\\\" foo a c b"); System.out.println(parser); //$NON-NLS-1$		
+		System.out.println();
+		parser = new ArgumentParser("'foo a' b c d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a b 'c d'"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b c' d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b\\e' d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \"b\\e\" d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b c d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \"b c d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \"b c\" d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \"b c\"d"); System.out.println(parser);	 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b c' d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b c'd"); System.out.println(parser);	 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b \" c' d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \"b ' c\" d"); System.out.println(parser);	 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a 'b \\\" c' d"); System.out.println(parser);		 //$NON-NLS-1$
+		parser = new ArgumentParser("foo a \"b \' c\" d"); System.out.println(parser);	 //$NON-NLS-1$		
 		
+		System.out.println();		
 		parser = new ArgumentParser(new String[] {}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"a"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"av"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"a d"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"a", "a"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"av", "a"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"a d", "a"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"a", "b b"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"av", "b b"}); System.out.println(parser.getCommandLine(true));
-		parser = new ArgumentParser(new String[] {"a d", "b b"}); System.out.println(parser.getCommandLine(true));
+		parser = new ArgumentParser(new String[] {"a"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$
+		parser = new ArgumentParser(new String[] {"av"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$
+		parser = new ArgumentParser(new String[] {"a d"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$
+		parser = new ArgumentParser(new String[] {"a", "a"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$ //$NON-NLS-2$
+		parser = new ArgumentParser(new String[] {"av", "a"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$ //$NON-NLS-2$
+		parser = new ArgumentParser(new String[] {"a d", "a"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$ //$NON-NLS-2$
+		parser = new ArgumentParser(new String[] {"a", "b b"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$ //$NON-NLS-2$
+		parser = new ArgumentParser(new String[] {"av", "b b"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$ //$NON-NLS-2$
+		parser = new ArgumentParser(new String[] {"a d", "b b"}); System.out.println(parser.getCommandLine(true)); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 	
