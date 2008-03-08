@@ -1025,7 +1025,11 @@ int command_cancel_job(int gui_transmission_id, int nargs, char *args[])
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
   print_message_args(nargs, args);
 
-  job_ident = atoi(args[0]);
+  for (i = 0; i < nargs; i++) {
+    if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
+	  job_ident = proxy_get_attribute_value_int(args[i]);
+    }
+  }
   job_object = get_job_in_list_from_id(job_list, job_ident);
   if (job_object != NULL) {
     my_ll_terminate_job(gui_transmission_id, job_object);
