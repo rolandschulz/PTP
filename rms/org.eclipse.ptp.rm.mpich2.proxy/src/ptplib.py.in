@@ -20,155 +20,359 @@
 from time import ctime
 __author__ = "Greg Watson"
 __date__ = ctime()
-__version__ = "1.0"
+__version__ = "2.0"
 __credits__ = ""
 
 import os, sys, socket, binascii
 
-PROXY_EV_OK		        	= 0
-PROXY_EV_ERROR			    = 1
+PROTOCOL_VERSION			= '2.0'
 
-RTEV_BASE		        	= 200
+CMD_QUIT 					= 0
+CMD_INIT                    = 1
+CMD_MODELDEF                = 2
+CMD_STARTEVENTS             = 3
+CMD_STOPEVENTS              = 4
+CMD_SUBMITJOB               = 5
+CMD_TERMINATEJOB            = 6
 
-RTEV_OK			        	= RTEV_BASE
-RTEV_ERROR			        = RTEV_BASE + 1
-RTEV_JOBSTATE		    	= RTEV_BASE + 2
-RTEV_PROCS		        	= RTEV_BASE + 4
-RTEV_PATTR		        	= RTEV_BASE + 5
-RTEV_NODES			        = RTEV_BASE + 7
-RTEV_NATTR			        = RTEV_BASE + 8
-RTEV_NEWJOB			        = RTEV_BASE + 12
-RTEV_PROCOUT			    = RTEV_BASE + 13
-RTEV_NODECHANGE			    = RTEV_BASE + 14
+EV_OK						= 0
+EV_MESSAGE					= 1
+EV_ERROR					= 5
+EV_SHUTDOWN					= 6
 
-RTEV_ERROR_BASE			    = RTEV_BASE + 1000
-RTEV_ERROR_RUN			    = RTEV_ERROR_BASE + 2
-RTEV_ERROR_TERMINATE_JOB	= RTEV_ERROR_BASE + 3
-RTEV_ERROR_PATTR		    = RTEV_ERROR_BASE + 4
-RTEV_ERROR_PROCS		    = RTEV_ERROR_BASE + 5
-RTEV_ERROR_NODES		    = RTEV_ERROR_BASE + 6
-RTEV_ERROR_NATTR		    = RTEV_ERROR_BASE + 7
-RTEV_ERROR_SIGNAL		    = RTEV_ERROR_BASE + 9
+RUNTIME_EVENT_BASE			= 200;
 
-global ptpCmds
+EV_NEW_JOB 					= RUNTIME_EVENT_BASE + 20;
+EV_NEW_MACHINE 				= RUNTIME_EVENT_BASE + 21;
+EV_NEW_NODE 				= RUNTIME_EVENT_BASE + 22;
+EV_NEW_PROCESS 				= RUNTIME_EVENT_BASE + 23;
+EV_NEW_QUEUE 				= RUNTIME_EVENT_BASE + 24;
+EV_JOB_CHANGE 				= RUNTIME_EVENT_BASE + 30;
+EV_MACHINE_CHANGE 			= RUNTIME_EVENT_BASE + 31;
+EV_NODE_CHANGE 				= RUNTIME_EVENT_BASE + 32;
+EV_PROCESS_CHANGE 			= RUNTIME_EVENT_BASE + 33;
+EV_QUEUE_CHANGE 			= RUNTIME_EVENT_BASE + 34;
+EV_REMOVE_ALL 				= RUNTIME_EVENT_BASE + 40;
+EV_REMOVE_JOB 				= RUNTIME_EVENT_BASE + 41;
+EV_REMOVE_MACHINE 			= RUNTIME_EVENT_BASE + 42;
+EV_REMOVE_NODE 				= RUNTIME_EVENT_BASE + 43;
+EV_REMOVE_PROCESS 			= RUNTIME_EVENT_BASE + 44;
+EV_REMOVE_QUEUE 			= RUNTIME_EVENT_BASE + 45;
+EV_ATTR_DEF 				= RUNTIME_EVENT_BASE + 51;
+	
+LEVEL_FATAL   = 0
+LEVEL_ERROR   = 1
+LEVEL_WARNING = 2
+LEVEL_INFO    = 3
+LEVEL_DEBUG   = 4
 
+ELEMENT_ID_ATTR				= 'id'
+ELEMENT_NAME_ATTR			= 'name'
+MACHINE_STATE_ATTR			= 'machineState'
+MACHINE_STATE_UNKNOWN			= 'UNKNOWN'
+MACHINE_STATE_UP				= 'UP'
+MACHINE_STATE_DOWN				= 'DOWN'
+MACHINE_STATE_ALERT				= 'ALERT'
+JOB_STATE_ATTR				= 'jobState'
+JOB_STATE_INIT					= 'STARTED'
+JOB_STATE_RUNNING				= 'RUNNING'
+JOB_STATE_TERMINATED			= 'TERMINATED'
+JOB_STATE_ERROR					= 'ERROR'
+JOB_SUB_ID_ATTR				= 'jobSubId'
+JOB_NUM_PROCS_ATTR			= 'jobNumProcs'
+JOB_EXEC_NAME_ATTR			= 'execName'
+JOB_EXEC_PATH_ATTR			= 'execPath'
+JOB_WORKING_DIR_ATTR		= 'workingDir'
+JOB_PROG_ARGS_ATTR			= 'progArgs'
+JOB_ENV_ATTR				= 'env'
+JOB_DEBUG_EXEC_NAME_ATTR	= 'debugExecName'
+JOB_DEBUG_EXEC_PATH_ATTR	= 'debugExecPath'
+JOB_DEBUG_ARGS_ATTR			= 'debugArgs'
+JOB_DEBUG_FLAG_ATTR			= 'debug'
+NODE_STATE_ATTR				= 'nodeState'
+NODE_STATE_UP					= 'UP'
+NODE_STATE_DOWN					= 'DOWN'
+NODE_STATE_ERROR				= 'ERROR'
+NODE_STATE_UNKNOWN				= 'UNKNOWN'
+NODE_NUMBER_ATTR			= 'nodeNumber'
+QUEUE_STATE_ATTR			= 'queueState'
+QUEUE_STATE_NORMAL				= 'NORMAL'
+QUEUE_STATE_COLLECTING			= 'COLLECTING'
+QUEUE_STATE_DRAINING			= 'DRAINING'
+QUEUE_STATE_STOPPED				= 'STOPPED'
+QUEUE_ID_ATTR				= 'queueId'
+PROC_STATE_ATTR				= 'processState'
+PROC_STATE_STARTING				= 'STARTING'
+PROC_STATE_RUNNING				= 'RUNNING'
+PROC_STATE_EXITED				= 'EXITED'
+PROC_STATE_EXITED_SIGNALLED		= 'EXITED_SIGNALLED'
+PROC_STATE_STOPPED				= 'STOPPED'
+PROC_STATE_ERROR				= 'ERROR'
+PROC_NODEID_ATTR			= 'processNodeId'
+PROC_PID_ATTR				= 'processPID'
+PROC_INDEX_ATTR				= 'processIndex'
+PROC_STDOUT_ATTR			= 'processStdout'
+PROC_EXITCODE_ATTR			= 'processExitCode'
+PROC_SIGNALNAME_ATTR		= 'processSignalName'
+MSG_LEVEL_ATTR				= 'messageLevel'
+MSG_LEVEL_FATAL					= 'FATAL'
+MSG_LEVEL_ERROR					= 'ERROR'
+MSG_LEVEL_WARNING				= 'WARNING'
+MSG_LEVEL_INFO					= 'INFO'
+MSG_CODE_ATTR				= 'messageCode'
+MSG_TEXT_ATTR				= 'messageText'
+ERROR_CODE_ATTR				= 'errorCode'
+ERROR_MSG_ATTR				= 'errorMsg'
+PROTOCOL_VERSION_ATTR		= 'version'
+BASE_ID_ATTR				= 'baseId'
+
+# 
+# PROXY PACKET FORMAT
+# -------------------
+#
+# LENGTH HEADER BODY
+# 
+# where:
+# 
+# LENGTH	is an PACKET_LENGTH_SIZE hexadecimal number representing
+# 			the total length of the HEADER and BODY sections.
+# 
+# HEADER consists of the following fields:
+# 
+# ' ' CMD_ID ':' TRANS_ID ':' NUM_ARGS
+# 
+# where:
+# 
+# CMD_ID	is an PACKET_ID_SIZE hexadecimal number representing
+# 			the type of this command.
+# TRANS_ID	is an PACKET_TRANS_ID_SIZE hexadecimal number representing
+# 			the transaction ID of the command.
+# NUM_ARGS	is an PACKET_ARGS_LEN_SIZE hexadecimal number representing
+# 			the number of arguments. 
+# 
+# The command body is formatted as a list of NUM_ARGS string arguments, each 
+# preceded by a space (0x20) characters as follows:
+# 	
+# ' ' LENGTH ':' BYTES ... ' ' LENGTH ':' BYTES
+# 
+# where:
+# 
+# LENGTH	is an PACKET_ARGS_LEN_SIZE hexadecimal number representing
+# 			the length of the string.
+# BYTES	are LENGTH bytes of the string. Any characters are permitted, 
+# 			including spaces
+#
+	 
 class PTPProxy:
     def __init__(self, host, port, cmds, debug=0):
-        self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = host
         self.port = port
         self.cmds = cmds
         self.debug = debug
+        
+    #
+    # Get the socket
+    #
     def getsocket(self):
         return self.sock
+    
+    #
+    # Close the socket
+    #
     def close(self):
         self.sock.close()
+    
+    #
+    # Connect to host using port
+    #
     def connect(self):
         self.sock.connect((self.host, self.port))
-    def read_commands(self,*args):
-        if len(args) > 0:
-            sock = args[0]
-        else:
-            sock = self.sock
-        cmd_str = self.read_cmd(sock)
-        if cmd_str == '':      
-            if self.cmds.has_key('EXIT'):
-        	self.cmds['EXIT']([])
-            return
-        cmd = cmd_str.rstrip(' \n').split(' ')
-        pos = 1
-        args = []
-        while pos < len(cmd):
-            args.append(from_ptp_string(cmd[pos]))
-            pos += 1
-        if self.cmds.has_key(cmd[0]):
-            res = []
-            func = self.cmds[cmd[0]]
-            res = func(args)
-            if res[0] < RTEV_ERROR_BASE: # success
-                self.send_ok_event(res[0], res[1], sock)
-            else:
-                self.send_err_event(res[0], res[1], sock)
-    def read_cmd(self, *args):
-        if len(args) > 0:
-            sock = args[0]
-        else:
-            sock = self.sock
-        hdr = sock.recv(9)
+    
+    #
+    # Read and process commands from the client.
+    #
+    def read_command(self, stream):
+        cmd = self.read_and_decode_command(stream)
+        if len(cmd) == 3:
+        	if cmd[0] in self.cmds:
+	         	self.cmds[cmd[0]](cmd[1], cmd[2], self)
+	        else:
+	        	print 'no such command: %d' % cmd[0]
+            
+    #
+    # Read and decode command
+    #
+    def read_and_decode_command(self, stream):
+        msg_len_hex = stream.recv(9)
+        if msg_len_hex == '':
+            return ()
+        msg_len = from_hex(msg_len_hex.rstrip(' ')) - 23 # length of header is 23 bytes
+        self.debug_print('received msg_len %d' % msg_len)
+        hdr = stream.recv(22)
         if hdr == '':
-            return ''
+        	return ()
         self.debug_print('received hdr <%s>' % hdr)
-        msg_len = int(hdr.rstrip(' '), 16)
-        msg = ''
-        while msg_len > 0:
-            try:
-                c = sock.recv(1)
-            except socket.error, errinfo:
-                if errinfo[0] == EINTR:
-                    return msg
-                elif errinfo[0] == ECONNRESET:
-                    return msg
-                else:
-                    return ''
-            except Exception:
-                c = ''
-                msg = ''
-                break
-            msg += c
-            msg_len -= 1
-        self.debug_print('received msg <%s>' % msg)
-        return msg
-    def send_msg(self, str, *args):
-        if len(args) > 0:
-            sock = args[0]
-        else:
-            sock = self.sock
-        msg = '%s %s' % (hex(len(str))[2:].zfill(8),str)
-        self.debug_print('sending msg <%s>' % msg)
-        sock.sendall(msg)
-    def send_event(self, code, res, *args):
-        if len(args) > 0:
-            sock = args[0]
-        else:
-            sock = self.sock
-        msg = '%d %s' % (code,res)
-        self.send_msg(msg, sock)
-    def send_ok_event(self, code, res, *args):
-        if len(args) > 0:
-            sock = args[0]
-        else:
-            sock = self.sock
-        ret_str = '%d' % code
-        for v in res:
-            if isinstance(v, str):
-                ret_str += ' ' + to_ptp_string(v)
-            else:
-                ret_str += ' ' + str(v)
-        self.debug_print('sending event %s' % ret_str)
-        self.send_event(PROXY_EV_OK, ret_str, sock)
-    def send_err_event(self, code, res, *args):
-        if len(args) > 0:
-            sock = args[0]
-        else:
-            sock = self.sock
-        self.send_event(PROXY_EV_OK, '%d %d %s' % \
-        		(RTEV_ERROR, code, to_ptp_string(res)), sock)
+        hdr_val = hdr.split(':')
+        if len(hdr_val) != 3:
+        	return ()
+        cmd_id = from_hex(hdr_val[0])
+        trans_id = from_hex(hdr_val[1])
+        num_attrs = from_hex(hdr_val[2])
+        body = ''
+        if msg_len > 0:
+	        try:
+	            body = stream.recv(msg_len)
+	        except socket.error, errinfo:
+	            if errinfo[0] == EINTR:
+	                return ()
+	            elif errinfo[0] == ECONNRESET:
+	                return ()
+	            else:
+	                return ()
+	        except Exception:
+	            return ()
+        	self.debug_print('received msg body <%s>' % body)
+        attrs = {}
+        while num_attrs > 0:
+        	body_part = body.split(':', 1)
+        	if len(body_part) != 2:
+        		return ()
+        	attr_len = from_hex(body_part[0])
+        	attr = body_part[1][:attr_len]
+        	if attr.find('=') < 0:
+        		return ()
+    		kv = attr.split('=')
+    		if kv[0] in attrs:
+    			val = attrs[kv[0]]
+    			if type(val) == str:
+    				val = list(val)
+    			attrs[kv[0]] = val + kv[1]
+    		else:
+    		 	attrs[kv[0]] = kv[1]
+        	body = body_part[1][attr_len+1:]
+        	num_attrs -= 1
+        return (cmd_id, trans_id, attrs)
+       
+    #
+    # Send msg as a properly formatted packet
+    #
+    def send_packet(self, msg):
+        packet = to_hex(len(msg), 8) + msg
+        self.debug_print('sending msg <%s>' % packet)
+        self.sock.sendall(packet)
+        
+    #
+    # Format arguments into a proxy packet
+    #
+    def send_event(self, event_id, trans_id, attrs):
+        body = ''
+        for attr in attrs:
+        	body = body + ' ' + to_hex(len(str(attr)), 8) + ':' + str(attr)
+        hdr = ' ' + to_hex(event_id, 4) + ':' + to_hex(trans_id, 8) + ':' + to_hex(len(attrs), 8)
+        msg = hdr + body
+        self.send_packet(msg)
+        
+    def send_ok_event(self, trans_id):
+        self.send_event(EV_OK, trans_id, [])
+        
+    def send_shutdown_event(self, trans_id):
+        self.send_event(EV_OK, trans_id, [])
+
+    def send_message_event(self, trans_id, level, code, msg):
+        self.send_event(EV_MESSAGE, trans_id, ['%s=%s' % (MSG_LEVEL_ATTR, level), 
+											   '%s=%d' % (MSG_CODE_ATTR, code),
+											   '%s=%s' % (MSG_TEXT_ATTR, msg)])
+   
+    def send_submitjob_error_event(self, trans_id, job_id, code, msg):
+    	self.send_event(EV_ERROR, trans_id, ['%s=%s' % (JOB_SUB_ID_ATTR, job_id),
+											 '%s=%d' % (ERROR_CODE_ATTR, code),
+											 '%s=%s' % (ERROR_MSG_ATTR, msg)])
+    	
+    def send_new_job_event(self, trans_id, queue_id, job_id_range, name, state, job_sub_id):
+    	self.send_event(EV_NEW_JOB, trans_id, [queue_id, 1, job_id_range, 3,
+											   '%s=%s' % (ELEMENT_NAME_ATTR, name),
+											   '%s=%s' % (JOB_STATE_ATTR, state),
+											   '%s=%s' % (JOB_SUB_ID_ATTR, job_sub_id)])
+    	
+    def send_new_machine_event(self, trans_id, rm_id, machine_id_range, name, state):
+    	self.send_event(EV_NEW_MACHINE, trans_id, [rm_id, 1, machine_id_range, 2,
+												   '%s=%s' % (ELEMENT_NAME_ATTR, name),
+												   '%s=%s' % (MACHINE_STATE_ATTR, state)])
+
+    def send_new_node_event(self, trans_id, machine_id, attrs):
+    	self.send_event(EV_NEW_NODE, trans_id, [machine_id] + attrs)
+    	
+    def send_new_process_event(self, trans_id, job_id, proc_id, name, node_id, index, pid):
+    	self.send_event(EV_NEW_PROCESS, trans_id, [job_id, 1, proc_id, 5, 
+												   '%s=%d' % (ELEMENT_NAME_ATTR, name),
+												   '%s=%s' % (PROC_STATE_ATTR, PROC_STATE_RUNNING),
+												   '%s=%d' % (PROC_NODEID_ATTR, node_id),
+												   '%s=%d' % (PROC_INDEX_ATTR, index),
+												   '%s=%d' % (PROC_PID_ATTR, pid)])
+    	
+    def send_new_queue_event(self, trans_id, rm_id, queue_id, name, state):
+    	self.send_event(EV_NEW_QUEUE, trans_id, [rm_id, 1, queue_id, 2,
+												   '%s=%s' % (ELEMENT_NAME_ATTR, name),
+												   '%s=%s' % (QUEUE_STATE_ATTR, state)])
+    
+    def send_job_state_change_event(self, trans_id, id_range, state):
+    	self.send_event(EV_JOB_CHANGE, trans_id, [1, id_range, 1,
+												  '%s=%s' % (JOB_STATE_ATTR, state)])
+
+    def send_machine_change_event(self, trans_id, id_range, attrs):
+    	self.send_event(EV_MACHINE_CHANGE, trans_id, [1, id_range, len(attrs)] + attrs)
+
+    def send_node_change_event(self, trans_id, id_range, attrs):
+    	self.send_event(EV_NODE_CHANGE, trans_id, [1, id_range, len(attrs)] + attrs)
+
+    def send_process_change_event(self, trans_id, id_range, attrs):
+    	self.send_event(EV_PROCESS_CHANGE, trans_id, [1, id_range, len(attrs)] + attrs)
+
+    def send_process_state_change_event(self, trans_id, id_range, state):
+    	self.send_event(EV_PROCESS_CHANGE, trans_id, [1, id_range, 1, '%s=%s' % (PROC_STATE_ATTR, state)])
+    
+    def send_process_exited_event(self, trans_id, id_range, exit_code):
+    	self.send_event(EV_PROCESS_CHANGE, trans_id, [1, id_range, 2,
+    												  '%s=%s' % (PROC_STATE_ATTR, PROC_STATE_EXITED),
+    												  '%s=%s' % (PROC_EXITCODE_ATTR, exit_code)])
+
+    def send_process_signalled_event(self, trans_id, id_range, signal):
+    	self.send_event(EV_PROCESS_CHANGE, trans_id, [1, id_range, 1, 
+													  '%s=%s' % (PROC_STATE_ATTR, PROC_STATE_EXITED_SIGNALLED),
+													  '%s=%s' % (PROC_SIGNALNAME_ATTR, signal)])
+    
+    def send_process_output_event(self, trans_id, id_range, text):
+    	self.send_event(EV_PROCESS_CHANGE, trans_id, [1, id_range, 1,
+													  '%s=%s' % (PROC_STDOUT_ATTR, text)])
+
+    def send_queue_change_event(self, trans_id, id_range, attrs):
+    	self.send_event(EV_QUEUE_CHANGE, trans_id, [1, id_range, len(attrs)] + attrs)
+
+	#
+    # Print a debugging string
+    #
     def debug_print(self, str):
         if self.debug:
             print str
 
-def to_ptp_string(s):
-    if s == '':
-        return '1:00'
-    res = hex(len(s)+1)[2:] + ':'
-    return res + binascii.b2a_hex(s) + '00'
+#
+# Convert value to a string of hexadecimal digits
+# of length characters
+#
+def to_hex(value, length):
+	return hex(value)[2:].zfill(length)
 
-def from_ptp_string(s):
-    val = s.split(':')
-    if val[0] == '1':
-        return ''
-    return binascii.a2b_hex(val[1][0:-2])
+#
+# Convert a string of hexadecimal digits
+# to an integer value
+#
+def from_hex(str):
+	return int(str, 16)
 
+#
+# Print a string
+#
 def ptp_print(str):
     sys.stdout.write(str + '\n')
     sys.stdout.flush()

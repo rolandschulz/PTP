@@ -23,7 +23,7 @@ usage: ptp_mpich2_proxy [[--host=hostname] --port=port]
 from time import ctime
 __author__ = "Greg Watson"
 __date__ = ctime()
-__version__ = "1.0"
+__version__ = "2.0"
 __credits__ = ""
 
 import sys, os
@@ -34,13 +34,23 @@ from  sets     import  Set
 from  re       import  sub
 from  urllib   import  unquote
 
-from  ptplib   import  PTPProxy, ptp_print, to_ptp_string, from_ptp_string, \
-                       RTEV_OK, RTEV_NEWJOB, RTEV_NODES, RTEV_NATTR, \
-                       RTEV_PATTR, RTEV_JOBSTATE, RTEV_PROCOUT, \
-                       RTEV_ERROR_PROCS, RTEV_ERROR_PATTR, \
-                       RTEV_ERROR_NODES, RTEV_ERROR_NATTR, \
-                       RTEV_ERROR_RUN, RTEV_ERROR_TERMINATE_JOB, \
-                       RTEV_ERROR_BASE
+from  ptplib   import  PTPProxy, ptp_print, \
+                       CMD_QUIT, CMD_INIT, CMD_MODELDEF, CMD_STARTEVENTS, \
+                       CMD_STOPEVENTS, CMD_SUBMITJOB, CMD_TERMINATEJOB, \
+                       ELEMENT_ID_ATTR, ELEMENT_NAME_ATTR, \
+                       MACHINE_STATE_UP, \
+                       NODE_NUMBER_ATTR, NODE_STATE_ATTR, NODE_STATE_UP, \
+                       QUEUE_STATE_NORMAL, \
+                       JOB_STATE_INIT, JOB_STATE_RUNNING, JOB_STATE_ERROR, \
+                       JOB_STATE_TERMINATED, JOB_SUB_ID_ATTR, JOB_EXEC_NAME_ATTR, \
+                       JOB_EXEC_PATH_ATTR, JOB_NUM_PROCS_ATTR, JOB_WORKING_DIR_ATTR, \
+                       JOB_PROG_ARGS_ATTR, JOB_ENV_ATTR, JOB_DEBUG_EXEC_NAME_ATTR, \
+                       JOB_DEBUG_EXEC_PATH_ATTR, JOB_DEBUG_ARGS_ATTR, JOB_DEBUG_FLAG_ATTR, \
+                       PROC_STATE_STARTING, PROC_STATE_RUNNING, PROC_STATE_ERROR, \
+                       PROTOCOL_VERSION_ATTR, PROTOCOL_VERSION, \
+                       MSG_LEVEL_FATAL, MSG_LEVEL_ERROR, \
+                       BASE_ID_ATTR
+
                        
 ptp_print(os.environ['PATH'])
 #
@@ -59,19 +69,24 @@ from  mpdlib   import  mpd_set_my_id, mpd_get_my_id, mpd_uncaught_except_tb, \
                        MPDStreamHandler, mpd_get_my_username, \
                        mpd_get_groups_for_username
                      
-global exit, parmdb, myHost, myIP, cliMode, runningJobs, jobIDMap
-global sigOccurred, streamHandler, manSocks, ptpProxy, extraEvent, debug
+global exit, parmdb, myAddr, myIP, cliMode, jobProcCount, ptpJobIDToJobID
+global sigOccurred, streamHandler, manSocks, proxy, extraEvent, debug
+
+global lastID, rmID, machineID, queueID, nodeIDs, gTransID, procIDs
 
 recvTimeout = 20  # const
-runningJobs = {}
-jobIDMap = []
+jobProcCount = {}
+ptpJobIDToJobID = {}
+procIDs = {}
+nodeIDs = {}
 extraEvent = ()
-ptpProxy = None
+proxy = None
 debug = 0
+lastID = 0
 
 def ptp_mpd_proxy():
-    global exit, parmdb, myHost, myIP, streamHandler
-    global manSocks, runningJobs, ptpProxy, extraEvent, debug
+    global exit, parmdb, myAddr, myIP, streamHandler
+    global manSocks, jobProcCount, proxy, extraEvent, debug
 
     sys.excepthook = mpd_uncaught_except_tb
 
@@ -83,14 +98,13 @@ def ptp_mpd_proxy():
     debug = 0
 
     ptpProxyCmds = {
-	'QUI'		: finish,
-	'STARTDAEMON'	: startdaemon,
-	'RUN'	 	: run,
-	'TERMJOB'	: kill,
-	'GETNODES'	: getnodes,
-	'GETNATTR'	: getnodeattr,
-	'GETPROCS'	: listprocs,
-	'GETPATTR'	: procattrs,
+	CMD_QUIT         : finish,
+	CMD_INIT         : initialize,
+	CMD_MODELDEF     : model_def,
+    CMD_SUBMITJOB    : submit_job,
+	CMD_TERMINATEJOB : terminate_job,
+    CMD_STARTEVENTS  : start_events,
+    CMD_STOPEVENTS   : stop_events,
     }
 
     if len(sys.argv) > 1:
@@ -111,6 +125,8 @@ def ptp_mpd_proxy():
             ptp_print('ptpport = %d' % ptpPort)
         elif args[0] == '--debug':
             debug = 1
+        elif args[0] == '--proxy':
+            pass
         else:
         	usage()
         arg += 1
@@ -122,13 +138,13 @@ def ptp_mpd_proxy():
     #
     if ptpPort != 0:
         ptp_print('about to connect')
-        ptpProxy = PTPProxy(ptpHost, ptpPort, ptpProxyCmds, debug=debug)
+        proxy = PTPProxy(ptpHost, ptpPort, ptpProxyCmds, debug=debug)
     	try:
-    	    ptpProxy.connect()
+    	    proxy.connect()
     	except:
     	    ptp_print('ptp_mpich2_proxy: could not connect to %s:%d' % (ptpHost,ptpPort))
     	    sys.exit(-1)
-    	streamHandler.set_handler(ptpProxy.getsocket(),ptpProxy.read_commands,args=())
+    	streamHandler.set_handler(proxy.getsocket(),proxy.read_command,args=())
 
     #
     # Set up MPD stuff
@@ -140,11 +156,11 @@ def ptp_mpd_proxy():
 
     mpd_set_my_id(myid='ptp_mpich2_proxy')
 
-    myHost = socket.gethostname();
+    myAddr = socket.gethostname();
     try:
-    	hostinfo = socket.gethostbyname_ex(myHost)
+    	hostinfo = socket.gethostbyname_ex(myAddr)
     except:
-    	ptp_print('ptp_mpich2_proxy failed: gethostbyname_ex failed for %s' % (myHost))
+    	ptp_print('ptp_mpich2_proxy failed: gethostbyname_ex failed for %s' % (myAddr))
     	sys.exit(-1)
     myIP = hostinfo[2][0]
 
@@ -192,7 +208,7 @@ def ptp_mpd_proxy():
     	# Send fake event to handle job state changes
     	#
     	if extraEvent != ():
-    	    ptpProxy.send_ok_event(*extraEvent)
+    	    proxy.send_ok_event(*extraEvent)
     	    extraEvent = ()
 
 def do_input(fd):
@@ -210,9 +226,7 @@ def do_input(fd):
     if line[0] == 'exit' or line[0] == 'quit' or line[0] == 'q':
     	exit = 1
     elif line[0] == 'getnodes':
-    	res = getnodes([])
-    elif line[0] == 'getnodeattr':
-    	res = getnodeattr([0, '-1', 'ATTRIB_NODE_NAME', 'ATTRIB_NODE_USER', 'ATTRIB_NODE_GROUP', 'ATTRIB_NODE_STATE', 'ATTRIB_NODE_MODE'])
+    	print get_nodes()
     elif line[0] == 'listjobs':
     	res = listjobs([])
     elif line[0] == 'listprocs':
@@ -249,16 +263,12 @@ def do_input(fd):
     else:
     	ptp_print('Unknown command: %s' % line[0])
     
-    if len(res) == 2:   
-        if res[0] >= RTEV_ERROR_BASE:
-            ptp_print(res[1]);
-        else:
-            for v in res[1]:
-                ptp_print(str(v));
-
     sys.stdout.write('>>> ')
     sys.stdout.flush()
 
+#
+# Open a connection to the mpd console
+#
 def open_mpd_console():
     global parmdb
     if (hasattr(os,'getuid')  and  os.getuid() == 0)  or  parmdb['MPD_USE_ROOT_MPD']:
@@ -271,80 +281,121 @@ def open_mpd_console():
         return conSock
     return 0
 
+#
+# Create a jobid string
+#
 def make_jobid(str):
     smjobid = str.split('  ')  # jobnum, mpdid, and alias (if present)
     return smjobid[0] + '@' + smjobid[1]
 
-def getnodes(args):
+#
+# Generate a new ID
+#
+def generate_id():
+    global lastID
+    lastID += 1
+    return lastID 
+#
+# Query mpd for node information
+#
+def get_nodes():
+    global nodeIDs
     conSock = open_mpd_console()
     if conSock == 0:
-    	return (RTEV_ERROR_NODES, 'Could not connect to MPD')
+    	return []
     msgToSend = { 'cmd' : 'mpdtrace' }
     conSock.send_dict_msg(msgToSend)
-    num_nodes = 0
+    attrs = []
+    node_number = 0
     done = 0
     while not done:
     	msg = conSock.recv_dict_msg(timeout=5.0)
     	if not msg:    # also get this on ^C
     	    conSock.close()
-    	    return (RTEV_ERROR_NODES, 'No message recvd from MPD before timeout')
+    	    return []
     	elif not msg.has_key('cmd'):
     	    conSock.close()
-            return (RTEV_ERROR_NODES, 'Invalid message: %s:' % (msg))
-    	if msg['cmd'] == 'mpdtrace_info':
-    	    num_nodes += 1
-    	elif msg['cmd'] == 'mpdtrace_trailer':
-    	    done = 1
-    conSock.close()
-    return (RTEV_NODES, [num_nodes])
-
-def getnodeattr(args):
-    if len(args) < 2 or args[1] != '-1':
-    	return (RTEV_ERROR_NATTR, 'Invalid arguments')
-    if not 'ATTRIB_NODE_NAME' in args[2:]:
-    	return (RTEV_NATTR, [])
-    conSock = open_mpd_console()
-    if conSock == 0:
-    	return (RTEV_ERROR_NATTR, 'Could not connect to MPD')
-    msgToSend = { 'cmd' : 'mpdtrace' }
-    conSock.send_dict_msg(msgToSend)
-    node_attr = []
-    done = 0
-    while not done:
-    	msg = conSock.recv_dict_msg(timeout=5.0)
-    	if not msg:    # also get this on ^C
-    	    conSock.close()
-    	    return (RTEV_ERROR_NATTR, 'No message recvd from MPD before timeout')
-    	elif not msg.has_key('cmd'):
-    	    conSock.close()
-            return (RTEV_ERROR_NATTR, 'Invalid message: %s:' % (msg))
+            return []
     	if msg['cmd'] == 'mpdtrace_info':
     	    pos = msg['id'].rfind('_')
-    	    for attr in args[2:]:
-        		if attr == 'ATTRIB_NODE_NAME':
-        		    node_attr.append(str(msg['id'][:pos]))  # strip off port
-        		elif attr == 'ATTRIB_NODE_USER':
-        		    node_attr.append(mpd_get_my_username())
-        		elif attr == 'ATTRIB_NODE_GROUP':
-        		    group = pwd.getpwnam(mpd_get_my_username())[3]
-        		    group_name = grp.getgrgid(group)[0]
-        		    node_attr.append(group_name)
-        		elif attr == 'ATTRIB_NODE_STATE':
-        		    node_attr.append('up')
-        		elif attr == 'ATTRIB_NODE_MODE':
-        		    node_attr.append('72')
+            node_name = str(msg['id'][:pos])
+            node_id = generate_id()
+            nodeIDs[node_name] = node_id
+            node_attrs = [node_id, 3]
+            node_attrs.append('%s=%s' % (ELEMENT_NAME_ATTR, node_name))
+            node_attrs.append('%s=%d' % (NODE_NUMBER_ATTR, node_number))
+            node_attrs.append('%s=%s' % (NODE_STATE_ATTR, NODE_STATE_UP))
+            node_number += 1
+            attrs += node_attrs
     	elif msg['cmd'] == 'mpdtrace_trailer':
     	    done = 1
     conSock.close()
-    return (RTEV_NATTR, node_attr)
+    return [node_number] + attrs
 
-def finish(args):
-    global exit
+#
+# Terminate proxy
+#
+def finish(tid, attrs, proxy):
+    global exit, gTransID
     exit = 1
-    return (RTEV_OK, [])
+    if gTransID >= 0:
+        proxy.send_ok_event(gTransID) 
+    proxy.send_shutdown_event(tid)
+    return 0
 
-def startdaemon(args):
-    return (RTEV_OK, [])
+#
+# CMD_INIT
+#
+def initialize(tid, attrs, proxy):
+    global rmID, lastID, gTransID
+    if PROTOCOL_VERSION_ATTR not in attrs:
+        proxy.send_error_event(tid, 0, 'no protocol version supplied')
+        return 0
+    version = attrs[PROTOCOL_VERSION_ATTR]
+    if version != PROTOCOL_VERSION:
+        proxy.send_error_event(tid, 0, 'wire protocol \'%s\' not supported' % version)
+        return 0
+    if BASE_ID_ATTR not in attrs:
+        proxy.send_error_event(tid, 0, 'no base ID supplied')
+        return 0
+    rmID = int(attrs[BASE_ID_ATTR])
+    lastID = int(rmID)
+    gTransID = -1
+    proxy.send_ok_event(tid)
+    return 1
+
+#
+# CMD_MODELDEF
+#
+def model_def(tid, attrs, proxy):
+    proxy.send_ok_event(tid)
+    return 1
+
+#
+# CMD_STARTEVENTS
+#
+def start_events(tid, attrs, proxy):
+    global machineID, queueID, rmID, myAddr, gTransID
+    gTransID = tid
+    machineID = generate_id()
+    proxy.send_new_machine_event(tid, rmID, machineID, myAddr, MACHINE_STATE_UP)
+    attrs = get_nodes()
+    if len(attrs) > 0:
+        proxy.send_new_node_event(tid, machineID, attrs)
+    queueID = generate_id()
+    proxy.send_new_queue_event(tid, rmID, queueID, "default", QUEUE_STATE_NORMAL)
+    return 1
+
+#
+# CMD_STOPEVENTS
+#
+def stop_events(tid, attrs, proxy):
+    global gTransID
+    if gTransID >= 0:
+        proxy.send_ok_event(gTransID)
+        gTransID = -1
+    proxy.send_ok_event(tid)
+    return 1;
 
 def listjobs(args):
     conSock = open_mpd_console()
@@ -379,9 +430,9 @@ def listprocs(args):
     if len(args) != 1:
     	return (RTEV_ERROR_PROCS, 'Invalid arguments')
     jid = int(args[0])
-    if jid >= len(jobIDMap):
+    if jid >= len(ptpJobIDToJobID):
     	return (RTEV_ERROR_PROCS, 'No such job')
-    jobid = jobIDMap(jid)
+    jobid = ptpJobIDToJobID(jid)
     conSock = open_mpd_console()
     if conSock == 0:
     	return (RTEV_ERROR_PROCS, 'Could not connect to MPD')
@@ -409,64 +460,56 @@ def listprocs(args):
     conSock.close()
     return (RTEV_PROCS, procs)
 
-def procattrs(args):
-    global jobIDMap, extraEvent
-    if len(args) < 2 or args[1] != '-1':
-    	return (RTEV_ERROR_NATTR, 'Invalid arguments')
-    jid = int(args[0])
-    if jid >= len(jobIDMap):
-        return (RTEV_ERROR_PROCS, 'No such job')
-    jobid = jobIDMap[jid]
+def get_procs(jobid, proxy):
+    global ptpJobIDToJobID, procIDs, gTransID
     conSock = open_mpd_console()
     if conSock == 0:
-    	return (RTEV_ERROR_PATTR, 'Could not connect to MPD')
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Could not connect to MPD')
+        return 0
     msgToSend = { 'cmd' : 'mpdlistjobs' }
     conSock.send_dict_msg(msgToSend)
     msg = conSock.recv_dict_msg(timeout=5.0)
     if not msg:
     	conSock.close()
-    	return (RTEV_ERROR_PATTR, 'No message recvd from MPD before timeout')
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'No message recvd from MPD before timeout')
+        return 0
     if msg['cmd'] != 'local_mpdid':     # get full id of local mpd for filters later
     	conSock.close()
-    	return (RTEV_ERROR_PATTR, 'Did not recv local_mpdid msg from local mpd; instead, recvd: %s' % msg)
-    pattr = []
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Did not recv local_mpdid msg from local mpd; instead, recvd: %s' % msg)
+        return 0
+    procs = {}
     done = 0
+    mpich_jobid = ptpJobIDToJobID[jobid]
     while not done:
-	msg = conSock.recv_dict_msg()
+        msg = conSock.recv_dict_msg()
         if not msg.has_key('cmd'):
     	    conSock.close()
-            return (RTEV_ERROR_PATTR, 'Invalid message: %s:' % (msg))
+            proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Invalid message: %s:' % (msg))
+            return 0
         if msg['cmd'] == 'mpdlistjobs_info':
-    	    pid = msg['rank']
-    	    if make_jobid(msg['jobid']) == jobid:
-        		attrs = []
-        		for v in args[2:]:
-        		    if v == 'ATTRIB_PROCESS_PID':
-            			attrs.append(str(msg['clipid']))
-        		    elif v == 'ATTRIB_PROCESS_NODE_NAME':
-            			attrs.append(str(msg['host']))
-        		pattr.insert(pid, attrs)
+    	    if make_jobid(msg['jobid']) == mpich_jobid:
+                pid = generate_id()
+                rank = int(msg['rank'])
+                procs[rank] = pid
+                attrs = []
+                attrs.append('%s=%d' % (ELEMENT_NAME_ATTR, rank))
+                proxy.send_new_process_event(gTransID, jobid, pid, rank, nodeIDs[msg['host']], rank, int(msg['clipid']))
         else:  # mpdlistjobs_trailer
             done = 1
     conSock.close()
-    #
-    # Flatten out the pattr list
-    #
-    attrs = []
-    for v1 in pattr:
-    	for v2 in v1:
-    	    attrs.append(v2)
-    extraEvent = (RTEV_JOBSTATE, [jid, 4])
-    return (RTEV_PATTR, attrs)
+    procIDs[jobid] = procs
+    return 1
 
-def kill(args):
-    global jobIDMap, extraEvent
-    if len(args) != 1:
-    	return (RTEV_ERROR_PROCS, 'Invalid arguments')
-    jid = int(args[0])
-    if jid >= len(jobIDMap):
-    	return (RTEV_ERROR_PROCS, 'No such job')
-    jobid = jobIDMap[jid]
+def terminate_job(tid, attrs, proxy):
+    global ptpJobIDToJobID, extraEvent
+    if ELEMENT_ID_ATTR not in attrs:
+    	ptp_print('Invalid arguments')
+        return 0
+    ptp_jobid = int(attrs[ELEMENT_ID_ATTR])
+    if ptp_jobid not in ptpJobIDToJobID:
+    	ptp_print('No such job: %s' % ptp_jobid)
+        return 1
+    jobid = ptpJobIDToJobID[ptp_jobid]
     mpdid = ''
     sjobid = jobid.split('@')
     jobnum = sjobid[0]
@@ -475,81 +518,98 @@ def kill(args):
 
     conSock = open_mpd_console()
     if conSock == 0:
-    	return (RTEV_ERROR_TERMINATE_JOB, 'Could not connect to MPD')
+    	ptp_print('Could not connect to MPD')
+        return 0
     msgToSend = { 'cmd':'mpdkilljob', 'jobnum' : jobnum, 'mpdid' : mpdid,
                   'jobalias' : '', 'username' : mpd_get_my_username() }
     conSock.send_dict_msg(msgToSend)
     msg = conSock.recv_dict_msg(timeout=5.0)
     if not msg:
     	conSock.close()
-    	return (RTEV_ERROR_TERMINATE_JOB, 'No message recvd from MPD before timeout')
+    	ptp_print('No message recvd from MPD before timeout')
+        return 0
     if msg['cmd'] != 'mpdkilljob_ack':
         if msg['cmd'] == 'already_have_a_console':
     	    err_msg = 'Someone already connected to the MPD console'
         else:
             err_msg = 'Unexpected message from mpd: %s' % (msg)
     	conSock.close()
-        return (RTEV_ERROR_TERMINATE_JOB, err_msg)
+        ptp_print(err_msg)
+        return 0
     conSock.close()
     if not msg['handled']:
-        return (RTEV_ERROR_TERMINATE_JOB, 'job not found')
-    extraEvent = (RTEV_JOBSTATE, [jid, 9])
-    return (RTEV_OK, [])
+        ptp_print('warning: job not found')
+    proxy.send_ok_event(tid)
+    return 1
 
-def run(args):
+def submit_job(tid, attrs, proxy):
     global parmdb, sigOccurred, streamHandler, manSocks
-    global tmpJobID, runningJobs, jobIDMap, ringInfo
+    global tmpJobID, jobProcCount, ptpJobIDToJobID, ringInfo, gTransID
     currumask = os.umask(0); os.umask(currumask)
 
+    jobsub_id = ''
     pgm_name = ''
     pgm_args = []
     pgm_env = {}
     exec_path = ''
     nprocs = 0
     cwd = ''
+    debug = 0
+    debug_exec_name = ''
     debug_exec_path = ''
     debug_args = []
 
-    pos = 0
-    while pos < len(args):
-    	if args[pos] == 'execName':
-    	    pgm_name = args[pos+1]
-    	elif args[pos] == 'pathToExec':
-    	    exec_path = args[pos+1]
-    	elif args[pos] == 'numOfProcs':
-    	    nprocs = int(args[pos+1])
-    	elif args[pos] == 'procsPerNode':
-    	    pass
-    	elif args[pos] == 'firstNodeNum':
-    	    pass
-    	elif args[pos] == 'workingDir':
-    	    cwd = args[pos+1]
-    	elif args[pos] == 'progArg':
-    	    pgm_args.append(args[pos+1])
-    	elif args[pos] == 'progEnv':
-    	    env = args[pos+1].split('=')
-    	    if len(env) == 2:
+    if JOB_SUB_ID_ATTR in attrs:
+        jobsub_id = attrs[JOB_SUB_ID_ATTR]
+    if JOB_EXEC_NAME_ATTR in attrs:
+	    pgm_name = attrs[JOB_EXEC_NAME_ATTR]
+    if JOB_EXEC_PATH_ATTR in attrs:
+        exec_path = attrs[JOB_EXEC_PATH_ATTR]
+    if JOB_NUM_PROCS_ATTR in attrs:
+        nprocs = int(attrs[JOB_NUM_PROCS_ATTR])
+    if JOB_WORKING_DIR_ATTR in attrs:
+        cwd = attrs[JOB_WORKING_DIR_ATTR]
+    if JOB_PROG_ARGS_ATTR in attrs:
+        pgm_args = attrs[JOB_PROG_ARGS_ATTR]
+    if JOB_ENV_ATTR in attrs:
+        for kv in attrs[JOB_ENV_ATTR]:
+            env = kv.split('=')
+            if len(env) == 2:
         		pgm_env[env[0]] = env[1]
-    	elif args[pos] == 'debuggerPath':
-    	    debug_exec_path = args[pos+1]
-    	elif args[pos] == 'debuggerArg':
-    	    debug_args.append(args[pos+1])
-    	else:
-    	    return (RTEV_ERROR_RUN, 'Invalid argument: %s' % args[pos])
-    	pos += 2
+    if JOB_DEBUG_EXEC_NAME_ATTR in attrs:
+        debug_exec_name = attrs[JOB_DEBUG_EXEC_NAME_ATTR]
+    if JOB_DEBUG_EXEC_PATH_ATTR in attrs:
+        debug_exec_path = attrs[JOB_DEBUG_EXEC_PATH_ATTR]
+    if JOB_DEBUG_ARGS_ATTR in attrs:
+        debug_args = attrs[JOB_DEBUG_ARGS_ATTR]
+    if JOB_DEBUG_FLAG_ATTR in attrs:
+        debug = 1
 
+    if jobsub_id == '':
+        proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'missing ID on job submission')
+        return 1
+        
     if pgm_name == '':
-    	return (RTEV_ERROR_RUN, 'Must specify a program name')
+    	proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Must specify a program name')
+        return 1
 
+    if exec_path != '':
+        pgm_path = exec_path + '/' + pgm_name
+    else:
+        pgm_path = pgm_name
+        
     if nprocs <= 0:
-    	return (RTEV_ERROR_RUN, 'Invalid number of processes')
+    	proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Invalid number of processes')
+        return 1
 
     if cwd == '':
-    	return (RTEV_ERROR_RUN, 'Must specify a working directory')
+    	proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Must specify a working directory')
+        return 1
 
     conSock = open_mpd_console()
     if conSock == 0:
-    	return (RTEV_ERROR_RUN, 'Could not connect to MPD')
+    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'Could not connect to MPD')
+        return 0
 
     listenSock = MPDListenSock('',0,name='socket_to_listen_for_man')
     listenPort = listenSock.getsockname()[1]
@@ -557,7 +617,7 @@ def run(args):
     parmdb[('thispgm','nprocs')] = nprocs
 
     msgToMPD = { 'cmd'            : 'mpdrun',
-                 'conhost'        : myHost,
+                 'conhost'        : myAddr,
                  'conip'	      : myIP,
                  'spawned'        : 0,
                  'nstarted'       : 0,
@@ -570,13 +630,14 @@ def run(args):
                  'args'           : {},
                  'limits'         : {},
                  'envvars'        : {},
+                 'ifhns'          : {},
                }
 
     msgToMPD['nprocs'] = nprocs
     msgToMPD['conport'] = listenPort
     msgToMPD['limits'][(0,nprocs-1)]  = {}
     msgToMPD['users'][(0,nprocs-1)]   = mpd_get_my_username()
-    msgToMPD['execs'][(0,nprocs-1)]   = pgm_name
+    msgToMPD['execs'][(0,nprocs-1)]   = pgm_path
     msgToMPD['args'][(0,nprocs-1)]    = pgm_args
     msgToMPD['paths'][(0,nprocs-1)]   = os.environ['PATH']
     msgToMPD['cwds'][(0,nprocs-1)]    = cwd
@@ -589,6 +650,7 @@ def run(args):
     msgToMPD['line_labels'] = '%r'
     msgToMPD['stdin_dest'] = '0'
     msgToMPD['gdb'] = 0
+    msgToMPD['gdba'] = ''
     msgToMPD['totalview'] = 0
     msgToMPD['singinitpid'] = parmdb['singinitpid']
     msgToMPD['singinitport'] = parmdb['singinitport']
@@ -600,16 +662,19 @@ def run(args):
     if not msg:
         conSock.close()
         listenSock.close()
-    	return (RTEV_ERROR_RUN, 'Communication with MPD failed')
+    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'Communication with MPD failed')
+        return 0
     elif msg['cmd'] != 'response_get_mpdrun_values':
         conSock.close()
         listenSock.close()
-    	return (RTEV_ERROR_RUN, 'Unexpected msg from MPD :%s:' % (msg))
+    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'Unexpected msg from MPD :%s:' % (msg))
+        return 0
     if msg['mpd_version'] != mpd_version():
         conSock.close()
         listenSock.close()
-    	return (RTEV_ERROR_RUN, 'MPD version %s does not match mpiexec version %s' % \
+    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'MPD version %s does not match mpiexec version %s' % \
                       (msg['mpd_version'],mpd_version()))
+        return 0
 
     # make sure to do this after nprocs has its value
     linesPerRank = {}  # keep this a dict instead of a list
@@ -621,7 +686,8 @@ def run(args):
     if not msg:
         conSock.close()
         listenSock.close()
-    	return (RTEV_ERROR_RUN, 'No msg recvd from MPD when expecting ack of request')
+    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'No msg recvd from MPD when expecting ack of request')
+        return 0
     elif msg['cmd'] == 'mpdrun_ack':
         currRingSize = msg['ringsize']
         currRingNCPUs = msg['ring_ncpus']
@@ -640,66 +706,105 @@ def run(args):
             err_msg = 'Unexpected message from mpd: %s' % (msg)
     	conSock.close()
     	listenSock.close()
-    	return (RTEV_ERROR_RUN, err_msg)
+    	proxy.send_submitjob_error_event(tid, jobsub_id, 0, err_msg)
+        return 1
 
     conSock.close()
+
+    #
+    # Acknowledge job submission
+    #
+    proxy.send_ok_event(tid)
 
     (manSock,addr) = listenSock.accept()
     if not manSock:
     	listenSock.close()
-    	return (RTEV_ERROR_RUN, 'Failed to obtain sock from MPD manager')
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Failed to obtain sock from MPD manager')
+        return 0
+        
+    ptp_jobid = generate_id()
+    jobProcCount[ptp_jobid] = nprocs
+    streamHandler.set_handler(manSock,handle_man_input,args=(streamHandler,ptp_jobid,proxy))
 
     # first, do handshaking with man 
     msg = manSock.recv_dict_msg()  
     if (not msg  or  not msg.has_key('cmd') or msg['cmd'] != 'man_checking_in'):
-    	return (RTEV_ERROR_RUN, 'Invalid handshake msg: %s' % (msg) )
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Invalid handshake msg: %s' % (msg))
+        return 0
 
     msgToSend = { 'cmd' : 'ringsize', 'ring_ncpus' : currRingNCPUs,
                   'ringsize' : currRingSize }
     manSock.send_dict_msg(msgToSend)
     msg = manSock.recv_dict_msg()
     if (not msg  or  not msg.has_key('cmd')):
-    	return (RTEV_ERROR_RUN, 'Invalid reply to ringsize msg: %s' % (msg) )
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Invalid reply to ringsize msg: %s' % (msg))
+        return 0
     if (msg['cmd'] == 'job_started'):
-        jobid = make_jobid(msg['jobid'])
-    	runningJobs[jobid] = nprocs
-    	jobIDMap.append(jobid)
-    	debug_print('mpiexec: job %s started' % jobid)
+        mpich_jobid = make_jobid(msg['jobid'])
+    	ptpJobIDToJobID[ptp_jobid] = mpich_jobid
+    	debug_print('ptp_mpich2_proxy: job %s started' % mpich_jobid)
     else:
-    	return (RTEV_ERROR_RUN, 'Unknown msg: %s' % (msg) )
+    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Unknown msg: %s' % (msg))
+        return 0
 
-    streamHandler.set_handler(manSock,handle_man_input,args=(streamHandler,jobid))
-
+    proxy.send_new_job_event(gTransID, queueID, ptp_jobid, mpich_jobid, JOB_STATE_RUNNING, jobsub_id)
+    if get_procs(ptp_jobid, proxy) == 0:
+        return 0
+    
     (manCliStdoutSock,addr) = listenSock.accept(name='stdout_sock')
     streamHandler.set_handler(manCliStdoutSock,
-			  handle_cli_stdout_input,
-			  args=(streamHandler,jobid))
+			  handle_cli_stdout,
+			  args=(streamHandler,ptp_jobid,proxy))
     (manCliStderrSock,addr) = listenSock.accept(name='stderr_sock')
     streamHandler.set_handler(manCliStderrSock,
-			  handle_cli_stderr_input,
-			  args=(streamHandler,jobid))
+			  handle_cli_stderr,
+			  args=(streamHandler,ptp_jobid,proxy))
 
     manSocks.append(manSock)
 
-    return (RTEV_NEWJOB, [jobIDMap.index(jobid)])
+    return 1
 
-def handle_man_input(sock,streamHandler,jobid):
-    global manSocks, ptpProxy, jobIDMap
+#
+# Find lowest and highest element IDs and
+# return an ID range
+#
+def get_proc_id_range(jobid):
+    global procIDs, jobProcCount
+    if jobid not in procIDs or jobid not in jobProcCount:
+        ptp_print('fatal error: could not find job %s', jobid)
+        return '0'
+    procs = procIDs[jobid]
+    min = procs[0]
+    max = procs[0]
+    for proc in procs.values():
+        if proc > max:
+            max = proc
+        if proc < min:
+            min = proc
+    return '%s-%s' % (min, max)
+    
+def handle_man_input(sock,streamHandler,jobid,proxy):
+    global manSocks, jobIDToPTPJobId, gTransID, procIDs, jobProcCount
     msg = sock.recv_dict_msg()
     if not msg:
+        # The the job is terminated, we will enter here. This doesn't
+        # seem right, but it's what appears to happen.
+        proxy.send_process_signalled_event(gTransID, get_proc_id_range(jobid), signal.SIGKILL)
+        proxy.send_job_state_change_event(gTransID, jobid, JOB_STATE_TERMINATED)
         streamHandler.del_handler(sock)
     elif not msg.has_key('cmd'):
-        ptp_print('mpiexec: from man, invalid msg=:%s:' % (msg) )
-    elif msg['cmd'] == 'execution_problem':
-        ptp_print('rank %d (%s) in job %s failed to find executable %s' % \
-              ( msg['rank'], msg['src'], msg['jobid'], msg['exec'] ))
-        host = msg['src'].split('_')[0]
-        reason = unquote(msg['reason'])
-        ptp_print('problem with execution of %s  on  %s:  %s ' % \
-              (msg['exec'],host,reason))
-        # keep going until all man's finish
-    	if ptpProxy != None:
-    	    ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), 9])
+        ptp_print('ptp_mpich2_proxy: from man, invalid msg=:%s:' % (msg))
+    elif msg['cmd'] == 'startup_status':
+        if msg['rc'] != 0:
+            ptp_print('rank %d (%s) in job %s failed to find executable %s' % \
+                  ( msg['rank'], msg['src'], msg['jobid'], msg['exec'] ))
+            host = msg['src'].split('_')[0]
+            reason = unquote(msg['reason'])
+            ptp_print('problem with execution of %s  on  %s:  %s ' % \
+                  (msg['exec'],host,reason))
+            # keep going until all man's finish
+            proxy.send_process_state_change_event(gTransID, get_proc_id_range(jobid), PROC_STATE_ERROR)
+            proxy.send_job_state_change_event(gTransID, jobid, JOB_STATE_ERROR)
     	return
     elif msg['cmd'] == 'job_aborted_early':
         ptp_print('rank %d in job %s caused collective abort of all ranks' % \
@@ -709,16 +814,19 @@ def handle_man_input(sock,streamHandler,jobid):
             killed_status = status & 0x007f  # AND off core flag
             ptp_print('  exit status of rank %d: killed by signal %d ' % \
                   (msg['rank'],killed_status))
+            proxy.send_process_signalled_event(gTransID, procIDs[jobid][int(msg['rank'])], killed_status)
         elif hasattr(os,'WEXITSTATUS'):
             exit_status = os.WEXITSTATUS(status)
             ptp_print('  exit status of rank %d: return code %d ' % \
                   (msg['rank'],exit_status))
-    	job_state = 8
-        runningJobs[jobid] -= 1
+            proxy.send_process_exited_event(gTransID, procIDs[jobid][int(msg['rank'])], exit_status)
+    	job_state = JOB_STATE_ERROR
+        jobProcCount[jobid] -= 1
     elif msg['cmd'] == 'job_aborted':
         ptp_print('job aborted; reason = %s' % (msg['reason']))
-        job_state = 9
-        runningJobs[jobid] = 0
+        proxy.send_process_state_change_event(gTransID, get_proc_id_range(jobid), PROC_STATE_ERROR)
+        job_state = JOB_STATE_ERROR
+        jobProcCount[jobid] = 0
     elif msg['cmd'] == 'client_exit_status':
         ptp_print("exit info: rank=%d  host=%s  pid=%d  status=%d" % \
               (msg['cli_rank'],msg['cli_host'],
@@ -728,41 +836,44 @@ def handle_man_input(sock,streamHandler,jobid):
             killed_status = status & 0x007f  # AND off core flag
             ptp_print('exit status of rank %d: killed by signal %d ' % \
                    (msg['cli_rank'],killed_status))
+            proxy.send_process_signalled_event(gTransID, procIDs[jobid][int(msg['cli_rank'])], killed_status)
         elif hasattr(os,'WEXITSTATUS'):
             exit_status = os.WEXITSTATUS(status)
             ptp_print('exit status of rank %d: return code %d ' % \
                   (msg['cli_rank'],exit_status))
-        job_state = 8
-        runningJobs[jobid] -= 1
+            proxy.send_process_exited_event(gTransID, procIDs[jobid][int(msg['cli_rank'])], exit_status)
+        job_state = JOB_STATE_TERMINATED
+        jobProcCount[jobid] -= 1
     else:
         ptp_print('unrecognized msg from manager :%s:' % msg)
+        return
 
-    if runningJobs[jobid] <= 0:
-        if ptpProxy != None:
-            ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), job_state])
+    if jobProcCount[jobid] <= 0:
+        proxy.send_job_state_change_event(gTransID, jobid, job_state)
+        del ptpJobIDToJobID[jobid]
+        del procIDs[jobid]
     	streamHandler.del_handler(sock)
     	manSocks.remove(sock)
     	sock.close()
 
-def handle_cli_stdout_input(sock,streamHandler,jobid):
-    global ptpProxy
+def handle_cli_stdout(sock,streamHandler,jobid,proxy):
+    global procIDs
     msg = sock.recv_one_line()
     if not msg:
     	streamHandler.del_handler(sock)
     else:
     	try:
     	    (rank,rest) = msg.rstrip().split(':',1)
-    	    rank = int(rank)
+            rank = int(rank)
     	except:
     	    rest = msg.rstrip()
     	    rank = 0
-    	if ptpProxy != None:
-    	    ptpProxy.send_ok_event(RTEV_PROCOUT, [jobIDMap.index(jobid), rank, rest])
-    	else:
-    	    sys.stdout.write(msg)
-    	    sys.stdout.flush()
+        if jobid in procIDs:
+            procs = procIDs[jobid]
+            if rank in procs:
+                proxy.send_process_output_event(gTransID, procs[rank], rest)
 
-def handle_cli_stderr_input(sock,streamHandler,jobid):
+def handle_cli_stderr(sock,streamHandler,jobid,proxy):
     msg = sock.recv(1024)
     if not msg:
         streamHandler.del_handler(sock)
