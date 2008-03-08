@@ -2162,8 +2162,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 int
 ORTE_TerminateJob(int trans_id, int nargs, char **args)
 {
+	int			i;
 	int			rc;
-	int			jobid;
+	int			jobid = -1;
 	ptp_job *	j;
 	
 	if (proxy_state != STATE_RUNNING) {
@@ -2171,13 +2172,17 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 	
-	if (nargs < 1) {
-		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "incorrect arg count");
+	for (i = 0; i < nargs; i++) {
+		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
+			jobid = proxy_get_attribute_value_int(args[i]);
+		}
+	}
+	
+	if (jobid < 0) {
+		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "no such job");
 		return PROXY_RES_OK;
 	}
 	
-	jobid = (int)strtol(args[0], NULL, 10);
-
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->terminating) {
 			sendJobErrorEvent(trans_id, args[0], "Job termination already requested");
@@ -2192,6 +2197,8 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
 		
 		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_JOB, rc)) return 1;
+		
+		sendOKEvent(trans_id);
 	}
 	
 	return PROXY_RES_OK;

@@ -1316,14 +1316,19 @@ terminate_job(int trans_id, int nargs, char *args[])
      */
     pthread_t kill_tid;
     jobinfo *job;
-    int job_ident;
+    int job_ident = -1;
+    int i;
 
     TRACE_ENTRY;
     print_message_args(nargs, args);
     pthread_mutex_lock(&job_lock);
     SetList(jobs);
     job = GetListElement(jobs);
-    job_ident = atoi(args[0]);
+	for (i = 0; i < nargs; i++) {
+		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
+			job_ident = proxy_get_attribute_value_int(args[i]);
+		}
+	}
     while (job != NULL) {
 	if (job_ident == job->proxy_jobid) {
 	    break;
