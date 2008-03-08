@@ -20,7 +20,6 @@ package org.eclipse.ptp.rm.mpich2.core.rmsystem;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -37,7 +36,6 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 public class MPICH2ResourceManager extends AbstractRuntimeResourceManager {
 
 	private Integer MPICH2RMID;
-
 
 	public MPICH2ResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id.toString(), universe, config);
@@ -76,7 +74,6 @@ public class MPICH2ResourceManager extends AbstractRuntimeResourceManager {
 		return newJob(queue, jobId, attrs);
 	}
 
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateMachine(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
@@ -113,17 +110,11 @@ public class MPICH2ResourceManager extends AbstractRuntimeResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
+	protected IRuntimeSystem doCreateRuntimeSystem() {
 		MPICH2ResourceManagerConfiguration config = (MPICH2ResourceManagerConfiguration) getConfiguration();
 		/* load up the control and monitoring systems for OMPI */
 		MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(config, MPICH2RMID);
 		return new MPICH2RuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
-	 */
-	protected void doDispose() {
 	}
 
 	/* (non-Javadoc)

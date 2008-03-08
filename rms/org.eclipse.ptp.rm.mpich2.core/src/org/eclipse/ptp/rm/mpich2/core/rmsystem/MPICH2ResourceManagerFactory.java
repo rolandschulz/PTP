@@ -48,7 +48,6 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		MPICH2ResourceManagerConfiguration configuration = (MPICH2ResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		//Preferences p = plugin.getPluginPreferences();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new MPICH2ResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}

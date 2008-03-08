@@ -25,7 +25,8 @@ import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
-final public class MPICH2ResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration {
+final public class MPICH2ResourceManagerConfiguration extends 
+		AbstractRemoteResourceManagerConfiguration implements Cloneable {
 	
 	public static IResourceManagerConfiguration load(MPICH2ResourceManagerFactory factory,
 			IMemento memento) {

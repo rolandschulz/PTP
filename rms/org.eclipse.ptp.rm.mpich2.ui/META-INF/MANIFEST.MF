@@ -13,5 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.ui,
  org.eclipse.ptp.rm.mpich2.core,
  org.eclipse.ptp.remote,
- org.eclipse.ptp.rm.remote
+ org.eclipse.ptp.rm.remote,
+ org.eclipse.ptp.launch
 Eclipse-LazyStart: true

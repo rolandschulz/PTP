@@ -17,5 +17,12 @@
             class="org.eclipse.ptp.rm.mpich2.ui.wizards.MPICH2ResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.mpich2.ui.configurationWizard"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
+      <launchConfiguration
+            class="org.eclipse.ptp.rm.mpich2.ui.rmLaunchConfiguration.MPICH2RMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.rm.mpich2.ui.launchConfiguration">
+      </launchConfiguration>
+   </extension>
 
 </plugin>

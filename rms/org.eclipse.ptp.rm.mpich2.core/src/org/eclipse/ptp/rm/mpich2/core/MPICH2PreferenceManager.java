@@ -33,10 +33,6 @@ public class MPICH2PreferenceManager {
 		return OPTIONS;
 	}
 
-	public static String getDefaultProxyExecutableName() {
-		return PROXY_EXECUTABLE_NAME;
-	}
-
 	public static String getDefaultProxyExecutablePath() {
 		return PROXY_EXECUTABLE_PATH;
 	}
