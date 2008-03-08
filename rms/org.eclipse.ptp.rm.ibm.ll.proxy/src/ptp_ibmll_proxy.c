@@ -1020,6 +1020,7 @@ int command_halt_events(int gui_transmission_id, int nargs, char *args[])
  *************************************************************************/
 int command_cancel_job(int gui_transmission_id, int nargs, char *args[])
 {
+  int i;
   int job_ident = -1;
   JobObject *job_object = NULL;
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
