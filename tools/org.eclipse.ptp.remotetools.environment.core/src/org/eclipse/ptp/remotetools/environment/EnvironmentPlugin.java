@@ -41,7 +41,6 @@ public class EnvironmentPlugin extends Plugin {
 
 	final public static String FILENAME = "environments.xml"; //$NON-NLS-1$
 	final public static String EXT_CONTROLS_ID = "org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate"; //$NON-NLS-1$
-	final public static String EXT_PROVIDER_ID = "org.eclipse.ptp.remotetools.environment.core.remoteTargetProvider"; //$NON-NLS-1$
 	final private static String ID = "org.eclipse.ptp.remotetools.environment.core"; //$NON-NLS-1$
 	
 	//The shared instance.

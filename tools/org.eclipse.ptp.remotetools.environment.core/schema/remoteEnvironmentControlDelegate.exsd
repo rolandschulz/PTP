@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.remotetools.environment.management.ICellTargetEnvironment"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.remotetools.environment.extension.ITargetTypeExtension"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -69,7 +69,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         2.0
       </documentation>
    </annotation>
 
