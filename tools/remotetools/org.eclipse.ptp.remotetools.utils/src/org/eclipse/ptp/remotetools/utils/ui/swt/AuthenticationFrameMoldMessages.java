@@ -14,7 +14,8 @@ package org.eclipse.ptp.remotetools.utils.ui.swt;
 import org.eclipse.osgi.util.NLS;
 
 public class AuthenticationFrameMoldMessages extends NLS {
-	private static final String BUNDLE_NAME = "com.ibm.celldt.ui.swt.auth_frame_messages"; //$NON-NLS-1$
+	// FIXME wrong reference to bundle
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.remotetools.utils.ui.swt.auth_frame_messages"; //$NON-NLS-1$
 
 	public static String AuthenticationFrameMold_Button_HideAdvanced;
 
