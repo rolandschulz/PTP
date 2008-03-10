@@ -8,9 +8,9 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.internal.core;
+package org.eclipse.ptp.rdt.services.internal.core;
 
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
+import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
 
 /**
  * @author greg
@@ -28,21 +28,21 @@ public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getId()
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor#getId()
 	 */
 	public String getId() {
 		return id;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getName()
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getServiceId()
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor#getServiceId()
 	 */
 	public String getServiceId() {
 		return serviceId;

@@ -4,7 +4,7 @@
    <extension-point id="providers" name="Service Providers" schema="schema/providers.exsd"/>
    <extension-point id="services" name="Services" schema="schema/services.exsd"/>
    <extension
-         point="org.eclipse.ptp.services.services">
+         point="org.eclipse.ptp.rdt.services.services">
       <service
             id="test1"
             name="Test1">
