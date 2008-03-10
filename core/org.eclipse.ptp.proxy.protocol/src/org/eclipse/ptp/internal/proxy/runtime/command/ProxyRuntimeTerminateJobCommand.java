@@ -16,11 +16,11 @@ import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand;
 public class ProxyRuntimeTerminateJobCommand extends AbstractProxyCommand
 		implements IProxyRuntimeTerminateJobCommand {
 
-	public final static String ID_ATTR = "id";
+	public final static String JOB_ID_ATTR = "jobId";
 
 	public ProxyRuntimeTerminateJobCommand(String jobId) {
 		super(TERMINATE_JOB);
-		addArgument(ID_ATTR + "=" + jobId);
+		addArgument(JOB_ID_ATTR + "=" + jobId);
 	}
 
 	public ProxyRuntimeTerminateJobCommand(int transID, String[] args) {

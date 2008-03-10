@@ -1325,7 +1325,7 @@ terminate_job(int trans_id, int nargs, char *args[])
     SetList(jobs);
     job = GetListElement(jobs);
 	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
+		if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
 			job_ident = proxy_get_attribute_value_int(args[i]);
 		}
 	}
