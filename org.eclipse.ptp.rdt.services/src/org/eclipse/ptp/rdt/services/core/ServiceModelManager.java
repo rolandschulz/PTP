@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.core;
+package org.eclipse.ptp.rdt.services.core;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,11 +22,11 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.services.Activator;
-import org.eclipse.ptp.services.internal.core.Service;
-import org.eclipse.ptp.services.internal.core.ServiceProviderDescriptor;
-import org.eclipse.ptp.services.ui.IServiceProviderConfiguration;
-import org.eclipse.ptp.services.ui.Messages;
+import org.eclipse.ptp.rdt.services.Activator;
+import org.eclipse.ptp.rdt.services.internal.core.Service;
+import org.eclipse.ptp.rdt.services.internal.core.ServiceProviderDescriptor;
+import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
+import org.eclipse.ptp.rdt.services.ui.Messages;
 
 public class ServiceModelManager implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "services"; //$NON-NLS-1$
@@ -52,7 +52,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
 	 */
 	public void addConfiguration(IProject project, IServiceConfiguration conf) {
 		Set<IServiceConfiguration> confs = projectConfigurations.get(project);
@@ -62,21 +62,21 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
 	 */
 	public IServiceConfiguration getActiveConfiguration(IProject project) {
 		return activeConfigurations.get(project);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
 	 */
 	public IServiceConfiguration getConfiguration(IProject project, String name) {
 		return configurations.get(name);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project) {
 		return projectConfigurations.get(project);
@@ -127,7 +127,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices()
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getServices()
 	 */
 	public Set<IService> getServices() {
 		loadServices();
@@ -135,14 +135,14 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
 	 */
 	public Set<IService> getServices(IProject project) {
 		return projectServices.get(project);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getServices(java.lang.String)
 	 */
 	public Set<IService> getServices(String natureId) {
 		loadServices();
@@ -150,7 +150,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
 	 */
 	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
 		Set<IServiceConfiguration> confs = projectConfigurations.get(project);
@@ -160,7 +160,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
 	 */
 	public void setActiveConfiguration(IProject project,
 			IServiceConfiguration configuration) {

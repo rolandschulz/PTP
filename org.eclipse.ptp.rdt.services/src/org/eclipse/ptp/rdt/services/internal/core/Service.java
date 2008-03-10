@@ -8,13 +8,13 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.internal.core;
+package org.eclipse.ptp.rdt.services.internal.core;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
+import org.eclipse.ptp.rdt.services.core.IService;
+import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
 
 /**
  * @author greg
@@ -33,42 +33,42 @@ public class Service implements IService {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IService#addServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
+	 * @see org.eclipse.ptp.rdt.services.core.IService#addServiceProvider(org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor)
 	 */
 	public void addServiceProvider(IServiceProviderDescriptor provider) {
 		serviceProviderDescriptors.add(provider);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IService#getId()
+	 * @see org.eclipse.ptp.rdt.services.core.IService#getId()
 	 */
 	public String getId() {
 		return serviceId;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IService#getName()
+	 * @see org.eclipse.ptp.rdt.services.core.IService#getName()
 	 */
 	public String getName() {
 		return serviceName;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IService#getNatures()
+	 * @see org.eclipse.ptp.rdt.services.core.IService#getNatures()
 	 */
 	public Set<String> getNatures() {
 		return serviceNatures;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IService#getProviders()
+	 * @see org.eclipse.ptp.rdt.services.core.IService#getProviders()
 	 */
 	public Set<IServiceProviderDescriptor> getProviders() {
 		return serviceProviderDescriptors;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IService#removeServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
+	 * @see org.eclipse.ptp.rdt.services.core.IService#removeServiceProvider(org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor)
 	 */
 	public void removeServiceProvider(IServiceProviderDescriptor provider) {
 		serviceProviderDescriptors.remove(provider);
