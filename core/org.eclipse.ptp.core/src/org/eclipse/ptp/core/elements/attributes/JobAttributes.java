@@ -47,6 +47,7 @@ public class JobAttributes {
 	private static final String EXEC_PATH_ATTR_ID = "execPath";
 	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding";
 	private static final String LAUNCHED_BY_PTP_FLAG_ATTR_ID = "launchedByPTP";
+	private static final String JOB_ID_ATTR_ID = "jobId";
 	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
 	private static final String PROG_ARGS_ATTR_ID = "progArgs";
 	private static final String QUEUEID_ATTR_ID = "queueId";
@@ -93,6 +94,10 @@ public class JobAttributes {
 	private final static BooleanAttributeDefinition launchedByPTPFlagAttrDef = 
 		new BooleanAttributeDefinition(LAUNCHED_BY_PTP_FLAG_ATTR_ID, "Launched By PTP", 
 				"Application was launched by PTP", true, false);
+
+	private final static StringAttributeDefinition jobIdAttrDef = 
+		new StringAttributeDefinition(JOB_ID_ATTR_ID, "Job ID",
+				"Job ID that command applies to", true, "");
 
 	private final static IntegerAttributeDefinition numProcsAttrDef = 
 		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", 
@@ -150,6 +155,7 @@ public class JobAttributes {
 				execNameAttrDef, 
 				execPathAttrDef,
 				ioForwardingAttrDef,
+				jobIdAttrDef,
 				launchedByPTPFlagAttrDef,
 				numProcsAttrDef,
 				progArgsAttrDef,
@@ -180,6 +186,10 @@ public class JobAttributes {
 		return ioForwardingAttrDef;
 	}
 
+	public static StringAttributeDefinition getJobIdAttributeDefinition() {
+		return jobIdAttrDef;
+	}
+	
 	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
 		return numProcsAttrDef;
 	}

@@ -2173,7 +2173,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	}
 	
 	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
+		if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
 			jobid = proxy_get_attribute_value_int(args[i]);
 		}
 	}

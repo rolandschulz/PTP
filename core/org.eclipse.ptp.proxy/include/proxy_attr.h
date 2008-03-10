@@ -40,6 +40,7 @@
 #define 	JOB_STATE_TERMINATED		"TERMINATED"
 #define 	JOB_STATE_ERROR				"ERROR"
 #define JOB_SUB_ID_ATTR				"jobSubId"
+#define JOB_ID_ATTR					"jobId"
 #define JOB_NUM_PROCS_ATTR			"jobNumProcs"
 #define JOB_EXEC_NAME_ATTR			"execName"
 #define JOB_EXEC_PATH_ATTR			"execPath"
