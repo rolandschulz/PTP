@@ -2,6 +2,5 @@
 <?eclipse version="3.0"?>
 <plugin>
    <extension-point id="remoteEnvironmentControlDelegate" name="Remote Environment Control Delegate" schema="schema/remoteEnvironmentControlDelegate.exsd"/>
-   <extension-point id="remoteTargetProvider" name="Remote Target Provider" schema="schema/remoteTargetProvider.exsd"/>
   
 </plugin>
