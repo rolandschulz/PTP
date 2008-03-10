@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.services">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.services" id="service" name="Service"/>
+         <meta.schema plugin="org.eclipse.ptp.services" id="services" name="Services"/>
       </appInfo>
       <documentation>
          Used to define a service. This extension point is intended to allow certain services to be abstracted. For example, to provide remote implementations of project build services.
