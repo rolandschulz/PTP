@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.core;
+package org.eclipse.ptp.rdt.services.core;
 
 /**
  * An IServiceProviderConfiguration represents a particular set of service providers

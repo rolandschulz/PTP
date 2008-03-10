@@ -1,4 +1,4 @@
-package org.eclipse.ptp.services;
+package org.eclipse.ptp.rdt.services;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -11,7 +11,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.services";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rdt.services";
 
 	// The shared instance
 	private static Activator plugin;

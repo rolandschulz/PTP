@@ -8,16 +8,13 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.ui;
+package org.eclipse.ptp.rdt.services.core;
 
-import org.eclipse.ptp.services.core.IServiceProvider;
-
-public interface IServiceProviderConfiguration {
+public interface IServiceProvider extends IServiceProviderDescriptor {
 	/**
-	 * Configure the service provider, which typically launches a dialog/wizard to allow the 
-	 * service provider to be configured (may include setting up and associating any required connections)
+	 * Test if this service provider has been configured.
 	 * 
-	 * @param provider
+	 * @return true if provider has been configured
 	 */
-	public void configureServiceProvider(IServiceProvider provider);
+	public boolean isConfigured();
 }
