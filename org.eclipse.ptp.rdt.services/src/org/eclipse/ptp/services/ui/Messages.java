@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 
 public class Messages {
 
-	private static final String RESOURCE_BUNDLE= "org.eclipse.ptp.ui.messages";//$NON-NLS-1$
+	private static final String RESOURCE_BUNDLE= "org.eclipse.ptp.services.ui.messages";//$NON-NLS-1$
 	
 	public static final String Services_invalidServiceId = "Services_invalidServiceId"; //$NON-NLS-1$
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="serviceProvider" name="Service Provider" schema="schema/serviceProvider.exsd"/>
-   <extension-point id="service" name="Service" schema="schema/service.exsd"/>
+   <extension-point id="providers" name="Service Providers" schema="schema/providers.exsd"/>
+   <extension-point id="services" name="Services" schema="schema/services.exsd"/>
    <extension
-         point="org.eclipse.ptp.services.service">
+         point="org.eclipse.ptp.services.services">
       <service
             id="test1"
             name="Test1">

@@ -29,8 +29,8 @@ import org.eclipse.ptp.services.ui.IServiceProviderConfiguration;
 import org.eclipse.ptp.services.ui.Messages;
 
 public class ServiceModelManager implements IServiceModelManager {
-	private final static String SERVICE_EXTENSION_ID = "service"; //$NON-NLS-1$
-	private final static String PROVIDER_EXTENSION_ID = "serviceProvider"; //$NON-NLS-1$
+	private final static String SERVICE_EXTENSION_ID = "services"; //$NON-NLS-1$
+	private final static String PROVIDER_EXTENSION_ID = "providers"; //$NON-NLS-1$
 	private final static String SERVICE_ELEMENT_NAME = "service"; //$NON-NLS-1$
 	private final static String NATURE_ELEMENT_NAME = "nature"; //$NON-NLS-1$
 	private final static String PROVIDER_ELEMENT_NAME = "provider"; //$NON-NLS-1$
