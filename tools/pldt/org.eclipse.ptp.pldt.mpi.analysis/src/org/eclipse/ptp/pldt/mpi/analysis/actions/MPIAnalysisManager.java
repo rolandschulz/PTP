@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008  IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICFGBuilder;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIDUChain;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIMVAnalysis;
-import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPISingleAssignAnalysis;
 import org.eclipse.ptp.pldt.mpi.analysis.view.BarrierArtifacts;
 import org.eclipse.ptp.pldt.mpi.analysis.view.MPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.mpi.analysis.view.MatchingSet;
