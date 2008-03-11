@@ -669,10 +669,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (terminateAllAction != null) {
 			ISelection selection = jobTableViewer.getSelection();
 			if (selection.isEmpty()) {
-				System.out.println("selction EMPTY");
 				terminateAllAction.setEnabled(false);
 			} else {
-				System.out.println("selction is: " + ((IStructuredSelection) selection).getFirstElement());
 				IPJob job = (IPJob) ((IStructuredSelection) selection).getFirstElement();
 				terminateAllAction.setEnabled(!(job.isDebug() || job.isTerminated()));
 			}
