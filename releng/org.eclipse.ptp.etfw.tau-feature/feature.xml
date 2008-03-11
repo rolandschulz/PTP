@@ -22,20 +22,18 @@ ParaProf from Eclipse and call back from ParaProf to source code
 in Eclipse.
 org.eclipse.ptp.tau.selinst: Selective instrumentation functionality
 for C/C++
-org.eclipse.ptp.tau.selinstfort: Selective instrumentatin functionality
-for Fortran via Photran.
    </description>
 
    <copyright>
       /****************************************************************************
-*			Tuning and Analysis Utilities
-*			http://www.cs.uoregon.edu/research/paracomp/tau
+*   Tuning and Analysis Utilities
+*   http://www.cs.uoregon.edu/research/paracomp/tau
 ****************************************************************************
 * Copyright (c) 1997-2006
 *    Department of Computer and Information Science, University
 of Oregon
 *    Advanced Computing Laboratory, Los Alamos National Laboratory
-*    Research Center Juelich, ZAM Germany	
+*    Research Center Juelich, ZAM Germany 
 *
 * All rights reserved. This program and the accompanying materials
 * are made available under the terms of the Eclipse Public License
@@ -191,6 +189,10 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems,
 Inc. in the United States, other countries, or both.\n
    </license>
 
+   <includes
+         id="org.eclipse.ptp.perf_feature"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
@@ -247,13 +249,6 @@ Inc. in the United States, other countries, or both.\n
 
    <plugin
          id="org.eclipse.ptp.perf.tau.selinst"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.perf.tau.selinstfort"
          download-size="0"
          install-size="0"
          version="0.0.0"
