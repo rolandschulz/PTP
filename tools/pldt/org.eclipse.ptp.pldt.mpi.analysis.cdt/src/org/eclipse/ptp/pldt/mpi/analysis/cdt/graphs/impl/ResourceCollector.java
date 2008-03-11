@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,10 +32,10 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 
 /**
- * The resource collector collects all functions, but does not
+ * The resource collector collects all functions for the call grah, but does not
  * calculate the caller and callee relations.
  * 
- * @author Yuan Zhang
+ * @author Yuan Zhang, Beth Tibbitts
  *
  */
 public class ResourceCollector extends ASTVisitor {
@@ -61,40 +61,43 @@ public class ResourceCollector extends ASTVisitor {
         ast_.accept(this);
 	}
 	
-	public int visit(IASTDeclaration declaration) 
-	{
+	public int visit(IASTDeclaration declaration) {
 		String filename = declaration.getContainingFilename();
-		//if(!filename.endsWith(".c") || !filename.endsWith(".C"))
-		if(filename.endsWith(".h"))
+		// if(!filename.endsWith(".c") || !filename.endsWith(".C"))
+		if (filename.endsWith(".h"))
 			return PROCESS_SKIP;
-		
+
 		if (declaration instanceof IASTFunctionDefinition) {
-			depth ++;
-			IASTFunctionDefinition fd = (IASTFunctionDefinition)declaration;
-			ICallGraphNode node = new CallGraphNode(file_, filename, fd);
+			depth++;
+			IASTFunctionDefinition fd = (IASTFunctionDefinition) declaration;
+			ICallGraphNode node = addCallGraphNode(file_, filename, fd);
 			CG_.addNode(node);
 			return PROCESS_SKIP;
-		}
-		else if (declaration instanceof IASTSimpleDeclaration){
-			if(depth > 0) return PROCESS_SKIP; //not global
-			IASTSimpleDeclaration sdecl = (IASTSimpleDeclaration)declaration;
-			/* if the declarator is null, then it is a structure specifier*/
-			if(sdecl.getDeclarators() == null) return PROCESS_CONTINUE;
+		} else if (declaration instanceof IASTSimpleDeclaration) {
+			if (depth > 0)
+				return PROCESS_SKIP; // not global
+			IASTSimpleDeclaration sdecl = (IASTSimpleDeclaration) declaration;
+			/* if the declarator is null, then it is a structure specifier */
+			if (sdecl.getDeclarators() == null)
+				return PROCESS_CONTINUE;
 			IASTDeclSpecifier spec = sdecl.getDeclSpecifier();
-			if(spec instanceof IASTCompositeTypeSpecifier ||
-					spec instanceof IASTElaboratedTypeSpecifier ||
-					spec instanceof IASTEnumerationSpecifier)
+			if (spec instanceof IASTCompositeTypeSpecifier
+					|| spec instanceof IASTElaboratedTypeSpecifier
+					|| spec instanceof IASTEnumerationSpecifier)
 				return PROCESS_SKIP;
-			
+
 			List<String> env = CG_.getEnv();
 			IASTDeclarator[] declarators = sdecl.getDeclarators();
-			for(int j=0; j<declarators.length; j++){
-				if(declarators[j] instanceof IASTFunctionDeclarator)
+			for (int j = 0; j < declarators.length; j++) {
+				if (declarators[j] instanceof IASTFunctionDeclarator)
 					continue;
 				IASTName n = declarators[j].getName();
 				String var = n.toString();
-				if(!env.contains(var)) 
+				if (doQuickOptionalTest(var))
+					continue;
+				if (!env.contains(var))
 					env.add(var);
+				doOtherDeClaratorStuff(declarators[j]);
 			}
 		}
 		return PROCESS_CONTINUE;
@@ -113,4 +116,27 @@ public class ResourceCollector extends ASTVisitor {
 		}
 		return PROCESS_CONTINUE;
 	}
+	/**
+	 * Can be overridden by subclasses to create a specific kind of call graph
+	 * node if required
+	 * 
+	 * @return call graph node created
+	 */
+	protected ICallGraphNode addCallGraphNode(IFile file, String filename,
+			IASTFunctionDefinition fd) {
+		ICallGraphNode cgnode = new CallGraphNode(file, filename, fd);
+		return cgnode;
+	}
+	/** 
+     * extra optional test that derived class can do
+     */
+	protected boolean doQuickOptionalTest(String var){
+	 return true;
+	 }
+	 
+	/**
+	 * optional stuff that derived class may want to do at this point
+	 * @param declarator
+	 */
+	 protected void doOtherDeClaratorStuff(IASTDeclarator declarator){}
 }
