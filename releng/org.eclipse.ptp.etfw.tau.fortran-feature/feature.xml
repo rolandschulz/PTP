@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.perf.tau.fortran_feature"
+      label="Fortran_feature Feature"
+      version="1.0.0"
+      provider-name="University of Oregon">
+
+   <description url="http://www.eclipse.org/legal/epl/notice.php">
+      org.eclipse.ptp.tau.selinstfort: Selective instrumentatin functionality
+for Fortran via Photran.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      /****************************************************************************
+*   Tuning and Analysis Utilities
+*   http://www.cs.uoregon.edu/research/paracomp/tau
+****************************************************************************
+* Copyright (c) 1997-2006
+*    Department of Computer and Information Science, University
+of Oregon
+*    Advanced Computing Laboratory, Los Alamos National Laboratory
+*    Research Center Juelich, ZAM Germany 
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License
+v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*    Wyatt Spear - initial API and implementation
+****************************************************************************/
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="org.eclipse.photran_feature"
+         version="0.0.0"
+         name="Photran"/>
+
+   <includes
+         id="org.eclipse.ptp.perf.tau_feature"
+         version="0.0.0"
+         name="TAU Performance Analysis Tools"/>
+
+   <includes
+         id="org.eclipse.ptp.perf_feature"
+         version="0.0.0"
+         name="Performance Framework"/>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.photran.ui"/>
+      <import plugin="org.eclipse.ptp.perf.tau.selinst"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.perf.tau.selinstfort"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
