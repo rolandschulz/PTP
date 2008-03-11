@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,29 +23,27 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandler;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIResourceCollector;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * Do MPI barrier analysis from dropdown toolbar menu
- * @author tibbitts
+ * @author Beth Tibbitts
  *
  */
-public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  /*implements IHandler*/ {
+public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	protected MPICallGraph callGraph_;
 	
 	public RunAnalyseMPIAnalysiscommandHandler(){ 
 		callGraph_ = null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	/** 
+	 * Execute the action for the event
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
@@ -54,12 +52,13 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  /*im
 		if ((selection == null) || selection.isEmpty()) {
 			MessageDialog
 					.openWarning(null, "No files selected for analysis.",
-							"Please select a source file or container (folder or project) to analyze.");
+							"Please select a source file  or container (folder or project) to analyze.");
 			return null;
 		} else {
 			callGraph_ = new MPICallGraph();
-			for(Iterator iter = this.selection.iterator(); iter.hasNext();){
-				Object obj = (Object) iter.next();
+
+			for(Iterator iter = selection.iterator(); iter.hasNext();){
+				Object obj =  iter.next();
 				// It can be a Project, Folder, File, etc...
 				if (obj instanceof IAdaptable) {
 					final IResource res = (IResource) ((IAdaptable) obj)
@@ -76,15 +75,11 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  /*im
 		return null;
 	}
 	/**
-	 * Run analysis on a resource (e.g. File or Folder) Will descend to members
-	 * of folder
+	 * Run analysis (collect resource info in the call graph) on a resource (e.g. File or Folder) 
+	 * <br>Will descend to members of folder
 	 * 
 	 * @param resource
-	 *            the resource
-	 * @param indent
-	 *            number of levels of nesting/recursion for prettyprinting
-	 * @param includes
-	 *            contains header files include paths from the Preference page
+	 *            the resource upon which barrier analysis was initiated: file, folder, or project
 	 * @return
 	 */
 	protected boolean resourceCollector(IResource resource) {
