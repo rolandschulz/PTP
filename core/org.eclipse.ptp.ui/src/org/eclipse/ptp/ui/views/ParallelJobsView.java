@@ -132,6 +132,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				if (isCurrent) {
 					updateJobSet();
 					changeJobRefresh((IPJob)e.getSource());
+					// should this just be refreshJobView()?
+					// refresh will need to be batched in the future
 				}
 			}
 		}
@@ -151,6 +153,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				if (isCurrent) {
 					updateJobSet();
 					changeJobRefresh((IPJob)e.getSource());
+					// should this just be refreshJobView()?
+					// refresh will need to be batched in the future
 				}
 			}
 		}
@@ -665,8 +669,10 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (terminateAllAction != null) {
 			ISelection selection = jobTableViewer.getSelection();
 			if (selection.isEmpty()) {
+				System.out.println("selction EMPTY");
 				terminateAllAction.setEnabled(false);
 			} else {
+				System.out.println("selction is: " + ((IStructuredSelection) selection).getFirstElement());
 				IPJob job = (IPJob) ((IStructuredSelection) selection).getFirstElement();
 				terminateAllAction.setEnabled(!(job.isDebug() || job.isTerminated()));
 			}
@@ -768,21 +774,19 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				if (item == null && !selection.isEmpty()) {
 					jobTableViewer.getTable().deselectAll();
 					doChangeJob((IPJob) null);
-				}
-				else if (item != null) {
+				} else if (item != null) {
 					IPJob job = (IPJob)item.getData();
 					if (job == null) {
 						doChangeJob((IPJob) null);
-					}
-					else if (selection.isEmpty()) {
+					} else if (selection.isEmpty()) {
 						doChangeJob(job);
-					}
-					else {
+					} else {
 						String cur_id = getCurrentID();
 						if (cur_id == null || !cur_id.equals(job.getID())) {
 							doChangeJob(job);
 						}
 					}
+					update(); // Added to ensure that terminate button is updated correctly
 				}
 			}
 		});
