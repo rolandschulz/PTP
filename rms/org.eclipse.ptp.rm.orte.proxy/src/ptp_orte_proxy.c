@@ -177,6 +177,7 @@ static List *		gMachineList;
 static int			ptp_signal_exit;
 static int			debug_level = 0; /* 0 is off */
 static RETSIGTYPE	(*saved_signals[NSIG])(int);
+static int			disable_callbacks = 0;
 
 static proxy_svr_helper_funcs helper_funcs = {
 	NULL,					// newconn() - can be used to reject connections
@@ -839,6 +840,14 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 static void
 do_state_callback(ptp_job *job, orte_proc_state_t state) 
 {
+	/*
+	 * ORTE 1.2.5 on Linux seems to have introduced a bug where do_state_callback() is called as a result
+	 * of the GPR calls in get_proc_info(). This results in a core dump.
+	 */
+	if (disable_callbacks) {
+		return;
+	}
+	
 	if (debug_level > 0) {
 		fprintf(stderr, "STATE CALLBACK: %d\n", state); fflush(stderr);
 	}
@@ -916,15 +925,19 @@ get_proc_info(ptp_job *j)
 		NULL
 	};
 	
-   if((rc = orte_schema.get_job_segment_name(&segment, j->orte_jobid)) != ORTE_SUCCESS) {
+	disable_callbacks = 1;
+	
+    if((rc = orte_schema.get_job_segment_name(&segment, j->orte_jobid)) != ORTE_SUCCESS) {
         ORTE_ERROR_LOG(rc);
+        disable_callbacks = 0;
         return;
     }
 	
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, segment, NULL, keys, &cnt, &values);
 	if(rc != ORTE_SUCCESS) {
 		free(segment);
-		return;
+		disable_callbacks = 0;
+        return;
 	}
 	
     for (i = 0; i < cnt; i++) {
@@ -970,6 +983,8 @@ get_proc_info(ptp_job *j)
 			sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
 		}
     }
+    
+    disable_callbacks = 0;  
 }
 #endif /* !ORTE_VERSION_1_0 */
 
