@@ -10,6 +10,10 @@ resource manager, which should have been set up as described in
 <a href="02resMgrSetup.html">Resource Managers</a> under the description for a remote resource manager.
 See also <a href="02pLaunchConfig.html">Launching parallel programs locally</a>.
 
+<p><b>Note</b> that currently (PTP 2.0) you must build the executable on the remote machine,
+or move it there manually after building elsewhere.  Further improvements to the remote
+communication infrastructure should automate more of this soon.
+
 <p>Topics  include:
 <ul>
 <li>selecting the machine to run on
@@ -37,8 +41,9 @@ Here we use the same name as the project.
 must be running for it to appear in the drop-down list of resource managers here.)
 </li>
 <li>Choose the Parallel Project - on the local machine</li>
-<li>Choose the Application Program (executable) from the project - from the remote machine via the Browse button.
-<br>(it is probably located in the Debug folder, if this is a debug configruation)
+<li>Choose the Application Program (executable)- from the remote machine via the Browse button.
+
+
 </li>
 <br><img src="images/0104newRemoteExecutable.png">
 </ul>
