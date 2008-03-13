@@ -28,7 +28,6 @@ import org.eclipse.cdt.core.dom.ast.IASTExpression;
 import org.eclipse.cdt.core.dom.ast.IASTExpressionStatement;
 import org.eclipse.cdt.core.dom.ast.IASTForStatement;
 import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
-import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
 import org.eclipse.cdt.core.dom.ast.IASTGotoStatement;
 import org.eclipse.cdt.core.dom.ast.IASTIfStatement;
 import org.eclipse.cdt.core.dom.ast.IASTLabelStatement;
@@ -65,7 +64,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 	 * Step 1: collecting all blocks in a function
 	 * Step 2: calculating control flows among blocks
 	 * Step 3: calculating dominator and post-dominator relations
-	 * Step 4: Sort all blocks accoring to the topological order
+	 * Step 4: Sort all blocks according to the topological order
 	 * Step 5: Other additional operations
 	 */
 	public void buildCFG(){
@@ -697,6 +696,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 			BBs_.add(bb);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void buildDOM(){
 		List<IBlock> all = new ArrayList<IBlock>();
 		all.add(entry_);
@@ -736,6 +736,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 		/* TODO */
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List intersect(List A, List B){
 		if(A == null || B == null) return null;
 		List list = new ArrayList();
@@ -745,7 +746,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 		}
 		return list;
 	}
-	
+	@SuppressWarnings("unchecked")
 	public boolean equals(List A, List B){
 		if(A == null && B == null) return true;
 		if(A == null && B != null) return false;
