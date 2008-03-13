@@ -419,7 +419,10 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		if (logEvents) {
 			System.out.println(toString() + " received event " + event);
 		}
-		if (command instanceof IProxyRuntimeStartEventsCommand) {
+		if (event instanceof IProxyMessageEvent) {
+			fireProxyRuntimeMessageEvent(eventFactory
+					.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
+		} else if (command instanceof IProxyRuntimeStartEventsCommand) {
 			if (event instanceof IProxyRuntimeNewJobEvent) {
 				fireProxyRuntimeNewJobEvent((IProxyRuntimeNewJobEvent) event);
 			} else if (event instanceof IProxyRuntimeNewMachineEvent) {
@@ -452,6 +455,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				fireProxyRuntimeRemoveProcessEvent((IProxyRuntimeRemoveProcessEvent) event);
 			} else if (event instanceof IProxyRuntimeRemoveQueueEvent) {
 				fireProxyRuntimeRemoveQueueEvent((IProxyRuntimeRemoveQueueEvent) event);
+			} else if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeErrorStateEvent(eventFactory
+						.newProxyRuntimeErrorStateEvent());
 			} else if (event instanceof IProxyOKEvent) {
 				removeCommand(command);
 			}
@@ -461,16 +467,26 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 			}
 		} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
 			if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeSubmitJobErrorEvent(eventFactory
-						.newProxyRuntimeSubmitJobErrorEvent(event
-								.getTransactionID(), event.getAttributes()));
+				if (event instanceof IProxyRuntimeSubmitJobErrorEvent) {
+					fireProxyRuntimeSubmitJobErrorEvent(eventFactory
+							.newProxyRuntimeSubmitJobErrorEvent(event
+									.getTransactionID(), event.getAttributes()));
+				} else {
+					fireProxyRuntimeErrorStateEvent(eventFactory
+							.newProxyRuntimeErrorStateEvent());
+				}
 			}
 			removeCommand(command);
 		} else if (command instanceof IProxyRuntimeTerminateJobCommand) {
 			if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeTerminateJobErrorEvent(eventFactory
-						.newProxyRuntimeTerminateJobErrorEvent(event
-								.getTransactionID(), event.getAttributes()));
+				if (event instanceof IProxyErrorEvent) {
+					fireProxyRuntimeTerminateJobErrorEvent(eventFactory
+							.newProxyRuntimeTerminateJobErrorEvent(event
+									.getTransactionID(), event.getAttributes()));
+				} else {
+					fireProxyRuntimeErrorStateEvent(eventFactory
+							.newProxyRuntimeErrorStateEvent());
+				}
 			}
 			removeCommand(command);
 		}
@@ -837,9 +853,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
 							.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
-				} else if (event instanceof IProxyMessageEvent) {
-					fireProxyRuntimeMessageEvent(eventFactory
-							.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
 				} else {
 					state = ProxyState.ERROR;
 					fireProxyRuntimeErrorStateEvent(eventFactory
@@ -851,7 +864,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 
 			case INIT:
 				/*
-				 * This state is sed to wait from a response from the INIT
+				 * This state is set to wait from a response from the INIT
 				 * command. If we receive an OK event, we next send a MODEL_DEF
 				 * command and enter the MODEL_DEF state.
 				 */
@@ -861,6 +874,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
 							.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+				} else if (event instanceof IProxyMessageEvent) {
+					fireProxyRuntimeMessageEvent(eventFactory
+							.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
 				} else {
 					command = getCommandForEvent(event);
 					if (command != null) {
@@ -907,6 +923,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
 							.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+				} else if (event instanceof IProxyMessageEvent) {
+					fireProxyRuntimeMessageEvent(eventFactory
+							.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
 				} else {
 					command = getCommandForEvent(event);
 					if (command != null) {
@@ -924,8 +943,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 									.newProxyRuntimeStartupErrorEvent(event
 											.getAttributes()));
 						} else {
-							state = ProxyState.ERROR;
 							removeCommand(command);
+							state = ProxyState.ERROR;
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException(
