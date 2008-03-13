@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.pldt.common.analysis;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
@@ -59,10 +58,10 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * For example, only paths found in this list (specified in PLDT preferences) would be considered
 	 * to be a path from which definitions of "Artifacts" would be found.
 	 */
-	private final List includes_;
+	private final List<String> includes_;
 	private final String fileName;
 	private final ScanReturn scanReturn;
-	private static final String STRING_QUOTE = "\"";
+	//private static final String STRING_QUOTE = "\"";
 
 	/**
 	 * 
@@ -75,7 +74,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	 *            the ScanReturn object to which the artifacts that we find will
 	 *            be appended.
 	 */
-	public PldtAstVisitor(List includes, String fileName, ScanReturn scanReturn) {
+	public PldtAstVisitor(List<String> includes, String fileName, ScanReturn scanReturn) {
 		this.includes_ = includes;
 		this.fileName = fileName;
 		this.scanReturn = scanReturn;
@@ -118,7 +117,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * @param funcName
 	 */
 	public void processFuncName(IASTName funcName, IASTExpression astExpr) {
-		IASTTranslationUnit tu = funcName.getTranslationUnit();
+		//IASTTranslationUnit tu = funcName.getTranslationUnit();
 
 		if (isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
@@ -127,7 +126,7 @@ public class PldtAstVisitor extends CASTVisitor {
 				// FIXME we're determining the artifact name twice. (also in chooseName())
 				String artName=funcName.toString();
 				String rawName=funcName.getRawSignature();
-				String bName=funcName.getBinding().getName();
+				//String bName=funcName.getBinding().getName();
 				if(!artName.equals(rawName)) {
 					if(rawName.length()==0)rawName="  ";
 					artName=artName+"  ("+rawName+")"; // indicate orig pre-pre-processor value in parens
@@ -147,7 +146,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	 */
 	public void processExprWithConstant(IASTExpression astExpr) {
 		IASTName funcName = ((IASTIdExpression) astExpr).getName();
-		IASTTranslationUnit tu = funcName.getTranslationUnit();
+		//IASTTranslationUnit tu = funcName.getTranslationUnit();
 
 		if (isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
@@ -171,7 +170,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * @param funcName
 	 */
 	protected boolean isArtifact(IASTName funcName) {
-		String funcNameString=funcName.toString();
+		//String funcNameString=funcName.toString();
 		IBinding binding = funcName.resolveBinding();
 		String name=binding.getName(); 
 		String rawSig=funcName.getRawSignature();
@@ -184,7 +183,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			if (decls.length == 0) { // BRT decls=null detection
 				IASTTranslationUnit tu = funcName.getTranslationUnit();
 				IASTName[] na = tu.getDeclarationsInAST(binding);
-				IASTDeclaration[] astDecls = tu.getDeclarations();
+				//IASTDeclaration[] astDecls = tu.getDeclarations();
 				for (int i = 0; i < na.length; i++) {
 					IASTName nm = na[i];
 					System.out.println(nm);
@@ -264,8 +263,8 @@ public class PldtAstVisitor extends CASTVisitor {
 
 	/**
 	 * Is this path found in the include path in which we are interested?
-	 * E.g. is it in the MPI include path specified in PLDT preferences,
-	 * which would identify it as an MPI artifact of interest.
+	 * E.g. is it in the  include path specified in PLDT preferences,
+	 * which would identify it as an  artifact of interest?
 	 * 
 	 * @param includeFilePath under consideration
 	 * @return true if this is found in the include path from PLDT preferences
@@ -274,14 +273,9 @@ public class PldtAstVisitor extends CASTVisitor {
 		if (includeFilePath == null)
 			return false;
 		// java5
-		// for (String includeDir : mpiIncludes_) {
-		// IPath includePath = new Path(includeDir);
-		// if (includePath.isPrefixOf(includeFilePath)) return true;
-		// }
-		for (Iterator it = includes_.iterator(); it.hasNext();) {
-			String includeDir = (String) it.next();
-			if(traceOn)System.out.println("PldtAstVisitor: is "+includeFilePath+" found in "+includeDir+"?");
+		for (String includeDir : includes_) {
 			IPath includePath = new Path(includeDir);
+			if(traceOn)System.out.println("PldtAstVisitor: is "+includeFilePath+" found in "+includeDir+"?");
 			if (includePath.isPrefixOf(includeFilePath))
 				return true;
 		}
@@ -289,7 +283,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	}
 
 	/**
-	 * Get exact source locational info for a function call
+	 * Get exact source location info for a function call
 	 * 
 	 * @param astExpr
 	 * @param constructType
@@ -309,22 +303,19 @@ public class PldtAstVisitor extends CASTVisitor {
 				astFileLocation=me.asFileLocation();
 			}
 			if(astFileLocation!=null) {
-				String tmp=astFileLocation.toString();
+				//String tmp=astFileLocation.toString();
 				sourceInfo = new SourceInfo();
 				sourceInfo.setStartingLine(astFileLocation.getStartingLineNumber());
 				sourceInfo.setStart(astFileLocation.getNodeOffset());
-				sourceInfo
-						.setEnd(astFileLocation.getNodeOffset() + astFileLocation.getNodeLength());
-				sourceInfo.setConstructType(constructType);
-				
-				
+				sourceInfo.setEnd(astFileLocation.getNodeOffset() + astFileLocation.getNodeLength());
+				sourceInfo.setConstructType(constructType);			
 			}
 		}
 		return sourceInfo;
 	}
 
 	/**
-	 * Get exact source locational info for a constant originated from Macro
+	 * Get exact source location info for a constant originated from Macro
 	 * expansion(s)
 	 * 
 	 * @param iASTMacroExpansion
