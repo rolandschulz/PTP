@@ -32,7 +32,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 
 /**
- * The resource collector collects all functions for the call grah, but does not
+ * The resource collector collects all functions for the call graph, but does not
  * calculate the caller and callee relations.
  * 
  * @author Yuan Zhang, Beth Tibbitts
@@ -43,11 +43,20 @@ public class ResourceCollector extends ASTVisitor {
 	protected IFile file_;
 	protected int depth;
 	
+	/**
+	 * Resource collector finds all functions in a given source file,
+	 * and adds them to the given call graph
+	 * @param cg call graph that will have this information added to it
+	 * @param file source file whose functions will be discovered and catalogued
+	 */
 	public ResourceCollector(ICallGraph cg, IFile file){
 		CG_ = cg;
 		file_ = file;
 	}
 	
+	/**
+	 * Use an ASTVisitor to discover the functions in the the given source and add them to the call graph
+	 */
 	public void run(){
 		this.shouldVisitDeclarations = true;
 		this.shouldVisitTranslationUnit = true;
@@ -61,6 +70,9 @@ public class ResourceCollector extends ASTVisitor {
         ast_.accept(this);
 	}
 	
+	/**
+	 * visits declaration nodes to catalog the function declarations
+	 */
 	public int visit(IASTDeclaration declaration) {
 		String filename = declaration.getContainingFilename();
 		// if(!filename.endsWith(".c") || !filename.endsWith(".C"))
@@ -103,6 +115,7 @@ public class ResourceCollector extends ASTVisitor {
 		return PROCESS_CONTINUE;
 	}
 	
+
 	public int leave(IASTDeclaration declaration) 
 	{
 		String filename = declaration.getContainingFilename();
