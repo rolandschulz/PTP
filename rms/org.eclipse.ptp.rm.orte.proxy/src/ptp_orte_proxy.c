@@ -437,10 +437,11 @@ sendJobSubErrorEvent(int trans_id, char *jobSubId, char *msg)
 	proxy_svr_queue_msg(orte_proxy, proxy_submitjob_error_event(trans_id, jobSubId, RTEV_ERROR_ORTE_SUBMIT, msg));
 }
 
+
 static void
-sendJobErrorEvent(int trans_id, char *jobid, char *msg)
+sendJobTerminateErrorEvent(int trans_id, char *msg)
 {
-	proxy_svr_queue_msg(orte_proxy, proxy_job_error_event(trans_id, jobid, RTEV_ERROR_JOB, msg));
+	proxy_svr_queue_msg(orte_proxy, proxy_terminatejob_error_event(trans_id, RTEV_ERROR_JOB, msg));
 }
 
 static void
@@ -1912,7 +1913,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (jobsubid == NULL) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, 0, "missing ID on job submission");
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_SUBMIT, "missing ID on job submission");
 		return PROXY_RES_OK;
 	}
 	
@@ -2183,7 +2184,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	ptp_job *	j;
 	
 	if (proxy_state != STATE_RUNNING) {
-		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "must call INIT first");
+		sendJobTerminateErrorEvent(trans_id, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 	
@@ -2194,13 +2195,13 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (jobid < 0) {
-		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "no such job");
+		sendJobTerminateErrorEvent(trans_id, "no such job");
 		return PROXY_RES_OK;
 	}
 	
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->terminating) {
-			sendJobErrorEvent(trans_id, args[0], "Job termination already requested");
+			sendJobTerminateErrorEvent(trans_id, "Job termination already requested");
 			return PROXY_RES_OK;
 		}
 		
@@ -2211,7 +2212,10 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 		else
 			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
 		
-		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_JOB, rc)) return 1;
+		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_JOB, rc)) {
+			sendJobTerminateErrorEvent(trans_id, "terminate job command failed");
+			return 1;
+		}
 		
 		sendOKEvent(trans_id);
 	}

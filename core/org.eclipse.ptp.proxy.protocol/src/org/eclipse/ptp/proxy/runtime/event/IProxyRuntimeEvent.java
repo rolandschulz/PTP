@@ -34,9 +34,13 @@ public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	public static final int ERROR_STATE = EVENT_OFFSET + 5;
 	
 	/*
-	 * Internal error events
+	 * Internal error event
 	 */
 	public static final int STARTUP_ERROR = EVENT_OFFSET + 10;
+	
+	/*
+	 * Command error events
+	 */
 	public static final int SUBMITJOB_ERROR = EVENT_OFFSET + 11;
 	public static final int TERMINATEJOB_ERROR = EVENT_OFFSET + 12;
 
