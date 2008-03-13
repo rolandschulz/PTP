@@ -218,12 +218,17 @@ public class Block implements IBlock {
 	}
 	
 	/**
-	 * Print IBlock information, include id, content, and successors
+	 * Print IBlock information, include id, content (type & raw signature), and successors
 	 */
 	public void print(){
 		System.out.print("Block " + id + ": ");
-		if(getContent() != null)
-			System.out.println("  "+getContent().toString());
+		IASTNode content = getContent();
+		if(content != null) {
+			String type=content.toString(); // a.b.c.Name@abcd
+			type = type.substring(type.lastIndexOf('.')+1);  // Name@abcd
+			type=type.substring(0,type.indexOf('@'));
+			System.out.println("  "+type+"  "+content.getRawSignature());
+		}
 		else
 			System.out.println("  Empty block");
 		System.out.print("  flows to: ");
