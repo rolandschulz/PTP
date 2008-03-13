@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IBlock;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IControlFlowGraph;
 
 /**
+ * Control Flow Graph implementation
  * 
  * @author Yuan Zhang
  *
@@ -759,7 +760,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 	}
 	
 	/**
-	 * Sort basic blocks in topological order
+	 * Sort Blocks in topological order
 	 */
 	private Stack<IBlock> order;
 	protected void sort(){
