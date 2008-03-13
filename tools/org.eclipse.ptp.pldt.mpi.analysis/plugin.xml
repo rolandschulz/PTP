@@ -1,45 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            objectClass="org.eclipse.core.resources.IFile"
-            nameFilter="plugin.xml"
-            id="org.eclipse.ptp.pldt.mpi.analysis.contribution1">
-         <menu
-               label="New Submenu"
-               path="additions"
-               id="org.eclipse.ptp.pldt.mpi.analysis.menu1">
-            <separator
-                  name="group1">
-            </separator>
-         </menu>
-         <action
-               label="New Action"
-               class="org.eclipse.ptp.pldt.mpi.analysis.popup.actions.NewAction"
-               menubarPath="org.eclipse.ptp.pldt.mpi.analysis.menu1/group1"
-               enablesFor="1"
-               id="org.eclipse.ptp.pldt.mpi.analysis.newAction">
-         </action>
-      </objectContribution>
- 
-      
-      <!-- Match set annotation -->
-      <!--
-      <viewerContribution
-            id="org.eclipse.ptp.pldt.mpi.analysis.CEditorContribution"
-            targetID="#CEditorContext">
-         <action
-               class="org.eclipse.ptp.pldt.mpi.analysis.popup.actions.ShowMatchSet"
-               id="org.eclipse.ptp.pldt.mpi.analysis.ShowMatchSet"
-               label="Show Barrier Matching Set"
-               menubarPath="additions"/>
-      </viewerContribution>
-      -->
-   </extension>
-
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -137,39 +98,6 @@
       </specification>  
    </extension>
 
-	<!--
-   <extension
-         id="MPIBarrierMatchSetMarker"
-         name="MPIBarrierMatchSetMarker"
-         point="org.eclipse.ui.editors.markerAnnotationSpecification">
-      <specification
-            annotationType="org.eclipse.ptp.pldt.mpi.analysis.matchset"
-            colorPreferenceKey="concurrencyIndicationColor"
-            colorPreferenceValue="250,230,110"
-            contributesToHeader="false"
-            highlightPreferenceKey="concurrencyHighlighting"
-            highlightPreferenceValue="true"
-            includeOnPreferencePage="true"
-            isGoToNextNavigationTarget="false"
-            isGoToNextNavigationTargetKey="isConcurrencyRecordGoToNextNavigationTarget"
-            label="Concurrency Marker"
-            overviewRulerPreferenceKey="concurrencyIndicationInOverviewRuler"
-            overviewRulerPreferenceValue="false"
-            presentationLayer="5"
-            showInNextPrevDropdownToolbarAction="false"
-            showInNextPrevDropdownToolbarActionKey="showConcurrencyInNextPrevDropdownToolbarAction"
-            textPreferenceKey="concurrencyIndication"
-            textPreferenceValue="true"
-            verticalRulerPreferenceKey="concurrencyIndicationInVerticalRuler"
-            verticalRulerPreferenceValue="false"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.editors.annotationTypes">
-      <type
-            markerType="org.eclipse.core.resources.problemmarker"
-            name="org.eclipse.ptp.pldt.mpi.analysis.matchset"/>
-   </extension>
-	-->
 	
    <!-- Matching Set Artifacts -->
    <extension point="org.eclipse.core.resources.markers"
@@ -294,49 +222,7 @@
                   tooltip="Run MPI Barrier Analysis on selected project, folder, or file">
             </command>
          </menuContribution>
-         <!--  testing of separator areas
-         <menuContribution
-               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=additions">
-            <command
-                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
-                  icon="icons/collapseall.gif"
-                  label="test insertion after 'additions'"
-                  style="push"
-                  tooltip="tooltipFoo">
-            </command>
-         </menuContribution>
-                  <menuContribution
-               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator5.other">
-            <command
-                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
-                  icon="icons/collapseall.gif"
-                  label="test insertion after 'sep5.other'"
-                  style="push"
-                  tooltip="tooltipFoo">
-            </command>
-         </menuContribution>
-         <menuContribution
-               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=nonexistantSeparator">
-            <command
-                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
-                  icon="icons/collapseall.gif"
-                  label="test insertion after nonExistantSeparator"
-                  style="push"
-                  tooltip="tooltipFoo">
-            </command>
-         </menuContribution>
-         <menuContribution
-               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1">
-            <command
-                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
-                  icon="icons/collapseall.gif"
-                  label="test insertion without ?after=separator"
-                  style="push"
-                  tooltip="tooltipFoo">
-            </command>
-         </menuContribution>
-         -->
-         <!-- end of test section -->
+
       </extension>
 
 </plugin>
