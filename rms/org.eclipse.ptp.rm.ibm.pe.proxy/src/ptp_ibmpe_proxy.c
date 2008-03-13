@@ -202,14 +202,15 @@ static int shutdown_proxy(void);
 static int start_events(int trans_id, int nargs, char *args[]);
 static int halt_events(int trans_id, int nargs, char *args[]);
 static void post_error(int trans_id, int type, char *msg);
+static void post_submitjob_error(int trans_id, char *subid, char *msg);
 static char
 **create_exec_parmlist(char *execname, char *targetname, char *args);
 static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem,
 			       char *mp_rdma_count);
 static void add_environment_variable(char *env_var);
-static int setup_stdio_fd(int run_trans_id, int pipe_fds[], char *path, char *stdio_name,
+static int setup_stdio_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
 			  int *fd, int *redirect);
-static int setup_child_stdio(int run_trans_id, int stdio_fd, int redirect,
+static int setup_child_stdio(int run_trans_id, char *subid, int stdio_fd, int redirect,
 			     int *file_fd, int pipe_fd[]);
 static int stdout_handler(int fd, void *job);
 static int stderr_handler(int fd, void *job);
@@ -917,6 +918,7 @@ run(int trans_id, int nargs, char *args[])
     char *argp;
     char *jobid;
     char *cp;
+    char *cwd;
     jobinfo *job;
     int i;
     int label_io;
@@ -940,8 +942,10 @@ run(int trans_id, int nargs, char *args[])
 
     TRACE_ENTRY;
     print_message_args(nargs, args);
+    jobid = NULL;
     execdir = NULL;
     execname = NULL;
+    cwd = NULL;
     argp = NULL;
     label_io = 0;
     split_io = 0;
@@ -1088,13 +1092,7 @@ run(int trans_id, int nargs, char *args[])
 		    execname = cp;
 		}
 		else if (strcmp(args[i], JOB_WORKING_DIR_ATTR) == 0) {
-		    status = chdir(cp);
-		    if (status == -1) {
-			post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR,
-				   "Invalid working directory");
-			TRACE_EXIT;
-			return PROXY_RES_OK;
-		    }
+			cwd = cp;
 		}
 		else if (strcmp(args[i], JOB_PROG_ARGS_ATTR) == 0) {
 		    argp = cp;
@@ -1108,6 +1106,18 @@ run(int trans_id, int nargs, char *args[])
 	    }
 	}
     }
+    if (jobid == NULL) {
+    	post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
+    }
+    if (cwd != NULL) {
+    	status = chdir(cp);
+	    if (status == -1) {
+		post_submitjob_error(trans_id, jobid,
+			   "Invalid working directory");
+		TRACE_EXIT;
+		return PROXY_RES_OK;
+	    }
+    }
     if (mp_buffer_mem_set) {
 	snprintf(mp_buffer_mem_value, sizeof mp_buffer_mem_value,
 		 "MP_BUFFER_MEM=%s%s%s", mp_buffer_mem, (mp_buffer_mem_max[0]
@@ -1119,12 +1129,12 @@ run(int trans_id, int nargs, char *args[])
 							 == '\0') ? "" : ",", mp_rdma_count_2);
     }
     if (execdir == NULL) {
-	post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "No executable directory specified");
+    post_submitjob_error(trans_id, jobid, "No executable directory specified");
 	TRACE_EXIT;
 	return PROXY_RES_OK;
     }
     if (execname == NULL) {
-	post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "No executable specified");
+    post_submitjob_error(trans_id, jobid, "No executable specified");
 	TRACE_EXIT;
 	return PROXY_RES_OK;
     }
@@ -1140,7 +1150,7 @@ run(int trans_id, int nargs, char *args[])
      * Handle file descriptor setup for stdout first
      */
     status =
-	setup_stdio_fd(trans_id, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd), &redirect);
+	setup_stdio_fd(trans_id, jobid, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd), &redirect);
     if (status == -1) {
 	TRACE_EXIT;
 	return PROXY_RES_OK;
@@ -1148,7 +1158,7 @@ run(int trans_id, int nargs, char *args[])
     job->stdout_redirect = redirect;
     TRACE_DETAIL_V("stdout FD %d %d\n", stdout_pipe[0], stdout_pipe[1]);
     status =
-	setup_stdio_fd(trans_id, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd), &redirect);
+	setup_stdio_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd), &redirect);
     if (status == -1) {
 	TRACE_EXIT;
 	return PROXY_RES_OK;
@@ -1199,14 +1209,14 @@ run(int trans_id, int nargs, char *args[])
 	 */
 	TRACE_DETAIL("+++ Setting up poe stdio file descriptors\n");
 	status =
-	    setup_child_stdio(trans_id, STDOUT_FILENO, job->stdout_redirect, &(job->stdout_fd),
+	    setup_child_stdio(trans_id, jobid, STDOUT_FILENO, job->stdout_redirect, &(job->stdout_fd),
 			      stdout_pipe);
 	if (status == -1) {
 	    TRACE_EXIT;
 	    exit(1);
 	}
 	status =
-	    setup_child_stdio(trans_id, STDERR_FILENO, job->stderr_redirect, &(job->stderr_fd),
+	    setup_child_stdio(trans_id, jobid, STDERR_FILENO, job->stderr_redirect, &(job->stderr_fd),
 			      stderr_pipe);
 	if (status == -1) {
 	    TRACE_EXIT;
@@ -1237,13 +1247,13 @@ run(int trans_id, int nargs, char *args[])
 	}
 	status = execve("/usr/bin/poe", argv, envp);
 	print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
-	post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Exec failed");
+	post_submitjob_error(trans_id, jobid, "Exec failed");
 	TRACE_EXIT;
 	exit(1);
     }
     else {
 	if (pid == -1) {
-	    post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Fork failed");
+		post_submitjob_error(trans_id, jobid, "Fork failed");
 	    return PROXY_RES_OK;
 	}
 	else {
@@ -1344,6 +1354,7 @@ terminate_job(int trans_id, int nargs, char *args[])
 	pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) job->poe_pid);
     }
     pthread_mutex_unlock(&job_lock);
+    send_ok_event(trans_id);
     TRACE_EXIT;
     return PROXY_RES_OK;
 }
@@ -3019,7 +3030,7 @@ add_environment_variable(char *env_var)
  * Set up the file descriptor for stdio output files
  */
 int
-setup_stdio_fd(int run_trans_id, int pipe_fds[], char *path, char *stdio_name, int *fd,
+setup_stdio_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
 	       int *redirect)
 {
     int status;
@@ -3031,7 +3042,7 @@ setup_stdio_fd(int run_trans_id, int pipe_fds[], char *path, char *stdio_name, i
 	    snprintf(emsg_buffer, sizeof emsg_buffer,
 		     "Error creating %s pipe: %s", stdio_name, strerror(errno));
 	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_error(run_trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, emsg_buffer);
+	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
 	    TRACE_EXIT;
 	    return -1;
 	}
@@ -3040,7 +3051,7 @@ setup_stdio_fd(int run_trans_id, int pipe_fds[], char *path, char *stdio_name, i
 	    snprintf(emsg_buffer, sizeof emsg_buffer,
 		     "Error initializing %s pipe: %s", stdio_name, strerror(errno));
 	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_error(run_trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, emsg_buffer);
+	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
 	    TRACE_EXIT;
 	    return -1;
 	}
@@ -3053,7 +3064,7 @@ setup_stdio_fd(int run_trans_id, int pipe_fds[], char *path, char *stdio_name, i
 	    snprintf(emsg_buffer, sizeof emsg_buffer,
 		     "Error redirecting %s to %s: %s", stdio_name, path, strerror(errno));
 	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_error(run_trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, emsg_buffer);
+	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
 	    TRACE_EXIT;
 	    return -1;
 	}
@@ -3067,7 +3078,7 @@ setup_stdio_fd(int run_trans_id, int pipe_fds[], char *path, char *stdio_name, i
  * Set up a stdio file descriptor for child process so it is redirected to a file or pipe
  */
 int
-setup_child_stdio(int run_trans_id, int stdio_fd, int redirect, int *file_fd, int pipe_fd[])
+setup_child_stdio(int run_trans_id, char *subid, int stdio_fd, int redirect, int *file_fd, int pipe_fd[])
 {
     int status;
 
@@ -3084,7 +3095,7 @@ setup_child_stdio(int run_trans_id, int stdio_fd, int redirect, int *file_fd, in
 		 "Error setting stdio file descriptor (%d) for application: %s",
 		 stdio_fd, strerror(errno));
 	emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	post_error(run_trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, emsg_buffer);
+	post_submitjob_error(run_trans_id, subid, emsg_buffer);
     }
     TRACE_EXIT;
     return status;
@@ -4868,9 +4879,22 @@ post_error(int trans_id, int type, char *msgtext)
 
     fprintf(stderr, "post_error: %s\n", msgtext);
     fflush(stderr);
-    msg = new_proxy_msg(PROXY_EV_ERROR, trans_id);
-    proxy_msg_add_int(msg, type);
-    proxy_msg_add_string(msg, msgtext);
+    msg = proxy_error_event(trans_id, type, msgtext);
+    enqueue_event(msg);
+    return;
+}
+
+void
+post_submitjob_error(int trans_id, char *subid, char *msgtext)
+{
+    /*
+     * Send an error message to the front end
+     */
+    proxy_msg *msg;
+
+    fprintf(stderr, "post_submitjob_error: %s\n", msgtext);
+    fflush(stderr);
+    msg = proxy_submitjob_error_event(trans_id, subid, 0, msgtext);
     enqueue_event(msg);
     return;
 }

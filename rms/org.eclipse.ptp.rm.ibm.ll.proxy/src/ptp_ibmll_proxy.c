@@ -178,6 +178,7 @@ void add_task_to_list(List * task_list, TaskObject * task_object);
 void delete_task_from_list(List * task_list, TaskObject * task_object);
 
 static void sendErrorEvent(int gui_transmission_id, int type, char *msg);
+static void sendJobSubmissionErrorEvent(int gui_transmission_id, char *subid, char *msgtext);
 static void sendOkEvent(int gui_transmission_id);
 static void sendShutdownEvent(int gui_transmission_id);
 static int sendAttrDefIntEvent(int gui_transmission_id, char *id, char *shortname, char *description, int show, int default_value, int llimit, int ulimit);
@@ -993,7 +994,7 @@ int command_submit_job(int gui_transmission_id, int nargs, char *args[])
     sendOkEvent(gui_transmission_id);     /* close out the halt events command */
   }
   else {
-	sendErrorEvent(gui_transmission_id, RTEV_ERROR_LL_SUBMIT_JOB, "LoadLeveler job submit failed.");
+	sendSubmitJobErrorEvent(gui_transmission_id, job_sub_id, "LoadLeveler job submit failed.");
   }
   
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
@@ -1036,6 +1037,7 @@ int command_cancel_job(int gui_transmission_id, int nargs, char *args[])
     my_ll_terminate_job(gui_transmission_id, job_object);
   }
 
+  sendOkEvent(gui_transmission_id);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return 0;
 }
@@ -1922,6 +1924,23 @@ void sendErrorEvent(int gui_transmission_id, int type, char *msgtext)
   msg = new_proxy_msg(PROXY_EV_ERROR, gui_transmission_id);
   proxy_msg_add_int(msg, type);
   proxy_msg_add_string(msg, msgtext);
+  enqueue_event_to_proxy_server(msg);
+  print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
+  return;
+}
+
+/************************************************************************* 
+ * Send job submission ERROR Event to front end GUI (error type and      *
+ * message)                                                              * 
+ *************************************************************************/
+void sendJobSubmissionErrorEvent(int gui_transmission_id, char *subid, char *msgtext)
+{
+  print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. id=%s. message=%s.\n", __FUNCTION__, __LINE__, subid, msgtext);
+/* 
+ * Send an error message to the front end
+ */
+  proxy_msg *msg;
+  msg = proxy_submitjob_error_event(gui_transmission_id, subid, 0, msgtext);
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return;
