@@ -46,13 +46,31 @@ public interface IBlock {
 	 * order (top-down order)
 	 */
 	public IBlock topNext();
+	/**
+	 * @return the next basic block in CFG according to the topological 
+	 * order (top-down order)
+	 */
+	public IBlock getTopNext();
+	/**
+	 * Set the next basic block in CFG according to the topological 
+	 * order (top-down order)
+	 */
 	public void setTopNext(IBlock b);
 	
 	/**
-	 * @return the next block in CFG according to the reverse
+	 * Get the next block in CFG according to the reverse
 	 * topological order (bottom-up order)
 	 */
 	public IBlock botNext();
+	/**
+	 * Get the next block in CFG according to the reverse
+	 * topological order (bottom-up order)
+	 */
+	public IBlock getBotNext();
+	/**
+	 * Set the next block in CFG according to the reverse
+	 * topological order (bottom-up order)
+	 */
 	public void setBotNext(IBlock b);
 
 	/**
@@ -61,39 +79,67 @@ public interface IBlock {
 	public IASTNode getContent();
 	
 	/**
-	 * @return true if this block contains expression <expr>
+	 * Search to determine if a block contains an expression
+	 * @return true if this block contains expression expr
 	 * which is the predicate of statement <parent>, false otherwise.
 	 */
 	public boolean search(IASTExpression expr, IASTStatement parent);
 	/** 
-	 * @return true if this block contains statement <stmt>,
+	 * Search to determine if a block contains a statement
+	 * @return true if this block contains statement stmt,
 	 * false otherwise.
 	 */
 	public boolean search(IASTStatement stmt);
 	/**
-	 * @return true if this block contains <label>, false otherwise
+	 * Search to determine if a block contains a given label
+	 * @return true if this block contains label, false otherwise
 	 */
 	public boolean search(IASTName label);
 	
-	/*
-	 * @return dominators
+	/**
+	 * Get Dominators<br>
+	 * Block A dominates another block B if every path from the entry that 
+	 * reaches  block B has to pass through  block A.
+	 * The entry block dominates all blocks.
+	 * @return list of dominator IBlocks
 	 */
 	public List<IBlock> getDOM();
+	/**
+	 * Set dominators
+	 * @param set list of dominators
+	 */
 	public void setDOM(List<IBlock> set);
 	
 	/**
-	 * @return post-dominators
+	 * Get post-dominators<br>
+	 * Block A postdominates block B if every path from B to the exit has to pass through block A.  
+	 * The exit block postdominates all blocks.
+	 * 
+	 * @return list of post-dominator IBlocks
 	 */
 	public List<IBlock> getPDOM();
+	/**
+	 * set post-dominators
+	 * @param set
+	 */
 	public void setPDOM(List<IBlock> set);
 
-	/** An attribute (identified by its name) of a block could be any 
+	/** 
+	 * An attribute (identified by its name) of a block could be any 
 	 * property of it.
 	 * @param name
 	 * @param attr
 	 */
 	public void setAttr(String name, Object attr);
+	/**
+	 * Get an attribute of a block
+	 * @param name
+	 * @return
+	 */
 	public Object getAttr(String name);
 	
+	/**
+	 * Print IBlock information, include id, content, and successors
+	 */
 	public void print();
 }
