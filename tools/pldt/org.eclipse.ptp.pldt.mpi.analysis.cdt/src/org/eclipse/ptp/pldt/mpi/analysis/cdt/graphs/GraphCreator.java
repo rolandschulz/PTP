@@ -169,8 +169,8 @@ public class GraphCreator {
 		System.out.println("Recursive cycles:");
 		for (List<ICallGraphNode> cycle : cycles) {
 			System.out.println("Cycle: ");
-			for (Iterator iterator = cycle.iterator(); iterator.hasNext();) {
-				ICallGraphNode fn = (ICallGraphNode) iterator.next();
+			for (Iterator<ICallGraphNode> iterator = cycle.iterator(); iterator.hasNext();) {
+				ICallGraphNode fn =  iterator.next();
 				System.out.print(" "+fn.getFuncName());
 				
 			}
