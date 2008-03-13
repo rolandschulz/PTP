@@ -49,7 +49,7 @@ from  ptplib   import  PTPProxy, ptp_print, \
                        JOB_ID_ATTR, \
                        PROC_STATE_STARTING, PROC_STATE_RUNNING, PROC_STATE_ERROR, \
                        PROTOCOL_VERSION_ATTR, PROTOCOL_VERSION, \
-                       MSG_LEVEL_FATAL, MSG_LEVEL_ERROR, \
+                       MSG_LEVEL_FATAL, MSG_LEVEL_ERROR, MSG_LEVEL_WARNING, \
                        BASE_ID_ATTR
 
                        
@@ -71,7 +71,7 @@ from  mpdlib   import  mpd_set_my_id, mpd_get_my_id, mpd_uncaught_except_tb, \
                        mpd_get_groups_for_username
                      
 global exit, parmdb, myAddr, myIP, cliMode, jobProcCount, ptpJobIDToJobID
-global sigOccurred, streamHandler, manSocks, proxy, extraEvent, debug
+global sigOccurred, streamHandler, manSocks, proxy, debug
 
 global lastID, rmID, machineID, queueID, nodeIDs, gTransID, procIDs
 
@@ -80,14 +80,13 @@ jobProcCount = {}
 ptpJobIDToJobID = {}
 procIDs = {}
 nodeIDs = {}
-extraEvent = ()
 proxy = None
 debug = 0
 lastID = 0
 
 def ptp_mpd_proxy():
     global exit, parmdb, myAddr, myIP, streamHandler
-    global manSocks, jobProcCount, proxy, extraEvent, debug
+    global manSocks, jobProcCount, proxy, debug
 
     sys.excepthook = mpd_uncaught_except_tb
 
@@ -205,12 +204,9 @@ def ptp_mpd_proxy():
     	rv = streamHandler.handle_active_streams(timeout=0.1)
     	if rv[0] < 0:  # will handle some sigs at top of next loop
     	    pass       # may have to handle some err conditions here
-    	#
-    	# Send fake event to handle job state changes
-    	#
-    	if extraEvent != ():
-    	    proxy.send_ok_event(*extraEvent)
-    	    extraEvent = ()
+        if proxy.getResult() < 0:
+            proxy.close()
+            exit = 1
 
 def do_input(fd):
     global exit
@@ -299,10 +295,11 @@ def generate_id():
 #
 # Query mpd for node information
 #
-def get_nodes():
+def get_nodes(proxy):
     global nodeIDs
     conSock = open_mpd_console()
     if conSock == 0:
+        proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'Could not connect to MPD')
     	return []
     msgToSend = { 'cmd' : 'mpdtrace' }
     conSock.send_dict_msg(msgToSend)
@@ -312,9 +309,11 @@ def get_nodes():
     while not done:
     	msg = conSock.recv_dict_msg(timeout=5.0)
     	if not msg:    # also get this on ^C
+            proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'Did not receive message from MPD')
     	    conSock.close()
     	    return []
     	elif not msg.has_key('cmd'):
+            proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'Invalid message from MPD')
     	    conSock.close()
             return []
     	if msg['cmd'] == 'mpdtrace_info':
@@ -342,6 +341,7 @@ def finish(tid, attrs, proxy):
     if gTransID >= 0:
         proxy.send_ok_event(gTransID) 
     proxy.send_shutdown_event(tid)
+    proxy.close()
     return 0
 
 #
@@ -351,26 +351,33 @@ def initialize(tid, attrs, proxy):
     global rmID, lastID, gTransID
     if PROTOCOL_VERSION_ATTR not in attrs:
         proxy.send_error_event(tid, 0, 'no protocol version supplied')
-        return 0
+        return -1
     version = attrs[PROTOCOL_VERSION_ATTR]
     if version != PROTOCOL_VERSION:
         proxy.send_error_event(tid, 0, 'wire protocol \'%s\' not supported' % version)
-        return 0
+        return -1
     if BASE_ID_ATTR not in attrs:
         proxy.send_error_event(tid, 0, 'no base ID supplied')
-        return 0
+        return -1
     rmID = int(attrs[BASE_ID_ATTR])
     lastID = int(rmID)
     gTransID = -1
+    #
+    # Test if mpd is running
+    #
+    conSock = open_mpd_console()
+    if conSock == 0:
+        proxy.send_error_event(tid, 0, 'Could not connect to MPD. Check it is running.')
+        return -1
     proxy.send_ok_event(tid)
-    return 1
+    return 0
 
 #
 # CMD_MODELDEF
 #
 def model_def(tid, attrs, proxy):
     proxy.send_ok_event(tid)
-    return 1
+    return 0
 
 #
 # CMD_STARTEVENTS
@@ -380,12 +387,12 @@ def start_events(tid, attrs, proxy):
     gTransID = tid
     machineID = generate_id()
     proxy.send_new_machine_event(tid, rmID, machineID, myAddr, MACHINE_STATE_UP)
-    attrs = get_nodes()
+    attrs = get_nodes(proxy)
     if len(attrs) > 0:
         proxy.send_new_node_event(tid, machineID, attrs)
     queueID = generate_id()
     proxy.send_new_queue_event(tid, rmID, queueID, "default", QUEUE_STATE_NORMAL)
-    return 1
+    return 0
 
 #
 # CMD_STOPEVENTS
@@ -396,8 +403,11 @@ def stop_events(tid, attrs, proxy):
         proxy.send_ok_event(gTransID)
         gTransID = -1
     proxy.send_ok_event(tid)
-    return 1;
+    return 0;
 
+#
+# Deprecated
+#
 def listjobs(args):
     conSock = open_mpd_console()
     if conSock == 0:
@@ -427,6 +437,9 @@ def listjobs(args):
     conSock.close()
     return (RTEV_OK, jobids)
 
+#
+# Deprecated
+#
 def listprocs(args):
     if len(args) != 1:
     	return (RTEV_ERROR_PROCS, 'Invalid arguments')
@@ -461,23 +474,27 @@ def listprocs(args):
     conSock.close()
     return (RTEV_PROCS, procs)
 
+#
+# Query mpd for to obtain process information
+# for the given job
+#
 def get_procs(jobid, proxy):
     global ptpJobIDToJobID, procIDs, gTransID
     conSock = open_mpd_console()
     if conSock == 0:
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Could not connect to MPD')
-        return 0
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Could not connect to MPD')
+        return -1
     msgToSend = { 'cmd' : 'mpdlistjobs' }
     conSock.send_dict_msg(msgToSend)
     msg = conSock.recv_dict_msg(timeout=5.0)
     if not msg:
     	conSock.close()
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'No message recvd from MPD before timeout')
-        return 0
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'No message recvd from MPD before timeout')
+        return -1
     if msg['cmd'] != 'local_mpdid':     # get full id of local mpd for filters later
     	conSock.close()
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Did not recv local_mpdid msg from local mpd; instead, recvd: %s' % msg)
-        return 0
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Did not recv local_mpdid msg from local mpd; instead, recvd: %s' % msg)
+        return -1
     procs = {}
     done = 0
     mpich_jobid = ptpJobIDToJobID[jobid]
@@ -485,8 +502,8 @@ def get_procs(jobid, proxy):
         msg = conSock.recv_dict_msg()
         if not msg.has_key('cmd'):
     	    conSock.close()
-            proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Invalid message: %s:' % (msg))
-            return 0
+            proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Invalid message: %s:' % (msg))
+            return -1
         if msg['cmd'] == 'mpdlistjobs_info':
     	    if make_jobid(msg['jobid']) == mpich_jobid:
                 pid = generate_id()
@@ -499,17 +516,17 @@ def get_procs(jobid, proxy):
             done = 1
     conSock.close()
     procIDs[jobid] = procs
-    return 1
+    return 0
 
 def terminate_job(tid, attrs, proxy):
-    global ptpJobIDToJobID, extraEvent
-    if ELEMENT_ID_ATTR not in attrs:
-    	ptp_print('Invalid arguments')
+    global ptpJobIDToJobID
+    if JOB_ID_ATTR not in attrs:
+        proxy.send_terminatejob_error_event(tid, 0, 'Invalid arguments to terminate job command')
         return 0
     ptp_jobid = int(attrs[JOB_ID_ATTR])
     if ptp_jobid not in ptpJobIDToJobID:
-    	ptp_print('No such job: %s' % ptp_jobid)
-        return 1
+        proxy.send_terminatejob_error_event(tid, 0, 'No such job: %s' % ptp_jobid)
+        return 0
     jobid = ptpJobIDToJobID[ptp_jobid]
     mpdid = ''
     sjobid = jobid.split('@')
@@ -519,7 +536,8 @@ def terminate_job(tid, attrs, proxy):
 
     conSock = open_mpd_console()
     if conSock == 0:
-    	ptp_print('Could not connect to MPD')
+        proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Could not connect to MPD')
+        proxy.send_terminatejob_error_event(tid, 0, 'Could not contact runtime')
         return 0
     msgToSend = { 'cmd':'mpdkilljob', 'jobnum' : jobnum, 'mpdid' : mpdid,
                   'jobalias' : '', 'username' : mpd_get_my_username() }
@@ -527,7 +545,8 @@ def terminate_job(tid, attrs, proxy):
     msg = conSock.recv_dict_msg(timeout=5.0)
     if not msg:
     	conSock.close()
-    	ptp_print('No message recvd from MPD before timeout')
+        proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'No message recvd from MPD before timeout')
+        proxy.send_terminatejob_error_event(tid, 0, 'Could not contact runtime')
         return 0
     if msg['cmd'] != 'mpdkilljob_ack':
         if msg['cmd'] == 'already_have_a_console':
@@ -535,13 +554,14 @@ def terminate_job(tid, attrs, proxy):
         else:
             err_msg = 'Unexpected message from mpd: %s' % (msg)
     	conSock.close()
-        ptp_print(err_msg)
+        proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, err_msg)
+        proxy.send_terminatejob_error_event(tid, 0, 'Could not contact runtime')
         return 0
     conSock.close()
     if not msg['handled']:
-        ptp_print('warning: job not found')
+        proxy.send_message_event(gTransID, MSG_LEVEL_WARNING, 0, 'job not found')
     proxy.send_ok_event(tid)
-    return 1
+    return 0
 
 def submit_job(tid, attrs, proxy):
     global parmdb, sigOccurred, streamHandler, manSocks
@@ -587,12 +607,12 @@ def submit_job(tid, attrs, proxy):
         debug = 1
 
     if jobsub_id == '':
-        proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'missing ID on job submission')
-        return 1
+        proxy.send_error_event(tid, 0, 'missing ID on job submission')
+        return 0
         
     if pgm_name == '':
     	proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Must specify a program name')
-        return 1
+        return 0
 
     if exec_path != '':
         pgm_path = exec_path + '/' + pgm_name
@@ -601,15 +621,16 @@ def submit_job(tid, attrs, proxy):
         
     if nprocs <= 0:
     	proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Invalid number of processes')
-        return 1
+        return 0
 
     if cwd == '':
     	proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Must specify a working directory')
-        return 1
+        return 0
 
     conSock = open_mpd_console()
     if conSock == 0:
-    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'Could not connect to MPD')
+    	proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'Could not connect to MPD')
+        proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Could not submit job to runtime')
         return 0
 
     listenSock = MPDListenSock('',0,name='socket_to_listen_for_man')
@@ -663,18 +684,21 @@ def submit_job(tid, attrs, proxy):
     if not msg:
         conSock.close()
         listenSock.close()
-    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'Communication with MPD failed')
+    	proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'Communication with MPD failed')
+        proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Could not submit job to runtime')
         return 0
     elif msg['cmd'] != 'response_get_mpdrun_values':
         conSock.close()
         listenSock.close()
-    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'Unexpected msg from MPD :%s:' % (msg))
+    	proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'Unexpected msg from MPD :%s:' % (msg))
+        proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Could not submit job to runtime')
         return 0
     if msg['mpd_version'] != mpd_version():
         conSock.close()
         listenSock.close()
-    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'MPD version %s does not match mpiexec version %s' % \
+    	proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'MPD version %s does not match mpiexec version %s' % \
                       (msg['mpd_version'],mpd_version()))
+        proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Could not submit job to runtime')
         return 0
 
     # make sure to do this after nprocs has its value
@@ -687,7 +711,8 @@ def submit_job(tid, attrs, proxy):
     if not msg:
         conSock.close()
         listenSock.close()
-    	proxy.send_message_event(tid, MSG_LEVEL_FATAL, 0, 'No msg recvd from MPD when expecting ack of request')
+    	proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, 'No msg recvd from MPD when expecting ack of request')
+        proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Could not submit job to runtime')
         return 0
     elif msg['cmd'] == 'mpdrun_ack':
         currRingSize = msg['ringsize']
@@ -707,8 +732,9 @@ def submit_job(tid, attrs, proxy):
             err_msg = 'Unexpected message from mpd: %s' % (msg)
     	conSock.close()
     	listenSock.close()
-    	proxy.send_submitjob_error_event(tid, jobsub_id, 0, err_msg)
-        return 1
+        proxy.send_message_event(tid, MSG_LEVEL_ERROR, 0, err_msg)
+        proxy.send_submitjob_error_event(tid, jobsub_id, 0, 'Could not submit job to runtime')
+        return 0
 
     conSock.close()
 
@@ -720,7 +746,7 @@ def submit_job(tid, attrs, proxy):
     (manSock,addr) = listenSock.accept()
     if not manSock:
     	listenSock.close()
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Failed to obtain sock from MPD manager')
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Failed to obtain sock from MPD manager')
         return 0
         
     ptp_jobid = generate_id()
@@ -730,7 +756,8 @@ def submit_job(tid, attrs, proxy):
     # first, do handshaking with man 
     msg = manSock.recv_dict_msg()  
     if (not msg  or  not msg.has_key('cmd') or msg['cmd'] != 'man_checking_in'):
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Invalid handshake msg: %s' % (msg))
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Invalid handshake msg: %s' % (msg))
+        streamHandler.del_handler(manSock)
         return 0
 
     msgToSend = { 'cmd' : 'ringsize', 'ring_ncpus' : currRingNCPUs,
@@ -738,18 +765,22 @@ def submit_job(tid, attrs, proxy):
     manSock.send_dict_msg(msgToSend)
     msg = manSock.recv_dict_msg()
     if (not msg  or  not msg.has_key('cmd')):
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Invalid reply to ringsize msg: %s' % (msg))
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Invalid reply to ringsize msg: %s' % (msg))
+        streamHandler.del_handler(manSock)
         return 0
     if (msg['cmd'] == 'job_started'):
         mpich_jobid = make_jobid(msg['jobid'])
     	ptpJobIDToJobID[ptp_jobid] = mpich_jobid
     	debug_print('ptp_mpich2_proxy: job %s started' % mpich_jobid)
     else:
-    	proxy.send_message_event(gTransID, MSG_LEVEL_FATAL, 0, 'Unknown msg: %s' % (msg))
+    	proxy.send_message_event(gTransID, MSG_LEVEL_ERROR, 0, 'Unknown msg: %s' % (msg))
+        streamHandler.del_handler(manSock)
         return 0
 
     proxy.send_new_job_event(gTransID, queueID, ptp_jobid, mpich_jobid, JOB_STATE_RUNNING, jobsub_id)
-    if get_procs(ptp_jobid, proxy) == 0:
+    if get_procs(ptp_jobid, proxy) < 0:
+        proxy.send_job_state_change_event(gTransID, ptp_jobid, JOB_STATE_ERROR)
+        streamHandler.del_handler(manSock)
         return 0
     
     (manCliStdoutSock,addr) = listenSock.accept(name='stdout_sock')
@@ -763,7 +794,7 @@ def submit_job(tid, attrs, proxy):
 
     manSocks.append(manSock)
 
-    return 1
+    return 0
 
 #
 # Find lowest and highest element IDs and

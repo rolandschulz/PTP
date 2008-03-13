@@ -40,25 +40,27 @@ EV_MESSAGE					= 1
 EV_ERROR					= 5
 EV_SHUTDOWN					= 6
 
-RUNTIME_EVENT_BASE			= 200;
+RUNTIME_EVENT_BASE			= 200
 
-EV_NEW_JOB 					= RUNTIME_EVENT_BASE + 20;
-EV_NEW_MACHINE 				= RUNTIME_EVENT_BASE + 21;
-EV_NEW_NODE 				= RUNTIME_EVENT_BASE + 22;
-EV_NEW_PROCESS 				= RUNTIME_EVENT_BASE + 23;
-EV_NEW_QUEUE 				= RUNTIME_EVENT_BASE + 24;
-EV_JOB_CHANGE 				= RUNTIME_EVENT_BASE + 30;
-EV_MACHINE_CHANGE 			= RUNTIME_EVENT_BASE + 31;
-EV_NODE_CHANGE 				= RUNTIME_EVENT_BASE + 32;
-EV_PROCESS_CHANGE 			= RUNTIME_EVENT_BASE + 33;
-EV_QUEUE_CHANGE 			= RUNTIME_EVENT_BASE + 34;
-EV_REMOVE_ALL 				= RUNTIME_EVENT_BASE + 40;
-EV_REMOVE_JOB 				= RUNTIME_EVENT_BASE + 41;
-EV_REMOVE_MACHINE 			= RUNTIME_EVENT_BASE + 42;
-EV_REMOVE_NODE 				= RUNTIME_EVENT_BASE + 43;
-EV_REMOVE_PROCESS 			= RUNTIME_EVENT_BASE + 44;
-EV_REMOVE_QUEUE 			= RUNTIME_EVENT_BASE + 45;
-EV_ATTR_DEF 				= RUNTIME_EVENT_BASE + 51;
+EV_SUBMITJOB_ERROR			= RUNTIME_EVENT_BASE + 11
+EV_TERMINATEJOB_ERROR		= RUNTIME_EVENT_BASE + 12
+EV_NEW_JOB 					= RUNTIME_EVENT_BASE + 20
+EV_NEW_MACHINE 				= RUNTIME_EVENT_BASE + 21
+EV_NEW_NODE 				= RUNTIME_EVENT_BASE + 22
+EV_NEW_PROCESS 				= RUNTIME_EVENT_BASE + 23
+EV_NEW_QUEUE 				= RUNTIME_EVENT_BASE + 24
+EV_JOB_CHANGE 				= RUNTIME_EVENT_BASE + 30
+EV_MACHINE_CHANGE 			= RUNTIME_EVENT_BASE + 31
+EV_NODE_CHANGE 				= RUNTIME_EVENT_BASE + 32
+EV_PROCESS_CHANGE 			= RUNTIME_EVENT_BASE + 33
+EV_QUEUE_CHANGE 			= RUNTIME_EVENT_BASE + 34
+EV_REMOVE_ALL 				= RUNTIME_EVENT_BASE + 40
+EV_REMOVE_JOB 				= RUNTIME_EVENT_BASE + 41
+EV_REMOVE_MACHINE 			= RUNTIME_EVENT_BASE + 42
+EV_REMOVE_NODE 				= RUNTIME_EVENT_BASE + 43
+EV_REMOVE_PROCESS 			= RUNTIME_EVENT_BASE + 44
+EV_REMOVE_QUEUE 			= RUNTIME_EVENT_BASE + 45
+EV_ATTR_DEF 				= RUNTIME_EVENT_BASE + 51
 	
 LEVEL_FATAL   = 0
 LEVEL_ERROR   = 1
@@ -171,6 +173,7 @@ class PTPProxy:
         self.port = port
         self.cmds = cmds
         self.debug = debug
+        self.result_value = 0
         
     #
     # Get the socket
@@ -191,15 +194,22 @@ class PTPProxy:
         self.sock.connect((self.host, self.port))
     
     #
+    # Return last result
+    #
+    def getResult(self):
+    	return self.result_value
+    
+    #
     # Read and process commands from the client.
     #
     def read_command(self, stream):
         cmd = self.read_and_decode_command(stream)
         if len(cmd) == 3:
         	if cmd[0] in self.cmds:
-	         	self.cmds[cmd[0]](cmd[1], cmd[2], self)
+	         	self.result_value = self.cmds[cmd[0]](cmd[1], cmd[2], self)
 	        else:
 	        	print 'no such command: %d' % cmd[0]
+		self.result = -1
             
     #
     # Read and decode command
@@ -280,16 +290,24 @@ class PTPProxy:
     def send_shutdown_event(self, trans_id):
         self.send_event(EV_OK, trans_id, [])
 
+    def send_error_event(self, trans_id, code, msg):
+        self.send_event(EV_ERROR, trans_id, ['%s=%d' % (ERROR_CODE_ATTR, code), 
+											   '%s=%s' % (ERROR_MSG_ATTR, msg)])
+
     def send_message_event(self, trans_id, level, code, msg):
         self.send_event(EV_MESSAGE, trans_id, ['%s=%s' % (MSG_LEVEL_ATTR, level), 
 											   '%s=%d' % (MSG_CODE_ATTR, code),
 											   '%s=%s' % (MSG_TEXT_ATTR, msg)])
    
     def send_submitjob_error_event(self, trans_id, job_id, code, msg):
-    	self.send_event(EV_ERROR, trans_id, ['%s=%s' % (JOB_SUB_ID_ATTR, job_id),
+    	self.send_event(EV_SUBMITJOB_ERROR, trans_id, ['%s=%s' % (JOB_SUB_ID_ATTR, job_id),
 											 '%s=%d' % (ERROR_CODE_ATTR, code),
 											 '%s=%s' % (ERROR_MSG_ATTR, msg)])
     	
+    def send_terminatejob_error_event(self, trans_id, code, msg):
+    	self.send_event(EV_TERMINATEJOB_ERROR, trans_id, ['%s=%d' % (ERROR_CODE_ATTR, code),
+														  '%s=%s' % (ERROR_MSG_ATTR, msg)])
+
     def send_new_job_event(self, trans_id, queue_id, job_id_range, name, state, job_sub_id):
     	self.send_event(EV_NEW_JOB, trans_id, [queue_id, 1, job_id_range, 3,
 											   '%s=%s' % (ELEMENT_NAME_ATTR, name),
