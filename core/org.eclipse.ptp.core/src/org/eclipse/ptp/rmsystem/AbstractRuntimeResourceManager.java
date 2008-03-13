@@ -150,6 +150,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	
 	private IRuntimeSystem runtimeSystem;
 	private RMState state;
+	private String errorMessage = null;
 	
 	private final ReentrantLock stateLock = new ReentrantLock();;
 	private final Condition stateCondition = stateLock.newCondition();
@@ -195,7 +196,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
 			for (JobSubmission sub : jobSubmissions.values()) {
 				sub.setState(JobSubState.ERROR);
-				sub.setErrorReason("Fatal error ocurred in runtime system");
+				sub.setErrorReason("Fatal error ocurred in runtime system"); //$NON-NLS-1$
 			}
 			subCondition.signalAll();
 		} finally {
@@ -206,6 +207,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
 			RMState oldState = state;
 			state = RMState.ERROR;
+			errorMessage = null;
 			if (oldState == RMState.STOPPING) {
 				stateCondition.signal();
 			}
@@ -240,7 +242,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedJobs.add(job);
 				} else {
-					PTPCorePlugin.log("JobChange: unknown node " + elementId);
+					PTPCorePlugin.log("JobChange: unknown node " + elementId); //$NON-NLS-1$
 				}
 			}
 
@@ -268,7 +270,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (machine != null) {
 					machines.add(machine);
 				} else {
-					System.out.println("MachineChange: unknown machine " + elementId);
+					System.out.println("MachineChange: unknown machine " + elementId); //$NON-NLS-1$
 				}
 			}
 			
@@ -454,7 +456,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedNodes.add(node);
 				} else {
-					PTPCorePlugin.log("NodeChange: unknown node " + elementId);
+					PTPCorePlugin.log("NodeChange: unknown node " + elementId); //$NON-NLS-1$
 				}
 			}
 
@@ -490,7 +492,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedProcesses.add(process);
 				} else {
-					PTPCorePlugin.log("ProcessChange: unknown process " + elementId);
+					PTPCorePlugin.log("ProcessChange: unknown process " + elementId); //$NON-NLS-1$
 				}
 			}
 			
@@ -715,6 +717,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
 			if (state == RMState.STARTING) {
 				state = RMState.ERROR;
+				errorMessage = e.getErrorMessage();
 				stateCondition.signal();
 				return;
 			}
@@ -920,14 +923,14 @@ public abstract class AbstractRuntimeResourceManager extends
 		stateLock.lock();
 		try {
 			if (state == RMState.STOPPED) {
-				monitor.beginTask("Runtime resource manager startup", 10);
+				monitor.beginTask("Runtime resource manager startup", 10); //$NON-NLS-1$
 				doBeforeOpenConnection();
-				monitor.subTask("Creating runtime system");
+				monitor.subTask("Creating runtime system"); //$NON-NLS-1$
 				runtimeSystem = doCreateRuntimeSystem();
 				monitor.worked(1);
 				runtimeSystem.addRuntimeEventListener(this);
 				monitor.worked(2);
-				monitor.subTask("Starting runtime system");
+				monitor.subTask("Starting runtime system"); //$NON-NLS-1$
 				
 				try {
 					runtimeSystem.startup(monitor);
@@ -946,9 +949,11 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 				}
 				if (state == RMState.ERROR) {
+					if (errorMessage == null) {
+						errorMessage= "Fatal error occurred in the runtime system"; //$NON-NLS-1$
+					}
 					throw new CoreException(new Status(IStatus.ERROR, 
-							PTPCorePlugin.getUniqueIdentifier(),
-							"Fatal error occurred in the runtime system"));
+							PTPCorePlugin.getUniqueIdentifier(), errorMessage));
 				}
 				if (monitor.isCanceled()) {
 					state = RMState.STOPPED;
