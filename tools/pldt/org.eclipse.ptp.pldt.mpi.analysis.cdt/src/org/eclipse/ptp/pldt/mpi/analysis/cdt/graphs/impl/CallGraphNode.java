@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007, 2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IControlFlowGraph;
 
+/**
+ * Implementation of a call graph node, which represents a user-defined
+ * function
+ *
+ */
 public class CallGraphNode implements ICallGraphNode {
 	protected IResource resource_;
 	protected String fileName_;
@@ -32,9 +37,9 @@ public class CallGraphNode implements ICallGraphNode {
 	protected boolean nested; //nested function declaration?
 	protected IControlFlowGraph CFG_;
 	
-	/* next node in reverse-topological (bottom-up) order */
+	/** next node in reverse-topological (bottom-up) order */
 	protected ICallGraphNode botNext_;
-	/* next node in topological (top-down) order */
+	/** next node in topological (top-down) order */
 	protected ICallGraphNode topNext_; 
 	protected Hashtable<String,Object> attrs_;
 
@@ -111,7 +116,7 @@ public class CallGraphNode implements ICallGraphNode {
 		if(!callees_.contains(callee))
 			callees_.add(callee);
 	}
-	
+	/** Returns next node in reverse-topological (bottom-up) order */
 	public ICallGraphNode botNext() {
 		return botNext_;
 	}
@@ -123,7 +128,7 @@ public class CallGraphNode implements ICallGraphNode {
 	public IControlFlowGraph getCFG() {
 		return CFG_;
 	}
-
+	/** Returns next node in topological (top-down) order */
 	public ICallGraphNode topNext() {
 		return topNext_;
 	}
