@@ -168,11 +168,17 @@ public class Block implements IBlock {
 	public IBlock topNext() {
 		return topNext_;
 	}
+	public IBlock getTopNext() {
+		return topNext_;
+	}
 	public void setTopNext(IBlock b){
 		topNext_ = b;
 	}
 	
 	public IBlock botNext() {
+		return botNext_;
+	}
+	public IBlock getBotNext() {
 		return botNext_;
 	}
 	public void setBotNext(IBlock b){
@@ -211,13 +217,16 @@ public class Block implements IBlock {
 		return attrs_.get(name);
 	}
 	
+	/**
+	 * Print IBlock information, include id, content, and successors
+	 */
 	public void print(){
 		System.out.print("Block " + id + ": ");
 		if(getContent() != null)
-			System.out.println(getContent().toString());
+			System.out.println("  "+getContent().toString());
 		else
-			System.out.println("Empty block");
-		System.out.print("flows to: ");
+			System.out.println("  Empty block");
+		System.out.print("  flows to: ");
 		for(Iterator<IBlock> i = succs_.iterator(); i.hasNext();){
 			System.out.print(i.next().getID() + ", ");
 		}
