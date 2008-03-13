@@ -316,8 +316,16 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements IProx
 		case IProxyRuntimeEvent.REMOVE_QUEUE:
 			evt = new ProxyRuntimeRemoveQueueEvent(packet.getTransID(), packet.getArgs());
 			break;
-		}
 
+		case IProxyRuntimeEvent.SUBMITJOB_ERROR:
+			evt = new ProxyRuntimeSubmitJobErrorEvent(packet.getTransID(), packet.getArgs());
+			break;
+			
+		case IProxyRuntimeEvent.TERMINATEJOB_ERROR:
+			evt = new ProxyRuntimeTerminateJobErrorEvent(packet.getTransID(), packet.getArgs());
+			break;
+		}
+			
 		return evt;
 	}
 

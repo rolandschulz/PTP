@@ -55,8 +55,12 @@
  * Internal error events
  */
 #define PROXY_EV_RT_STARTUP_ERROR		PROXY_EV_RT_OFFSET + 10	/*LOCAL EVENT */
-#define PROXY_EV_RT_SUBMITJOB_ERROR		PROXY_EV_RT_OFFSET + 11	/*LOCAL EVENT */
-#define PROXY_EV_RT_TERMINATEJOB_ERROR	PROXY_EV_RT_OFFSET + 12	/*LOCAL EVENT */
+
+/*
+ * Command error events
+ */
+#define PROXY_EV_RT_SUBMITJOB_ERROR		PROXY_EV_RT_OFFSET + 11
+#define PROXY_EV_RT_TERMINATEJOB_ERROR	PROXY_EV_RT_OFFSET + 12
 /*
  * New model element events
  */
@@ -95,7 +99,7 @@ proxy_msg *	proxy_shutdown_event(int trans_id);
 proxy_msg *	proxy_message_event(int trans_id, char *level, int code, char *fmt, ...);
 proxy_msg *	proxy_error_event(int trans_id, int code, char *fmt, ...);
 proxy_msg *	proxy_submitjob_error_event(int trans_id, char *jobSubId, int code, char *msg);
-proxy_msg *	proxy_job_error_event(int trans_id, char *jobId, int code, char *msg);
+proxy_msg *	proxy_terminatejob_error_event(int trans_id, int code, char *msg);
 proxy_msg *	proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int disp, int def);
 proxy_msg *	proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, int disp, char *def);
 proxy_msg *	proxy_new_machine_event(int trans_id, char *rm_id, char *machine_id_range, char *name, char *state);
