@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: TAU Jars Plug-in
+Bundle-Name: TAU External Jars Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.perf.tau.jars
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: batik-combined.jar,
  jargs.jar,
  jcommon-0.9.6.jar,

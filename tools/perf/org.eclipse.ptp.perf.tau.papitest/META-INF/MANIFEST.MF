@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Papitest Plug-in
+Bundle-Name: TAU PAPI Test Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.perf.tau.papitest;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.perf.tau.papitest.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
