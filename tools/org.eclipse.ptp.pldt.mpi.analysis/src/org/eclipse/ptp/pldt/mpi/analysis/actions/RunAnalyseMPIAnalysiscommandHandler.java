@@ -25,8 +25,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandler;
+import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIResourceCollector;
+
 
 /**
  * Do MPI barrier analysis from dropdown toolbar menu
@@ -72,6 +75,7 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			MPIAnalysisManager manager = new MPIAnalysisManager(callGraph_);
 			manager.run();
 		}
+		ViewActivater.activateView(IDs.matchingSetViewID);
 		return null;
 	}
 	/**

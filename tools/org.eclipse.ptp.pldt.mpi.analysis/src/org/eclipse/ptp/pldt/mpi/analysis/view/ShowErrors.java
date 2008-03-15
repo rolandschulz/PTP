@@ -147,8 +147,9 @@ public class ShowErrors {
         	}
 		}
 
-        // Done creating markers, now show the view
+        // Done creating markers, now show the views
         ViewActivater.activateView(IDs.matchingSetViewID);
+        ViewActivater.activateView(IDs.errorViewID);
 	}
 
 }
