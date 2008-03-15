@@ -114,11 +114,11 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
 
     }
 
-    public boolean visitFile(IResource resource, List artifacts)
+    public boolean visitFile(IResource resource, List<Artifact> artifacts)
     {
         Artifact[] artifactArray = new Artifact[artifacts.size()];
         int i = 0;
-        for (Iterator iter = artifacts.iterator(); iter.hasNext();) {
+        for (Iterator<Artifact> iter = artifacts.iterator(); iter.hasNext();) {
             Artifact element = (Artifact) iter.next();
             artifactArray[i] = element;
             i++;
@@ -196,7 +196,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
     protected void createArtifactMarker(IResource resource, Artifact artifact, String fn) throws CoreException
     {
         if (traceOn) System.out.println("Artifact desc=" + artifact.getShortName() + "  fn=" + fn);
-        Map attrs = createCommonMarkerAttrs(resource, artifact, fn);
+        Map<String, Object> attrs = createCommonMarkerAttrs(resource, artifact, fn);
         // message attribute will be used for hover over editor location
         attrs.put(IMarker.MESSAGE, artifact.getShortName());
         // create the marker all at once, so get ONLY a single resourceChange event.
@@ -220,9 +220,9 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
      * Note we are not creating the marker here; we do it all at once after attributes are calculated, so that a single
      * resourceChange event gets triggered
      */
-    protected Map createCommonMarkerAttrs(IResource resource, Artifact artifact, String fn)
+    protected Map<String, Object> createCommonMarkerAttrs(IResource resource, Artifact artifact, String fn)
     {
-        Map attrs = new HashMap();
+        Map<String, Object> attrs = new HashMap<String, Object>();
         attrs.put(IMarker.PRIORITY, new Integer(IMarker.PRIORITY_NORMAL));
         attrs.put(IMarker.LINE_NUMBER, new Integer(artifact.getLine()));
         // use filename from the artifact, not the base file being analysed,

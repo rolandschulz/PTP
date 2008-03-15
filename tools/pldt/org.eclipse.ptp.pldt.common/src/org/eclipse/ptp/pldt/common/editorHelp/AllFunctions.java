@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,18 +14,24 @@ package org.eclipse.ptp.pldt.common.editorHelp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllFunctions {
-	private List /* of FunctionSummary */ allFunctionList = new ArrayList();
+import org.eclipse.cdt.ui.IFunctionSummary;
 
-	public List getAllFunctionList() {
+/**
+ * Unused???? 3/13/08
+ *
+ */
+public class AllFunctions {
+	private List<IFunctionSummary> allFunctionList = new ArrayList<IFunctionSummary>();
+
+	public List<IFunctionSummary> getAllFunctionList() {
 		return allFunctionList;
 	}
 
-	public void setAllFunctionList(List allFunctionList) {
+	public void setAllFunctionList(List<IFunctionSummary> allFunctionList) {
 		this.allFunctionList = allFunctionList;
 	}
 	
-	public void addFunction(FunctionSummaryImpl functionSummary)
+	public void addFunction(IFunctionSummary functionSummary)
 	{
 		allFunctionList.add(functionSummary);
 	}

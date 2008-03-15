@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.common.util;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
@@ -25,8 +22,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.source.Annotation;
-import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.editors.text.ILocationProvider;
@@ -48,7 +43,8 @@ public class Utility
      * @param node - IASTNode
      * @return Location
      */
-    public static Location getLocation(IASTNode node)
+    @SuppressWarnings("restriction")// need getLength() from ASTNode (as opposed to IASTNode)
+	public static Location getLocation(IASTNode node)
     {
         ASTNode astnode = (node instanceof ASTNode ? (ASTNode)node : null);
         if (astnode==null)  return null;

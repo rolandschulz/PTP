@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation.
+ * Copyright (c) 2005, 2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import java.util.List;
  * the associated view, etc. <br>
  * It can also contain other information such as return codes, generalized analysis results, parameters, etc. <br>
  * 
- * @author tibbitts
+ * @author Beth Tibbitts
  * 
  */
 public class ScanReturn
@@ -37,7 +37,7 @@ public class ScanReturn
         return false;
     }
 
-    public List getArtifactList()
+    public List<Artifact> getArtifactList()
     {
         return artifacts;
     }
