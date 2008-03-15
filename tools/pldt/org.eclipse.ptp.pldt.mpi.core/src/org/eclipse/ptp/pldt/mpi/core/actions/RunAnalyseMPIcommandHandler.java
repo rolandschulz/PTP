@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,17 +12,13 @@
 package org.eclipse.ptp.pldt.mpi.core.actions;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
@@ -31,7 +27,6 @@ import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCASTVisitor;
 import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCPPASTVisitor;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * @author tibbitts
@@ -55,7 +50,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 	 * @return
 	 */
 	@Override
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List includes) {
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List<String> includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
