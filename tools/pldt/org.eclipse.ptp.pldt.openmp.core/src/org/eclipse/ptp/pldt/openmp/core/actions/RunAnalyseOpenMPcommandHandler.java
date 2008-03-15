@@ -67,7 +67,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	 */
 	@Override
 	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,
-			final List /* of String */includes) {
+			final List<String> includes) {
 		OpenMPScanReturn msr = new OpenMPScanReturn();
 		final String fileName = tu.getElementName();
 		IASTTranslationUnit atu = null;

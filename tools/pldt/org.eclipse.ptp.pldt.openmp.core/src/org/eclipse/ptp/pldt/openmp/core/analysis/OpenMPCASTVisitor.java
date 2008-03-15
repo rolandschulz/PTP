@@ -36,7 +36,7 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
     }
 
 
-    public OpenMPCASTVisitor(List includes, String fileName, ScanReturn msr)
+    public OpenMPCASTVisitor(List<String> includes, String fileName, ScanReturn msr)
     {
         super(includes, fileName, msr);
         ARTIFACT_CALL = "OpenMP Call";
