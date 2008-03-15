@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.perf.tau.fortran_feature"
-      label="Fortran_feature Feature"
+      id="org.eclipse.ptp.perf.tau.fortran"
+      label="TAU Fortran Enabler"
       version="1.0.0"
       provider-name="University of Oregon">
 
    <description url="http://www.eclipse.org/legal/epl/notice.php">
-      org.eclipse.ptp.tau.selinstfort: Selective instrumentatin functionality
-for Fortran via Photran.
+      Adds selective instrumentatin functionality for Fortran via the Photran project.
    </description>
 
    <copyright url="http://www.example.com/copyright">
