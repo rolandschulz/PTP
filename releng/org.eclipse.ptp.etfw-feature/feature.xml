@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.perf_feature"
-      label="Performance Analysis Framework Feature"
+      id="org.eclipse.ptp.perf"
+      label="PTP Performance Analysis Framework"
       version="1.0.0"
       provider-name="University of Oregon">
 
@@ -22,14 +22,14 @@ for performance tools.
 
    <copyright>
       /****************************************************************************
-*			Tuning and Analysis Utilities
-*			http://www.cs.uoregon.edu/research/paracomp/tau
+*   Tuning and Analysis Utilities
+*   http://www.cs.uoregon.edu/research/paracomp/tau
 ****************************************************************************
 * Copyright (c) 1997-2006
 *    Department of Computer and Information Science, University
 of Oregon
 *    Advanced Computing Laboratory, Los Alamos National Laboratory
-*    Research Center Juelich, ZAM Germany	
+*    Research Center Juelich, ZAM Germany 
 *
 * All rights reserved. This program and the accompanying materials
 * are made available under the terms of the Eclipse Public License

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.perf.tau_feature"
-      label="Tau Performance Analysis Feature"
+      id="org.eclipse.ptp.perf.tau"
+      label="Performance Analysis Framework for TAU"
       version="1.0.0"
       provider-name="University of Oregon">
 
