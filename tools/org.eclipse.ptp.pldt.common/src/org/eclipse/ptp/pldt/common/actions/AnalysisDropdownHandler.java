@@ -32,8 +32,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * 
  * This class also acts as a single point to cache the current structured selection
  * so that when a menu item is selected, the current selection can be accessed.
+ * It registers as a selection listener to actively listen for selection changes,
+ * instead of relying on HandlerUtil which won't get the first one (e.g. before
+ * the plugin is loaded).
  * 
- * @author tibbitts
+ * @author Beth Tibbitts
  *
  */
 public class AnalysisDropdownHandler extends AbstractHandler implements ISelectionListener {
