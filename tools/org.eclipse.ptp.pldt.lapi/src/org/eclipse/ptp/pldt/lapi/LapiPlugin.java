@@ -72,11 +72,11 @@ public class LapiPlugin extends AbstractUIPlugin {
      * 
      * @return
      */
-    public List /* of String */getLapiIncludeDirs()
+    public List<String> getLapiIncludeDirs()
     {
         String stringList = getPluginPreferences().getString(LapiIDs.LAPI_INCLUDES);
         StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
-        List dirs = new ArrayList();
+        List<String> dirs = new ArrayList<String>();
         while (st.hasMoreElements()) {
             dirs.add(st.nextToken());
         }
