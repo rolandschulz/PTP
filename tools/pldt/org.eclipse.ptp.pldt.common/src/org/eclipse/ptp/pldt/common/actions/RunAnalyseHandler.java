@@ -45,9 +45,10 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	 * (e.g. resource in the project explorer) then return it.
 	 * If it's e.g. a text selection in the editor, we don't care about that
 	 * 
-	 * Note that we  cache the last structured selection )like the action version
-	 * of this is) since we don't get selection changed events.
-	 * Can we somehow get those events? then this would be more accurate
+	 * Note that we  cache the last structured selection (like the previous "action" version
+	 * of this class) since we don't get selection changed events.
+	 * However, AnalysisDropDownHandler does get these events, and its value
+	 * will be used if HanderUtil doesn't have any information yet.
 	 * 
 	 * @param event
 	 * @return the current selection if it's a structured selection e.g. in the navigator
