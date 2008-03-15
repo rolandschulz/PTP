@@ -42,17 +42,17 @@ public interface IBlock {
 	public List<IBlock> getPreds();
 	
 	/**
-	 * @return the next basic block in CFG according to the topological 
+	 * @return the next  block in CFG according to the topological 
 	 * order (top-down order)
 	 */
 	public IBlock topNext();
 	/**
-	 * @return the next basic block in CFG according to the topological 
+	 * @return the next  block in CFG according to the topological 
 	 * order (top-down order)
 	 */
 	public IBlock getTopNext();
 	/**
-	 * Set the next basic block in CFG according to the topological 
+	 * Set the next  block in CFG according to the topological 
 	 * order (top-down order)
 	 */
 	public void setTopNext(IBlock b);
