@@ -33,7 +33,8 @@ public class IDs {
 	public static final String parentName = "parentName";
 	
     public static final String matchingSetViewID="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetTableView";
-
+    public static final String errorViewID =     "org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView";
+    
     /* For error counter examples */
     public static final String errorMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.errorMarker";
     public static final String parentIDAttr = "parentID";
