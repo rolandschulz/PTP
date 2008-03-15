@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,17 +22,23 @@ import org.eclipse.cdt.ui.ICHelpResourceDescriptor;
 import org.eclipse.cdt.ui.IFunctionSummary;
 import org.eclipse.cdt.ui.text.ICHelpInvocationContext;
 
+/**
+ * C Help Book implementation for hover help, etc. etc.
+ * @author beth
+ *
+ */
 public class CHelpBookImpl implements ICHelpBook {
 	private String title = "Generic C Help Book";
 	private static final boolean traceOn=false;
 
 	private String pluginId;
 
-	protected Map /* String -> IFunctionSummary */funcName2FuncInfo = new HashMap();
+	protected Map<String,IFunctionSummary> funcName2FuncInfo = new HashMap<String, IFunctionSummary>();
 
 	/**
 	 * Disallow default ctor; must provide plugin id
 	 */
+	@SuppressWarnings("unused")
 	private CHelpBookImpl() {
 	}
 
@@ -54,7 +60,7 @@ public class CHelpBookImpl implements ICHelpBook {
 
 	public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context,
 			String name) {
-		IFunctionSummary fs = (IFunctionSummary) funcName2FuncInfo.get(name);
+		IFunctionSummary fs = funcName2FuncInfo.get(name);
 		if(traceOn){
 			String cn=this.getClass().getSimpleName();
 			String finfo=(fs!=null)?(fs.toString().substring(0,25)):null;
@@ -65,9 +71,9 @@ public class CHelpBookImpl implements ICHelpBook {
 
 	public IFunctionSummary[] getMatchingFunctions(
 			ICHelpInvocationContext context, String prefix) {
-		List functionSummaryList = new ArrayList();
-		for (Iterator it = funcName2FuncInfo.keySet().iterator(); it.hasNext();) {
-			String funcName = (String) it.next();
+		List<IFunctionSummary> functionSummaryList = new ArrayList<IFunctionSummary>();
+		for (Iterator<String> it = funcName2FuncInfo.keySet().iterator(); it.hasNext();) {
+			String funcName = it.next();
 			if (funcName != null
 					&& funcName.toUpperCase().startsWith(prefix.toUpperCase())) {
 				functionSummaryList.add(funcName2FuncInfo.get(funcName));
@@ -81,8 +87,8 @@ public class CHelpBookImpl implements ICHelpBook {
 			functionSummaryArray = new IFunctionSummary[functionSummaryList
 					.size()];
 			int i = 0;
-			for (Iterator it = functionSummaryList.iterator(); it.hasNext(); i++) {
-				functionSummaryArray[i] = (IFunctionSummary) it.next();
+			for (Iterator<IFunctionSummary> it = functionSummaryList.iterator(); it.hasNext(); i++) {
+				functionSummaryArray[i] = it.next();
 			}
 		}
 

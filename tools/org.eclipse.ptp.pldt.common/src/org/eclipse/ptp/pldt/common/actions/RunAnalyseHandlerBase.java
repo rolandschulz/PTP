@@ -35,6 +35,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IDs;
@@ -137,6 +139,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		readPreferences();
 
 		final int indent = 0;
+ 
 		if ((selection == null) || selection.isEmpty()) {
 			MessageDialog
 					.openWarning(null, "No files selected for analysis.",
@@ -145,7 +148,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			return;
 		} else {
 			// get preference for include paths
-			final List includes = getIncludePath();
+			final List<String> includes = getIncludePath();
 			if (areIncludePathsNeeded() && includes.isEmpty()) {
 				System.out
 						.println("RunAnalyseBase.run(), no include paths found.");
@@ -243,24 +246,25 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * @return true if any errors were found.
 	 * @throws InterruptedException
 	 */
+	@SuppressWarnings("unchecked") // on Iterator
 	protected boolean runResources(IProgressMonitor monitor, int indent,
-			List includes) throws InterruptedException {
+			List<String> includes) throws InterruptedException {
 		boolean foundError = false;
 		// First, count files so we know how much work to do.
 		// note this is number of files of any type, not necessarily number of
-		// files that will be anlayzed.
+		// files that will be analyzed.
 		int count = countFilesSelected();
 
 		monitor.beginTask("Analysis", count);
 		// Get elements of a possible multiple selection
-		Iterator iter = this.selection.iterator();
+		Iterator<IStructuredSelection> iter = selection.iterator();
 		while (iter.hasNext()) {
 			if (monitor.isCanceled()) {
 				// this is usually caught here while processing
 				// multiple-selection of files
 				throw new InterruptedException();
 			}
-			Object obj = (Object) iter.next();// piece of selectionb
+			Object obj = (Object) iter.next();// piece of selection
 			// It can be a Project, Folder, File, etc...
 			if (obj instanceof IAdaptable) {
 				// ICElement covers folders and translationunits
@@ -270,6 +274,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					// cdt40
 					// IASTTranslationUnit atu = tu.getAST(); not yet
 					boolean err = runResource(monitor, ce, indent, includes);
+					if(traceOn)System.out.println("Error (err="+err+")running analysis on "+ce.getResource().getName());
 				}
 			}
 		}
@@ -284,6 +289,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * 
 	 * @return number of files
 	 */
+	@SuppressWarnings("unchecked")
 	protected int countFilesSelected() {
 		int count = 0;
 		// Get elements of a possible multiple selection
@@ -340,7 +346,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * 
 	 * @return
 	 */
-	abstract protected List getIncludePath();
+	abstract protected List<String> getIncludePath();
 
 	/**
 	 * Show something in the status line; this is used when we don't have easy
@@ -392,7 +398,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * @throws InterruptedException
 	 */
 	protected boolean runResource(IProgressMonitor monitor, ICElement ce,
-			int indent, List includes) throws InterruptedException {
+			int indent, List<String> includes) throws InterruptedException {
 		indent += INDENT_INCR;
 		ScanReturn results;
 		boolean foundError = false;
@@ -406,7 +412,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 				if (res instanceof IFile) {//shd always be true (but might be null)
 					IFile file = (IFile) res;
 					String filename = file.getName();
-					String fn2 = ce.getElementName();// shd be filename too
+					//String fn2 = ce.getElementName();// shd be filename too
 														// cdt40
 					if (AnalysisUtil.validForAnalysis(filename)) {
 						if (traceOn)
@@ -473,21 +479,17 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					}
 				} catch (CoreException e) {
 					e.printStackTrace();
-				}
-				
+				}			
 			}
-
-			// container could be project or folder
-			
+			// container could be project or folder		
 		} // end if !monitor.isCanceled()
 		else {
 			String name = "";
 			//cdt40
 				name = ce.getElementName();
-				String p=ce.getPath().toString();
+				//String p=ce.getPath().toString();
 			 
-			System.out
-					.println("Cancelled by User, aborting analysis on subsequent files... "
+			System.out.println("Cancelled by User, aborting analysis on subsequent files... "
 							+ name);
 			throw new InterruptedException();
 		}
@@ -496,17 +498,17 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	}
 
 	protected void processResults(ScanReturn results, IResource resource) {
-		List artifacts = results.getArtifactList();
+		List<Artifact> artifacts = results.getArtifactList();
 		visitor.visitFile(resource, artifacts);
 	}
 
 
 
 	public ScanReturn analyse(IProgressMonitor monitor, ITranslationUnit tu,
-			List /* of String */includes) {
+			List<String> includes) {
 		if (traceOn)
 			println("RunAnalyseBase.analyse()...");
-		ScanReturn nr = null;
+		//ScanReturn nr = null;
 		String errMsg = null;
 
 		monitor.subTask("Starting Analysis...");
@@ -637,7 +639,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * @return
 	 */
 	public abstract ScanReturn doArtifactAnalysis(final ITranslationUnit tu,
-			final List includes);
+			final List<String> includes);
 
 	/**
 	 * returns true if include paths must be set for this implementation. For
