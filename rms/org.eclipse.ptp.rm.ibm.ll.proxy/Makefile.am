@@ -4,9 +4,6 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
-PROXY =					../org.eclipse.ptp.proxy
-UTILS =					../org.eclipse.ptp.utils
-SUBDIRS =				$(PROXY) $(UTILS)
 
 bin_PROGRAMS =			ptp_ibmll_proxy
 
@@ -14,4 +11,4 @@ ptp_ibmll_proxy_SOURCES =		src/ptp_ibmll_proxy.c
 ptp_ibmll_proxy_CFLAGS =		-g -I/opt/ibmll/LoadL/full/include/ -I/usr/lpp/LoadL/full/include/ -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) 
 
 ptp_ibmll_proxy_LDFLAGS = -g -ldl
-ptp_ibmll_proxy_LDADD =		-lpthread -L$(PROXY) -lproxysvr -L$(UTILS) -lutils 
+ptp_ibmll_proxy_LDADD =		-lpthread 
