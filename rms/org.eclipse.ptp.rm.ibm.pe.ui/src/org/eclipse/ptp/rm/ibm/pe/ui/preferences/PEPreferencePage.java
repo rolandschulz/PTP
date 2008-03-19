@@ -225,7 +225,6 @@ public class PEPreferencePage extends AbstractRemotePreferencePage
 	if (preferenceValue.equals(PEPreferenceConstants.OPTION_YES)) {
 	    runMiniproxy.setSelection(true);
 	}
-	loadLevelerOption.addSelectionListener(eventMonitor);
 	traceLabel = new Label(optionsGroup, SWT.NONE);
 	traceLabel.setText(Messages.getString("PEDialogs.TraceLevelLabel"));
 	traceOptions = new Combo(optionsGroup, SWT.READ_ONLY);
@@ -233,11 +232,11 @@ public class PEPreferencePage extends AbstractRemotePreferencePage
 	traceOptions.add(PEPreferenceConstants.TRACE_FUNCTION);
 	traceOptions.add(PEPreferenceConstants.TRACE_DETAIL);
 	traceOptions.setText(preferences.getString(PEPreferenceConstants.TRACE_LEVEL));
-	traceOptions.addSelectionListener(eventMonitor);
 
 	if (!loadLevelerOption.getSelection()) {
 	    setLLWidgetEnableState(false);
 	}
+	loadLevelerOption.addSelectionListener(eventMonitor);
 	llModeLocal.addSelectionListener(eventMonitor);
 	llModeMulticluster.addSelectionListener(eventMonitor);
 	llModeDefault.addSelectionListener(eventMonitor);
@@ -246,6 +245,8 @@ public class PEPreferencePage extends AbstractRemotePreferencePage
 	jobPollInterval.addModifyListener(eventMonitor);
 	libOverridePath.addModifyListener(eventMonitor);
 	libOverrideBrowse.addSelectionListener(eventMonitor);
+	traceOptions.addSelectionListener(eventMonitor);
+	runMiniproxy.addSelectionListener(eventMonitor);
 
 	return preferencePane;
     }
