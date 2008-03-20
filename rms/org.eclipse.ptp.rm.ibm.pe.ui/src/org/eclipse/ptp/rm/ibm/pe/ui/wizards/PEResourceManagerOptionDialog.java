@@ -352,7 +352,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 	    String multiclusterMode;
 	    int interval;
 
-	    proxyOptions = proxyOptions + USE_LOADLEVELER_OPTION + "=y";
+	    proxyOptions = proxyOptions + USE_LOADLEVELER_OPTION;
 	    config.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
 	    proxyOptions = proxyOptions + MULTICLUSTER_OPTION + "=";
 	    if (llModeDefault.getSelection()) {
