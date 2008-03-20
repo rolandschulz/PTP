@@ -175,7 +175,7 @@ public class Activator extends AbstractUIPlugin {
 		workflowList = new ArrayList<File>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.perf.perfworkflow");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.perf.workflows");
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {
@@ -300,7 +300,7 @@ public class Activator extends AbstractUIPlugin {
 		perfConfTabs = new ArrayList<AbstractPerformanceConfigurationTab>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.perf.perfconfigurationtab");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.perf.configurationTabs");
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {
@@ -337,7 +337,7 @@ public class Activator extends AbstractUIPlugin {
 		perfConfManagers = new ArrayList<AbstractPerformanceDataManager>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.perf.perfdatamanager");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.perf.dataManagers");
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {

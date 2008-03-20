@@ -231,6 +231,7 @@ public class ToolParser extends DefaultHandler{
 			{
 				currentApp=new ToolApp();
 				currentApp.toolCommand=getAttribute("command",atts);
+				currentApp.toolID=getAttribute("id",atts);
 				currentApp.toolGroup=getAttribute("group",atts);
 				if(currentApp.toolGroup!=null&&currentApp.toolCommand!=null)
 					currentTool.groupApp.put(currentApp.toolGroup, currentApp.toolCommand);
@@ -422,7 +423,10 @@ public class ToolParser extends DefaultHandler{
 		{
 			if(actOpt!=null)
 			{
-				actOpt=ToolMaker.finishToolOption(actOpt);
+				String panename="";
+				if(currentPane!=null&&currentPane.configID!=null)
+					panename=currentPane.configID;
+				actOpt=ToolMaker.finishToolOption(actOpt,panename);
 				if(actOpt!=null)
 					toolOptions.add(actOpt);
 			}
@@ -765,7 +769,7 @@ public class ToolParser extends DefaultHandler{
 		{
 			if(actOpt!=null)
 			{
-				actOpt=ToolMaker.finishToolOption(actOpt);
+				actOpt=ToolMaker.finishToolOption(actOpt,"");
 				toolOptions.add(actOpt);
 			}
 		}

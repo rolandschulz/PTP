@@ -77,7 +77,7 @@ public class ToolMaker {
 	 * @param toolopt The ToolOption to be finished
 	 * @return The finished ToolOption
 	 */
-	protected static ToolOption finishToolOption(ToolOption toolopt){
+	protected static ToolOption finishToolOption(ToolOption toolopt, String paneID){
 		
 		if(toolopt.type>5)
 			toolopt.type=0;
@@ -94,7 +94,7 @@ public class ToolMaker {
 		{
 			return null;
 		}
-		upname = toolopt.optName.toUpperCase();
+		upname = paneID+"_"+toolopt.optName.toUpperCase();
 
 		toolopt.confArgString=upname+"_ARGUMENT_SAVED";
 		toolopt.confStateString=upname+"_BUTTON_STATE";
