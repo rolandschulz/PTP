@@ -62,7 +62,8 @@ MIVarFree(MIVar *var)
 	free(var);
 }
 
-MIVarChange * MIVarChangeNew(void) {
+MIVarChange * 
+MIVarChangeNew(void) {
 	MIVarChange *varchange = (MIVarChange *)malloc(sizeof(MIVarChange));
 	
 	varchange->name = NULL;
@@ -71,7 +72,8 @@ MIVarChange * MIVarChangeNew(void) {
 	return varchange;
 }
 
-void MIVarChangeFree(MIVarChange *varchange) {
+void 
+MIVarChangeFree(MIVarChange *varchange) {
 	if (varchange->name != NULL)
 		free(varchange->name);
 	free(varchange);
