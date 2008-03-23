@@ -207,6 +207,7 @@ CreateMIVar(char *name)
 	MICommandFree(cmd);
 	return mivar;
 }
+
 static void
 DeleteMIVar(char *mi_name)
 {
@@ -1790,7 +1791,7 @@ GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int 
 	dbg_event *	e;
 	MIDataReadMemoryInfo * info;
 	MIMemory * mem;	
-	memoryinfo *meminfo;
+	memoryinfo *meminfo = NULL;
 	memory * m;
 	
 	CHECK_SESSION();
@@ -2729,12 +2730,11 @@ GetPartialAIF(MIVar *var, char *exp)
 }
 
 static MIVar *
-GetChildrenMIVar(char *mivar_name, int showParentType)
+GetChildrenMIVar(char *mivar_name, MIVar *mivar, int showParentType)
 {
 	MICommand *cmd;
-	MIVar *mivar;
 
-	if (showParentType) {
+	if (showParentType || mivar == NULL) {
 		cmd = MIVarInfoType(mivar_name);
 		SendCommandWait(DebugSession, cmd);
 		if (!MICommandResultOK(cmd)) {
@@ -2800,11 +2800,11 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 		if (!listChildren || strchr(var_name, '@') != NULL) {
 			mivar = CreateMIVar(var_name);
 			if (listChildren) {
-				mivar = GetChildrenMIVar(mivar->name, 0);
+				mivar = GetChildrenMIVar(mivar->name, mivar, 0);
 			}
 		}
 		else {
-			mivar = GetChildrenMIVar(var_name, 1);
+			mivar = GetChildrenMIVar(var_name, NULL, 1);
 		}
 	}
 	
