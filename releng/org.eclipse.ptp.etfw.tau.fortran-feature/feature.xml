@@ -35,21 +35,6 @@ v1.0
       [Enter License Description here.]
    </license>
 
-   <includes
-         id="org.eclipse.photran_feature"
-         version="0.0.0"
-         name="Photran"/>
-
-   <includes
-         id="org.eclipse.ptp.perf.tau_feature"
-         version="0.0.0"
-         name="TAU Performance Analysis Tools"/>
-
-   <includes
-         id="org.eclipse.ptp.perf_feature"
-         version="0.0.0"
-         name="Performance Framework"/>
-
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
