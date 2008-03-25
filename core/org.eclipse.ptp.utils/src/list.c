@@ -38,6 +38,9 @@
 
 THREAD_DECL(list);
 
+/*
+ * Create a new empty list
+ */
 List *
 NewList(void)
 {
@@ -54,8 +57,8 @@ NewList(void)
 }
 
 /*
-** Add new element to end of list.
-*/
+ * Add new element to end of list.
+ */
 void		
 AddToList(List *l, void *v)
 {
@@ -79,15 +82,15 @@ AddToList(List *l, void *v)
 }
 
 /*
-** Add new element to beginning of list (stack emulation).
-*/
+ * Add new element to beginning of list (stack emulation).
+ */
 void		
 AddFirst(List *l, void *v)
 {
 	ListElement *	e;
 	ListElement *	ep;
 
-	if ( l == (List *)NULL)
+	if (l == (List *)NULL)
 		return;
 
 	e = malloc(sizeof(ListElement));
@@ -114,6 +117,47 @@ AddFirst(List *l, void *v)
 	THREAD_UNLOCK(list);
 }
 
+/*
+ * Insert new element before given element
+ */
+void
+InsertBefore(List *l, void *val, void *new_val) 
+{
+	ListElement **	e;
+	ListElement *	ne;
+
+	if (l == (List *)NULL) {
+		return;
+	}
+	
+	/*
+	 * Find the element corresponding to val
+	 */
+	THREAD_LOCK(list);
+	for (e = &l->l_head ; *e != (ListElement *)NULL ; e = &(*e)->l_next) {
+		if ((*e)->l_value == val) {
+			break;
+		}
+	}
+	THREAD_UNLOCK(list);
+	
+	if (*e == NULL) {
+		return;
+	}
+
+	ne = malloc(sizeof(ListElement));
+
+	ne->l_value = new_val;
+	THREAD_LOCK(list);
+	ne->l_next = *e;
+	*e = ne;
+	l->l_nel++;
+	THREAD_UNLOCK(list);	
+}
+
+/*
+ * Append source list to destination list
+ */
 void
 AppendList(List *dst, List *src)
 {
@@ -125,6 +169,9 @@ AppendList(List *dst, List *src)
 		AddToList(dst, e);
 }
 
+/*
+ * Remove element from list
+ */
 void		
 RemoveFromList(List *l, void *v)
 {
@@ -177,8 +224,8 @@ RemoveFromList(List *l, void *v)
 }
 
 /*
-** Remove first element of list (stack emulation)
-*/
+ * Remove first element of list (stack emulation)
+ */
 void *
 RemoveFirst(List *l)
 {
@@ -214,6 +261,9 @@ RemoveFirst(List *l)
 	return v;
 }
 
+/*
+ * Destroy list and its contents
+ */
 void		
 DestroyList(List *l, void (*destroy)())
 {
@@ -244,6 +294,9 @@ DestroyList(List *l, void (*destroy)())
 	THREAD_UNLOCK(list);
 }
 
+/*
+ * Initialize list iterator
+ */
 void
 SetList(List *l)
 {
@@ -255,6 +308,9 @@ SetList(List *l)
 	THREAD_UNLOCK(list);
 }
 
+/*
+ * Get next element from list. Returns NULL when there are no more elements
+ */
 void *
 GetListElement(List *l)
 {
@@ -278,6 +334,9 @@ GetListElement(List *l)
 	return val;
 }
 
+/*
+ * Get the first element in the list
+ */
 void *
 GetFirstElement(List *l)
 {
@@ -297,6 +356,9 @@ GetFirstElement(List *l)
 	return val;
 }
 
+/*
+ * Check if the list is empty. Returns true (1) if it is.
+ */
 int
 EmptyList(List *l)
 {
@@ -309,6 +371,9 @@ EmptyList(List *l)
 	return res;
 }
 
+/*
+ * Check if element is in the list
+ */
 int
 InList(List *l, void *v)
 {
@@ -333,6 +398,9 @@ InList(List *l, void *v)
 	return 0;
 }
 
+/*
+ * Get the number of elements in the list
+ */
 int
 SizeOfList(List *l)
 {
