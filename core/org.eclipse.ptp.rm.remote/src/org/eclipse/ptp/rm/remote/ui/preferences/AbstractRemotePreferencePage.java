@@ -122,6 +122,7 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 	 */
 	public void performDefaults() 
 	{
+		loadDefaults();
 		defaultSetting();
 		updateApplyButton();
 	}
@@ -159,22 +160,19 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 	public abstract void savePreferences();
 
 	/**
-	 * 
+	 * Update options fields in UI
 	 */
-	private void loadSaved()
-	{
-		Preferences preferences = getPreferences();
-		
-		serverFile = preferences.getString(PreferenceConstants.PROXY_PATH);
-		serverText.setText(serverFile);
-		
-		int options = preferences.getInt(PreferenceConstants.OPTIONS);
+	private void updateOptions(int options) {
+		fStdioButton.setSelection(false);
+		fPortForwardingButton.setSelection(false);
+		fNoneButton.setSelection(true);
+
 		if ((options & IRemoteProxyOptions.STDIO) == IRemoteProxyOptions.STDIO) {
 			fStdioButton.setSelection(true);
+			fNoneButton.setSelection(false);
 		} else if ((options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING) {
 			fPortForwardingButton.setSelection(true);
-		} else {
-			fNoneButton.setSelection(true);
+			fNoneButton.setSelection(false);
 		}
 
 		if (fStdioButton.getSelection()) {
@@ -184,6 +182,40 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 			fManualButton.setSelection(
 				(options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH);
 		}
+		
+
+	}
+	
+	/**
+	 * Load values from preference store
+	 */
+	private void loadSaved()
+	{
+		loading = true;
+		
+		Preferences preferences = getPreferences();
+		
+		serverFile = preferences.getString(PreferenceConstants.PROXY_PATH);
+		serverText.setText(serverFile);
+		
+		updateOptions(preferences.getInt(PreferenceConstants.OPTIONS));
+		loading = false;
+	}
+	
+	/**
+	 * Load default values from preference store
+	 */
+	private void loadDefaults()
+	{
+		loading = true;
+		
+		Preferences preferences = getPreferences();
+		
+		serverFile = preferences.getDefaultString(PreferenceConstants.PROXY_PATH);
+		serverText.setText(serverFile);
+		
+		updateOptions(preferences.getDefaultInt(PreferenceConstants.OPTIONS));
+		loading = false;
 	}
 	
 	/**
@@ -284,10 +316,7 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 
 		fManualButton = createCheckButton(otherGroup, Messages.getString("RemotePreferencesPage.manualButton"));
 
-		loading = true;
 		loadSaved();
-		loading = false;
-		
 		defaultSetting();
 		return composite;
 	}
@@ -358,16 +387,15 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		if (name == null) {
 			setErrorMessage(Messages
 					.getString("RemotePreferencesPage.Invalid"));
-			//setValid(false);
-			//return false;
-		}
-		else {
+			setValid(false);
+			return false;
+		} else {
 			File path = new File(name);
 			if (!path.exists() || !path.isFile()) {
 				setErrorMessage(Messages
 					.getString("RemotePreferencesPage.Invalid"));
-				//setValid(false);
-				//return false;
+				setValid(false);
+				return false;
 			}
 		}
 
@@ -401,7 +429,6 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		if (!isValidSetting())
 			return;
 
-		performOk();
 		setValid(true);
 	}
 }
