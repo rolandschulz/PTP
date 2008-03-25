@@ -16,10 +16,6 @@ package org.eclipse.ptp.remotetools.utils.stream;
 /**
  * A listener that is called when some chunk of data is received from a stream.
  * A IStreamListener is an entity that can receive one chunk at time.
- * <p>
- * In CellDT this interface is used to implement listeners that receive console
- * text that from the Linux Console that is running inside the simulator. This
- * listeners use to show the text on a console.
  * 
  * @author Daniel Felix Ferber
  * @since 1.0

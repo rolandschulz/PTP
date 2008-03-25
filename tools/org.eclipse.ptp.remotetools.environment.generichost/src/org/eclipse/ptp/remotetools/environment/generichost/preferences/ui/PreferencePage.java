@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbench;
 
 
 /**
- * Preference page for the Remote Cell Box default values for new targets.
+ * Preference page for the remote target default values for new targets.
  * @author Richard Maciel, Daniel Felix Ferber
  * @since 1.2.1
  */

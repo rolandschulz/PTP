@@ -33,9 +33,6 @@ import org.eclipse.ptp.remotetools.internal.common.Debug;
 import org.eclipse.ptp.remotetools.utils.file.FileEnumeration;
 import org.eclipse.ptp.remotetools.utils.file.FileRecursiveEnumeration;
 
-//import com.ibm.celldt.environment.launcher.internal.FileEnumeration;
-//import com.ibm.celldt.environment.launcher.internal.FileRecursiveEnumeration;
-
 public class CopyTools implements IRemoteCopyTools {
 	
 	ExecutionManager manager;

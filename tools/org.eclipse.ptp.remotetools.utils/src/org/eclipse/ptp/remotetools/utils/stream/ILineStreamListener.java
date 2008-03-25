@@ -14,10 +14,6 @@ package org.eclipse.ptp.remotetools.utils.stream;
 /**
  * A listener that is called when an entire line is read from a stream.
  * A ILineStreamListener is an entity that can receive one line of text at time.
- * <p>
- * In CellDT this interface is used to implement listeners that receive lines of
- * text that are responses to TCL commands sent to the Cell Simulator. This
- * listeners use to show the text on a console.
  * 
  * @author Daniel Felix Ferber
  * @since 1.0

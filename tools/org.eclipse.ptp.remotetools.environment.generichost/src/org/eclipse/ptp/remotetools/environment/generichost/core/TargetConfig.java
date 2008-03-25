@@ -12,9 +12,7 @@
 package org.eclipse.ptp.remotetools.environment.generichost.core;
 
 /**
- * Describes a target created from the environment. This class contains only attributes that apply how the environment
- * interacts with Eclipse. Cell Simulator specific attributes are stored in the proper configuration class from the Cell
- * Simulator Control.
+ * Describes a target created from the environment.
  * 
  * @author Daniel Felix Ferber
  * @since 1.2

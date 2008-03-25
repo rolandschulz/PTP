@@ -111,7 +111,7 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		/*
 		 * System workspace
 		 */
-		Frame frame = new Frame(topControl, "Cell application launch:");
+		Frame frame = new Frame(topControl, "Remote application launcher:");
 		mold = new TextMold(TextMold.GRID_DATA_ALIGNMENT_FILL | TextMold.GRID_DATA_GRAB_EXCESS_SPACE, Messages.ConfigurationPage_LabelSystemWorkspace);
 		systemWorkspaceGroup = new TextGroup(frame.getTopUserReservedComposite(), mold);
 		

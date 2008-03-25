@@ -6,14 +6,14 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="Remote Tools"
-            class="org.eclipse.ptp.remotetools.preferences.ui.CellPreferencePage"
+            class="org.eclipse.ptp.remotetools.preferences.ui.TargetPreferencePage"
             id="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage">
       </page>
       <page
             category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage"
-            class="org.eclipse.ptp.remotetools.preferences.ui.CellEnvironmentPreferencePage"
+            class="org.eclipse.ptp.remotetools.preferences.ui.TargetEnvironmentPreferencePage"
             id="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
-            name="Environment"/>
+            name="Environments"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

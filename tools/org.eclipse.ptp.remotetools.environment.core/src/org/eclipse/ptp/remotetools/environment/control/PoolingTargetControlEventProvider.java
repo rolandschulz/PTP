@@ -55,17 +55,6 @@ public class PoolingTargetControlEventProvider  implements
 								info.setStatus(entryStatus);
 								controls.put(control,info);
 								fireEvent(entryStatus, control);
-								/*
-								if (entryStatus == ICellStatus.STARTED) {
-									model.notifyStarted(element);
-								} else if (entryStatus == ICellStatus.STOPPED) {
-									model.notifyStopped(element);
-								} else if (entryStatus == ICellStatus.RESUMED) {
-									model.notifyResumed(element);
-								} else if (entryStatus == ICellStatus.PAUSED) {
-									model.notifyPaused(element);
-								}
-								*/
 							}
 						
 					}

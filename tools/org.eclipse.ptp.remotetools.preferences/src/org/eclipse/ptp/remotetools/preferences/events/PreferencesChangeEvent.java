@@ -19,7 +19,7 @@ import java.util.EventObject;
  * @author Ricardo M. Matinata
  * @since 1.0
  */
-public class CellPreferencesChangeEvent extends EventObject {
+public class PreferencesChangeEvent extends EventObject {
 	
 	/**
 	 * 
@@ -54,7 +54,7 @@ public class CellPreferencesChangeEvent extends EventObject {
 	 * @param newValue the new value of the property, or 
 	 *    <code>null</code> if none
 	 */
-	public CellPreferencesChangeEvent(Object source, String property, Object oldValue, Object newValue) {
+	public PreferencesChangeEvent(Object source, String property, Object oldValue, Object newValue) {
 		super(source);
 		if (property == null) {
 			throw new IllegalArgumentException();

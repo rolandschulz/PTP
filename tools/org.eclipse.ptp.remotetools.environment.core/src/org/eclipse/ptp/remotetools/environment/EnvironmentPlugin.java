@@ -82,31 +82,7 @@ public class EnvironmentPlugin extends Plugin {
 			manager = new TargetEnvironmentManager();
 		return manager;
 	}
-	
-	/*
-	public ICellTargetProvider getCellTargetProvider() {
 		
-		ProcessExtensions.process(EXT_PROVIDER_ID, new IProcessMemberVisitor() {
-
-			public Object process(IExtension extension, IConfigurationElement member) {
-				Object mprovider;
-				try {
-					mprovider = member.createExecutableExtension("class");
-					if ( !ICellTargetProvider.class.isAssignableFrom(mprovider.getClass()) ) {
-						mprovider = null;
-					}
-				} catch (CoreException e) {
-					mprovider = null;
-				}
-				provider = (ICellTargetProvider) mprovider;
-				return mprovider;
-			}
-			
-		});
-		return provider;
-	}
-	*/
-	
 	/**
 	 * This method is called upon plug-in activation
 	 */

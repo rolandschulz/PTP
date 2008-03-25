@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.ptp.remotetools.environment.launcher" id="observer" name="launcherObserver"/>
       </appInfo>
       <documentation>
-         Implements an observer that received STDOUT from Cell Application.
+         Implements an observer that receives STDOUT from a remote application.
       </documentation>
    </annotation>
 
@@ -76,7 +76,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         2.0
       </documentation>
    </annotation>
 

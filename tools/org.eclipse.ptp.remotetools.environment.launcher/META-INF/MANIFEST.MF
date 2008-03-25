@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Remote Tools Cell Application Launcher for Target EnvironmentPlug-in
+Bundle-Name: Remote Tools Application Launcher
 Bundle-SymbolicName: org.eclipse.ptp.remotetools.environment.launcher;singleton:=true
 Bundle-Version: 2.0.1
 Bundle-Activator: org.eclipse.ptp.remotetools.environment.launcher.RemoteLauncherPlugin

@@ -22,7 +22,7 @@ public interface ITargetControlEventListener {
 	/**
 	 * Notifies the listener that the state change event has occurred.
 	 * 
-	 * @param event the event code as in org.eclipse.ptp.remotetools.environment.control.ICellStatus
+	 * @param event the event code as in {@link ITargetStatus}
 	 * @param from the originating control
 	 */
 	public void handleStateChangeEvent(int event, ITargetControl from);

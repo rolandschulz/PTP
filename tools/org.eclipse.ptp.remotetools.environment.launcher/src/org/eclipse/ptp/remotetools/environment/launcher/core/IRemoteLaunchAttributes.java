@@ -16,22 +16,20 @@ package org.eclipse.ptp.remotetools.environment.launcher.core;
  * @author Daniel Felix Ferber
  */
 public interface IRemoteLaunchAttributes {
-	public static final String CELLDT_LAUNCH_ID = "com.ibm.celldt.launch"; //$NON-NLS-1$
+	public static final String LAUNCH_ID = "org.eclipse.ptp.remotetools.environment.launcher.core"; //$NON-NLS-1$
 	
-	public static final String ATTR_AUTOMATIC_WORKING_DIRECTORY = CELLDT_LAUNCH_ID + ".AUTO_REMOTE_DIRECTORY"; //$NON-NLS-1$
-	public static final String ATTR_REMOTE_DIRECTORY = CELLDT_LAUNCH_ID + ".REMOTE_DIRECTORY"; //$NON-NLS-1$
+	public static final String ATTR_AUTOMATIC_WORKING_DIRECTORY = LAUNCH_ID + ".AUTO_REMOTE_DIRECTORY"; //$NON-NLS-1$
+	public static final String ATTR_REMOTE_DIRECTORY = LAUNCH_ID + ".REMOTE_DIRECTORY"; //$NON-NLS-1$
 	/** @deprecated */
-	public static final String ATTR_LOCAL_DIRECTORY = CELLDT_LAUNCH_ID + ".LOCAL_DIRECTORY"; //$NON-NLS-1$
-	public static final String ATTR_SYNC_BEFORE = CELLDT_LAUNCH_ID + ".SYNC_BEFORE"; //$NON-NLS-1$
-	public static final String ATTR_SYNC_AFTER = CELLDT_LAUNCH_ID + ".SYNC_AFTER"; //$NON-NLS-1$
-	public static final String ATTR_SYNC_CLEANUP = CELLDT_LAUNCH_ID + ".SYNC_CLEANUP"; //$NON-NLS-1$
-	public static final String ATTR_USE_FORWARDED_X11 = CELLDT_LAUNCH_ID + ".FORWARD_X11"; //$NON-NLS-1$
-	public static final String ATTR_OUTPUT_OBSERVER = CELLDT_LAUNCH_ID + ".OUTPUT_OBSERVER";  //$NON-NLS-1$
-	public static final String ATTR_BEFORE_COMMAND = CELLDT_LAUNCH_ID + ".BEFORE_COMMAND";  //$NON-NLS-1$
-	public static final String ATTR_AFTER_COMMAND = CELLDT_LAUNCH_ID + ".AFTER_COMMAND"; //$NON-NLS-1$
-//	public static final String ATTR_BEFORE_FILES = CELLDT_LAUNCH_ID + ".BEFORE_FILES"; //$NON-NLS-1$
-//	public static final String ATTR_AFTER_FILES = CELLDT_LAUNCH_ID + ".AFTER_FILES"; //$NON-NLS-1$
-	public static final String ATTR_SYNC_RULES = CELLDT_LAUNCH_ID + ".SYNC_RULES"; //$NON-NLS-1$
+	public static final String ATTR_LOCAL_DIRECTORY = LAUNCH_ID + ".LOCAL_DIRECTORY"; //$NON-NLS-1$
+	public static final String ATTR_SYNC_BEFORE = LAUNCH_ID + ".SYNC_BEFORE"; //$NON-NLS-1$
+	public static final String ATTR_SYNC_AFTER = LAUNCH_ID + ".SYNC_AFTER"; //$NON-NLS-1$
+	public static final String ATTR_SYNC_CLEANUP = LAUNCH_ID + ".SYNC_CLEANUP"; //$NON-NLS-1$
+	public static final String ATTR_USE_FORWARDED_X11 = LAUNCH_ID + ".FORWARD_X11"; //$NON-NLS-1$
+	public static final String ATTR_OUTPUT_OBSERVER = LAUNCH_ID + ".OUTPUT_OBSERVER";  //$NON-NLS-1$
+	public static final String ATTR_BEFORE_COMMAND = LAUNCH_ID + ".BEFORE_COMMAND";  //$NON-NLS-1$
+	public static final String ATTR_AFTER_COMMAND = LAUNCH_ID + ".AFTER_COMMAND"; //$NON-NLS-1$
+	public static final String ATTR_SYNC_RULES = LAUNCH_ID + ".SYNC_RULES"; //$NON-NLS-1$
 	
 	public static final boolean DEFAULT_AUTOMATIC_WORKING_DIRECTORY = true;
 	public static final String DEFAULT_LOCAL_DIRECTORY = ""; //$NON-NLS-1$

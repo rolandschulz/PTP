@@ -19,7 +19,7 @@ import java.util.EventListener;
  * @author Ricardo M. Matinata
  * @since 1.0
  */
-public interface ICellPreferencesChangeListener extends EventListener {
+public interface IPreferencesChangeListener extends EventListener {
 
 	/**
 	 * Notification that a property has changed.
@@ -31,5 +31,5 @@ public interface ICellPreferencesChangeListener extends EventListener {
 	 * @param event the property change event object describing which
 	 *    property changed and how
 	 */
-	public void propertyChange(CellPreferencesChangeEvent event);
+	public void propertyChange(PreferencesChangeEvent event);
 }

@@ -22,7 +22,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remotetools.environment.cellbox";
+//	public static final String PLUGIN_ID = "org.eclipse.ptp.remotetools.environment.genericohost";
 
 	// The shared instance
 	private static Activator plugin;
