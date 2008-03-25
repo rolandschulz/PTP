@@ -44,7 +44,7 @@ Tivoli Workload Scheduler LoadLeveler V3.4 Diagnosis and Messages Guide
 <p>Define an appropriate project, either a C/C++ project using CDT or a FORTRAN project using Photran. You can define 
 either a standard make project or a managed make project.</p>
 <p>You should use the following compiler invocation commands
-to invoke the compiler, either in your makefile, or when specifying the compiler and linker in a managed make project.</p>
+to invoke the compiler if you want to build a parallel program to run with the LoadLeveler proxy, either in your makefile, or when specifying the compiler and linker in a managed make project.</p>
 <ul>
 <li>AIX</li>
 <ul>
@@ -235,7 +235,7 @@ and customize your own template file.<br><br>
 # @ tasks_per_node = &lt;&lt;&lt;LL_PTP_TASKS_PER_NODE&gt;&gt;&gt;<br>
 # @ total_tasks = &lt;&lt;&lt;LL_PTP_TOTAL_TASKS&gt;&gt;&gt;<br>
 # @ user_priority = &lt;&lt;&lt;LL_PTP_USER_PRIORITY&gt;&gt;&gt;<br>
-# @ wall_clock_limit = &lt;&lt;&lt;LL_PTP_WALL_CLOCK_LIMIT_HARD&gt;&gt;&gt;,LL_PTP_WALL_CLOCK_LIMIT_SOFT&gt;&gt;&gt;<br>
+# @ wall_clock_limit = &lt;&lt;&lt;LL_PTP_WALLCLOCK_HARD&gt;&gt;&gt;,&lt;&lt;&lt;LL_PTP_WALLCLOCK_SOFT&gt;&gt;&gt;<br>
 # @ queue<br>
 </small>
 </p>
