@@ -63,9 +63,7 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 	public static final String DEFAULT_CIPHER = RemotetoolsPlugin.CIPHER_DEFAULT;
 	
 	/**
-	 * Creates a target control for Remote Cell Box. If some attribute related to the environment has an invalid
-	 * format, an exception is thrown. Simulator attributes are not checked yet, but will be checked when the target is
-	 * created (launched).
+	 * Creates a target control.
 	 * 
 	 * @param attributes
 	 *            Configuration attributes
@@ -83,7 +81,7 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 	}
 
 	/**
-	 * Connect to the remote cell box. On every error or possible failure, an exception
+	 * Connect to the remote target.. On every error or possible failure, an exception
 	 * (CoreException) is thrown, whose (multi)status describe the error(s) that prevented creating the target control.
 	 * 
 	 * @param monitor
@@ -95,7 +93,7 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 	public boolean create(IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.TargetControl_create_MonitorConnecting, 1);
 		/*
-		 *  Connect to the remote Cell Box
+		 *  Connect to the remote temote target
 		 */
 		if(currentTargetConfig.isPasswordAuth()) {
 			setConnectionParameters(
@@ -177,10 +175,6 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 				Messages.TargetControl_stop_CannotPause, null));
 	}
 
-	/**
-	 * Sets new attributes.
-	 * <p>Only allowed when the Cell Simulator is not running. The simulator attributes will only be parsed the next time the simulator is started.
-	 */
 	public void updateConfiguration() throws CoreException {
 		//targetElement.setName(name);
 		configFactory = new ConfigFactory(targetElement.getAttributes());
@@ -192,7 +186,7 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 	}
 
 	protected String getPluginId() {
-		return Activator.PLUGIN_ID;
+		return Activator.getDefault().getBundle().getSymbolicName();
 	}
 	
 	public TargetSocket createTargetSocket(int port) {
@@ -208,9 +202,6 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 	}
 
 	public void destroy() throws CoreException {
-		// TODO Implementar destruicao do environment controlado
-		//System.out.println("Teste destroy cellbox");
-		
 		// End all jobs, if possible, then disconnect
 		try {
 			terminateJobs(null);

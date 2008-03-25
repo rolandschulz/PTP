@@ -24,7 +24,7 @@
  <extension
        point="org.eclipse.ui.preferencePages">
     <page
-          category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
+          category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage"
           class="org.eclipse.ptp.remotetools.environment.launcher.preferences.LauncherPreferencePage"
           id="org.eclipse.ptp.remotetools.environment.launcher.LauncherPreferencePage"
           name="Launcher"/>

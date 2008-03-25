@@ -76,7 +76,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         3.0.0
+         2.0
       </documentation>
    </annotation>
 
@@ -85,18 +85,7 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         &lt;pre&gt;
-   &lt;extension
-         point=&quot;org.eclipse.ptp.remotetools.environment.launcher.launchConfigurationMacroSupplier&quot;
-         id=&quot;org.eclipse.ptp.remotetools.environment.launhcer.launchConfigurationMacroSupplierExtension&quot;&gt; 
-      &lt;launchConfigurationMacroSupplier
-           id=&quot;org.eclipse.ptp.remotetools.environment.launcher.cellLaunch.defaultCellLaunchMacroSupplier&quot;
-           configTypeId=&quot;org.eclipse.ptp.remotetools.environment.launcher.cellLaunch&quot;
-           class=&quot;org.eclipse.ptp.remotetools.environment.launcher.internal.macros.DefaultCellLaunchMacroSupplier&quot;&gt;
-     &lt;/launchConfigurationMacroSupplier&gt;
-     &lt;/wizard&gt;
-   &lt;/extension&gt;
-&lt;/pre&gt;
+         
       </documentation>
    </annotation>
 
@@ -114,7 +103,6 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         A supplied implementation of this extension point is available in the org.eclipse.ptp.remotetools.environment.launcher.cellLaunch.defaultCellLaunchMacroSupplier extension.
       </documentation>
    </annotation>
 

@@ -18,7 +18,7 @@ import org.eclipse.ptp.remotetools.internal.ssh.ExecutionManager;
 
 
 /**
- * @author Richard Maciel, Daniel Felix Ferber <b>Review OK</b>
+ * @author Richard Maciel, Daniel Felix Ferber
  */
 public abstract class AbstractRemoteExecution implements IRemoteOperation {
 	/**
@@ -53,29 +53,14 @@ public abstract class AbstractRemoteExecution implements IRemoteOperation {
 		return executionManager;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remotetools.IRemoteExecution#wasCancelled()
-	 */
 	public synchronized boolean wasCanceled() {
 		return cancelled;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteOperation#wasFinished()
-	 */
 	public synchronized boolean wasFinished() {
 		return finished;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteOperation#cancel()
-	 */
 	public final synchronized void cancel() {
 		notifyCancel();
 	}

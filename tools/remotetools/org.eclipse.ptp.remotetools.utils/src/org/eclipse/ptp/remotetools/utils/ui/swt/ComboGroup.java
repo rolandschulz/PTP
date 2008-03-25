@@ -50,9 +50,6 @@ public class ComboGroup extends GenericControlGroup {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.celldt.ui.swt.GenericControlGroup#createCustomControl(com.ibm.celldt.ui.swt.GenericControlGroupMold)
-	 */
 	protected Control createCustomControl(int bitmask, GridData gd) {
 		
 		if((bitmask & ComboMold.EDITABLE) != 0) {

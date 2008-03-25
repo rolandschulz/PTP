@@ -12,7 +12,7 @@
       <page
             category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
             class="org.eclipse.ptp.remotetools.environment.generichost.preferences.ui.PreferencePage"
-            id="com.ibm.celldt.preferences.ui.CellPreferencePage.EnvironmentPreferencePage.GenericHostPreferencePage"
+            id="org.eclipse.ptp.remotetools.environment.generichost.GenericHostPreferencePage"
             name="Generic Host"/>      
    </extension>
    <extension

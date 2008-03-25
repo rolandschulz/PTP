@@ -39,9 +39,6 @@ public class SpinnerGroup extends GenericControlGroup {
 		spinner.setIncrement(sgm.increment);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.celldt.ui.swt.GenericControlGroup#createCustomControl(com.ibm.celldt.ui.swt.GenericControlGroupMold, org.eclipse.swt.layout.GridData)
-	 */
 	protected Control createCustomControl(int bitmask, GridData gridData) {
 		spinner = new Spinner(this, SWT.BORDER);
 		return spinner;

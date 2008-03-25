@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class PreferenceConstantsFromFile extends NLS
 {
-	private static final String BUNDLE_ID = "com.ibm.celldt.preferences.ui.PluginResources"; //$NON-NLS-1$
+	private static final String BUNDLE_ID = "org.eclipse.ptp.remotetools.preferences.PluginResources"; //$NON-NLS-1$
 	
 	public static String TIMING_SPUBIN_VALUE;
 	

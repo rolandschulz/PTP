@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 
-import org.eclipse.ptp.remotetools.preferences.events.CellPreferencesChangeEvent;
-import org.eclipse.ptp.remotetools.preferences.events.ICellPreferencesChangeListener;
+import org.eclipse.ptp.remotetools.preferences.events.PreferencesChangeEvent;
+import org.eclipse.ptp.remotetools.preferences.events.IPreferencesChangeListener;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -80,23 +80,12 @@ public class PreferencesPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 	
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("com.ibm.celldt.preferences", path);
-	}
-	
-	public void addListener(ICellPreferencesChangeListener listener) {
+	public void addListener(IPreferencesChangeListener listener) {
 		
 		propertiesListeners.add(listener);
 	}
 	
-	public void removeListener(ICellPreferencesChangeListener listener) {
+	public void removeListener(IPreferencesChangeListener listener) {
 		
 		propertiesListeners.remove(listener);
 	}
@@ -108,8 +97,8 @@ public class PreferencesPlugin extends AbstractUIPlugin {
         Iterator i = propertiesListeners.iterator();
         
         while (i.hasNext()) { 
-        	ICellPreferencesChangeListener listener = (ICellPreferencesChangeListener) i.next();
-        	listener.propertyChange(new CellPreferencesChangeEvent(this,
+        	IPreferencesChangeListener listener = (IPreferencesChangeListener) i.next();
+        	listener.propertyChange(new PreferencesChangeEvent(this,
                 property, oldValue, newValue));
         }
     }

@@ -13,8 +13,8 @@ package org.eclipse.ptp.remotetools.environment.control;
 
 /**
  * 
- * Interface definition of event providers for Target Controls. ICellTargetControl
- * instances can optionally provide an implementation of this interface thru the
+ * Interface definition of event providers for Target Controls.
+ * {@link ITargetControl} instances can optionally provide an implementation of this interface thru the
  * IAdaptable mechanism.
  * 
  * @author Ricardo M. Matinata

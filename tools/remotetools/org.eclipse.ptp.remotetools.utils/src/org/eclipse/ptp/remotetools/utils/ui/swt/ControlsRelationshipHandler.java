@@ -126,9 +126,6 @@ public class ControlsRelationshipHandler {
 
 	class ControlRelationshipListener extends SelectionAdapter {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-		 */
 		public void widgetSelected(SelectionEvent arg0) {
 			manageDependentControls((Button)arg0.widget);
 		}

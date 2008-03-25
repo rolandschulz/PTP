@@ -117,12 +117,6 @@ public class StreamObserver extends Thread {
 					streamClosed();
 					break;
 				}
-				/*
-				 * If an IOException is raised, then the stream between Eclipse
-				 * and Cell Simulator is broken. This happens when the Cell
-				 * Simulator is closed or killed unexpectedly. Notify the
-				 * control that the simulator is not running anymore.
-				 */
 				if (e instanceof EOFException) {
 					streamClosed();
 					break;

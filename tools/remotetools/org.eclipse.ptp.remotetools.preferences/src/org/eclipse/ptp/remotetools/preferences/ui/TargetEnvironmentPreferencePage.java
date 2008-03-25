@@ -17,11 +17,11 @@ package org.eclipse.ptp.remotetools.preferences.ui;
  * @author Ricardo M. Matinata
  * @since 1.0
  */
-public class CellEnvironmentPreferencePage extends AbstractBasicPreferencePage {
+public class TargetEnvironmentPreferencePage extends AbstractBasicPreferencePage {
 	
-	public CellEnvironmentPreferencePage() {
+	public TargetEnvironmentPreferencePage() {
 		super();
-		setDescription("Cell Environment Preferences");
+		setDescription("Target Environment Preferences");
 	}
 
 

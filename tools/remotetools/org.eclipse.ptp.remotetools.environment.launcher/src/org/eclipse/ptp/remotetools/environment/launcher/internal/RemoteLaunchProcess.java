@@ -472,7 +472,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		RemoteProcess remoteProcess = null;
 		executionResult = new ExecutionResult();
 		try {
-			launchProcessOutputWriter.println("* Started Cell application on target.");
+			launchProcessOutputWriter.println("* Started application on target.");
 			
 			launchIntegration.prepareLaunch();
 			remoteProcess = manager.getExecutionTools().executeProcess(script);

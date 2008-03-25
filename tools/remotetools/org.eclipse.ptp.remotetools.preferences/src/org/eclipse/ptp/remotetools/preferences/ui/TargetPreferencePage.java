@@ -19,12 +19,12 @@ package org.eclipse.ptp.remotetools.preferences.ui;
  * @author Ricardo M. Matinata
  * @since 1.0
  */
-public class CellPreferencePage
+public class TargetPreferencePage
 	extends AbstractBasicPreferencePage{
 
-	public CellPreferencePage() {
+	public TargetPreferencePage() {
 		super();
-		setDescription("Cell IDE Preferences");
+		setDescription("Remote Tools preferences");
 	}
 	
 }

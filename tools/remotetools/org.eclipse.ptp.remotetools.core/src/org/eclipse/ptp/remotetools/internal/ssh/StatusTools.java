@@ -69,17 +69,11 @@ public class StatusTools implements IRemoteStatusTools {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteStatusTools#checkRemoteMacAddressUse(com.ibm.celldt.utils.network.MacAddress)
-	 */
 	public boolean checkRemoteMacAddressUse(MacAddress macAddr) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteStatusTools#checkRemotePortUse(int, int)
-	 */
 	public Set getRemotePortsInUse(int protocol) throws RemoteConnectionException, RemoteOperationException, CancelException {
 		// Uses the following shell script to get a list of used ports in the
 		// remote host:

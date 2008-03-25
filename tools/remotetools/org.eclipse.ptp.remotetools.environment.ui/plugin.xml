@@ -5,13 +5,13 @@
    <extension
          point="org.eclipse.ui.views">
       <category
-            name="Remote Environments"
-            id="org.eclipse.ptp.remotetools.remoteenvironments">
+            name="Remote Tools"
+            id="org.eclipse.ptp.remotetools">
       </category>
       <view
             name="Remote Environments"
             icon="icons/iprocess.gif"
-            category="org.eclipse.ptp.remotetools.remoteenvironments"
+            category="org.eclipse.ptp.remotetools"
             class="org.eclipse.ptp.remotetools.environment.ui.views.RemoteToolsEnvironmentView"
             id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView">
       </view>

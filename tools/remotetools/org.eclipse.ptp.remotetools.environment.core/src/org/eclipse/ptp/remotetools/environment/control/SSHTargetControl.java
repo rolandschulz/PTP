@@ -269,7 +269,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	/**
 	 * Create the remote target environment by opening a SSH connection to it.
-	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHCellTargetControl.SSHParameters)}
+	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
 	 * must be called.
 	 */
 	public boolean create(IProgressMonitor monitor) throws CoreException {
@@ -305,7 +305,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	/**
 	 * Create the SSH connection to the remote target environment.
-	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHCellTargetControl.SSHParameters)}
+	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)}
 	 * must be called.
 	 * @throws RemoteConnectionException
 	 */
@@ -383,10 +383,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.environment.control.ICellTargetControl#executeRemoteCommand(org.eclipse.core.runtime.IProgressMonitor, java.lang.String, java.lang.String[])
-	 */
 	public boolean executeRemoteCommand(IProgressMonitor monitor, String command, String[] args) throws CoreException {
 		for (int i = 0; i < args.length; i++) {
 			command += (" " + args[i]);

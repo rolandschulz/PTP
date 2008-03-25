@@ -19,7 +19,7 @@ public class ExecutionResult {
 	int exitValue = 0;
 	int status = UNDEFINED;
 	
-	// Execution result status for cell application
+	// Execution result status for remote application
 	/** The execution of application has noy yet finished. The execution resulta has not meaning yest. */
 	public static final int UNDEFINED = 0;
 	/** The execution of application has finished succesfully with zero as exit value. */
