@@ -21,7 +21,7 @@ for each barrier if error-free. The matching set of a barrier contains all barri
 synchronize with it at run time. 
 
 <p>For example, consider the second if-branch in 
-<a href="testMPIbarrier.c">testMPIbarrier.c</a>. 
+<a href="samples/testMPIbarrier.c">testMPIbarrier.c</a>. 
 <pre>
 	if(my_rank == 0){
 		printf("test errors\n");
@@ -34,7 +34,7 @@ will execute the global barrier in the branch while the others will skip it. How
 one cannot expect an error if barriers are not "textually" aligned. 
 <!--  ??? -->
 Now, consider the
-third if-branch in <a href="testMPIbarrier.c">testMPIbarrier.c</a>. 
+third if-branch in <a href="samples/testMPIbarrier.c">testMPIbarrier.c</a>. 
 <pre>
 	if(x < 3){
 		printf("It is not an error\n");
@@ -112,7 +112,7 @@ double-click on the Path line in the view, as shown below:
 <br><img src="images/barrierPathSelection.gif" border=1>
 
 
-<h3> testMPI.c </h3>
+<h3> testMPIbarrier.c </h3>
 <p> We use this simple program to ilustrate the basic functionality of the
 analysis and three views. There are two branches and one loop in the program.
 The first loop is synchronization error free; two barriers (one in such loop, 
