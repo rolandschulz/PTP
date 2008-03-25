@@ -1089,16 +1089,16 @@ run(int trans_id, int nargs, char *args[])
 		    jobid = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_EXEC_NAME_ATTR) == 0) {
-		    execname = cp;
+		    execname = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_WORKING_DIR_ATTR) == 0) {
-			cwd = cp;
+			cwd = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_PROG_ARGS_ATTR) == 0) {
-		    argp = cp;
+		    argp = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_EXEC_PATH_ATTR) == 0) {
-		    execdir = cp;
+		    execdir = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_ENV_ATTR) == 0) {
 		}
@@ -1110,7 +1110,7 @@ run(int trans_id, int nargs, char *args[])
     	post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
     }
     if (cwd != NULL) {
-    	status = chdir(cp);
+    	status = chdir(cwd);
 	    if (status == -1) {
 		post_submitjob_error(trans_id, jobid,
 			   "Invalid working directory");
