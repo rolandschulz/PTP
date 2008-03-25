@@ -40,6 +40,7 @@
 #include "handler.h"
 #include "list.h"
 #include "args.h"
+#include "rangeset.h"
 
 /*
  * Need to undef these if we include
@@ -141,7 +142,8 @@ struct ptp_job {
 	bool			debug;			/* job is debug job */
 	bool			terminating;	/* job termination has been requested */
 	bool			iof;			/* job has i/o forwarding */
-	ptp_process **	procs;
+	ptp_process **	procs;			/* procs for this job */
+	rangeset *		set;			/* range set of proc IDs */
 };
 typedef struct ptp_job ptp_job;
 
@@ -293,6 +295,7 @@ new_process(ptp_job *job, int node_id, int task_id, int pid)
 	p->task_id = task_id;
 	p->pid = pid;
     job->procs[task_id] = p;
+    insert_in_rangeset(job->set, p->id);
     return p;
 }
 
@@ -345,6 +348,7 @@ new_job(int num_procs, bool debug, int ptp_jobid, int orte_jobid, int debug_jobi
     j->debug = debug;
     j->terminating = false;
     j->iof = false;
+    j->set = new_rangeset();
     j->procs = (ptp_process **)malloc(sizeof(ptp_process *) * num_procs);
     memset(j->procs, 0, sizeof(ptp_process *) * num_procs);
     AddToList(gJobList, (void *)j);
@@ -361,6 +365,7 @@ free_job(ptp_job *j)
 			free_process(j->procs[i]);
 	}
 	free(j->procs);
+	free_rangeset(j->set);
 	free(j);
 }
 
@@ -578,19 +583,14 @@ sendNewQueueEvent(int trans_id)
 static void
 sendProcessStateChangeEvent(int trans_id, ptp_job *j, char *state)
 {
-	char *		range;
 	proxy_msg *	m;
 	
 	if (j == NULL || j->num_procs == 0)
 		return;
 		
-	asprintf(&range, "%d-%d", j->procs[0]->id, j->procs[j->num_procs-1]->id);
-	
-	m = proxy_process_change_event(trans_id, range, 1);
+	m = proxy_process_change_event(trans_id, rangeset_to_string(j->set), 1);
 	proxy_add_string_attribute(m, PROC_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
-	
-	free(range);
 }
 	
 static void
