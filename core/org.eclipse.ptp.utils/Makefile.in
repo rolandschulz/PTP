@@ -36,7 +36,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
-noinst_PROGRAMS = bitset_test$(EXEEXT) args_test$(EXEEXT)
+noinst_PROGRAMS = bitset_test$(EXEEXT) args_test$(EXEEXT) \
+	rangeset_test$(EXEEXT)
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
@@ -60,7 +61,7 @@ libutils_a_LIBADD =
 am_libutils_a_OBJECTS = libutils_a-bitset.$(OBJEXT) \
 	libutils_a-args.$(OBJEXT) libutils_a-list.$(OBJEXT) \
 	libutils_a-hash.$(OBJEXT) libutils_a-handler.$(OBJEXT) \
-	libutils_a-compat.$(OBJEXT)
+	libutils_a-compat.$(OBJEXT) libutils_a-rangeset.$(OBJEXT)
 libutils_a_OBJECTS = $(am_libutils_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
 am_args_test_OBJECTS = args_test-args_test.$(OBJEXT)
@@ -69,6 +70,9 @@ args_test_DEPENDENCIES = libutils.a
 am_bitset_test_OBJECTS = bitset_test-bitset_test.$(OBJEXT)
 bitset_test_OBJECTS = $(am_bitset_test_OBJECTS)
 bitset_test_DEPENDENCIES = libutils.a
+am_rangeset_test_OBJECTS = rangeset_test-rangeset_test.$(OBJEXT)
+rangeset_test_OBJECTS = $(am_rangeset_test_OBJECTS)
+rangeset_test_DEPENDENCIES = libutils.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -77,9 +81,9 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libutils_a_SOURCES) $(args_test_SOURCES) \
-	$(bitset_test_SOURCES)
+	$(bitset_test_SOURCES) $(rangeset_test_SOURCES)
 DIST_SOURCES = $(libutils_a_SOURCES) $(args_test_SOURCES) \
-	$(bitset_test_SOURCES)
+	$(bitset_test_SOURCES) $(rangeset_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -179,7 +183,8 @@ libutils_a_SOURCES = src/bitset.c \
 						src/list.c \
 						src/hash.c \
 						src/handler.c \
-						src/compat.c
+						src/compat.c \
+						src/rangeset.c
 
 libutils_a_CFLAGS = -I./include $(AM_CFLAGS) -g 
 bitset_test_SOURCES = src/bitset_test.c
@@ -190,6 +195,10 @@ args_test_SOURCES = src/args_test.c
 args_test_CFLAGS = -I./include $(AM_CFLAGS) -g
 args_test_LDFLAGS = -g
 args_test_LDADD = libutils.a
+rangeset_test_SOURCES = src/rangeset_test.c
+rangeset_test_CFLAGS = -I./include $(AM_CFLAGS) -g
+rangeset_test_LDFLAGS = -g
+rangeset_test_LDADD = libutils.a
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -261,6 +270,9 @@ args_test$(EXEEXT): $(args_test_OBJECTS) $(args_test_DEPENDENCIES)
 bitset_test$(EXEEXT): $(bitset_test_OBJECTS) $(bitset_test_DEPENDENCIES) 
 	@rm -f bitset_test$(EXEEXT)
 	$(LINK) $(bitset_test_LDFLAGS) $(bitset_test_OBJECTS) $(bitset_test_LDADD) $(LIBS)
+rangeset_test$(EXEEXT): $(rangeset_test_OBJECTS) $(rangeset_test_DEPENDENCIES) 
+	@rm -f rangeset_test$(EXEEXT)
+	$(LINK) $(rangeset_test_LDFLAGS) $(rangeset_test_OBJECTS) $(rangeset_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -276,6 +288,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-rangeset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rangeset_test-rangeset_test.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -375,6 +389,20 @@ libutils_a-compat.obj: src/compat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o libutils_a-compat.obj `if test -f 'src/compat.c'; then $(CYGPATH_W) 'src/compat.c'; else $(CYGPATH_W) '$(srcdir)/src/compat.c'; fi`
 
+libutils_a-rangeset.o: src/rangeset.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT libutils_a-rangeset.o -MD -MP -MF "$(DEPDIR)/libutils_a-rangeset.Tpo" -c -o libutils_a-rangeset.o `test -f 'src/rangeset.c' || echo '$(srcdir)/'`src/rangeset.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libutils_a-rangeset.Tpo" "$(DEPDIR)/libutils_a-rangeset.Po"; else rm -f "$(DEPDIR)/libutils_a-rangeset.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/rangeset.c' object='libutils_a-rangeset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o libutils_a-rangeset.o `test -f 'src/rangeset.c' || echo '$(srcdir)/'`src/rangeset.c
+
+libutils_a-rangeset.obj: src/rangeset.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT libutils_a-rangeset.obj -MD -MP -MF "$(DEPDIR)/libutils_a-rangeset.Tpo" -c -o libutils_a-rangeset.obj `if test -f 'src/rangeset.c'; then $(CYGPATH_W) 'src/rangeset.c'; else $(CYGPATH_W) '$(srcdir)/src/rangeset.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libutils_a-rangeset.Tpo" "$(DEPDIR)/libutils_a-rangeset.Po"; else rm -f "$(DEPDIR)/libutils_a-rangeset.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/rangeset.c' object='libutils_a-rangeset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o libutils_a-rangeset.obj `if test -f 'src/rangeset.c'; then $(CYGPATH_W) 'src/rangeset.c'; else $(CYGPATH_W) '$(srcdir)/src/rangeset.c'; fi`
+
 args_test-args_test.o: src/args_test.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(args_test_CFLAGS) $(CFLAGS) -MT args_test-args_test.o -MD -MP -MF "$(DEPDIR)/args_test-args_test.Tpo" -c -o args_test-args_test.o `test -f 'src/args_test.c' || echo '$(srcdir)/'`src/args_test.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/args_test-args_test.Tpo" "$(DEPDIR)/args_test-args_test.Po"; else rm -f "$(DEPDIR)/args_test-args_test.Tpo"; exit 1; fi
@@ -402,6 +430,20 @@ bitset_test-bitset_test.obj: src/bitset_test.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/bitset_test.c' object='bitset_test-bitset_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(bitset_test_CFLAGS) $(CFLAGS) -c -o bitset_test-bitset_test.obj `if test -f 'src/bitset_test.c'; then $(CYGPATH_W) 'src/bitset_test.c'; else $(CYGPATH_W) '$(srcdir)/src/bitset_test.c'; fi`
+
+rangeset_test-rangeset_test.o: src/rangeset_test.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(rangeset_test_CFLAGS) $(CFLAGS) -MT rangeset_test-rangeset_test.o -MD -MP -MF "$(DEPDIR)/rangeset_test-rangeset_test.Tpo" -c -o rangeset_test-rangeset_test.o `test -f 'src/rangeset_test.c' || echo '$(srcdir)/'`src/rangeset_test.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/rangeset_test-rangeset_test.Tpo" "$(DEPDIR)/rangeset_test-rangeset_test.Po"; else rm -f "$(DEPDIR)/rangeset_test-rangeset_test.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/rangeset_test.c' object='rangeset_test-rangeset_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(rangeset_test_CFLAGS) $(CFLAGS) -c -o rangeset_test-rangeset_test.o `test -f 'src/rangeset_test.c' || echo '$(srcdir)/'`src/rangeset_test.c
+
+rangeset_test-rangeset_test.obj: src/rangeset_test.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(rangeset_test_CFLAGS) $(CFLAGS) -MT rangeset_test-rangeset_test.obj -MD -MP -MF "$(DEPDIR)/rangeset_test-rangeset_test.Tpo" -c -o rangeset_test-rangeset_test.obj `if test -f 'src/rangeset_test.c'; then $(CYGPATH_W) 'src/rangeset_test.c'; else $(CYGPATH_W) '$(srcdir)/src/rangeset_test.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/rangeset_test-rangeset_test.Tpo" "$(DEPDIR)/rangeset_test-rangeset_test.Po"; else rm -f "$(DEPDIR)/rangeset_test-rangeset_test.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/rangeset_test.c' object='rangeset_test-rangeset_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(rangeset_test_CFLAGS) $(CFLAGS) -c -o rangeset_test-rangeset_test.obj `if test -f 'src/rangeset_test.c'; then $(CYGPATH_W) 'src/rangeset_test.c'; else $(CYGPATH_W) '$(srcdir)/src/rangeset_test.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

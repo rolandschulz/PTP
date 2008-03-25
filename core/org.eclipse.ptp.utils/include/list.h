@@ -40,6 +40,7 @@ extern List *	NewList(void);
 extern void		AddToList(List *, void *);
 extern void		AddFirst(List *, void *);
 extern void		AppendList(List *, List *);
+extern void		InsertBefore(List *l, void *val, void *new_val);
 extern void		RemoveFromList(List *, void *);
 extern void *	RemoveFirst(List *);
 extern void		DestroyList(List *, void (*)());
