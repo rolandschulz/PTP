@@ -487,7 +487,7 @@ static char *job_command_file_template[] = {
   "# @ tasks_per_node = <<<LL_PTP_TASKS_PER_NODE>>>",
   "# @ total_tasks = <<<LL_PTP_TOTAL_TASKS>>>",
   "# @ user_priority = <<<LL_PTP_USER_PRIORITY>>>",
-  "# @ wall_clock_limit = <<<LL_PTP_WALL_CLOCK_LIMIT_HARD>>>,LL_PTP_WALL_CLOCK_LIMIT_SOFT>>>",
+  "# @ wall_clock_limit = <<<LL_PTP_WALLCLOCK_HARD>>>,<<<LL_PTP_WALLCLOCK_SOFT>>>",
   "# @ queue"
 };
 
@@ -994,7 +994,7 @@ int command_submit_job(int gui_transmission_id, int nargs, char *args[])
     sendOkEvent(gui_transmission_id);     /* close out the halt events command */
   }
   else {
-	sendSubmitJobErrorEvent(gui_transmission_id, job_sub_id, "LoadLeveler job submit failed.");
+	sendJobSubmissionErrorEvent(gui_transmission_id, job_sub_id, "LoadLeveler job submit failed.");
   }
   
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
