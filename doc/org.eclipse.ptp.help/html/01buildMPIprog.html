@@ -1,51 +1,64 @@
 <html>
 <head>
-<title>Building an MPI program</title>
+<title>Creating an MPI Project</title>
+<script language="JavaScript"> 
+function newWin(url) {
+	window.open(url, 'install_ptp', 'width=900, height=700, menubar=no, toolbar=no, status=no, resizable=yes, location=no, scrollbars=yes');
+}
+</script>
 </head>
 <body>
-<h1>Building an MPI program with Managed Build</h1>
+<h1>Creating an MPI Project</h1>
 
-<p>Topics include:
+<p>This section provides a brief introduction to creating, building and launching an MPI program. It will cover the following steps:
 <ul>
-<li><a href="#create">Creating an MPI project </a>
-
-<li><a href="#include">include paths</a>
-<li><a href="#mpicc">specifying the mpicc toolchain</a>
-<li><a href="#launch">launching an MPI program </a> locally using 'External  Tools...' 
-(by specifying the mpirun command)?
+<li><a href="#create">Create the project</a></li>
+<li><a href="#configure">Configure to use MPI</a></li>
+<li><a href="#build">Build the executable</a></li>
+<li><a href="#launch">Launch the program</a></li>
 </ul>
 
-<h2 id="create">Create an MPI Project</h2>
-<p>Note: this tutorial assumes you have the 
-<a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.help/html/toc.html">PLDT</a> installed, to use the wizards for creating MPI projects.
-<p>First, be sure you are in the C/C++ Perspective (Window -> Open Perspective -> Other...  and find C/C++)
-<p>To create a new MPI project in C using the managed build facility,
-Select File -> New -> C Project ...  The New Project dialog opens.
-Fill in the project name, e.g. MyMPIProject.
-Expand "Executable" and select "MPI Hello World C Project"
-<br><img src="images/0112newMPIproject.gif">
-<br>Click Next.
-<p>In the Basic Settings dialog, fill in the author name and change any other values you like.
-<br>Click Next.
-<br><img src="images/0112projBasicSettings.gif">
-<p>In the MPI Project Settings dialog, make sure "Add MPI Project settings to this project" is checked.
-You can uncheck "Use default information" if you need to change any values for include path, lib name or search path,
-or MPI build commands.
-<br><img src="images/0112mpiProjSettings.gif">
-<p>Click Finish.
-<p>The new project is created, and appears in the C/C++ Projects view. Expand the 'src' folder to see the new source file.
-<br><img src="images/0112proj.gif">
-<p>Double-click on the source file name to open the C/C++ editor.
-<br><img src="images/0112wbSrcEditor.gif">
-<p>If you open the Console view (click on the "Console" tab near the bottom)
-you should see the result of the build.
+<h2 id="create">Step 1: Create the project</h2>
+<p>Note: this tutorial uses the
+<a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.help/html/toc.html">Parallel Lanugage Development Tools (PLDT)</a> wizards for creating MPI projects. Please make sure this feature is installed before continuting.
 
-<p>Next create and start a <a href="02resMgrSetup.html">Resource Manager</a>
-and then you will be ready to  <a href="02pLaunchConfig.html">launch the parallel program.</a>
-<p>&nbsp;
+<ol>
+<li><p>Switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose <b>C/C++</b></p></li>
+<li><p>Create a new MPI project using the managed build facility. Select <b>File &gt; New &gt; C Project ...</b> and the <b>New Project</b> dialog should open.</p></li>
+<li><p>Enter a name for the project e.g. MyMPIProject.</p></li>
+<li><p>From the <b>Project types</b> list, expand <b>Executable</b> and select <b>MPI Hello World C Project</b></p>
+<a href="javascript:void(0)" onClick="newWin('images/0112newMPIproject.gif')">Click here to see an illustration.</a>
+<p>Click <b>Next</b>.</p></li>
+<li><p>In the <b>Basic Settings</b> dialog, fill in the author name and change any other values you like.</p>
+<a href="javascript:void(0)" onClick="newWin('images/0112projBasicSettings.gif')">Click here to see an illustration.</a>
+<p>Click <b>Next</b>.</p></li>
+</ol>
 
-<p>&nbsp;
+<h2 id="configure">Step 2: Configure the project to use MPI</h2>
+<ol>
+<li><p>In the <b>MPI Project Settings</b> dialog, make sure <b>Add MPI Project settings to this project</b> is checked.
+You can uncheck <b>Use default information</b> if you need to change any values for include paths, libraries or search path,
+or MPI build commands.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0112mpiProjSettings.gif')">Click here to see an illustration.</a></p>
+<p>Click <b>Finish</b>.</p></li>
+<li><p>The new project is created and appears in the <b>C/C++ Projects</b> view. Expand the <b>src</b> folder to see the new source file.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0112proj.gif')">Click here to see an illustration.</a></p></li>
+</ol>
 
+<h2 id="build">Step 3: Build the executable</h2>
+<ol>
+<li><p>Assuming that you have MPI installed and that the project was configured correctly, the application should now autmatically build. When the automatic build setting is selected, Eclipse will build the application whenever you save changes in an editor. Automatic/manual build can be toggled by selecting <b>Project &gt; Build Automatically...</b>. When manual build is selected, a build can be initiated using <b>Project &gt; Build All</b>.</p></li>
+<li><p>Once the build is complete, any errors will be dislayed in the <b>Problems view</b>, the corresponding source files will be flagged, and markers will be insterted into the editor window.</p></li>
+<li><p>Double-click on the source file name to open the C/C++ editor in order to correct any errors.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0112wbSrcEditor.gif')">Click here to see an illustration.</a></p></li>
+<li><p>Details of the commands that were executed to complete the build can be seen in the <b>Console view</b> (click on the <b>Console</b> tab near the bottom right hand corner of the Eclispe workbench.)</p></li>
+</ol>
+
+<h2 id="launch">Step 4: Launch the program</h2>
+<ol>
+<li><p>Before launching the program, you will need to <i>create</i> and <i>start</i> a <a href="02resMgrSetup.html">Resource Manager</a></p></li>
+<li><p>Once you have verified that the resource manager is operating correctly, you can then <a href="02pLaunchConfig.html">create a configuration and launch the parallel program.</a></p></li>
+</ol>
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 </body>
