@@ -8,10 +8,8 @@
 <p>The following prerequisites are required for PTP installation:
 <ul>
 <li>Java 1.5 or later</li>
-<li>Eclipse
-<ul>
-<li><a href="http://eclipse.org/downloads">Eclipse platform</a> version  3.3.2 or later</li>
-<li><a href="http://eclipse.org/cdt/">C/C++ Development Tools (CDT)</a> version 4.0.2 or later</li>
+<li><a href="http://eclipse.org/downloads">Eclipse SDK</a> version 3.3.2 or later</li>
+<li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 4.0.2 or later</li>
 <li>Note: Eclipse + the CDT, without the Java tools, are available in a convenient download
 of "Eclipse IDE for C/C++ Developers" also available on the <a href="http://eclipse.org/downloads">Eclipse downloads</a>
 page.
@@ -20,32 +18,37 @@ page.
 
 <table border="1">
   <tr>
-    <th colspan="3" scope="col">PTP Support Matrix <br></th>
+    <th colspan="4" scope="col">PTP Support Matrix <br></th>
   </tr>
   <tr>
     <th scope="col">Operating System</th>
     <th scope="col">Architecture</th>
     <th scope="col">Components</th>
+    <th scope="col">Debugging</th>
   </tr>
   <tr>
     <td>Linux</td>
     <td>x86, x86_64, ppc</td>
     <td>Eclipse+Agents</td>
+    <td>gdb 6.3 - 6.7</td>
   </tr>
   <tr>
     <td>MacOS X</td>
     <td>x86</td>
     <td>Eclipse+Agents</td>
+    <td>gdb 6.3</td>
   </tr>
   <tr>
     <td>Windows</td>
     <td>x86</td>
     <td>Eclipse only</td>
+    <td>N/A</td>
   </tr>
   <tr>
     <td>AIX</td>
     <td>ppc</td>
     <td>Eclipse+Agents</td>
+    <td>N/A</td>
   </tr>
 </table>
 <ul>
@@ -58,6 +61,13 @@ PTP supports a number of parallel runtime systems and job schedulers. These need
 <li>IBM LoadLeveler (LL)</li>
 </ul>
 
+Support for the following resource managers/systems is under development, and should be available in future releases of PTP:
+
+<ul>
+<li>Blue Gene/P</li>
+<li>PBS/Moab</li>
+<li>LSF</li>
+</ul>
 <p>
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
