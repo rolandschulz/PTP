@@ -45,8 +45,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class PEResourceManagerOptionDialog extends TitleAreaDialog
 {
-    private static final String SUSPEND_AT_STARTUP_OPTION = "--suspend_at_startup ";
-    private static final String USE_LOADLEVELER_OPTION = "--useloadleveler ";
+    private static final String SUSPEND_AT_STARTUP_OPTION = "--suspend_at_startup";
+    private static final String USE_LOADLEVELER_OPTION = "--useloadleveler";
     private static final String MULTICLUSTER_OPTION = "--multicluster";
     private static final String NODE_POLL_MIN_OPTION = "--node_polling_min";
     private static final String NODE_POLL_MAX_OPTION = "--node_polling_max";
@@ -132,6 +132,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 	parentShell = parent;
 	confWizard = wizard;
 	config = (PEResourceManagerConfiguration) confWizard.getConfiguration();
+	setInitialOptions(initialOptions);
 	create();
     }
 
@@ -352,7 +353,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 	    String multiclusterMode;
 	    int interval;
 
-	    proxyOptions = proxyOptions + USE_LOADLEVELER_OPTION;
+	    proxyOptions = proxyOptions + USE_LOADLEVELER_OPTION + " ";
 	    config.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
 	    proxyOptions = proxyOptions + MULTICLUSTER_OPTION + "=";
 	    if (llModeDefault.getSelection()) {
@@ -473,13 +474,13 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 		}
 		else if (currentToken[0].equals(RUN_MINIPROXY_OPTION)) {
 		    config.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
-		}    
+		}  
+		else if (currentToken[0].equals(USE_LOADLEVELER_OPTION)) {
+		    config.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
+		}  
 	    }
 	    else {
-		if (currentToken[0].equals(USE_LOADLEVELER_OPTION)) {
-		    config.setUseLoadLeveler(currentToken[1]);
-		}
-		else if (currentToken[0].equals(MULTICLUSTER_OPTION)) {
+		if (currentToken[0].equals(MULTICLUSTER_OPTION)) {
 		    config.setLoadLevelerMode(currentToken[1]);
 		}
 		else if (currentToken[0].equals(NODE_POLL_MIN_OPTION)) {
@@ -493,6 +494,9 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 		}
 		else if (currentToken[0].equals(LIB_OVERRIDE_OPTION)) {
 		    config.setLibraryOverride(currentToken[1]);
+		}
+		else if (currentToken[0].equals(TRACE_OPTION)) {
+		    config.setDebugLevel(currentToken[1]);
 		}
 	    }
 	}

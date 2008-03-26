@@ -46,7 +46,6 @@ public final class PEResourceManagerConfigurationWizardPage extends
 	    PEResourceManagerOptionDialog dialog;
 	    
 	    dialog = new PEResourceManagerOptionDialog(shell, configWizard, initialOptions);
-	    dialog.setInitialOptions(initialOptions);
 		if (dialog.open() == Dialog.OK) {
 			return dialog.getValue();
 		}
