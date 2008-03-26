@@ -11,7 +11,7 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.core,org.eclipse.ptp.pldt.openmp.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv,org.eclipse.ptp.pldt.openmp.ui.pv"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards,org.eclipse.ptp.pldt.wizards"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.lapi-feature,org.eclipse.ptp.lapi-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.pldt.lapi-feature,org.eclipse.ptp.pldt.lapi-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.pldt-feature,org.eclipse.ptp.pldt-feature"/>
 </provider>
 </psf>
