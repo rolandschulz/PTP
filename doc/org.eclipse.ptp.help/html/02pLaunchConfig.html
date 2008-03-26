@@ -39,7 +39,12 @@ must be running for it to appear in the drop-down list of resource managers here
 <li>Choose the Application Program (executable) from the project
 <br>(it is probably located in the Debug folder of your project, if this is a debug configuration)
 </li>
+
 <br><img src="images/launch2.gif">
+<p>&nbsp;
+<li>If you wish to have the output from all processes in a single output console,
+check the "Display combined output in a console view" option.
+<br><img src="images/03combinedConsole1.gif">
 </ul>
 <p>&nbsp;
 <li>Select the Arguments tab
@@ -67,12 +72,12 @@ set to "0" initially. Enter a value > 0.
 <li>Select the Debugger that will control the parallel processes
 by selecting "SDM" (the PTP's Scalable Debug Manager) from the selection menu.
 </li>
-<p>Under Debugger options, select path
-to debugger executable (probably in your 
+<p>Under Debugger options, assure that the path
+to debugger executable is correct (it is probably in your 
 eclipse/plugins/org.eclipse.ptp.<i>os.arch</i>/bin directory,
 where <i>os.arch</i> is your operating system and architecture, e.g.
 org.eclipse.ptp.linux.x86)
-<br>For Debugger session address, assuming you are creating a local launch, fill in with "localhost"
+<br>For Debugger session address, assuming you are creating a local launch, it should already be filled in with "localhost" or "localhost.localdomain"
 
 <br><img src="images/launch5.png">
 </ul>
