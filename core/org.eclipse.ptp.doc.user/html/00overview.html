@@ -4,21 +4,29 @@
 </head>
 <body>
 <h1 id="top">PTP - Overview and Features</h1>
-<p><p>The Parallel Tools Platform (PTP) objectives include:
+<p><p>The Parallel Tools Platform (PTP) is a framework for integrating tools to aid the development of parallel applications into Eclipse. The PTP framework provides a range of services to support tools in four main areas:
 <ul>
-<li>Extending Eclipse to support parallel application development.
-Not just for MPI, but for other environments and APIs as well.
-<li>Equipping Eclipse with key tools needed to start developing
-parallel codes.  This includes the Parallel runtime, parallel debugger,
-Fortran, etc.
-<li>Encouraging parallel tool developers to support Eclipse
-<li>Developing a new generation of parallel tools needed to 
-meet the demands of HPCS.
+<li>Runtime tools that allow developers to monitor and control the execution of parallel applications
+<li>Debugging tools for locating runtime errors in parallel applications
+<li>Analysis tools that provide advanced editing, error checking, and programmer assistance for developing parallel applications
+<li>Performance tools for analyzing and optimizing the performance of parallel applications
 </ul>
-<h2 id="arch">PTP Architecture</h2>
-<img src="images/ptpArch.gif">
 
+<h2>Runtime Tools</h2>
 
+These tools aid the developer in launching and monitoring parallel applications on a range of local and remote systems. PTP provides a parallel model that represents the state of a (possibly remote) parallel system, and the applications running on that system. This model includes the notion of a <i>resource manager</i> which is used to control interaction with the target system. Developers can use the normal Eclipse launch configuration mechanism to specify the system-specifc attributes necessary to launch a parallel job, and monitor the status of the system and job using a number of different views.
+
+<h2>Debugging Tools</h2>
+
+PTP provides an integrated parallel debugger that provides a range of basic debugging functions for locating errors in parallel applications. This includes the ability to set breakpoints and control program execution (single step, resume, etc.) across an arbitrary set of application processes. The developer can also drill down into individual process to obtain more detailed information about the process state, variable information, etc.
+
+<h2>Analysis Tools</h2>
+
+These tools are built on the C/C++ Development Tools (CDT) abstract syntax tree infrastructure and use static analysis techniques to provide a range of advanced editing and error checking features. Examples include content assist for MPI and OpenMP directives, barrier analysis for MPI programs, and concurrency analysis for OpenMP programs.  Future versions of PTP will combine this with the performance framework to provide dynamic analysis functions, such as parallelization assistance.
+
+<h2>Performance Tools</h2>
+
+The performance tools framework provides a simple mechanism for integrating external performance tools with PTP. By providing an XML description file, the tool is able to be integrated with the editor, build, and launch systems. Currently, support is provided for the Tuning and Analysis Utilities (TAU) performance analysis system.
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
