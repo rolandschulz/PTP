@@ -1,11 +1,7 @@
 <html>
 <head>
 <title>Monitoring Parallel Machines and Jobs</title>
-<script language="JavaScript"> 
-function newWin(url) {
-	window.open(url, 'install_ptp', 'width=900, height=700, menubar=no, toolbar=no, status=no, resizable=yes, location=no, scrollbars=yes');
-}
-</script>
+<script type="text/javascript" src="thumb.js"> </script>
 <head>
 <body>
 <h1 id="top">Monitoring Parallel Machines and Jobs</h1>
@@ -28,8 +24,7 @@ function newWin(url) {
 
 <p>To open the <b>PTP Runtime perspective</b>,
 select <b>Window &gt; Open Perspective &gt; Other ...</b> and choose <b>PTP Runtime</b> from the list.</p>
-<p><a href="javascript:void(0)" onClick="newWin('images/0104runtimePerspAnn.gif')">Click here to see the perspective.</a></p>
-
+<script> thumb("images/0104runtimePerspAnn.gif") </script>
 
 <h2 id="resMgr">Resource Managers View</h2>
 <p>The <b>Resource Managers view</b> shows all resource managers that have been configured, and is used to manage and control these resource managers. Each resource manager has an icon and a name. The icon color indicates the current state of the resource manager. The following image shows two resource managers, one that is <i>stopped</i> and one that is <i>running</i>. A stopped resource manager is know to the system, but is not providing any information to PTP. A running resource manager is the normal state, and indicates that PTP is receiving information and can launch jobs using the resource manager.</p>
