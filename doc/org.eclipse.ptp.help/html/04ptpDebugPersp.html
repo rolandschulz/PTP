@@ -1,6 +1,7 @@
 <html>
 <head>
 <title>The PTP Debug Perspective</title>
+<script type="text/javascript" src="thumb.js"> </script>
 </head>
 <body>
 <!-- test -->
@@ -31,9 +32,9 @@ in the debug process view
 the current values of variables for the currently selected
 process in the debug process view
 <li>the outline view (from CDT)
-</ul>
-<img src="images/ptpDebugOview.gif">
 
+<script> thumb("images/ptpDebugOview.gif",240) </script>
+</ul>
 
 <h2>Launching a parallel debug session</h2>
 <ul>
@@ -55,7 +56,7 @@ for future launches.  It will then
 switch to the PTP Debug perspective.</li>
 </ul>
 <p>The Parallel Debug Perspective:
-<p><img src="images/ptpDebugPersp.gif">
+<script> thumb("images/ptpDebugPersp.gif",240) </script>
 <br>The debug perspective appears as in the example above.
 This is a launch with 32 processes set on the launch configuration.
 The Parallel Debug view shows the 32 processes  (yellow diamonds
@@ -200,7 +201,7 @@ and processes can be registered or un-registered at any time.
 <p>To register a process, double-click its process icon in the Jobs view.
 Note that the process "diamond" then is surrounded by a box.
 The process appears in the debug view.
-<br><img src="images/reg1.gif">
+<script> thumb("images/reg1.gif",240) </script>
 <p>To un-register a process, double-click on the same icon.
 The box disappears, and the process is removed from the debug view.
 <p>Note that the debug commands (icons including run, step, etc.)
