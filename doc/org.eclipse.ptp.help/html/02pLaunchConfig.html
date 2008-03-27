@@ -26,7 +26,7 @@ a parallel launch configuration.
 or click the run icon menu on the tool bar and select <b>Open Run Dialog...</b></p></li>
 <li><p>Create a new parallel launch configuration by clicking <b>Parallel Application</b> and
 then clicking on the <b>New</b> button icon.
-<script> thumb("images/launch1.gif") </script>
+<p><script> thumb("images/launch1.gif") </script></p>
 </p>
 </li>
 <li><p>Enter a name for the configuration in the <b>Name:</b> field. Here we use the same name as the project.</p></li>
@@ -39,11 +39,11 @@ must be running for it to appear in the list.)</p></li>
 <li><p>Ensure that the correct the <b>Parallel Project</b> is selected</p></li>
 <li><p>Select the <b>Application Program</b> (executable) that you wish to launch by clicking on the <b>Browse</b> button. If you are running the application on the local machine, you will need to navigate to the workspace and project directory. In this case, and if you are using a debug configuration, the executable will be located in the Debug folder of your project.</p>
 <p>If you are running the application on a remote machine you will need to navigate to the location of the executable on that machine. If the project was <i>built</i> locally, then you will have to manually copy the executable to the remote machine first.</p>
-<script> thumb("images/launch2.gif") </script>
+<p><script> thumb("images/launch2.gif") </script></p>
 </li>
 <li><p>If you wish to have the output from all processes in a single output console,
 check the <b>Display combined output in a console view</b> option.
-<script> thumb("images/03combinedConsole1.gif") </script>
+<p><script> thumb("images/03combinedConsole1.gif") </script></p>
 </li>
 </ol>
 
@@ -52,7 +52,7 @@ check the <b>Display combined output in a console view</b> option.
 <ol>
 <li><p>The <b>Queue:</b> drop-down should be showing <b>default</b> and be disabled. This indicates that this resource manager does not support multiple queues.</p></li>
 <li><p>Enter a value in the <b>Number of Processes</b> field. This field must be greater than 0 in order to launch a job, and specifies the number of processes to use for the application launch.</p>
-<script> thumb("images/launchResTab.png") </script>
+<p><script> thumb("images/launchResTab.png") </script></p>
 </li>
 </ol>
 
@@ -72,7 +72,7 @@ architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and v
 <li><p>If you are launching onto a remote machine without using port forwarding (as specified in the resource manager configuration), then this should be the address of the local machine (the one running Eclipse) <i>as viewed from one of the nodes of the parallel machine</i>. Note that if the parallel machine configuration precludes nodes accessing your local machine, you will need to reconfigure the resource manager to use port forwarding.</p></li>
 <li><p>If you are launching onto a remote machine using port forwarding, this is the address of the remote machine 
 <i>as viewed from one of its nodes</i>
-<script> thumb("images/launch5.gif") </script>
+<p><script> thumb("images/launch5.gif") </script></p>
 </p></li>
 </ul>
 
