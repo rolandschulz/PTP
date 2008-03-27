@@ -5,12 +5,12 @@
 //Usage: <script> thumb("images/foo.gif")</script>
 function thumb(url,height){
    if (!height) {height=120;}
-   document.write ("<br><a href='"+url+"'><img src='"+url+"' height="+height+" title='Click for a full-size image' alt='Click for a full-size image'></a>");
+   document.write ("<a href='"+url+"'><img src='"+url+"' height="+height+" title='Click for a full-size image' alt='Click for a full-size image'></a>");
 }
 // simple imbedding of image, in default full size, with break preceeding
 // (easy to replace the above with this one)
 //Usage: <script> full("images/foo.gif")</script>
 function full(url){
-   document.write ("<br><img src='"+url+"'>");
+   document.write ("<img src='"+url+"'>");
 }
 
