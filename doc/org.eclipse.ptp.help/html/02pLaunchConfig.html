@@ -61,12 +61,13 @@ The <b>Debugger tab</b> is only required if you are planning to debug the applic
 <li><p>Select a debugger from the <b>Debugger</b> drop-down. This is the debugger that will control the parallel debug session. Currently only <b>SDM</b> is supported (SDM stands for Scalable Debug Manager), so select this.</p></li>
 <li><p>If you wish the debugger to automatically suspend the application on launch, make sure <b>Stop in main() on startup</b> is checked</p></li>
 <li><p>Under Debugger options, make sure that the path to debugger executable is correct.</p>
-<p>If you are debugging on the local machine, this path should point to the <b>sdm</b> executable in your Ecilpse installation's <b>plugins/org.eclipse.ptp.<i>os.arch_version</i>/bin</b> directory,
-where <b><i>os.arch_version</i></b> is your operating system (<b>linux</b>, <b>macosx</b>, or <b>aix</b>), architecture (<b>x86</b>, <b>x86_64</b>, or <b>ppc</b>), and version number of the plugin (e.g. <b>2.0.0.200803261107</b>).</p>
-<p>If you are debugging remotely, then this path will be the path to where the <b>sdm</b> executable was installed on the remote machine.</p></li>
+<p>If you are debugging on the local machine, this path should point to the <code>sdm</code> executable in your Ecilpse installation's <code>plugins/org.eclipse.ptp.<i>os.arch_version</i>/bin</code> directory,
+where <code><i>os.arch_version</i></code> is your operating system (<code>linux</code>, <code>macosx</code>, or <code>aix</code>), 
+architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and version number of the plugin (e.g. <code>2.0.0.200803261107</code>).</p>
+<p>If you are debugging remotely, then this path will be the path to where the <code>sdm</code> executable was installed on the remote machine.</p></li>
 <li><p>Set the <b>Debugger session address</b>. This is the address that the debugger will connect to when it starts, and will depend on where you are launching the application:</p>
 <ul>
-<li><p>If you are launching onto the local machine, use <b>localhost</b> (some systems will accept <b>localhost.localdomain</b>).</p></li>
+<li><p>If you are launching onto the local machine, use <code>localhost</code> (some systems will accept <code>localhost.localdomain</code>).</p></li>
 <li><p>If you are launching onto a remote machine without using port forwarding (as specified in the resource manager configuration), then this should be the address of the local machine (the one running Eclipse) <i>as viewed from one of the nodes of the parallel machine</i>. Note that if the parallel machine configuration precludes nodes accessing your local machine, you will need to reconfigure the resource manager to use port forwarding.</p></li>
 <li><p>If you are launching onto a remote machine using port forwarding, this is the address of the remote machine <i>as viewed from one of its nodes</i></p></li>
 </ul>

@@ -1,180 +1,197 @@
 <html>
 <head>
 <title>Resource Managers</title>
+<script language="JavaScript"> 
+function newWin(url) {
+	window.open(url, 'install_ptp', 'width=900, height=700, menubar=no, toolbar=no, status=no, resizable=yes, location=no, scrollbars=yes');
+}
+</script>
 </head>
 <body>
 
-<h1 id="top">Resource Managers</h1>
+<h1 id="top">Configuring Resource Managers</h1>
 
 <p>Topics  include:
 <ul>
-<li><a href="#defn">Resource managers</a>
-<li><a href="#creat">Creating and Configuring Resource Managers</a>
-<ul>
-<li><a href="#configRML">Local Resource Manager</a>
-<li><a href="#configRMR">Remote Resource Manager</a>
-</ul>
-
-<li><a href="#editRM">Editing a Resource Manager</a>
-<li><a href="#remRM">Removing a Resource Manager</a>
+<li><a href="#defn">Resource managers</a></li>
+<li>Steps for defining a resource manager</li>
+<ol>
+<li><a href="#creat">Creating a resource manager</a></li>
+<li>Configuring a resource manager</li>
+<ol type="a">
+<li><a href="#local">Local resource manager</a></li>
+<li><a href="#remote">Remote resource manager</a></li>
+</ol>
+<li><a href="#spec">Resource manager-specific configuration</a></li>
+<li><a href="#finish">Finishing resource manager configuration</a></li>
+<li><a href="#start">Starting the resource manager</a></li>
+</ol>
+<li><a href="#edit">Editing a Resource Manager</a></li>
+<li><a href="#rm">Removing a Resource Manager</a></li>
 </ul>
 <h2 id="defn">Resource Managers</h2>
-<p>[needs updating] A Resource Manager controls resources for launching a parallel job.
-It could be a real job scheduling program, or the simplest is ORTE for a local? job.
-<p>In this example we will create a local resource manager for ORTE, in which the parallel
-program will be launched and run on the local machine.
-<h2 id="creat">Creating and Configuring Resource Managers</h2>
-<p>First we will demonstrate <a href="#createRML">creating a local resource manager</a>, where PTP 
-will control a cluster whose head node is on the local machine.  This was the
-scenario that PTP 1.x handled.  Eclipse and PTP are installed on the cluster head node.
-<p>Then we will demonstrate <a href="#configRMR">creating a remote resource manager</a>, where
-Eclipse and PTP are on your local laptop or workstation, for example, and PTP
-controls a remote cluster.  This is one of the most significant improvements in PTP 2.0.
+<p>PTP uses the term <i>resource manager</i> to refer to any subsystem that controls the resources required for launching a parallel job. If the target parallel system employs a job scheduler for controlling access to compute resources, then the job scheduler would be considered the resource manager for the system. For a cluster with Open MPI installed, the Open MPI runtime system would be considered the resource manager.</p>
+
+<p>In order for PTP to launch, monitor, and control applications on a target system, it must know what type of resource manager is being employed. PTP allows you to configure and manage resource managers that correspond to target systems. Each resource manager controls one target system, although a particular target system may have more than one type of resource manager.</p>
+
+<p>Resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running Eclipse. A remote resource manager controls resources on a physically remote system. The process of configuring a local or remote resource manager is the same.</p>
+
+<h2 id="creat">Step 1: Creating a resource manager</h2>
+
+<ol>
+<li><p>Open the <b>PTP Runtime Perspective</b> using <b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>PTP Runtime</b> from the list of perspectives.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104RuntimePerspEmpty.png')">Click here to see an illustration.</a></p></li>
+<li><p>Right-click in <b>Resource Managers</b> view and select 
+<b>Add Resource Manager...</b></p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104addResMgr.png')">Click here to see an illustration.</a></p></li>
+<li><p>Choose the resource manager that corresponds to the target system. In this example we will use the <b>ORTE</b> resource manager, which is used to control the Open MPI Open Runtime Environment.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104chooseResMgrType.png')">Click here to see an illustration.</a></p></li>
+<li><p>Select <b>Next &gt;</b></p></li>
+</ol>
+
+<h2 id="local">Step 2a: Configuring a local resource manager</h2>
+<p>In this
+example, we will show how to configure PTP to use a local resource manager, for example, where Eclipse is installed on the 
+head node of a cluster.  This was the
+scenario that PTP 1.x handled.</p>
+<p>The <b>ORTE Proxy Configuration</b> dialog is used to configure how Eclipse will communicate with the resource manager. </p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104ORTEProxyConn1.png')">Click here to see an illustration.</a></p>
+
+<ol>
+<li><p>To configure the simple case of a local resource manager, select <b>Local</b> as the <b>Remote service provider</b>.</p></li>
+<li><p>For the local case, the <b>Proxy server location</b> will be automatically set to <b>Local</b>.</p></li>
+<li>
+  <p>The <b>Path to proxy executable</b> should already contain a path that points to the <code>ptp_orte_proxy</code> executable file in
+your local Eclipse installation. If not, you will need to navigate to your Eclipse installation's 
+<code>plugins/org.eclipse.ptp.<i>os.arch_version</i>/bin</code> directory, where <code><i>os.arch_version</i></code> is your operating system 
+(<code>linux</code>, <code>macosx</code>, or <code>aix</code>), architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and
+ version number of the plugin (e.g. <code>2.0.0.200803261107</code>).</p>
+</li>
+<li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager documentation instructs otherwise.</p></li>
+<li>
+  <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection if necessary. For the local case, it is not required, and <b>None</b> should be selected.</p>
+</li>
+<li><p>The <b>Local address for proxy connection</b> should be set to the address of your local machine (it's host name, IP address, or <code>localhost</code>).</p></li>
+<li>
+  <p>The <b>Launch server manually</b> checkbox is used for debugging purposes and should be left unchecked.</p>
+</li>
+<li><p>Select <b>Next &gt;</b>
+</ol>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104ORTEProxyConn2local.png')">Click here to see an illustration.</a></p>
+
+<h2 id="remote">Step 2b: Configuring a remote resource manager</h2>
+<p>This example will demonstrate configuring a remote resource manager, where
+Eclipse and PTP are on your local laptop or workstation, and PTP
+controls a remote target system.  This is one of the most significant improvements in PTP 2.0.
 A small set of PTP components need to be installed
-on the remote node (need to list these, but basically the proxy and sdm -- the 
-parts built by the "sh BUILD" step of ptp installation, need to be on the remote node.)
+on the remote node. See the installation instructions for details on how to do this.
 
-<h3 id="configRML">Creating and Configuring a Local Resource Manager</h3>
+<p>A remote resource manager allows PTP to control a remote target machine. To accomplish this, PTP uses the services of
+a <i>remote service provider</i>. Currently supported remote service providers include the <b>Remote Tools</b> package (a part
+of PTP) and the <b>Eclipse Remote Systems Explorer (RSE)</b> which is an optional package that can be installed at any time.</p> The
+only reason to use RSE rather than Remote Tools is if your remote system does not use the <code>ssh</code> protocol for remote connections,
+or you wish to use the additional functionality that RSE provides. See the RSE documentation
+for more information. We will only consider Remote Tools here, but the steps for configuring RSE are similar.
 
-<p>To create a resource manager, first open the PTP Runtime Perspective.
-(Window -> Open Perspective -> Other... and then choose "C/C++" from the list of perspectives.)
-<br>
-<img src="images/0104RuntimePerspEmpty.png">
-<p>Right-click in Resource Managers view and select 
-<b>Add Resource Manager...</b>
-<br>
-<img src="images/0104addResMgr.png">
-<p>Choose the ORTE Resource Manager Type
-<br>
-<img src="images/0104chooseResMgrType.png">
-<p>Select <b>Next</b>
-<p>The Resource Manager configuration dialog is shown:
-<br>
-<img src="images/0104ORTEProxyConn1.png">
+<ol>
+<li><p>In the <b>ORTE Proxy Configuration</b> dialog, 
+select <b>Remote Tools</b> as the <b>Remote service provider</b>.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104newORTEproxyRemote.png')">Click here to see an illustration.</a></p></li>
+<li><p>At this point, you need to configure a <b>Proxy server location</b>. This will differ depending on the remote service provider that
+you selected in the previous step. The following steps describe configuring a <b>Remote Tools</b> location.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104newRemoteHost.png')">Click here to see an illustration.</a></p></li>
+<ol>
+<li><p>Select <b>New...</b></p></li>
+<li><p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> field (can be anything).</p></li>
+<li><p>Select the <b>Remote Host</b> radio button.</p></li>
+<li><p>Enter the address of the remote host in the <b>Host</b> field.</p></li>
+<li><p>The <b>Port</b> field should be left at <code>22</code> unless your installation uses a different port for <code>ssh</code> connections.</p></li>
+<li><p>Enter your user name on the remote machine in the <b>User</b> field.</p></li>
+<li><p>If you use password authentication, select the <b>Password based authentication</b> radio button and enter the password in the <b>Password</b> field.</p></li>
+<li>
+  <p>If you use key based authentication, select the <b>Public key based authentication</b> radio button, select the file containing your public key, and enter the passphrase for your key (or leave blank if you don't use a passphrase).</p>
+</li>
+<li><p>Click <b>Finish</b></p></li>
+</ol>
+<li><p>The <b>Path to proxy executable</b> field needs to point to the <code>ptp_orte_proxy</code> executable file on the remote machine.
+If this isn't filled in correctly already, then navigate to the <code>ptp_orte_proxy</code> executable by clicking on the <b>Browse</b>
+button and select it. </p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104remoteBrowseProxy.png')">Click here to see an illustration.</a></p></li>
+<li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager documentation instructs otherwise.</p></li>
+<li>
+  <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection if supported by the remote service provider. To enable tunneling, select the <b>Use port forwarding</b> radio button.</p>
+  <p><a href="javascript:void(0)" onClick="newWin('images/0104orteProxyConfigRemoteAddr1.png')">Click here to see an illustration.</a></p></li>
+<li><p>If you don't wish to use port forwarding, select the <b>None</b> radio button and enter the address of your local machine (it's host name, or IP address) in the <b>Local address for proxy connection</b> field. Note that if your site does not allow outbound connections from the remote machine to your local machine, then you <i>must</i> use port forwarding.</p></li>
+<li>
+  <p>The <b>Launch server manually</b> checkbox is used for debugging purposes and should be left unchecked.</p>
+</li>
+<li><p>Select <b>Next &gt;</b></p></li>
+</ol>
 
-<p>To configure the simple case of a local ORTE Resource Manager,
-Select <b>Local</b> as the Remote service provider.
+<h2 id="spec">Step 3: Resource manager-specific configuration</h2>
+<p>The next page will show configuration information specific to a particular resource manager. In this case, the <b>ORTED Configuration</b> dialog is shown. You will not normally need to change this information.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104ORTEConfiguration.png')">Click here to see an illustration.</a></p>
+<ol>
+<li><p>If you wish to specify the location of the <code>orted</code> daemon, or add extra arguments, uncheck the <b>Use default settings</b> checkbox.</p></li>
+<ol>
+<li><p>Browse to the location of the <code>orted</code> executable and select it.</p></li>
+<li><p>Add any extra arguments to the <b>Extra ORTED arguments</b> field.</p></li>
+</ol>
+<li><p>Select <b>Next &gt;</b></p></li>
+</ol>
 
-<p>The proxy server location should be set to Local as well,
-and  the Path to proxy server executable 
-should point to your <code>ptp_orte_proxy</code> executable file.
-It should probably be pointing to your plugins directory under your eclipse installation.
-<br>Under Multiplexing options, <b>None</b> should be selected
-and the local address for proxy connection should be set to your local address
-(either IP address x.x.x.x or localhost).
-<br>
-<img src="images/0104ORTEProxyConn2local.png">
-<p>Select Next.
-<p>The ORTED Configuration dialog is shown; the default settings for ORTED are usually ok, so select Next or Finish
-<br>
-<img src="images/0104ORTEConfiguration.gif">
-
-<p>If you selected Next, the Choose Resource Manager Name and Description dialog
-is shown and you have the opportunity to change the displayed name
-for this resource manager, if desired.
-<br>
-<img src="images/0104ChooseResMgrNameAndDesc.png">
-<p>Select Finish.
+<h2 id="finish">Step 4: Finishing resource manager configuration</h2>
+<p>The final dialog is <b>Choose Resource Manager Name and Description</b> which provides an opportunity
+to change how the resource manager is displayed.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104ChooseResMgrNameAndDesc.png')">Click here to see an illustration.</a></p>
+<ol>
+<li><p>If you wish to change the name or description, uncheck the <b>Use default name and description</b> checkbox.</p></li>
+<ol>
+<li><p>Enter a new name in the <b>Name</b> field. Anything can be entered.</p></li>
+<li>
+  <p>Enter a new description in the <b>Description</b> field. Anything can be entered.</p>
+</li>
+</ol>
+<li><p>Select <b>Finish</b></p></li>
+</ol>
 <p>The new Resource Manager should appear in the list of Resource
-Managers.
-<br>
-<img src="images/0104resMgrListOrteLocal.png">
+Managers.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104resMgrListOrteLocal.png')">Click here to see an illustration.</a></p>
 
-<h2 id="startRML">Starting the Local Resource Manager</h2>
-<p>Right mouse on the resource manager and select Start Resource Manager.
-<br><img src="images/0104resMgrStart.png">
-<p>The Resource Manager item in the Resource Managers view
-changes color to indicate it is running.
-<br><img src="images/0104resMgrRunning.png">
-<p>The Machines view should be populated with icons for your node(s).
-<br><img src="images/0104ORTEresMgrLocalStarted.png">
+<h2 id="start">Step 5: Starting the resource manager</h2>
+<ol>
+<li><p>To start the resource manager, right mouse click on the resource manager in the <b>Resource Managers view</b>, then select <b>Start Resource Manager</b> from the context menu.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104resMgrStart.png')">Click here to see an illustration.</a></p></li>
+<li><p>The resource manager icon should change color to green to indicate has been successfully started.</p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104resMgrRunning.png')">Click here to see an illustration.</a></p></li>
+<li>
+  <p>In the <b>Machines view</b> you should see an icon representing your target system and icons showing status of the node(s).</p>
+  <p><a href="javascript:void(0)" onClick="newWin('images/0104ORTEresMgrLocalStarted.png')">Click here to see an illustration.</a></p></li>
+<li><p>If the resource manager fails to start (the icon is red), right click on the resource manager and select <b>Stop Resource Manager</b>. Check the log files for the reason that the resource manager failed to start, correct the error and restart again.</p></li>
+</ol>
 
-<p>Now you may want to proceed to <a href="02pLaunchConfig.html">Launching a parallel application</a>.
-<p>&nbsp;
+<h2 id="edit">Editing a resource manager</h2>
+<p>It is sometimes necessary to change the configuration of an existing resource manager, for example, to change the remote machine that the resource manager controls. Note that the resource manager cannot be edited when it is running.</p>
+<ol>
+<li><p>If the resource manager is running, stop it first. Right-click on the resource manager and select <b>Stop Resource Manager</b></p></li>
+<li><p>Right-click on the resource manager and select <b>Edit Resource Manager</b></p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104resMgrEdit.png')">Click here to see an illustration.</a></p></li>
+<li><p>Modify the required configuration settings and click <b>Finish</b>.</p></li>
+<li><p>Restart the resource manager.</p></li>
+</ol>
 
-<h3 id="configRMR">Creating and configuring a Remote Resource Manager</h3>
-<p>
-Remote Resource Managers allow control via PTP of a remote target machine.
-This control can be accomplished via a variety of "remote service providers,"
-which currently includes Eclipse RSE (Remote Systems Explorer) or the more
-lightweight PTP Remote Tools, which you probably installed with PTP.
-
-<p>The following instructions show how to configure a remote ORTE Resource Manager using the PTP Remote Tools.
-<p>The example is a local machine running Windows XP, and the remote target machine running Linux (Fedora 7).
-<p>Note: Caveat here about having source on local machine, to match executable located on remote machine.
-<p>&nbsp;
-<p>Add a new resource manager, of type ORTE.
-<p>In the  PTP Runtime Perspective,
-Right-click in Resource Managers view and select 
-<b>Add Resource Manager...</b>
-<br>
-<img src="images/0104newRemoteResMgr.png">
-<p>In the ORTE Proxy Configuration dialog, 
-Select <b>Remote Tools </b> as the Remote service provider.
-<br>
-<img src="images/0104newORTEproxyRemote.png">
-<p>Click New ... 
-<br>
-<img src="images/0104newRemoteHost.png">
-<p>The proxy server location should be set to the hostname, or IP address, of the remote target machine.
-<p>Note: assure that <code>sftp</code> works on the remote machine, with a known userid and password.
-<p>Click Finish.
-
-<p>
-The Path to proxy server executable 
-should point to your <code>ptp_orte_proxy</code> executable file on the target machine.
-If this isn't filled in correctly already, then 
-navigate to the <code>ptp_orte_proxy</code> executable and select it.  It is 
-which is probably located in the eclipse/plugins/org.eclipse.ptp.<i>os.arch</i>.xxxx directory, where <i>os.arch</i> is the 
-operating system and architecture of the remote target machine, and <code>xxxx</code> is the suffix on the plugins directory, probably
-a release name and date suffix.
-<br>
-<img src="images/0104remoteBrowseProxy.png">
-<br>
-Click OK to close the browse dialog.
-
-<br>Under Multiplexing options, select <b>None</b>.
-The local address for proxy connection should be set to your local address
-(either IP address x.x.x.x or hostname of your local machine: the pulldown menu should provide some alternatives or you can enter the hostname/IP Address manually).
-This is the address with which the remote target machine will attempt to connect back with the local machine.
-<br>
-<img src="images/0104orteProxyConfigRemoteAddr1.png">
-
-<p>Select Next.
-<p>If ORTED configuration info is required enter it here.
-
-<br>
-<img src="images/0104ORTEDconfigRemote.png">
-<p>Select Next or Finish.
-<p>If you select Next, the Choose Resource Manager Name dialog
-is shown and you have the opportunity to change the displayed name
-for this resource manager, if desired.
-<br>
-<img src="images/0104ORTEDremoteName.png">
+<h2 id="rm">Removing a Resource Manager</h2>
+<p>If the resource manager is no longer required, it can be removed from the <b>Resource Managers view</b></p>
+<ol>
+<li><p>If the resource manager is running, stop it first. Right-click on the resource manager and select <b>Stop Resource Manager</b></p></li>
+<li><p>Right-click on the resource manager and select <b>Remove Resource Manager</b></p>
+<p><a href="javascript:void(0)" onClick="newWin('images/0104resMgrRemove.png')">Click here to see an illustration.</a></p></li>
+<li>
+  <p>You will be prompted to confirm removal. Click <b>OK</b></p>
+</li>
+</ol>
 
 
-
-<p>Select Finish.
-<p>The new Resource Manager should appear in the list of Resource
-Managers.
-
-<h2 id="startRMR">Starting the Remote Resource Manager</h2>
-<p>Right mouse on the resource manager and select Start Resource Manager.
-<br><img src="images/0104remoteStart.png">
-<p>The Resource Manager item in the Resource Managers view
-changes color to indicate it is running.
-<br><img src="images/0104ORTEremoteStarted.png">
-<p>The Machines view should be populated with icons for your node(s).
-<p>Now you may want to proceed to <a href="02pLaunchConfigRemote.html">Launching a parallel application remotely</a>.
-<p>&nbsp;
-<h2 id="editRM">Editing the Resource Manager</h2>
-<p>Note that the resource manager cannot be edited when it is running.  
-Stop it first and then
-it can be edited.
-<br><img src="images/0104resMgrEdit.png">
-
-<h2 id="remRM">Removing the Resource Manager</h2>
-<p><br><img src="images/0104resMgrRemove.png">
 <p>Proceed to <a href="02pLaunchConfig.html">Launching a parallel application</a>.
 <p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
