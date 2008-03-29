@@ -1,16 +1,18 @@
 <html>
 <head>
-<title>Launching Parallel Programs </title>
+<title>Launching Parallel Programs for Debugging</title>
 <script type="text/javascript" src="thumb.js"> </script>
 </head>
 <body>
 
-<h1 id="top">Launching Parallel Programs</h1>
-<p>This section describes how to launch a parallel program. Launching requires the services of a resource manager, which should have been set up as described in <a href="02resMgrSetup.html">Resource Managers</a>. PTP is able to launch applications that have been compiled to use an MPI runtime system, those compiled to use the OpenMP system, and a combination of MPI and OpenMP. It is also possible to launch multiple copies of a sequential program so that they execute simultaneously.
+<h1 id="top">Launching Parallel Programs for Debugging</h1>
+<p>This section describes how to launch a parallel program that you wish to debug. A <a href="04ptpDebugPersp.html">description of how to actually debug the application</a> is provided in another section. 
 
-<p>Topics  include:
+<p>If you have already created <a href="02pLaunchConfig.html">normal parallel launch configuration</a> and configured the <b>Debug tab</b> you are ready to launch a debug session. Simply select <b>Run &gt; Debug</b>, the debug icon, or choose a configuration from the debug icon menu on the toolbar.</p>
+
+<p>Topics  include:</p>
 <ol>
-<li><a href="#create">Creating a parallel launch configuration</a></li>
+<li><a href="#create">Creating a parallel debug launch configuration</a></li>
 <li><a href="#main">Completing the <b>Main tab</b></a></li>
 <li><a href="#resources">Completing the <b>Resources tab</b></a></li>
 <li><a href="#debugger">Completing the <b>Debugger tab</b></a></li>
@@ -18,20 +20,21 @@
 <li><a href="#launch">Launching the application</b></a></li>
 </ol>
 
-<h2 id="create">Step 1: Create a parallel launch configuration</h2>
+<h2 id="create">Step 1: Create a parallel debug launch configuration</h2>
 <p>Note: At least one resource manager must have been configured and started before it is possible to create
 a parallel launch configuration.
 <ol>
-<li><p>Open the run configuration dialog using <b>Run &gt; Open Run Dialog...</b>
-or click the run icon menu on the tool bar and select <b>Open Run Dialog...</b></p></li>
+<li><p>Open the run configuration dialog using <b>Run &gt; Open Debug Dialog...</b>
+or click the debug icon menu on the tool bar and select <b>Open Debug Dialog...</b></p></li>
 <li><p>Create a new parallel launch configuration by clicking <b>Parallel Application</b> and
 then clicking on the <b>New</b> button icon.</p>
 <p><script> thumb("images/launch1.gif") </script></p>
+
 </li>
 <li><p>Enter a name for the configuration in the <b>Name:</b> field. Here we use the same name as the project.</p></li>
 </ol>
 
-<h2 id="main">Step 2: Complete the <b>Main</b> tab</h2>
+<h2 id="main">Step 2: Complete the <b>Main</b>,  tab</h2>
 <ol>
 <li><p>Select a resource manager from the drop-down (Note: a resource manager
 must be running for it to appear in the list.)</p></li>
@@ -56,7 +59,6 @@ check the <b>Display combined output in a console view</b> option.
 </ol>
 
 <h2 id="debugger">Step 4: Complete the Debugger tab</h2>
-The <b>Debugger tab</b> is only required if you are planning to debug the application. However it is a good idea to complete it now, even if you are only planning to launch a non-debug job.
 <ol>
 <li><p>Select a debugger from the <b>Debugger</b> drop-down. This is the debugger that will control the parallel debug session. Currently only <b>SDM</b> is supported (SDM stands for Scalable Debug Manager), so select this.</p></li>
 <li><p>If you wish the debugger to automatically suspend the application on launch, make sure <b>Stop in main() on startup</b> is checked</p></li>
@@ -85,10 +87,9 @@ architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and v
 </ol>
 
 <h2 id="launch">Step 6: Launching the application</h2>
-<p>The launch configuration is now complete. Click on the <b>Run</b> button to launch the program.
-At this point the application should begin execution. 
-The <a href="03ptpRuntimePersp.html">Monitoring Parallel Machines and Jobs</a> section will show you how to
-monitor the program's execution.</p>
+<p>The launch configuration is now complete. Click on the <b>Debug</b> button to start debugging the program. Eclipse will, by default, switch to the <b>PTP Debug perspective</b>, and you can begin debugging the application.
+The <a href="03ptpDebugPersp.html">Parallel Debugging</a> section will show you how to
+use the debugger.</p>
 
 
 
