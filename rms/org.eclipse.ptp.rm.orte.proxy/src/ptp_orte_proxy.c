@@ -943,7 +943,7 @@ get_proc_info(ptp_job *j)
 	
     for (i = 0; i < cnt; i++) {
     	int					k;
-    	int					pid = -1;
+    	int					pid = 0;
     	int					task_id = -1;
     	int					node_id = -1;
     	ptp_node *			node;
@@ -952,8 +952,8 @@ get_proc_info(ptp_job *j)
 		orte_gpr_value_t *	value = values[i];
 		
 		/*
-		 * Find process rank. Make sure it gets added to event before
-		 * the other attributes.
+		 * Find process rank, node and pid. Make sure it gets added to event before
+		 * the other attributes. Note: for debug jobs, pid may not be available.
 		 */
 		for(k = 0; k < value->cnt; k++) {
 			orte_gpr_keyval_t *	keyval = value->keyvals[k];
@@ -976,7 +976,7 @@ get_proc_info(ptp_job *j)
 			}
 		}
 		
-		if (task_id >= 0 && node_id >= 0 && pid >= 0) {
+		if (task_id >= 0 && node_id >= 0) {
 			p = find_process(j, task_id);
 			if (p == NULL) {
 				p = new_process(j, node_id, task_id, pid);
