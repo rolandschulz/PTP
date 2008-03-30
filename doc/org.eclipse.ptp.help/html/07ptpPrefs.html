@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>PTP Preferences</title>
+<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1>PTP Preferences</h1>
+<p>To open the <b>Preferences dialog</b>, select:</p>
+<ul>
+<li><p><b>Window &gt; Preferences...</b> for Windows and Linux</p></li>
+<li><p><b>Eclipse &gt; Preferences...</b> for MacOS X</p></li>
+</ul>
+
+<p>Next, expand <b>PTP</b> in the list of preferences pages on the left side and choose the component who's preferences you wish to change. The following image shows all available components:</p>
+
+<p><script> thumb("images/07prefsAll.png") </script></p>
+
+<h2 id="main"><a name="run"></a>PTP Preference Page </h2>
+<p>This is the main preferences page for PTP. Available preferences are:</p>
+<dl>
+<dt><b>Output directory</b></dt><dd>Temporary directory to use to save process output</dd>
+<dt><b>Store line number</b></dt><dd>Number of lines of output from each process to save (0 means infinite)</dd>
+</dl>
+
+<h2 id="debug">Debug Preferences Page (PTP &gt; Debug)</h2>
+<p>This is the main parallel debugger preferences page. These are  preferences that apply to any parallel debugger.
+<p><script> thumb("images/07prefsDebug.png") </script></p>
+
+<h3>Default setting</h3>
+<p>These preferences control some debugger default behavior</p>
+<dl>
+<dt><b>Show full paths on breakpoint</b> (default disabled)</dt><dd>Use the full path to the source file when displayed in the debugger <b>Breakpoint view</b></dd>
+<dt><b>Register process 0 by default</b> (default enabled)</dt><dd>Will register process 0 with the <b>Debug view</b> when the parallel debugger starts. This is required to enable Eclipse to switch automatically to the <b>PTP Debug perspective</b> when a debugger breakpoint is hit.</dd>
+</dl>
+
+<h3>Communication</h3>
+<p>These are preferences relating to the communication between Eclipse and the external parallel debugger. They do not normally need to be changed.</p>
+<dl>
+<dt><b>Command timeout (ms)</b> (default 60000)</dt><dd>This specifices the period Eclipse waits after sending a command to the external debugger. If no response is received the debug session will be terminated.</dd>
+</dl>
+
+<h3>Variable</h3>
+<p>These variables control the action of the debugger to update variable information.</p>
+<dl>
+<dt><b>The debugger is suspended</b> (default enabled)</dt><dd>The debugger allows variable values to be displayed in tooltip popups when the mouse hovers over a process in the <b>Parallel Debug view</b>. Enabling this option will update all the values each time the process is suspended. When this option is disabled, the value will be updated when the tooltip popup is displayed.</dd>
+<dt><b>Job or Set is changed</b> (default disabled)</dt><dd>Variable values will be updated when the current job or set is changed.</dd>
+</dl>
+
+<h2>  SDM (Scalable Debug Manager) Preferences (PTP &gt; Debug > SDM)</h2>
+<p>These are
+  preferences for controlling the behavior of the scalable debug manager, which is server component of the parallel debugger. They
+  do not normally need to be changed.</p>
+  
+<p><script> thumb("images/07prefsDebugSDM.png") </script></p>
+
+<h3>Debugger launch preferences</h3>
+<p>These preference control how the debugger behaves when it is launched.  
+    They do not normally need to be altered.</p>
+    
+<dl>
+<dt><b>SDM client host</b> (default localhost)</dt><dd>This specifies the host on which Eclipse is running. It is used to establish communication between the SDM and Eclipse. In situations where a parallel job is being debugged remotely, this should be the host name of the &quot;front end&quot; on which Eclipse is running.</dd>
+<dt><b>Backend debugger</b> (default gdb-mi)</dt><dd>The name of the backend debugger to use when debugging the application. This is an internal name known by the SDM, not the name of the debugger itself. Currently only gdb using the MI mode is supported.</dd>
+<dt><b>Path to backend debugger</b> (default empty)</dt><dd>This can be used to specify the path to the backend debugger, if it is located in a non standard place. Useful on machines that do not have physical disks or network filesystems on compute nodes. </dd>
+<dt><b>SDM executable</b> (default sdm location)</dt><dd>The path to the SDM executable. This is normally installed in an Eclipse plugin and is automatically determined. </dd>
+<dt><b>Extra SDM arguments</b> (default empty)</dt><dd>Any extra arguments that need to be supplied to the sdm (e.g. for debugging purposes)</dd>
+</dl>
+
+<h2 id="pldt">Parallel Language Development Tool (PLDT) Preferences</h2>
+<p>See the help for <a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.help/html/toc.html">PLDT</a></p>
+
+<h2 id="rm"></a>Resource Manager Preferences (PTP > Resource Managers )</h2>
+<p>See the help for <a href="PLUGINS_ROOT/org.eclipse.ptp.ibmll.help/html/IBMLLMainHelp.html">Loadleveler</a> 
+and <a href="PLUGINS_ROOT/org.eclipse.ptp.ibmpe.help/html/PEMainHelp.html">Parallel Environment</a>
+for details on their preference pages.</p>
+
+
+<h2 id="orte"></a>Open RTE Preferences (PTP &gt; Resource Managers &gt; Open RTE)</h2>
+
+<p> These are preferences specific to the Open Runtime Environment (Open RTE).</p>
+<p><script> thumb("images/07prefsORTE.png")</script>
+
+<h3>PTP Proxy Server</h3>
+<p>Specifies the location  
+    of the Open RTE proxy server executable. Default location of the proxy agent.
+    This is automatically determined and  does not need to be changed.<p>
+
+<h3>Multiplexing Options</h3>
+<p>Specifies the default method for connection between Eclipse and the proxy agent. Does not
+need to be changed.</p>
+
+<h3>Other Options</h3>
+<p>These options do not need to be changed.</p>
+
+<h2 id="viewer">Viewer (PTP &gt; Viewer)</h2>
+<p>These preferences are used to change the behavior of some of the PTP views. They do not normally need to be altered.</p>
+<p><script> thumb("images/07prefsViewer.png")</script></p>
+
+<h3>Tooltip</h3>
+<p>Controls the way tooltips for PTP variables are displayed.</p>
+<dl>
+<dt><b>Show all the time</b></dt><dd>Always show tooltips</dd>
+<dt><b>Timeout (ms)</b> (default 5000)</dt><dd>Changes the time the tooltip remains displayed when the mouse hovers over a node or process icon.</dd>
+<dt><b>Wrap text</b> (default enabled)</dt><dd>Wrap the text to fit into the tooltip</dd>
+</dl>
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
