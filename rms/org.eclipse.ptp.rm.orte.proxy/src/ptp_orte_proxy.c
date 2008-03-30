@@ -943,9 +943,9 @@ get_proc_info(ptp_job *j)
 	
     for (i = 0; i < cnt; i++) {
     	int					k;
-    	int					pid = 0;
-    	int					task_id = 0;
-    	int					node_id = 0;
+    	int					pid = -1;
+    	int					task_id = -1;
+    	int					node_id = -1;
     	ptp_node *			node;
 		pid_t	*			pidptr;
 		orte_std_cntr_t		*rankptr;
@@ -976,12 +976,14 @@ get_proc_info(ptp_job *j)
 			}
 		}
 		
-		p = find_process(j, task_id);
-		if (p == NULL) {
-			p = new_process(j, node_id, task_id, pid);
-	    	sendNewProcessEvent(gTransID, j->ptp_jobid, p, PROC_STATE_STARTING);
-		} else {
-			sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
+		if (task_id >= 0 && node_id >= 0 && pid >= 0) {
+			p = find_process(j, task_id);
+			if (p == NULL) {
+				p = new_process(j, node_id, task_id, pid);
+		    	sendNewProcessEvent(gTransID, j->ptp_jobid, p, PROC_STATE_STARTING);
+			} else {
+				sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
+			}
 		}
     }
     
