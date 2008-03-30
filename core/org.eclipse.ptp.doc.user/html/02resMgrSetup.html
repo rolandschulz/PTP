@@ -36,14 +36,14 @@
 
 <ol>
 <li><p>Open the <b>PTP Runtime Perspective</b> using <b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>PTP Runtime</b> from the list of perspectives.</p>
-<p><script> thumb("images/0104RuntimePerspEmpty.png")</script></p>
+<p><script> thumb("images/02RuntimePerspEmpty.png")</script></p>
 </li>
 <li><p>Right-click in <b>Resource Managers</b> view and select 
 <b>Add Resource Manager...</b></p>
-<p><script> full("images/0104addResMgr.png") </script></p>
+<p><script> full("images/02addResMgr.png") </script></p>
 </li>
 <li><p>Choose the resource manager that corresponds to the target system. In this example we will use the <b>ORTE</b> resource manager, which is used to control the Open MPI Open Runtime Environment.</p>
-<p><script> thumb("images/0104chooseResMgrType.png",200) </script></p></li>
+<p><script> thumb("images/02chooseResMgrType.png",200) </script></p></li>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
 
@@ -53,7 +53,7 @@ example, we will show how to configure PTP to use a local resource manager, for 
 head node of a cluster.  This was the
 scenario that PTP 1.x handled.</p>
 <p>The <b>ORTE Proxy Configuration</b> dialog is used to configure how Eclipse will communicate with the resource manager. </p>
-<p><script> thumb("images/0104ORTEProxyConn2local.png",240) </script></p>
+<p><script> thumb("images/02ORTEProxyConn2local.png",240) </script></p>
 
 <ol>
 <li><p>To configure the simple case of a local resource manager, select <b>Local</b> as the <b>Remote service provider</b>.</p></li>
@@ -93,7 +93,7 @@ for more information. We will only consider Remote Tools here, but the steps for
 <ol>
 <li><p>In the <b>ORTE Proxy Configuration</b> dialog, 
 select <b>Remote Tools</b> as the <b>Remote service provider</b>.</p>
-<p><script> thumb("images/0104newORTEproxyRemote.png") </script></p>
+<p><script> thumb("images/02newORTEproxyRemote.png") </script></p>
 </li>
 <li><p>At this point, you need to configure a <b>Proxy server location</b>. This will differ depending on the remote service provider that
 you selected in the previous step. The following steps describe configuring a <b>Remote Tools</b> location.</p>
@@ -101,7 +101,7 @@ you selected in the previous step. The following steps describe configuring a <b
 <ol>
 <li><p>Select <b>New...</b></p></li>
 <li><p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> field (can be anything).</p>
-<p><script> thumb("images/0104newRemoteHost.png") </script></p>
+<p><script> thumb("images/02newRemoteHost.png") </script></p>
 </li>
 <li><p>Select the <b>Remote Host</b> radio button.</p></li>
 <li><p>Enter the address of the remote host in the <b>Host</b> field.</p></li>
@@ -116,12 +116,12 @@ you selected in the previous step. The following steps describe configuring a <b
 <li><p>The <b>Path to proxy executable</b> field needs to point to the <code>ptp_orte_proxy</code> executable file on the remote machine.
 If this isn't filled in correctly already, then navigate to the <code>ptp_orte_proxy</code> executable by clicking on the <b>Browse</b>
 button and select it. </p>
-<p><script> thumb("images/0104remoteBrowseProxy.png") </script></p>
+<p><script> thumb("images/02remoteBrowseProxy.png") </script></p>
 </li>
 <li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager documentation instructs otherwise.</p></li>
 <li>
   <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection if supported by the remote service provider. To enable tunneling, select the <b>Use port forwarding</b> radio button.</p>
-  <p><script> thumb("images/0104orteProxyConfigRemoteAddr1.png") </script></p>
+  <p><script> thumb("images/02orteProxyConfigRemoteAddr1.png") </script></p>
 </li>
 <li><p>If you don't wish to use port forwarding, select the <b>None</b> radio button and enter the address of your local machine (it's host name, or IP address) in the <b>Local address for proxy connection</b> field. Note that if your site does not allow outbound connections from the remote machine to your local machine, then you <i>must</i> use port forwarding.</p></li>
 <li>
@@ -132,7 +132,7 @@ button and select it. </p>
 
 <h2 id="spec">Step 3: Resource manager-specific configuration</h2>
 <p>The next page will show configuration information specific to a particular resource manager. In this case, the <b>ORTED Configuration</b> dialog is shown. You will not normally need to change this information.</p>
-<p><script> thumb("images/0104ORTEConfiguration.gif") </script></p>
+<p><script> thumb("images/02ORTEConfiguration.png") </script></p>
 <ol>
 <li><p>If you wish to specify the location of the <code>orted</code> daemon, or add extra arguments, uncheck the <b>Use default settings</b> checkbox.</p></li>
 <ol>
@@ -145,7 +145,7 @@ button and select it. </p>
 <h2 id="finish">Step 4: Finishing resource manager configuration</h2>
 <p>The final dialog is <b>Choose Resource Manager Name and Description</b> which provides an opportunity
 to change how the resource manager is displayed.</p>
-<p><script> thumb("images/0104ChooseResMgrNameAndDesc.png") </script></p>
+<p><script> thumb("images/02ChooseResMgrNameAndDesc.png") </script></p>
 <ol>
 <li><p>If you wish to change the name or description, uncheck the <b>Use default name and description</b> checkbox.</p></li>
 <ol>
@@ -158,19 +158,19 @@ to change how the resource manager is displayed.</p>
 </ol>
 <p>The new Resource Manager should appear in the list of Resource
 Managers.</p>
-<p><script> thumb("images/0104resMgrListOrteLocal.png") </script></p>
+<p><script> thumb("images/02resMgrListOrteLocal.png") </script></p>
 
 <h2 id="start">Step 5: Starting the resource manager</h2>
 <ol>
 <li><p>To start the resource manager, right mouse click on the resource manager in the <b>Resource Managers view</b>, then select <b>Start Resource Manager</b> from the context menu.</p>
-<p><script> thumb("images/0104resMgrStart.png") </script></p>
+<p><script> thumb("images/02resMgrStart.png") </script></p>
 </li>
 <li><p>The resource manager icon should change color to green to indicate has been successfully started.</p>
-  <p><script> full("images/0104resMgrRunning.png") </script></p>
+  <p><script> full("images/02resMgrRunning.png") </script></p>
 </li>
 <li>
   <p>In the <b>Machines view</b> you should see an icon representing your target system and icons showing status of the node(s).</p>
-  <p><script> thumb("images/0104ORTEresMgrLocalStarted.png") </script></p>
+  <p><script> thumb("images/02ORTEresMgrLocalStarted.png") </script></p>
 </li>
 <li><p>If the resource manager fails to start (the icon is red), right click on the resource manager and select <b>Stop Resource Manager</b>. Check the log files for the reason that the resource manager failed to start, correct the error and restart again.</p></li>
 </ol>
@@ -180,7 +180,7 @@ Managers.</p>
 <ol>
 <li><p>If the resource manager is running, stop it first. Right-click on the resource manager and select <b>Stop Resource Manager</b></p></li>
 <li><p>Right-click on the resource manager and select <b>Edit Resource Manager</b></p>
-<p><script> thumb("images/0104resMgrEdit.png") </script></p>
+<p><script> thumb("images/02resMgrEdit.png") </script></p>
 </li>
 <li><p>Modify the required configuration settings and click <b>Finish</b>.</p></li>
 <li><p>Restart the resource manager.</p></li>
@@ -191,7 +191,7 @@ Managers.</p>
 <ol>
 <li><p>If the resource manager is running, stop it first. Right-click on the resource manager and select <b>Stop Resource Manager</b></p></li>
 <li><p>Right-click on the resource manager and select <b>Remove Resource Manager</b></p>
-<p><script> thumb("images/0104resMgrRemove.png") </script></p>
+<p><script> thumb("images/02resMgrRemove.png") </script></p>
 </li>
 <li>
   <p>You will be prompted to confirm removal. Click <b>OK</b></p>
@@ -199,7 +199,7 @@ Managers.</p>
 </ol>
 
 
-<p>Proceed to <a href="02pLaunchConfig.html">Launching a parallel application</a>.
+<p>Proceed to <a href="03pLaunchConfig.html">Launching a parallel application</a>.
 <p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
