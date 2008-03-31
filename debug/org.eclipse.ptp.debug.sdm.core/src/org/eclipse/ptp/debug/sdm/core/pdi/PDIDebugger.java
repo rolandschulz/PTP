@@ -197,19 +197,20 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
 				if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 					IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-					String address;
-					try {
-						address = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
-					} catch (CoreException e1) {
-						throw new PDIException(null, e1.getMessage());
-					}
 					if (remoteServices != null) {
 						IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 						if (connMgr != null) {
 							IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
 							if (conn != null) {
 								try {
-									port = conn.forwardRemotePort(address, getSessionPort(), monitor);
+									/*
+									 * Bind remote port to all interfaces. This allows the sdm master
+									 * process running on a cluster node to use the tunnel. 
+									 * 
+									 * FIXME: Since this requires a special option to be enabled in sshd
+									 * on the head node (GatewayPorts), I'd like this to go way.
+									 */
+									port = conn.forwardRemotePort("", getSessionPort(), monitor);
 								} catch (RemoteConnectionException e) {
 									throw new PDIException(null, e.getMessage());
 								}
