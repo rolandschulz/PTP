@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.util.BitList;
 
 /**
@@ -95,8 +96,10 @@ public interface IPDIDebugger extends
 	 * and add any necessary arguments to the list. If args is not empty, then attempt to
 	 * initialize the debugger using the supplied arguments.
 	 * 
+	 * @param configuration debugger launch configuration
 	 * @param args debugger arguments
+	 * @param monitor progress monitor
 	 * @throws PDIException
 	 */
-	public void initialize(List<String> args) throws PDIException;
+	public void initialize(ILaunchConfiguration configuration, List<String> args, IProgressMonitor monitor) throws PDIException;
 }

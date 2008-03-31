@@ -153,7 +153,10 @@ public class ParallelLaunchConfigurationDelegate
 				
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
-				debugger.initialize(attrManager);
+				debugger.initialize(configuration, attrManager, monitor);
+				if (monitor.isCanceled()) {
+					return;
+				}
 				debugger.getLaunchAttributes(configuration, attrManager);
 			}
 			

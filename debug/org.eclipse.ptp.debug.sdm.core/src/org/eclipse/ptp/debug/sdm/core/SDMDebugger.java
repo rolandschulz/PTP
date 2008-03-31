@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -83,7 +84,7 @@ public class SDMDebugger implements IPDebugger {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public void initialize(AttributeManager attrMgr) throws CoreException {
+	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
 		ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
 		
 		if (dbgArgsAttr == null) {
@@ -94,7 +95,7 @@ public class SDMDebugger implements IPDebugger {
 		List<String> dbgArgs = dbgArgsAttr.getValue();
 
 		try {
-			getDebugger().initialize(dbgArgs);
+			getDebugger().initialize(configuration, dbgArgs, monitor);
 		} catch (PDIException e) {
 			throw newCoreException(e);
 		}
