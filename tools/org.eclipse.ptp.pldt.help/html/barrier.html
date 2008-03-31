@@ -4,6 +4,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>MPI Barrier Analysis</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+	<script type="text/javascript" src="thumb.js"> </script>
 </head>
 
 <body>
@@ -16,7 +18,7 @@ the other tasks will deadlock while waiting.
 
 <p>
 The PLDT MPI Barrier analysis checks an SPMD program and determines whether there are deadlocks
-due to the misplacement of barriers. We will report errors if any, and "matching sets" 
+due to the misplacement of barriers. We will report errors if any, and show "matching sets" 
 for each barrier if error-free. The matching set of a barrier contains all barriers that
 synchronize with it at run time. 
 
@@ -46,115 +48,185 @@ Even if we only have a barrier in the then clause but
 not in the else clause, there is no error since all processors agree on the branch
 predicate, and they will choose the same way to go.
 <h2>Running Barrier Analysis</h2>
-<p>To run the barrier analysis, select a project, container, or source file in the C/C++ projects view, 
+<p>To run the barrier analysis, select a project, container, or source file in the Project Explorer view, 
 and click the  MPI barrier analysis action in the PLDT icon menu. 
-<br><img src="images/barrierMenu.gif">
-<p>[Note: these images have not been updated for PLDT 2.0 - new menu icons etc., but the basic function is the same.]
-<img src="images/barrierActionAnn.gif">
+<br><script> thumb("images/barrierActionAnn.gif",300)</script>
 <p>The barrier analysis produces three views of information:
 <ul>
-<li><a href="#barView">Barrier Artifact View</a></li>
-<li><a href="#barMatch">Barrier Matching Set View</a></li>
-<li><a href="#barError">Barrier Error View</a></li>
+<li><a href="#barView">MPI Barriers View</a></li>
+<li><a href="#barMatch">Barrier Matches View</a></li>
+<li><a href="#barError">Barrier Errors View</a></li>
 </ul>
+<p>The three views should show automatically after performing barrier analysis,
+but to bring them up otherwise, select Window > Show View > Other... and under
+<b>PTP MPI Views</b>, select the view you want to show.
 
-<h2 id="barView">Barrier Artifact View </h2>
-<p>The Barrier Artifact View lists all barriers in the program(s), their
+<h2 id="barView">MPI Barriers View </h2>
+<p>The <b>MPI Barriers</b> view lists all barriers in the program(s), their
 enclosing function names, filenames, line numbers, and index numbers 
 (beginning from 1). In the other two views, barriers are referred to according to
 their index numbers (e.g., the barrier with index number 1 is called 
 "barrier 1").
+<p>To find the source code line for a barrier in the view, double-click on the line
+in the view, and the editor will open on that source file (if not already opened) and
+it will scroll to the line containing the barrier.</p>
 <p> 
 <img src="images/BarrierView.gif">
 <br>
-<h2 id="barMatch">Barrier Matching Set View </h2>
+<h2 id="barMatch">Barrier Matches View </h2>
 <p>By running the analysis, we will show two kinds
 of results: 
 
 <ol>
 <li>
-For each barrier b, we show all barriers that match to b. </li>
-<li>  
-Barrier synchronization errors if any. </li>
+For each barrier b, all barriers that match to b are shown. </li>
+<li>
+Barrier synchronization errors are shown, if any. </li>
 </ol>
-<p>The matching sets are shown in the Barrier
-matching set view. The number following each parent barrier shows the size
-of its matching set. Note that if a matching error occurs in a statement,  
-then barriers used in this statement MIGHT have empty matching set (they MIGHT
-still have non-empty matching set if they are also used in other portions of the
+<p>The matching sets are shown in the <b>Barrier Matches</b> view. 
+They are grouped in this view as a tree view with "parent" nodes and "child" nodes.
+The matching set of a barrier contains all barriers that
+synchronize with it at run time. That is, all processes in the MPI program must arrive
+at one of the barrier statements in a matching set, before any of the processes can proceed.
+For each barrier statement in the program source files that are analyzed, a matching set is calculated and shown.  
+So for a matching set
+with two members, this view will show both a matching set with the first barrier as the parent,
+and another matching set with the second barrier as the parent.
+The parent barrier node in the view shows the size of its matching set in parentheses.
+<p>
+Note that if a matching error occurs in a statement,  
+then barriers used in this statement <i>might</i> have an empty matching set (they <i>might</i>
+still have a non-empty matching set if they are also used in other portions of the
 program). This is one of the advantages of our analysis: if an error occurs, our
 analysis can "recover" from such an error by continuing to analyze other portions of 
 the program that are not affected by such error.
+</p>
+<p>In the following example, the matching set for "Barrier 1" 
+(the barrier set highlight in blue below) contains two (2) barriers.
+The first is in the <code>barrier()</code> function and the second is in the 
+<code>main()</code> function.
+</p>
+<p>Like the other views, to find a barrier source code line from the view, double-click on the
+line in the view.  Barrier markers are shown in the marker bar of the editor to pinpoint the
+barrier statements found.
 
 <p>
 <img src="images/BarrierMatchingSetView.gif">
 
-<h2 id="barError">Barrier Error View </h2>
+<h2 id="barError">Barrier Errors View </h2>
 <p>When a barrier error is detected, it is highlighted in
-the editor (red arrows). In additon, a counter example is shown which contains 
+the editor in red. In addition, the Barrier Errors view shows a counter example which contains 
 two sequences of barriers which have different sizes along two
 paths starting from the highlighted error position. This counter example
-simulates? an execution and illustrates the reason for the 
+simulates an execution and illustrates the reason for the 
 synchronization error. Note that a synchronization error occurs if different 
 MPI tasks meet a different number of barriers.  If a barrier b is in a loop, and
 all tasks execute the same number of iterations, then barrier b is marked by 
-"*", which means that the static barier in the counter example reperesents a 
+"*", which means that the static barrier in the counter example represents a 
 dynamic number of barriers at runtime. If a synchronization error occurs 
 on a loop (i.e., different tasks will execute a different number of iterations 
 of such loop), then we show the counter example as the sequence of barriers
 in the loop body. 
-<p>
-<img src="images/BarrierErrorView.gif">
+<br><script> thumb("images/barrierErrorView.gif",300)</script>
 <p>If a filename and LineNo are shown, double-click on that line in
 the Barrier Errors view to locate that Barrier or error.
+The initial Error line in the view should point to the point in the path of
+execution that forks (such as an if statement) such that one path encounters 
+a barrier that the other path does not.
+<!--  fixme paths no longer work? -->
+<!--
 To show a path with or without barriers (e.g. a counterexample),
 double-click on the Path line in the view, as shown below:
 <br><img src="images/barrierPathSelection.gif" border=1>
+-->
 
-
-<h3> testMPIbarrier.c </h3>
+<h3>Sample program testMPIbarrier.c </h3>
 <p> We use this simple program <a href="samples/testMPIbarrier.c">testMPIbarrier.c</a> 
-to ilustrate the basic functionality of the
-analysis and three views. There are two branches and one loop in the program.
-The first loop is synchronization error free; two barriers (one in such loop, 
-and the other in barrier() function) match to each other. The second branch
+to illustrate the basic functionality of the
+analysis and three views. 
+The code is condensed here:
+<pre>
+if (my_rank !=0){
+		...
+		MPI_Send(...);
+		MPI_Barrier(MPI_COMM_WORLD);
+	}
+	else{
+		for (source = 1; source < p; source++) {
+			MPI_Recv(...);
+		}
+		barrier();
+	}
+	if(my_rank == 0){
+		MPI_Barrier(MPI_COMM_WORLD);
+	}
+	
+	if(x < 3){
+		...
+		MPI_Barrier(MPI_COMM_WORLD);
+	}
+	
+	while(x < my_rank){
+		MPI_Barrier(MPI_COMM_WORLD);
+		x ++;
+	}
+</pre>
+There are three branches and one loop in the program.
+The first branch ( the <code>if( my_rank!=0)</code> statement ) is free of synchronization 
+errors; two barriers (one encoded directly in 
+the loop, 
+and the other in the barrier() function called in the else clause) match to each other. 
+The second branch (<code>if(my_rank == 0)</code>)
 contains an error because some tasks would execute the barrier in it, while the
-other tasks would skip it. The loop contains an error also, since different 
-tasks may execute different number of iterations thus different number of
+other tasks would skip it. 
+The next branch (<code>if(x<3)</code>) does not make a decision based on processor
+rank (x does not depend on rank) so processes should proceed similar to each other.
+The loop (<code>while(x < my_rank)</code>)
+contains an error also, since different 
+tasks may execute a different number of iterations, and thus encounter a different number of
 barriers.
- 
+ <!-- since this code isn't included, don't refer to it here  
 <h3> MPB </h3>
 <p>MPB is a scientific application which computes the electromagnetic model using
 maxwell equations. We use this example to show the following points:
 <p>(1) Our analysis has inter-procedural analysis. This makes our analysis tool 
-outperform the previous intra-procedural analysis in Berkeley. 
+outperform previous intra-procedural analysis algorithms.
 <p>(2) Try this to show the necessity and effectiveness of the inter-procedural 
 analysis. In the original code, there are three barriers: two in function 
 matrixio_create_sub(), and one in matrixio_create_dataset(). Obviously two barriers
 in matrixio_create_sub() match to each other. Now comment out "barrier 1" (the one 
 in the then clause of the if-branch in matrixio_create_sub()), add a barrier in function
 mpi_is_master(), right after the MPI_Comm_rank call, then run the analysis.
-One may expect a synchronizatio error in this branch, however it is still error free, 
+One may expect a synchronization error in this branch, however it is still error free, 
 since the function matrixio_write_string_attr() will call mpi_is_master() somewhere.
-(matrixio_write_string_attr --> write_attr --> mpi_is_master)
+(matrixio_write_string_attr calls  write_attr which calls mpi_is_master)
 
 <h3> Tcgmsg </h3>
-<p>Tcgmsg is an MPI toolkit. Same as MPB, we use it to demonstrate the inter-procedural
+
+Tcgmsg is an MPI toolkit. As with the MPB application, we use it to demonstrate the inter-procedural
 analysis. There are some interesting points in the function test_main():
-<p>(1) At the beginning of test_main(), the master thread reads a parameter "opt"
+
+(1) At the beginning of test_main(), the master thread reads a parameter "opt"
 from stdout (the first while loop), and broadcasts it to other threads 
 (by BRDCST_) so that they obtain the same "opt". All threads then choose 
 some job to do according to the value of "opt". No synchronization occurs in the original
 code. If the master thread doesn't broadcast the "opt" value, then different processors
 will choose different jobs, and an error occurs (no barrier are used in cast 0-4, while
 some barriers are used in case 5).
-<p>(2) This program also illustrates how errors (and counter examples) are reported for
+
+(2) This program also illustrates how errors (and counter examples) are reported for
 the "switch" statement. Briefly, we will only show the "first" error, i.e., if
 the switch statement contains n cases, we will always begin from the first two cases, 
 and move to the next case ONLY IF the first two cases are error-free. To test it, if
 we add a barrier in case 0 clause, then an error will be reported, and one path
 in the counter example contains 1 barrier (the barrier we've just added in), and the
-other path contains no barrier (case 1 clause). 
+other path contains no barrier (case 1 clause).
+-->
 
+<p>&nbsp;
+<p>&nbsp;
+<p>&nbsp;
+<p>&nbsp;
+<p>&nbsp;
 </body>
 </html>
