@@ -71,7 +71,8 @@ architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and v
 <li><p>If you are launching onto the local machine, use <code>localhost</code> (some systems will accept <code>localhost.localdomain</code>).</p></li>
 <li><p>If you are launching onto a remote machine without using port forwarding (as specified in the resource manager configuration), then this should be the address of the local machine (the one running Eclipse) <i>as viewed from one of the nodes of the parallel machine</i>. Note that if the parallel machine configuration precludes nodes accessing your local machine, you will need to reconfigure the resource manager to use port forwarding.</p></li>
 <li><p>If you are launching onto a remote machine using port forwarding, this is the address of the remote machine 
-<i>as viewed from one of its nodes</i>
+<i>as viewed from one of its nodes</i>. Note that you will need to have the <code>GatewayPorts</code> option set to <code>yes</code>
+in the <code>sshd</code> configuration file on the remote system (see the manual page for <code>sshd_config</code>) for this to work.</p>
 <p><script> thumb("../images/03launch5.png") </script></p>
 </p></li>
 </ul>
