@@ -56,9 +56,12 @@ public interface IRemoteConnection {
 	public int forwardLocalPort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
 	
 	/**
-	 * Forward a remote port to port remotePort on remote machine fwdAddress. The remote port is chosen
+	 * Forward a remote port to port fwdPort on remote machine fwdAddress. The remote port is chosen
 	 * dynamically and returned by the method. When a connection is made to this port
 	 * on the remote machine, it is forwarded via this IRemoteConnection to fwdPort on machine fwdAddress.
+	 * 
+	 * If fwdAddress is the empty string ("") then the fwdPort will be bound to any address on
+	 * all interfaces. Note that this requires enabling the GatewayPort sshd option on some systems.
 	 * 
 	 * @param fwdAddress
 	 * @param fwdPort
