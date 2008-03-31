@@ -23,9 +23,17 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
@@ -43,6 +51,14 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
+import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  * @author clement
@@ -151,7 +167,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#initialize(java.util.List)
 	 */
-	public void initialize(List<String> args) throws PDIException {
+	public void initialize(ILaunchConfiguration configuration, List<String> args, IProgressMonitor monitor) throws PDIException {
 		int port = 0;
 		
 		/*
@@ -173,9 +189,75 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			throw new PDIException(null, "Error on getting proxy port number: " + e.getMessage()); //$NON-NLS-1$
 		}
 		
-		args.add("--port=" + getSessionPort()); //$NON-NLS-1$
+		IResourceManagerControl rm = getResourceManager(configuration);
+		if (rm != null) {
+			port = getSessionPort();
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+				if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+					IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+					String address;
+					try {
+						address = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
+					} catch (CoreException e1) {
+						throw new PDIException(null, e1.getMessage());
+					}
+					if (remoteServices != null) {
+						IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+						if (connMgr != null) {
+							IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
+							if (conn != null) {
+								try {
+									port = conn.forwardRemotePort(address, getSessionPort(), monitor);
+								} catch (RemoteConnectionException e) {
+									throw new PDIException(null, e.getMessage());
+								}
+								if (monitor.isCanceled()) {
+									return;
+								}
+							} else {
+								throw new PDIException(null, "Error getting connection"); //$NON-NLS-1$
+							}
+						} else {
+							throw new PDIException(null, "Error getting connection manager"); //$NON-NLS-1$
+						}
+					} else {
+						throw new PDIException(null, "Error getting remote services for connection"); //$NON-NLS-1$
+					}
+				}
+			}
+			args.add("--port=" + port); //$NON-NLS-1$
+		} else {
+			throw new PDIException(null, "Error getting resource manager"); //$NON-NLS-1$
+		}
 	}
 
+	/**
+	 * Get resource manager from a launch configuration
+	 * 
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	private IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws PDIException {
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager[] rms = universe.getResourceManagers();
+		String rmUniqueName;
+		try {
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+		} catch (CoreException e) {
+			throw new PDIException(null, e.getMessage());
+		}
+		for (IResourceManager rm : rms) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
+					rm.getUniqueName().equals(rmUniqueName)) {
+				return (IResourceManagerControl)rm;
+			}
+		}
+		return null;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#getErrorAction(int)
 	 */

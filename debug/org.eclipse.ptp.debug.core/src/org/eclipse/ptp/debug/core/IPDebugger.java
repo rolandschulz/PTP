@@ -28,6 +28,7 @@ package org.eclipse.ptp.debug.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -51,10 +52,12 @@ public interface IPDebugger {
 	 * to start debugging the user application. The attrMgr argument can supply attributes
 	 * from a previously submitted job that may be used to initialize the debug session.
 	 * 
+	 * @param configuration debugger launch configuration
 	 * @param attrMgr attribute manager containing attributes for launch
+	 * @param monitor progress monitor
 	 * @throws CoreException if the debugger cannot be initialized
 	 */
-	public void initialize(AttributeManager attrMgr) throws CoreException;
+	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
 	
 	/**
 	 * Using the supplied ILaunchConfiguration, add the required attributes to attrMgr 
