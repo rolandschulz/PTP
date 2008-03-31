@@ -55,6 +55,9 @@ int main(int argc, char* argv[]){
 		printf("test errors\n");
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
+	else{
+		printf("this path does not contain a barrier");
+	}
 	
 	if(x < 3){
 		printf("It is not an error\n");

@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>MPI Barrier Analysis</title>
-	<link rel="stylesheet" type="text/css" href="../help.css">
+	<link rel="stylesheet" type="text/css" href="help.css">
 	<script type="text/javascript" src="thumb.js"> </script>
 </head>
 
@@ -32,9 +32,10 @@ synchronize with it at run time.
 
 </pre>
 The program will become deadlocked on the above branch because some processors
-will execute the global barrier in the branch while the others will skip it. However,
-one cannot expect an error if barriers are not "textually" aligned. 
-<!--  ??? -->
+will execute the global barrier in the branch while the others will skip it. 
+However,
+it is difficult to visually detect an error if barriers are not "textually" aligned. 
+<p>
 Now, consider the
 third if-branch in <a href="samples/testMPIbarrier.c">testMPIbarrier.c</a>. 
 <pre>
@@ -133,12 +134,12 @@ the Barrier Errors view to locate that Barrier or error.
 The initial Error line in the view should point to the point in the path of
 execution that forks (such as an if statement) such that one path encounters 
 a barrier that the other path does not.
-<!--  fixme paths no longer work? -->
-<!--
-To show a path with or without barriers (e.g. a counterexample),
-double-click on the Path line in the view, as shown below:
-<br><img src="images/barrierPathSelection.gif" border=1>
--->
+<p>
+To show the path of a counterexample (e.g. a path without barriers),
+double-click on the Path line in the view, as shown below. If there
+is a path available it should be shown.
+<br><script> thumb("images/barrierPathSelection.png",350)</script>
+
 
 <h3>Sample program testMPIbarrier.c </h3>
 <p> We use this simple program <a href="samples/testMPIbarrier.c">testMPIbarrier.c</a> 
@@ -146,7 +147,7 @@ to illustrate the basic functionality of the
 analysis and three views. 
 The code is condensed here:
 <pre>
-if (my_rank !=0){
+    if (my_rank !=0){
 		...
 		MPI_Send(...);
 		MPI_Barrier(MPI_COMM_WORLD);
@@ -159,6 +160,9 @@ if (my_rank !=0){
 	}
 	if(my_rank == 0){
 		MPI_Barrier(MPI_COMM_WORLD);
+	}
+	else{
+	    printf("this path does not contain a barrier\n");
 	}
 	
 	if(x < 3){
@@ -178,7 +182,7 @@ the loop,
 and the other in the barrier() function called in the else clause) match to each other. 
 The second branch (<code>if(my_rank == 0)</code>)
 contains an error because some tasks would execute the barrier in it, while the
-other tasks would skip it. 
+other tasks would skip it. The else clause here is added for emphasis.
 The next branch (<code>if(x<3)</code>) does not make a decision based on processor
 rank (x does not depend on rank) so processes should proceed similar to each other.
 The loop (<code>while(x < my_rank)</code>)

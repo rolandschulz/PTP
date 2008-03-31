@@ -3,6 +3,9 @@
 <title>
 Running PTP OpenMP Tools Plug-in
 </title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<script type="text/javascript" src="thumb.js"> </script>
+	</head>
 <body>
 <h1> Running PTP OpenMP Tools </h1>
 <p>For the most part, the OpenMP tools are similar to the MPI
@@ -25,8 +28,8 @@ specific functions uniquely for OpenMP development:
 
 
 <h2 id="pragma">Show #pragma regions</h2>
-<img src="images/ptp-openMPpragmaAnn.gif">
-<br>
+<p><script> thumb("images/ptp-openMPpragmaAnn.gif",300)</script>
+</p>
 <p>In the example screenshot above, OpenMP analysis has been run
 on the source file and two artifacts were found, one API and
 one #pragma.  
@@ -55,7 +58,7 @@ The result includes all highlighted statements between the two barriers.  But be
 
 
 <h2 id="prob">Show Common OpenMP Problems</h2>
-<p><img src="images/ptp-openMPproblems.gif"> 
+<p><script> thumb("images/ptp-openMPproblems.gif",300)</script>
 <p>Along with the analysis for finding OpenMP artifacts,
 common problems are also located, and shown in the OpenMP Problems view.
 <p>Types of problems recognized include:
