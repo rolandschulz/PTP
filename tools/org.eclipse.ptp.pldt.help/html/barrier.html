@@ -51,6 +51,8 @@ predicate, and they will choose the same way to go.
 <h2>Running Barrier Analysis</h2>
 <p>To run the barrier analysis, select a project, container, or source file in the Project Explorer view, 
 and click the  MPI barrier analysis action in the PLDT icon menu. 
+Note that this simple example has all code in a single file, but by running the analysis on a 
+container (folder) or the entire project, inter-procedural barriers from other included files are also considered.
 <br><script> thumb("images/barrierActionAnn.gif",300)</script>
 <p>The barrier analysis produces three views of information:
 <ul>
