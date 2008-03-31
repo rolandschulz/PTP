@@ -8,20 +8,18 @@ void barrier(){
 	MPI_Barrier(MPI_COMM_WORLD);
 }
 
-int main(int argc, char* argv[]){
-	//printf("Hello MPI World the original.\n");	
+int main(int argc, char* argv[]){	
 	int  my_rank; /* rank of process */
 	int  p;       /* number of processes */
 	int source;   /* rank of sender */
 	int dest;     /* rank of receiver */
 	int tag=0, x = 3;    /* tag for messages */
-	char message[100], *tmp;        /* storage for message */
+	char message[100];        /* storage for message */
 	MPI_Status status ;   /* return status for receive */
 	 
 	/* start up MPI */
 	
 	MPI_Init(&argc, &argv);
-	//MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 	
 	/* find out process rank */
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); 
