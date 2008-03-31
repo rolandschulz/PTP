@@ -23,7 +23,7 @@
 <h2 id="feat">The PTP Debug perspective</h2>
 <p>The <b>PTP Debug perspective</b> is used when debugging a parallel application. The default behavior is to switch to the perspective when a <a href="04pLaunchConfigDebug.html">debug session is launched</a>. Experienced Eclipse users will notice that many of the views are similar to those available in the CDT <b>Debug perspectives</b>. Please refer to the <b>C/C++ Development User Guide</b> for a description of these views.</p>
 
-<p><script> thumb("../images/06ptpDebugPersp.png",240) </script></p>
+<p><script> thumb("images/06ptpDebugPersp.png",240) </script></p>
 <p>This image shows a typical debug session. In the upper left of the perspecitve is the <b>Parallel Debug view</b> which shows the processes associated with the job, and allows bulk control of the processes. Underneath this is the <b>Debug view</b> which is the standard view showing process threads and stack frames. The source window shows a current line marker, which represents the current location of all 64 processes. In the upper right, the <b>Variables view</b> is showing the variables from the processes currently selected in the <b>Debug view</b>. There are also a number of other views available for setting breakpoints, manipulating signals, etc. Below this is the standard <b>Outline view</b>. At the very bottom are the standard <b>Problems</b>, <b>Console</b>, and <b>Memory</b> views.</p>
 
 <h2 id="pSets">Process Sets</h2>
@@ -36,11 +36,11 @@ A job can have any number of process sets, and a set can contain from 1 to the
 number of processes in a job. Process sets from the same job can contain overlapping sets of processes. This is
 shown in the following diagram.</p>
 
-<p><script> thumb("../images/06pSets.png",100)</script></p>
+<p><script> thumb("images/06pSets.png",100)</script></p>
 
 <p>Debug commands on the <b>Parallel Debug view</b> toolbar always apply to the <i>current process set</i>, which is the set of processes that is visible in the view.</p>
 
-<p><script> thumb("../images/06parallelDebugViewCmds.png",100)</script></p>
+<p><script> thumb("images/06parallelDebugViewCmds.png",100)</script></p>
 
 <h2 id="pSetsOper">Operations on Process sets</h2>
 
@@ -48,7 +48,7 @@ shown in the following diagram.</p>
 to create, modify, and delete process sets, and to change
 the current process set.</p>
 
-<p><script> thumb("../images/06parallelDebugViewSets.png",100)</script></p>
+<p><script> thumb("images/06parallelDebugViewSets.png",100)</script></p>
 
 
 <h2 id="pSetsCreate">Managing Process Sets</h2>
@@ -60,34 +60,34 @@ select a contiguous region, or separate processes, respectively.</p>
 
 <p>For example, to select a rectangular set of processes:</p>
 
-<p><script> thumb("../images/06pSetSelect.png")</script></p>
+<p><script> thumb("images/06pSetSelect.png")</script></p>
 
-<p>Once the processes have been selected, create a process set clicking on the <b>Create Set button</b> <img src="../images/06createProcessSetIcon.png">.</p>
+<p>Once the processes have been selected, create a process set clicking on the <b>Create Set button</b> <img src="images/06createProcessSetIcon.png">.</p>
 
-<p><script> thumb("../images/06selectProcessSetCreate.png")</script></p>
+<p><script> thumb("images/06selectProcessSetCreate.png")</script></p>
 
 <p>To add processes to an existing process set, select the processes you wish to add and click on
-the down-arrow <img src="../images/06downArrowSelect.png"> to the right of the icon:</p>
+the down-arrow <img src="images/06downArrowSelect.png"> to the right of the icon:</p>
 
-<p><script> thumb("../images/06selectProcessSetCreateAdd.png", 80)</script></p>
+<p><script> thumb("images/06selectProcessSetCreateAdd.png", 80)</script></p>
 
 
 <p>To change the current process set, select the <b>Change Set button</b>
-<img src="../images/06pSetChooseIcon.png">
-and choose from the list via the down-arrow <img src="../images/06downArrowSelect.png">, or 
+<img src="images/06pSetChooseIcon.png">
+and choose from the list via the down-arrow <img src="images/06downArrowSelect.png">, or 
 click on the button itself to cycle through the sets.</p>
 
-<p><script> thumb("../images/06pSetChange.png")</script></p>
+<p><script> thumb("images/06pSetChange.png")</script></p>
 
 <p>To remove processes from the <i>current set</i>, select the processes 
 as described above, and click the
 <b>Remove Elements button</b>.</p>
 
-<p><script> thumb("../images/06pSetRemove.png", 100)</script></p>
+<p><script> thumb("images/06pSetRemove.png", 100)</script></p>
 
 <p>Select the <b>Delete Set button</b> to delete the current process set:</p>
 
-<p><script> thumb("../images/06pSetDelete.png", 100)</script></p>
+<p><script> thumb("images/06pSetDelete.png", 100)</script></p>
 
 <h2 id="bkpt">Breakpoints</h2>
 <p>PTP has a special type of breakpoint known as a <i>parallel breakpoint</i>. These breakpoints differ from normal breakpoints because they apply to a set of processes instead of a single process (or thread). There are two types of parallel breakpoints:</p>
@@ -95,14 +95,14 @@ as described above, and click the
 <ul>
 <li><p><i>Global breakpoints</i> apply to <i>all</i> processes in <i>any</i> job. A global breakpoint remains in effect between job launches. Typically, a global breakpoint is used for gaining control of an application at a predetermined point. Global breakpoints are identified by a parallel breakpoint icon with a small <code>G</code> in the upper left corner:</p>
 
-<p><script> thumb("../images/06globalBreakpoint.png",60)</script></p> 
+<p><script> thumb("images/06globalBreakpoint.png",60)</script></p> 
 </li>
 
 <li><p><i>Set Breakpoints </i> apply only to a <i>specific set</i> of processes
 (which can include the root set) for a <i>single</i> job. When the job completes,
 these breakpoints are removed.</p>
 
-<p><script> thumb("../images/06setBreakpoint.png",60)</script></p> 
+<p><script> thumb("images/06setBreakpoint.png",60)</script></p> 
 </li>
 <p>Set breakpoints can be one of three colors:<p>
 <ul>
@@ -117,7 +117,7 @@ To create a breakpoint, double-click on the left edge of
 an editor window, at the line on which you want to set the breakpoint.
 You can also right-click and use the <b>Parallel Breakpoint &gt; Toggle breakpoint</b> context menu.</p>
 
-<p><script> thumb("../images/06bkptSetContext.png")</script></p> 
+<p><script> thumb("images/06bkptSetContext.png")</script></p> 
 
 <p>A global breakpoint is created if no jobs are selected in the <b>Parallel Debug view</b>.
 If a job is selected, the breakpoint will apply to the current set.</p>
@@ -126,21 +126,21 @@ If a job is selected, the breakpoint will apply to the current set.</p>
 
 <p>There are a number of ways to find out more information about a breakpoint, such as the source file, line and process set it applies to. Placing the mouse over a breakpoint will display a tooltip popup:</p>
 
-<p><script> thumb("../images/06bkptHover.png", 80)</script></p> 
+<p><script> thumb("images/06bkptHover.png", 80)</script></p> 
 
 <p>The <b>Breakpoints view</b> can be used to see all breakpoints that have been created: </p>
 
-<p><script> thumb("../images/06bkptsView.png")</script></p> 
+<p><script> thumb("images/06bkptsView.png")</script></p> 
 
 <p>Use <b>Show &gt; Parallel Breakpoint Set</b> in the menu on the <b>Breakpoints view</b> toolbar to group breakpoints
 by the process set they apply to:</p>
 
-<p><script> thumb("../images/06bkptsViewMenu.png")</script></p> 
+<p><script> thumb("images/06bkptsViewMenu.png")</script></p> 
 
 <p>For example the above selection will list the breakpoints
 by process set:</p>
 
-<p><script> thumb("../images/06bkptsViewByProcessSet.png")</script></p> 
+<p><script> thumb("images/06bkptsViewByProcessSet.png")</script></p> 
 
 <h2 id="cip">Current Instruction Pointer</h2>
 <p>The current instruction pointer is used to show the current
@@ -152,20 +152,20 @@ In parallel programs, there is an instruction pointer for every process.</p>
 <i>every group of processes at the same location</i>. In the following example, there are processes suspended
 at three different locations in the program.</p>
 
-<p><script> thumb("../images/06mip.png")</script></p> 
+<p><script> thumb("images/06mip.png")</script></p> 
 
 <p><i>The group of processes represented by an instruction pointer
 is not necessarily the same as a process set.</i></p>
 
 <p>Different markers are used to indicate the types of processes stopped at that location (the different types will be discussed below):</p>
 <ul>
-<li><p><img src="../images/06ipReg.png">Registered processes marker</p></li>
-<li><p><img src="../images/06ipUnreg.png">Un-registered processes marker</p></li>
-<li><p><img src="../images/06ipMult.png">Marker indicating a combination of registered and un-registered processes</p></li>
+<li><p><img src="images/06ipReg.png">Registered processes marker</p></li>
+<li><p><img src="images/06ipUnreg.png">Un-registered processes marker</p></li>
+<li><p><img src="images/06ipMult.png">Marker indicating a combination of registered and un-registered processes</p></li>
 </ul>
 
 <p>Placing the mouse over an instruction pointer provides additional information about the processes suspended at that location:</p>
-<p><script> thumb("../images/06cipHover.png", 80)</script></p> 
+<p><script> thumb("images/06cipHover.png", 80)</script></p> 
 
 <h2 id="reg">Process Registration and the Debug View</h2> 
 
@@ -173,14 +173,14 @@ is not necessarily the same as a process set.</i></p>
 
 <p>Any number of processes can be registered, and processes can be registered or un-registered at any time. To register a process, double-click its process icon in the <b>Parallel Debug view</b>. A black box will be shown around the process icon to indicate that it has been registered. At the sime time, the process will appear in the <b>Debug view</b>.</p>
 
-<p><script> thumb("../images/06reg1.png",240) </script></p>
+<p><script> thumb("images/06reg1.png",240) </script></p>
 
 <p>To un-register a process, double-click on the same process icon. The box disappears, and the process is removed from the debug view.</p>
 
 <p>The <b>Debug view</b> also provides a set of debug commands (resume, pause, step over, etc.) that apply to the <i>currently selected process</i> in the view. This provides a convenient means of controlling individual processes.</p>
 
 <h2 id="finish">Terminating Execution</h2>
-<p>At the end of a debug session, it is necessary to terminate the execution of the job. To do this, click on the terminate icon <img src="../images/06terminateAll.png"> in the <b>Parallel Debug view</b>.  Note that the terminate icon in the <b>Debug view</b> <img src="../images/06terminate.png"> will only terminate the currently selected process in that view.</p>
+<p>At the end of a debug session, it is necessary to terminate the execution of the job. To do this, click on the terminate icon <img src="images/06terminateAll.png"> in the <b>Parallel Debug view</b>.  Note that the terminate icon in the <b>Debug view</b> <img src="images/06terminate.png"> will only terminate the currently selected process in that view.</p>
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
