@@ -42,7 +42,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class AnalysisDropdownHandler extends AbstractHandler implements ISelectionListener {
 	static protected RunAnalyseHandler lastAnalysisHandler=null;
 	static protected IStructuredSelection lastAnalysisSelection=null;
-	protected IStructuredSelection lastSelection;
+	protected IStructuredSelection lastSelection=null;
 	protected static AnalysisDropdownHandler instance=null;
 	private static final boolean traceOn=false;
 
@@ -130,6 +130,9 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	 * @return
 	 */
 	public static AnalysisDropdownHandler getInstance() {
+		if(instance==null) {
+			instance=new AnalysisDropdownHandler();
+		}
 		return instance;
 	}
 
