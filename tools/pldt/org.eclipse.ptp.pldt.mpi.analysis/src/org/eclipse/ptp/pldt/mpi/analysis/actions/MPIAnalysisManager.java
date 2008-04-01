@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.pldt.mpi.analysis.actions;
 
+import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierAnalysisResults;
@@ -36,7 +37,11 @@ public class MPIAnalysisManager{
 		cg_ = cg;
 	}
 	
-	public void run()
+	/**
+	 * Runs analysis and returns true if any errors were found
+	 * @return
+	 */
+	public boolean run()
 	{	
 		cg_.buildCG();
 		//cg_.print();
@@ -84,7 +89,10 @@ public class MPIAnalysisManager{
 		msv.run();
 		
 		ShowErrors se = new ShowErrors(bm.getErrors());
-		se.run();	
+		boolean foundError = se.run();	
+
+		return foundError;
+		
 	}
 
 }
