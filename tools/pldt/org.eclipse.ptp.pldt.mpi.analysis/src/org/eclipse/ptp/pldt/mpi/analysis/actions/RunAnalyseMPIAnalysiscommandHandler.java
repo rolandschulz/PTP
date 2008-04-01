@@ -44,12 +44,12 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	}
 
 	/** 
-	 * Execute the action for the event
+	 * Execute the action for MPI barrier analysis
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		
+		boolean foundError=false;
 		getSelection(event);
 		AnalysisDropdownHandler.setLastHandledAnalysis(this,selection);
 		if ((selection == null) || selection.isEmpty()) {
@@ -59,6 +59,8 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			return null;
 		} else {
 			callGraph_ = new MPICallGraph();
+			//int numFiles=this.countFilesSelected();
+			// BRT use numfiles for a progress monitor?
 
 			for(Iterator iter = selection.iterator(); iter.hasNext();){
 				Object obj =  iter.next();
@@ -73,11 +75,48 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 				}
 			} // end for
 			MPIAnalysisManager manager = new MPIAnalysisManager(callGraph_);
-			manager.run();
+			foundError=manager.run();
 		}
 		ViewActivater.activateView(IDs.matchingSetViewID);
+		ViewActivater.activateView(IDs.barrierViewID);
+		// if error found, assure its view has focus
+		if(foundError) {
+			ViewActivater.activateView(IDs.errorViewID);
+		}
 		return null;
 	}
+	
+/*	//ProgressMonitorDialog example?
+public Object execute2(ExecutionEvent event) throws ExecutionException {
+		int numFiles=this.countFilesSelected();
+		// batch ws modifications *and* report progress
+		WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
+			@Override
+			protected void execute(IProgressMonitor monitor)
+					throws CoreException, InvocationTargetException,
+					InterruptedException {
+				err = runResources(monitor, indent, includes);
+			}
+		};
+		ProgressMonitorDialog pmdialog = new ProgressMonitorDialog(
+				shell);
+		try {
+			pmdialog.run(true, true, wmo); // fork=true; if false, not
+											// cancelable
+
+		} catch (InvocationTargetException e) {
+			err = true;
+			System.out.println("Error running analysis: ITE: "
+					+ e.getMessage());
+			System.out.println("  cause: " + e.getCause() + " - "
+					+ e.getCause().getMessage());
+			Throwable th = e.getCause();
+			th.printStackTrace();
+		} catch (InterruptedException e) {
+			cancelledByUser = true;
+		}
+	}
+	*/
 	/**
 	 * Run analysis (collect resource info in the call graph) on a resource (e.g. File or Folder) 
 	 * <br>Will descend to members of folder
@@ -92,8 +131,9 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 
 		if (resource instanceof IFile) {
 			try{
-				resource.deleteMarkers(IMarker.PROBLEM, 
-						true, IResource.DEPTH_INFINITE);
+				// BRT barrierMarker change to non-problem marker here?
+				resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+				//resource.deleteMarkers(IDs.errorMarkerID,true,IResource.DEPTH_INFINITE);
 			} catch(CoreException e){
 				//System.out.println("RM: exception deleting markers.");
 				//e.printStackTrace();
