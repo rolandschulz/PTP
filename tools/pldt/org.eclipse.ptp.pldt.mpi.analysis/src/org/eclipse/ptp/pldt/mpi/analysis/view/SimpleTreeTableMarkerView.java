@@ -27,10 +27,13 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
@@ -111,6 +114,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	private Action filterAction;
 
 	private Action doubleClickAction;
+	protected Action removeMarkerAction;
 
 	private static final boolean traceOn = false;
 
@@ -376,6 +380,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		/**
 		 * Get the list of objects to populate this view.
 		 */
+		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object parent) {
 			ArrayList list = new ArrayList();
 			Object[] objs = null;
@@ -1335,6 +1340,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(infoAction);
+		//manager.add(removeMarkerAction); // BRT barrierMarker - put remove marker action in here
 	}
 
 	/**
@@ -1345,6 +1351,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		makeShowInfoAction();
 		makeFilterAction();
 		makeDoubleClickAction();
+		//makeRemoveMarkerAction(); // BRT barrierMarker removeMarkerAction
 	}
 
 	/**
@@ -1601,6 +1608,47 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		}
 		return result;
 
+	}
+
+	/**
+	 * Make "remove marker" action to display remove barrier markers and barrier error markers
+	 */
+	protected void makeRemoveMarkerAction() {
+		removeMarkerAction = new Action() {
+			public void run() {
+				// batch changes so we get only one resource change event
+				final IWorkspaceRoot wsResource = ResourcesPlugin.getWorkspace().getRoot();
+				
+				IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+					public void run(IProgressMonitor monitor)
+							throws CoreException {
+						try {
+							int depth = IResource.DEPTH_INFINITE;
+							wsResource.deleteMarkers(IDs.barrierMarkerID,false, depth);
+							wsResource.deleteMarkers(IDs.errorMarkerID, false, depth);
+							if (traceOn)System.out.println("markers removed.");
+
+						} catch (CoreException e) {
+							System.out.println("STTMV: exception deleting BARRIER markers.");
+						}
+					}
+				};
+					try {
+						runnable.run(null);
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	
+				 
+			}//end run()
+		};// end new action
+		removeMarkerAction.setText("Remove Markers");
+		removeMarkerAction.setToolTipText("Remove Markers");
+		removeMarkerAction.setImageDescriptor(PlatformUI.getWorkbench()
+				.getSharedImages().getImageDescriptor(
+						ISharedImages.IMG_TOOL_DELETE));// nice "red X" image
+	
 	}
 
 	/**
