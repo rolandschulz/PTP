@@ -29,6 +29,7 @@ import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
 import org.eclipse.cdt.core.dom.ast.IASTStatement;
 import org.eclipse.cdt.core.dom.ast.IASTSwitchStatement;
 import org.eclipse.cdt.core.dom.ast.IASTWhileStatement;
+import org.eclipse.cdt.internal.core.dom.parser.c.CASTCompoundStatement;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -69,6 +70,7 @@ public class MPIBarrierMatching {
 	}
 	
 	public void run(){
+		boolean errorAlreadyReported=false;
 		for(ICallGraphNode n = cg_.botEntry(); n != null; n = n.botNext()){
 			MPICallGraphNode node = (MPICallGraphNode)n;
 			if(!node.marked || !node.barrierRelated()) continue;
@@ -81,10 +83,14 @@ public class MPIBarrierMatching {
 				BarrierExpression be = barrierExpr.get(currentComm_);
 				error = false;
 				fixedLength(be);
-				if(error){
-					String errorMsg = "Found barrier synchronization error(s)!";
-					MessageDialog.openInformation(ShowMatchSet.getStandardDisplay().getActiveShell(), 
-							"MPI Barrier Analysis", errorMsg);
+				if(error){// BRT this reports an error dialog for *each* barrier matching error found!
+					if (!errorAlreadyReported) {
+						errorAlreadyReported=true;
+						String errorMsg = "Found barrier synchronization error(s)!";
+						MessageDialog.openInformation(ShowMatchSet
+								.getStandardDisplay().getActiveShell(),
+								"MPI Barrier Analysis", errorMsg);
+					}
 					
 				}
 				findMatches(be);
@@ -135,7 +141,7 @@ public class MPIBarrierMatching {
 			}
 		}
 		else if(OP.getOperator() == BarrierExpressionOP.op_branch){
-			/* TODO: special treatment for conditional expression */
+			/* need special treatment for conditional expression */
 			BarrierExpression oprd1 = BE.getOP1();
 			BarrierExpression oprd2 = BE.getOP2();
 			fixedLength(oprd1);
@@ -221,7 +227,9 @@ public class MPIBarrierMatching {
 		}
 		
 		try{
+			// BRT barrierMarker change to problem marker here?
 			IMarker m = currentFunc_.getResource().createMarker(IMarker.PROBLEM);
+			//IMarker m = currentFunc_.getResource().createMarker(IDs.errorMarkerID);
 			m.setAttribute(IMarker.LINE_NUMBER, line);
 			m.setAttribute(IMarker.MESSAGE, "Barrier Synchronization Error");
 			m.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
@@ -470,6 +478,19 @@ public class MPIBarrierMatching {
 			}
 			else {
 				System.out.println("MPIBarrierMatching.getSourceInfo().. ! More than one IASTNodeLocation !");
+				// CASTCompoundStatement causes this.  Probably ok? assuming it descends into the child nodes
+				if(traceOn) {
+				if(node instanceof CASTCompoundStatement) {
+					CASTCompoundStatement cstmt = (CASTCompoundStatement)node;
+					System.out.println("Compound stmt: "+cstmt.getRawSignature());
+					IASTNodeLocation[] locs = cstmt.getNodeLocations();
+					for (int i = 0; i < locs.length; i++) {
+						IASTNodeLocation loc = locs[i];
+						System.out.println("  subnode: "+loc.toString());			
+					}
+				}
+					
+				}
 			}
 			return sourceInfo; 
 		}
