@@ -20,43 +20,54 @@
 Please make sure this feature is installed before continuing.
 
 <ol>
-<li><p>Switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose <b>C/C++</b></p></li>
-<li><p>Create a new MPI project using the managed build facility. Select <b>File &gt; New &gt; C Project ...</b> and the <b>New Project</b> dialog should open.</p></li>
-<li><p>Enter a name for the project e.g. MyMPIProject.</p></li>
-<li><p>From the <b>Project types</b> list, expand <b>Executable</b> and select <b>MPI Hello World C Project</b></p>
-<p><script> thumb("images/01newMPIproject.png")</script></p>
+<li><p>Switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose <b>C/C++</b></p><p><br></p></li>
+<li><p>Create a new MPI project using the managed build facility. Select <b>File &gt; New &gt; C Project ...</b> and the <b>New Project</b> dialog should open.</p><p><br></p></li>
+<li><p>Enter a name for the project e.g. MyMPIProject.</p><p><br></p></li>
+<li><p>From the <b>Project types</b> list, expand <b>Executable</b> and select <b>MPI Hello World C Project</b></p><p><br></p>
+<p><script> thumb("images/01newMPIproject.png")</script></p><p><br></p>
 </li>
-<li><p>In the <b>Basic Settings</b> dialog, fill in the author name and change any other values you like.</p>
-<p><script> thumb("images/01projBasicSettings.png")</script></p>
-<p>Click <b>Next</b>.</p></li>
+<li><p>In the <b>Basic Settings</b> dialog, fill in the author name and change any other values you like.</p><p><br></p>
+<p><script> thumb("images/01projBasicSettings.png")</script></p><p><br></p>
+<p>Click <b>Next</b>.</p><p><br></p></li>
 </ol>
 
 <h2 id="configure">Step 2: Configure the project to use MPI</h2>
+<p></p>
 <ol>
 <li><p>In the <b>MPI Project Settings</b> dialog, make sure <b>Add MPI Project settings to this project</b> is checked.
 You can uncheck <b>Use default information</b> if you need to change any values for include paths, libraries or search path,
-or MPI build commands.</p>
-<p><script> thumb("images/01mpiProjSettings.png")</script></p>
-<p>Click <b>Finish</b>.</p></li>
-<li><p>The new project is created and appears in the <b>C/C++ Projects</b> view. Expand the <b>src</b> folder to see the new source file.</p>
+or MPI build commands.</p><p><br></p>
+<p><script> thumb("images/01mpiProjSettings.png")</script></p><p><br></p>
+<p>Click <b>Finish</b>.</p><p><br></p></li>
+<li><p>The new project is created and appears in the <b>C/C++ Projects</b> view. Expand the <b>src</b> folder to see the new source file.</p><p><br></p>
 <p><script> full("images/01proj.png") </script></p>
 </li>
 </ol>
 
 <h2 id="build">Step 3: Build the executable</h2>
+<p></p>
 <ol>
-<li><p>Assuming that you have MPI installed and that the project was configured correctly, the application should now autmatically build. When the automatic build setting is selected, Eclipse will build the application whenever you save changes in an editor. Automatic/manual build can be toggled by selecting <b>Project &gt; Build Automatically...</b>. When manual build is selected, a build can be initiated using <b>Project &gt; Build All</b>.</p></li>
-<li><p>Once the build is complete, any errors will be dislayed in the <b>Problems view</b>, the corresponding source files will be flagged, and markers will be insterted into the editor window.</p></li>
-<li><p>Double-click on the source file name to open the C/C++ editor in order to correct any errors.</p>
-<p><script> thumb("images/01wbSrcEditor.png") </script></p>
+<li><p>Assuming that you have MPI installed and that the project was configured correctly, the application should now autmatically build. When the automatic 
+build setting is selected, Eclipse will build the application whenever you save changes in an editor. 
+Automatic/manual build can be toggled by selecting <b>Project &gt; Build Automatically...</b>. When 
+manual build is selected, a build can be initiated using <b>Project &gt; Build All</b>.</p><p><br></p></li>
+<li><p>Once the build is complete, any errors will be dislayed in the <b>Problems view</b>, the 
+corresponding source files will be flagged, and markers will be insterted into the editor window.</p><p><br></p></li>
+<li><p>Double-click on the source file name to open the C/C++ editor in order to correct any errors.</p><p><br></p>
+<p><script> thumb("images/01wbSrcEditor.png") </script></p><p><br></p>
 </li>
-<li><p>Details of the commands that were executed to complete the build can be seen in the <b>Console view</b> (click on the <b>Console</b> tab near the bottom right hand corner of the Eclispe workbench.)</p></li>
+<li><p>Details of the commands that were executed to complete the build can be seen in the <b>Console 
+view</b> (click on the <b>Console</b> tab near the bottom right hand corner of the Eclispe 
+workbench.)</p></li>
 </ol>
 
 <h2 id="launch">Step 4: Launch the program</h2>
+<p></p>
 <ol>
-<li><p>Before launching the program, you will need to <i>create</i> and <i>start</i> a <a href="02resMgrSetup.html">Resource Manager</a></p></li>
-<li><p>Once you have verified that the resource manager is operating correctly, you can then <a href="03pLaunchConfig.html">create a configuration and launch the parallel program.</a></p></li>
+<li><p>Before launching the program, you will need to <i>create</i> and <i>start</i> a 
+<a href="02resMgrSetup.html">Resource Manager</a></p><p><br></p></li>
+<li><p>Once you have verified that the resource manager is operating correctly, you can then 
+<a href="03pLaunchConfig.html">create a configuration and launch the parallel program.</a></p></li>
 </ol>
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
