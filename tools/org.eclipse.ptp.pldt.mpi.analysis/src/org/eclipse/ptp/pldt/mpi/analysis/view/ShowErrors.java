@@ -26,6 +26,12 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierMatching.ErrorMessage;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierMatching.PathNode;
 
+/**
+ * For the list of ErrorMessage objects given to this class,
+ * iterate through them and create parent and child node groups of
+ * markers for each error.
+ *
+ */
 public class ShowErrors {
 	protected List<ErrorMessage> errors_;
 	protected int counter = 0;
@@ -33,8 +39,13 @@ public class ShowErrors {
 	public ShowErrors(List<ErrorMessage> errors){
 		this.errors_ = errors;
 	}
-	
-	public void run(){
+	/**
+	 * 
+	 * @return true if errors found
+	 */
+
+	public boolean run(){
+		boolean foundErrors=false;
 		IWorkspaceRoot wsResource = ResourcesPlugin.getWorkspace().getRoot();
 		try {
 			int depth = IResource.DEPTH_INFINITE;
@@ -65,7 +76,7 @@ public class ShowErrors {
 			SourceInfo sourceInfo = err.getSourceInfo();
 			ArtifactWithParent ea = new ArtifactWithParent(fileName, 
 					sourceInfo.getStartingLine(), 1, 
-					funcName, "Errorous Condition", sourceInfo, 0, condID, "Error", 0);
+					funcName, "Erroneous Condition", sourceInfo, 0, condID, "Error", 0);
 			sr.addArtifact(ea);
         	visitor.visitFile(err.getResource(), sr.getArtifactList());
         	
@@ -112,6 +123,8 @@ public class ShowErrors {
 	        	fileName = barrier.getFileName();
 	        	funcName = barrier.getEnclosingFunc();
 	        	String barrierName = (String)null;
+	        	// BRT Note! This is where the barrier matching set labels are.
+	        	// Consider changing the parent node to "Barrier Set"
 	        	if(pn.isRepeat())
 	        		barrierName = "Barrier " + (barrier.getID() -4) + "(*)";
 	        	else
@@ -149,7 +162,12 @@ public class ShowErrors {
 
         // Done creating markers, now show the views
         ViewActivater.activateView(IDs.matchingSetViewID);
-        ViewActivater.activateView(IDs.errorViewID);
+        if(errors_.size()>0) {
+        	ViewActivater.activateView(IDs.errorViewID);
+        	foundErrors=true;
+        }
+        return foundErrors;
+        
 	}
 
 }
