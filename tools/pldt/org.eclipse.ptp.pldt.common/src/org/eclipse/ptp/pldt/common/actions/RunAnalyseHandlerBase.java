@@ -21,7 +21,6 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -280,58 +279,6 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		}
 		monitor.done();
 		return foundError;
-	}
-
-	/**
-	 * Counts the number of files in the selection (leaf nodes only - Files -
-	 * not the directories/containers) <br>
-	 * Note that this makes no distinction about what type of files.
-	 * 
-	 * @return number of files
-	 */
-	@SuppressWarnings("unchecked")
-	protected int countFilesSelected() {
-		int count = 0;
-		// Get elements of a possible multiple selection
-		Iterator iter = this.selection.iterator();
-		while (iter.hasNext()) {
-			Object obj = (Object) iter.next();
-			// It can be a Project, Folder, File, etc...
-			if (obj instanceof IAdaptable) {
-				final IResource res = (IResource) ((IAdaptable) obj)
-						.getAdapter(IResource.class);
-				count = count + countFiles(res);
-			}
-		}
-		// System.out.println("number of files: " + count);
-		return count;
-	}
-
-	/**
-	 * Count the number of files in this resource (file or container).
-	 * 
-	 * @param res
-	 * @return
-	 */
-	protected int countFiles(IResource res) {
-		if (res instanceof IFile) {
-			return 1;
-		} else if (res instanceof IContainer) {
-			int count = 0;
-
-			try {
-				IResource[] kids = ((IContainer) res).members();
-				for (int i = 0; i < kids.length; i++) {
-					IResource child = kids[i];
-					count = count + countFiles(child);
-				}
-				return count;
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return 0;
 	}
 
 	abstract protected void activateArtifactView();
