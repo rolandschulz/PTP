@@ -34,47 +34,58 @@
 <p>Resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running Eclipse. A remote resource manager controls resources on a physically remote system. The process of configuring a local or remote resource manager is the same.</p>
 
 <h2 id="creat">Step 1: Creating a resource manager</h2>
-
+<p></p>
 <ol>
-<li><p>Open the <b>PTP Runtime Perspective</b> using <b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>PTP Runtime</b> from the list of perspectives.</p>
-<p><script> thumb("images/02RuntimePerspEmpty.png")</script></p>
+<li><p>Open the <b>PTP Runtime Perspective</b> using 
+<b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>PTP Runtime</b> from the 
+list of perspectives.</p><p><br></p>
+<p><script> thumb("images/02RuntimePerspEmpty.png")</script></p><p><br></p>
 </li>
 <li><p>Right-click in <b>Resource Managers</b> view and select 
-<b>Add Resource Manager...</b></p>
-<p><script> full("images/02addResMgr.png") </script></p>
+<b>Add Resource Manager...</b></p><p><br></p>
+<p><script> full("images/02addResMgr.png") </script></p><p><br></p>
 </li>
-<li><p>Choose the resource manager that corresponds to the target system. In this example we will use the <b>ORTE</b> resource manager, which is used to control the Open MPI Open Runtime Environment.</p>
-<p><script> thumb("images/02chooseResMgrType.png",200) </script></p></li>
+<li><p>Choose the resource manager that corresponds to the target system. In this example we 
+will use the <b>ORTE</b> resource manager, which is used to control the Open MPI Open Runtime 
+Environment.</p><p><br></p>
+<p><script> thumb("images/02chooseResMgrType.png",200) </script></p><p><br></p></li>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
 
 <h2 id="local">Step 2a: Configuring a local resource manager</h2>
 <p>In this
-example, we will show how to configure PTP to use a local resource manager, for example, where Eclipse is installed on the 
+example, we will show how to configure PTP to use a local resource manager, for example, 
+where Eclipse is installed on the 
 head node of a cluster.  This was the
 scenario that PTP 1.x handled.</p>
 <p>The <b>ORTE Proxy Configuration</b> dialog is used to configure how Eclipse will communicate with the resource manager. </p>
 <p><script> thumb("images/02ORTEProxyConn2local.png",240) </script></p>
 
 <ol>
-<li><p>To configure the simple case of a local resource manager, select <b>Local</b> as the <b>Remote service provider</b>.</p></li>
-<li><p>For the local case, the <b>Proxy server location</b> will be automatically set to <b>Local</b>.</p></li>
+<li><p>To configure the simple case of a local resource manager, select <b>Local</b> as 
+the <b>Remote service provider</b>.</p><p><br></p></li>
+<li><p>For the local case, the <b>Proxy server location</b> will be automatically set to 
+<b>Local</b>.</p><p><br></p></li>
 <li>
   <p>The <b>Path to proxy executable</b> should already contain a path that points to the <code>ptp_orte_proxy</code> executable file in
 your local Eclipse installation. If not, you will need to navigate to your Eclipse installation's 
 <code>plugins/org.eclipse.ptp.<i>os.arch_version</i>/bin</code> directory, where <code><i>os.arch_version</i></code> is your operating system 
 (<code>linux</code>, <code>macosx</code>, or <code>aix</code>), architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and
- version number of the plugin (e.g. <code>2.0.0.200803261107</code>).</p>
+ version number of the plugin (e.g. <code>2.0.0.200803261107</code>).</p><p><br></p>
 </li>
-<li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager documentation instructs otherwise.</p></li>
+<li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager 
+documentation instructs otherwise.</p><p><br></p></li>
 <li>
-  <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection if necessary. For the local case, it is not required, and <b>None</b> should be selected.</p>
+  <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection 
+  if necessary. For the local case, it is not required, and <b>None</b> should be selected.</p><p><br></p>
 </li>
-<li><p>The <b>Local address for proxy connection</b> should be set to the address of your local machine (it's host name, IP address, or <code>localhost</code>).</p></li>
+<li><p>The <b>Local address for proxy connection</b> should be set to the address of your local machine 
+(it's host name, IP address, or <code>localhost</code>).</p><p><br></p></li>
 <li>
-  <p>The <b>Launch server manually</b> checkbox is used for debugging purposes and should be left unchecked.</p>
+  <p>The <b>Launch server manually</b> checkbox is used for debugging purposes and should be 
+  left unchecked.</p><p><br></p>
 </li>
-<li><p>Select <b>Next &gt;</b>
+<li><p>Select <b>Next &gt;</b></p>
 </ol>
 
 <h2 id="remote">Step 2b: Configuring a remote resource manager</h2>
@@ -91,42 +102,59 @@ only reason to use RSE rather than Remote Tools is if your remote system does no
 or you wish to use the additional functionality that RSE provides. See the RSE documentation
 for more information. We will only consider Remote Tools here, but the steps for configuring RSE are similar.
 
+<p></p>
 <ol>
 <li><p>In the <b>ORTE Proxy Configuration</b> dialog, 
-select <b>Remote Tools</b> as the <b>Remote service provider</b>.</p>
-<p><script> thumb("images/02newORTEproxyRemote.png") </script></p>
+select <b>Remote Tools</b> as the <b>Remote service provider</b>.</p><p><br></p>
+<p><script> thumb("images/02newORTEproxyRemote.png") </script></p><p><br></p>
 </li>
-<li><p>At this point, you need to configure a <b>Proxy server location</b>. This will differ depending on the remote service provider that
-you selected in the previous step. The following steps describe configuring a <b>Remote Tools</b> location.</p>
+<li><p>At this point, you need to configure a <b>Proxy server location</b>. This will differ 
+depending on the remote service provider that
+you selected in the previous step. The following steps describe configuring a <b>Remote Tools</b> 
+location.</p><p><br></p>
 </li>
-<ol>
-<li><p>Select <b>New...</b></p></li>
-<li><p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> field (can be anything).</p>
-<p><script> thumb("images/02newRemoteHost.png") </script></p>
+<ol type="a">
+<li><p>Select <b>New...</b></p><p><br></p></li>
+<li><p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> 
+field (can be anything).</p><p><br></p>
+<p><script> thumb("images/02newRemoteHost.png") </script></p><p><br></p>
 </li>
-<li><p>Select the <b>Remote Host</b> radio button.</p></li>
-<li><p>Enter the address of the remote host in the <b>Host</b> field.</p></li>
-<li><p>The <b>Port</b> field should be left at <code>22</code> unless your installation uses a different port for <code>ssh</code> connections.</p></li>
-<li><p>Enter your user name on the remote machine in the <b>User</b> field.</p></li>
-<li><p>If you use password authentication, select the <b>Password based authentication</b> radio button and enter the password in the <b>Password</b> field.</p></li>
+<li><p>Select the <b>Remote Host</b> radio button.</p><p><br></p></li>
+<li><p>Enter the address of the remote host in the <b>Host</b> field.</p><p><br></p></li>
+<li><p>The <b>Port</b> field should be left at <code>22</code> unless your installation uses a 
+different port for <code>ssh</code> connections.</p><p><br></p></li>
+<li><p>Enter your user name on the remote machine in the <b>User</b> field.</p><p><br></p></li>
+<li><p>If you use password authentication, select the <b>Password based authentication</b> radio 
+button and enter the password in the <b>Password</b> field.</p><p><br></p></li>
 <li>
-  <p>If you use key based authentication, select the <b>Public key based authentication</b> radio button, select the file containing your public key, and enter the passphrase for your key (or leave blank if you don't use a passphrase).</p>
+  <p>If you use key based authentication, select the <b>Public key based authentication</b> radio 
+  button, select the file containing your public key, and enter the passphrase for your key (or 
+  leave blank if you don't use a passphrase).</p><p><br></p>
 </li>
-<li><p>Click <b>Finish</b></p></li>
+<li><p>Click <b>Finish</b></p><p><br></p></li>
 </ol>
-<li><p>The <b>Path to proxy executable</b> field needs to point to the <code>ptp_orte_proxy</code> executable file on the remote machine.
-If this isn't filled in correctly already, then navigate to the <code>ptp_orte_proxy</code> executable by clicking on the <b>Browse</b>
-button and select it. </p>
-<p><script> thumb("images/02remoteBrowseProxy.png") </script></p>
+<li><p>The <b>Path to proxy executable</b> field needs to point to the <code>ptp_orte_proxy</code> 
+executable file on the remote machine.
+If this isn't filled in correctly already, then navigate to the <code>ptp_orte_proxy</code> 
+executable by clicking on the <b>Browse</b>
+button and select it. </p><p><br></p>
+<p><script> thumb("images/02remoteBrowseProxy.png") </script></p><p><br></p>
 </li>
-<li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager documentation instructs otherwise.</p></li>
+<li><p>Leave the <b>Extra proxy arguments</b> field empty unless your resource manager documentation 
+instructs otherwise.</p><p><br></p></li>
 <li>
-  <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection if supported by the remote service provider. To enable tunneling, select the <b>Use port forwarding</b> radio button.</p>
-  <p><script> thumb("images/02orteProxyConfigRemoteAddr1.png") </script></p>
+  <p>The <b>Multiplexing Options</b> allow communication to be tunneled over a single connection if 
+  supported by the remote service provider. To enable tunneling, select the 
+  <b>Use port forwarding</b> radio button.</p><p><br></p>
+  <p><script> thumb("images/02orteProxyConfigRemoteAddr1.png") </script></p><p><br></p>
 </li>
-<li><p>If you don't wish to use port forwarding, select the <b>None</b> radio button and enter the address of your local machine (it's host name, or IP address) in the <b>Local address for proxy connection</b> field. Note that if your site does not allow outbound connections from the remote machine to your local machine, then you <i>must</i> use port forwarding.</p></li>
+<li><p>If you don't wish to use port forwarding, select the <b>None</b> radio button and enter the 
+address of your local machine (it's host name, or IP address) in the <b>Local address for proxy 
+connection</b> field. Note that if your site does not allow outbound connections from the remote 
+machine to your local machine, then you <i>must</i> use port forwarding.</p><p><br></p></li>
 <li>
-  <p>The <b>Launch server manually</b> checkbox is used for debugging purposes and should be left unchecked.</p>
+  <p>The <b>Launch server manually</b> checkbox is used for debugging purposes and should be left 
+  unchecked.<p><br></p></p>
 </li>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
@@ -135,10 +163,11 @@ button and select it. </p>
 <p>The next page will show configuration information specific to a particular resource manager. In this case, the <b>ORTED Configuration</b> dialog is shown. You will not normally need to change this information.</p>
 <p><script> thumb("images/02ORTEConfiguration.png") </script></p>
 <ol>
-<li><p>If you wish to specify the location of the <code>orted</code> daemon, or add extra arguments, uncheck the <b>Use default settings</b> checkbox.</p></li>
+<li><p>If you wish to specify the location of the <code>orted</code> daemon, or add extra arguments, 
+uncheck the <b>Use default settings</b> checkbox.</p><p><br></p></li>
 <ol>
-<li><p>Browse to the location of the <code>orted</code> executable and select it.</p></li>
-<li><p>Add any extra arguments to the <b>Extra ORTED arguments</b> field.</p></li>
+<li><p>Browse to the location of the <code>orted</code> executable and select it.</p><p><br></p></li>
+<li><p>Add any extra arguments to the <b>Extra ORTED arguments</b> field.</p><p><br></p></li>
 </ol>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
@@ -148,11 +177,12 @@ button and select it. </p>
 to change how the resource manager is displayed.</p>
 <p><script> thumb("images/02ChooseResMgrNameAndDesc.png") </script></p>
 <ol>
-<li><p>If you wish to change the name or description, uncheck the <b>Use default name and description</b> checkbox.</p></li>
+<li><p>If you wish to change the name or description, uncheck the <b>Use default name and 
+description</b> checkbox.</p><p><br></p></li>
 <ol>
-<li><p>Enter a new name in the <b>Name</b> field. Anything can be entered.</p></li>
+<li><p>Enter a new name in the <b>Name</b> field. Anything can be entered.</p><p><br></p></li>
 <li>
-  <p>Enter a new description in the <b>Description</b> field. Anything can be entered.</p>
+  <p>Enter a new description in the <b>Description</b> field. Anything can be entered.</p><p><br></p>
 </li>
 </ol>
 <li><p>Select <b>Finish</b></p></li>
@@ -162,37 +192,45 @@ Managers.</p>
 <p><script> thumb("images/02resMgrListOrteLocal.png") </script></p>
 
 <h2 id="start">Step 5: Starting the resource manager</h2>
+<p></p>
 <ol>
-<li><p>To start the resource manager, right mouse click on the resource manager in the <b>Resource Managers view</b>, then select <b>Start Resource Manager</b> from the context menu.</p>
-<p><script> thumb("images/02resMgrStart.png") </script></p>
+<li><p>To start the resource manager, right mouse click on the resource manager in the <b>Resource 
+Managers view</b>, then select <b>Start Resource Manager</b> from the context menu.</p><p><br></p>
+<p><script> thumb("images/02resMgrStart.png") </script></p><p><br></p>
 </li>
-<li><p>The resource manager icon should change color to green to indicate has been successfully started.</p>
-  <p><script> full("images/02resMgrRunning.png") </script></p>
+<li><p>The resource manager icon should change color to green to indicate has been successfully 
+started.</p><p><br></p>
+  <p><script> full("images/02resMgrRunning.png") </script></p><p><br></p>
 </li>
 <li>
-  <p>In the <b>Machines view</b> you should see an icon representing your target system and icons showing status of the node(s).</p>
-  <p><script> thumb("images/02ORTEresMgrLocalStarted.png") </script></p>
+  <p>In the <b>Machines view</b> you should see an icon representing your target system and icons 
+  showing status of the node(s).</p><p><br></p>
+  <p><script> thumb("images/02ORTEresMgrLocalStarted.png") </script></p><p><br></p>
 </li>
-<li><p>If the resource manager fails to start (the icon is red), right click on the resource manager and select <b>Stop Resource Manager</b>. Check the log files for the reason that the resource manager failed to start, correct the error and restart again.</p></li>
+<li><p>If the resource manager fails to start (the icon is red), right click on the resource 
+manager and select <b>Stop Resource Manager</b>. Check the log files for the reason that the 
+resource manager failed to start, correct the error and restart again.</p></li>
 </ol>
 
 <h2 id="edit">Editing a resource manager</h2>
 <p>It is sometimes necessary to change the configuration of an existing resource manager, for example, to change the remote machine that the resource manager controls. Note that the resource manager cannot be edited when it is running.</p>
 <ol>
-<li><p>If the resource manager is running, stop it first. Right-click on the resource manager and select <b>Stop Resource Manager</b></p></li>
-<li><p>Right-click on the resource manager and select <b>Edit Resource Manager</b></p>
-<p><script> thumb("images/02resMgrEdit.png") </script></p>
+<li><p>If the resource manager is running, stop it first. Right-click on the resource manager and 
+select <b>Stop Resource Manager</b></p><p><br></p></li>
+<li><p>Right-click on the resource manager and select <b>Edit Resource Manager</b><p><br></p></p>
+<p><script> thumb("images/02resMgrEdit.png") </script></p><p><br></p>
 </li>
-<li><p>Modify the required configuration settings and click <b>Finish</b>.</p></li>
+<li><p>Modify the required configuration settings and click <b>Finish</b>.</p><p><br></p></li>
 <li><p>Restart the resource manager.</p></li>
 </ol>
 
 <h2 id="rm">Removing a Resource Manager</h2>
 <p>If the resource manager is no longer required, it can be removed from the <b>Resource Managers view</b></p>
 <ol>
-<li><p>If the resource manager is running, stop it first. Right-click on the resource manager and select <b>Stop Resource Manager</b></p></li>
-<li><p>Right-click on the resource manager and select <b>Remove Resource Manager</b></p>
-<p><script> thumb("images/02resMgrRemove.png") </script></p>
+<li><p>If the resource manager is running, stop it first. Right-click on the resource manager and 
+select <b>Stop Resource Manager</b></p><p><br></p></li>
+<li><p>Right-click on the resource manager and select <b>Remove Resource Manager</b></p><p><br></p>
+<p><script> thumb("images/02resMgrRemove.png") </script></p><p><br></p>
 </li>
 <li>
   <p>You will be prompted to confirm removal. Click <b>OK</b></p>
