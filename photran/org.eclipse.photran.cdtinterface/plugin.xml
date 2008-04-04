@@ -15,6 +15,85 @@
       </language>
    </extension>
 
+   <!--==================-->
+   <!-- CDT Launch Clone -->
+   <!--==================-->
+   
+   <!-- Fortran Launch Configuration (visible in "Run..." dialog)--> 
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            delegate="org.eclipse.cdt.launch.internal.LocalCDILaunchDelegate"
+            public="true"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
+            name="Fortran Local Application"
+            id="org.eclipse.photran.launch.localCLaunch"
+            modes="run,debug">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            icon="icons/obj16/f_app.gif"
+            configTypeID="org.eclipse.photran.launch.localCLaunch"
+            id="org.eclipse.photran.launch.localRunLaunchImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            type="org.eclipse.photran.launch.localCLaunch"
+            class="org.eclipse.photran.cdtinterface.launch.FortranLocalRunLaunchConfigurationTabGroup"
+            id="org.eclipse.photran.launch.localRunLaunchTabGroup">
+      </launchConfigurationTabGroup>
+   </extension>
+   <!-- Fortran Application Launch Shortcut (Run As > Local Fortran Application) --> 
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="Local Fortran Application"
+            icon="icons/obj16/f_app.gif"
+            modes="run, debug"
+            class="org.eclipse.photran.cdtinterface.launch.FortranApplicationLaunchShortcut"
+            id="org.eclipse.photran.debug.ui.localCShortcut">
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                   <or>
+                     <instanceof value="org.eclipse.cdt.core.model.IBinary"/>
+                     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.cdt.launch.isExecutable"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.cdt.launch.isCProject"/>
+                     <and>
+                       <instanceof value="org.eclipse.ui.IFileEditorInput"/>
+                       <adapt type="org.eclipse.core.resources.IResource">
+                         <adapt type="org.eclipse.cdt.core.model.ICElement"/>
+                       </adapt>
+                     </and>
+                   </or>
+               </iterate>
+             </with>
+           </enablement>
+         </contextualLaunch>
+         <description
+             mode="run"
+             description="Runs a local Fortran application"/>
+          <description
+             mode="debug"
+             description="Debugs a local Fortran application"/>
+         <configurationType
+               id="org.eclipse.photran.launch.localCLaunch">
+         </configurationType>
+       </shortcut>
+   </extension>
+
    <!--==============-->
    <!-- CDT UI Clone -->
    <!--==============-->
