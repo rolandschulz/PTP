@@ -93,14 +93,25 @@ public abstract class FortranRefactoring extends Refactoring
 
     public FortranRefactoring(IFile file, /* boolean isFixedForm, */ ITextSelection selection)
     {
-    	assert file != null && file.isAccessible();
-    	assert selection != null;
+        assert file != null && file.isAccessible();
+        assert selection != null;
 
-    	this.vpg = PhotranVPG.getInstance();
-    	
+        this.vpg = PhotranVPG.getInstance();
+        
         this.fileInEditor = file;
         //this.isFixedForm = isFixedForm;
         this.selectedRegionInEditor = selection;
+    }
+
+    public FortranRefactoring(IFile file /* boolean isFixedForm, */)
+    {
+        assert file != null && file.isAccessible();
+
+        this.vpg = PhotranVPG.getInstance();
+        
+        this.fileInEditor = file;
+        //this.isFixedForm = isFixedForm;
+        this.selectedRegionInEditor = null;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -508,7 +519,7 @@ public abstract class FortranRefactoring extends Refactoring
 
     // PARSE TREE SEARCHING ///////////////////////////////////////////////////
     
-    protected Token findFirstTokenIn(InteriorNode node)
+    public static Token findFirstTokenIn(InteriorNode node)
     {
         try
         {
@@ -542,7 +553,7 @@ public abstract class FortranRefactoring extends Refactoring
         public Token getLastToken() { return lastToken; }
     }
 
-    protected Token findLastTokenIn(InteriorNode node)
+    public static Token findLastTokenIn(InteriorNode node)
     {
         LastTokenVisitor lastTokenVisitor = new LastTokenVisitor();
         node.visitUsing(lastTokenVisitor);
