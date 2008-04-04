@@ -35,7 +35,7 @@ public class DisplayVPGDatabase extends FortranEditorActionDelegate
             PhotranVPG.getDatabase().printOn(ps);
             ps.close();
 
-            openHtmlViewerOn("Symbol Table", temp);
+            openHtmlViewerOn("VPG Database", temp);
         }
         catch (Exception e)
         {

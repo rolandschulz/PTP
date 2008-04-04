@@ -12,6 +12,7 @@ package org.eclipse.photran.core.vpg;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 import bz.over.vpg.VPGDependency;
+import bz.over.vpg.db.caching.CachingDB;
 import bz.over.vpg.eclipse.EclipseVPG;
 
 /**
@@ -46,7 +48,7 @@ import bz.over.vpg.eclipse.EclipseVPG;
  * 
  * @author Jeff Overbey
  */
-public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
+public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB>
 {
 	// Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
 	// (since our parser declares classes with the same name)
@@ -72,7 +74,6 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
 	                                                             "Type" };
 	
 	private static PhotranVPG instance = null;
-	
 	public PhotranVPGDB db = null;
 	
 	public static PhotranVPG getInstance()
@@ -80,11 +81,11 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
 		if (instance == null) instance = new PhotranVPGBuilder();
 		return instance;
 	}
-	
-	public static PhotranVPGDB getDatabase()
-	{
-	    return getInstance().db;
-	}
+    
+    public static PhotranVPGDB getDatabase()
+    {
+        return getInstance().db;
+    }
 	
 	@Override public void start()
 	{
@@ -94,7 +95,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
 	protected PhotranVPG()
 	{
         super(new PhotranVPGDB(), "Synchronizing Photran VPG");
-        db = (PhotranVPGDB)super.db;
+        db = super.db;
     }
 
     public static boolean inTestingMode()
@@ -138,8 +139,9 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
 	{
 		try
 		{
-			return (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID))
-			    && (inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"));
+		    if (!project.isAccessible()) return false;
+		    if (!project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) return false;
+		    return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
 		}
 		catch (CoreException e)
 		{
