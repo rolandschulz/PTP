@@ -57,13 +57,14 @@ public class FortranModelBuilder implements IFortranModelBuilder
         this.newElements = new HashMap();
         boolean wasSuccessful = true;
 
+        IAccumulatingLexer lexer = null;
         try
         {
 //            SourceForm sourceForm = isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM;
 //            IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(translationUnit.getFile());
             
             IFile file = translationUnit.getFile();
-            IAccumulatingLexer lexer = LexerFactory.createLexer(
+            lexer = LexerFactory.createLexer(
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file.getName(),
                 isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM);
@@ -88,7 +89,19 @@ public class FortranModelBuilder implements IFortranModelBuilder
         }
         catch (Exception e)
         {
-            createParseFailureNode(translationUnit, e.getMessage());
+            FortranElement elt = createParseFailureNode(translationUnit, e.getMessage());
+            if (lexer != null)
+            {
+                int offset = lexer.getLastTokenFileOffset();
+                int length = lexer.getLastTokenLength();
+                int line = lexer.getLastTokenLine();
+                if (offset >= 0 && length > 0)
+                {
+                    elt.setIdPos(offset, length);
+                    elt.setPos(offset, length);
+                    if (line > 0) elt.setLines(line, line);
+                }
+            }
             wasSuccessful = false;
         }
 
