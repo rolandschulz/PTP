@@ -448,14 +448,14 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             
             int precedingKeywordOffset = findPrecedingKeyword(column);
             if (precedingKeywordOffset == column) return false;
+
             if (!retainAsKeyword(precedingKeywordOffset)) return false;
             
             String precedingKeyword = line.substring(precedingKeywordOffset, column);
             if (precedingKeyword.indexOf("(") >= 0) precedingKeyword = precedingKeyword.substring(0, precedingKeyword.indexOf("("));
             precedingKeyword = precedingKeyword.trim();
-            
-            //System.out.println("Preceding keyword is " + precedingKeyword);
-            
+//            System.out.println("Preceding keyword is " + precedingKeyword);
+
             if (isType(keyword))
                 return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit");
             else if (keyword.equalsIgnoreCase("none"))
@@ -470,6 +470,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("do");
             else if (keyword.equalsIgnoreCase("then"))
                 return !openContextEquals && !openContextComma && match("if", firstTokenPos);
+            else if (keyword.equalsIgnoreCase("result"))
+                return letterFollowsParenthetical;
             else
                 return precedingKeyword.equalsIgnoreCase("end");
         }

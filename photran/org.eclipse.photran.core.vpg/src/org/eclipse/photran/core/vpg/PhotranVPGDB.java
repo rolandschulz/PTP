@@ -18,7 +18,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
 {
     public PhotranVPGDB()
     {
-        super(new PhotranCDTDB());
+        super(new PhotranCDTDB(), 100, 100);
     }
     
     static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef>
