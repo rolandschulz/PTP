@@ -28,7 +28,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * 
  * RunAnalyseHandler - keeps state information for the analysis handlers in
  * the dropdown analysis menu.
- * Common behavior is in the RunAnalyseHandlerBase class.
+ * Common behavior is in  (derived class) RunAnalyseHandlerBase.
  * 
  * That is, the AnalysisDropdownHandler will repeat the action of the last RunAnalyseHandler 
  * that was executed - they are cached as one of these.
@@ -36,7 +36,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * @author Beth Tibbitts
 
  */
-
 public abstract class RunAnalyseHandler extends AbstractHandler {
 	/**
 	 * the current selection is cached here
@@ -44,7 +43,6 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	protected IStructuredSelection selection;
 
 	public RunAnalyseHandler(){
-		
 	}
 
 	/**
@@ -61,12 +59,11 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	 * @return the current selection if it's a structured selection e.g. in the navigator
 	 */
 	public IStructuredSelection getSelection(ExecutionEvent event) {
-		
-		
 		ISelection curSel = HandlerUtil.getCurrentSelection(event);
 		if (curSel instanceof IStructuredSelection) {
 			selection = (IStructuredSelection) curSel;
 		}
+		
 		if(selection == null) {
 			selection = AnalysisDropdownHandler.getInstance().getLastSelection();
 		}
