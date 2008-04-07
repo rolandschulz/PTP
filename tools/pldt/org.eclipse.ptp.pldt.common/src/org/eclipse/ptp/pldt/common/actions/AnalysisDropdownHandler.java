@@ -52,6 +52,11 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	 * than relying on HandlerUtil.getCurrentSelection();
 	 * if the current selection isn't a structured selection (e.g. editor selection or something
 	 * we don't care about) then we want the last structured selection.
+	 * If we can't find a structured selection at the time this ctor is called,
+	 * go get the selection in the Project Explorer; it's probably what we want
+	 * (for the case when an editor has just been opened by double-clicking on its
+	 * entry in the project explorer: it's still selected in the Proj explorer,
+	 * but the editor now has the focus).
 	 */
 	public AnalysisDropdownHandler(){
 		if(traceOn)System.out.println("AnalysisDropdownHandler() ctor... should not be >1 of these");
@@ -59,12 +64,26 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		instance=this;
 		// register to be notified of future selections
 		ISelectionService ss=CommonPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getSelectionService();
+		//String id=CommonPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite().getId();
 		ss.addSelectionListener(this);
+
 		// and cache the selection that was in effect now.
-		ISelection sel= ss.getSelection();
+		ISelection sel= ss.getSelection();//gives selection in ACTIVE PART.If editor was just opened, active part is probably the editor.
+		//
 		if(sel instanceof IStructuredSelection) {
 			lastSelection=(IStructuredSelection)sel;
 			if(traceOn)System.out.println("  ...got initial selection.");
+		}
+		// If we still don't know the selection then find out the selection in the
+		// project explorer view - its guess is probably right.
+		if (lastSelection == null) {
+			String projExpID = "org.eclipse.ui.navigator.ProjectExplorer";
+			ISelection apSel = ss.getSelection(projExpID);
+			if (apSel != null & apSel instanceof IStructuredSelection) {
+				if (!apSel.isEmpty()) {
+					lastSelection = (IStructuredSelection) apSel;
+				}
+			}
 		}
 	}
 
