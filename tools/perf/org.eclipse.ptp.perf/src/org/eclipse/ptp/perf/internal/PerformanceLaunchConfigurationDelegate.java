@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
 /**
  * Launches sequential C/C++ (or Fortran) applications after rebuilding them with performance tool instrumentation
@@ -37,9 +38,16 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{
 		//TODO:  This is a special case for TAU.  It should be merged into the general performance framework
-		//TAULaunch tool=null;
+		//TAULaunch tool=null; 
 		//if(configuration.getAttribute(TAULAUNCH, TAULAUNCH_DEF))
 			//tool=new TAULaunch();
+		
+		// save the executable location so we can access it in the postprocessing 
+		ILaunchConfigurationWorkingCopy  wc=configuration.getWorkingCopy();
+		String progName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,"defaultValue");
+		wc.setAttribute(PERF_EXECUTABLE_NAME, progName);
+		wc.doSave();
+		
 		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new LocalRunLaunchDelegate(),ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 		plaunch.launch(configuration, mode, launchIn, monitor);//,tool
 		
