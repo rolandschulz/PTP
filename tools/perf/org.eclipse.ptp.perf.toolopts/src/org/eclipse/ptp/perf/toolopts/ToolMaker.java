@@ -96,9 +96,9 @@ public class ToolMaker {
 		}
 		upname = paneID+"_"+toolopt.optName.toUpperCase();
 
-		toolopt.confArgString=upname+"_ARGUMENT_SAVED";
-		toolopt.confStateString=upname+"_BUTTON_STATE";
-		toolopt.confDefString=upname+"_ARGUMENT_DEFAULT";
+		toolopt.confArgString=upname+ToolsOptionsConstants.TOOL_CONFIG_ARGUMENT_SUFFIX;
+		toolopt.confStateString=upname+ToolsOptionsConstants.TOOL_CONFIG_STATE_SUFFIX;
+		toolopt.confDefString=upname+ToolsOptionsConstants.TOOL_CONFIG_DEFAULT_SUFFIX;
 		
 		toolopt.optionLine=new StringBuffer(toolopt.optName);
 		if(toolopt.type>0)
@@ -293,7 +293,7 @@ public class ToolMaker {
 	}
 	
 	/**
-	 * Creatues a new shell from the workbench's current display
+	 * Creates a new shell from the workbench's current display
 	 * @return A fresh shell
 	 */
 	protected static Shell getShell(){
