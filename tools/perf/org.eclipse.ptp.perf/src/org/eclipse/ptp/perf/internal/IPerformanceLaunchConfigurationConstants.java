@@ -93,4 +93,9 @@ public interface IPerformanceLaunchConfigurationConstants {
 	public static final String TOOL_BIN_ID="performance_tool_bin_directory";
 	
 	//public static final String BUILDCONF_PRFX_ID="performance_build_configuration_name.";
+	/**
+	 * Key in which which executable name will be stored in the ILaunchConfiguration
+	 */
+	public static final String PERF_EXECUTABLE_NAME= "perf_executable_name";
+	
 }
