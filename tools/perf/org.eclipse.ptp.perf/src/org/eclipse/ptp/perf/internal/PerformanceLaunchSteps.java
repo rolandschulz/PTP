@@ -99,7 +99,9 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 	
 	private final PerformanceTool tool;//=null;//Activator.getTool();// .tools[0].toolPanes[0];;
 	
+	/**  Executable (application) attribute name 	 */
 	private String appnameattrib=null;
+	/** Executable (application) path attribute name */
 	private String apppathattrib=null;
 	private ILaunchConfiguration configuration=null;
 	
