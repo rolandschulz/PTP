@@ -19,7 +19,6 @@ package org.eclipse.ptp.perf;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.perf.internal.IPerformanceLaunchConfigurationConstants;
 
 /**
  * The implementations of this abstract class can be used by the 

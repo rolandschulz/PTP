@@ -28,6 +28,7 @@ import java.util.TimeZone;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.perf.Activator;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.toolopts.PerformanceTool;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;

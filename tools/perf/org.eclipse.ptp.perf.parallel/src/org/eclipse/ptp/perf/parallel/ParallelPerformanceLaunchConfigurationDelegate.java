@@ -17,13 +17,17 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.parallel;
 
+import java.io.File;
+
+import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.internal.ParallelLaunchConfigurationDelegate;
-import org.eclipse.ptp.perf.internal.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.internal.PerformanceLaunchManager;
 
 /**
@@ -37,6 +41,16 @@ public class ParallelPerformanceLaunchConfigurationDelegate extends ParallelLaun
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{
+		// save the executable location so we can access it in the postprocessing 
+		ILaunchConfigurationWorkingCopy  wc=configuration.getWorkingCopy();
+		String progName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME,"defaultValue");
+		String progPath = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,"defaultValue");
+		String projName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,"defaultValue");
+		wc.setAttribute(PERF_EXECUTABLE_NAME, progPath+File.separator+progName);
+		wc.setAttribute(PERF_PROJECT_NAME, projName);
+		wc.doSave();
+		
+		
 		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new ParallelLaunchConfigurationDelegate(),IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
 		plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
 	}

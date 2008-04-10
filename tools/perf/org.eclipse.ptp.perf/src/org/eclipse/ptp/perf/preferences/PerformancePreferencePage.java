@@ -25,7 +25,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.perf.Activator;
-import org.eclipse.ptp.perf.internal.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;

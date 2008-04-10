@@ -29,7 +29,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.eclipse.ptp.perf.Activator;
-import org.eclipse.ptp.perf.internal.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 
 /**
  * Defines the tab group in the performance analysis launch configuration system using the CDT launcher

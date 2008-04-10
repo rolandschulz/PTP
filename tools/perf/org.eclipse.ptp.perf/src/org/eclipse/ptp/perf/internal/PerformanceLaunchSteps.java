@@ -54,6 +54,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.perf.AbstractPerformanceDataManager;
 import org.eclipse.ptp.perf.Activator;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.toolopts.PerformanceTool;
 import org.eclipse.ptp.perf.toolopts.ToolApp;
 import org.eclipse.ptp.perf.toolopts.ToolIO;

@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 
 /**
  * Launches sequential C/C++ (or Fortran) applications after rebuilding them with performance tool instrumentation
@@ -45,7 +46,9 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 		// save the executable location so we can access it in the postprocessing 
 		ILaunchConfigurationWorkingCopy  wc=configuration.getWorkingCopy();
 		String progName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,"defaultValue");
+		String projName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME,"defaultValue");
 		wc.setAttribute(PERF_EXECUTABLE_NAME, progName);
+		wc.setAttribute(PERF_PROJECT_NAME, projName);
 		wc.doSave();
 		
 		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new LocalRunLaunchDelegate(),ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);

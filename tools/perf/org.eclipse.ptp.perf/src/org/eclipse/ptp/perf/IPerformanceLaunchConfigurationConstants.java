@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.perf.internal;
+package org.eclipse.ptp.perf;
 
 public interface IPerformanceLaunchConfigurationConstants {
 
@@ -97,5 +97,6 @@ public interface IPerformanceLaunchConfigurationConstants {
 	 * Key in which which executable name will be stored in the ILaunchConfiguration
 	 */
 	public static final String PERF_EXECUTABLE_NAME= "perf_executable_name";
+	public static final String PERF_PROJECT_NAME= "perf_project_name";
 	
 }

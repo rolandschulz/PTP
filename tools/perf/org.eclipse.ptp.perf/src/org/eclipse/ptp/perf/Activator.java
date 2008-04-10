@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
-import org.eclipse.ptp.perf.internal.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.toolopts.PerformanceTool;
 import org.eclipse.ptp.perf.toolopts.ToolApp;
 import org.eclipse.ptp.perf.toolopts.ToolMaker;
