@@ -48,19 +48,19 @@ public class PhotranVPGBuilder extends PhotranVPG
 	    db.setAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE, definition);
 	}
 	
-	public void markScope(Token identifier, ScopingNode scope)
+	public void markScope(PhotranTokenRef identifier, ScopingNode scope)
 	{
-	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, identifier.getTokenRef(), scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
+	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, identifier, scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
 	}
 	
-	public void markBinding(Token reference, PhotranTokenRef definition)
+	public void markBinding(PhotranTokenRef reference, PhotranTokenRef definition)
 	{
-	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference.getTokenRef(), definition, BINDING_EDGE_TYPE));
+	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference, definition, BINDING_EDGE_TYPE));
 	}
 	
-	public void markRenamedBinding(Token reference, PhotranTokenRef definition)
+	public void markRenamedBinding(PhotranTokenRef reference, PhotranTokenRef definition)
 	{
-	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference.getTokenRef(), definition, RENAMED_BINDING_EDGE_TYPE));
+	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference, definition, RENAMED_BINDING_EDGE_TYPE));
 	}
 	
 	public void setScopeImplicitSpec(ScopingNode scope, ImplicitSpec implicitSpec)

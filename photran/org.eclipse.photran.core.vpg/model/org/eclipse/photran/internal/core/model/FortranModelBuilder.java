@@ -14,6 +14,7 @@ import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.vpg.Activator;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
@@ -35,6 +36,8 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  */
 public class FortranModelBuilder implements IFortranModelBuilder
 {
+    private static Parser parser = new Parser();
+    
     private TranslationUnit translationUnit;
     private Map newElements;
     private boolean isFixedForm;
@@ -68,7 +71,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file.getName(),
                 isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM);
-            IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
+            IFortranAST ast = new FortranAST(file, parser.parse(lexer), lexer.getTokenList());
                         
             if (isParseTreeModelEnabled())
                  ast.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));

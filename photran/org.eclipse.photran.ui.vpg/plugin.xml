@@ -131,28 +131,47 @@
                path="org.eclipse.jdt.ui.refactoring.menu/debugging"
                id="org.eclipse.photran.ui.AnalysisDebuggingMenu">
             <separator name="debugging"/>
+            <separator name="vpgstats"/>
+            <separator name="vpgdb"/>
          </menu>
          <action
-               label="Select Enclosing &amp;Scope"
+               label="Select &amp;Enclosing Scope"
                class="org.eclipse.photran.internal.ui.actions.SelectEnclosingScope"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
                definitionId="org.eclipse.photran.ui.SelectEnclosingScopeCommand"
                id="org.eclipse.photran.ui.FindEnclosingScopeAction"/>
          <action
-               label="Find All &amp;Declarations in Scope"
+               label="&amp;Find All Declarations in Scope"
                class="org.eclipse.photran.internal.ui.actions.FindAllDeclarationsInScope"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
                id="org.eclipse.photran.ui.FindAllDeclarationsInScopeAction"/>
          <action
-               class="org.eclipse.photran.internal.ui.actions.DisplayVPGDatabase"
-               id="org.eclipse.photran.ui.DisplayVPGDatabaseAction"
-               label="Display &amp;Virtual Program Graph Database"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
-         <action
                class="org.eclipse.photran.internal.ui.actions.DisplaySymbolTable"
                id="org.eclipse.photran.ui.DisplaySymbolTableAction"
-               label="Display &amp;Symbol Table for Current File"
+               label="Display Symbol &amp;Table for Current File"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
+         <!-- -->
+         <action
+               class="org.eclipse.photran.internal.ui.actions.ResetVPGStatistics"
+               id="org.eclipse.photran.ui.ResetVPGStatisticsAction"
+               label="&amp;Reset VPG Statistics"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgstats"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplayVPGStatistics"
+               id="org.eclipse.photran.ui.DisplayVPGStatisticsAction"
+               label="Display VPG &amp;Statistics"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgstats"/>
+         <!-- -->
+         <action
+               class="org.eclipse.photran.internal.ui.actions.ClearVPGDatabase"
+               id="org.eclipse.photran.ui.ClearVPGDatabaseAction"
+               label="Clear VPG Database"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgdb"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplayVPGDatabase"
+               id="org.eclipse.photran.ui.DisplayVPGDatabaseAction"
+               label="Display VPG Database"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgdb"/>
       </actionSet>
    </extension>
    

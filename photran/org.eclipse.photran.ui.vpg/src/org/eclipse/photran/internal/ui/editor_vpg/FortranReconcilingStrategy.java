@@ -30,6 +30,8 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
     protected VPGJob<IFortranAST, Token> updateVPGJob = null, dispatchVPGTasksJob = null;
     protected IFortranAST vpgAST = null;
     
+    private Parser parser = new Parser();
+    
     public FortranReconcilingStrategy(ITextEditor editor)
     {
         super(editor);
@@ -67,7 +69,7 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
                     IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
                                                                         null,
                                                                         SourceForm.UNPREPROCESSED_FREE_FORM);
-                    astRootNode = new Parser().parse(lexer);
+                    astRootNode = parser.parse(lexer);
                     if (astRootNode == null) return Status.OK_STATUS;
                     
                     for (IEditorASTTask task : editor.astTasks)

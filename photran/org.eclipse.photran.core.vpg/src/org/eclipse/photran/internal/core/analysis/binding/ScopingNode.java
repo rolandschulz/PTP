@@ -474,7 +474,7 @@ public abstract class ScopingNode extends InteriorNode
 		Definition def = new Definition(tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, type);
 		
     	vpg.setDefinitionFor(tokenRef, def);
-    	vpg.markScope(identifier, this);
+    	vpg.markScope(tokenRef, this);
     	bindings.foundDefinition(tokenRef, getGlobalScope());
 	}
 

@@ -64,7 +64,7 @@ public abstract class BindingCollector extends ASTVisitor
     	{
             Definition definition = new Definition(token.getTokenRef(), classification, type);
     		vpg.setDefinitionFor(token.getTokenRef(), definition);
-    		vpg.markScope(token, token.getEnclosingScope());
+    		vpg.markScope(token.getTokenRef(), token.getEnclosingScope());
     		return definition;
     	}
     	catch (Exception e)
@@ -82,8 +82,7 @@ public abstract class BindingCollector extends ASTVisitor
     {
     	try
     	{
-    		Token token = definitionToImport.getTokenRef().findToken();
-    		vpg.markScope(token, importIntoScope);
+    		vpg.markScope(definitionToImport.getTokenRef(), importIntoScope);
     	}
     	catch (Exception e)
     	{
@@ -119,7 +118,7 @@ public abstract class BindingCollector extends ASTVisitor
     {
        	try
     	{
-       		vpg.markBinding(identifier, toDefinition);
+       		vpg.markBinding(identifier.getTokenRef(), toDefinition);
     	}
     	catch (Exception e)
     	{
@@ -133,7 +132,7 @@ public abstract class BindingCollector extends ASTVisitor
     	
        	try
     	{
-       		vpg.markRenamedBinding(identifier, toDefinition);
+       		vpg.markRenamedBinding(identifier.getTokenRef(), toDefinition);
     	}
     	catch (Exception e)
     	{

@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 
@@ -25,9 +26,15 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
     {
         public PhotranCDTDB()
         {
-            super(PhotranVPG.inTestingMode() ? createTempFile() : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "vpg");
+            this(PhotranVPG.inTestingMode() ? createTempFile() : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "vpg");
         }
         
+        private PhotranCDTDB(String filename)
+        {
+            super(filename);
+            PhotranVPG.printDebug("Using Photran VPG database " + filename, "");
+        }
+
         private static String createTempFile()
         {
             try
@@ -47,7 +54,8 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         {
             if (filename.startsWith("module:")) return Long.MIN_VALUE;
             
-            return PhotranVPG.getIFileForFilename(filename).getLocalTimeStamp();
+            IFile ifile = PhotranVPG.getIFileForFilename(filename);
+            return ifile == null ? Integer.MIN_VALUE : ifile.getLocalTimeStamp();
         }
         
         @Override protected byte[] serialize(Serializable annotation) throws IOException

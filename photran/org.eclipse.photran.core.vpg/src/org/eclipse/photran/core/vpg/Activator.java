@@ -27,8 +27,6 @@ public class Activator extends Plugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	private static Parser parser = new Parser();
-	
 	/**
 	 * The constructor
 	 */
@@ -42,7 +40,6 @@ public class Activator extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		parser = new Parser();
 	}
 
 	/*
@@ -50,6 +47,7 @@ public class Activator extends Plugin {
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+	    PhotranVPG.getDatabase().db.close();
 		plugin = null;
 		super.stop(context);
 	}
