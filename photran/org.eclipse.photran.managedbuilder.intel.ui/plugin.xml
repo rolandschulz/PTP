@@ -19,7 +19,14 @@
          name="%ToolName.linker.intel.fortran"
          outputFlag="-o"
          command="ifort"
-         id="photran.managedbuild.tool.intel.fortran.linker">
+         id="photran.managedbuild.tool.intel.fortran.linker"
+         errorParsers="org.eclipse.cdt.core.GLDErrorParser">
+         <supportedProperties>
+            <property id="org.eclipse.cdt.build.core.buildArtefactType">
+	            <value id="org.eclipse.cdt.build.core.buildArtefactType.exe"/>
+    	        <value id="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"/>
+            </property>
+         </supportedProperties>
          <envVarBuildPath 
             pathType="buildpathLibrary"
             variableList="LIBRARY_PATH">
@@ -86,6 +93,25 @@
             valueType="string"
             id="intel.fortran.link.cmdline.addlopts">
          </option>
+         <option
+               defaultValue="false"
+               command="-shared"
+               id="intel.fortran.link.option.shared"
+               valueType="boolean">
+              <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="true"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"/>
+			  </enablement>
+			  <enablement
+			    type="UI_VISIBILITY|UI_ENABLEMENT">
+			    <false/>
+			  </enablement>
+         </option>
          <inputType
             sourceContentType="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"
             sources="o"
@@ -108,7 +134,25 @@
             nameProvider="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuLinkOutputNameProvider"
             primaryOutput="true"
             id="photran.managedbuild.tool.intel.fortran.linker.output">
+              <enablement 
+              	type="ALL">
+			  	<checkOption 
+			  		optionId="gnu.cpp.link.option.shared"
+			  		value="false"/>
+			  </enablement>
          </outputType>
+         <outputType
+            outputs="so"
+            outputPrefix="lib"
+            buildVariable="LIBRARIES"
+            id="photran.managedbuild.tool.intel.fortran.linker.output.so">
+              <enablement 
+              	type="ALL">
+			  	<checkOption 
+			  		optionId="gnu.cpp.link.option.shared"
+			  		value="true"/>
+			  </enablement>
+         </outputType>         
       </tool>
 <!--  End Intel Fortran Linker -->
 
@@ -118,6 +162,11 @@
          name="%ToolName.archiver.intel.fortran"
          command="ar"		
          id="photran.managedbuild.tool.intel.fortran.archiver">
+         <supportedProperties>
+            <property id="org.eclipse.cdt.build.core.buildArtefactType">
+    	        <value id="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+            </property>
+         </supportedProperties>
          <inputType
             sourceContentType="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"
             sources="o"
@@ -158,13 +207,19 @@
 
 <!--  Start Intel Fortran compiler -->
       <tool
-         name="%ToolName.compiler.intel.fortran"
          id="photran.managedbuild.tool.intel.fortran.compiler"
          isAbstract="true"
          command="ifort"
          commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}"
          natureFilter="both"
-         outputFlag="-o">
+         outputFlag="-o"
+         errorParsers="org.eclipse.photran.core.intel.IntelCompilerErrorParser">
+         <supportedProperties>
+            <property id="org.eclipse.cdt.build.core.buildType">
+	            <value id="org.eclipse.cdt.build.core.buildType.debug"/>
+    	        <value id="org.eclipse.cdt.build.core.buildType.release"/>
+            </property>
+         </supportedProperties>
          <envVarBuildPath 
             pathType="buildpathInclude"
             variableList="CPATH,C_INCLUDE_PATH">
@@ -192,6 +247,24 @@
             command="-g"
             valueType="boolean"
             id="intel.linux.fortran.compiler.general.debug">
+            <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="false"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildType"
+			  		value="org.eclipse.cdt.build.core.buildType.release"/>
+			  </enablement>
+              <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="true"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildType"
+			  		value="org.eclipse.cdt.build.core.buildType.debug"/>
+			</enablement>
          </option>
          <option
             name="%Option.intel.fortran.general.optlvl"
@@ -219,6 +292,24 @@
                command="-O3"
                id="general.opt.speedHLO">
             </enumeratedOptionValue>
+            <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="general.opt.speed"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildType"
+			  		value="org.eclipse.cdt.build.core.buildType.release"/>
+			  </enablement>
+              <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="general.opt.none"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildType"
+			  		value="org.eclipse.cdt.build.core.buildType.debug"/>
+			</enablement>
          </option>
          <option
             name="%Option.intel.fortran.general.warnlvl"
@@ -280,6 +371,24 @@
                command=""
                id="inl.exp.anysuitable">
             </enumeratedOptionValue>
+            <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="inl.exp.anysuitable"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildType"
+			  		value="org.eclipse.cdt.build.core.buildType.release"/>
+			  </enablement>
+              <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="inl.exp.none"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildType"
+			  		value="org.eclipse.cdt.build.core.buildType.debug"/>
+			</enablement>
          </option>
          <option
             defaultValue=""
@@ -1370,7 +1479,7 @@
          <inputType
             sources="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
             dependencyExtensions="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
-            dependencyCalculator="org.eclipse.photran.managedbuilder.core/org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
+            dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
             id="photran.managedbuild.tool.intel.fortran.compiler.input">
          </inputType>
          <outputType
@@ -1384,7 +1493,8 @@
 <!-- Begin Intel Fortran compiler x86 specific definitions -->
       <tool  
          id="photran.managedbuild.tool.intel.fortran.compiler.x86"
-         superClass="photran.managedbuild.tool.intel.fortran.compiler">
+         superClass="photran.managedbuild.tool.intel.fortran.compiler"
+         name="%ToolName.compiler.intel.fortran.x86">
          <option
             name="%Option.intel.fortran.optimize.fp"
             category="intel.linux.fortran.compiler.category.optimization"
@@ -1559,7 +1669,8 @@
 <!-- Begin Intel Fortran compiler ipf specific definitions -->
       <tool  
          id="photran.managedbuild.tool.intel.fortran.compiler.ipf"
-         superClass="photran.managedbuild.tool.intel.fortran.compiler">
+         superClass="photran.managedbuild.tool.intel.fortran.compiler"
+         name="%ToolName.compiler.intel.fortran.ipf">
          <option
             defaultValue="false"
             name="%Option.intel.fortran.optimize.ivdep"
@@ -1586,31 +1697,34 @@
                id="intel.opt.g2">
             </enumeratedOptionValue>
          </option>
+         <option
+            id="intel.linux.fortran.compiler.codegen.fpic.ipf"
+            superClass="intel.linux.fortran.compiler.codegen.fpic">
+            <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="true"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"/>
+			</enablement>
+         </option>
+         
       </tool>
 <!-- End Intel Fortran compiler ipf specific definitions -->
 
-<!-- Begin Intel Fortran exe project -->
-      <projectType      
-         isAbstract="false"     
-         isTest="false"
-         name="%TargetName.intel.fortran.exe"
-         id="photran.managedbuild.target.intel.fortran.exe">
-         <configuration
-            name="%ConfigName.x86.Dbg"
-            id="photran.managedbuild.config.intel.fortran.exe.x86.debug"
-            cleanCommand="rm -rf"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+<!-- Begin Intel Fortran x86 compiler tool-chain definition -->
             <toolChain
                archList="x86"
                osList="linux"
-               name="%ToolChainName.Dbg"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.exe.x86.debug"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.exe.x86.debug">
+               name="%ToolChainName.x86"
+               targetTool="photran.managedbuild.tool.intel.fortran.linker;photran.managedbuild.tool.intel.fortran.archiver"
+               id="photran.managedbuild.toolchain.intel.fortran.x86.base">
                <!-- add archList="x86,x86_64" when possible-->
 		       <targetPlatform
-		          id="photran.managedbuild.target.intel.platform.exe.x86.debug"
-		          name="%PlatformName.Dbg"
+		          id="photran.managedbuild.target.intel.platform.x86.base"
+		          name="%PlatformName.x86"
 		          binaryParser="org.eclipse.cdt.core.ELF"
 		          osList="linux"
                   archList="x86">
@@ -1618,110 +1732,224 @@
                <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.exe.x86.debug"
-                  name="%BuilderName.Dbg"
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  id="photran.managedbuild.target.intel.builder.x86.base">
+               </builder>               
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base"
+                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.x86.base"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.x86.base"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  <enablement 
+              	    type="ALL">
+              	    <not>
+			  	      <checkBuildProperty 
+			  		    property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		    value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			  	    </not>
+			      </enablement>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.x86.base"
+                  superClass="cdt.managedbuild.tool.gnu.assembler">
+               </tool>
+			   <tool
+		    		  id="photran.managedbuild.tool.intel.fortran.archiver.x86.base"
+			          superClass="photran.managedbuild.tool.intel.fortran.archiver">
+			      <enablement 
+              	     type="ALL">
+			  	     <checkBuildProperty 
+			  		     property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		     value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			      </enablement>
+               </tool>                 
+            </toolChain>
+
+<!-- End Intel Fortran x86 compiler tool-chain definition -->
+
+<!-- Begin Intel Fortran IPF compiler tool-chain definition -->
+            <toolChain
+               archList="ia64"
+               osList="linux"
+               name="%ToolChainName.ipf"
+               targetTool="photran.managedbuild.tool.intel.fortran.linker;photran.managedbuild.tool.intel.fortran.archiver"
+               id="photran.managedbuild.toolchain.intel.fortran.ipf.base">
+               <targetPlatform
+                  id="photran.managedbuild.target.intel.platform.ipf.base"
+                  name="%PlatformName.ipf"
+                  binaryParser="org.eclipse.cdt.core.ELF"
+                  osList="linux"
+                  archList="ia64">
+               </targetPlatform>
+               <builder
+                  superClass="cdt.managedbuild.target.gnu.builder"
+                  id="photran.managedbuild.target.intel.builder.ipf.base">
+               </builder>               
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base"
+                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.ipf.base"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.ipf.base"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  <enablement 
+              	    type="ALL">
+              	    <not>
+			  	      <checkBuildProperty 
+			  		    property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		    value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			  	    </not>
+			      </enablement>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.ipf.base"
+                  superClass="cdt.managedbuild.tool.gnu.assembler">
+               </tool>  
+			   <tool
+		    		  id="photran.managedbuild.tool.intel.fortran.archiver.ipf.base"
+			          superClass="photran.managedbuild.tool.intel.fortran.archiver">
+			      <enablement 
+              	     type="ALL">
+			  	     <checkBuildProperty 
+			  		     property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		     value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			      </enablement>
+               </tool>
+           </toolChain>
+
+<!-- End Intel Fortran IPF compiler tool-chain definition -->
+
+         <configuration
+               id="photran.managedbuild.config.intel.fortran.base"
+               cleanCommand="rm -rf">
+		    <enablement type="CONTAINER_ATTRIBUTE" 
+              	attribute="artifactExtension"
+              	value="so"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"/>
+			  </enablement>
+		    <enablement type="CONTAINER_ATTRIBUTE" 
+              	attribute="artifactExtension" 
+              	value="a"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			  </enablement>
+		</configuration>
+
+<!-- Begin Intel Fortran exe project -->
+      <projectType      
+         isAbstract="false"     
+         isTest="false"
+         name="%TargetName.intel.fortran.exe"
+         id="photran.managedbuild.target.intel.fortran.exe"
+         buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+         <configuration
+            name="%ConfigName.x86.Dbg"
+            id="photran.managedbuild.config.intel.fortran.exe.x86.debug"
+            parent="photran.managedbuild.config.intel.fortran.base"
+	        buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.exe.x86.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86.base">
+		       <targetPlatform
+		          id="photran.managedbuild.target.intel.platform.exe.x86.debug"
+		          superClass="photran.managedbuild.target.intel.platform.x86.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86.base"
+                  id="photran.managedbuild.target.intel.builder.exe.x86.debug">
                </builder>               
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.exe.x86.debug"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.exe.x86.debug.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.none"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option   
                      id="photran.intel.gnu.c.compiler.exe.x86.debug.option.debugging.level"					     
-                     defaultValue="gnu.c.debugging.level.max"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.exe.x86.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86.base">
                   <option
                      id="intel.linux.fortran.compiler.exe.x86.debug.general.optimization"
-                     defaultValue="general.opt.none"
                      superClass="intel.linux.fortran.compiler.general.optimization">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.exe.x86.debug.general.debug"
-                     defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.exe.x86.debug.optimization.inline.expand"
-                     defaultValue="inl.exp.none"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.exe.x86.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86.base">
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.exe.x86.debug"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
                </tool>   
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.x86.Rel"
             id="photran.managedbuild.config.intel.fortran.exe.x86.release"
-            cleanCommand="rm -rf"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
             <toolChain
-               archList="x86"
-               osList="linux"
-               name="%ToolChainName.Rel"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.exe.x86.release"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.exe.x86.release">
-               <!-- add archList="x86,x86_64" when possible-->
+               id="photran.managedbuild.toolchain.intel.fortran.exe.x86.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.exe.x86.release"
-                  name="%PlatformName.Rel"		             
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="x86">
+                  superClass="photran.managedbuild.target.intel.platform.x86.base">
                </targetPlatform>
-               <!-- add archList="x86,x86_64" when possible-->
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.exe.x86.release"
-                  name="%BuilderName.Rel"		              
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.x86.base"
+                  id="photran.managedbuild.target.intel.builder.exe.x86.release">
                </builder> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.exe.x86.release"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.exe.x86.release.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.most"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option
                      id="photran.intel.gnu.c.compiler.exe.x86.release.option.debugging.level"
-                     defaultValue="gnu.c.debugging.level.none"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.exe.x86.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">                     
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86.base">                     
                </tool>
 
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.exe.x86.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86.base">
                </tool> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.exe.x86.release"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
                </tool>   
             </toolChain>
          </configuration>
@@ -1729,126 +1957,97 @@
          <configuration
             name="%ConfigName.ipf.Dbg"
             id="photran.managedbuild.config.intel.fortran.exe.ipf.debug"
-            cleanCommand="rm -rf"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
             <toolChain
-               archList="ia64"
-               osList="linux"
-               name="%ToolChainName.Dbg"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.exe.ipf.debug"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.exe.ipf.debug">
+               id="photran.managedbuild.toolchain.intel.fortran.exe.ipf.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.ipf.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.exe.ipf.debug"
-                  name="%PlatformName.Dbg"
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="ia64">
+                  superClass="photran.managedbuild.target.intel.platform.ipf.base">
                </targetPlatform>
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.exe.ipf.debug"
-                  name="%BuilderName.Dbg"
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.ipf.base"
+                  id="photran.managedbuild.target.intel.builder.exe.ipf.debug">
                </builder>               
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.exe.ipf.debug"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.exe.ipf.debug.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.none"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option   
                      id="photran.intel.gnu.c.compiler.exe.ipf.debug.option.debugging.level"					     
-                     defaultValue="gnu.c.debugging.level.max"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.exe.ipf.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">
                   <option
                      id="intel.linux.fortran.compiler.exe.ipf.debug.general.optimization"
-                     defaultValue="general.opt.none"
                      superClass="intel.linux.fortran.compiler.general.optimization">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.exe.ipf.debug.general.debug"
-                     defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.exe.ipf.debug.optimization.inline.expand"
-                     defaultValue="inl.exp.none"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.exe.ipf.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.ipf.base">
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.exe.ipf.debug"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.ipf.base">
                </tool>   
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.ipf.Rel"
             id="photran.managedbuild.config.intel.fortran.exe.ipf.release"
-            cleanCommand="rm -rf"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
             <toolChain
-               archList="ia64"
-               osList="linux"
-               name="%ToolChainName.Rel"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.exe.ipf.release"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.exe.ipf.release">
+               id="photran.managedbuild.toolchain.intel.fortran.exe.ipf.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.ipf.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.exe.ipf.release"
-                  name="%PlatformName.Rel"		             
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="ia64">
+                  superClass="photran.managedbuild.target.intel.platform.ipf.base">
                </targetPlatform>
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.exe.ipf.release"
-                  name="%BuilderName.Rel"		              
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.ipf.base"
+                  id="photran.managedbuild.target.intel.builder.exe.ipf.release">
                </builder> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.exe.ipf.release"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.exe.ipf.release.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.most"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option
                      id="photran.intel.gnu.c.compiler.exe.ipf.release.option.debugging.level"
-                     defaultValue="gnu.c.debugging.level.none"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.exe.ipf.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">                     
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">                     
                </tool>
 
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.exe.ipf.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.ipf.base">
                </tool> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.exe.ipf.release"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.ipf.base">
                </tool>   
             </toolChain>
          </configuration>
@@ -1862,143 +2061,102 @@
          isAbstract="false"     
          isTest="false"
          name="%TargetName.intel.fortran.ar"
-         id="photran.managedbuild.target.intel.fortran.ar">
+         id="photran.managedbuild.target.intel.fortran.ar"
+         buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
          <configuration
             name="%ConfigName.x86.Dbg"
             id="photran.managedbuild.config.intel.fortran.ar.x86.debug"
-            cleanCommand="rm -rf"
-            artifactExtension="a"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
             <toolChain
-               archList="x86"
-               osList="linux"
-               name="%ToolChainName.Dbg"
-               targetTool="photran.managedbuild.tool.intel.fortran.archiver.ar.x86.debug"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.ar.x86.debug">
-               <!-- add archList="x86,x86_64" when possible-->
+               id="photran.managedbuild.toolchain.intel.fortran.ar.x86.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.ar.x86.debug"
-                  name="%PlatformName.Dbg"
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="x86">
+                  superClass="photran.managedbuild.target.intel.platform.x86.base">
                </targetPlatform>
-               <!-- add archList="x86,x86_64" when possible-->
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.ar.x86.debug"
-                  name="%BuilderName.Dbg"
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.x86.base"
+                  id="photran.managedbuild.target.intel.builder.ar.x86.debug">
                </builder>               
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.ar.x86.debug"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.ar.x86.debug.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.none"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option   
                      id="photran.intel.gnu.c.compiler.ar.x86.debug.option.debugging.level"					     
-                     defaultValue="gnu.c.debugging.level.max"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.ar.x86.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86.base">
                   <option
                      id="intel.linux.fortran.compiler.ar.x86.debug.general.optimization"
-                     defaultValue="general.opt.none"
                      superClass="intel.linux.fortran.compiler.general.optimization">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.ar.x86.debug.general.debug"
-                     defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
-<!-- Would like to default -fp to true in the debug configuration however, there appears to be a bug in handling of the optionCategory...try a later CDT version or HEAD to see if it is fixed.
-                  <option
-                     id="intel.linux.fortran.compiler.ar.x86.debug.optimization.fp"
-                     defaultValue="true"
-                     superClass="intel.linux.fortran.compiler.optimization.fp">
-                  </option>
--->
                   <option
                      id="intel.linux.fortran.compiler.ar.x86.debug.optimization.inline.expand"
-                     defaultValue="inl.exp.none"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.archiver.ar.x86.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.archiver">
+                  superClass="photran.managedbuild.tool.intel.fortran.archiver.x86.base">
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.ar.x86.debug"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
                </tool>   
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.x86.Rel"
             id="photran.managedbuild.config.intel.fortran.ar.x86.release"
-            cleanCommand="rm -rf"
-            artifactExtension="a"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
             <toolChain
-               archList="x86"
-               osList="linux"
-               name="%ToolChainName.Rel"
-               targetTool="photran.managedbuild.tool.intel.fortran.archiver.ar.x86.release"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.ar.x86.release">
-               <!-- add archList="x86,x86_64" when possible-->
+               id="photran.managedbuild.toolchain.intel.fortran.ar.x86.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.ar.x86.release"
-                  name="%PlatformName.Rel"		             
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="x86">
+                  superClass="photran.managedbuild.target.intel.platform.x86.base">
                </targetPlatform>
-               <!-- add archList="x86,x86_64" when possible-->
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.ar.x86.release"
-                  name="%BuilderName.Rel"		              
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.x86.base"
+                  id="photran.managedbuild.target.intel.builder.ar.x86.release">
                </builder> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.ar.x86.release"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.ar.x86.release.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.most"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option
                      id="photran.intel.gnu.c.compiler.ar.x86.release.option.debugging.level"
-                     defaultValue="gnu.c.debugging.level.none"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.ar.x86.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">                     
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86.base">                     
                </tool>
 
                <tool
                   id="photran.managedbuild.tool.intel.fortran.archiver.ar.x86.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.archiver">
+                  superClass="photran.managedbuild.tool.intel.fortran.archiver.x86.base">
                </tool> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.ar.x86.release"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
                </tool>   
             </toolChain>
          </configuration>
@@ -2006,128 +2164,97 @@
          <configuration
             name="%ConfigName.ipf.Dbg"
             id="photran.managedbuild.config.intel.fortran.ar.ipf.debug"
-            cleanCommand="rm -rf"
-            artifactExtension="a"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
             <toolChain
-               archList="ia64"
-               osList="linux"
-               name="%ToolChainName.Dbg"
-               targetTool="photran.managedbuild.tool.intel.fortran.archiver.ar.ipf.debug"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.ar.ipf.debug">
+               id="photran.managedbuild.toolchain.intel.fortran.ar.ipf.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.ipf.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.ar.ipf.debug"
-                  name="%PlatformName.Dbg"
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="ia64">
+                  superClass="photran.managedbuild.target.intel.platform.ipf.base">
                </targetPlatform>
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.ar.ipf.debug"
-                  name="%BuilderName.Dbg"
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.ipf.base"
+                  id="photran.managedbuild.target.intel.builder.ar.ipf.debug">
                </builder>               
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.ar.ipf.debug"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.ar.ipf.debug.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.none"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option   
                      id="photran.intel.gnu.c.compiler.ar.ipf.debug.option.debugging.level"					     
-                     defaultValue="gnu.c.debugging.level.max"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.ar.ipf.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">
                   <option
                      id="intel.linux.fortran.compiler.ar.ipf.debug.general.optimization"
-                     defaultValue="general.opt.none"
                      superClass="intel.linux.fortran.compiler.general.optimization">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.ar.ipf.debug.general.debug"
-                     defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.ar.ipf.debug.optimization.inline.expand"
-                     defaultValue="inl.exp.none"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.archiver.ar.ipf.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.archiver">
+                  superClass="photran.managedbuild.tool.intel.fortran.archiver.ipf.base">
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.ar.ipf.debug"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.ipf.base">
                </tool>   
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.ipf.Rel"
             id="photran.managedbuild.config.intel.fortran.ar.ipf.release"
-            cleanCommand="rm -rf"
-            artifactExtension="a"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
             <toolChain
-               archList="ia64"
-               osList="linux"
-               name="%ToolChainName.Rel"
-               targetTool="photran.managedbuild.tool.intel.fortran.archiver.ar.ipf.release"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.ar.ipf.release">
+               id="photran.managedbuild.toolchain.intel.fortran.ar.ipf.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.ipf.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.ar.ipf.release"
-                  name="%PlatformName.Rel"		             
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="ia64">
+                  superClass="photran.managedbuild.target.intel.platform.ipf.base">
                </targetPlatform>
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.ar.ipf.release"
-                  name="%BuilderName.Rel"		              
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.ipf.base"
+                  id="photran.managedbuild.target.intel.builder.ar.ipf.release">
                </builder> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.ar.ipf.release"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.ar.ipf.release.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.most"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option
                      id="photran.intel.gnu.c.compiler.ar.ipf.release.option.debugging.level"
-                     defaultValue="gnu.c.debugging.level.none"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.ar.ipf.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">                     
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">                     
                </tool>
 
                <tool
                   id="photran.managedbuild.tool.intel.fortran.archiver.ar.ipf.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.archiver">
+                  superClass="photran.managedbuild.tool.intel.fortran.archiver.ipf.base">
                </tool> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.ar.ipf.release"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.ipf.base">
                </tool>   
             </toolChain>
          </configuration>
@@ -2140,311 +2267,221 @@
          isAbstract="false"     
          isTest="false"
          name="%TargetName.intel.fortran.so"
-         id="photran.managedbuild.target.intel.fortran.so">
+         id="photran.managedbuild.target.intel.fortran.so"
+         buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
          <configuration
             name="%ConfigName.x86.Dbg"
             id="photran.managedbuild.config.intel.fortran.so.x86.debug"
-            cleanCommand="rm -rf"
-            artifactExtension="so"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
             <toolChain
-               archList="x86"
-               osList="linux"
-               name="%ToolChainName.Dbg"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.so.x86.debug"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.so.x86.debug">
-               <!-- add archList="x86,x86_64" when possible-->
+               id="photran.managedbuild.toolchain.intel.fortran.so.x86.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.so.x86.debug"
-                  name="%PlatformName.Dbg"
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="x86">
+                  superClass="photran.managedbuild.target.intel.platform.x86.base">
                </targetPlatform>
-               <!-- add archList="x86,x86_64" when possible-->
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.so.x86.debug"
-                  name="%BuilderName.Dbg"
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.x86.base"
+                  id="photran.managedbuild.target.intel.builder.so.x86.debug">
                </builder>               
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.so.x86.debug"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.so.x86.debug.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.none"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option   
                      id="photran.intel.gnu.c.compiler.so.x86.debug.option.debugging.level"					     
-                     defaultValue="gnu.c.debugging.level.max"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.so.x86.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86.base">
                   <option
                      id="intel.linux.fortran.compiler.so.x86.debug.general.optimization"
-                     defaultValue="general.opt.none"
                      superClass="intel.linux.fortran.compiler.general.optimization">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.so.x86.debug.general.debug"
-                     defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
-<!-- Would like to default -fp to true in the debug configuration however, there appears to be a bug in handling of the optionCategory...try a later CDT version or HEAD to see if it is fixed.
-                  <option
-                     id="intel.linux.fortran.compiler.so.x86.debug.optimization.fp"
-                     defaultValue="true"
-                     superClass="intel.linux.fortran.compiler.optimization.fp">
-                  </option>
--->
                   <option
                      id="intel.linux.fortran.compiler.so.x86.debug.optimization.inline.expand"
-                     defaultValue="inl.exp.none"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.so.x86.debug"
-                  outputFlag="-shared -o"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86.base">
                   <outputType
-                     outputs="so"
-                     outputPrefix="lib"
-                     buildVariable="LIBRARIES"
-                     superClass="photran.managedbuild.tool.intel.fortran.linker.output"
+                     superClass="photran.managedbuild.tool.intel.fortran.linker.output.so"
                      id="photran.managedbuild.tool.intel.fortran.linker.so.x86.debug.output">
                   </outputType>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.so.x86.debug"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
                </tool>   
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.x86.Rel"
             id="photran.managedbuild.config.intel.fortran.so.x86.release"
-            cleanCommand="rm -rf"
-            artifactExtension="so"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
             <toolChain
-               archList="x86"
-               osList="linux"
-               name="%ToolChainName.Rel"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.so.x86.release"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.so.x86.release">
-               <!-- add archList="x86,x86_64" when possible-->
+               id="photran.managedbuild.toolchain.intel.fortran.so.x86.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.so.x86.release"
-                  name="%PlatformName.Rel"		             
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="x86">
+                  superClass="photran.managedbuild.target.intel.platform.x86.base">
                </targetPlatform>
-               <!-- add archList="x86,x86_64" when possible-->
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.so.x86.release"
-                  name="%BuilderName.Rel"		              
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.x86.base"
+                  id="photran.managedbuild.target.intel.builder.so.x86.release">
                </builder> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.so.x86.release"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86.base">
                   <option
                      id="photran.intel.gnu.c.compiler.so.x86.release.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.most"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option
                      id="photran.intel.gnu.c.compiler.so.x86.release.option.debugging.level"
-                     defaultValue="gnu.c.debugging.level.none"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.so.x86.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86">                     
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86.base">                     
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.so.x86.release"
-                  outputFlag="-shared -o"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86.base">
                   <outputType
-                     outputs="so"
-                     outputPrefix="lib"
-                     buildVariable="LIBRARIES"
-                     superClass="photran.managedbuild.tool.intel.fortran.linker.output"
+                     superClass="photran.managedbuild.tool.intel.fortran.linker.output.so"
                      id="photran.managedbuild.tool.intel.fortran.linker.so.x86.release.output">
                   </outputType>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.so.x86.release"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
                </tool>
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.ipf.Dbg"
             id="photran.managedbuild.config.intel.fortran.so.ipf.debug"
-            cleanCommand="rm -rf"
-            artifactExtension="so"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
             <toolChain
-               archList="ia64"
-               osList="linux"
-               name="%ToolChainName.Dbg"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.so.ipf.debug"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.so.ipf.debug">
+               id="photran.managedbuild.toolchain.intel.fortran.so.ipf.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.ipf.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.so.ipf.debug"
-                  name="%PlatformName.Dbg"
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="ia64">
+                  superClass="photran.managedbuild.target.intel.platform.ipf.base">
                </targetPlatform>
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.so.ipf.debug"
-                  name="%BuilderName.Dbg"
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.ipf.base"
+                  id="photran.managedbuild.target.intel.builder.so.ipf.debug">
                </builder>               
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.so.ipf.debug"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.so.ipf.debug.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.none"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option   
                      id="photran.intel.gnu.c.compiler.so.ipf.debug.option.debugging.level"					     
-                     defaultValue="gnu.c.debugging.level.max"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.so.ipf.debug"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">
                   <option
                      id="intel.linux.fortran.compiler.so.ipf.debug.general.optimization"
-                     defaultValue="general.opt.none"
                      superClass="intel.linux.fortran.compiler.general.optimization">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.so.ipf.debug.general.debug"
-                     defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.so.ipf.debug.optimization.inline.expand"
-                     defaultValue="inl.exp.none"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
                   </option>
                   <option
                      id="intel.linux.fortran.compiler.so.ipf.so.debug.option.codegen.fpic"
-                     defaultValue="true"
-                     superClass="intel.linux.fortran.compiler.codegen.fpic">
+                     superClass="intel.linux.fortran.compiler.codegen.fpic.ipf">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.so.ipf.debug"
-                  outputFlag="-shared -o"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.ipf.base">
                   <outputType
-                     outputs="so"
-                     outputPrefix="lib"
-                     buildVariable="LIBRARIES"
-                     superClass="photran.managedbuild.tool.intel.fortran.linker.output"
+                     superClass="photran.managedbuild.tool.intel.fortran.linker.output.so"
                      id="photran.managedbuild.tool.intel.fortran.linker.so.ipf.debug.output">
                   </outputType>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.so.ipf.debug"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.ipf.base">
                </tool>   
             </toolChain>
          </configuration>
          <configuration
             name="%ConfigName.ipf.Rel"
             id="photran.managedbuild.config.intel.fortran.so.ipf.release"
-            cleanCommand="rm -rf"
-            artifactExtension="so"
-            errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
             <toolChain
-               archList="ia64"
-               osList="linux"
-               name="%ToolChainName.Rel"
-               targetTool="photran.managedbuild.tool.intel.fortran.linker.so.ipf.release"
-               scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-               id="photran.managedbuild.toolchain.intel.fortran.so.ipf.release">
+               id="photran.managedbuild.toolchain.intel.fortran.so.ipf.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.ipf.base">
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.so.ipf.release"
-                  name="%PlatformName.Rel"		             
-                  binaryParser="org.eclipse.cdt.core.ELF"
-                  osList="linux"
-                  archList="ia64">
+                  superClass="photran.managedbuild.target.intel.platform.ipf.base">
                </targetPlatform>
                <builder
-                  superClass="cdt.managedbuild.target.gnu.builder"
-                  id="photran.managedbuild.target.intel.builder.so.ipf.release"
-                  name="%BuilderName.Rel"		              
-                  command="make"
-                  arguments="-k"
-                  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+                  superClass="photran.managedbuild.target.intel.builder.ipf.base"
+                  id="photran.managedbuild.target.intel.builder.so.ipf.release">
                </builder> 
                <tool
                   id="photran.managedbuild.tool.intel.gnu.c.compiler.so.ipf.release"
-                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.ipf.base">                          
                   <option
                      id="photran.intel.gnu.c.compiler.so.ipf.release.option.optimization.level"
-                     defaultValue="gnu.c.optimization.level.most"
                      superClass="gnu.c.compiler.option.optimization.level">
                   </option>
                   <option
                      id="photran.intel.gnu.c.compiler.so.ipf.release.option.debugging.level"
-                     defaultValue="gnu.c.debugging.level.none"
                      superClass="gnu.c.compiler.option.debugging.level">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.so.ipf.release"
-                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf">                     
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">                     
                   <option
                      id="intel.linux.fortran.compiler.so.ipf.so.release.option.codegen.fpic"
-                     defaultValue="true"
-                     superClass="intel.linux.fortran.compiler.codegen.fpic">
+                     superClass="intel.linux.fortran.compiler.codegen.fpic.ipf">
                   </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.so.ipf.release"
-                  outputFlag="-shared -o"
-                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.ipf.base">
                   <outputType
-                     outputs="so"
-                     outputPrefix="lib"
-                     buildVariable="LIBRARIES"
-                     superClass="photran.managedbuild.tool.intel.fortran.linker.output"
+                     superClass="photran.managedbuild.tool.intel.fortran.linker.output.so"
                      id="photran.managedbuild.tool.intel.fortran.linker.so.ipf.release.output">
                   </outputType>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.so.ipf.release"
-                  superClass="cdt.managedbuild.tool.gnu.assembler">
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.ipf.base">
                </tool>
             </toolChain>
          </configuration>
