@@ -34,4 +34,8 @@ public class TypeCheckerTestCase extends TestCase
 //        checkType("3.2+4*5**6.7", Type.REAL);
 //        checkType("(3.2+4)*5**6.7", Type.REAL);
 //    }
+    
+    public void test()
+    {
+    }
 }
