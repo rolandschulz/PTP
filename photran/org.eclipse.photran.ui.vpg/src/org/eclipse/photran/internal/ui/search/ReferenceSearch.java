@@ -79,18 +79,10 @@ public class ReferenceSearch implements ISearchQuery
         PhotranVPG.getInstance().ensureVPGIsUpToDate(monitor);
         try
         {
-            List<PhotranTokenRef> references = getDef().findAllReferences();
-            for (PhotranTokenRef ref : references)
-            {
-                // Filter out unwanted thingies.
-                if (!searchScope.filterOut(ref, getFile()))
-                {
-                    Match match = new Match(ref.getFile(),
-                                            ref.getOffset(),
-                                            ref.getLength());
-                    ((ReferenceSearchResult)getSearchResult()).addMatch(match);
-                }
-            }
+            filterAndAddSearchResult(getDef().getTokenRef());
+            
+            for (PhotranTokenRef ref : getDef().findAllReferences())
+                filterAndAddSearchResult(ref);
         }
         catch (Exception e)
         {
@@ -101,6 +93,17 @@ public class ReferenceSearch implements ISearchQuery
 
         return new Status(IStatus.OK, Activator.PLUGIN_ID,
                           SearchMessages.getString("ReferenceSearch_1"));
+    }
+
+    private void filterAndAddSearchResult(PhotranTokenRef ref)
+    {
+        if (!searchScope.filterOut(ref, getFile()))
+        {
+            Match match = new Match(ref.getFile(),
+                                    ref.getOffset(),
+                                    ref.getLength());
+            ((ReferenceSearchResult)getSearchResult()).addMatch(match);
+        }
     }
 
     public static void searchForReference(Definition p_def,
