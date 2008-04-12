@@ -1,22 +1,20 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 final class SampleEditorASTTask implements IEditorASTTask
 {
-    private final ExperimentalFreeFormFortranEditor freeFormVPGEditor;
+    private final AbstractFortranEditor freeFormVPGEditor;
     private Color LIGHT_YELLOW = new Color(null, new RGB(240, 240, 128));
 
-    SampleEditorASTTask(ExperimentalFreeFormFortranEditor freeFormVPGEditor)
+    SampleEditorASTTask(AbstractFortranEditor freeFormVPGEditor)
     {
         this.freeFormVPGEditor = freeFormVPGEditor;
     }

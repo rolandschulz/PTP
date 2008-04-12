@@ -15,6 +15,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.IWorkingCopy;
+import org.eclipse.cdt.internal.core.model.LanguageDescriptor;
 import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.text.CReconciler;
@@ -23,7 +24,9 @@ import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
@@ -37,6 +40,7 @@ import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
@@ -89,6 +93,8 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     // Constants
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
+    protected static final String RECONCILER_EXTENSION_POINT_ID = "org.eclipse.photran.ui.reconciler";
+    
     protected static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
     
     protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
@@ -178,24 +184,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     protected void initializeKeyBindingScopes()
     {
         setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID });
-    }
-
-//    /**
-//     * Create actions that will be registered with the editor.
-//     */
-//    protected void createActions()
-//    {
-//        super.createActions();
-//        createAction(new FortranBlockCommentActionDelegate(this), BLOCK_COMMENT_COMMAND_ID);
-//        //createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
-//    }
-
-    protected void createAction(IAction action, String id)
-    {
-        action.setActionDefinitionId(id);
-        setAction(id, action);
-        markAsStateDependentAction(id, true);
-        markAsSelectionDependentAction(id, true);      
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -330,11 +318,37 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
          */
         public IReconciler getReconciler(ISourceViewer sourceViewer)
         {
-            MonoReconciler reconciler = new CReconciler(AbstractFortranEditor.this, new CReconcilingStrategy(AbstractFortranEditor.this));
-            reconciler.setIsIncrementalReconciler(false);
-            reconciler.setProgressMonitor(new NullProgressMonitor());
-            reconciler.setDelay(500);
+            IReconciler reconciler = loadReconciler();
+            if (reconciler instanceof MonoReconciler)
+            {
+                MonoReconciler r = (MonoReconciler)reconciler;
+                r.setIsIncrementalReconciler(false);
+                r.setProgressMonitor(new NullProgressMonitor());
+                r.setDelay(500);
+            }
             return reconciler;
+        }
+        
+        private IReconciler loadReconciler()
+        {
+            // If org.eclipse.photran.vpg.ui is contributing a reconciler through the extension point, load it
+            IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor(RECONCILER_EXTENSION_POINT_ID);
+            if (configs.length > 0)
+            {
+                try
+                {
+                    IFortranReconcilerFactory factory = (IFortranReconcilerFactory)
+                        configs[configs.length-1].createExecutableExtension("factory");
+                    return factory.create(AbstractFortranEditor.this);
+                }
+                catch (CoreException e)
+                {
+                    // Fall through
+                }
+            }
+
+            // Otherwise, default to CDT's reconciler
+            return new CReconciler(AbstractFortranEditor.this, new CReconcilingStrategy(AbstractFortranEditor.this));
         }
     }
 
@@ -577,7 +591,17 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     {
         return getSite().getShell();
     }
+
+    public ISourceViewer getSourceViewerx() // Annoyingly, the superclass method is declared final
+    {
+        return super.getSourceViewer();
+    }
     
+    public IReconciler getReconciler()
+    {
+        return getSourceViewerConfiguration().getReconciler(getSourceViewer());
+    }
+
     public void forceOutlineViewUpdate()
     {
         //  //     ///     ////   //  //    ///

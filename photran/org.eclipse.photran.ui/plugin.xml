@@ -206,4 +206,10 @@
          </enabledWhen>
       </page>
     </extension>    
+
+   <!--============================-->
+   <!-- Reconciler Extension Point -->
+   <!--============================-->
+
+   <extension-point id="reconciler" name="Reconciler" schema="schema/reconciler.exsd"/>
 </plugin>

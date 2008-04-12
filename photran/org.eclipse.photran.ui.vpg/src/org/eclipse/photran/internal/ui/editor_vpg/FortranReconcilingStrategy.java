@@ -1,8 +1,10 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import java.io.ByteArrayInputStream;
+import java.util.LinkedList;
 
 import org.eclipse.cdt.internal.ui.text.CReconcilingStrategy;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -17,6 +19,8 @@ import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.views.DeclarationView;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import bz.over.vpg.eclipse.VPGJob;
@@ -24,7 +28,19 @@ import bz.over.vpg.eclipse.VPGJob;
 @SuppressWarnings("restriction")
 public class FortranReconcilingStrategy extends CReconcilingStrategy
 {
-    protected ExperimentalFreeFormFortranEditor editor = null;
+    /**
+     * These jobs will be run (in order) if the contents of the editor parses successfully.  The VPG will probably
+     * <i>not</i> be up to date, but token positions will correspond to the contents of the editor.
+     */
+    protected LinkedList<IEditorASTTask> astTasks = new LinkedList<IEditorASTTask>();
+    
+    /**
+     * These jobs will be run (in order) when the VPG is more-or-less up-to-date and an AST is available for the
+     * file in the editor.
+     */
+    protected LinkedList<IEditorVPGTask> vpgTasks = new LinkedList<IEditorVPGTask>();
+    
+    protected final AbstractFortranEditor editor;
     protected PhotranVPG vpg = PhotranVPG.getInstance();
     protected VPGJob<IFortranAST, Token> dispatchASTTasksJob = null;
     protected VPGJob<IFortranAST, Token> updateVPGJob = null, dispatchVPGTasksJob = null;
@@ -35,7 +51,29 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
     public FortranReconcilingStrategy(ITextEditor editor)
     {
         super(editor);
-        if (editor instanceof ExperimentalFreeFormFortranEditor) this.editor = (ExperimentalFreeFormFortranEditor)editor;
+        if (editor instanceof AbstractFortranEditor)
+        {
+            this.editor = (AbstractFortranEditor)editor;
+            
+//            astTasks.add(new SampleEditorASTTask(this.editor));
+//            vpgTasks.add(new SampleEditorVPGTask(this.editor));
+            
+//            SampleEditorMappingTask t = new SampleEditorMappingTask(this.editor);
+//            astTasks.add(t.astTask);
+//            vpgTasks.add(t.vpgTask);
+            
+            this.vpgTasks.add(new IEditorVPGTask()
+            {
+                public void handle(IFile file, IFortranAST ast)
+                {
+                    //declView.update("Offset " + FortranReconcilingStrategy.this.editor.getHighlightRange().getOffset());
+                }
+            });
+        }
+        else
+        {
+            this.editor = null;
+        }
     }
 
     @Override public void initialReconcile()
@@ -72,7 +110,7 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
                     astRootNode = parser.parse(lexer);
                     if (astRootNode == null) return Status.OK_STATUS;
                     
-                    for (IEditorASTTask task : editor.astTasks)
+                    for (IEditorASTTask task : astTasks)
                         task.handle(new FortranAST(editor.getIFile(),
                                                    astRootNode,
                                                    lexer.getTokenList()));
@@ -116,7 +154,7 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
             {
                 if (vpgAST != null) // Parse might have failed
                 {
-                    for (IEditorVPGTask task : editor.vpgTasks)
+                    for (IEditorVPGTask task : vpgTasks)
                         task.handle(editor.getIFile(), vpgAST);
                 }
                 dispatchVPGTasksJob = null;

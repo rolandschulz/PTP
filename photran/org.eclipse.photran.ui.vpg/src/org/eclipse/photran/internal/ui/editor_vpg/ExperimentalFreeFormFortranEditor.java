@@ -1,7 +1,5 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
-import java.util.LinkedList;
-
 import org.eclipse.cdt.internal.ui.text.CReconciler;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IPaintPositionManager;
@@ -25,32 +23,6 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
 {
-    /**
-     * These jobs will be run (in order) if the contents of the editor parses successfully.  The VPG will probably
-     * <i>not</i> be up to date, but token positions will correspond to the contents of the editor.
-     */
-    LinkedList<IEditorASTTask> astTasks = new LinkedList<IEditorASTTask>();
-    
-    /**
-     * These jobs will be run (in order) when the VPG is more-or-less up-to-date and an AST is available for the
-     * file in the editor.
-     */
-    LinkedList<IEditorVPGTask> vpgTasks = new LinkedList<IEditorVPGTask>();
-    
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    public ExperimentalFreeFormFortranEditor()
-    {
-        astTasks.add(new SampleEditorASTTask(this));
-        vpgTasks.add(new SampleEditorVPGTask(this));
-        
-        SampleEditorMappingTask t = new SampleEditorMappingTask(this);
-        astTasks.add(t.astTask);
-        vpgTasks.add(t.vpgTask);
-    }
-    
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Custom Reconciler Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,14 +114,5 @@ public class ExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
                 public void setPositionManager(IPaintPositionManager manager) {}
             });
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Utility Methods
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ISourceViewer getSourceViewerx() // Annoyingly, the superclass method is declared final
-    {
-        return super.getSourceViewer();
     }
 }

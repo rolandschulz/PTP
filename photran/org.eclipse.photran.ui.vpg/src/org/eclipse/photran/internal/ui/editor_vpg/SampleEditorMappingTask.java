@@ -1,11 +1,11 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
@@ -14,12 +14,12 @@ final class SampleEditorMappingTask
     IEditorVPGTask vpgTask = new VPGTask();
     IEditorASTTask astTask = new ASTTask();
     
-    private final ExperimentalFreeFormFortranEditor freeFormVPGEditor;
+    private final AbstractFortranEditor freeFormVPGEditor;
     private DefinitionMap defMap = null;
     
     private Color LIGHT_YELLOW = new Color(null, new RGB(240, 240, 128));
 
-    SampleEditorMappingTask(ExperimentalFreeFormFortranEditor freeFormVPGEditor)
+    SampleEditorMappingTask(AbstractFortranEditor freeFormVPGEditor)
     {
         this.freeFormVPGEditor = freeFormVPGEditor;
     }

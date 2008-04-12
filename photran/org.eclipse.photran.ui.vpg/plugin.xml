@@ -100,6 +100,13 @@
    <!-- Find All References -->
    <!--=====================-->
    <extension
+         point="org.eclipse.search.searchResultViewPages">
+      <viewPage
+            class="org.eclipse.photran.internal.ui.search.ReferenceSearchViewPage"
+            id="searchreferences.search.ReferenceSearchViewPage"
+            searchResultClass="org.eclipse.photran.internal.ui.search.ReferenceSearchResult"/>
+   </extension>
+   <extension
          point="org.eclipse.ui.commands">
       <category
             name="Fortran Search"
@@ -471,7 +478,7 @@
            That way, fixed form files will open in the fixed form editor by default, but they can also
            be opened in the free form editor (right click, and choose Open With).  Similarly, free form files
            can be opened in the fixed form editor. -->
-      <editor
+      <!--editor
             default="false"
             name="Fortran Editor (VPG Experimental Features)"
             icon="icons/full/obj16/f_file_obj.gif"
@@ -482,17 +489,39 @@
               contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
          <contentTypeBinding
               contentTypeId="org.eclipse.photran.core.fortranSource" />
-      </editor>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
+      </editor-->
    </extension>
    
+   <!--==================-->
+   <!-- Declaration View -->   
+   <!--==================-->
+   <!-- 
+ 		Added for the Declaration view Project
+ 		@author John Goode, Abe Hassan, Sean Kim
+ 		Group: Fennel-Garlic
+ 		University of Illinois at Urbana-Champaign 
+ 		CS 427 Fall 2007  -->
    <extension
-         point="org.eclipse.search.searchResultViewPages">
-      <viewPage
-            class="org.eclipse.photran.internal.ui.search.ReferenceSearchViewPage"
-            id="searchreferences.search.ReferenceSearchViewPage"
-            searchResultClass="org.eclipse.photran.internal.ui.search.ReferenceSearchResult"/>
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.photran.ui.views"
+            name="Fortran Views">
+      </category>
+      <view
+            category="org.eclipse.photran.ui.views"
+            class="org.eclipse.photran.internal.ui.views.DeclarationView"
+            icon="icons/full/eview16/source.gif"
+            id="org.eclipse.photran.ui.DeclarationView"
+            name="Fortran Declaration">
+      </view>
+   </extension>
+   
+   <!--================-->
+   <!-- VPG Reconciler -->   
+   <!--================-->
+   <extension
+   	point="org.eclipse.photran.ui.reconciler">
+   	<reconciler
+          factory="org.eclipse.photran.internal.ui.editor_vpg.FortranVPGReconcilerFactory" />
    </extension>
 </plugin>

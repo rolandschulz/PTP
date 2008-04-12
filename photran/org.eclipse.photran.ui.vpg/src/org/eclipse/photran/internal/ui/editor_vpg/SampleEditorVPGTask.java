@@ -7,10 +7,11 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 
 final class SampleEditorVPGTask implements IEditorVPGTask
 {
-    SampleEditorVPGTask(ExperimentalFreeFormFortranEditor freeFormVPGEditor)
+    SampleEditorVPGTask(AbstractFortranEditor freeFormVPGEditor)
     {
     }
 
