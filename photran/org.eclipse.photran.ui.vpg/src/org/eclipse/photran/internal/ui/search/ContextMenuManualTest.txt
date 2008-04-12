@@ -1,0 +1,18 @@
+1. Using the Photran development environment, open a Fortran 90 project.
+2. Open source file into the editor.
+3. Select the text of a variable in the source file.
+4. Right click on the selected text.
+   4.1 Verify context menu contains "Find all references" with a submenu of File.
+5. Click on the File item of the submenu.
+   5.1 Verify that, at a minimum, the search view tab becomes visible. Basically, verify
+       that clicking begins execution of the command.
+6. Right click on the selected text.
+   6.1 Verify context menu contains "Find all references" with a submenu of Project.
+7. Click on the Project item of the submenu.
+   7.1 Verify that, at a minimum, the search view tab becomes visible. Basically, verify
+       that clicking begins execution of the command.
+8. Right click on the selected text.
+   8.1 Verify context menu contains "Find all references" with a submenu of Workspace.
+9. Click on the Workspace item of the submenu.
+   9.1 Verify that, at a minimum, the search view tab becomes visible. Basically, verify
+       that clicking begins execution of the command.

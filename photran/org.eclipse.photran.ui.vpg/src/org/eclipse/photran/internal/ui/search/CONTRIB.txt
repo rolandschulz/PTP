@@ -1,0 +1,28 @@
+"Find All References" was contributed by
+
+James Shepherd   - jshephe2@uiuc.edu
+Sarah De La Cruz - slieter2@uiuc.edu
+Charles Felish   - felish@uiuc.edu
+Kevin Decker     - kdecker3@uiuc.edu
+
+The work was completed as part of CS427 (Software Engineering I), Fall, 2007,
+under the guidance of Nicholas Chen and Prof. Ralph Johnson.
+
+The code was reviewed, edited, and submitted to Bugzilla by Jeff Overbey (4/12/08).
+
+
+
+Bios from the CS427 wiki:
+
+James is a software engineer for a Fortune 100 U.S. defense engineering firm
+living in Australia. CS428 is his fourth graduate class as an I2CS student.
+CS428 is also the third class in a row with Dr. Johnson and Nick Chen.
+
+Sarah: I am an online grad student and this is my first class so far. I work
+as an IT Analyst for John Deere and live in Moline, Illinois.
+
+Charles: I'm currently in the working world, working for Serengeti Law as a
+developer. I telecommute and currently live in W Lafayette, IN. I'm hoping to
+expand my knowledge with a few extra classes.
+
+Kevin: Busy developing for Xythos Software during days.

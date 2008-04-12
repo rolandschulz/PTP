@@ -1,0 +1,66 @@
+<-- Notes -->
+  - Take a look at the CDT implementations for the search results page. PDOMSearch(Tree*|View*|List*)
+
+<-- BEGIN Chuck James -->
+-  Day 1
+   -  Worked on user story 2.1.  Ran tests against refactored core.vpg.test.  
+      Completed in 1.5 units compared to 2 units estimated.
+   -  Started looking into showing/extending the menu items, but haven't updated the plugin xml yet.
+      Probably will be updating the org.eclipse.photran.ui plugin.xml.
+-  Day 2
+   -  Experiment with a context menu using the Plugin template gave a good example of how to do
+      a context menu.
+   -  Do we need to create separate actions for each action type (file, workspace, project?) or can we re-use a single class
+      and use the action parameter? Maybe use 3 subclasses of the main action? Decided
+      on the single base class with 3 subclasses.
+   -  Plan to borrow the ActionSet code from the Comment/Uncomment code to create an ActionSet for
+      our refactor action.
+   -  Plan to write a manual test to verify the menu(s) are working.
+-  Day 3
+   -  Added the ActionSet and got (after much deliberation) it to display in the Search menu.
+   -  Updated icon for search.
+   -  Wrote manual tests to verify the UI was working.
+   -  Discovered that "selecting" a token could be done by simply placing the cursor in
+      the text, not having to actually select the token. Also, selecting multiple tokens
+      or a token with any whitespace generates the error "Please select a token". Probably
+      should be fixed to reflect the "correct" error.
+-  Day 4 (Short day)
+   - Started looking into how we might implement the search results objects by extending
+     org.eclipse.search.searchResultViewPages extension point. This will require implementing
+     the ISearchResultPage and IContentProvider interfaces. Didn't really get too far with this.
+   - We thought the VPG wasn't initalized on the call to SearchReferences, but apparently it was...
+     This was a wild goose chase. 
+<-- END Chuck James -->  
+
+<-- BEGIN Sarah Kevin -->
+-  Day 1 (2.5 Units worked)
+   -  Worked on user story 2.4.  Implemented the ISearchQuery interface for the search through the 
+      ReferenceSearch class.  
+   -  Created the searchForReference method within the ReferenceSearch class as a 'helper' method.
+-  Day 2 (2.5 Units worked)
+   -  Worked on user story 2.5.  Implemented the AbstractTextSearchResult to show the search view
+      through the ReferenceSearchResult class.
+   -  Finished implementing the ReferenceSearch run() method. Still need to determine if the 
+      getFile attribute is the best/correct value to use when adding a Match to the ReferenceSearchResult.
+   -  Changed the VPGInformationTest to test user stories 2.4 and 2.5. Checked the matches within
+      the ReferenceSearchResult to make sure they were what was expected.
+   -  Performed group work to integrate results so far with James and Chuck's progress (see Group Work). 
+-  Day 3
+   -  Clean up tests and To Do's left in the code. Update the Wiki with the comments for user stories 2.4 
+      and 2.5.
+   -  Added JavaDoc to ReferenceSearch and ReferenceSearchResult.
+   -  Determined that we will leave some To Do's, such as CanRerun() which can be re-looked at after 
+      user story 3.1. This is the same for getEditorMatchAdapter() and getFileMatchAdapter(), which 
+      can be implemented during or after user story 3.1.
+   -  Determined that we can leave the getFile() attribute when creating a Match. If this needs to be 
+      changed later, it will not be a hard thing to modify.
+<-- END Sarah Kevin -->
+
+<-- BEGIN Group work -->
+-  Day 2
+   -  The ActionDelegate code was completed and the SearchReferences within one file was completed, so
+      we put the modules together and verified that they worked as a pair.
+   -  Ran regression tests (whoo for buzzwords)
+-  Day 4
+   -  Implemented 2.6 as a group.
+<-- END Group work -->

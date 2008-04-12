@@ -1,0 +1,85 @@
+Goal
+- In JDT, clicking on Search > References provides several options for searching
+  for all of the references to a particular entity. (This is also available in the
+  editor context menu.) The goal of this project is to implement this in Fortran.
+  At a minimum, a workspace-wide search should be implemented; searching within a
+  single project and/or working set should be attempted if time permits.
+
+Starting points suggestion from Contributors page
+- This will need to be implemented in the VPG UI plug-in. It is probably easiest
+  to contribute these actions to the experimental editor located in the
+  org.eclipse.photran.ui.vpg plug-in (when you run Photran, right-click a file and
+  choose Open With > Fortran Editor (VPG Experimental Features);
+  "EXPERIMENTAL" should be displayed in 36-point letters at the top of the editor window).
+  The JavaDoc and sample code in the org.eclipse.photran.internal.ui.editor_vpg
+  package should be particularly helpful.
+
+- Performing the search itself is actually quite easy (Hint: Finding all of the
+  references to a variable is an essential part of performing a Rename refactoring).
+
+List of probably useful packages
+- Reference Determinination:
+  - org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring
+  - org.eclipse.photran.internal.core.refactoring.RenameRefactoring
+  - org.eclipse.jdt.ui.actions.FindReferencesIn(Project|Workspace|WorkingSet)Action
+ 
+- Search Integration:
+  - org.eclipse.search.ui.ISearchQuery
+  - org.eclipse.jdt.internal.ui.search.JavaSearchQuery
+  - org.eclipse.search.ui.ISearchResult
+
+- Photran useful stuff
+  -  org.eclipse.photran.internal.actions.FortranBlockCOmmentAction
+  - FortranActionDelegate - Does a bunch of the base work for "Actions", things
+    the editor can request via a menu.
+  - We'll have to update org.eclipse.photran.ui\plugin.xml to reference our stuff.
+    Check out Comment/Uncomment in the .xml file.
+    
+- When used properly, the real benefit of a VPG is the methods that can be added to AST nodes. In the example VPG in the picture above, for example,
+    * The user could call a method getDeclaration() on a VariableReference node, which would return the corresponding Declaration node.
+    * The user could call a method getAllReferences() on a Declaration node, which would return a list of all of the references to that declaration.
+    * The user could call a method getScope() on a Declaration node, which would return the scope of that definition (e.g., a Program node).
+    * The user could call a method getScope() on a VariableReference node, which would return the scope of its definition. 
+  Again, it is important to remember that the returned node does not have to be in the same file. For example, getAllReferences() could return a list of all of the references to that variable, even if they span hundreds of files. (Of course, it does not have to load hundreds of ASTs into memory to do this!)
+- See ScopingNode.java, specifically ScopingNode.getAllDefinitions, FindAllDeclarationsInScope.java. getAllDefinitions
+  has a good example of using the vpg to find edges that point to the various references of a given node.
+- "To find all of the references to a variable, we search for all of the binding edges pointing to its declaration."
+  See BINDING_EDGE_TYPE in PhotranVPG
+
+- Probably spots to modify
+  - org.eclipse.photran.internal.ui.actions
+
+Notes From TA Meeting:
+-  Try to determine the scope of our project
+-  VPG can show a backpointer to where each entity is defined in the node
+-  Suggests - First iteration, find out how much has already been implemented,
+   and narrow the scope down into three iterations so that we can implement something
+  
+
+XP Spike (Iteration 1)
+-  Try to create a simple plugin (non-photran, a user story) that just pops a simple dialog.
+   Part of the Spike 
+-  Take a look at "Views" and how they are implemented. He'll send us some info on the relevant chapters
+   -  How to populate the view
+-  Sample tests cases to prove that we are able to read information from the VPG
+
+
+User Stories
+-  User should be able to right click on selected source code and get a menu that allows
+   them to find all references.
+-  User should be able to find references via the Search menu after highlighting code.
+-  User should be able to double click on the references in the view to jump to the
+   point in the source code.
+-  The Find All References functionality should be able to find all the references to a
+   simple variable within one file.  
+-  Find All References should be able to present the information that we gathered in the
+   Search View.
+-  The Find All References functionality should be able to find all the references to a
+   simple variable within a project with several files.
+-  The Find All References functionality should be able to find all the references to a
+   simple variable within a workspace.
+   
+Other notes
+- Created a sample plugin "Hello World". SampleAction.run has the same prototype
+   as FortranEditorActionDelegate.run, so we can start with a frame from there. 
+- See Definition.findAllReferences
