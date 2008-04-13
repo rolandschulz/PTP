@@ -230,15 +230,6 @@ public class DeclarationView extends ViewPart
             sourceViewer.removePostSelectionChangedListener(this);
     }
 
-    private FortranVPGReconcilingStrategy getFortranReconcilingStrategy(AbstractFortranEditor editor)
-    {
-        IReconcilingStrategy result = editor.getReconciler().getReconcilingStrategy(IDocument.DEFAULT_CONTENT_TYPE);
-        if (result instanceof FortranVPGReconcilingStrategy)
-            return (FortranVPGReconcilingStrategy)result;
-        else
-            return null;
-    }
-
     /**
      * IFortranEditorVPGTask - Callback run when the VPG is more-or-less up-to-date.
      * This method is run <i>outside</i> the UI thread.
