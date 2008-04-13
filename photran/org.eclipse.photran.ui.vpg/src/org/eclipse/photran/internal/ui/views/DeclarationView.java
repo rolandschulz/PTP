@@ -1,13 +1,25 @@
 
 package org.eclipse.photran.internal.ui.views;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranKeywordRuleBasedScanner;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -31,7 +43,7 @@ public class DeclarationView extends ViewPart implements ISelectionListener, ISe
 {
     private AbstractFortranEditor activeEditor = null;
     
-    private TextViewer viewer = null;
+    private SourceViewer viewer = null;
     private Document document = new Document();
 
     private Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
@@ -52,10 +64,7 @@ public class DeclarationView extends ViewPart implements ISelectionListener, ISe
      */
     public void createPartControl(Composite parent)
     {
-        viewer = new TextViewer(parent, SWT.NONE);
-        viewer.setDocument(document);
-        viewer.getControl().setBackground(LIGHT_YELLOW);
-        viewer.setEditable(false);
+        this.viewer = createFortranSourceViewer(parent);
 
         // Add this view as a selection listener to the workbench page
         getSite().getPage().addSelectionListener(this);
@@ -71,6 +80,40 @@ public class DeclarationView extends ViewPart implements ISelectionListener, ISe
         {
             ;
         }
+    }
+
+    private SourceViewer createFortranSourceViewer(Composite parent)
+    {
+        final SourceViewer viewer = new SourceViewer(parent, null, SWT.NONE); //TextViewer(parent, SWT.NONE);
+        final String[] partitionTypes = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
+        viewer.configure(new SourceViewerConfiguration()
+        {
+            public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+            {
+                return partitionTypes;
+            }
+
+            public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+            {
+                PresentationReconciler reconciler = new PresentationReconciler();
+        
+                DefaultDamagerRepairer dr = new DefaultDamagerRepairer(new FortranKeywordRuleBasedScanner(false, viewer));
+                reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+                reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+       
+                return reconciler;
+            }
+        });
+        viewer.setDocument(document);
+        IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), partitionTypes);
+        partitioner.connect(document);
+        document.setDocumentPartitioner(partitioner);
+        
+        viewer.getControl().setBackground(LIGHT_YELLOW);
+        viewer.setEditable(false);
+        viewer.getTextWidget().setFont(JFaceResources.getTextFont());
+        
+        return viewer;
     }
 
     /**
@@ -155,7 +198,7 @@ public class DeclarationView extends ViewPart implements ISelectionListener, ISe
         if (event.getSelection() instanceof TextSelection)
         {
             TextSelection selection = (TextSelection)event.getSelection();
-            update(selection.getOffset() + " - " + selection.getText());
+            update("! This is some fortran at index " + selection.getOffset() + "\n" + selection.getText());
         }
         else
         {
