@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataNameNode;
@@ -20,9 +21,9 @@ import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
 
-public final class DefinitionMap
+public abstract class DefinitionMap<T>
 {
-    private HashMap<String, Definition> definitions = new HashMap<String, Definition>();
+    private HashMap<String, T> definitions = new HashMap<String, T>();
     
     public DefinitionMap(IFortranAST ast)
     {
@@ -32,8 +33,9 @@ public final class DefinitionMap
             {
                 if (ScopingNode.isScopingNode(node))
                     for (Definition def : ((ScopingNode)node).getAllDefinitions())
-                        definitions.put(qualify(def.getTokenRef().findToken()),
-                                        def);
+                        // Qualify definitions imported from modules in the *importing* scope
+                        definitions.put(qualify(def.getTokenRef().findToken(), (ScopingNode)node),
+                                        map(def));
             }
         });
         
@@ -41,9 +43,13 @@ public final class DefinitionMap
             System.out.println(def);
     }
     
-    public Definition lookup(Token token)
+    protected abstract T map(Definition def);
+
+    public T lookup(Token token)
     {
-        String qualifiedName = qualify(token);
+        if (token == null) return null;
+        
+        String qualifiedName = qualify(token, token.getEnclosingScope());
         while (true)
         {
             System.out.println("Checking " + qualifiedName);
@@ -52,18 +58,18 @@ public final class DefinitionMap
             
             int index = qualifiedName.indexOf(':');
             if (index < 0)
-                return null;
+                return map(Intrinsics.resolveIntrinsic(token));
             else
                 qualifiedName = qualifiedName.substring(index+1);
         }
     }
 
-    private String qualify(Token token)
+    private String qualify(Token token, ScopingNode initialScope)
     {
         StringBuilder result = new StringBuilder();
         
         // Append scopes in *reverse* order
-        for (ScopingNode scope = token.getEnclosingScope();
+        for (ScopingNode scope = initialScope;
              scope != null && !(scope instanceof ASTExecutableProgramNode);
              scope = scope.getEnclosingScope())
         {

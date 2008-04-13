@@ -12,7 +12,7 @@ public class FortranVPGReconcilerFactory implements IFortranReconcilerFactory
     {
         if (editor instanceof AbstractFortranEditor)
             return new CReconciler((AbstractFortranEditor)editor,
-                                   new FortranReconcilingStrategy((AbstractFortranEditor)editor));
+                                   new FortranVPGReconcilingStrategy((AbstractFortranEditor)editor));
         else
             return null;
     }

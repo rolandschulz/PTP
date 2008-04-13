@@ -36,8 +36,6 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  */
 public class FortranModelBuilder implements IFortranModelBuilder
 {
-    private static Parser parser = new Parser();
-    
     private TranslationUnit translationUnit;
     private Map newElements;
     private boolean isFixedForm;
@@ -71,7 +69,9 @@ public class FortranModelBuilder implements IFortranModelBuilder
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file.getName(),
                 isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM);
-            IFortranAST ast = new FortranAST(file, parser.parse(lexer), lexer.getTokenList());
+            // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
+            // create a new parser each time
+            IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
                         
             if (isParseTreeModelEnabled())
                  ast.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));

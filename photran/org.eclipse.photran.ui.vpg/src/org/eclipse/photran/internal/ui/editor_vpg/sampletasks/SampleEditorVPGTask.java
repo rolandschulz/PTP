@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.ui.editor_vpg;
+package org.eclipse.photran.internal.ui.editor_vpg.sampletasks;
 
 import java.util.List;
 
@@ -8,8 +8,9 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorVPGTask;
 
-final class SampleEditorVPGTask implements IEditorVPGTask
+final class SampleEditorVPGTask implements IFortranEditorVPGTask
 {
     SampleEditorVPGTask(AbstractFortranEditor freeFormVPGEditor)
     {

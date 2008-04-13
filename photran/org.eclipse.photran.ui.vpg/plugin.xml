@@ -482,7 +482,7 @@
             default="false"
             name="Fortran Editor (VPG Experimental Features)"
             icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.internal.ui.editor_vpg.ExperimentalFreeFormFortranEditor"
+            class="org.eclipse.photran.internal.ui.editor_vpg.OldExperimentalFreeFormFortranEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             id="org.eclipse.photran.ui.FreeFormVPGEditor">
          <contentTypeBinding

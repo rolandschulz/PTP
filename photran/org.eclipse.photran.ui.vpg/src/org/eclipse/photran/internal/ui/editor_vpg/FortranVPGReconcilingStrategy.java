@@ -1,10 +1,8 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import java.io.ByteArrayInputStream;
-import java.util.LinkedList;
 
 import org.eclipse.cdt.internal.ui.text.CReconcilingStrategy;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -20,26 +18,13 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.photran.internal.ui.views.DeclarationView;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import bz.over.vpg.eclipse.VPGJob;
 
 @SuppressWarnings("restriction")
-public class FortranReconcilingStrategy extends CReconcilingStrategy
+public class FortranVPGReconcilingStrategy extends CReconcilingStrategy
 {
-    /**
-     * These jobs will be run (in order) if the contents of the editor parses successfully.  The VPG will probably
-     * <i>not</i> be up to date, but token positions will correspond to the contents of the editor.
-     */
-    protected LinkedList<IEditorASTTask> astTasks = new LinkedList<IEditorASTTask>();
-    
-    /**
-     * These jobs will be run (in order) when the VPG is more-or-less up-to-date and an AST is available for the
-     * file in the editor.
-     */
-    protected LinkedList<IEditorVPGTask> vpgTasks = new LinkedList<IEditorVPGTask>();
-    
     protected final AbstractFortranEditor editor;
     protected PhotranVPG vpg = PhotranVPG.getInstance();
     protected VPGJob<IFortranAST, Token> dispatchASTTasksJob = null;
@@ -48,7 +33,7 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
     
     private Parser parser = new Parser();
     
-    public FortranReconcilingStrategy(ITextEditor editor)
+    public FortranVPGReconcilingStrategy(ITextEditor editor)
     {
         super(editor);
         if (editor instanceof AbstractFortranEditor)
@@ -61,14 +46,6 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
 //            SampleEditorMappingTask t = new SampleEditorMappingTask(this.editor);
 //            astTasks.add(t.astTask);
 //            vpgTasks.add(t.vpgTask);
-            
-            this.vpgTasks.add(new IEditorVPGTask()
-            {
-                public void handle(IFile file, IFortranAST ast)
-                {
-                    //declView.update("Offset " + FortranReconcilingStrategy.this.editor.getHighlightRange().getOffset());
-                }
-            });
         }
         else
         {
@@ -79,18 +56,22 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
     @Override public void initialReconcile()
     {
         super.initialReconcile();
-        this.reconcile(null);
+        runTasks();
     }
 
     @Override public void reconcile(IRegion region)
     {
         super.reconcile(region);
+        runTasks();
+    }
+
+    private void runTasks()
+    {
         if (editor == null) return;
-        
         runASTTasks();
         runVPGTasks();
     }
-
+    
     private void runASTTasks()
     {
         if (dispatchASTTasksJob != null) return; // Already running an update
@@ -110,7 +91,7 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
                     astRootNode = parser.parse(lexer);
                     if (astRootNode == null) return Status.OK_STATUS;
                     
-                    for (IEditorASTTask task : astTasks)
+                    for (IFortranEditorASTTask task : FortranEditorVPGTasks.instance(editor).astTasks)
                         task.handle(new FortranAST(editor.getIFile(),
                                                    astRootNode,
                                                    lexer.getTokenList()));
@@ -154,7 +135,7 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
             {
                 if (vpgAST != null) // Parse might have failed
                 {
-                    for (IEditorVPGTask task : vpgTasks)
+                    for (IFortranEditorVPGTask task : FortranEditorVPGTasks.instance(editor).vpgTasks)
                         task.handle(editor.getIFile(), vpgAST);
                 }
                 dispatchVPGTasksJob = null;

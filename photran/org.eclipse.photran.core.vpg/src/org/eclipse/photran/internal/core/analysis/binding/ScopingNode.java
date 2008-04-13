@@ -80,21 +80,30 @@ public abstract class ScopingNode extends InteriorNode
 
     public static ScopingNode getEnclosingScope(CSTNode node)
     {
-    	for (CSTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
-    	{
-    		if (isScopingNode(candidate))
-    		{
-    			ScopingNode scope = (ScopingNode)candidate;
-    			
-    			//if (node == scope.getRepresentativeToken().findToken())
-    			if (shouldBeBoundToOuterScope(node))
-    				return getEnclosingScope(scope);
-    			else
-    				return scope;
-    		}
-    	}
-    	
-    	return null;
+        for (CSTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
+        {
+            if (isScopingNode(candidate))
+            {
+                ScopingNode scope = (ScopingNode)candidate;
+                
+                //if (node == scope.getRepresentativeToken().findToken())
+                if (shouldBeBoundToOuterScope(node))
+                    return getEnclosingScope(scope);
+                else
+                    return scope;
+            }
+        }
+        
+        return null;
+    }
+
+    public static ScopingNode getLocalScope(CSTNode node)
+    {
+        for (CSTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
+            if (isScopingNode(candidate))
+                return (ScopingNode)candidate;
+        
+        return null;
     }
     
 	/**

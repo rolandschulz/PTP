@@ -333,7 +333,12 @@ public class Token extends CSTNode implements IToken
 
     public ScopingNode getEnclosingScope()
     {
-    	return ScopingNode.getEnclosingScope(this);
+        return ScopingNode.getEnclosingScope(this);
+    }
+
+    public ScopingNode getLocalScope()
+    {
+        return ScopingNode.getLocalScope(this);
     }
     
     ///////////////////////////////////////////////////////////////////////////

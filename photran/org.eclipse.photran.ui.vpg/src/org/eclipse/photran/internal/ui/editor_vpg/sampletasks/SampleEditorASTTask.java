@@ -1,15 +1,16 @@
-package org.eclipse.photran.internal.ui.editor_vpg;
+package org.eclipse.photran.internal.ui.editor_vpg.sampletasks;
 
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
-final class SampleEditorASTTask implements IEditorASTTask
+final class SampleEditorASTTask implements IFortranEditorASTTask
 {
     private final AbstractFortranEditor freeFormVPGEditor;
     private Color LIGHT_YELLOW = new Color(null, new RGB(240, 240, 128));

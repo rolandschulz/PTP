@@ -18,15 +18,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.types.ArraySpec;
+import org.eclipse.photran.internal.core.analysis.types.DerivedType;
+import org.eclipse.photran.internal.core.analysis.types.FunctionType;
 import org.eclipse.photran.internal.core.analysis.types.Type;
+import org.eclipse.photran.internal.core.analysis.types.TypeProcessor;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
+import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 
 import bz.over.vpg.TokenRef;
 
@@ -433,5 +440,183 @@ public class Definition implements Serializable
     private int hashCode(Object o)
     {
         return o == null ? 0 : o.hashCode();
+    }
+    
+    public String describe()
+    {
+        String commentsBefore = "\n", name = getCanonicalizedName(), commentsAfter = "";
+        boolean isScopingUnit = false;
+        
+        Token tok = tokenRef.findTokenOrReturnNull();
+        if (tok != null)
+        {
+            if (!name.equals("(anonymous)"))
+                name = tok.getText();
+            
+            ScopingNode localScope = tok.getLocalScope();
+            if (localScope != null)
+            {
+                isScopingUnit = (localScope != tok.getEnclosingScope());
+                
+                InteriorNode headerStmt;
+                if (isScopingUnit)
+                    headerStmt = localScope.getHeaderStmt();
+                else
+                    headerStmt = findEnclosingSpecificationStmt(tok);
+                
+                if (headerStmt != null)
+                {
+                    Token first = FortranRefactoring.findFirstTokenIn(headerStmt);
+                    Token last = FortranRefactoring.findLastTokenIn(headerStmt);
+                    if (first != null) commentsBefore = first.getWhiteBefore();
+                    if (last != null) commentsAfter = last.getWhiteAfter();
+                    
+//                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+//                    headerStmt.printOn(new PrintStream(out), null);
+//                    return out.toString();
+                }
+            }
+        }
+        
+        return commentsBefore + describe(name) + "\n" + commentsAfter;
+    }
+    
+    private InteriorNode findEnclosingSpecificationStmt(Token tok)
+    {
+        for (InteriorNode candidate = tok.getParent(); candidate != null; candidate = candidate.getParent())
+            if (candidate instanceof ISpecificationStmt)
+                return candidate;
+        
+        return null;
+    }
+
+    private String describe(String name)
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        switch (classification)
+        {
+        case VARIABLE_DECLARATION:
+            sb.append("! Local variable\n");
+            sb.append(describeType());
+            sb.append(":: ");
+            sb.append(name);
+            break;
+            
+        case IMPLICIT_LOCAL_VARIABLE:
+            sb.append("! Implicit local variable\n");
+            sb.append(describeType());
+            sb.append(":: ");
+            sb.append(name);
+            break;
+            
+        case SUBROUTINE:
+            sb.append("subroutine ");
+            sb.append(name);
+            //TODO: describeParameters(def.getType());
+            break;
+            
+        case FUNCTION:
+            //TODO: describeReturnType(def.getType());
+            sb.append("function ");
+            sb.append(name);
+            //TODO: describeParameters(def.getType());
+            break;
+            
+        case INTERFACE:
+            sb.append("interface ");
+            sb.append(name);
+            // TODO: Describe contents
+            break;
+            
+        case MODULE:
+            sb.append("module ");
+            sb.append(name);
+            // TODO: Describe contents
+            break;
+        
+        case DERIVED_TYPE:
+            sb.append("type :: ");
+            sb.append(name);
+            // TODO: Describe contents
+            break;
+            
+        default:
+            sb.append("! ");
+            sb.append(classification);
+            sb.append('\n');
+            sb.append(describeType());
+            sb.append(name);
+        }
+        
+        return sb.toString();
+    }
+
+    private String describeType()
+    {
+        return type.processUsing(new TypeProcessor<String>()
+        {
+            @Override
+            public String ifCharacter(Type type)
+            {
+                return "character ";
+            }
+
+            @Override
+            public String ifComplex(Type type)
+            {
+                return "complex ";
+            }
+
+            @Override
+            public String ifDerivedType(String derivedTypeName,
+                                        DerivedType type)
+            {
+                return "type(" + derivedTypeName + ") ";
+            }
+
+            @Override
+            public String ifDoublePrecision(Type type)
+            {
+                return "double precision ";
+            }
+
+            @Override
+            public String ifFunctionType(String name,
+                                         FunctionType functionType)
+            {
+                return "function ";
+            }
+
+            @Override
+            public String ifInteger(Type type)
+            {
+                return "integer ";
+            }
+
+            @Override
+            public String ifLogical(Type type)
+            {
+                return "logical ";
+            }
+
+            @Override
+            public String ifReal(Type type)
+            {
+                return "real ";
+            }
+
+            @Override
+            public String ifUnclassified(Type type)
+            {
+                return "";
+            }
+
+            @Override
+            public String ifUnknown(Type type)
+            {
+                return "";
+            }
+        });
     }
 }

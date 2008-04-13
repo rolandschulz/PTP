@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-public class ExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
+public class OldExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Custom Reconciler Support
@@ -47,8 +47,8 @@ public class ExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
          */
         public IReconciler getReconciler(ISourceViewer sourceViewer)
         {
-            MonoReconciler reconciler = new CReconciler(ExperimentalFreeFormFortranEditor.this,
-                                                        new FortranReconcilingStrategy(ExperimentalFreeFormFortranEditor.this));
+            MonoReconciler reconciler = new CReconciler(OldExperimentalFreeFormFortranEditor.this,
+                                                        new FortranVPGReconcilingStrategy(OldExperimentalFreeFormFortranEditor.this));
             reconciler.setIsIncrementalReconciler(false);
             reconciler.setProgressMonitor(new NullProgressMonitor());
             reconciler.setDelay(500);
@@ -80,7 +80,7 @@ public class ExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
                     if (!active)
                     {
                         active = true;
-                        widget = ExperimentalFreeFormFortranEditor.this.getSourceViewer().getTextWidget();
+                        widget = OldExperimentalFreeFormFortranEditor.this.getSourceViewer().getTextWidget();
                         final Font font = new Font(null, new FontData("Arial", 36, SWT.NORMAL));
                         final Color lightGray = new Color(null, new RGB(192, 192, 192));
                         listener = new PaintListener()
