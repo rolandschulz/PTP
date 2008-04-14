@@ -37,6 +37,6 @@ public class Binder
         t[5] = System.currentTimeMillis();
         sb.append(", Ref: " + (t[5] - t[4]));
         
-        PhotranVPG.printDebug(sb.toString(), "");
+        PhotranVPG.getInstance().debug(sb.toString(), "");
     }
 }

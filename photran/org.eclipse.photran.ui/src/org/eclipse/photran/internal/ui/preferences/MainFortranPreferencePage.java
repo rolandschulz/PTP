@@ -27,12 +27,17 @@ public class MainFortranPreferencePage extends AbstractFortranPreferencePage
     protected void initializeDefaults()
     {
         FortranPreferences.SHOW_PARSE_TREE.setDefault();
+        FortranPreferences.ENABLE_VPG_LOGGING.setDefault();
     }
 
     protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.SHOW_PARSE_TREE.getName(),
                                         "(Debugging) Show entire parse tree rather than Outline view",
+                                        getFieldEditorParent()));
+        
+        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_VPG_LOGGING.getName(),
+                                        "(Debugging) Enable Fortran indexer (VPG database) logging",
                                         getFieldEditorParent()));
     }
 }

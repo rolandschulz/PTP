@@ -49,10 +49,10 @@ public class SearchPathsPropertyPage extends PropertyPage
         composite.setLayoutData(data);
 
         Label l = new Label(composite, SWT.WRAP);
-        l.setText("To enable Open Declaration, the Fortran Declaration view, content\n"
-                  + "assist, and refactoring in Fortran programs, check the following\n"
-                  + "box.  A program database (index) will be updated every time a\n"
-                  + "Fortran file is created or saved.");
+        l.setText("To enable Open Declaration, Find All References, the Fortran Declaration\n"
+                  + "view, content assist, and refactoring in Fortran programs, check the\n"
+                  + "following box.  A program database (index) will be updated every time\n"
+                  + "a Fortran file is created or saved.");
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         enableVPG = new BooleanFieldEditor("IgnoreThis", "Enable Fortran analysis/refactoring", composite)

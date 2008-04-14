@@ -272,14 +272,13 @@ public class Definition implements Serializable, Comparable<Definition>
         
         if (!type.equals(Type.VOID))
         {
-        	result.append(" (");
+        	result.append(" - ");
         	result.append(type);
         	if (arraySpec != null) result.append(arraySpec);
-        	result.append(")");
         }
         
         if (visibility != Visibility.INHERIT_FROM_SCOPE)
-        	result.append(" (" + visibility + " Visibility)");
+        	result.append(" (" + visibility + ")");
         
         return result.toString();
     }

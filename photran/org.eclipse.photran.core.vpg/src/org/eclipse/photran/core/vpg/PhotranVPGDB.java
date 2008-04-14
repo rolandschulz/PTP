@@ -11,6 +11,7 @@ import java.io.Serializable;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 import bz.over.vpg.db.caching.CachingDB;
 import bz.over.vpg.db.cdt.CDTDB;
@@ -26,13 +27,17 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
     {
         public PhotranCDTDB()
         {
-            this(PhotranVPG.inTestingMode() ? createTempFile() : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "vpg");
+            this(PhotranVPG.inTestingMode()
+                 ? createTempFile()
+                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "vpg");
         }
         
         private PhotranCDTDB(String filename)
         {
             super(filename);
-            PhotranVPG.printDebug("Using Photran VPG database " + filename, "");
+            
+            if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
+                System.out.println("Using Photran VPG database " + filename);
         }
 
         private static String createTempFile()

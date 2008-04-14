@@ -27,6 +27,7 @@ import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 import bz.over.vpg.VPGDependency;
@@ -69,7 +70,23 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, 
 	
 	public static PhotranVPG getInstance()
 	{
-		if (instance == null) instance = new PhotranVPGBuilder();
+		if (instance == null)
+	    {
+            if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
+            {
+    		    instance = new PhotranVPGBuilder()
+        		{
+        		    @Override public void debug(String message, String filename)
+        		    {
+        		        System.out.println(message + " - " + lastSegmentOf(filename));
+        		    }
+        		};
+            }
+            else
+            {
+                instance = new PhotranVPGBuilder();
+            }
+	    }
 		return instance;
 	}
     
@@ -77,20 +94,14 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, 
     {
         return getInstance().db;
     }
+    
+    @Override public void debug(String message, String filename)
+    {
+    }
 	
-    public static void printDebug(String message, String filename)
-    {
-        System.out.println(message + " - " + lastSegmentOf(filename));
-    }
-    
-    @Override protected void debug(String message, String filename)
-    {
-        PhotranVPG.printDebug(message, filename);
-    }
-    
     @Override protected void debug(long parseTimeMillisec,
-                         long computeEdgesAndAnnotationsMillisec,
-                         String filename)
+                                   long computeEdgesAndAnnotationsMillisec,
+                                   String filename)
     {
 //        printDebug("- "
 //                   + parseTimeMillisec

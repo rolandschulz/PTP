@@ -44,8 +44,8 @@ public abstract class DefinitionMap<T>
             }
         });
         
-        for (String def : definitions.keySet())
-            System.out.println(def);
+//        for (String def : definitions.keySet())
+//            System.out.println(def);
     }
     
     protected abstract T map(Definition def);
@@ -75,7 +75,7 @@ public abstract class DefinitionMap<T>
         String qualifiedName = qualify(token, token.getEnclosingScope());
         while (true)
         {
-            System.out.println("Checking " + qualifiedName);
+//            System.out.println("Checking " + qualifiedName);
             if (definitions.containsKey(qualifiedName))
                 return definitions.get(qualifiedName);
             
@@ -174,8 +174,6 @@ public abstract class DefinitionMap<T>
         }
         
         GetScopeVisitor visitor = new GetScopeVisitor();
-        if (node.getNonterminal() == Nonterminal.INTERFACE_BLOCK)
-            System.out.println("!");
         node.visitOnlyThisNodeUsing(visitor);
         return node.getNonterminal() + "/" + visitor.name.toLowerCase() + ":";
     }

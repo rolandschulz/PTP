@@ -102,10 +102,13 @@ public class FortranVPGReconcilingStrategy extends CReconcilingStrategy
                     astRootNode = parser.parse(lexer);
                     if (astRootNode == null) return Status.OK_STATUS;
                     
-                    for (IFortranEditorASTTask task : FortranEditorVPGTasks.instance(editor).astTasks)
-                        task.handle(new FortranAST(editor.getIFile(),
-                                                   astRootNode,
-                                                   lexer.getTokenList()));
+                    synchronized (FortranEditorVPGTasks.instance(editor))
+                    {
+                        for (IFortranEditorASTTask task : FortranEditorVPGTasks.instance(editor).astTasks)
+                            task.handle(new FortranAST(editor.getIFile(),
+                                                       astRootNode,
+                                                       lexer.getTokenList()));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -146,8 +149,11 @@ public class FortranVPGReconcilingStrategy extends CReconcilingStrategy
             {
                 if (vpgAST != null) // Parse might have failed
                 {
-                    for (IFortranEditorVPGTask task : FortranEditorVPGTasks.instance(editor).vpgTasks)
-                        task.handle(editor.getIFile(), vpgAST);
+                    synchronized (FortranEditorVPGTasks.instance(editor))
+                    {
+                        for (IFortranEditorVPGTask task : FortranEditorVPGTasks.instance(editor).vpgTasks)
+                            task.handle(editor.getIFile(), vpgAST);
+                    }
                 }
                 dispatchVPGTasksJob = null;
                 return Status.OK_STATUS;

@@ -51,7 +51,7 @@ public class SearchPathProperties
             if (result == null) result = getPropertyDefault(project, propertyName);
             
             if (propertyName.equals(ENABLE_DECL_VIEW_PROPERTY_NAME)
-                            || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
+                    || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
                 return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true") ? "true" : "";
             else
                 return result;
