@@ -1,6 +1,5 @@
 package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -9,6 +8,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
@@ -176,16 +176,16 @@ class FortranCompletionProposalComputer
         }
     }
 
-    private FortranCompletionProposal createProposal(String canonicalizedId, String description, Image image)
+    private FortranCompletionProposal createProposal(String identifier, String description, Image image)
     {
         return new FortranCompletionProposal(
-            canonicalizedId,
-            new CompletionProposal(canonicalizedId,
+            identifier,
+            new CompletionProposal(identifier,
                                    replOffset,
                                    replLen,
-                                   canonicalizedId.length(),
+                                   identifier.length(),
                                    image,
-                                   canonicalizedId + " - " + description,
+                                   identifier + " - " + description,
                                    null,
                                    null));
     }
@@ -195,9 +195,9 @@ class FortranCompletionProposalComputer
         public final String canonicalizedId;
         public final CompletionProposal wrappedProposal;
 
-        public FortranCompletionProposal(String canonicalizedId, CompletionProposal completionProposal)
+        public FortranCompletionProposal(String identifier, CompletionProposal completionProposal)
         {
-            this.canonicalizedId = canonicalizedId;
+            this.canonicalizedId = PhotranVPG.canonicalizeIdentifier(identifier);
             this.wrappedProposal = completionProposal;
         }
 
@@ -210,7 +210,7 @@ class FortranCompletionProposalComputer
         {
             return obj != null
                 && obj.getClass().equals(this.getClass())
-                && ((FortranCompletionProposal)obj).canonicalizedId.equals(canonicalizedId);
+                && ((FortranCompletionProposal)obj).canonicalizedId.equals(this.canonicalizedId);
         }
 
         @Override public int hashCode()
