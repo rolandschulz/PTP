@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
 import org.eclipse.swt.graphics.Color;
@@ -34,19 +35,24 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
     
     public IContentAssistant setup(AbstractFortranEditor editor)
     {
-        final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
-        
-        FortranEditorVPGTasks.instance(editor).addASTTask(new FortranCompletionProcessorASTTask(this));
-        FortranEditorVPGTasks.instance(editor).addVPGTask(new FortranCompletionProcessorVPGTask(this));
-        
-        ContentAssistant assistant = new ContentAssistant();
-        for (String partitionType : AbstractFortranEditor.PARTITION_TYPES)
-            assistant.setContentAssistProcessor(this, partitionType);
-        assistant.enableAutoActivation(false); //assistant.setAutoActivationDelay(500);
-        assistant.setProposalPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
-        assistant.setContextInformationPopupBackground(LIGHT_YELLOW);
-        assistant.setProposalSelectorBackground(LIGHT_YELLOW);
-        return assistant;
+        if (SearchPathProperties.getProperty(editor.getIFile().getProject(),
+                                             SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME).equals("true"))
+        {
+            final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
+            
+            FortranEditorVPGTasks.instance(editor).addASTTask(new FortranCompletionProcessorASTTask(this));
+            FortranEditorVPGTasks.instance(editor).addVPGTask(new FortranCompletionProcessorVPGTask(this));
+            
+            ContentAssistant assistant = new ContentAssistant();
+            for (String partitionType : AbstractFortranEditor.PARTITION_TYPES)
+                assistant.setContentAssistProcessor(this, partitionType);
+            assistant.enableAutoActivation(false); //assistant.setAutoActivationDelay(500);
+            assistant.setProposalPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+            assistant.setContextInformationPopupBackground(LIGHT_YELLOW);
+            assistant.setProposalSelectorBackground(LIGHT_YELLOW);
+            return assistant;
+        }
+        else return null;
     }
 
     public synchronized ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)

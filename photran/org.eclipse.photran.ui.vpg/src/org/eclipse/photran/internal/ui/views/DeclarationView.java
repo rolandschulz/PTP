@@ -33,6 +33,7 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.analysis.types.TypeProcessor;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor.FortranKeywordRuleBasedScanner;
@@ -160,8 +161,7 @@ public class DeclarationView extends ViewPart
             {
                 // Observe new editor
                 stopObserving(activeEditor);
-                activeEditor = (AbstractFortranEditor)part;
-                startObserving(activeEditor);
+                activeEditor = startObserving((AbstractFortranEditor)part);
             }
             else
             {
@@ -181,15 +181,22 @@ public class DeclarationView extends ViewPart
      * 
      * See http://dev.eclipse.org/mhonarc/newsLists/news.eclipse.platform/msg44602.html
      */
-    private void startObserving(AbstractFortranEditor editor)
+    private AbstractFortranEditor startObserving(AbstractFortranEditor editor)
     {
         if (editor != null)
         {
-            addCaretMovementListenerTo(editor);
-            FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
-            tasks.addASTTask(this);
-            tasks.addVPGTask(this);
+            if (SearchPathProperties.getProperty(editor.getIFile().getProject(),
+                                                 SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME).equals("true"))
+            {
+                addCaretMovementListenerTo(editor);
+                FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
+                tasks.addASTTask(this);
+                tasks.addVPGTask(this);
+                return editor;
+            }
         }
+        
+        return null;
     }
 
     private void addCaretMovementListenerTo(AbstractFortranEditor editor)
@@ -204,6 +211,7 @@ public class DeclarationView extends ViewPart
      */
     private void stopObserving(AbstractFortranEditor editor)
     {
+        update("");
         if (editor != null)
         {
             removeCaretMovementListenerFrom(editor);

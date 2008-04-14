@@ -1,6 +1,8 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import org.eclipse.cdt.internal.ui.text.CReconcilingStrategy;
 import org.eclipse.core.runtime.CoreException;
@@ -10,16 +12,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
+import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import bz.over.vpg.VPGDependency;
 import bz.over.vpg.eclipse.VPGJob;
 
 @SuppressWarnings("restriction")
@@ -68,8 +74,13 @@ public class FortranVPGReconcilingStrategy extends CReconcilingStrategy
     private void runTasks()
     {
         if (editor == null) return;
-        runASTTasks();
-        runVPGTasks();
+        
+        if (SearchPathProperties.getProperty(editor.getIFile().getProject(),
+                                             SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"))
+        {
+            runASTTasks();
+            runVPGTasks();
+        }
     }
     
     private void runASTTasks()
@@ -87,7 +98,7 @@ public class FortranVPGReconcilingStrategy extends CReconcilingStrategy
                     String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
                     IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
                                                                         null,
-                                                                        SourceForm.UNPREPROCESSED_FREE_FORM);
+                                                                        SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject())));
                     astRootNode = parser.parse(lexer);
                     if (astRootNode == null) return Status.OK_STATUS;
                     

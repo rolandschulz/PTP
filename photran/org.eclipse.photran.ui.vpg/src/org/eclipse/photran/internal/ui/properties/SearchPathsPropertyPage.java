@@ -34,7 +34,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class SearchPathsPropertyPage extends PropertyPage
 {
-    private BooleanFieldEditor enableVPG;
+    private BooleanFieldEditor enableVPG, enableDeclView, enableContentAssist;
     private WorkspacePathEditor modulePathEditor, includePathEditor;
     
     /**
@@ -42,47 +42,52 @@ public class SearchPathsPropertyPage extends PropertyPage
      */
     protected Control createContents(Composite parent)
     {
-        Composite composite = new Composite(parent, SWT.NONE);
+        final Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(1, true));
         GridData data = new GridData(GridData.FILL);
         data.grabExcessHorizontalSpace = true;
         composite.setLayoutData(data);
 
         Label l = new Label(composite, SWT.WRAP);
-        l.setText("To enable Open Declaration and refactoring in Fortran programs, check the following "
-                  + "box.  A program database (the Virtual Program Graph, or VPG) will be updated as "
-                  + "Fortran files are modified.  These features are EXPERIMENTAL and have not been "
-                  + "optimized to work well on large programs.");
+        l.setText("To enable Open Declaration, the Fortran Declaration view, content\n"
+                  + "assist, and refactoring in Fortran programs, check the following\n"
+                  + "box.  A program database (index) will be updated every time a\n"
+                  + "Fortran file is created or saved.");
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        enableVPG = new BooleanFieldEditor("IgnoreThis", "Enable Fortran analysis/refactoring", composite);
-        enableVPG.setPreferenceStore(new CustomPropertyStore()
+        enableVPG = new BooleanFieldEditor("IgnoreThis", "Enable Fortran analysis/refactoring", composite)
         {
-            @Override protected String getProperty()
+            @Override protected void valueChanged(boolean oldValue, boolean newValue)
             {
-                return SearchPathProperties.getProperty((IProject)getElement(), SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
+                enableDeclView.setEnabled(newValue, composite);
+                enableContentAssist.setEnabled(newValue, composite);
             }
-
-            @Override protected String getDefault()
-            {
-                return SearchPathProperties.getPropertyDefault((IProject)getElement(), SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
-            }
-
-            @Override protected void setProperty(String value)
-            {
-                SearchPathProperties.setProperty((IProject)getElement(), SearchPathProperties.ENABLE_VPG_PROPERTY_NAME, value);
-            }
-            
-        });
+        };
+        enableVPG.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
+                                                                           SearchPathProperties.ENABLE_VPG_PROPERTY_NAME));
         enableVPG.load();
 
+        enableDeclView = new BooleanFieldEditor("IgnoreThis", "Enable Fortran Declaration view", composite);
+        enableDeclView.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
+                                                                                SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME));
+        enableDeclView.load();
+
+        enableContentAssist = new BooleanFieldEditor("IgnoreThis", "Enable Fortran content assist (Ctrl+Space)", composite);
+        enableContentAssist.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
+                                                                                     SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME));
+        enableContentAssist.load();
+
+        enableDeclView.setEnabled(enableVPG.getBooleanValue(), composite);
+        enableContentAssist.setEnabled(enableVPG.getBooleanValue(), composite);
+        
         l = new Label(composite, SWT.WRAP);
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
 
         l = new Label(composite, SWT.WRAP);
-        l.setText("The following specify the paths searched when the refactoring engine "
-                  + "attempts to locate modules and INCLUDE files.  These MAY BE DIFFERENT from the "
-                  + "paths used by your compiler to build your project.");
+        l.setText("The following specify the paths searched for modules\n"
+                  + "and INCLUDE files during analysis and refactoring.\n"
+                  + "These MAY BE DIFFERENT from the settings used by\n"
+                  + "your compiler to build your project.");
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         modulePathEditor = new WorkspacePathEditor((IProject)getElement(),
@@ -90,23 +95,9 @@ public class SearchPathsPropertyPage extends PropertyPage
                                              "Folders to be searched for &modules, in order of preference:",
                                              "Select a folder to be searched for Fortran modules:",
                                              composite);
-        modulePathEditor.setPreferenceStore(new CustomPropertyStore()
-        {
-            @Override protected String getProperty()
-            {
-                return SearchPathProperties.getProperty((IProject)getElement(), SearchPathProperties.MODULE_PATHS_PROPERTY_NAME);
-            }
-
-            @Override protected String getDefault()
-            {
-                return SearchPathProperties.getPropertyDefault((IProject)getElement(), SearchPathProperties.MODULE_PATHS_PROPERTY_NAME);
-            }
-
-            @Override protected void setProperty(String value)
-            {
-                SearchPathProperties.setProperty((IProject)getElement(), SearchPathProperties.MODULE_PATHS_PROPERTY_NAME, value);
-            }
-        });
+        modulePathEditor.setPreferenceStore(SearchPathProperties.getPropertyStore(
+             (IProject)getElement(),
+             SearchPathProperties.MODULE_PATHS_PROPERTY_NAME));
         modulePathEditor.load();
 
         includePathEditor = new WorkspacePathEditor((IProject)getElement(),
@@ -114,24 +105,8 @@ public class SearchPathsPropertyPage extends PropertyPage
                                              "Folders to be searched for &INCLUDE files, in order of preference:",
                                              "Select a folder to be searched for INCLUDE files:",
                                              composite);
-        includePathEditor.setPreferenceStore(new CustomPropertyStore()
-        {
-            @Override protected String getProperty()
-            {
-                return SearchPathProperties.getProperty((IProject)getElement(), SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME);
-            }
-
-            @Override protected String getDefault()
-            {
-                return SearchPathProperties.getPropertyDefault((IProject)getElement(), SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME);
-            }
-
-            @Override protected void setProperty(String value)
-            {
-                SearchPathProperties.setProperty((IProject)getElement(), SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME, value);
-            }
-            
-        });
+        includePathEditor.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
+                                                                                   SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME));
         includePathEditor.load();
         
         return composite;
@@ -140,6 +115,8 @@ public class SearchPathsPropertyPage extends PropertyPage
     protected void performDefaults()
     {
         enableVPG.loadDefault();
+        enableDeclView.loadDefault();
+        enableContentAssist.loadDefault();
         modulePathEditor.loadDefault();
         includePathEditor.loadDefault();
     }
@@ -147,48 +124,10 @@ public class SearchPathsPropertyPage extends PropertyPage
     public boolean performOk()
     {
         enableVPG.store();
+        enableDeclView.store();
+        enableContentAssist.store();
         modulePathEditor.store();
         includePathEditor.store();
         return true;
-    }
-
-    private static abstract class CustomPropertyStore implements IPreferenceStore
-    {
-        public void addPropertyChangeListener(IPropertyChangeListener listener) {;}
-        public boolean contains(String name) {throw new Error();}
-        public void firePropertyChangeEvent(String name, Object oldValue, Object newValue) {;}
-        public boolean getBoolean(String name) { return getProperty().equals("true"); }
-        public boolean getDefaultBoolean(String name) {throw new Error();}
-        public double getDefaultDouble(String name) {throw new Error();}
-        public float getDefaultFloat(String name) {throw new Error();}
-        public int getDefaultInt(String name) {throw new Error();}
-        public long getDefaultLong(String name) {throw new Error();}
-        public String getDefaultString(String name) { return getDefault(); } //////////////
-        public double getDouble(String name) {throw new Error();}
-        public float getFloat(String name) {throw new Error();}
-        public int getInt(String name) {throw new Error();}
-        public long getLong(String name) {throw new Error();}
-        public String getString(String name) { return getProperty(); } ////////////
-        public boolean isDefault(String name) { return getProperty()==null || getProperty().equals(getDefault()); } //////////
-        public boolean needsSaving() {return false;}
-        public void putValue(String name, String value) { setProperty(value); } //////
-        public void removePropertyChangeListener(IPropertyChangeListener listener) {;}
-        public void setDefault(String name, double value) {;}
-        public void setDefault(String name, float value) {;}
-        public void setDefault(String name, int value) {;}
-        public void setDefault(String name, long value) {;}
-        public void setDefault(String name, String defaultObject) {throw new Error();}
-        public void setDefault(String name, boolean value) { setProperty(null); }
-        public void setToDefault(String name) { setProperty(null); } ///////////
-        public void setValue(String name, double value) {;}
-        public void setValue(String name, float value) {;}
-        public void setValue(String name, int value) {;}
-        public void setValue(String name, long value) {;}
-        public void setValue(String name, String value) { setProperty(value); } ///////
-        public void setValue(String name, boolean value) { setProperty(value ? "true" : "false"); }
-        
-        protected abstract String getProperty();
-        protected abstract String getDefault();
-        protected abstract void setProperty(String value);
     }
 }

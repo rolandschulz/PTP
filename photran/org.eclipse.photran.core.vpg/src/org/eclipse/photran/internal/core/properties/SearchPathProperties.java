@@ -17,6 +17,8 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
  * Provides access to the module paths and include paths for a project.
@@ -35,6 +37,8 @@ import org.eclipse.core.runtime.QualifiedName;
 public class SearchPathProperties
 {
     public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG";
+    public static final String ENABLE_DECL_VIEW_PROPERTY_NAME = "EnableDeclView";
+    public static final String ENABLE_CONTENT_ASSIST_PROPERTY_NAME = "EnableContentAssist";
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
     
@@ -45,7 +49,12 @@ public class SearchPathProperties
         {
             String result = project.getPersistentProperty(new QualifiedName("", propertyName)); // Could cast to IResource instead
             if (result == null) result = getPropertyDefault(project, propertyName);
-            return result;
+            
+            if (propertyName.equals(ENABLE_DECL_VIEW_PROPERTY_NAME)
+                            || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
+                return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true") ? "true" : "";
+            else
+                return result;
         }
         catch (CoreException e)
         {
@@ -101,5 +110,66 @@ public class SearchPathProperties
         while (st.hasMoreTokens())
             v.add(st.nextToken());
         return (String[]) v.toArray(new String[v.size()]);
+    }
+
+    public static IPreferenceStore getPropertyStore(final IProject project, final String propertyName)
+    {
+        return new CustomPropertyStore()
+        {
+            @Override protected String getProperty()
+            {
+                return SearchPathProperties.getProperty(project, propertyName);
+            }
+
+            @Override protected String getDefault()
+            {
+                return SearchPathProperties.getPropertyDefault(project, propertyName);
+            }
+
+            @Override protected void setProperty(String value)
+            {
+                SearchPathProperties.setProperty(project, propertyName, value);
+            }
+        };
+    }
+
+    private static abstract class CustomPropertyStore implements IPreferenceStore
+    {
+        public void addPropertyChangeListener(IPropertyChangeListener listener) {;}
+        public boolean contains(String name) {throw new Error();}
+        public void firePropertyChangeEvent(String name, Object oldValue, Object newValue) {;}
+        public boolean getBoolean(String name) { return getProperty().equals("true"); }
+        public boolean getDefaultBoolean(String name) {throw new Error();}
+        public double getDefaultDouble(String name) {throw new Error();}
+        public float getDefaultFloat(String name) {throw new Error();}
+        public int getDefaultInt(String name) {throw new Error();}
+        public long getDefaultLong(String name) {throw new Error();}
+        public String getDefaultString(String name) { return getDefault(); } //////////////
+        public double getDouble(String name) {throw new Error();}
+        public float getFloat(String name) {throw new Error();}
+        public int getInt(String name) {throw new Error();}
+        public long getLong(String name) {throw new Error();}
+        public String getString(String name) { return getProperty(); } ////////////
+        public boolean isDefault(String name) { return getProperty()==null || getProperty().equals(getDefault()); } //////////
+        public boolean needsSaving() {return false;}
+        public void putValue(String name, String value) { setProperty(value); } //////
+        public void removePropertyChangeListener(IPropertyChangeListener listener) {;}
+        public void setDefault(String name, double value) {;}
+        public void setDefault(String name, float value) {;}
+        public void setDefault(String name, int value) {;}
+        public void setDefault(String name, long value) {;}
+        public void setDefault(String name, String defaultObject) {throw new Error();}
+        public void setDefault(String name, boolean value) { setProperty(null); }
+        public void setToDefault(String name) { setProperty(null); } ///////////
+        public void setValue(String name, double value) {;}
+        public void setValue(String name, float value) {;}
+        public void setValue(String name, int value) {;}
+        public void setValue(String name, long value) {;}
+        public void setValue(String name, String value) { setProperty(value); } ///////
+        public void setValue(String name, boolean value) { setProperty(value ? "true" : "false"); }
+        
+        protected abstract String getProperty();
+        protected abstract String getDefault();
+        protected abstract void setProperty(String value);
     }
 }

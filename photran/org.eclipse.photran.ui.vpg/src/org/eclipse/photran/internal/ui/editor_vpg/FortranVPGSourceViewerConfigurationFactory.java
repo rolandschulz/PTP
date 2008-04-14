@@ -29,7 +29,8 @@ public class FortranVPGSourceViewerConfigurationFactory implements IFortranSourc
 
             @Override public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
             {
-                return fortranCompletionProcessor.setup(editor);
+                IContentAssistant result = fortranCompletionProcessor.setup(editor);
+                return result == null ? super.getContentAssistant(sourceViewer) : result;
             }
         };
     }

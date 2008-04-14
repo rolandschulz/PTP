@@ -134,7 +134,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, 
 
 	protected PhotranVPG()
 	{
-        super(new PhotranVPGDB(), "Synchronizing Photran VPG", 2);
+        super(new PhotranVPGDB(), "Photran indexer", 2);
         db = super.db;
     }
 
