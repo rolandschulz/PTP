@@ -36,7 +36,7 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (synchronizing Fortran virtual program graph)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
             File temp = createTempFile();
             final PrintStream ps = createPrintStream(temp);

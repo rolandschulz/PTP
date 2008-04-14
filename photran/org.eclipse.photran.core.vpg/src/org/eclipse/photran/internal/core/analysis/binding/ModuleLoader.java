@@ -189,7 +189,7 @@ public class ModuleLoader extends BindingCollector
 	{
 		for (IFile file : files)
 		{
-		    if (PhotranVPG.getFilenameForIResource(file.getParent()).equals(path))
+		    if (PhotranVPG.getFilenameForIResource(file.getParent()).startsWith(path))
 		    {
 		        result.add(file);
 	            if (!result.isEmpty()) return true;

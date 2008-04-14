@@ -31,7 +31,7 @@ public class SelectEnclosingScope extends FortranEditorASTActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (synchronizing Fortran virtual program graph)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
         	
             progressMonitor.subTask("Parsing...");
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());

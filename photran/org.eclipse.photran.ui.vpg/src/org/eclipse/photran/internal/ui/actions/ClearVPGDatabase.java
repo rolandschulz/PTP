@@ -26,7 +26,7 @@ public class ClearVPGDatabase extends FortranEditorActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (synchronizing Fortran virtual program graph)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
             PhotranVPG.getDatabase().clearDatabase();
         }

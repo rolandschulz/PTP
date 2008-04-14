@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.core;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
@@ -34,11 +35,12 @@ public class FortranAST implements IFortranAST
     {
         this.root = root;
         this.tokenList = tokenList;
+        
         for (Token token : new IterableWrapper<Token>(tokenList))
         	if (token.getFile() == null)
         		token.setFile(file);
     }
-    
+
     public void visitBottomUpUsing(ASTVisitor visitor)
     {
         root.visitBottomUpUsing(visitor);
@@ -107,12 +109,16 @@ public class FortranAST implements IFortranAST
 //        return null;
     }
 
+    /** WARNING: Files are compared by identity, not equality */
     public Token findTokenByFileOffsetLength(IFile file, int offset, int length)
     {
         for (int i = 0; i < tokenList.size(); i++)
         {
             Token token = (Token)tokenList.get(i);
-            if (token.getFile().equals(file) && token.getFileOffset() == offset && token.getLength() == length)
+            if (token.getFile().hashCode() == file.hashCode()  //    OPTIMIZATION: Profile indicates lots
+                            && token.getFile().equals(file)    // << of time spent in String#equals here
+                            && token.getFileOffset() == offset
+                            && token.getLength() == length)
                 return token;
         }
         return null;

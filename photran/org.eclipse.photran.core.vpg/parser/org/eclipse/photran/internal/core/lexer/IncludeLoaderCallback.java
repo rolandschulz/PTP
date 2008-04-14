@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
@@ -60,10 +61,41 @@ public class IncludeLoaderCallback
         String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(project, SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME));
     	for (int i = 0; i < paths.length; i++)
         {
-            IResource result = ResourcesPlugin.getWorkspace().getRoot().findMember(paths[i] + File.separatorChar + fileToInclude);
-            if (result != null && result instanceof IFile)
-                return (IFile)result;
+    	    IResource folder = ResourcesPlugin.getWorkspace().getRoot().findMember(paths[i]);
+            if (folder != null && folder.isAccessible())
+            {
+                IFile result = getIncludedFile(fileToInclude, folder);
+                if (result != null)
+                    return (IFile)result;
+            }
         }
         throw new FileNotFoundException(fileToInclude);
+    }
+
+    private IFile getIncludedFile(final String fileToInclude, IResource folder)
+    {
+        class Visitor implements IResourceVisitor
+        {
+            private IFile result = null;
+            
+            public boolean visit(IResource resource) throws CoreException
+            {
+                if (resource instanceof IFile
+                                && resource.isAccessible()
+                                && resource.getName().equals(fileToInclude))
+                {
+                    result = (IFile)resource;
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        };
+        
+        Visitor visitor = new Visitor();
+        try { ((IContainer)folder).accept(visitor); } catch (CoreException e) { throw new Error(e); }
+        return visitor.result;
     }
 }

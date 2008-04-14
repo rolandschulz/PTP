@@ -216,7 +216,6 @@ public abstract class ScopingNode extends InteriorNode
 					{
 						throw new Notification(token.getFile());
 					}
-	    			
 	    		});
     		}
     		catch (Notification n)
@@ -480,7 +479,7 @@ public abstract class ScopingNode extends InteriorNode
     	
     	PhotranTokenRef tokenRef = identifier.getTokenRef();
 		Type type = implicitSpec.getType(name.charAt(0));
-		Definition def = new Definition(tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, type);
+		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, type);
 		
     	vpg.setDefinitionFor(tokenRef, def);
     	vpg.markScope(tokenRef, this);

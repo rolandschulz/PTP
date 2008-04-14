@@ -34,7 +34,7 @@ public class Intrinsics
     	
         for (String intrinsic : intrinsics)
            if (intrinsic.matches(canonicalizedName))
-               return new Intrinsic(identifier.getTokenRef());
+               return new Intrinsic(identifier.getText(), identifier.getTokenRef());
 
         return null;
     }
@@ -170,9 +170,9 @@ public class Intrinsics
      */
     private static class Intrinsic extends Definition
     {
-        public Intrinsic(PhotranTokenRef tokenRef)
+        public Intrinsic(String declaredName, PhotranTokenRef tokenRef)
         {
-        	super(tokenRef, Definition.Classification.INTRINSIC, Type.UNKNOWN);
+        	super(declaredName, tokenRef, Definition.Classification.INTRINSIC, Type.UNKNOWN);
         }
 
         @Override

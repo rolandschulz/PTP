@@ -112,11 +112,11 @@ public class Definition implements Serializable, Comparable<Definition>
     protected Definition() {}
     
     /** Creates a definition and binds it to the given token */
-    public Definition(PhotranTokenRef tokenRef, Classification classification, Type type)
+    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, Type type)
     {
         this.classification = classification;
     	this.tokenRef = tokenRef;
-    	this.declaredName = tokenRef.getText();
+    	this.declaredName = declaredName;
     	this.canonicalizedName = canonicalize(declaredName);
         this.visibility = Visibility.INHERIT_FROM_SCOPE;
         this.type = type;

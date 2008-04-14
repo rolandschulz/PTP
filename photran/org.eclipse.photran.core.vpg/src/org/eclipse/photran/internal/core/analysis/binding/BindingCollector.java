@@ -62,7 +62,7 @@ public abstract class BindingCollector extends ASTVisitor
     	
     	try
     	{
-            Definition definition = new Definition(token.getTokenRef(), classification, type);
+            Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, type);
     		vpg.setDefinitionFor(token.getTokenRef(), definition);
     		vpg.markScope(token.getTokenRef(), token.getEnclosingScope());
     		return definition;

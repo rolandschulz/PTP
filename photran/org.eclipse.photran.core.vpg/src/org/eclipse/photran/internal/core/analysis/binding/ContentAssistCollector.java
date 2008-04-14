@@ -51,7 +51,7 @@ public class ContentAssistCollector
                 if (!defs.containsKey(scope))
                     defs.put(scope, new ArrayList<Definition>(16));
                 
-                Definition result = new Definition(token.getTokenRef(), classification, type);
+                Definition result = new Definition(token.getText(), token.getTokenRef(), classification, type);
                 defs.get(scope).add(result);
                 return result;
             }

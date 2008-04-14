@@ -29,7 +29,7 @@ public class FindAllDeclarationsInScope extends FortranEditorASTActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (synchronizing Fortran virtual program graph)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());
             if (token == null) throw new Exception("Please select a token.");
