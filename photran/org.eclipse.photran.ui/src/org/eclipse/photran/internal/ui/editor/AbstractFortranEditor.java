@@ -15,9 +15,10 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.cdt.internal.core.model.LanguageDescriptor;
 import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
+import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.text.CReconciler;
 import org.eclipse.cdt.internal.ui.text.CReconcilingStrategy;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -40,7 +41,6 @@ import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
-import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
@@ -56,7 +56,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -76,9 +75,12 @@ import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.ContentAssistAction;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
+import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -93,9 +95,10 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     // Constants
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected static final String RECONCILER_EXTENSION_POINT_ID = "org.eclipse.photran.ui.reconciler";
+    protected static final String SOURCE_VIEWER_CONFIG_EXTENSION_POINT_ID =
+        "org.eclipse.photran.ui.sourceViewerConfig";
     
-    protected static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
+    public static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
     
     protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
     
@@ -184,6 +187,28 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         createLightGrayLines();
     }
 
+    protected void createActions()
+    {
+        super.createActions();
+
+        // See CEditor#createActions
+        
+        IAction action = new TextOperationAction(CEditorMessages.getResourceBundle(), "Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
+        action.setActionDefinitionId(ICEditorActionDefinitionIds.FORMAT);
+        setAction("Format", action); //$NON-NLS-1$
+        markAsStateDependentAction("Format", true); //$NON-NLS-1$
+
+        action = new ContentAssistAction(CEditorMessages.getResourceBundle(), "ContentAssistProposal.", this); //$NON-NLS-1$
+        action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
+        setAction("ContentAssistProposal", action); //$NON-NLS-1$
+        markAsStateDependentAction("ContentAssistProposal", true); //$NON-NLS-1$
+
+        action= new TextOperationAction(CEditorMessages.getResourceBundle(), "ContentAssistContextInformation.", this, ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION); //$NON-NLS-1$
+        action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_CONTEXT_INFORMATION);
+        setAction("ContentAssistContextInformation", action); //$NON-NLS-1$
+        markAsStateDependentAction("ContentAssistContextInformation", true); //$NON-NLS-1$
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Ctrl+/ Block Commenting Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,6 +284,35 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         return FortranPreferences.respondToPreferenceChange(event.getProperty())
                || super.affectsTextPresentation(event);
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Extensible SourceViewerConfiguration (permits Declaration View, content assist, etc.)
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected SourceViewerConfiguration createSourceViewerConfiguration()
+    {
+        // If org.eclipse.photran.vpg.ui is contributing a SourceViewerConfiguration through the
+        // extension point, load it
+        IConfigurationElement[] configs = Platform.getExtensionRegistry().
+            getConfigurationElementsFor(SOURCE_VIEWER_CONFIG_EXTENSION_POINT_ID);
+        if (configs.length > 0)
+        {
+            try
+            {
+                IFortranSourceViewerConfigurationFactory factory =
+                    (IFortranSourceViewerConfigurationFactory)
+                    configs[configs.length-1].createExecutableExtension("factory");
+                return factory.create(AbstractFortranEditor.this);
+            }
+            catch (CoreException e)
+            {
+                // Fall through
+            }
+        }
+
+        // Otherwise, default to CDT's reconciler
+        return new FortranModelReconcilingSourceViewerConfiguration(this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Syntax Highlighting
@@ -273,16 +327,11 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     }
 
     protected abstract ITokenScanner getTokenScanner();
-    
-    protected SourceViewerConfiguration createSourceViewerConfiguration()
-    {
-        return new FortranSourceViewerConfiguration();
-    }
-    
-    protected class FortranSourceViewerConfiguration extends SourceViewerConfiguration
-    {
-        protected PresentationReconciler reconciler = null;
 
+    public static abstract class FortranSourceViewerConfiguration extends SourceViewerConfiguration
+    {
+        protected PresentationReconciler reconciler;
+        
         /**
          * Returns a list of the possible partitions' content types.
          * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
@@ -311,6 +360,22 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
    
             return reconciler;
         }
+        
+        protected abstract ITokenScanner getTokenScanner();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Outline View Support
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static class FortranModelReconcilingSourceViewerConfiguration extends FortranSourceViewerConfiguration
+    {
+        protected AbstractFortranEditor editor;
+        
+        public FortranModelReconcilingSourceViewerConfiguration(AbstractFortranEditor editor)
+        {
+            this.editor = editor;
+        }
 
         /*
          * The CReconciler is used to ensure that an ElementChangedEvent is fired.
@@ -335,27 +400,15 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
             }
             return reconciler;
         }
-        
-        private IReconciler loadReconciler()
-        {
-            // If org.eclipse.photran.vpg.ui is contributing a reconciler through the extension point, load it
-            IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor(RECONCILER_EXTENSION_POINT_ID);
-            if (configs.length > 0)
-            {
-                try
-                {
-                    IFortranReconcilerFactory factory = (IFortranReconcilerFactory)
-                        configs[configs.length-1].createExecutableExtension("factory");
-                    return factory.create(AbstractFortranEditor.this);
-                }
-                catch (CoreException e)
-                {
-                    // Fall through
-                }
-            }
 
-            // Otherwise, default to CDT's reconciler
-            return new CReconciler(AbstractFortranEditor.this, new CReconcilingStrategy(AbstractFortranEditor.this));
+        protected IReconciler loadReconciler()
+        {
+            return new CReconciler(editor, new CReconcilingStrategy(editor));
+        }
+
+        protected ITokenScanner getTokenScanner()
+        {
+            return editor.getTokenScanner();
         }
     }
 

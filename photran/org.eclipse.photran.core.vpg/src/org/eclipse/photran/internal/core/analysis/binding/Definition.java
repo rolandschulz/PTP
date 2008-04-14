@@ -49,7 +49,7 @@ import bz.over.vpg.TokenRef;
  * 
  * @author Jeff Overbey
  */
-public class Definition implements Serializable
+public class Definition implements Serializable, Comparable<Definition>
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -76,7 +76,7 @@ public class Definition implements Serializable
         RENAMED_MODULE_ENTITY, // subprogram name after rename
         SUBROUTINE,
         SELECT,
-        VARIABLE_DECLARATION,
+        VARIABLE_DECLARATION { @Override public String toString() { return "Local variable"; } },
         WHERE;
         
         @Override public String toString()
@@ -102,7 +102,7 @@ public class Definition implements Serializable
 
     protected Classification classification;
     protected PhotranTokenRef tokenRef;
-    protected String canonicalizedName;
+    protected String declaredName, canonicalizedName;
     protected Visibility visibility;
     protected Type type;
     protected ArraySpec arraySpec;
@@ -116,7 +116,8 @@ public class Definition implements Serializable
     {
         this.classification = classification;
     	this.tokenRef = tokenRef;
-    	this.canonicalizedName = canonicalize(tokenRef.getText());
+    	this.declaredName = tokenRef.getText();
+    	this.canonicalizedName = canonicalize(declaredName);
         this.visibility = Visibility.INHERIT_FROM_SCOPE;
         this.type = type;
         this.arraySpec = null;
@@ -250,10 +251,16 @@ public class Definition implements Serializable
         return type;
     }
     
+    /** @return the name of the entity this defines, cased according to its declaration */
+    public String getDeclaredName()
+    {
+        return declaredName;
+    }
+    
     /** @return the name of the entity this defines, canonicalized by <code>PhotranVPG.canonicalizeIdentifier</code> */
     public String getCanonicalizedName()
     {
-    	return canonicalizedName;
+        return canonicalizedName;
     }
     
     /** @return a description of the type of entity being defined */
@@ -441,7 +448,12 @@ public class Definition implements Serializable
     {
         return o == null ? 0 : o.hashCode();
     }
-    
+
+    public int compareTo(Definition o)
+    {
+        return canonicalizedName.compareTo(o.canonicalizedName);
+    }
+
     public String describe()
     {
         String commentsBefore = "\n", name = getCanonicalizedName(), commentsAfter = "";
@@ -497,14 +509,14 @@ public class Definition implements Serializable
         switch (classification)
         {
         case VARIABLE_DECLARATION:
-            sb.append("! Local variable\n");
+            sb.append("! "); sb.append(describeClassification()); sb.append('\n');
             sb.append(describeType());
             sb.append(":: ");
             sb.append(name);
             break;
             
         case IMPLICIT_LOCAL_VARIABLE:
-            sb.append("! Implicit local variable\n");
+            sb.append("! "); sb.append(describeClassification()); sb.append('\n');
             sb.append(describeType());
             sb.append(":: ");
             sb.append(name);
@@ -542,10 +554,7 @@ public class Definition implements Serializable
             break;
             
         default:
-            sb.append("! ");
-            sb.append(classification);
-            sb.append('\n');
-            sb.append(describeType());
+            sb.append("! "); sb.append(describeClassification()); sb.append('\n');
             sb.append(name);
         }
         

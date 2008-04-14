@@ -143,10 +143,15 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * @param filename
      * @return <code>ImageDescriptor</code>
      */
-	protected ImageDescriptor getImageDescriptorForIcon(String filename)
+	public static ImageDescriptor getImageDescriptorForIcon(String filename)
     {
 	    return CDTInterfacePlugin.getImageDescriptor("icons/model/" + filename);
 	}
+	
+    public static ImageDescriptor unknownImageDescriptor()
+    {
+        return getImageDescriptorForIcon("unknown.gif");
+    }
 
 	// --- Concrete Subclasses -------------------------------------------
 
@@ -191,6 +196,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public ImageDescriptor getBaseImageDescriptor()
         {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
+        {
             return getImageDescriptorForIcon("mainprogram.gif");
         }
     }
@@ -203,6 +213,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
 
         public ImageDescriptor getBaseImageDescriptor()
+        {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
         {
             return getImageDescriptorForIcon("module.gif");
         }
@@ -217,6 +232,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public ImageDescriptor getBaseImageDescriptor()
         {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
+        {
             return getImageDescriptorForIcon("derivedtype.gif");
         }
     }
@@ -229,6 +249,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
 
         public ImageDescriptor getBaseImageDescriptor()
+        {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
         {
             return getImageDescriptorForIcon("function.gif");
         }
@@ -243,6 +268,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public ImageDescriptor getBaseImageDescriptor()
         {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
+        {
             return getImageDescriptorForIcon("subroutine.gif");
         }
     }
@@ -256,7 +286,12 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public ImageDescriptor getBaseImageDescriptor()
         {
-            return getImageDescriptorForIcon("unknown.gif");
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
+        {
+            return unknownImageDescriptor();
         }
     }
 
@@ -268,6 +303,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
         
         public ImageDescriptor getBaseImageDescriptor()
+        {
+            return imageDescriptor();
+        }
+
+        public static  ImageDescriptor imageDescriptor()
         {
             return getImageDescriptorForIcon("subroutine.gif");
         }
@@ -281,6 +321,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
 
         public ImageDescriptor getBaseImageDescriptor()
+        {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
         {
             return getImageDescriptorForIcon("variable.gif");
         }

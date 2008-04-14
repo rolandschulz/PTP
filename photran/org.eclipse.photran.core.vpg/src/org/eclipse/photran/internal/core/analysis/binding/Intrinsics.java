@@ -44,7 +44,7 @@ public class Intrinsics
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // All names here are canonicalized according to PhotranVPG.canonicalizeIdentifier
-    static String[] intrinsics =
+    public static final String[] intrinsics =
     {
         // From Metcalf and Reid, "Fortran 90/95 Explained", Chapter 8
         // Functions

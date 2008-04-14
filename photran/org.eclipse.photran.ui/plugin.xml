@@ -207,9 +207,11 @@
       </page>
     </extension>    
 
-   <!--============================-->
-   <!-- Reconciler Extension Point -->
-   <!--============================-->
-
-   <extension-point id="reconciler" name="Reconciler" schema="schema/reconciler.exsd"/>
+   <!--=============================================-->
+   <!-- Source Viewer Configuration Extension Point -->
+   <!--=============================================-->
+   <extension-point
+   	id="sourceViewerConfig"
+   	name="Source Viewer Configuration"
+   	schema="schema/sourceViewerConfig.exsd"/>
 </plugin>

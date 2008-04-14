@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.photran.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.photran.ui" id="reconciler" name="Reconciler"/>
+         <meta.schema plugin="org.eclipse.photran.ui" id="sourceViewerConfig" name="Source Viewer Configuration"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -13,7 +13,7 @@
    <element name="extension">
       <complexType>
          <sequence>
-            <element ref="reconciler"/>
+            <element ref="sourceViewerConfig"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -42,7 +42,7 @@
       </complexType>
    </element>
 
-   <element name="reconciler">
+   <element name="sourceViewerConfig">
       <complexType>
          <attribute name="factory" type="string" use="required">
             <annotation>
@@ -50,7 +50,7 @@
                   A class extending &lt;code&gt;org.eclipse.core.model.IContributedModelBuildere&lt;/code&gt;.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.photran.internal.ui.editor.IFortranReconcilerFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.photran.internal.ui.editor.IFortranSourceViewerConfigurationFactory"/>
                </appInfo>
             </annotation>
          </attribute>

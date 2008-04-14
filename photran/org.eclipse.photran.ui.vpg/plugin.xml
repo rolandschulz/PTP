@@ -516,12 +516,12 @@
       </view>
    </extension>
    
-   <!--================-->
-   <!-- VPG Reconciler -->   
-   <!--================-->
+   <!--=================================-->
+   <!-- VPG Source Viewer Configuration -->   
+   <!--=================================-->
    <extension
-   	point="org.eclipse.photran.ui.reconciler">
-   	<reconciler
-          factory="org.eclipse.photran.internal.ui.editor_vpg.FortranVPGReconcilerFactory" />
+   	point="org.eclipse.photran.ui.sourceViewerConfig">
+   	<sourceViewerConfig
+          factory="org.eclipse.photran.internal.ui.editor_vpg.FortranVPGSourceViewerConfigurationFactory" />
    </extension>
 </plugin>

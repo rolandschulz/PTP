@@ -1,14 +1,13 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import org.eclipse.cdt.internal.ui.text.CReconciler;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.reconciler.IReconciler;
-import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -29,30 +28,20 @@ public class OldExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
 
     @Override protected SourceViewerConfiguration createSourceViewerConfiguration()
     {
-        return new VPGFortranSourceViewerConfiguration();
+        return new VPGFortranSourceViewerConfiguration(this);
     }
     
-    protected class VPGFortranSourceViewerConfiguration extends FortranSourceViewerConfiguration
+    protected class VPGFortranSourceViewerConfiguration extends FortranModelReconcilingSourceViewerConfiguration
     {
-        /*
-         * The CReconciler is used to ensure that an ElementChangedEvent is fired.
-         * Without this, the Outline view says "Pending..." but never populates.
-         * 
-         * From Anton Leherbaurer (cdt-dev, 8/16/07):
-         *     The outline view waits for the initial reconciler to run and it requires
-         *     an ElementChangedEvent when it is done to populate the view.
-         *     See CContentOutlinerProvider$ElementChangedListener#elementChanged().
-         *     The event should usually be issued from the
-         *     ReconcileWorkingCopyOperation.
-         */
-        public IReconciler getReconciler(ISourceViewer sourceViewer)
+        public VPGFortranSourceViewerConfiguration(AbstractFortranEditor editor)
         {
-            MonoReconciler reconciler = new CReconciler(OldExperimentalFreeFormFortranEditor.this,
-                                                        new FortranVPGReconcilingStrategy(OldExperimentalFreeFormFortranEditor.this));
-            reconciler.setIsIncrementalReconciler(false);
-            reconciler.setProgressMonitor(new NullProgressMonitor());
-            reconciler.setDelay(500);
-            return reconciler;
+            super(editor);
+        }
+        
+        @Override protected IReconciler loadReconciler()
+        {
+            return new CReconciler(OldExperimentalFreeFormFortranEditor.this,
+                                   new FortranVPGReconcilingStrategy(OldExperimentalFreeFormFortranEditor.this));
         }
     }
 

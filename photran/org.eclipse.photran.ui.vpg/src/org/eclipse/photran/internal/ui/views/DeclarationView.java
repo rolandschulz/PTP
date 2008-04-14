@@ -16,6 +16,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -111,27 +112,16 @@ public class DeclarationView extends ViewPart
     private SourceViewer createFortranSourceViewer(Composite parent)
     {
         final SourceViewer viewer = new SourceViewer(parent, null, SWT.V_SCROLL); //TextViewer(parent, SWT.NONE);
-        final String[] partitionTypes = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
-        viewer.configure(new SourceViewerConfiguration()
+        viewer.configure(new AbstractFortranEditor.FortranSourceViewerConfiguration()
         {
-            public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+            @Override protected ITokenScanner getTokenScanner()
             {
-                return partitionTypes;
-            }
-
-            public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-            {
-                PresentationReconciler reconciler = new PresentationReconciler();
-        
-                DefaultDamagerRepairer dr = new DefaultDamagerRepairer(new FortranKeywordRuleBasedScanner(false, viewer));
-                reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-                reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-       
-                return reconciler;
+                // Copied from FreeFormFortranEditor#getTokenScanner
+                return new FortranKeywordRuleBasedScanner(false, viewer);
             }
         });
         viewer.setDocument(document);
-        IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), partitionTypes);
+        IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), AbstractFortranEditor.PARTITION_TYPES);
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
         
@@ -197,8 +187,8 @@ public class DeclarationView extends ViewPart
         {
             addCaretMovementListenerTo(editor);
             FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
-            tasks.astTasks.add(this);
-            tasks.vpgTasks.add(this);
+            tasks.addASTTask(this);
+            tasks.addVPGTask(this);
         }
     }
 
@@ -218,8 +208,8 @@ public class DeclarationView extends ViewPart
         {
             removeCaretMovementListenerFrom(editor);
             FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
-            tasks.astTasks.remove(this);
-            tasks.vpgTasks.remove(this);
+            tasks.removeASTTask(this);
+            tasks.removeVPGTask(this);
         }
     }
 
@@ -242,10 +232,7 @@ public class DeclarationView extends ViewPart
         {
             @Override protected String map(Definition def)
             {
-                if (def != null)
-                    return def.describe();
-                else
-                    return null;
+                return def.describe();
             }
         };
     }
@@ -267,20 +254,12 @@ public class DeclarationView extends ViewPart
     {
         if (event.getSelection() instanceof TextSelection && activeAST != null && activeDefMap != null)
         {
-            String description = activeDefMap.lookup(findTokenEnclosing((TextSelection)event.getSelection()));
+            String description = activeDefMap.lookup((TextSelection)event.getSelection(), activeAST);
             update(description == null ? "" : description);
         }
         else
         {
             update("");
         }
-    }
-    
-    private Token findTokenEnclosing(TextSelection sel)
-    {
-        for (Token t : activeAST)
-            if (t.containsFileOffset(sel.getOffset()))
-                return t;
-        return null;
     }
 }
