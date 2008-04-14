@@ -2,8 +2,11 @@ package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.ArrayList;
 
-import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.vpg.util.IterableWrapper;
+import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.TokenList;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
 
@@ -17,7 +20,9 @@ final class FortranCompletionProcessorASTTask implements IFortranEditorASTTask
     }
     
     // Will be run <i>outside</i> the UI thread
-    public void handle(IFortranAST ast)
+    public boolean handle(ASTExecutableProgramNode ast,
+                          TokenList tokenList,
+                          DefinitionMap<Definition> defMap)
     {
         synchronized (fortranCompletionProcessor)
         {
@@ -26,7 +31,7 @@ final class FortranCompletionProcessorASTTask implements IFortranEditorASTTask
             try
             {
                 int lastLine = 0;
-                for (Token token : ast)
+                for (Token token : new IterableWrapper<Token>(tokenList))
                 {
                     int line = token.getLine();
                     if (line > lastLine)
@@ -43,6 +48,7 @@ final class FortranCompletionProcessorASTTask implements IFortranEditorASTTask
             {
                 // Ignore
             }
+            return true;
         }
     }
 }

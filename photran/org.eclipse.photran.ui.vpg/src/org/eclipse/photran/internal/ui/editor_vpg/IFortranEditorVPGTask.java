@@ -2,6 +2,7 @@ package org.eclipse.photran.internal.ui.editor_vpg;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.analysis.binding.Definition;
 
 /**
  * An <code>IFortranEditorVPGTask</code> can be run only after the VPG has been updated for the file in the editor.
@@ -16,5 +17,5 @@ import org.eclipse.photran.core.IFortranAST;
  */
 public interface IFortranEditorVPGTask
 {
-    void handle(IFile file, IFortranAST ast);
+    void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap);
 }

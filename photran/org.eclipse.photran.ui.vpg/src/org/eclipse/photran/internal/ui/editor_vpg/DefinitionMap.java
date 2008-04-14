@@ -4,11 +4,13 @@ import java.util.HashMap;
 
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataNameNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
@@ -16,7 +18,6 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
-import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
@@ -24,7 +25,6 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.parser.Parser.Nonterminal;
 
 public abstract class DefinitionMap<T>
 {
@@ -32,39 +32,52 @@ public abstract class DefinitionMap<T>
     
     public DefinitionMap(IFortranAST ast)
     {
+        this(ast.getRoot());
+    }
+
+    public DefinitionMap(ASTExecutableProgramNode ast)
+    {
         ast.visitUsing(new GenericParseTreeVisitor()
         {
             @Override public void visitParseTreeNode(InteriorNode node)
             {
                 if (ScopingNode.isScopingNode(node))
                     for (Definition def : ((ScopingNode)node).getAllDefinitions())
-                        // Qualify definitions imported from modules in the *importing* scope
-                        definitions.put(qualify(def.getTokenRef().findToken(), (ScopingNode)node),
-                                        map(def));
+                    {
+                        String qualifiedName = qualify(def.getTokenRef().findToken(), (ScopingNode)node);
+                        definitions.put(qualifiedName, map(qualifiedName, def));
+                    }
             }
         });
         
 //        for (String def : definitions.keySet())
 //            System.out.println(def);
     }
+
+    public DefinitionMap(DefinitionMap<Definition> other)
+    {
+        for (String key : other.definitions.keySet())
+            definitions.put(key, map(key, other.definitions.get(key)));
+    }
+
     
-    protected abstract T map(Definition def);
+    protected abstract T map(String qualifiedName, Definition def);
 
-    public T lookup(TextSelection selection, IFortranAST ast)
+    public T lookup(TextSelection selection, TokenList tokenList)
     {
-        return lookup(findTokenEnclosing(selection, ast));
+        return lookup(findTokenEnclosing(selection, tokenList));
     }
 
-    public static Token findTokenEnclosing(TextSelection sel, IFortranAST ast)
+    public static Token findTokenEnclosing(TextSelection sel, TokenList tokenList)
     {
-        return findTokenEnclosing(sel.getOffset(), ast);
+        return findTokenEnclosing(sel.getOffset(), tokenList);
     }
 
-    public static Token findTokenEnclosing(int offset, IFortranAST ast)
+    public static Token findTokenEnclosing(int offset, TokenList tokenList)
     {
-        for (Token t : ast)
-            if (t.containsFileOffset(offset))
-                return t;
+        for (int i = 0, size = tokenList.size(); i < size; i++)
+            if (tokenList.get(i).containsFileOffset(offset))
+                return tokenList.get(i);
         return null;
     }
 
@@ -84,7 +97,7 @@ public abstract class DefinitionMap<T>
             {
                 Definition intrinsic = Intrinsics.resolveIntrinsic(token);
                 if (intrinsic != null)
-                    return map(intrinsic);
+                    return map(intrinsic.getCanonicalizedName(), intrinsic);
                 else
                     return null;
             }

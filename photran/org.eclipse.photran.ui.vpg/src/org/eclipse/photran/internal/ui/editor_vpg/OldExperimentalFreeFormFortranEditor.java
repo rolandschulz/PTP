@@ -1,10 +1,12 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
 import org.eclipse.cdt.internal.ui.text.CReconciler;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.reconciler.IReconciler;
+import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
@@ -38,10 +40,13 @@ public class OldExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
             super(editor);
         }
         
-        @Override protected IReconciler loadReconciler()
+        @Override public IReconciler getReconciler(ISourceViewer sourceViewer)
         {
-            return new CReconciler(OldExperimentalFreeFormFortranEditor.this,
-                                   new FortranVPGReconcilingStrategy(OldExperimentalFreeFormFortranEditor.this));
+            MonoReconciler r = new CReconciler(editor, new FortranVPGReconcilingStrategy(OldExperimentalFreeFormFortranEditor.this));
+            r.setIsIncrementalReconciler(false);
+            r.setProgressMonitor(new NullProgressMonitor());
+            r.setDelay(2000);
+            return r;
         }
     }
 

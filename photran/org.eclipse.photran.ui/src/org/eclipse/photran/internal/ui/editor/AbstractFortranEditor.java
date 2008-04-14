@@ -112,7 +112,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     // Public Fields - Custom Reconciler Task Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
-    /** @see org.eclipse.photran.internal.ui.editor_vpg.FortranReconcilingStrategy */
+    /** @see org.eclipse.photran.internal.ui.editor_vpg.FortranVPGReconcilingStrategy */
     public Object reconcilerTasks = null;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -390,20 +390,11 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
          */
         public IReconciler getReconciler(ISourceViewer sourceViewer)
         {
-            IReconciler reconciler = loadReconciler();
-            if (reconciler instanceof MonoReconciler)
-            {
-                MonoReconciler r = (MonoReconciler)reconciler;
-                r.setIsIncrementalReconciler(false);
-                r.setProgressMonitor(new NullProgressMonitor());
-                r.setDelay(500);
-            }
-            return reconciler;
-        }
-
-        protected IReconciler loadReconciler()
-        {
-            return new CReconciler(editor, new CReconcilingStrategy(editor));
+            MonoReconciler r = new CReconciler(editor, new CReconcilingStrategy(editor));
+            r.setIsIncrementalReconciler(false);
+            r.setProgressMonitor(new NullProgressMonitor());
+            r.setDelay(500);
+            return r;
         }
 
         protected ITokenScanner getTokenScanner()

@@ -11,17 +11,21 @@
 package org.eclipse.photran.internal.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.lexer.Terminal;
-import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.ui.PartInitException;
+import org.eclipse.photran.internal.core.lexer.TokenList;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
+import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
+import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.ide.IDE;
 
 /**
@@ -38,53 +42,73 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
 {
     public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException
     {
-        try
-        {
-        	progressMonitor.beginTask("Waiting for background work to complete (synchronizing Fortran virtual program graph)", IProgressMonitor.UNKNOWN);
-
-        	List<Definition> defs = resolveBinding();
-
-            if (defs == null || defs.isEmpty())
-                MessageDialog.openError(getFortranEditor().getShell(), "Error", "Unable to locate declaration");
-            else if (defs.size() == 1)
-                openEditorOn(defs.get(0));
-            else
-                openEditorOn(openSelectionDialog(defs));
-        }
-        catch (Exception e)
-        {
-        	String message = e.getMessage();
-        	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
-        }
-        finally
-        {
-        	progressMonitor.done();
-        }
+        AbstractFortranEditor editor = getFortranEditor();
+        TextSelection selection = (TextSelection)editor.getSelection();
+        Shell shell = editor.getShell();
+        IWorkbenchPage page = editor.getEditorSite().getPage();
+        
+        FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
+        tasks.addASTTask(new OpenDeclarationASTTask(editor, selection, shell, page));
+        tasks.getRunner().runTasks(false);
     }
     
-    private List<Definition> resolveBinding() throws Exception
+    private static class OpenDeclarationASTTask implements IFortranEditorASTTask
     {
-    	// TODO: No need to parse; this is all in VPG edges
-    	
-        IFortranAST ast = getAST();
+        private AbstractFortranEditor editor;
+        private TextSelection selection;
+        private Shell shell;
+        private IWorkbenchPage page;
         
-        Token token = findEnclosingToken(ast, getFortranEditor().getSelection());
-        if (token == null || token.getTerminal() != Terminal.T_IDENT)
-            throw new Exception("Please select an identifier.");
-
-        return token.resolveBinding();
-    }
-
-    private void openEditorOn(Definition def) throws PartInitException
-    {
-        if (def == null) return; // Dialog canceled
+        public OpenDeclarationASTTask(AbstractFortranEditor editor, TextSelection selection, Shell shell, IWorkbenchPage page)
+        {
+            this.editor = editor;
+            this.selection = selection;
+            this.shell = shell;
+            this.page = page;
+        }
         
-        IMarker marker = def.createMarker();
-        if (marker == null) return;
-        if (marker == null)
-            MessageDialog.openError(getFortranEditor().getShell(), "Error", "Unable to create marker");
-        else
-        	IDE.openEditor(getFortranEditor().getEditorSite().getPage(), marker, true);
+        // This runs outside the UI thread
+        public boolean handle(ASTExecutableProgramNode ast,
+                           TokenList tokenList,
+                           DefinitionMap<Definition> defMap)
+        {
+            final Definition def = defMap.lookup(selection, tokenList);
+
+            // Run this in the UI thread
+            Display.getDefault().asyncExec(new Runnable()
+            {
+                public void run()
+                {
+                    if (def == null)
+                        MessageDialog.openError(shell, "Error", "Unable to locate declaration");
+                    else
+                        openEditorOn(def);
+                }
+            });
+
+            // Remove this task
+            return false;
+        }
+
+        private void openEditorOn(Definition def)
+        {
+            if (def == null) return; // Selection dialog canceled
+            
+            try
+            {
+                IMarker marker = def.createMarker();
+                if (marker == null) return;
+                if (marker == null)
+                    MessageDialog.openError(shell, "Error", "Unable to create marker");
+                else
+                    IDE.openEditor(page, marker, true);
+            }
+            catch (Exception e)
+            {
+                String message = e.getMessage();
+                if (message == null) message = e.getClass().getName();
+                MessageDialog.openError(shell, "Error", message);
+            }
+        }
     }
 }

@@ -1,47 +1,29 @@
-
 package org.eclipse.photran.internal.ui.views;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.analysis.types.DerivedType;
-import org.eclipse.photran.internal.core.analysis.types.FunctionType;
-import org.eclipse.photran.internal.core.analysis.types.Type;
-import org.eclipse.photran.internal.core.analysis.types.TypeProcessor;
-import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.lexer.TokenList;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor.FortranKeywordRuleBasedScanner;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
-import org.eclipse.photran.internal.ui.editor_vpg.FortranVPGReconcilingStrategy;
+import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorVPGTask;
-import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -67,8 +49,9 @@ public class DeclarationView extends ViewPart
                IFortranEditorASTTask
 {
     private AbstractFortranEditor activeEditor = null;
-    private IFortranAST activeAST = null;
-    private DefinitionMap<String> activeDefMap = null;
+    private ASTExecutableProgramNode activeAST = null;
+    private TokenList activeTokenList = null;
+    private DefinitionMap<String> activeDefinitions = null;
     
     private SourceViewer viewer = null;
     private Document document = new Document();
@@ -232,13 +215,11 @@ public class DeclarationView extends ViewPart
      * IFortranEditorVPGTask - Callback run when the VPG is more-or-less up-to-date.
      * This method is run <i>outside</i> the UI thread.
      */
-    public synchronized void handle(IFile file, IFortranAST ast)
+    public synchronized void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap)
     {
-        if (activeEditor == null || activeAST == null) return;
-        
-        activeDefMap = new DefinitionMap<String>(ast)
+        activeDefinitions = new DefinitionMap<String>(defMap)
         {
-            @Override protected String map(Definition def)
+            @Override protected String map(String qualifiedName, Definition def)
             {
                 return def.describe();
             }
@@ -250,9 +231,11 @@ public class DeclarationView extends ViewPart
      * is available.  May be newer than the information available in the VPG.
      * This method is run <i>outside</i> the UI thread.
      */
-    public synchronized void handle(final IFortranAST ast)
+    public synchronized boolean handle(ASTExecutableProgramNode ast, TokenList tokenList, DefinitionMap<Definition> defMap)
     {
         activeAST = ast;
+        activeTokenList = tokenList;
+        return true;
     }
 
     /**
@@ -260,9 +243,9 @@ public class DeclarationView extends ViewPart
      */
     public synchronized void selectionChanged(SelectionChangedEvent event)
     {
-        if (event.getSelection() instanceof TextSelection && activeAST != null && activeDefMap != null)
+        if (event.getSelection() instanceof TextSelection && activeAST != null && activeDefinitions != null)
         {
-            String description = activeDefMap.lookup((TextSelection)event.getSelection(), activeAST);
+            String description = activeDefinitions.lookup((TextSelection)event.getSelection(), activeTokenList);
             update(description == null ? "" : description);
         }
         else
