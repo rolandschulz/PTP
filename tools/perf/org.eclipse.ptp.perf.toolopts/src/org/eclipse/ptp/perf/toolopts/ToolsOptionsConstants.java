@@ -20,5 +20,6 @@ public class ToolsOptionsConstants {
 	public static final String TOOL_CONFIG_ARGUMENT_SUFFIX="_ARGUMENT_SAVED";
 	public static final String TOOL_CONFIG_STATE_SUFFIX="_BUTTON_STATE";
 	public static final String TOOL_CONFIG_DEFAULT_SUFFIX="_ARGUMENT_DEFAULT";
+	public static final String TOOL_PANE_ID_SUFFIX = ".performance.options.configuration_id_";
 	
 }
