@@ -28,8 +28,8 @@ public class ToolOptionsUtilities {
 	 * @return
 	 * @throws CoreException 
 	 */
-	public static String getConfigAttribute(ILaunchConfiguration configuration, String key, String defaultValue) throws CoreException{
-		key = key.toUpperCase()+ToolsOptionsConstants.TOOL_CONFIG_ARGUMENT_SUFFIX;
+	public static String getConfigAttribute(ILaunchConfiguration configuration, String paneTitle, String key, String defaultValue) throws CoreException{
+		key = paneTitle+ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX+key.toUpperCase()+ToolsOptionsConstants.TOOL_CONFIG_ARGUMENT_SUFFIX;
 		String result=configuration.getAttribute(key, defaultValue);
 		return result;
 	}
