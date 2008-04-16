@@ -302,7 +302,7 @@ public class ToolPane {
 	protected void setName(String name)
 	{
 		toolName = name;
-		configID=name+".performance.options.configuration_id";
+		configID=name+ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;
 	}
 	
 	protected void setOptions(List<ToolOption> toptions)
