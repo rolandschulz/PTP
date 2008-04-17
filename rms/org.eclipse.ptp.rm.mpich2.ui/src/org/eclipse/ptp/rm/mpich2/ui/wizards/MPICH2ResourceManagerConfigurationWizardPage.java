@@ -18,11 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.mpich2.ui.wizards;
 
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
 public final class MPICH2ResourceManagerConfigurationWizardPage extends
-	AbstractRemoteResourceManagerConfigurationWizardPage {
+	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 		
 	public MPICH2ResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, "MPICH2 Proxy Configuration");

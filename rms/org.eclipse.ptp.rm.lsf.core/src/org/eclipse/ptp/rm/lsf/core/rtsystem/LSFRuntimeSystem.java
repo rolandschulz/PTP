@@ -20,9 +20,9 @@
 package org.eclipse.ptp.rm.lsf.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteRuntimeSystem;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeSystem;
 
-public class LSFRuntimeSystem extends AbstractRemoteRuntimeSystem {
+public class LSFRuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public LSFRuntimeSystem(LSFProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 	}

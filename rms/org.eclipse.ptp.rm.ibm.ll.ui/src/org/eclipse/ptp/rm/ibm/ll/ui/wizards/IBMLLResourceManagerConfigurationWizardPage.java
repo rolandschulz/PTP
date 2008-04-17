@@ -27,11 +27,11 @@ package org.eclipse.ptp.rm.ibm.ll.ui.wizards;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
 public final class IBMLLResourceManagerConfigurationWizardPage extends
-	AbstractRemoteResourceManagerConfigurationWizardPage {
+	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 	
 	public IBMLLResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("Wizard.ConfigurationTitle"));

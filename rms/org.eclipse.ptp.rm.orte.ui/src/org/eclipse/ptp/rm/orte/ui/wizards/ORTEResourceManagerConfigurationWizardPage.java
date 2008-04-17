@@ -19,11 +19,11 @@
 package org.eclipse.ptp.rm.orte.ui.wizards;
 
 import org.eclipse.ptp.rm.orte.ui.internal.ui.Messages;
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
 public final class ORTEResourceManagerConfigurationWizardPage extends
-	AbstractRemoteResourceManagerConfigurationWizardPage {
+	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 	
 	public ORTEResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("ORTEResourceManagerConfigurationWizardPage.name")); //$NON-NLS-1$

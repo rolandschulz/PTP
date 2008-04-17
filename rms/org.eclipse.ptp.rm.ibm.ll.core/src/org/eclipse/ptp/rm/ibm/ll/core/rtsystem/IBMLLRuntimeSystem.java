@@ -26,9 +26,9 @@
 package org.eclipse.ptp.rm.ibm.ll.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteRuntimeSystem;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeSystem;
 
-public class IBMLLRuntimeSystem extends AbstractRemoteRuntimeSystem {
+public class IBMLLRuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public IBMLLRuntimeSystem(IBMLLProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 	}

@@ -97,6 +97,16 @@ public class StatusTools implements IRemoteStatusTools {
 			IRemoteExecutionTools remExecTools = manager.getExecutionTools(); 
 			
 			// Filter information from files.
+			/*
+			 * "protoOutput" and "proto6Output" are the 
+			 * outputs of the above commands, WITHOUT the header 
+			 * that is being wiped out by the "replaceFirst" 
+			 * method. Thus, the resulting string
+			 * "rawProcOutput" contains only valid connection
+			 * entries for both ipv4 and ipv6 and must be
+			 * totally processed on the following loop.
+			 * 
+			 */
 			String protoOutput = remExecTools.executeWithOutput(protoStr).
 				replaceFirst("^\\p{Space}*sl.*inode\\p{Space}*\\n", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			String proto6Output = remExecTools.executeWithOutput(protoStr6).
@@ -105,17 +115,17 @@ public class StatusTools implements IRemoteStatusTools {
 			String rawProcOutput = protoOutput.concat(proto6Output); 
 			
 			String [] rawProcLines = rawProcOutput.split("\n"); //$NON-NLS-1$
-			// Ignore first line, because it has the file legend.
-			for(int i=1; i < rawProcLines.length; i++) {
+			
+			for(int i=0; i < rawProcLines.length; i++) {
 				// Trim the beginning of each line, and split the string using
 				// whitespace as separator.
 				String [] procFields = rawProcLines[i].trim().split(" "); //$NON-NLS-1$
-				
+
 				// Get the second field and split it using ':' as separator.
 				// Get the second field.
 				String [] addrFields = procFields[1].split(":"); //$NON-NLS-1$
 				String allocedPort = addrFields[1];
-				
+
 				// Convert the value to an integer (it's on base 16) 
 				// and put it into the set.
 				portSet.add(Integer.valueOf(allocedPort, 16));

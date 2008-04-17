@@ -21,10 +21,10 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem;
 
-public class AbstractRemoteRuntimeSystem extends AbstractProxyRuntimeSystem {
+public class AbstractRemoteProxyRuntimeSystem extends AbstractProxyRuntimeSystem {
 	private AbstractRemoteProxyRuntimeClient proxy;
 	
-	public AbstractRemoteRuntimeSystem(AbstractRemoteProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
+	public AbstractRemoteProxyRuntimeSystem(AbstractRemoteProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 		this.proxy = proxy;
 	}

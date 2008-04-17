@@ -26,12 +26,12 @@ package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public final class PEResourceManagerConfigurationWizardPage extends
-	AbstractRemoteResourceManagerConfigurationWizardPage {
+	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 	
     private RMConfigurationWizard configWizard;
     

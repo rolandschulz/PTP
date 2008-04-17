@@ -20,10 +20,10 @@
 package org.eclipse.ptp.rm.mpich2.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteRuntimeSystem;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeSystem;
 
 
-public class MPICH2RuntimeSystem extends AbstractRemoteRuntimeSystem  {
+public class MPICH2RuntimeSystem extends AbstractRemoteProxyRuntimeSystem  {
 	public MPICH2RuntimeSystem(MPICH2ProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);
 	}

@@ -29,6 +29,13 @@
 			class="org.eclipse.ptp.ui.views.ResourceManagerView"
 			id="org.eclipse.ptp.ui.views.resourceManagerView">
 		</view>
+  <view
+        category="org.eclipse.ptp.ui.views"
+        class="org.eclipse.ptp.ui.views.JobsListView"
+        icon="icons/parallel_perspective.gif"
+        id="org.eclipse.ptp.ui.views.JobsListView"
+        name="%JobsListView.name">
+  </view>
 	</extension>
 	<extension
 		point="org.eclipse.ui.editors">
