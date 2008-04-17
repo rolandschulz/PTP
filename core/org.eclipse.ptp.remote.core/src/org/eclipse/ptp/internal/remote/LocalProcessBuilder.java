@@ -13,27 +13,28 @@ package org.eclipse.ptp.internal.remote;
 import java.io.IOException;
 import java.util.List;
 
+import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
-	private ProcessBuilder localProcessBuilder;
+	private ProcessFactory localProcessBuilder;
 
 	public LocalProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
-		localProcessBuilder = new ProcessBuilder(command);
+		localProcessBuilder = ProcessFactory.getFactory();;
 	}
 	
 	public LocalProcessBuilder(IRemoteConnection conn, String... command) {
 		super(conn, command);
-		localProcessBuilder = new ProcessBuilder(command);
+		localProcessBuilder = ProcessFactory.getFactory();;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
 	 */
 	public IRemoteProcess start() throws IOException {
-		return new LocalProcess(localProcessBuilder.start());
+		return new LocalProcess(localProcessBuilder.exec(command().toArray(new String[0])));
 	}
 }

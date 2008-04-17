@@ -45,6 +45,8 @@ public class JobAttributes {
 	private static final String ENV_ATTR_ID = "env";
 	private static final String EXEC_NAME_ATTR_ID = "execName";
 	private static final String EXEC_PATH_ATTR_ID = "execPath";
+	private static final String HOST_FILE_ATTR_ID = "hostFile";
+	private static final String HOST_LIST_ATTR_ID = "hostList";
 	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding";
 	private static final String LAUNCHED_BY_PTP_FLAG_ATTR_ID = "launchedByPTP";
 	private static final String JOB_ID_ATTR_ID = "jobId";
@@ -53,6 +55,7 @@ public class JobAttributes {
 	private static final String QUEUEID_ATTR_ID = "queueId";
 	private static final String STATE_ATTR_ID = "jobState";
 	private static final String SUBID_ATTR_ID = "jobSubId";
+	private static final String USERID_ATTR_ID = "userId";
 	private static final String WORKING_DIR_ATTR_ID = "workingDir";
 
 	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
@@ -87,6 +90,14 @@ public class JobAttributes {
 		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path",
 				"Path of executable to be launched", true, "");
 
+	private final static StringAttributeDefinition hostFileAttrDef = 
+		new StringAttributeDefinition(HOST_FILE_ATTR_ID, "Host File",
+				"Path to file containing hosts to use for launch", true, "");
+
+	private final static StringAttributeDefinition hostListAttrDef = 
+		new StringAttributeDefinition(HOST_LIST_ATTR_ID, "Host List",
+				"Comma separated list of hosts to use for launch", true, "");
+
 	private final static IntegerAttributeDefinition ioForwardingAttrDef = 
 		new IntegerAttributeDefinition(IO_FORWARDING_ATTR_ID, "I/O Forwarding", 
 				"Specify which I/O channels to foward", false, IO_FORWARDING_STDOUT);
@@ -100,7 +111,7 @@ public class JobAttributes {
 				"Job ID that command applies to", true, "");
 
 	private final static IntegerAttributeDefinition numProcsAttrDef = 
-		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", 
+		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Procs", 
 				"Number of processes to launch", true, 0);
 
 	private final static ArrayAttributeDefinition<String> progArgsAttrDef = 
@@ -112,12 +123,16 @@ public class JobAttributes {
 				"Job submission queue ID", true, "");
 	
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job", 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State", "State of a job", 
 				true, State.STARTED);
 
 	private final static StringAttributeDefinition subIdAttrDef = 
 		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
 				"Temporary ID used for job submission", false, "");
+
+	private final static StringAttributeDefinition userIdAttrDef = 
+		new StringAttributeDefinition(USERID_ATTR_ID, "User",
+				"User ID", true, "");
 
 	private final static StringAttributeDefinition workingDirAttrDef = 
 		new StringAttributeDefinition(WORKING_DIR_ATTR_ID, "Working Directory",
@@ -154,6 +169,8 @@ public class JobAttributes {
 				envAttrDef,
 				execNameAttrDef, 
 				execPathAttrDef,
+				hostFileAttrDef,
+				hostListAttrDef,
 				ioForwardingAttrDef,
 				jobIdAttrDef,
 				launchedByPTPFlagAttrDef,
@@ -162,6 +179,7 @@ public class JobAttributes {
 				queueIdAttrDef,
 				stateAttrDef, 
 				subIdAttrDef, 
+				userIdAttrDef,
 				workingDirAttrDef,
 			};
 	}
@@ -176,6 +194,14 @@ public class JobAttributes {
 
 	public static StringAttributeDefinition getExecutablePathAttributeDefinition() {
 		return execPathAttrDef;
+	}
+
+	public static StringAttributeDefinition getHostFileAttributeDefinition() {
+		return hostFileAttrDef;
+	}
+
+	public static StringAttributeDefinition getHostListAttributeDefinition() {
+		return hostListAttrDef;
 	}
 
 	public static BooleanAttributeDefinition getLaunchedByPTPFlagAttributeDefinition() {
@@ -210,6 +236,10 @@ public class JobAttributes {
 		return subIdAttrDef;
 	}
 	
+	public static StringAttributeDefinition getUserIdAttributeDefinition() {
+		return userIdAttrDef;
+	}
+
 	public static StringAttributeDefinition getWorkingDirectoryAttributeDefinition() {
 		return workingDirAttrDef;
 	}
