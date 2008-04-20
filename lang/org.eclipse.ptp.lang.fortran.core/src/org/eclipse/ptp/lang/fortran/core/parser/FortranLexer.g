@@ -26,16 +26,45 @@ options {
 
 /**
  *
- * @author Craig E Rasmussen, Christopher D. Rickett
+ * @author Craig E Rasmussen, Christopher D. Rickett, Jeffrey Overbey
  */
  
-package parser.java;
+package fortran.ofp.parser.java;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Stack;
+
+import fortran.ofp.parser.java.FortranToken;
 }
 
 @members {
     private Token prevToken;
     private boolean continueFlag;
     private boolean includeLine;
+    private boolean inFormat;
+    private ArrayList<String> includeDirs;
+    private Stack<FortranStream> oldStreams;
+
+    protected StringBuilder whiteText = new StringBuilder();
+
+    public Token emit() {
+        FortranToken t = new FortranToken(input, type, channel,
+            tokenStartCharIndex, getCharIndex()-1);
+        t.setLine(tokenStartLine);
+        t.setText(text);
+        t.setCharPositionInLine(tokenStartCharPositionInLine);
+
+        if(channel == HIDDEN) {
+            whiteText.append(getText());
+        } else {
+            t.setWhiteText(whiteText.toString());
+            whiteText.delete(0, whiteText.length());
+        }
+
+        emit(t);
+        return t;
+    }
 
     public boolean isKeyword(Token tmpToken) {
         if(tmpToken.getType() >= T_INTEGER && 
@@ -55,10 +84,43 @@ package parser.java;
     }// end isKeyword()
 
 
+    /**
+     * This is necessary because the lexer class caches some values from 
+     * the input stream.  Here we reset them to what the current input stream 
+     * values are.  This is done when we switch streams for including files.
+     */    
+    private void resetLexerState() {
+        tokenStartCharIndex = input.index();
+        tokenStartCharPositionInLine = input.getCharPositionInLine();
+        tokenStartLine = input.getLine();
+        token = null;
+        text = null;
+    }// end resetLexerState()
+
+
     // overrides nextToken in superclass
     public Token nextToken() {
         Token tmpToken;
         tmpToken = super.nextToken();
+
+        if(tmpToken.getType() == EOF) {
+            tmpToken.setChannel(Token.DEFAULT_CHANNEL);
+            if(this.oldStreams != null && this.oldStreams.empty() == false) {
+                FortranToken eofToken = 
+                    new FortranToken(this.input, T_EOF, Token.DEFAULT_CHANNEL,
+                        this.input.index(), this.input.index()+1);
+                eofToken.setText("EOF token text");
+                tmpToken = eofToken;
+                /* We have at least one previous input stream on the stack, 
+                   meaning we should be at the end of an included file.  
+                   Switch back to the previous stream and continue.  */
+                this.input = this.oldStreams.pop();
+                /* Is this ok to do??  */
+                resetLexerState();
+            }
+
+            return tmpToken;
+        }
 
         if(tmpToken.getType() != LINE_COMMENT && 
            tmpToken.getType() != WS &&
@@ -91,6 +153,12 @@ package parser.java;
         return 99;
     }// end getIgnoreChannelNumber()
 
+    
+    public CharStream getInput() {
+        return this.input;
+    }
+
+
     /**
      * Do this here because not sure how to get antlr to generate the 
      * init code.  It doesn't seem to do anything with the @init block below.
@@ -101,7 +169,102 @@ package parser.java;
         prevToken = null;
         continueFlag = false;
         includeLine = false;
+        inFormat = false;
+        oldStreams = new Stack<FortranStream>();
     }// end constructor()
+
+
+    public void setIncludeDirs(ArrayList<String> includeDirs) {
+        this.includeDirs = includeDirs;
+    }// end setIncludeDirs()
+
+    
+    private File findFile(String fileName) {
+        File tmpFile;
+        String tmpPath;
+        StringBuffer newFileName;
+        
+        tmpFile = new File(fileName);
+        if(tmpFile.exists() == false) {
+            /* the file doesn't exist by the given name from the include line, 
+             * so we need to append it to each include dir and search.  */
+            for(int i = 0; i < this.includeDirs.size(); i++) {
+                tmpPath = this.includeDirs.get(i);
+
+                newFileName = new StringBuffer();
+
+                /* Build the new file name with the path.  Add separator to 
+                 * end of path if necessary (unix specific).  */
+                newFileName = newFileName.append(tmpPath);
+                if(tmpPath.charAt(tmpPath.length()-1) != '/') {
+                    newFileName = newFileName.append('/');
+                }
+                newFileName = newFileName.append(fileName);
+
+                /* Try opening the new file.  */
+                tmpFile = new File(newFileName.toString());
+                if(tmpFile.exists() == true) {
+                    return tmpFile;
+                }
+            }
+
+            /* File did not exist.  */
+            return null;
+        } else {
+            return null;
+        }
+    }// end findFile()
+
+
+    private void includeFile() {
+        /* For debugging, print out the list of include dirs.  */
+        if(this.includeDirs == null || this.includeDirs.size() == 0) {
+            System.err.println("no include dirs given!");
+            return;
+        }
+
+        if(prevToken != null) {
+            String fileName = null;
+            String charConst = null;
+            FortranStream includedStream = null;
+            File includedFile;
+
+            charConst = prevToken.getText();
+            fileName = charConst.substring(1, charConst.length()-1);
+
+            /* Find the file, including it's complete path.  */
+            includedFile = findFile(fileName);
+            if(includedFile == null) {
+                System.err.println("Error: Could not open file '" + 
+                    charConst.substring(1, charConst.length()-1) + "'");
+                return;
+            }
+
+//             System.err.println("includedFile.getAbsolutePath() is: " + 
+//                 includedFile.getAbsolutePath());
+
+            /* Create a new stream for the included file.  */
+            try {
+                includedStream = 
+                new FortranStream(includedFile.getAbsolutePath(), 
+                    ((FortranStream)this.input).getSourceForm());
+            } catch(IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            /* Save current character stream.  */
+            oldStreams.push((FortranStream)(this.input));
+            this.input = includedStream;
+            /* Is this ok to do??  */
+            resetLexerState();
+        } else {
+            System.err.println("Error: Unable to determine file name from " + 
+                               "include line");
+        }
+
+        return;
+    }// end includeFile()
 
 }
 
@@ -119,42 +282,29 @@ package parser.java;
  */
 
 T_EOS 
+@after {
+    // if the previous token was a T_EOS, then the one we're 
+    // processing now is whitespace, so throw it away.
+    // also, if the previous token is null it means we have a 
+    // blank line or a semicolon at the start of the file and 
+    // we need to ignore it.  
+    if(prevToken == null || 
+        (prevToken != null && prevToken.getType() == T_EOS)) {
+        $channel=HIDDEN;
+    } 
+
+    if(includeLine) {
+        $channel=HIDDEN;
+        // Part of include file handling..
+        includeFile();
+        includeLine = false;
+    }
+
+    // Make sure we clear the flag saying we're in a format-stmt
+    inFormat = false;
+}
       : ';' 
-        { 
-            // if the previous token was a T_EOS, then the one we're 
-            // processing now is whitespace, so throw it away.
-            // also, ignore semicolons that come before any real 
-            // statements (is this correct??).  --Rickett, 11.28.06
-            if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS)) {
-//                 _channel=99;
-                $channel=HIDDEN;
-//                 $channel=99;
-//                 $channel=HIDDEN;
-            }
-
-        }
       |  ('\r')? ('\n')
-        {
-            // if the previous token was a T_EOS, then the one we're 
-            // processing now is whitespace, so throw it away.
-            // also, if the previous token is null it means we have a 
-            // blank line or a semicolon at the start of the file and 
-            // we need to ignore it.  
-            if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS)) {
-//                _channel=99;
-                $channel=HIDDEN;
-//                 $channel=99;
-            } 
-
-            if(includeLine) {
-//                 _channel=99; 
-                $channel=HIDDEN;
-//                 $channel=99;
-                includeLine = false;
-            }
-        }
       ;
                 
 
@@ -323,7 +473,8 @@ T_PERIOD        : '.' ;
 // not sure what this is; is it just a place holder for something 
 // else??  --Rickett, 10.27.06  
 // it's a placeholder in the parser..
-T_XYZ           : 'XYZ';
+// make the text unreachable from valid Fortran.
+T_XYZ           : '__XYZ__';
 
 T_INTEGER       :       'INTEGER'       ;
 T_REAL          :       'REAL'          ;
@@ -335,6 +486,8 @@ T_ABSTRACT      :       'ABSTRACT'      ;
 T_ALLOCATABLE   :       'ALLOCATABLE'   ;
 T_ALLOCATE      :       'ALLOCATE'      ;
 T_ASSIGNMENT    :       'ASSIGNMENT'    ;
+// ASSIGN statements are a deleted feature.
+T_ASSIGN        :       'ASSIGN'        ;
 T_ASSOCIATE     :       'ASSOCIATE'     ;
 T_ASYNCHRONOUS  :       'ASYNCHRONOUS'  ;
 T_BACKSPACE     :       'BACKSPACE'     ;
@@ -371,7 +524,7 @@ T_FILE          :       'FILE'          ;
 T_FINAL         :       'FINAL'         ;
 T_FLUSH         :       'FLUSH'         ;
 T_FORALL        :       'FORALL'        ;
-T_FORMAT        :       'FORMAT'        ;
+T_FORMAT        :       'FORMAT'        { inFormat = true; };
 T_FORMATTED     :       'FORMATTED'     ;
 T_FUNCTION      :       'FUNCTION'      ;
 T_GENERIC       :       'GENERIC'       ;
@@ -400,6 +553,7 @@ T_OPTIONAL      :       'OPTIONAL'      ;
 T_OUT           :       'OUT'           ;
 T_PARAMETER     :       'PARAMETER'     ;
 T_PASS          :       'PASS'          ;
+T_PAUSE         :       'PAUSE'         ;
 T_POINTER       :       'POINTER'       ;
 T_PRINT         :       'PRINT'         ;
 T_PRECISION     :       'PRECISION'     ;
@@ -461,6 +615,22 @@ T_LEN : 'LEN' ;
 
 T_BIND : 'BIND' ;
 
+T_HOLLERITH : Digit_String 'H' 
+    { 
+        // If we're inside a format stmt we don't want to process it as 
+        // a Hollerith constant because it's most likely an H-edit descriptor. 
+        // However, the H-edit descriptor needs processed the same way both 
+        // here and in the prepass.
+        StringBuffer hollConst = new StringBuffer();
+        int count = Integer.parseInt($Digit_String.text);
+
+        for(int i = 0; i < count; i++) 
+           hollConst = hollConst.append((char)input.LA(i+1));
+        for(int i = 0; i < count; i++)
+           // consume the character so the lexer doesn't try matching it.
+           input.consume();
+    };
+
 // Must come after .EQ. (for example) or will get matched first
 // TODO:: this may have to be done in the parser w/ a rule such as:
 // T_PERIOD T_IDENT T_PERIOD
@@ -499,6 +669,11 @@ T_FORALL_STMT : '__T_FORALL_STMT__' ;
 T_WHERE_CONSTRUCT_STMT : '__T_WHERE_CONSTRUCT_STMT__' ;
 T_FORALL_CONSTRUCT_STMT : '__T_FORALL_CONSTRUCT_STMT__' ;
 T_INQUIRE_STMT_2 : '__T_INQUIRE_STMT_2__' ;
+// text for the real constant will be set when a token of this type is 
+// created by the prepass.
+T_REAL_CONSTANT : '__T_REAL_CONSTANT__' ; 
+
+T_EOF: '__T_EOF__' ;
 
 // R304
 T_IDENT
