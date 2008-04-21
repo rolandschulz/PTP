@@ -66,8 +66,10 @@ public class FortranASTIdExpression extends FortranASTNode implements IASTIdExpr
 		return FortranVisitor.getExpressionType(this);
 	}
 	
+	// TODO - FIXME
 	public IBinding[] findBindings(IASTName n, boolean isPrefix) {
-		return FortranVisitor.findBindingsForContentAssist(n, isPrefix);
+		//return FortranVisitor.findBindingsForContentAssist(n, isPrefix);
+		return null;
 	}
 
 }

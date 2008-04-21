@@ -24,8 +24,7 @@ import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IType;
 
 import org.eclipse.ptp.lang.fortran.core.parser.FortranParserActionPrint;
-import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
-import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
+import org.eclipse.ptp.lang.fortran.core.parser.IActionEnums;
 
 /**
  * @author crasmussen
@@ -41,15 +40,15 @@ public class FortranASTLiteralExpression extends FortranASTNode implements
     private Token		token;
     private Token		ktToken;
     private int			kindType = -1;
-    private KindParam	kindTokenType = KindParam.none;
+    private int			kindTokenType = IActionEnums.KindParam_none;
     
-    public FortranASTLiteralExpression(LiteralConstant fKind, Token cToken, KindParam kindTokenType, Token ktToken) {
+    public FortranASTLiteralExpression(int fKind, Token cToken, int kindTokenType, Token ktToken) {
     	super();
     	
     	this.token = cToken;
     	this.ktToken = ktToken;
     	this.kindTokenType = kindTokenType;
-    	if (kindTokenType == KindParam.literal) {
+    	if (kindTokenType == IActionEnums.KindParam_literal) {
     		kindType = Integer.parseInt(ktToken.getText());
     	} else {
     		// TODO - get kind type from identifier
@@ -59,17 +58,17 @@ public class FortranASTLiteralExpression extends FortranASTNode implements
 		setOffsetAndLength(FortranParserActionDom.offset(cToken), FortranParserActionDom.length(cToken));
     	
     	switch (fKind) {
-		case int_literal_constant:
+		case IActionEnums.LiteralConstant_int_literal_constant:
 			setKind(IASTLiteralExpression.lk_integer_constant);		break;
-		case real_literal_constant:
+		case IActionEnums.LiteralConstant_real_literal_constant:
 			setKind(IASTLiteralExpression.lk_float_constant);		break;
-		case complex_literal_constant:
+		case IActionEnums.LiteralConstant_complex_literal_constant:
 			setKind(IASTLiteralExpression.lk_last + 1);				break;
-		case logical_literal_constant:
+		case IActionEnums.LiteralConstant_logical_literal_constant:
 			setKind(IASTLiteralExpression.lk_last + 2);				break;
-		case char_literal_constant:
+		case IActionEnums.LiteralConstant_char_literal_constant:
 			setKind(IASTLiteralExpression.lk_string_literal);		break;
-		case boz_literal_constant:
+		case IActionEnums.LiteralConstant_boz_literal_constant:
 			setKind(IASTLiteralExpression.lk_last + 3);				break;
 		}
     }
@@ -102,7 +101,7 @@ public class FortranASTLiteralExpression extends FortranASTNode implements
     	if (getKindTypeParameter() != -1) {
     		kt = " _" + getKindTypeParameter();
     	}
-    	if (kindTokenType == KindParam.id) {
+    	if (kindTokenType == IActionEnums.KindParam_id) {
     		id = " _" + ktToken;
     	}
     	return value + " " + FortranParserActionPrint.toString(kindTokenType) + kt + id;
