@@ -44,8 +44,10 @@ public class FrontEnd implements Callable<Boolean> {
    private int sourceForm;
    private boolean verbose = false;
    private boolean silent = false;
-	private static boolean hasErrorOccurred = false;
-	private static ArrayList<String> includeDirs;
+   private static boolean hasErrorOccurred = false;
+   private static ArrayList<String> includeDirs;
+   
+   public static final String packageName = "org.eclipse.ptp.lang.fortran.core.parser";
 
    public static final int UNKNOWN_SOURCE_FORM = -1;
    public static final int FREE_FORM = 1;
@@ -165,7 +167,7 @@ public class FrontEnd implements Callable<Boolean> {
 		Boolean verbose = false;
 		Boolean silent = true;
 		ArrayList<String> newArgs = new ArrayList<String>(0);
-		String type = "fortran.ofp.parser.java.FortranParserActionNull";
+		String type = packageName + ".FortranParserActionNull";
 		int nArgs = 0;
 
 		includeDirs = new ArrayList<String>();
@@ -174,20 +176,20 @@ public class FrontEnd implements Callable<Boolean> {
 		// so we don't have to specify explicit class names on the command line.
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith("--dump")) {
-				type = "fortran.ofp.parser.java.FortranParserActionPrint";
+				type = packageName + ".FortranParserActionPrint";
 				silent = false;
 				nArgs += 1;
 				continue;
 			}
 			else if (args[i].startsWith("--verbose")) {
-				type = "fortran.ofp.parser.java.FortranParserActionPrint";
+				type = packageName + ".FortranParserActionPrint";
 				verbose = true;
 				silent = false;
 				nArgs += 1;
 				continue;
 			}
 			else if (args[i].startsWith("--silent")) {
-				type = "fortran.ofp.parser.java.FortranParserActionNull";
+				type = packageName + ".FortranParserActionNull";
 				silent = true;
 				nArgs += 1;
 				continue;
@@ -211,7 +213,7 @@ public class FrontEnd implements Callable<Boolean> {
 		}
 
       if (args.length <= nArgs) {
-    	  System.out.println("Usage: java fortran.ofp.FrontEnd " + 
+    	  System.out.println("Usage: java " + packageName + ".FrontEnd " + 
 									"[--dump] [--silent] [--class className] ");
     	  System.out.println("                                    " + 
 									"[--user_option user_arg] file1 [file2..fileN]");
@@ -243,7 +245,7 @@ public class FrontEnd implements Callable<Boolean> {
 				  newArgs.toArray(new String[newArgs.size()]), args[i], type);
 			  ofp.setVerbose(verbose,silent);
 			  if (ofp.getParser().getAction().getClass().getName() 
-					== "fortran.ofp.parser.java.FortranParserActionPrint") {
+					== packageName + ".FortranParserActionPrint") {
 				  FortranParserActionPrint action = 
 					  (FortranParserActionPrint) ofp.getParser().getAction();
 				  
