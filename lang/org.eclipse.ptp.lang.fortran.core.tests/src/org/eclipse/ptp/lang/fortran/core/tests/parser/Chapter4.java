@@ -1,6 +1,6 @@
 package org.eclipse.ptp.lang.fortran.core.tests.parser;
 
-import org.eclipse.ptp.lang.fortran.core.parser.FortranMain;
+import org.eclipse.ptp.lang.fortran.core.parser.FrontEnd;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class Chapter4 {
 	      String action = "org.eclipse.ptp.lang.fortran.core.parser.FortranParserActionNull";
 
 	      try {
-	    	  FortranMain fortran = new FortranMain(new String[0], path, action);
+	    	  FrontEnd fortran = new FrontEnd(new String[0], path, action);
 	    	  error = fortran.call();
 	      } catch(Exception e) {
 	    	  //e.printStackTrace();

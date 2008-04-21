@@ -6,7 +6,7 @@ import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
 import org.eclipse.ptp.lang.fortran.core.parser.FortranStream;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranMain;
+import org.eclipse.ptp.lang.fortran.core.parser.FrontEnd;
 
 public class MPI {
 	
@@ -18,7 +18,7 @@ public class MPI {
 	    String action = "org.eclipse.ptp.lang.fortran.core.parser.FortranParserActionNull";
 
 		try {
-			FortranMain fortran = new FortranMain(new String[0], path, action);
+			FrontEnd fortran = new FrontEnd(new String[0], path, action);
 			error = fortran.call();
 		} catch(Exception e) {
 			 //        e.printStackTrace();
