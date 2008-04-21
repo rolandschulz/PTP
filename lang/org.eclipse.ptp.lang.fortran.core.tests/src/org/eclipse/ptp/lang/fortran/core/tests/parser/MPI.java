@@ -1,9 +1,5 @@
 package org.eclipse.ptp.lang.fortran.core.tests.parser;
 
-import org.antlr.runtime.*;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranLexer;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranStream;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.eclipse.ptp.lang.fortran.core.parser.FrontEnd;
