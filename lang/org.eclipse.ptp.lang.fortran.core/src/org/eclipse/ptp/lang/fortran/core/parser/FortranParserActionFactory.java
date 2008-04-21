@@ -23,31 +23,42 @@ public class FortranParserActionFactory {
 
 	static IFortranParserAction newAction(String[] args, FortranParser parser, String kind, String filename) {
 		IFortranParserAction action = null;
+		/*
 		if (kind.compareToIgnoreCase("dump") == 0) {
 			action = new FortranParserActionPrint(args, parser, filename);
 		} else if (kind.compareToIgnoreCase("null") == 0) {
 			action = new FortranParserActionNull(args, parser, filename);
 		} else {
-			try {
-				Constructor[] cons = Class.forName(kind).getDeclaredConstructors();
-				for (int i = 0; i < cons.length; i++) {
-					Class[] types = cons[i].getParameterTypes();
-					if (types.length == 3 & types[0] == String[].class & types[1] == FortranParser.class & types[2] == java.lang.String.class) {
-						Object[] actionArgs = {args, parser, filename};
-						action = (IFortranParserAction) cons[i].newInstance(actionArgs);
-						break;
-					}
+		*/
+		// Look up the class name. Could be FortranParserActionPrint, or
+		// FortranParserActionNull, or maybe somethig else.
+		try {
+			Constructor[] cons = Class.forName(kind).getDeclaredConstructors();
+			for (int i = 0; i < cons.length; i++) {
+				Class[] types = cons[i].getParameterTypes();
+				if ( types.length == 3 &
+						types[0] == String[].class & 
+						types[1] == FortranParser.class & 
+						types[2] == java.lang.String.class ) {
+					Object[] actionArgs = {args, parser, filename};
+					action = (IFortranParserAction) cons[i].newInstance(actionArgs);
+					break;
 				}
-			} catch (Exception e) {
-				// InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
-				// ClassNotFoundException, NoSuchMethodException
-				System.out.println(e);
 			}
+		} catch (Exception e) {
+			// InstantiationException, IllegalAccessException,
+			// IllegalArgumentException, InvocationTargetException
+			// ClassNotFoundException, NoSuchMethodException
+			System.out.println(e);
 		}
 		
-		if (action == null) {
+		// Had to eliminate error case because we don't want to instantiate
+		// any explicit objects here.
+		/*
+		if (action == null)
 			action = new FortranParserActionNull(args, parser, filename);
-		}
+		*/
+
 		return action;
 	}
 

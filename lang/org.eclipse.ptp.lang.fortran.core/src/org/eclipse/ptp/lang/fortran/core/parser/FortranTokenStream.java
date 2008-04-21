@@ -21,6 +21,9 @@ import java.io.*;
 import java.util.*;
 import org.antlr.runtime.*;
 
+/* The following needed for OFP packaging scheme */
+//import fortran.ofp.parser.java.FortranToken;
+
 public class FortranTokenStream extends CommonTokenStream {
    public FortranLexer lexer;
    public int needIdent;
@@ -221,7 +224,11 @@ public class FortranTokenStream extends CommonTokenStream {
       // need to make sure the line was terminated with a T_EOS.  this may 
       // not happen if we're working on a file that ended w/o a newline
       if(packedList.get(packedListSize-1).getType() != lexer.T_EOS) {
-         CommonToken eos = new CommonToken(lexer.T_EOS);
+         FortranToken eos = new FortranToken(lexer.getInput(), lexer.T_EOS, 
+															Token.DEFAULT_CHANNEL, 
+															lexer.getInput().index(), 
+															lexer.getInput().index()+1);
+			eos.setText("\n");
          packedList.add(this.packedListSize, eos);
          packedListSize++;
       }
@@ -655,7 +662,7 @@ public class FortranTokenStream extends CommonTokenStream {
    }// end currLineLA()
 
 
-   public boolean testForFunction() {
+   public boolean lookForToken(int desiredToken) {
       int lookAhead = 1;
       int tmpToken;
 
@@ -665,9 +672,9 @@ public class FortranTokenStream extends CommonTokenStream {
          // update lookAhead in case we look again
          lookAhead++;
       } while(tmpToken != lexer.T_EOS && tmpToken != lexer.EOF && 
-              tmpToken != lexer.T_FUNCTION);
+              tmpToken != desiredToken);
       
-      if(tmpToken == lexer.T_FUNCTION) {
+      if(tmpToken == desiredToken) {
          return true;
       } else {
          return false;
@@ -676,8 +683,10 @@ public class FortranTokenStream extends CommonTokenStream {
 
    
    public boolean appendToken(int tokenType, String tokenText) {
+		FortranToken newToken = new FortranToken(tokenType);
+		newToken.setText(tokenText);
       // append a token to the end of newTokenList
-      return this.packedList.add(new CommonToken(tokenType));   
+      return this.packedList.add(newToken);   
    }// end appendToken()
 
 
@@ -694,7 +703,7 @@ public class FortranTokenStream extends CommonTokenStream {
          // newTokensList.size() == 22
          // 22-3+1=20 
          // so, inserted between the label and T_CONTINUE
-         this.packedList.add(index, new CommonToken(tokenType, tokenText));
+         this.packedList.add(index, new FortranToken(tokenType, tokenText));
       } catch(Exception e) {
          e.printStackTrace();
          System.exit(1);
@@ -742,12 +751,24 @@ public class FortranTokenStream extends CommonTokenStream {
    }// end getTokensListSize()
 
 
-   public CommonToken createToken(int type, String text, int line, int col) {
-      CommonToken token = new CommonToken(type, text);
+   public void updatePackedListSize() {
+      this.packedListSize = this.packedList.size();
+   }
+
+
+   public FortranToken createToken(int type, String text, int line, int col) {
+      FortranToken token = new FortranToken(type, text);
       token.setLine(line);
       token.setCharPositionInLine(col);
       return token;
    }// end createToken()
+
+
+	public void addTokenToNewList(Token token) {
+		if(this.newTokensList.add(token) == false) 
+			System.err.println("Couldn't add to newTokensList!");
+		return;
+	}
 
 
    public void finalizeLine() {
@@ -769,5 +790,7 @@ public class FortranTokenStream extends CommonTokenStream {
 //       System.out.println("================================================");
 //       System.out.println("original tokens list: " + super.tokens.toString());
       super.tokens = this.newTokensList;
+//       System.out.println("================================================");
+//       System.out.println("super.tokens new list: " + super.tokens.toString());
    }// end finalizeTokenStream()
 }// end class FortranTokenStream

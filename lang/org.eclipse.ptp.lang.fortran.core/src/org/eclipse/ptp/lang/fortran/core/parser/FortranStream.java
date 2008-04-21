@@ -21,6 +21,9 @@ import java.io.*;
 import java.util.ArrayList;
 import org.antlr.runtime.*;
 
+/* The following needed for OFP packaging scheme */
+//import fortran.ofp.FrontEnd;
+
 public class FortranStream extends ANTLRFileStream {
    private int sourceForm;
 
@@ -36,6 +39,16 @@ public class FortranStream extends ANTLRFileStream {
    }
 
 
+	public int getSourceForm() {
+		return this.sourceForm;
+	}
+
+
+	public String getFileName() {
+		return getSourceName();
+	}
+
+
    public int LA(int i) {
       int letter_value;
 
@@ -47,7 +60,7 @@ public class FortranStream extends ANTLRFileStream {
          letter_value = (int)(Character.toUpperCase((char)(letter_value)));
       } 
 
-      if(this.sourceForm == FortranMain.FIXED_FORM) {
+      if(this.sourceForm == FrontEnd.FIXED_FORM) {
          if((letter_value == 'C' || letter_value == '*') &&
             super.getCharPositionInLine() == 0) {
             // return '!' to signify a line comment so the lexer won't try and 

@@ -22,7 +22,7 @@ import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranMain;
+import org.eclipse.ptp.lang.fortran.core.parser.FrontEnd;
 
 public class FortranLanguage extends PlatformObject implements ILanguage {
 
@@ -71,7 +71,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage {
 			String env = System.getenv("CLASSPATH");
 			System.out.println("env = " + env);
 			String path = reader.getPath();
-			FortranMain parser = new FortranMain(new String[0], reader.getPath(), "rose");
+			FrontEnd parser = new FrontEnd(new String[0], reader.getPath(), "rose");
 			parser.call();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
