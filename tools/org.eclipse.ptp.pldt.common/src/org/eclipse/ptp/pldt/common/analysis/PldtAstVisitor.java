@@ -181,6 +181,7 @@ public class PldtAstVisitor extends CASTVisitor {
 		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//10/2/07: empty for MPI/C++ MPI::
 		if (traceOn) {
 			if (decls.length == 0) { // BRT decls=null detection
+				System.out.println("PldtAstVisitor.isArtifact(): decls empty!...");
 				IASTTranslationUnit tu = funcName.getTranslationUnit();
 				IASTName[] na = tu.getDeclarationsInAST(binding);
 				//IASTDeclaration[] astDecls = tu.getDeclarations();
@@ -199,18 +200,31 @@ public class PldtAstVisitor extends CASTVisitor {
 		
 		for (int i = 0; i < decls.length; ++i) {
 			// IASTFileLocation is file and range of lineNos
+			IASTName declName = decls[i];
+			String declNameStr = declName.getBinding().getName();
 			IASTFileLocation loc = decls[i].getFileLocation();
-			String filename = loc.getFileName();
-			if(traceOn)System.out.println("PldtAstVisitor found filename " + filename);
-			IPath path = new Path(filename);
-			// is this path valid?
-			if(traceOn)System.out.println("PldtAstVisitor found path " + path);
+			if (loc != null) {
 
-			if (isInIncludePath(path)){
-				if(traceOn)System.out.println("   path match! "+name+" is an artifact.");
-				return true;
+				String filename = loc.getFileName();
+				if (traceOn)
+					System.out.println("PldtAstVisitor found filename "
+							+ filename);
+				IPath path = new Path(filename);
+				// is this path valid?
+				if (traceOn)
+					System.out.println("PldtAstVisitor found path " + path);
+
+				if (isInIncludePath(path)) {
+					if (traceOn)
+						System.out.println("   path match! " + name
+								+ " is an artifact.");
+					return true;
+				}
+			} else {
+				System.out.println("PldtAstVisitor.isArtifact() decl file locn null: decl name: " + declNameStr);
 			}
-		}
+
+		}// end for
 		return false;
 	}
 	
