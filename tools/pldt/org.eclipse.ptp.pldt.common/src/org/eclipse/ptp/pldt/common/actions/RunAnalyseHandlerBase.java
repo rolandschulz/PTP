@@ -175,12 +175,13 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 				} catch (InvocationTargetException e) {
 					err = true;
+					Throwable cause = e.getCause();
 					System.out.println("Error running analysis: ITE: "
 							+ e.getMessage());
-					System.out.println("  cause: " + e.getCause() + " - "
-							+ e.getCause().getMessage());
-					Throwable th = e.getCause();
-					th.printStackTrace();
+					System.out.println("  cause: " + cause + " - "
+							+ cause.getMessage());
+					
+					cause.printStackTrace();
 				} catch (InterruptedException e) {
 					cancelledByUser = true;
 				}
