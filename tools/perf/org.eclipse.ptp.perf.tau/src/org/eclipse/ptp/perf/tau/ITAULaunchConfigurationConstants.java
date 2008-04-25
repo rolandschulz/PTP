@@ -17,6 +17,8 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.tau;
 
+import org.eclipse.ptp.perf.toolopts.ToolsOptionsConstants;
+
 /**
  * Constant values used by the TAU launch configuration system
  * @author wspear
@@ -47,7 +49,7 @@ public interface ITAULaunchConfigurationConstants {
 	/**This is for internally restoring the last selected makefile*/
 	public static final String TAU_MAKENAME="filename_of_last_selected_makefile";
 	
-	public static final String TAU_MAKEFILE = "tau_makefile.performance.options.configuration_id";//"selected_tau_makefile";
+	public static final String TAU_MAKEFILE = "tau_makefile"+ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;//.performance.options.configuration_id";//"selected_tau_makefile";
 	
 	public static final boolean MPI_DEF = true;
 	public static final boolean TAUINC_DEF = false;
