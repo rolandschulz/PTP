@@ -77,7 +77,7 @@ public interface ITAULaunchConfigurationConstants {
 	/**
 	 * ID of the full string of the selective instrumentation command
 	 */
-	public static final String SELECT_COMMAND = "selective_instrumentation_arg.performance.options.configuration_id";
+	public static final String SELECT_COMMAND = "selective_instrumentation_arg"+ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;//.performance.options.configuration_id";
 	/**
 	 * ID of the selective instrumentation file
 	 */
