@@ -216,7 +216,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 * viewer.
 	 */
 	private void checkInitialSelections() {
-		Iterator itemsToCheck = getInitialElementSelections().iterator();
+		Iterator<?> itemsToCheck = getInitialElementSelections().iterator();
 
 		while (itemsToCheck.hasNext()) {
 			Object nextcheck = itemsToCheck.next();

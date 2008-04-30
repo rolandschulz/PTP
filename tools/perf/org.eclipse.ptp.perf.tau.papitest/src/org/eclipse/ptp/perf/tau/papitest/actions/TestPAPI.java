@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.perf.tau.papiselect.papic.EventTreeDialog;
 import org.eclipse.ptp.perf.tau.papiselect.PapiListSelectionDialog;
 import org.eclipse.ptp.perf.tau.papitest.Activator;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -54,7 +55,7 @@ public class TestPAPI implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {		
-		try {
+		//try {
 			LabelProvider papilab = new LabelProvider();
 			ArrayContentProvider paprov = new ArrayContentProvider();
 
@@ -65,6 +66,17 @@ public class TestPAPI implements IWorkbenchWindowActionDelegate {
 			String papiLoc=Activator.getDefault().getPreferenceStore().getString(papiLocationSelectionVar);
 			
 			System.out.println(papiLoc+" "+papiCountType);
+			
+			if(papiCountType==2)
+			{
+				EventTreeDialog treeD=new EventTreeDialog(window.getShell(),papiLoc);
+				
+				if(treeD.open()==Window.OK)
+				{
+					showCounters(treeD.getCommands().toArray());
+				}
+				return;
+			}
 			
 			PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
 					window.getShell(), papiLoc, paprov, papilab,
@@ -81,42 +93,47 @@ public class TestPAPI implements IWorkbenchWindowActionDelegate {
 
 			if (papidialog.open() == Window.OK) {
 				Object[] selected = papidialog.getResult();
-
-				if ((selected != null) && (selected.length > 0)) {
-					String counters="";
-					for(int i=0;i<selected.length;i++)
-					{
-						counters+=selected[i]+"\n";
-					}
-					
-					MessageDialog.openInformation(
-					window.getShell(),
-					"Selected PAPI Counters:",
-					counters);
-					
-//					LinkedHashSet selset = new LinkedHashSet(Arrays
-//							.asList(selected));
-//
-//					varmap = new HashMap(selset.size());
-//					varmap.put("COUNTER1", "GET_TIME_OF_DAY");
-//					Iterator varit = selset.iterator();
-//					int counter = 2;
-//					while (varit.hasNext()) {
-//						varmap.put("COUNTER" + counter, varit.next());
-//						counter++;
-//					}
-//
-//				} else {
-//					varmap = null;
-				}
+				showCounters(selected);
+	
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		
 		
 	}
 
+	private void showCounters(Object[] selected)
+	{
+		if ((selected != null) && (selected.length > 0)) {
+			String counters="";
+			for(int i=0;i<selected.length;i++)
+			{
+				counters+=selected[i]+"\n";
+			}
+			
+			MessageDialog.openInformation(
+			window.getShell(),
+			"Selected PAPI Counters:",
+			counters);
+			
+//			LinkedHashSet selset = new LinkedHashSet(Arrays
+//					.asList(selected));
+//
+//			varmap = new HashMap(selset.size());
+//			varmap.put("COUNTER1", "GET_TIME_OF_DAY");
+//			Iterator varit = selset.iterator();
+//			int counter = 2;
+//			while (varit.hasNext()) {
+//				varmap.put("COUNTER" + counter, varit.next());
+//				counter++;
+//			}
+//
+//		} else {
+//			varmap = null;
+		}
+	}
+	
 	/**
 	 * Selection in the workbench has been changed. We 
 	 * can change the state of the 'real' action here

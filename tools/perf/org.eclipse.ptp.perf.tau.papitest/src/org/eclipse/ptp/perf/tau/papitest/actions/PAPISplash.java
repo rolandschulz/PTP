@@ -116,12 +116,14 @@ public class PAPISplash extends Dialog{
 		browsePapi.setText("Browse");
 		browsePapi.addSelectionListener(listener);
 		
-		papiCountRadios = new Button[2];
+		papiCountRadios = new Button[3];
 		papiCountRadios[0] = new Button(parent,
 				SWT.RADIO);
 		papiCountRadios[0].setText("Preset Counters");
 		papiCountRadios[1] = new Button(parent,SWT.RADIO);
 		papiCountRadios[1].setText("Native Counters");
+		papiCountRadios[2] = new Button(parent,SWT.RADIO);
+		papiCountRadios[2].setText("PAPI-C Selector");
 		int pType=Activator.getDefault().getPreferenceStore().getInt(TestPAPI.papiCounterTypeVar);
 		if(pType<papiCountRadios.length)
 			papiCountRadios[pType].setSelection(true);
@@ -137,6 +139,8 @@ public class PAPISplash extends Dialog{
 		int papiType=0;
 		if(papiCountRadios[1].getSelection())
 			papiType=1;
+		else if(papiCountRadios[2].getSelection())
+			papiType=2;
 		Activator.getDefault().getPreferenceStore().setValue(TestPAPI.papiCounterTypeVar, papiType);
 		
 		super.okPressed();

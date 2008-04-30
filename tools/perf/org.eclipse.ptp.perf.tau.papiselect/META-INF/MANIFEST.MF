@@ -4,7 +4,8 @@ Bundle-Name: TAU PAPI Selection Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.perf.tau.papiselect
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.perf.tau.papiselect
+Export-Package: org.eclipse.ptp.perf.tau.papiselect,
+ org.eclipse.ptp.perf.tau.papiselect.papic
 Require-Bundle: org.eclipse.jface,
  org.eclipse.ui
 Bundle-Vendor: University of Oregon
