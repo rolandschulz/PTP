@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.perf"
       label="PTP Performance Analysis Framework"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="University of Oregon">
 
    <description url="http://www.cs.uoregon.edu/research/tau/home.php">

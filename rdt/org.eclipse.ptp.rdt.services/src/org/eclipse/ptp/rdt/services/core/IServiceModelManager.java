@@ -75,6 +75,14 @@ public interface IServiceModelManager {
 	public Set<IService> getServices(String nature);
 	
 	/**
+	 * Retrieves the service corresponding to a given id.
+	 * 
+	 * @param id The unique id of the service to retrieve.
+	 * @return IService
+	 */
+	public IService getService(String id);
+	
+	/**
 	 * Remove the service configuration from a project
 	 * 
 	 * @param project the project

@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
+import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
-import org.eclipse.ptp.launch.ui.PArgumentsTab;
-import org.eclipse.ptp.launch.ui.PCommonTab;
-import org.eclipse.ptp.launch.ui.PDebuggerTab;
+import org.eclipse.ptp.launch.ui.ArgumentsTab;
+import org.eclipse.ptp.launch.ui.DebuggerTab;
 import org.eclipse.ptp.launch.ui.ResourcesTab;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.ui.AbstractPerformanceConfigurationTab;
@@ -43,13 +43,13 @@ public class ParallelPerformanceLaunchConfigurationTabGroup extends AbstractLaun
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ArrayList<AbstractPerformanceConfigurationTab> perfTabs=Activator.getPerfTabs();
 		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[8+perfTabs.size()];
-		tabs[0]=new ParallelPerfRecompMainTab();
 		tabs[1]=new ResourcesTab();
-		tabs[2]=new PDebuggerTab(false);
-		tabs[3]=new PArgumentsTab();
+		tabs[0]=new ParallelPerfRecompMainTab();
+		tabs[2]=new DebuggerTab(false);
+		tabs[3]=new ArgumentsTab();
 		tabs[4]=new SourceLookupTab();
 		tabs[5]=new EnvironmentTab();
-		tabs[6]=new PCommonTab();
+		tabs[6]=new CommonTab();
 		tabs[7]=new PerformanceAnalysisTab(true);
 		
 		Iterator<AbstractPerformanceConfigurationTab> perfIt=perfTabs.iterator();

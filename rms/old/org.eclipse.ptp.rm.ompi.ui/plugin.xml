@@ -20,7 +20,7 @@
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
-            class="org.eclipse.ptp.rm.ompi.ui.rmLaunchConfiguration.OMPIRMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.ompi.ui.launch.OMPIRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.ompi.ui.launchConfiguration"/>
    </extension>
 

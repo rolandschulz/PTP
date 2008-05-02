@@ -5185,7 +5185,7 @@ main(int argc, char *argv[])
 		break;
 	    default:
 		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] [--template_override=file] [--template_write=y|n] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
+			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] [--template_override=file] [--template_write=y|n] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
 			      argv[0]);
 		exit(1);
 	}
@@ -5210,6 +5210,9 @@ main(int argc, char *argv[])
 	    }
 	    else if (strcmp(argv[n], "--runMiniproxy") == 0) {
 		run_miniproxy = 1;
+	    }
+	    else if (strcmp(argv[n], "--useloadleveler") == 0) {
+		use_load_leveler = 1;
 	    }
 	    else {
 		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
@@ -5249,9 +5252,6 @@ main(int argc, char *argv[])
 		    return 1;
 		}
 	    }
-	    else if (strcmp(argv[n], "--useloadleveler") == 0) {
-		use_load_leveler = 1;
-	    }
 	    else if (strcmp(argv[n], "--lib-override") == 0) {
 		user_libpath = strdup(cp + 1);
 	    }
@@ -5281,7 +5281,7 @@ main(int argc, char *argv[])
 	    else {
 		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
 		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
+			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
 			      argv[0]);
 		exit(1);
 	    }

@@ -18,25 +18,22 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ompi.core;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 
 public class OMPIPreferenceManager {
-	private static final String PROXY_EXECUTABLE_NAME = "ptp_orte_proxy";
-	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
+	public static final String PREFS_LAUNCH_CMD = "launchCmd";
+	public static final String PREFS_DISCOVER_CMD = "discoverCmd";
+	public static final String PREFS_MONITOR_CMD = "monitorCmd";
+	public static final String PREFS_PATH = "path";
+	public static final String PREFS_OPTIONS = "options";
+	
+	private static final String LAUNCH_CMD = "mpirun";
+	private static final String DISCOVER_CMD = "ompi_info -a --parseable";
+	private static final String MONITOR_CMD = "";
+	private static final String PATH = "";
 	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
 	
-	public static int getDefaultOptions() {
-		return OPTIONS;
-	}
-
-	public static String getDefaultProxyExecutablePath() {
-		return PROXY_EXECUTABLE_PATH;
-	}
-
 	public static Preferences getPreferences() {
 		return Activator.getDefault().getPluginPreferences();
 	}
@@ -47,19 +44,10 @@ public class OMPIPreferenceManager {
 	
 	public static void initializePreferences() {
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		
-		String server = "";
-			
-		if (PROXY_EXECUTABLE_PATH != null) {
-			server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
-		} else {
-			server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
-			if (server == null) {
-				server = "";
-			}
-       }
-		
-		preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
-		preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
+		preferences.setDefault(PREFS_PATH, PATH);
+		preferences.setDefault(PREFS_LAUNCH_CMD, LAUNCH_CMD);
+		preferences.setDefault(PREFS_DISCOVER_CMD, DISCOVER_CMD);
+		preferences.setDefault(PREFS_MONITOR_CMD, MONITOR_CMD);
+		preferences.setDefault(PREFS_OPTIONS, OPTIONS);
 	}
 }

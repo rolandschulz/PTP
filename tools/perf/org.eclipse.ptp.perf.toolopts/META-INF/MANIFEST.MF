@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Performance Tools Framework Tool Options Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.perf.toolopts
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Bundle-Vendor: University of Oregon
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,

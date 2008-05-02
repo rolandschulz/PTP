@@ -1,20 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly marked, 
- * so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * LA-CC 04-115
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.ptp.rm.ompi.core.rtsystem;
@@ -24,7 +16,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.core.filesystem.EFS;
@@ -37,6 +31,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -47,6 +43,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
@@ -57,6 +54,8 @@ import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.ompi.core.Activator;
+import org.eclipse.ptp.rm.ompi.core.OMPIAttributes;
+import org.eclipse.ptp.rm.ompi.core.parameters.Parameters;
 import org.eclipse.ptp.rm.ompi.core.rmsystem.OMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory;
@@ -67,11 +66,10 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		public void run() {
 			try {
 				while (connection != null) {
-					RTSJob job = jobQueue.take();
+					RTSJob job = pendingJobQueue.take();
 					job.start();
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -80,18 +78,20 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		private String jobSubID;
 		private String jobID;
 		private String name;
+		private String user;
 		private IRemoteProcessBuilder processBuilder;
 		private IRemoteProcess process = null;
-		private JobAttributes.State state;
 		private AttributeManager attrMgr;
 		private Thread jobMonitor;
+		EnumeratedAttribute<JobAttributes.State> state;
 		
 		public RTSJob(AttributeManager attrMgr) {
 			this.attrMgr = attrMgr;
 			this.name = generateJobName();
+			this.user = System.getenv("USER");
 			this.jobID = generateID().toString();
 			this.jobSubID = "JOBSUB_" + jobID;
-			this.state = JobAttributes.State.PENDING;
+			this.state = JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.PENDING);
 		}
 		
 		public String getJobID() {
@@ -111,26 +111,28 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		}
 		
 		public void start() throws CoreException {
+			state.setValue(JobAttributes.State.STARTED);
+			createJob(queueID, jobID, jobSubID, name, state, user);
+
 			/*
 			 * Get attributes required to start job
 			 */
 			IntegerAttribute nprocs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
+			StringAttribute args = attrMgr.getAttribute(OMPIAttributes.getLaunchArgumentsAttributeDefinition());
 			StringAttribute program = attrMgr.getAttribute(JobAttributes.getExecutableNameAttributeDefinition());
 			StringAttribute path = attrMgr.getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
 
+			if (nprocs == null || args == null || program == null || path == null) {
+				state.setValue(JobAttributes.State.ERROR);
+				changeJobAttributes(jobID, state);
+				return;
+			}
+			
 			/*
 			 * Create launch command
 			 */
-			processBuilder = remoteServices.getProcessBuilder(connection, "mpirun", "-np " + nprocs, path + "/" + program);
-
-			/*
-			 * Add the submission ID to the job
-			 */
-			attrMgr.addAttribute(JobAttributes.getSubIdAttributeDefinition().create(jobSubID));
-
-			state = JobAttributes.State.STARTED;
-			
-			createJob(queueID, jobID, jobSubID, name, state);
+			processBuilder = remoteServices.getProcessBuilder(connection, "mpirun", args.getValue(),
+					path.getValue() + "/" + program.getValue());
 
 			/*
 			 * Launch the job
@@ -138,10 +140,14 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 			try {
 				process = processBuilder.start();
 			} catch (IOException e) {
-				changeJobState(jobID, JobAttributes.State.ERROR);
+				state.setValue(JobAttributes.State.ERROR);
+				changeJobAttributes(jobID, state);
+				return;
 			}
 
-			changeJobState(jobID, JobAttributes.State.RUNNING);
+			state.setValue(JobAttributes.State.RUNNING);
+			changeJobAttributes(jobID, state, nprocs);
+			runningJobQueue.add(this);
 
 			jobMonitor = new Thread(new Runnable() {
 				public void run() {
@@ -153,7 +159,13 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 						}
 					} catch (IOException e) {
 					}
-					changeJobState(jobID, JobAttributes.State.TERMINATED);
+					
+					state.setValue(JobAttributes.State.TERMINATED);
+					changeJobAttributes(jobID, state);
+					
+					RTSJob job = jobs.get(jobID);
+					runningJobQueue.remove(job);
+					jobs.remove(job);
 				}
 			});
 			jobMonitor.start();
@@ -180,10 +192,11 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 	private Thread jobQueueThread = null;
 
 	private Map<String, RTSJob> jobs = Collections.synchronizedMap(new HashMap<String, RTSJob>());
-	private LinkedBlockingQueue<RTSJob> jobQueue = new LinkedBlockingQueue<RTSJob>();
+	private LinkedBlockingQueue<RTSJob> pendingJobQueue = new LinkedBlockingQueue<RTSJob>();
+	private ConcurrentLinkedQueue<RTSJob> runningJobQueue = new ConcurrentLinkedQueue<RTSJob>();
 
 	private IRuntimeEventFactory eventFactory = new RuntimeEventFactory();
-	private Map<String, String> params = new HashMap<String, String>();
+	private Parameters params = new Parameters();
 	
 	public OMPIRuntimeSystem(Integer id, OMPIResourceManagerConfiguration config, AttributeDefinitionManager manager) {
 		this.rmID = id.toString();
@@ -193,11 +206,19 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		this.attrMgr = manager;
 	}
 
+	/**
+	 * @return
+	 */
+	public Parameters getParameters() {
+		return params;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void shutdown(IProgressMonitor monitor) throws CoreException {
 		stopEvents();
+		stopJobs();
 		if (connection != null) {
 			connection.close(monitor);
 		}
@@ -251,29 +272,29 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 				} catch (RemoteConnectionException e) {
 					throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
+			}
 				
-				if (!monitor.isCanceled()) {
-					try {
-						initialize(monitor);
-					} catch (CoreException e) {
-						connection.close(monitor);
-						connection = null;
-						throw e;
-					}
-				
-					if (!monitor.isCanceled()) {
-						fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
-						if (jobQueueThread == null) {
-							jobQueueThread = new Thread(new JobQueueManager(), "Job Queue Manager");
-							jobQueueThread.start();
-						}
-						return;
-					}
+			if (monitor.isCanceled()) {
+				connection.close(monitor);
+				connection = null;
+				return;
+			}
+			
+			try {
+				initialize(monitor);
+			} catch (CoreException e) {
+				connection.close(monitor);
+				connection = null;
+				throw e;
+			}
+		
+			if (!monitor.isCanceled()) {
+				fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
+				if (jobQueueThread == null) {
+					jobQueueThread = new Thread(new JobQueueManager(), "Job Queue Manager");
+					jobQueueThread.start();
 				}
-				
-				/*
-				 * Monitor was canceled
-				 */
+			} else {
 				connection.close(monitor);
 				connection = null;
 			}
@@ -301,7 +322,7 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		RTSJob job = new RTSJob(attrMgr);
 		jobs.put(job.getJobID(), job);
 		try {
-			jobQueue.put(job);
+			pendingJobQueue.put(job);
 		} catch (InterruptedException e) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 		}
@@ -318,6 +339,22 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 			rjob.terminate();
 			jobs.remove(rjob);
 		}
+	}
+
+	/**
+	 * Change job attributes
+	 * 
+	 * @param id	job ID
+	 * @param attrs	new attributes
+	 */
+	private void changeJobAttributes(String id, IAttribute<?,?,?>... attrs) {
+		ElementAttributeManager mgr = new ElementAttributeManager();
+		AttributeManager attrMgr = new AttributeManager();
+		for (IAttribute<?,?,?> attr : attrs) {
+			attrMgr.addAttribute(attr);
+		}
+		mgr.setAttributeManager(new RangeSet(id), attrMgr);
+		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
 	}
 	
 	/**
@@ -341,13 +378,16 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 	 * @param name		name of the node
 	 * @param number	node index (zero-based)
 	 * @param state		job state
+	 * @param nprocs	number of processes
 	 */
-	private void createJob(String parentID, String jobID, String jobSubID, String name, JobAttributes.State state) {
+	private void createJob(String parentID, String jobID, String jobSubID, String name, 
+			EnumeratedAttribute<JobAttributes.State> state, String user) {
 		ElementAttributeManager mgr = new ElementAttributeManager();
 		AttributeManager attrMgr = new AttributeManager();
-		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(state));
+		attrMgr.addAttribute(state);
 		attrMgr.addAttribute(JobAttributes.getSubIdAttributeDefinition().create(jobSubID));
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
+		attrMgr.addAttribute(JobAttributes.getUserIdAttributeDefinition().create(user));
 		mgr.setAttributeManager(new RangeSet(jobID), attrMgr);
 		fireRuntimeNewJobEvent(eventFactory.newRuntimeNewJobEvent(parentID, mgr));
 	}
@@ -432,33 +472,37 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	private void getNodes(String parentID) throws CoreException {
 		int numNodes = 0;
-		String filename = params.get("mca:rds:hostfile:param:rds_hostfile_path:value");
 		
-		if (filename != null) {		
-			IProgressMonitor monitor = new NullProgressMonitor();
+		Parameters.Parameter param = params.getParameter("rds_hostfile_path");
+		if (param != null) {
+			String filename = param.getValue();
 			
-			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-			IFileStore hostfile;
-			try {
-				hostfile = fileMgr.getResource(new Path(filename), monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
-			}
-			
-			/*
-			 * Read hostfile
-			 */
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(hostfile.openInputStream(EFS.NONE, monitor)));
-			String line;
-			try {
-				while ((line = reader.readLine()) != null) {
-					if (!line.startsWith("#") && !line.equals("")) {
-						createNode(parentID, line, numNodes);
-						numNodes++;
-					}
+			if (filename != null) {		
+				IProgressMonitor monitor = new NullProgressMonitor();
+				
+				IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
+				IFileStore hostfile;
+				try {
+					hostfile = fileMgr.getResource(new Path(filename), monitor);
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
-			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+				
+				/*
+				 * Read hostfile
+				 */
+				final BufferedReader reader = new BufferedReader(new InputStreamReader(hostfile.openInputStream(EFS.NONE, monitor)));
+				String line;
+				try {
+					while ((line = reader.readLine()) != null) {
+						if (!line.startsWith("#") && !line.equals("")) {
+							createNode(parentID, line, numNodes);
+							numNodes++;
+						}
+					}
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+				}
 			}
 		}
 		
@@ -471,13 +515,30 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 	}
 	
 	/**
+	 * Do any necessary initialization. For OMPI, we read the rds parameters to find the
+	 * location of the hostfile.
+	 * 
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	private void initialize(IProgressMonitor monitor) throws CoreException {
+		String cmd = configuration.getDiscoverCmd();
+		if (!cmd.equals("")) {
+			ArgumentParser ap = new ArgumentParser(cmd);
+			List<String> args = ap.getArguments();
+			if (args != null) {
+				readParams(args);
+			}
+		}
+	}
+	
+	/**
 	 * Get OMPI parameters
 	 * 
 	 * @throws CoreException
 	 */
-	private void getParams() throws CoreException {
-		IRemoteProcessBuilder cmdBuilder = remoteServices.getProcessBuilder(connection, 
-				"ompi_info", "--parsable", "-a");
+	private void readParams(List<String> args) throws CoreException {
+		IRemoteProcessBuilder cmdBuilder = remoteServices.getProcessBuilder(connection, args);
 		
 		IRemoteProcess cmd;
 		try {
@@ -491,10 +552,28 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			String line;
 			while ((line = stdout.readLine()) != null) {
-				int pos = line.lastIndexOf(":");
-				String key = line.substring(0, pos);
-				String value = line.substring(pos+1);
-				params.put(key, value);
+				int nameStart = line.indexOf(":param:");
+				if (nameStart >= 0) {
+					nameStart += 7;
+					int pos = line.indexOf(":", nameStart);
+					if (pos >= 0) {
+						String name = line.substring(nameStart, pos);
+						Parameters.Parameter param = params.getParameter(name);
+						if (param == null) {
+							param = params.addParameter(name);
+						}
+						int pos2;
+						if ((pos2 = line.indexOf(":value:", pos)) >= 0) {
+							param.setValue(line.substring(pos2 + 7));
+						} else if ((pos2 = line.indexOf(":status:", pos)) >= 0) {
+							if (line.substring(pos2 + 8).equals("read-only")) {
+								param.setReadOnly(true);
+							}
+						} else if ((pos2 = line.indexOf(":help:", pos)) >= 0) {
+							param.setHelp(line.substring(pos2 + 6));
+						}
+					}
+				}
 			}
 		} catch (IOException e) {
 			cmd.destroy();
@@ -502,21 +581,14 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		}
 		
 		cmd.destroy();
-		
-		String version = params.get("orte:version:full");
-		if (!version.startsWith("1.2")) {
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "ORTE version " + version + " is not supported"));
-		}
 	}
 	
 	/**
-	 * Do any necessary initialization. For OMPI, we read the rds parameters to find the
-	 * location of the hostfile.
-	 * 
-	 * @param monitor
-	 * @throws CoreException
+	 * Stop all running jobs
 	 */
-	private void initialize(IProgressMonitor monitor) throws CoreException {
-		getParams();
+	private void stopJobs() {
+		for (RTSJob job : runningJobQueue) {
+			job.terminate();
+		}
 	}
 }

@@ -15,6 +15,6 @@ package org.eclipse.ptp.rm.remote.ui.preferences;
  * Constant definitions for plug-in preferences
  */
 public interface PreferenceConstants {
-	public static final String PROXY_PATH = "PROXY_PATH";
-	public static final String OPTIONS = "OPTIONS";
+	public static final String PROXY_PATH = "PROXY_PATH";  //$NON-NLS-1$
+	public static final String OPTIONS = "OPTIONS";  //$NON-NLS-1$
 }

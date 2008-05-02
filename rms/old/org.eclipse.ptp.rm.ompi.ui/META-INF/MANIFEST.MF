@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: OMPI Resource Manager UI Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.rm.ompi.ui;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.ompi.ui.Activator
 Bundle-Vendor: IBM
 Bundle-Localization: plugin
@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.ui,
  org.eclipse.ptp.launch,
  org.eclipse.debug.core,
+ org.eclipse.debug.ui,
  org.eclipse.ptp.remote,
  org.eclipse.ptp.rm.remote,
  org.eclipse.ptp.rm.ompi.core

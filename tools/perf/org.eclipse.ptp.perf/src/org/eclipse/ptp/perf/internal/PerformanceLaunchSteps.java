@@ -74,6 +74,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 	private ICProject thisCProject=null;
 	private IProject thisProject = null;
 	//private boolean useTau=false;
+	private static final boolean traceOn=false;
 	
 	/**
 	 * The location of the binary rebuilt with performance instrumentation
@@ -506,12 +507,13 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 			if(tool.execUtils!=null&&tool.execUtils.length>0)
 			{
 				//Iterator utilIt=utilList.iterator();
-				
+			
 				String firstExecUtil= getToolExecutable(tool.execUtils[0]);// tool.execUtils[0].toolCommand;// (String)utilIt.next();//confWC.getAttribute(EXEC_UTIL_LIST, (String)null);
-				
+				if(traceOn)System.out.println("PerfLaunchSteps, firstExecUtil="+firstExecUtil);
+				 
 				//String util1Path=BuildLaunchUtils.checkToolEnvPath(firstExecUtil);
-				
-				if(firstExecUtil==null)
+				File f = new File(firstExecUtil);
+				if(firstExecUtil==null || !f.exists())
 					throw new Exception("Tool "+firstExecUtil+" not found");
 			
 				confWC.setAttribute(appnameattrib, firstExecUtil);
@@ -524,7 +526,7 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration);//tool.execUtils[i].getCommand(configuration);
 				}
 				swappedArgs=true;
-				//System.out.println(firstExecUtil+otherUtils+" "+prog+" "+arg);
+				if(traceOn)System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+otherUtils+" "+prog+" "+arg);
 				confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, otherUtils+" "+prog+" "+arg);
 			}
 		}

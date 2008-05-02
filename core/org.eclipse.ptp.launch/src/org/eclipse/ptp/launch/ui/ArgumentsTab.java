@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  *
  */
-public class PArgumentsTab extends PLaunchConfigurationTab {
+public class ArgumentsTab extends LaunchConfigurationTab {
     protected Text argumentText = null;
     
     protected WorkingDirectoryBlock workingDirectoryBlock = new WorkingDirectoryBlock(); 
@@ -62,7 +62,6 @@ public class PArgumentsTab extends PLaunchConfigurationTab {
         
 		GridLayout topLayout = new GridLayout();
 		comp.setLayout(topLayout);
-		createVerticalSpacer(comp, 1);
 
 		Composite parallelComp = new Composite(comp, SWT.NONE);		
 		parallelComp.setLayout(createGridLayout(2, false, 0, 0));

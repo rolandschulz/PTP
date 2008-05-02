@@ -12,8 +12,8 @@
 <p>Topics  include:
 <ol>
 <li><a href="#create">Creating a parallel launch configuration</a></li>
-<li><a href="#main">Completing the <b>Main tab</b></a></li>
 <li><a href="#resources">Completing the <b>Resources tab</b></a></li>
+<li><a href="#application">Completing the <b>Application tab</b></a></li>
 <li><a href="#debugger">Completing the <b>Debugger tab</b></a></li>
 <li><a href="#arguments">Completing the <b>Arguments tab</b></a></li>
 <li><a href="#launch">Launching the application</b></a></li>
@@ -32,11 +32,25 @@ then clicking on the <b>New</b> button icon.</p><p><br></p>
 <li><p>Enter a name for the configuration in the <b>Name:</b> field. Here we use the same name as the project.</p></li>
 </ol>
 
-<h2 id="main">Step 2: Complete the <b>Main</b> tab</h2>
+<h2 id="resources">Step 2: Complete the Resources tab</h2>
+<p>The <b>Resources tab</b> is used to specify the resources required for the job execution. The contents of this tab will vary for different resource managers. This description only applys to the Open MPI and MPICH2 resource managers.</p>
 <ol>
 <li><p>Select a resource manager from the drop-down (Note: a resource manager
-must be running for it to appear in the list.)</p><p><br></p></li>
-<li><p>Ensure that the correct the <b>Parallel Project</b> is selected</p><p><br></p></li>
+must be running for it to appear in the list. If there is only one resource manager running, then it will be
+automatically selected.)</p><p><br></p></li>
+<li><p>Some resource managers require a job queue to be selected using a <b>Queue:</b> drop-down. If there is
+no drop-down, then this resource manager does not support multiple queues.</p><p><br></p></li>
+<li><p>Enter a value in the <b>Number of Processes</b> field. This field must be greater than 0 in 
+order to launch a job, and specifies the number of processes to use for the application launch.</p><p><br></p>
+<p><script> thumb("images/03launchResTab.png") </script></p>
+</li>
+</ol>
+
+<h2 id="application">Step 3: Complete the <b>Application</b> tab</h2>
+<p>The <b>Application tab</b> is used to specify the application (executable) to be launched.</p>
+<ol>
+<li><p>Ensure that the correct the <b>Parallel Project</b> is selected. This is the project containing the source
+and binaries for the application.</p><p><br></p></li>
 <li><p>Select the <b>Application Program</b> (executable) that you wish to launch by clicking on 
 the <b>Browse</b> button. If you are running the application on the local machine, you will need 
 to navigate to the workspace and project directory. In this case, and if you are using a debug 
@@ -48,18 +62,6 @@ manually copy the executable to the remote machine first.</p><p><br></p>
 </li>
 <li><p>If you wish to have the output from all processes in a single output console,
 check the <b>Display combined output in a console view</b> option.</p><p><br></p>
-<p><script> thumb("images/03combinedConsole1.png") </script></p>
-</li>
-</ol>
-
-<h2 id="resources">Step 3: Complete the Resources tab</h2>
-<p>The <b>Resources tab</b> is used to specify the resources required for the job execution. The contents of this tab will vary for different resource managers. This description only applys to the Open MPI and MPICH2 resource managers.</p>
-<ol>
-<li><p>The <b>Queue:</b> drop-down should be showing <b>default</b> and be disabled. This indicates 
-that this resource manager does not support multiple queues.</p><p><br></p></li>
-<li><p>Enter a value in the <b>Number of Processes</b> field. This field must be greater than 0 in 
-order to launch a job, and specifies the number of processes to use for the application launch.</p><p><br></p>
-<p><script> thumb("images/03launchResTab.png") </script></p>
 </li>
 </ol>
 
@@ -67,7 +69,7 @@ order to launch a job, and specifies the number of processes to use for the appl
 <p>The <b>Debugger tab</b> is only required if you are planning to debug the application. However 
 it is a good idea to complete it now, even if you are only planning to launch a non-debug job.</p>
 <ol>
-<li><p>Select a debugger from the <b>Debugger</b> drop-down. This is the debugger that will control 
+<li><p>If no debugger is visible in the <b>Debugger</b> drop-down, select one. This is the debugger that will control 
 the parallel debug session. Currently only <b>SDM</b> is supported (SDM stands for Scalable Debug 
 Manager), so select this.</p><p><br></p></li>
 <li><p>If you wish the debugger to automatically suspend the application on launch, make sure 

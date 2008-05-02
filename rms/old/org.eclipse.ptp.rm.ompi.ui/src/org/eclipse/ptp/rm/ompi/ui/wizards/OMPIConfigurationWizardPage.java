@@ -60,7 +60,8 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 	{
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && (source == pathText || source == argsText)) {
+			if(!loading && (source == launchCmdText || source == discoverCmdText ||
+					source == monitorCmdText || source == pathText)) {
 				updatePage();
 			}
 		}
@@ -85,18 +86,25 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private OMPIResourceManagerConfiguration config;
-	private String ortedPath = EMPTY_STRING;
-	private String ortedArgs = EMPTY_STRING;
-	private IRemoteServices remoteServices = null;
-	private IRemoteConnection connection = null;
+	
+	private String launchCmd = EMPTY_STRING;
+	private String discoverCmd = EMPTY_STRING;
+	private String monitorCmd = EMPTY_STRING;
+	private String path = EMPTY_STRING;
 	private boolean loading = true;
 	private boolean isValid;
 	private boolean useDefaults;
+	
+	private IRemoteServices remoteServices = null;
+	private IRemoteConnection connection = null;
+	
+	private Text launchCmdText = null;
+	private Text discoverCmdText = null;
+	private Text monitorCmdText = null;
 	private Text pathText = null;
-
-	private Text argsText = null;
 	private Button browseButton = null;
 	private Button defaultButton = null;
+	
 	private WidgetListener listener = new WidgetListener();
 	
 	public OMPIConfigurationWizardPage(RMConfigurationWizard wizard) {
@@ -129,8 +137,10 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 		store();
 		config.setUseDefaults(useDefaults);
 		if (!useDefaults) {
-			config.setOrtedPath(ortedPath);
-			config.setOrtedArgs(ortedArgs);
+			config.setLaunchCmd(launchCmd);
+			config.setDiscoverCmd(discoverCmd);
+			config.setMonitorCmd(monitorCmd);
+			config.setPath(path);
 		}
 		return true;
 	}
@@ -153,9 +163,6 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 	 * @param colSpan
 	 */
 	private void createContents(Composite parent) {
-		/*
-		 * Composite for remote provider and proxy location combo's
-		 */
 		Composite contents = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -175,9 +182,45 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 		defaultButton.setLayoutData(gd);
 
 		/*
-		 * ORTED path
+		 * OMPI launch cmd
 		 */
 		Label label = new Label(contents, SWT.NONE);
+		label.setText(Messages.getString("OMPIConfigurationWizardPage.launchCmd"));
+
+		launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		launchCmdText.setLayoutData(gd);
+		launchCmdText.addModifyListener(listener);
+		
+		/*
+		 * OMPI discover cmd
+		 */
+		label = new Label(contents, SWT.NONE);
+		label.setText(Messages.getString("OMPIConfigurationWizardPage.discoverCmd"));
+
+		discoverCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		discoverCmdText.setLayoutData(gd);
+		discoverCmdText.addModifyListener(listener);
+
+		/*
+		 * OMPI monitor cmd
+		 */
+		label = new Label(contents, SWT.NONE);
+		label.setText(Messages.getString("OMPIConfigurationWizardPage.monitorCmd"));
+
+		monitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		monitorCmdText.setLayoutData(gd);
+		monitorCmdText.addModifyListener(listener);
+
+		/*
+		 * Installation path
+		 */
+		label = new Label(contents, SWT.NONE);
 		label.setText(Messages.getString("OMPIConfigurationWizardPage.path"));
 
 		pathText = new Text(contents, SWT.SINGLE | SWT.BORDER);
@@ -189,18 +232,6 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 		
 		browseButton = SWTUtil.createPushButton(contents, Messages.getString("OMPIConfigurationWizardPage.browseButton"), null); //$NON-NLS-1$
 		browseButton.addSelectionListener(listener);
-		
-		/*
-		 * ORTED args
-		 */
-		label = new Label(contents, SWT.NONE);
-		label.setText(Messages.getString("OMPIConfigurationWizardPage.arguments")); //$NON-NLS-1$
-		
-		argsText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		argsText.setLayoutData(gd);
-		argsText.addModifyListener(listener);
 	}
 
 	/**
@@ -222,8 +253,10 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 	private void loadSaved()
 	{
 		useDefaults = config.useDefaults();
-		ortedPath = config.getOrtedPath();
-		ortedArgs = config.getOrtedArgs();
+		launchCmd = config.getLaunchCmd();
+		discoverCmd = config.getDiscoverCmd();
+		monitorCmd = config.getMonitorCmd();
+		path = config.getPath();
 	}
 	
 	/**
@@ -243,11 +276,17 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 			if (defaultButton != null) {
 				useDefaults = defaultButton.getSelection();
 			}
-			if (pathText != null) {
-				ortedPath = pathText.getText();
+			if (launchCmdText != null) {
+				launchCmd = launchCmdText.getText();
 			}
-			if (argsText != null) {
-				ortedArgs = argsText.getText();
+			if (discoverCmdText != null) {
+				discoverCmd = discoverCmdText.getText();
+			}
+			if (monitorCmdText != null) {
+				monitorCmd = monitorCmdText.getText();
+			}
+			if (pathText != null) {
+				path = pathText.getText();
 			}
 		}
 	}
@@ -258,8 +297,10 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	private void updateSettings() {
 		store();
+		launchCmdText.setEnabled(!useDefaults);
+		discoverCmdText.setEnabled(!useDefaults);
+		monitorCmdText.setEnabled(!useDefaults);
 		pathText.setEnabled(!useDefaults);
-		argsText.setEnabled(!useDefaults);
 		browseButton.setEnabled(!useDefaults);
 	}
 
@@ -336,8 +377,10 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 	protected void defaultSetting() 
 	{
 		defaultButton.setSelection(useDefaults);
-		pathText.setText(ortedPath);
-		argsText.setText(ortedArgs);
+		launchCmdText.setText(launchCmd);
+		discoverCmdText.setText(discoverCmd);
+		monitorCmdText.setText(monitorCmd);
+		pathText.setText(path);
 	}
 
 	/**
@@ -402,7 +445,7 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 			}
 			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 			
-			String initialPath = "//"; // Start at root since ORTED is probably installed in the system somewhere
+			String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("OMPIConfigurationWizardPage.select"), initialPath); //$NON-NLS-1$
 			if (selectedPath != null) {
 				pathText.setText(selectedPath.toString());
@@ -419,14 +462,14 @@ public class OMPIConfigurationWizardPage extends RMConfigurationWizardPage {
 			return true;
 		}
 		
-		if (pathText != null) {
-			String name = getFieldContent(pathText.getText());
+		if (launchCmdText != null) {
+			String name = getFieldContent(launchCmdText.getText());
 			if (name == null) {
 				setErrorMessage(Messages.getString("OMPIConfigurationWizardPage.invalid")); //$NON-NLS-1$
 				return false;
 			}
 		}
-	
+
 		return true;
 	}
 

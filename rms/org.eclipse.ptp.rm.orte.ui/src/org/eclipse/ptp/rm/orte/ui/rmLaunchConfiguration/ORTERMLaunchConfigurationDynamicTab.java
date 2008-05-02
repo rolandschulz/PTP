@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.orte.ui.Activator;
+import org.eclipse.ptp.rm.orte.ui.internal.ui.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -42,13 +43,12 @@ import org.eclipse.swt.widgets.Text;
 public class ORTERMLaunchConfigurationDynamicTab extends
 		AbstractRMLaunchConfigurationDynamicTab {
 	
-	private static final int MIN_TEXT_WIDTH = 50;
 	private static final String NUMBER_OF_PROCESSES_LABEL = "Number of Processes: ";
 	private static final String ATTR_PREFIX = Activator.PLUGIN_ID + ".launchAttributes";
 	private static final String ATTR_NUMPROCS = ATTR_PREFIX + ".numProcs";
 	private static final RMLaunchValidation success = new RMLaunchValidation(true, "");
 	private Text numProcsText;
-	private String numProcsString = "0";
+	private String numProcsString = "1";
 	private Composite control;
 
 	public ORTERMLaunchConfigurationDynamicTab(IResourceManager rm) {
@@ -170,6 +170,9 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
 			@SuppressWarnings("unused")
 			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, numProcsString);
+			if (iattr.getValue() < 1) {
+				return new RMLaunchValidation(false, Messages.getString("ORTEConfigurationWizardPage.numProcsInvalid")); //$NON-NLS-1$
+			}
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}

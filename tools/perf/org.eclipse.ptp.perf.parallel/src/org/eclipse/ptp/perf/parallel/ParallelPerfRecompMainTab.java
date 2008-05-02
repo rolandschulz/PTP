@@ -42,7 +42,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.launch.ui.PMainTab;
+import org.eclipse.ptp.launch.ui.ApplicationTab;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Text;
  * @author wspear
  *
  */
-public class ParallelPerfRecompMainTab extends PMainTab{
+public class ParallelPerfRecompMainTab extends ApplicationTab{
 	
     protected class WidgetListener extends SelectionAdapter implements ModifyListener {
 	    public void modifyText(ModifyEvent e) {

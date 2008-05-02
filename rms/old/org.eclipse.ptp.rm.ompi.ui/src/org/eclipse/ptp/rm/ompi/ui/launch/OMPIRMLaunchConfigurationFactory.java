@@ -14,7 +14,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.rm.ompi.ui.rmLaunchConfiguration;
+package org.eclipse.ptp.rm.ompi.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elements.IResourceManager;

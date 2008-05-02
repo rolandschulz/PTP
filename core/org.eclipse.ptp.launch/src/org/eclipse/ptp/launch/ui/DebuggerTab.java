@@ -22,7 +22,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab;
+import org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -32,18 +32,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-public class PDebuggerTab extends AbstractPDebuggerTab {
+public class DebuggerTab extends AbstractDebuggerTab {
 	final protected boolean fAttachMode;
 
 	protected Button fStopInMain;
 	protected Button fAttachButton;
 
-	public PDebuggerTab(boolean attachMode) {
+	public DebuggerTab(boolean attachMode) {
 		fAttachMode = attachMode;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab#createControl(org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -59,14 +59,17 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration config) {
 		setInitializing(true);
 		super.initializeFrom(config);
 		try {
-			String id = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, "");
-			loadDebuggerComboBox(config, id);
+			/*
+			 * Only set default debugger if there is a resource manager selected.
+			 */
+			String id = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
+			loadDebuggerComboBox(config, id, getResourceManager(config) == null);
 			initializeCommonControls(config);
 		} catch (CoreException e) {
 		}
@@ -74,7 +77,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public boolean isValid(ILaunchConfiguration config) {
 		if (!validateDebuggerConfig(config)) {
@@ -83,7 +86,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		IPDebugConfiguration debugConfig = getDebugConfig();
 		String mode = fAttachMode ? IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH : IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
 		if (!debugConfig.supportsMode(mode)) {
-			setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PDebuggerTab.Mode_not_supported"), new Object[]{mode}));
+			setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("DebuggerTab.Mode_not_supported"), new Object[]{mode}));
 			return false;
 		}
 		if (super.isValid(config) == false) {
@@ -93,7 +96,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy config) {
 		super.performApply(config);
@@ -106,7 +109,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy config) {
 		super.setDefaults(config);
@@ -134,7 +137,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 			GridLayout layout = new GridLayout(2, false);
 			optionsComp.setLayout(layout);
 			optionsComp.setLayoutData(new GridData(GridData.BEGINNING, GridData.CENTER, true, false, 2, 1));
-			fStopInMain = createCheckButton(optionsComp, LaunchMessages.getResourceString("PDebuggerTab.Stop_at_main_on_startup"));
+			fStopInMain = createCheckButton(optionsComp, LaunchMessages.getResourceString("DebuggerTab.Stop_at_main_on_startup"));
 			GridData data = new GridData();
 			data.horizontalAlignment = GridData.BEGINNING;
 			fStopInMain.setLayoutData(data);
@@ -168,9 +171,8 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	 * @param config
 	 * @param selection
 	 */
-	protected void loadDebuggerComboBox(ILaunchConfiguration config, String selection) {
+	protected void loadDebuggerComboBox(ILaunchConfiguration config, String selection, boolean noDefault) {
 		IPDebugConfiguration[] debugConfigs;
-		String configPlatform = getPlatform(config);
 		debugConfigs = PTPDebugCorePlugin.getDefault().getDebugConfigurations();
 		Arrays.sort(debugConfigs, new Comparator<IPDebugConfiguration>() {
 			public int compare(IPDebugConfiguration ic1, IPDebugConfiguration ic2) {
@@ -187,13 +189,10 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		String defaultSelection = selection;
 		for (int i = 0; i < debugConfigs.length; i++) {
 			if (debugConfigs[i].supportsMode(mode)) {
-				String debuggerPlatform = debugConfigs[i].getPlatform();
-				if (validatePlatform(config, debugConfigs[i])) {
-					list.add(debugConfigs[i]);
-					// select first exact matching debugger for platform or requested selection
-					if ((defaultSelection.equals("") && debuggerPlatform.equalsIgnoreCase(configPlatform))) {
-						defaultSelection = debugConfigs[i].getID();
-					}
+				list.add(debugConfigs[i]);
+				// select first exact matching debugger for requested selection
+				if (!noDefault && defaultSelection.equals("")) {
+					defaultSelection = debugConfigs[i].getID();
 				}
 			}
 		}
@@ -203,7 +202,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab#updateComboFromSelection()
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#updateComboFromSelection()
 	 */
 	protected void updateComboFromSelection() {
 		super.updateComboFromSelection();
@@ -219,7 +218,7 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	protected boolean validateDebuggerConfig(ILaunchConfiguration config) {
 		IPDebugConfiguration debugConfig = getDebugConfig();
 		if (debugConfig == null) {
-			setErrorMessage(LaunchMessages.getResourceString("PDebuggerTab.No_debugger_available"));
+			setErrorMessage(LaunchMessages.getResourceString("DebuggerTab.No_debugger_available"));
 			return false;
 		}
 		return true;

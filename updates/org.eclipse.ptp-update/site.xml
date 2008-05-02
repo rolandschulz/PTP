@@ -3,52 +3,52 @@
    <description url="http://download.eclipse.org/tools/ptp/releases/2.0">
       Parallel Tools Platform update site - Release 2.0
    </description>
-   <feature url="features/org.eclipse.ptp_2.0.0.200804010706.jar" id="org.eclipse.ptp" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp_2.0.1.200804292220.jar" id="org.eclipse.ptp" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.pldt_2.0.0.200804010706.jar" id="org.eclipse.ptp.pldt" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.pldt_2.0.1.200804292220.jar" id="org.eclipse.ptp.pldt" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.external_2.0.0.200804010706.jar" id="org.eclipse.ptp.external" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.external_2.0.1.200804292220.jar" id="org.eclipse.ptp.external" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.remote.remotetools_2.0.0.200804010706.jar" id="org.eclipse.ptp.remote.remotetools" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.remote.remotetools_2.0.1.200804292220.jar" id="org.eclipse.ptp.remote.remotetools" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.remote.rse_2.0.0.200804010706.jar" id="org.eclipse.ptp.remote.rse" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.remote.rse_2.0.0.200804292220.jar" id="org.eclipse.ptp.remote.rse" version="2.0.0.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.remotetools_2.0.0.200804010706.jar" id="org.eclipse.ptp.remotetools" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.remotetools_2.0.1.200804292220.jar" id="org.eclipse.ptp.remotetools" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.ibm.ll_2.0.0.200804010706.jar" id="org.eclipse.ptp.rm.ibm.ll" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.rm.ibm.ll_2.0.1.200804292220.jar" id="org.eclipse.ptp.rm.ibm.ll" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.ibm.pe_2.0.0.200804010706.jar" id="org.eclipse.ptp.rm.ibm.pe" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.rm.ibm.pe_2.0.1.200804292220.jar" id="org.eclipse.ptp.rm.ibm.pe" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.orte_2.0.0.200804010706.jar" id="org.eclipse.ptp.rm.orte" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.rm.orte_2.0.1.200804292220.jar" id="org.eclipse.ptp.rm.orte" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.debug.sdm_2.0.0.200804010706.jar" id="org.eclipse.ptp.debug.sdm" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.debug.sdm_2.0.1.200804292220.jar" id="org.eclipse.ptp.debug.sdm" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.mpich2_2.0.0.200804010706.jar" id="org.eclipse.ptp.rm.mpich2" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.rm.mpich2_2.0.1.200804292220.jar" id="org.eclipse.ptp.rm.mpich2" version="2.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.perf_1.0.0.200804010706.jar" id="org.eclipse.ptp.perf" version="1.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.perf_1.0.1.200804292220.jar" id="org.eclipse.ptp.perf" version="1.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rdt_1.0.0.200804010706.jar" id="org.eclipse.ptp.rdt" version="1.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.rdt_1.0.1.200804292220.jar" id="org.eclipse.ptp.rdt" version="1.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.perf.tau_1.0.0.200804010706.jar" id="org.eclipse.ptp.perf.tau" version="1.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.perf.tau_1.0.1.200804292220.jar" id="org.eclipse.ptp.perf.tau" version="1.0.1.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.perf.tau.fortran_1.0.0.200804010706.jar" id="org.eclipse.ptp.perf.tau.fortran" version="1.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.perf.tau.fortran_1.0.0.200804292220.jar" id="org.eclipse.ptp.perf.tau.fortran" version="1.0.0.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.pldt.lapi_2.0.0.200804010706.jar" id="org.eclipse.ptp.pldt.lapi" version="2.0.0.200804010706">
+   <feature url="features/org.eclipse.ptp.pldt.lapi_2.0.0.200804292220.jar" id="org.eclipse.ptp.pldt.lapi" version="2.0.0.200804292220">
       <category name="Parallel Tools Platform 2.0"/>
    </feature>
    <category-def name="Parallel Tools Platform 2.0" label="Parallel Tools Platform 2.0"/>

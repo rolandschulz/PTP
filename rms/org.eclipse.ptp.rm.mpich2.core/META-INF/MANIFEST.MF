@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MPICH2 Core Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.rm.mpich2.core;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.mpich2.core.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,

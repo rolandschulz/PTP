@@ -23,7 +23,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.ompi.core.OMPIPreferenceManager;
-import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
@@ -60,8 +59,9 @@ public class OMPIResourceManagerFactory extends AbstractResourceManagerFactory {
 		
 		Preferences preferences = OMPIPreferenceManager.getPreferences();
 		
-		conf.setProxyServerPath(preferences.getString(PreferenceConstants.PROXY_PATH));
-		conf.setOptions(preferences.getInt(PreferenceConstants.OPTIONS));
+		conf.setLaunchCmd(preferences.getString(OMPIPreferenceManager.PREFS_LAUNCH_CMD));
+		conf.setPath(preferences.getString(OMPIPreferenceManager.PREFS_PATH));
+		conf.setOptions(preferences.getInt(OMPIPreferenceManager.PREFS_OPTIONS));
 
 		return conf;
 	}

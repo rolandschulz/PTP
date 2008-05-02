@@ -20,6 +20,7 @@ package org.eclipse.ptp.rm.ompi.core.rmsystem;
 
 import java.util.Collection;
 
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -27,6 +28,8 @@ import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.rm.ompi.core.OMPIAttributes;
+import org.eclipse.ptp.rm.ompi.core.parameters.Parameters;
 import org.eclipse.ptp.rm.ompi.core.rtsystem.OMPIRuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -39,6 +42,15 @@ public class OMPIResourceManager extends AbstractRuntimeResourceManager {
 	public OMPIResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id.toString(), universe, config);
 		OMPI_RMID = id;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#getAttributeDefinitionManager()
+	 */
+	@Override
+	public AttributeDefinitionManager getAttributeDefinitionManager() {
+		// TODO Auto-generated method stub
+		return super.getAttributeDefinitionManager();
 	}
 
 	/* (non-Javadoc)
@@ -111,7 +123,9 @@ public class OMPIResourceManager extends AbstractRuntimeResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		OMPIResourceManagerConfiguration config = (OMPIResourceManagerConfiguration) getConfiguration();
-		return new OMPIRuntimeSystem(OMPI_RMID, config, getAttributeDefinitionManager());
+		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
+		attrDefMgr.setAttributeDefinitions(OMPIAttributes.getDefaultAttributeDefinitions());
+		return new OMPIRuntimeSystem(OMPI_RMID, config, attrDefMgr);
 	}
 
 	/* (non-Javadoc)
@@ -159,4 +173,16 @@ public class OMPIResourceManager extends AbstractRuntimeResourceManager {
 		return updateQueues(queues, attrs);
 	}
 
+	/**
+	 * Get the OMPI parameters from the runtime
+	 * 
+	 * @return OMPI parameters
+	 */
+	public Parameters getParameters() {
+		try {
+			return ((OMPIRuntimeSystem)super.getRuntimeSystem()).getParameters().clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
 }

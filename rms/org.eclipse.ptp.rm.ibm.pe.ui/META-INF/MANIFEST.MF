@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Parallel Environment UI Plugin
 Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.pe.ui;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.ibm.pe.ui.Activator
 Bundle-Vendor: IBM
 Bundle-Localization: plugin

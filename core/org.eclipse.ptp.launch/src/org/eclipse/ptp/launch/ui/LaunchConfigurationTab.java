@@ -37,9 +37,11 @@ import org.eclipse.swt.layout.GridLayout;
 /**
  *
  */
-public abstract class PLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
+public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab {
     public static final String DEFAULT_VALUE = "0";
     public static final String EMPTY_STRING = "";
+
+	private ILaunchConfiguration launchConfiguration = null;
 
     /**
      * Utility routine to create a grid layout
@@ -135,7 +137,6 @@ public abstract class PLaunchConfigurationTab extends AbstractLaunchConfiguratio
     protected IWorkspaceRoot getWorkspaceRoot() {
     	return ResourcesPlugin.getWorkspace().getRoot();
     }    
-
 	
     /**
 	 * Given a launch configuration, find the resource manager that was been selected.
@@ -174,4 +175,30 @@ public abstract class PLaunchConfigurationTab extends AbstractLaunchConfiguratio
         gd.horizontalSpan = space;
         return gd;
     }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public void initializeFrom(ILaunchConfiguration configuration) {
+		// cache the launch configuration for updates
+		setLaunchConfiguration(configuration);
+	}
+	
+
+	/**
+	 * Cache the launch configuration
+	 * 
+	 * @param configuration
+	 */
+	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		launchConfiguration = configuration;
+	}
+	
+
+	/**
+	 * @return the launchConfiguration
+	 */
+	public ILaunchConfiguration getLaunchConfiguration() {
+		return launchConfiguration;
+	}
 }

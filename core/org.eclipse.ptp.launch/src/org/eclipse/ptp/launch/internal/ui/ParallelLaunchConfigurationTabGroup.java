@@ -19,14 +19,14 @@
 package org.eclipse.ptp.launch.internal.ui;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
+import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
-import org.eclipse.ptp.launch.ui.PArgumentsTab;
-import org.eclipse.ptp.launch.ui.PCommonTab;
-import org.eclipse.ptp.launch.ui.PDebuggerTab;
-import org.eclipse.ptp.launch.ui.PMainTab;
+import org.eclipse.ptp.launch.ui.ApplicationTab;
+import org.eclipse.ptp.launch.ui.ArgumentsTab;
+import org.eclipse.ptp.launch.ui.DebuggerTab;
 import org.eclipse.ptp.launch.ui.ResourcesTab;
 
 /**
@@ -35,13 +35,13 @@ import org.eclipse.ptp.launch.ui.ResourcesTab;
 public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
     		ILaunchConfigurationTab tabs[] = {
-        		new PMainTab(), 
         		new ResourcesTab(),
-        		new PDebuggerTab(false),
-        		new PArgumentsTab(),
+        		new ApplicationTab(), 
+        		new DebuggerTab(false),
+        		new ArgumentsTab(),
         		new SourceLookupTab(),
         		new EnvironmentTab(), 
-        		new PCommonTab() };
+        		new CommonTab() };
     		setTabs(tabs);
 	}    
 }
