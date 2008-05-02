@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Remote Tools Utils Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.remotetools.utils
-Bundle-Version: 3.0.0
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remotetools.utils.UtilsPlugin
 Bundle-Vendor: IBM
 Bundle-Localization: plugin

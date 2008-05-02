@@ -60,6 +60,7 @@ extern MICommand *MIGDBVersion(void);
 /*
  * -exec-* commands
  */
+extern MICommand *MIExecArguments(char **);
 extern MICommand *MIExecContinue(void);
 extern MICommand *MIExecRun(void);
 extern MICommand *MIExecStep(int);

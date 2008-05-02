@@ -3,7 +3,7 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT(org.eclipse.ptp.utils, 2.0.0)
+AC_INIT(org.eclipse.ptp.utils, 2.0.1)
 AC_CONFIG_SRCDIR(src/args.c)
 AC_CONFIG_HEADERS(config.h)
 

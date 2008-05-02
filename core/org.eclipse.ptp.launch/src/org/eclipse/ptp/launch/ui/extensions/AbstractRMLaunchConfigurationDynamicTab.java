@@ -16,10 +16,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui.extensions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
 
@@ -31,6 +36,10 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
  *
  */
 public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaunchConfigurationDynamicTab {
+	public static final String EMPTY_STRING = "";
+	
+	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
+	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
 
 	/**
 	 * @param string
@@ -69,5 +78,58 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		for (Object listener : listeners) {
 			((IRMLaunchConfigurationContentsChangedListener) listener).handleContentsChanged(this);
 		}
+	}
+
+	/**
+	 * Get the queue with the corresponding name
+	 * 
+	 * @param rm resource manager
+	 * @param queueName queue name
+	 * @return queue
+	 */
+	public IPQueue getQueueFromName(IResourceManager rm, String queueName) {
+		if (rm == null) {
+			return null;
+		}
+		
+		IPQueue[] queues = rm.getQueues();
+		
+		for (IPQueue queue : queues) {
+			if (queue.getName().equals(queueName))
+				return queue;
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	public void clearQueues() {
+		queues.clear();
+	}
+	
+	/**
+	 * @param queue
+	 * @param index
+	 */
+	public void addQueue(IPQueue queue, int index) {
+		queues.put(index, queue);
+		queueIndices.put(queue, index);
+	}
+	
+	/**
+	 * @param index
+	 * @return
+	 */
+	public IPQueue getQueue(int index) {
+		return queues.get(index);
+	}
+	
+	/**
+	 * @param queue
+	 * @return
+	 */
+	public Integer getQueueIndex(IPQueue queue) {
+		return queueIndices.get(queue);
 	}
 }

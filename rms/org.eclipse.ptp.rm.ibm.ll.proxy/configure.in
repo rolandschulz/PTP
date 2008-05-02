@@ -8,7 +8,7 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT(org.eclipse.ptp.ibmll, 1.1.0)
+AC_INIT(org.eclipse.ptp.ibmll, 2.0.1)
 AC_CONFIG_SRCDIR(src/ptp_ibmll_proxy.c)
 AC_CONFIG_HEADERS(config.h)
 
@@ -17,7 +17,21 @@ AM_INIT_AUTOMAKE
 AC_CANONICAL_BUILD
 
 UTILS="../org.eclipse.ptp.utils"
+if test ! -d $UTILS; then
+	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	if test ! -d $UTILS; then
+		AC_MSG_ERROR([utils directory not found])
+	fi
+fi
+
 PROXY="../org.eclipse.ptp.proxy"
+if test ! -d $PROXY; then
+	PROXY="`echo ${PROXY}_${PACKAGE_VERSION}.*`"
+	if test ! -d $PROXY; then
+		AC_MSG_ERROR([proxy directory not found])
+	fi
+fi
+
 LIBS="$LIBS -L$UTILS -L$PROXY"
 
 AC_ARG_WITH(ll-header, AC_HELP_STRING([--with-ll-header=DIR], 

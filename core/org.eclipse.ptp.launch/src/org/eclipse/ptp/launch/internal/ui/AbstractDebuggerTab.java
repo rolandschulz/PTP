@@ -11,6 +11,7 @@
 package org.eclipse.ptp.launch.internal.ui;
 
 import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -19,7 +20,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.launch.ui.PLaunchConfigurationTab;
+import org.eclipse.ptp.launch.ui.LaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -32,8 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
-	protected ILaunchConfiguration fLaunchConfiguration;
+public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	protected ILaunchConfigurationWorkingCopy fWorkingCopy;
 	protected IPDebugConfiguration fCurrentDebugConfig;
 
@@ -73,13 +73,9 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 		return fWorkingCopy;
 	}
 
-	protected void setLaunchConfiguration(ILaunchConfiguration launchConfiguration) {
-		fLaunchConfiguration = launchConfiguration;
+	public void setLaunchConfiguration(ILaunchConfiguration launchConfiguration) {
+		super.setLaunchConfiguration(launchConfiguration);
 		setLaunchConfigurationWorkingCopy(null);
-	}
-
-	protected ILaunchConfiguration getLaunchConfiguration() {
-		return fLaunchConfiguration;
 	}
 
 	protected void setLaunchConfigurationWorkingCopy(ILaunchConfigurationWorkingCopy workingCopy) {
@@ -159,7 +155,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 			try {
 				tab = PTPDebugUIPlugin.getDefault().getDebuggerPage(debugConfig.getID());
 			} catch (CoreException e) {
-				PTPLaunchPlugin.errorDialog(LaunchMessages.getResourceString("AbstractPDebuggerTab.ErrorLoadingDebuggerPage"), e.getStatus());
+				PTPLaunchPlugin.errorDialog(LaunchMessages.getResourceString("AbstractDebuggerTab.ErrorLoadingDebuggerPage"), e.getStatus());
 			}
 			setDynamicTab(tab);
 		}
@@ -216,7 +212,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 		setErrorMessage(null);
 		setMessage(null);
 		if (getDebugConfig() == null) {
-			setErrorMessage(LaunchMessages.getResourceString("AbstractPDebuggerTab.No_debugger_available"));
+			setErrorMessage(LaunchMessages.getResourceString("AbstractDebuggerTab.No_debugger_available"));
 			return false;
 		}
 
@@ -240,7 +236,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 	}
 
 	public String getName() {
-		return LaunchMessages.getResourceString("AbstractPDebuggerTab.Debugger");
+		return LaunchMessages.getResourceString("AbstractDebuggerTab.Debugger");
 	}
 
 	protected void createDebuggerCombo(Composite parent, int colspan) {
@@ -289,7 +285,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 
 	protected void createDebuggerGroup(Composite parent, int colspan) {
 		Group debuggerGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		debuggerGroup.setText(LaunchMessages.getResourceString("PDebuggerTab.Debugger_Options"));
+		debuggerGroup.setText(LaunchMessages.getResourceString("DebuggerTab.Debugger_Options"));
 		setDynamicTabHolder(debuggerGroup);
 		GridLayout tabHolderLayout = new GridLayout();
 		tabHolderLayout.marginHeight = 0;

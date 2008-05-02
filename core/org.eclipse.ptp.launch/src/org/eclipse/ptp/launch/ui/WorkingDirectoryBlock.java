@@ -46,7 +46,7 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 /**
  *
  */
-public class WorkingDirectoryBlock extends PLaunchConfigurationTab {
+public class WorkingDirectoryBlock extends LaunchConfigurationTab {
     protected Button useDefaultWorkingDirButton = null;
     protected Button localDirButton = null;
     protected Text workingDirText = null;
