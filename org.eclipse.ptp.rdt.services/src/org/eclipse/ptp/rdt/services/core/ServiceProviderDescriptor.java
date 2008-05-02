@@ -8,9 +8,8 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.services.internal.core;
+package org.eclipse.ptp.rdt.services.core;
 
-import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
 
 /**
  * @author greg
