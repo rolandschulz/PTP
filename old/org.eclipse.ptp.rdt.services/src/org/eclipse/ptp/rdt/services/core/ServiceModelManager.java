@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.rdt.services.Activator;
 import org.eclipse.ptp.rdt.services.internal.core.Service;
-import org.eclipse.ptp.rdt.services.internal.core.ServiceProviderDescriptor;
 import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
 import org.eclipse.ptp.rdt.services.ui.Messages;
 
@@ -40,6 +39,8 @@ public class ServiceModelManager implements IServiceModelManager {
 	private final static String ATTR_CLASS = "class"; //$NON-NLS-1$
 	private final static String ATTR_UI_CLASS = "configurationUIClass"; //$NON-NLS-1$
 	
+	private final static ServiceModelManager fInstance = new ServiceModelManager();
+	
 	private Map<IProject, Set<IServiceConfiguration>> projectConfigurations = new HashMap<IProject, Set<IServiceConfiguration>>();
 	private Map<IProject, IServiceConfiguration> activeConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private Map<String, IServiceConfiguration> configurations = new HashMap<String, IServiceConfiguration>();
@@ -50,6 +51,14 @@ public class ServiceModelManager implements IServiceModelManager {
 	private Set<IService> serviceSet = null;
 	private Map<String, Set<IService>> natureServices = null;
 	
+	
+	public static ServiceModelManager getInstance() {
+		return fInstance;
+	}
+	
+	private ServiceModelManager() {
+		
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
@@ -232,5 +241,9 @@ public class ServiceModelManager implements IServiceModelManager {
 				}
 			}
 		}	
+	}
+
+	public IService getService(String id) {
+		return services.get(id);
 	}
 }
