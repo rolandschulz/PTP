@@ -35,6 +35,7 @@ import org.eclipse.ptp.remotetools.environment.launcher.data.ISynchronizationRul
 import org.eclipse.ptp.remotetools.environment.launcher.data.OverwritePolicies;
 import org.eclipse.ptp.remotetools.environment.launcher.data.RuleFactory;
 import org.eclipse.ptp.remotetools.environment.launcher.data.UploadRule;
+import org.eclipse.ptp.remotetools.environment.launcher.preferences.LaunchPreferences;
 import org.eclipse.ptp.remotetools.utils.ui.swt.Frame;
 import org.eclipse.ptp.remotetools.utils.ui.swt.FrameMold;
 import org.eclipse.swt.SWT;
@@ -306,10 +307,20 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 				ISynchronizationRule rule = RuleFactory.createRuleFromString(string);
 				rules.add(rule);
 			}
+
 //			RemoteLaunchDelegate delegate = new RemoteLaunchDelegate();
 //			ruleLabelProvider.setRemoteWorkingDir(LinuxPath.toString(delegate.getValidatedRemoteDirectory(configuration)));
 //			ruleLabelProvider.setRemoteWorkingDir(LinuxPath.toString(delegate.getRemoteDirectory(configuration)));
-			ruleLabelProvider.setRemoteWorkingDir(configuration.getAttribute(IRemoteLaunchAttributes.ATTR_REMOTE_DIRECTORY, "")); //$NON-NLS-1$
+			
+			String defaultRemoteWorkingDirectory = LaunchPreferences.getPreferenceStore().getString(
+					LaunchPreferences.ATTR_WORKING_DIRECTORY);
+			
+			if( configuration.getAttribute(IRemoteLaunchAttributes.ATTR_AUTOMATIC_WORKING_DIRECTORY, IRemoteLaunchAttributes.DEFAULT_AUTOMATIC_WORKING_DIRECTORY)){
+				ruleLabelProvider.setRemoteWorkingDir( defaultRemoteWorkingDirectory );
+			} else {
+				ruleLabelProvider.setRemoteWorkingDir( configuration.getAttribute(IRemoteLaunchAttributes.ATTR_REMOTE_DIRECTORY, defaultRemoteWorkingDirectory) );
+			}
+			
 			refreshRuleList();
 		} catch (CoreException e) {
 			setErrorMessage(LaunchMessages
