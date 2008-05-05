@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
+import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.shells.HostShellProcessAdapter;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
@@ -55,11 +56,11 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		String remoteCmd = "";
+		String remoteCmd = "";  //$NON-NLS-1$
 		
 		for (int i = 0; i < cmdArgs.size(); i++) {
 			if (i > 0) {
-				remoteCmd += " ";
+				remoteCmd += " ";  //$NON-NLS-1$
 			}
 			remoteCmd += spaceEscapify(cmdArgs.get(i));
 		}
@@ -73,7 +74,14 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		// This is necessary because runCommand does not actually run the command right now.
 		String env[] = new String[0];
-		IHostShell hostShell = shellService.launchShell("", env,new NullProgressMonitor()); //$NON-NLS-1$
+		IHostShell hostShell = null;
+		try {
+			hostShell = shellService.launchShell("", env,new NullProgressMonitor());  //$NON-NLS-1$
+		} catch (SystemMessageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 		hostShell.writeToShell(remoteCmd);
 		
 		Process p = new HostShellProcessAdapter(hostShell);
