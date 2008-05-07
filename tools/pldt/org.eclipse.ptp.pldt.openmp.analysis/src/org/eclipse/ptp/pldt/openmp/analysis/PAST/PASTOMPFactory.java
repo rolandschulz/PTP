@@ -22,15 +22,11 @@ import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTStatement;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IScope;
-import org.eclipse.cdt.core.parser.ISourceElementRequestor;
 import org.eclipse.cdt.core.parser.IToken;
-import org.eclipse.cdt.core.parser.NullSourceElementRequestor;
 import org.eclipse.cdt.internal.core.dom.parser.ASTInternal;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.cdt.internal.core.dom.parser.c.CScope;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPScope;
-import org.eclipse.cdt.internal.core.parser.scanner2.ScannerCallbackManager;
-import org.eclipse.cdt.internal.core.parser.scanner2.ScannerProblemFactory;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ptp.pldt.common.util.Utility;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
@@ -58,7 +54,7 @@ public class PASTOMPFactory
     protected OpenMPScanner scanner_ = null;
     protected OpenMPToken   token_   = null;
     
-    protected ScannerCallbackManager callbackManager_ = null;
+    //protected ScannerCallbackManager callbackManager_ = null;
     
     /**
      * Factory used only by this class
@@ -78,7 +74,7 @@ public class PASTOMPFactory
         if (traceOn_)
           readTokens();
         
-        otherinit(null);
+        //otherinit(null);
     }
     
     private void experiment()
@@ -968,14 +964,14 @@ public class PASTOMPFactory
     
     
     // We are presently unsure of what to do with all the following stuff:
-    protected static final ScannerProblemFactory spf = new ScannerProblemFactory();
-    protected ScannerCallbackManager callbackManager;
-    protected static char[] EMPTY_CHAR_ARRAY = new char[0];
-    
-    protected void otherinit(ISourceElementRequestor requestor)
-    {
-        callbackManager = new ScannerCallbackManager(new NullSourceElementRequestor());
-    }
+//    protected static final ScannerProblemFactory spf = new ScannerProblemFactory();
+//    protected ScannerCallbackManager callbackManager;
+//    protected static char[] EMPTY_CHAR_ARRAY = new char[0];
+//    
+//    protected void otherinit(ISourceElementRequestor requestor)
+//    {
+//        callbackManager = new ScannerCallbackManager(new NullSourceElementRequestor());
+//    }
     
     /**
      * handleProblem

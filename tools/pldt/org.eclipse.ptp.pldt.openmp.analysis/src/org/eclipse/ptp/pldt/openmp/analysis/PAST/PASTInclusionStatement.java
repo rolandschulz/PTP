@@ -12,7 +12,7 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTInclusionStatement;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -21,15 +21,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTInclusionSta
  */
 public class PASTInclusionStatement extends PASTNode implements IASTPreprocessorIncludeStatement
 {
-	protected ASTInclusionStatement incl_ = null;
+	protected IASTPreprocessorIncludeStatement incl_ = null;
 	
     /**
      * PASTInclusionStatement - constructor
      * @param incl: ASTInclusionStatement
      */
-	public PASTInclusionStatement(ASTInclusionStatement incl)
+	public PASTInclusionStatement(IASTPreprocessorIncludeStatement incl)
 	{
-		super(incl);
+		super((ASTNode)incl);
 		incl_ = incl;
 	}
     
@@ -59,6 +59,10 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	// cdt40
 	public boolean isResolved() {
 		return incl_.isResolved();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return incl_.isPartOfTranslationUnitFile();
 	}
 	
 }

@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorObjectStyleMacroDefinition;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTObjectMacro;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -21,15 +22,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTObjectMacro;
  */
 public class PASTObjectMacro extends PASTNode implements IASTPreprocessorObjectStyleMacroDefinition
 {
-    protected ASTObjectMacro objMacro_ = null;
+    protected IASTPreprocessorObjectStyleMacroDefinition objMacro_ = null;
     
     /**
      * PASTObjectMacro - constructor
      * @param objMacro: ASTObjectMacro
      */
-    public PASTObjectMacro(ASTObjectMacro objMacro)
+    public PASTObjectMacro(IASTPreprocessorObjectStyleMacroDefinition objMacro)
     {
-        super(objMacro);
+        super((ASTNode)objMacro);
         objMacro_ = objMacro;
     }
     
@@ -65,5 +66,13 @@ public class PASTObjectMacro extends PASTNode implements IASTPreprocessorObjectS
     {
         objMacro_.setName(name);        
     }
+
+	public IASTFileLocation getExpansionLocation() {
+		return objMacro_.getExpansionLocation();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return objMacro_.isPartOfTranslationUnitFile();
+	}
 
 }

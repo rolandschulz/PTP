@@ -10,19 +10,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorElifStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorElseStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorEndifStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorErrorStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorFunctionStyleMacroDefinition;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfdefStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfndefStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorObjectStyleMacroDefinition;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorPragmaStatement;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTElif;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTElse;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTEndif;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTError;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTFunctionMacro;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIf;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIfdef;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIfndef;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTInclusionStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTObjectMacro;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTPragma;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTUndef;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorUndefStatement;
+
 
 
 /**
@@ -38,30 +39,30 @@ public class PASTFactory
      */
     public static PASTNode PASTFactoryMake(IASTPreprocessorStatement node)
     {
-    	if (node instanceof ASTEndif)
-    		return new PASTEndif((ASTEndif)node);
-    	else if (node instanceof ASTElif)
-    		return new PASTElif((ASTElif)node);
-    	else if (node instanceof ASTElse)
-    		return new PASTElse((ASTElse)node);
-    	else if (node instanceof ASTIfndef)
-    		return new PASTIfndef((ASTIfndef)node);
-    	else if (node instanceof ASTIfdef)
-    		return new PASTIfdef((ASTIfdef)node);
-    	else if (node instanceof ASTIf)
-    		return new PASTIf((ASTIf)node);
-    	else if (node instanceof ASTError)
-    		return new PASTError((ASTError)node);
-    	else if (node instanceof ASTPragma)
-    		return new PASTPragma((ASTPragma)node);
-    	else if (node instanceof ASTUndef)
-    		return new PASTUndef((ASTUndef)node);
-    	else if (node instanceof ASTInclusionStatement)
-    		return new PASTInclusionStatement((ASTInclusionStatement)node);
-    	else if (node instanceof ASTFunctionMacro)
-    		return new PASTFunctionMacro((ASTFunctionMacro)node);
-        else if (node instanceof ASTObjectMacro)
-            return new PASTObjectMacro((ASTObjectMacro)node);
+    	if (node instanceof IASTPreprocessorEndifStatement)
+    		return new PASTEndif((IASTPreprocessorEndifStatement)node);
+    	else if (node instanceof IASTPreprocessorElifStatement)
+    		return new PASTElif((IASTPreprocessorElifStatement)node);
+    	else if (node instanceof IASTPreprocessorElseStatement)
+    		return new PASTElse((IASTPreprocessorElseStatement)node);
+    	else if (node instanceof IASTPreprocessorIfndefStatement)
+    		return new PASTIfndef((IASTPreprocessorIfndefStatement)node);
+    	else if (node instanceof IASTPreprocessorIfdefStatement)
+    		return new PASTIfdef((IASTPreprocessorIfdefStatement)node);
+    	else if (node instanceof IASTPreprocessorIfStatement)
+    		return new PASTIf((IASTPreprocessorIfStatement)node);
+    	else if (node instanceof IASTPreprocessorErrorStatement)
+    		return new PASTError((IASTPreprocessorErrorStatement)node);
+    	else if (node instanceof IASTPreprocessorPragmaStatement)
+    		return new PASTPragma((IASTPreprocessorPragmaStatement)node);
+    	else if (node instanceof IASTPreprocessorUndefStatement)
+    		return new PASTUndef((IASTPreprocessorUndefStatement)node);
+    	else if (node instanceof IASTPreprocessorIncludeStatement)
+    		return new PASTInclusionStatement((IASTPreprocessorIncludeStatement)node);
+    	else if (node instanceof IASTPreprocessorFunctionStyleMacroDefinition)
+    		return new PASTFunctionMacro((IASTPreprocessorFunctionStyleMacroDefinition)node);
+        else if (node instanceof IASTPreprocessorObjectStyleMacroDefinition)
+            return new PASTObjectMacro((IASTPreprocessorObjectStyleMacroDefinition)node);
         else{
         	return null;//what is node?   LocationMap$ASTWarning.
         }

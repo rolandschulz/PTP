@@ -11,7 +11,7 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorPragmaStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTPragma;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.ptp.pldt.common.util.Utility;
 
 /**
@@ -21,16 +21,16 @@ import org.eclipse.ptp.pldt.common.util.Utility;
  */
 public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatement
 {
-	protected ASTPragma pragma_ = null;
+	protected IASTPreprocessorPragmaStatement pragma_ = null;
     protected String    content_ = "";
 	
     /**
      * PASTPragma - constructor
      * @param pragma
      */
-	public PASTPragma(ASTPragma pragma)
+	public PASTPragma(IASTPreprocessorPragmaStatement pragma)
 	{
-		super(pragma);
+		super((ASTNode)pragma);
 		pragma_ = pragma;
 	}
     
@@ -45,7 +45,7 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
         content_ = pPragma.getContent();
     }
     
-    protected ASTPragma getASTPragma()
+    protected IASTPreprocessorPragmaStatement getASTPragma()
     {
         return pragma_;
     }
@@ -73,7 +73,7 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
      */
     public int getOffset()
     {
-        return pragma_.getOffset();
+        return getStartLocation();
     }
     
     /**
@@ -82,7 +82,7 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
      */
     public int getLength()
     {
-        return pragma_.getLength();
+        return getEndLocation() - getStartLocation();
     }
     
     /**
@@ -99,6 +99,10 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
 
 	public char[] getMessage() {
 		return pragma_.getMessage();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return pragma_.isPartOfTranslationUnitFile();
 	}
 	
 

@@ -12,7 +12,7 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorUndefStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTUndef;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -21,15 +21,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTUndef;
  */
 public class PASTUndef extends PASTNode implements IASTPreprocessorUndefStatement
 {
-	protected ASTUndef undef_ = null;
+	protected IASTPreprocessorUndefStatement undef_ = null;
 	
     /**
      * PASTUndef - constructor
      * @param undef
      */
-	public PASTUndef(ASTUndef undef)
+	public PASTUndef(IASTPreprocessorUndefStatement undef)
 	{
-		super(undef);
+		super((ASTNode)undef);
 		undef_ = undef;
 	}
     
@@ -43,6 +43,10 @@ public class PASTUndef extends PASTNode implements IASTPreprocessorUndefStatemen
      */
 	public IASTName getMacroName() {
 		return undef_.getMacroName();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return undef_.isPartOfTranslationUnitFile();
 	}
 
 }
