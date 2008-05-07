@@ -87,7 +87,7 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		}
 	}
 
-	@Override
+	//@Override BRT Ganymede problem
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if(traceOn)System.out.println("AnalysisDropdownHandler.execute()...");
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
