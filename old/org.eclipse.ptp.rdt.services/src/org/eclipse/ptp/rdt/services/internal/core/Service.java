@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.services.internal.core;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.ptp.rdt.services.core.IService;
@@ -25,6 +27,7 @@ public class Service implements IService {
 	private String serviceName;
 	private Set<String> serviceNatures;
 	private Set<IServiceProviderDescriptor> serviceProviderDescriptors = new HashSet<IServiceProviderDescriptor>();
+	private Map<String, IServiceProviderDescriptor> idToServiceProviderDescriptorMap = new HashMap<String, IServiceProviderDescriptor>();
 	
 	public Service(String id, String name, Set<String>natures) {
 		this.serviceId = id;
@@ -37,6 +40,7 @@ public class Service implements IService {
 	 */
 	public void addServiceProvider(IServiceProviderDescriptor provider) {
 		serviceProviderDescriptors.add(provider);
+		idToServiceProviderDescriptorMap.put(provider.getId(), provider);
 	}
 
 	/* (non-Javadoc)
@@ -72,5 +76,13 @@ public class Service implements IService {
 	 */
 	public void removeServiceProvider(IServiceProviderDescriptor provider) {
 		serviceProviderDescriptors.remove(provider);
+		idToServiceProviderDescriptorMap.remove(provider.getId());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.services.core.IService#getProvider(java.lang.String)
+	 */
+	public IServiceProviderDescriptor getProviderDescriptor(String id) {
+		return idToServiceProviderDescriptorMap.get(id);
 	}
 }
