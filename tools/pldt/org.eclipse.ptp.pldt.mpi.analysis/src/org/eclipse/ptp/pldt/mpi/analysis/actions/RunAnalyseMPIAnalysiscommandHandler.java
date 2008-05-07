@@ -47,7 +47,6 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	 * Execute the action for MPI barrier analysis
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		boolean foundError=false;
 		getSelection(event);
