@@ -49,6 +49,14 @@ public interface IService {
 	 * @return set of providers for this service
 	 */
 	public Set<IServiceProviderDescriptor> getProviders();
+	
+	/**
+	 * Gets a specific provider of this service.
+	 * 
+	 * @param id The unique ID of the service requested.
+	 * @return IServiceProviderDescriptor
+	 */
+	public IServiceProviderDescriptor getProviderDescriptor(String id);
 
 	/**
 	 * Remove service provider from list of providers for this service.
