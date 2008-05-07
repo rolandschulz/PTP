@@ -600,7 +600,6 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	/**
 	 * Implemented for Handler; this replaces run() which is for actions.
 	 */
-	// @Override BRT Ganymede problem
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if(traceOn)System.out.println("RunAnalyseHandlerBase.execute()...");
 		getSelection(event);
