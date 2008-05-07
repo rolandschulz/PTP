@@ -97,19 +97,25 @@ public class ServiceModelManager implements IServiceModelManager {
 	 */
 	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
 		IServiceProvider provider = null;
-		IExtension extension = Platform.getExtensionRegistry().getExtension(desc.getId());
-		if (extension != null) {
-			for (IConfigurationElement element : extension.getConfigurationElements()) {
-				if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
-					try {
-						provider = (IServiceProvider)element.createExecutableExtension(ATTR_CLASS);
-					} catch (Exception e) {
-						return null;
+
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	this.PROVIDER_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension
+						.getConfigurationElements()) {
+					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+						if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
+							try {
+								provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
+							} catch (Exception e) {
+								return null;
+							}
+						}
 					}
-			
 				}
 			}
 		}
+
 		return provider;
 	}
 
@@ -229,7 +235,7 @@ public class ServiceModelManager implements IServiceModelManager {
 						String name = element.getAttribute(ATTR_NAME);
 						String serviceId = element.getAttribute(ATTR_SERVICE_ID);
 						IServiceProviderDescriptor desc = new ServiceProviderDescriptor(id, name, serviceId);
-						IService service = services.get(id);
+						IService service = services.get(serviceId);
 						if (service != null) {
 							serviceProviders.put(id, desc);
 							service.addServiceProvider(desc);
