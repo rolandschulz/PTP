@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>  // for omp sample
 #include <math.h>    // for omp
-// fake header file from OpenMPstub proj
 #include "omp.h"
 
 
