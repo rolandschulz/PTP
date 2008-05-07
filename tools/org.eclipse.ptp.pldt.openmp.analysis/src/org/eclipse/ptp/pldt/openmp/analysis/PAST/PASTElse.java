@@ -12,7 +12,7 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorElseStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTElse;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -21,15 +21,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTElse;
  */
 public class PASTElse extends PASTNode implements IASTPreprocessorElseStatement
 {
-	protected ASTElse else_ = null;
+	protected IASTPreprocessorElseStatement else_ = null;
 	
     /**
      * PASTElse - Else preprocessor statement (Constructor)
      * @param elsee
      */
-	public PASTElse(ASTElse elsee)
+	public PASTElse(IASTPreprocessorElseStatement elsee)
 	{
-		super(elsee);
+		super((ASTNode)elsee);
 		else_ = elsee;
 	}
     
@@ -43,6 +43,10 @@ public class PASTElse extends PASTNode implements IASTPreprocessorElseStatement
      */
 	public boolean taken() {
 		return else_.taken();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return else_.isPartOfTranslationUnitFile();
 	}
 
 }

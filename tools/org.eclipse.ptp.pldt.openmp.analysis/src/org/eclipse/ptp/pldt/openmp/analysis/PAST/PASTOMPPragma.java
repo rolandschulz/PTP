@@ -13,8 +13,8 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 import java.util.LinkedList;
 
 import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorPragmaStatement;
 import org.eclipse.cdt.core.dom.ast.IASTStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTPragma;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 import org.eclipse.ptp.pldt.openmp.analysis.parser.OpenMPToken;
 
@@ -115,7 +115,7 @@ public class PASTOMPPragma extends PASTPragma
      * PASTOMPPragma - constructor using ASTPragma
      * @param pragma - ASTPragma
      */
-	public PASTOMPPragma(ASTPragma pragma)
+	public PASTOMPPragma(IASTPreprocessorPragmaStatement pragma)
 	{
 		super(pragma);
 		//pragma_ = pragma;

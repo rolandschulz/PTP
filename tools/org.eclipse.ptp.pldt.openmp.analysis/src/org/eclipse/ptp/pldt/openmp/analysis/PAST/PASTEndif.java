@@ -11,7 +11,7 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorEndifStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTEndif;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -20,15 +20,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTEndif;
  */
 public class PASTEndif extends PASTNode implements IASTPreprocessorEndifStatement
 {
-	private ASTEndif   endif_ = null;
+	private IASTPreprocessorEndifStatement   endif_ = null;
 	
     /**
      * PASTEndif - Endif proprocessor statment (Constructor)
      * @param endif: ASTEndif
      */
-    public PASTEndif(ASTEndif endif)
+    public PASTEndif(IASTPreprocessorEndifStatement endif)
     {
-    	super(endif);
+    	super((ASTNode)endif);
     	endif_ = endif;
     }
      
@@ -36,6 +36,10 @@ public class PASTEndif extends PASTNode implements IASTPreprocessorEndifStatemen
     {
         return "#endif";
     }
+
+	public boolean isPartOfTranslationUnitFile() {
+		return endif_.isPartOfTranslationUnitFile();
+	}
 
     
 }

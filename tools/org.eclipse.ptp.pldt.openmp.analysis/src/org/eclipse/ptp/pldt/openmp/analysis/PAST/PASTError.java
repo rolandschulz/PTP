@@ -11,7 +11,7 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorErrorStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTError;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -20,15 +20,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTError;
  */
 public class PASTError extends PASTNode implements IASTPreprocessorErrorStatement
 {
-	protected ASTError error_ = null;
+	protected IASTPreprocessorErrorStatement error_ = null;
 	
     /**
      * PASTError - Error preprocessor statment (Constructor)
      * @param error: ASTError
      */
-	public PASTError(ASTError error)
+	public PASTError(IASTPreprocessorErrorStatement error)
 	{
-		super(error);
+		super((ASTNode)error);
 		error_ = error;
 	}
     
@@ -39,6 +39,10 @@ public class PASTError extends PASTNode implements IASTPreprocessorErrorStatemen
 
 	public char[] getMessage() {
 		return error_.getMessage();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return error_.isPartOfTranslationUnitFile();
 	}
 
 

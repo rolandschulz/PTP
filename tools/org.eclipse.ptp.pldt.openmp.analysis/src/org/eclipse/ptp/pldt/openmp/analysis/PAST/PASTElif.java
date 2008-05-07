@@ -11,22 +11,22 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorElifStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTElif;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * @author pazel
  */
 public class PASTElif extends PASTNode  implements IASTPreprocessorElifStatement
 {
-	protected ASTElif elif_ = null;
+	protected IASTPreprocessorElifStatement elif_ = null;
 	
     /**
      * PASTElif - Elif preprocessor statement (constructor)
      * @param elif: ASTElif
      */
-	public PASTElif(ASTElif elif)
+	public PASTElif(IASTPreprocessorElifStatement elif)
 	{
-		super(elif);
+		super((ASTNode)elif);
 		elif_ = elif;
 	}
     
@@ -44,6 +44,10 @@ public class PASTElif extends PASTNode  implements IASTPreprocessorElifStatement
 
 	public char[] getCondition() {
 		return elif_.getCondition();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return elif_.isPartOfTranslationUnitFile();
 	}
 
 }

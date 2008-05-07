@@ -10,8 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfndefStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIfndef;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -20,15 +21,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIfndef;
  */
 public class PASTIfndef extends PASTNode implements IASTPreprocessorIfndefStatement
 {
-	protected ASTIfndef ifndef_ = null;
+	protected IASTPreprocessorIfndefStatement ifndef_ = null;
 	
     /**
      * PASTIfndef - constructor
      * @param ifndef
      */
-	public PASTIfndef(ASTIfndef ifndef)
+	public PASTIfndef(IASTPreprocessorIfndefStatement ifndef)
 	{
-		super(ifndef);
+		super((ASTNode)ifndef);
 		ifndef_ = ifndef;
 	}
     
@@ -44,6 +45,14 @@ public class PASTIfndef extends PASTNode implements IASTPreprocessorIfndefStatem
 
 	public char[] getCondition() {
 		return ifndef_.getCondition();
+	}
+
+	public IASTName getMacroReference() {
+		return ifndef_.getMacroReference();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return ifndef_.isPartOfTranslationUnitFile();
 	}
 
 }

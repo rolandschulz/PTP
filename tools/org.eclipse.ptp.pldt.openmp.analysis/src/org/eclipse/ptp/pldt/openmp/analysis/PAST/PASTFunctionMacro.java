@@ -10,10 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTFunctionStyleMacroParameter;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorFunctionStyleMacroDefinition;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTFunctionMacro;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -22,15 +23,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTFunctionMacr
  */
 public class PASTFunctionMacro extends PASTNode implements IASTPreprocessorFunctionStyleMacroDefinition
 {
-	protected ASTFunctionMacro macro_ = null;
+	protected IASTPreprocessorFunctionStyleMacroDefinition macro_ = null;
 	
     /**
      * PASTFunctionMacro - "define" function macro (Constructor)
      * @param macro
      */
-	public PASTFunctionMacro(ASTFunctionMacro macro)
+	public PASTFunctionMacro(IASTPreprocessorFunctionStyleMacroDefinition macro)
 	{
-		super(macro);
+		super((ASTNode)macro);
 		macro_ = macro;
 	}
     
@@ -68,6 +69,14 @@ public class PASTFunctionMacro extends PASTNode implements IASTPreprocessorFunct
 
 	public int getRoleForName(IASTName n) {
 		return macro_.getRoleForName(n);
+	}
+
+	public IASTFileLocation getExpansionLocation() {
+		return macro_.getExpansionLocation();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return macro_.isPartOfTranslationUnitFile();
 	}
 	
 }

@@ -11,7 +11,7 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfStatement;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIf;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
@@ -20,15 +20,15 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap.ASTIf;
  */
 public class PASTIf extends PASTNode implements IASTPreprocessorIfStatement
 {
-	protected ASTIf if_ = null;
+	protected IASTPreprocessorIfStatement if_ = null;
 	
     /**
      * PASTIf - constructor
      * @param ifx
      */
-	public PASTIf(ASTIf ifx)
+	public PASTIf(IASTPreprocessorIfStatement ifx)
 	{
-		super(ifx);
+		super((ASTNode)ifx);
 		if_ = ifx;
 	}
     
@@ -44,6 +44,10 @@ public class PASTIf extends PASTNode implements IASTPreprocessorIfStatement
 	//cdt40
 	public char[] getCondition() {
 		return if_.getCondition();
+	}
+
+	public boolean isPartOfTranslationUnitFile() {
+		return if_.isPartOfTranslationUnitFile();
 	}
 
 }
