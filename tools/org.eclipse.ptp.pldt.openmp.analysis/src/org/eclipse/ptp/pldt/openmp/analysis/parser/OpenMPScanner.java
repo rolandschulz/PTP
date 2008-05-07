@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import org.eclipse.cdt.core.parser.IGCCToken;
 import org.eclipse.cdt.core.parser.IToken;
 import org.eclipse.cdt.core.parser.util.CharArrayIntMap;
 import org.eclipse.cdt.core.parser.util.CharArrayUtils;
-import org.eclipse.cdt.internal.core.parser.scanner2.ScannerCallbackManager;
+
 
 /**
  * Class to scan #pragma string for OpenMP syntax (adapted from cdt's BaseScanner)
@@ -40,7 +40,7 @@ public class OpenMPScanner
     
     protected static char[] EMPTY_CHAR_ARRAY = new char[0];
     
-    protected ScannerCallbackManager callbackManager_ = null;
+    //protected ScannerCallbackManager callbackManager_ = null;  // unused; removed for CDT5.0
     
     //**
     //  OpenMPScanner - Object to scan OpenMP pragma line
