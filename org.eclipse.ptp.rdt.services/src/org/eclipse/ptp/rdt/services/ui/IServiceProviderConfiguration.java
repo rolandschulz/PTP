@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.services.ui;
 
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.swt.widgets.Shell;
 
 public interface IServiceProviderConfiguration {
 	/**
@@ -18,6 +19,7 @@ public interface IServiceProviderConfiguration {
 	 * service provider to be configured (may include setting up and associating any required connections)
 	 * 
 	 * @param provider
+	 * @param parentShell parent SWT shell of the UI that is to be launched
 	 */
-	public void configureServiceProvider(IServiceProvider provider);
+	public void configureServiceProvider(IServiceProvider provider, Shell parentShell);
 }
