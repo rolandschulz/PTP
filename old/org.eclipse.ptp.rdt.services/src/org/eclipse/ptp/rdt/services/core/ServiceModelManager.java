@@ -134,16 +134,20 @@ public class ServiceModelManager implements IServiceModelManager {
 	 */
 	public IServiceProviderConfiguration getServiceProviderConfigurationUI(IServiceProviderDescriptor desc) {
 		IServiceProviderConfiguration config = null;
-		IExtension extension = Platform.getExtensionRegistry().getExtension(desc.getId());
-		if (extension != null) {
-			for (IConfigurationElement element : extension.getConfigurationElements()) {
-				if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
-					try {
-						config = (IServiceProviderConfiguration)element.createExecutableExtension(ATTR_UI_CLASS);
-					} catch (Exception e) {
-						return null;
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	this.PROVIDER_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension
+						.getConfigurationElements()) {
+					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+						if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
+							try {
+								config = (IServiceProviderConfiguration) element.createExecutableExtension(ATTR_UI_CLASS);
+							} catch (Exception e) {
+								return null;
+							}
+						}
 					}
-			
 				}
 			}
 		}
