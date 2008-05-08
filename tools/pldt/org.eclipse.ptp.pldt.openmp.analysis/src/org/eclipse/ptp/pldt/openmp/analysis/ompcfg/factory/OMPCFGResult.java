@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,26 +29,34 @@ import org.eclipse.ptp.pldt.openmp.analysis.ompcfg.OMPPragmaNode;
  */
 public class OMPCFGResult
 {
-    // list of sequential chains in 1-level pass: the control flow between
-    // chains is broken by continue, break, return, or goto
+    /** List of sequential chains in 1-level pass: the control flow between
+    * chains is broken by continue, break, return, or goto
+    */
     protected LinkedList chains_            = new LinkedList();  // of Chain
-    // list of chains with no sequential flow to entry point - these get 
-    // aggregated.   Could be dead code, but could be branced into.
+    /** List of chains with no sequential flow to entry point - these get 
+    * aggregated.   Could be dead code, but could be branched into.
+    */
     protected LinkedList unconnectedChains_ = new LinkedList();  // of Chain
-    // list of blocks ending in continue, break, return, or goto whose further
-    // continuation needs to be resolved
+    /** List of blocks ending in continue, break, return, or goto whose further
+    * continuation needs to be resolved
+    */
     protected LinkedList unresolvedControlFlow_ = new LinkedList();  // of Chain
-    // list of labeled blocks (and related chain)
+    /** list of labeled blocks (and related chain) */
     protected Hashtable labelMap_              = new Hashtable();  // IASTName->LabeledBlock
-    // list of pragma nodes encountered
+    /** list of pragma nodes encountered */
     protected LinkedList pragmaNodeList_       = new LinkedList();
     
-    // block termination reasons
+    /** block termination reason - unknown */
     public static final int TermUnknown = -1;
+    /** block termination reason - no termination */
     public static final int TermForward = 0;    // no termination
+    /** block termination reason - continue */
     public static final int TermContinue = 1;   // continue
+    /** block termination reason - break */
     public static final int TermBreak    = 2;   // break
+    /** block termination reason - return */
     public static final int TermReturn   = 3;   // return
+    /** block termination reason - goto */
     public static final int TermGoto     = 4;   // goto
     
     /**
@@ -185,14 +193,21 @@ public class OMPCFGResult
     public LinkedList getPragmaNodeList() { return pragmaNodeList_; }
     
     /**
-     * getFirst/LastChain - get the very first/last chain - a common want in the code (other are dead code)
+     * Get the very first chain - a common want in the code (other are dead code)
      * @return Chain
      */
     public Chain      getFirstChain() { return (chains_.size()>0 ? (Chain)(chains_.getFirst()) : null); }
+    /**
+     * Get the very last chain - a common want in the code (other are dead code)
+     * @return Chain
+     */
     public Chain      getLastChain()  { return (chains_.size()>0 ? (Chain)(chains_.getLast())  : null);  }
     
     
-    // Chain - qualifies a code chain
+    /**
+     *  Chain - qualifies a code chain
+     *
+     */
     static public class Chain
     {
         protected OMPCFGNode    headNode_ = null;
@@ -206,13 +221,16 @@ public class OMPCFGResult
             terminationReason_ = terminationReason; terminationStmt_ = termStatement;
         }
         
+        /** Get head node in the Chain */
         public OMPCFGNode getHeadNode() { return headNode_; }
+        
+        /** Get tail node in the Chain */
         public OMPCFGNode getTailNode() { return tailNode_; }
         public int     getTerminationReason() { return terminationReason_; }
         public IASTStatement getTerminationStmt() { return terminationStmt_; }
     }
     
-    // LabeledBlock - qualifies a block with a label
+    /** LabeledBlock - qualifies a block with a label */
     static public class LabeledBlock
     {
         protected OMPCFGNode labeledBlock_ = null;
