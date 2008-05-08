@@ -65,9 +65,18 @@ public class ServiceModelManager implements IServiceModelManager {
 	 */
 	public void addConfiguration(IProject project, IServiceConfiguration conf) {
 		Set<IServiceConfiguration> confs = projectConfigurations.get(project);
-		if (confs != null) {
-			confs.add(conf);
+		if (confs == null) {
+			confs = new HashSet<IServiceConfiguration>();
 		}
+		
+		confs.add(conf);
+		projectConfigurations.put(project, confs);
+		configurations.put(conf.getName(), conf);
+		
+		if(activeConfigurations.get(project) == null) {
+			activeConfigurations.put(project, conf);
+		}
+		
 	}
 
 	/* (non-Javadoc)
