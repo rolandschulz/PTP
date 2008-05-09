@@ -370,7 +370,13 @@ public class PerformanceLaunchSteps implements IPerformanceLaunchConfigurationCo
 		IToolChain chain = newBuildConfig.getToolChain();
 		ITool[] tools = chain.getTools();
 		
-		String allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
+		
+		//TODO: Make sure this never has side-effects.
+		String allargs="";
+		if(!tool.getGlobalCompiler().equals(tool.getCcCompiler()))
+		{
+			allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
+		}
 		for(int i =0;i<tools.length;i++){
 			String toolid=tools[i].getId();
 			if(toolid.indexOf(".c.")>=0)
