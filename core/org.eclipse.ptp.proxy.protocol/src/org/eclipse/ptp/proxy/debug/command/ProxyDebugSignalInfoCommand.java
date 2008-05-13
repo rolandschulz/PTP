@@ -1,6 +1,8 @@
 package org.eclipse.ptp.proxy.debug.command;
 
-
+/**
+ * @deprecated
+ */
 public class ProxyDebugSignalInfoCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
 	
 	public ProxyDebugSignalInfoCommand(String bits, String arg) {

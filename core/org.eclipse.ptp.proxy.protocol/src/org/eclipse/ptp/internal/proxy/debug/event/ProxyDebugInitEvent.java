@@ -22,6 +22,10 @@ package org.eclipse.ptp.internal.proxy.debug.event;
 import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInitEvent;
 
+/**
+ * @deprecated
+ *
+ */
 public class ProxyDebugInitEvent extends AbstractProxyDebugEvent implements IProxyDebugInitEvent {
 	private int		num_servers;
 	

@@ -32,6 +32,9 @@ public interface IProxyDebugEvent extends IProxyExtendedEvent {
 	public static final int EVENT_DBG_TYPE = DBG_EVENT_OFFSET + 7;
 	public static final int EVENT_DBG_VARS = DBG_EVENT_OFFSET + 8;
 	public static final int EVENT_DBG_ARGS = DBG_EVENT_OFFSET + 9;
+	/**
+	 * @deprecated
+	 */
 	public static final int EVENT_DBG_INIT = DBG_EVENT_OFFSET + 10;
 	public static final int EVENT_DBG_OK = DBG_EVENT_OFFSET + 11;
 	public static final int EVENT_DBG_ERROR = DBG_EVENT_OFFSET + 12;
@@ -46,7 +49,9 @@ public interface IProxyDebugEvent extends IProxyExtendedEvent {
 	public static final int EVENT_DBG_DATA_READ_MEMORY = DBG_EVENT_OFFSET + 17;
 	public static final int EVENT_DBG_DATA_WRITE_MEMORY = DBG_EVENT_OFFSET + 18;
 	public static final int EVENT_DBG_SIGNALS = DBG_EVENT_OFFSET + 19;
-
+	/**
+	 * @deprecated
+	 */
 	public static final int EVENT_DBG_DATA_EVA_EX = DBG_EVENT_OFFSET + 20;
 	public static final int EVENT_DBG_PARTIAL_AIF = DBG_EVENT_OFFSET + 21;
 
