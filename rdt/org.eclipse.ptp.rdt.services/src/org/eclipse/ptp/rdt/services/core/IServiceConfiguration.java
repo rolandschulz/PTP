@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.rdt.services.core;
+
+import java.util.Set;
 
 /**
  * An IServiceProviderConfiguration represents a particular set of service providers
@@ -41,4 +43,10 @@ public interface IServiceConfiguration {
 	 * @param provider provider for this service
 	 */
 	public void setServiceProvider(IService service, IServiceProvider provider);
+	
+	/**
+	 * Returns all of the services that are part of this configuration. 
+	 * @return all of the services that are part of this configuration.
+	 */
+	public Set<IService> getServices();
 }

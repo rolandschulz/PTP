@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,6 +72,17 @@ public class ServiceModelManager implements IServiceModelManager {
 		confs.add(conf);
 		projectConfigurations.put(project, confs);
 		configurations.put(conf.getName(), conf);
+		
+		Set<IService> services = projectServices.get(project);
+		if (services == null) {
+			services = new HashSet<IService>();
+			projectServices.put(project, services);
+		}
+		for (IServiceConfiguration config : confs) {
+			for (IService service : config.getServices()) {
+				services.add(service);
+			}
+		}
 		
 		if(activeConfigurations.get(project) == null) {
 			activeConfigurations.put(project, conf);
@@ -263,6 +274,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 
 	public IService getService(String id) {
+		loadServices();
 		return services.get(id);
 	}
 }

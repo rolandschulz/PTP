@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.services.core;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author crecoskie
@@ -49,4 +51,7 @@ public class ServiceConfiguration implements IServiceConfiguration {
 
 	}
 
+	public Set<IService> getServices() {
+		return Collections.unmodifiableSet(fServiceToProviderMap.keySet());
+	}
 }
