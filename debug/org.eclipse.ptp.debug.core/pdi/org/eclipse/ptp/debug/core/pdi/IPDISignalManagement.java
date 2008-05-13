@@ -39,6 +39,7 @@ public interface IPDISignalManagement {
 	 * @param tasks target process
 	 * @param arg argument 
 	 * @throws PDIException on failure
+	 * @deprecated
 	 */
 	void retrieveSignalInfo(BitList tasks, String arg) throws PDIException;	
 }

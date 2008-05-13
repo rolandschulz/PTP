@@ -34,8 +34,14 @@ public interface IProxyDebugCommand extends IProxyCommand {
 	public static final int DATAREADMEMORY = 24;
 	public static final int DATAWRITEMEMORY = 25;
 	public static final int LISTSIGNALS = 26;
+	/**
+	 * @deprecated
+	 */
 	public static final int SIGNALINFO = 27;
 	public static final int CLIHANDLE = 28;
+	/**
+	 * @deprecated
+	 */
 	public static final int DATAEVALUATEEXPRESSION = 29;
 	public static final int GETPARTIALAIF = 30;
 	public static final int VARIABLEDELETE = 31;

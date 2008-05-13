@@ -22,6 +22,9 @@ package org.eclipse.ptp.internal.proxy.debug.event;
 import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataExpValueEvent;
 
+/**
+ * @deprecated
+ */
 public class ProxyDebugDataExpValueEvent extends AbstractProxyDebugEvent implements IProxyDebugDataExpValueEvent {
 	private String value;
 	
