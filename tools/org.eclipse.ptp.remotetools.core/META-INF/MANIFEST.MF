@@ -13,5 +13,5 @@ Eclipse-AutoStart: true
 Export-Package: org.eclipse.ptp.remotetools,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.exception
-Bundle-ClassPath: jsch-0.1.28.jar,
+Bundle-ClassPath: 
  .
