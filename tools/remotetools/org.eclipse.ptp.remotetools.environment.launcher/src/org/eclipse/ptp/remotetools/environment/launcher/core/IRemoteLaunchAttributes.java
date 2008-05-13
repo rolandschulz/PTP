@@ -33,8 +33,8 @@ public interface IRemoteLaunchAttributes {
 	
 	public static final boolean DEFAULT_AUTOMATIC_WORKING_DIRECTORY = true;
 	public static final String DEFAULT_LOCAL_DIRECTORY = ""; //$NON-NLS-1$
-	public static final boolean DEFAULT_SYNC_BEFORE = false;
-	public static final boolean DEFAULT_SYNC_AFTER = false;
+	public static final boolean DEFAULT_SYNC_BEFORE = true;
+	public static final boolean DEFAULT_SYNC_AFTER = true;
 	public static final boolean DEFAULT_SYNC_CLEANUP = true;
 	public static final boolean DEFAULT_USE_FORWARDED_X11 = false;
 	public static final String DEFAULT_AFTER_COMMAND = null;
