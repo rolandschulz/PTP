@@ -353,7 +353,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     {
         FortranCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(new PreferenceChangeListener(sourceViewer));
 
-        IRule[] rules = new IRule[isFixedForm ? 8 : 5];
+        IRule[] rules = new IRule[isFixedForm ? 5+(128-33+1) : 5];
         int i = 0;
 
         rules[i++] = new MultiLineRule("\"", "\"", colorStrings);
@@ -363,13 +363,12 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         
         if (isFixedForm)
         {
-            EndOfLineRule c1 = new EndOfLineRule("c", colorComments);
-            c1.setColumnConstraint(0);
-            rules[i++] = c1;
-
-            EndOfLineRule c2 = new EndOfLineRule("C", colorComments);
-            c2.setColumnConstraint(0);
-            rules[i++] = c2;
+            for (char ch = 33; ch < 128; ch++)
+            {
+                EndOfLineRule c1 = new EndOfLineRule(new String(new char[] { ch }), colorComments);
+                c1.setColumnConstraint(0);
+                rules[i++] = c1;
+            }
 
             IRule c3 = new FixedFormColumn72CommentRule();
             rules[i++] = c3;
