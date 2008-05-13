@@ -373,6 +373,12 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			for (int i = 0; i < environmentVariables.length; i++) {
 				script.addEnvironment(environmentVariables[i]);
 			}
+						
+			/*
+			 * Change the current directory from home to the actual working directory.
+			 */
+			command = "cd " + configuration.getRemoteDirectoryPath() + "\n" + command + "\n";
+
 			script.setScript(command.split("\n"));
 			
 			IRemoteScriptExecution execution = ret.executeScript(script);
@@ -414,6 +420,12 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			for (int i = 0; i < environmentVariables.length; i++) {
 				script.addEnvironment(environmentVariables[i]);
 			}
+			
+			/*
+			 * Change the current directory from home to the actual working directory.
+			 */
+			command = "cd " + configuration.getRemoteDirectoryPath() + "\n" + command + "\n";
+			
 			script.setScript(command.split("\n"));
 			
 			IRemoteScriptExecution execution = ret.executeScript(script);
