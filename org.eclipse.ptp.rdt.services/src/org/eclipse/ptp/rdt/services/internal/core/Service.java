@@ -85,4 +85,17 @@ public class Service implements IService {
 	public IServiceProviderDescriptor getProviderDescriptor(String id) {
 		return idToServiceProviderDescriptorMap.get(id);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof IService) {
+			return ((IService) o).getId().equals(serviceId);
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return serviceId.hashCode();
+	}
 }
