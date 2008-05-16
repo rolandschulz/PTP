@@ -10,14 +10,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.services.core;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -26,6 +36,8 @@ import org.eclipse.ptp.rdt.services.Activator;
 import org.eclipse.ptp.rdt.services.internal.core.Service;
 import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
 import org.eclipse.ptp.rdt.services.ui.Messages;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
 
 public class ServiceModelManager implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "services"; //$NON-NLS-1$
@@ -40,11 +52,16 @@ public class ServiceModelManager implements IServiceModelManager {
 	private final static String ATTR_UI_CLASS = "configurationUIClass"; //$NON-NLS-1$
 	
 	private final static ServiceModelManager fInstance = new ServiceModelManager();
+	private static final String SERVICE_MODEL_ELEMENT_NAME = "service-model"; //$NON-NLS-1$
+	private static final String PROJECT_ELEMENT_NAME = "project"; //$NON-NLS-1$
+	private static final String SERVICE_CONFIGURATION_ELEMENT_NAME = "service-configuration"; //$NON-NLS-1$
+	private static final String PROVIDER_CONFIGURATION_ELEMENT_NAME = "provider-configuration"; //$NON-NLS-1$
+	private final static String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
 	
-	private Map<IProject, Set<IServiceConfiguration>> projectConfigurations = new HashMap<IProject, Set<IServiceConfiguration>>();
-	private Map<IProject, IServiceConfiguration> activeConfigurations = new HashMap<IProject, IServiceConfiguration>();
-	private Map<String, IServiceConfiguration> configurations = new HashMap<String, IServiceConfiguration>();
-	private Map<IProject, Set<IService>> projectServices = new HashMap<IProject, Set<IService>>();
+	private Map<IProject, Set<IServiceConfiguration>> projectConfigurations;
+	private Map<IProject, IServiceConfiguration> activeConfigurations;
+	private Map<String, IServiceConfiguration> configurations;
+	private Map<IProject, Set<IService>> projectServices;
 
 	private Map<String, IService> services = null;
 	private Map<String, IServiceProviderDescriptor> serviceProviders = null;
@@ -57,9 +74,16 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	private ServiceModelManager() {
-		
+		initialize();
 	}
 	
+	private void initialize() {
+		 projectConfigurations = new HashMap<IProject, Set<IServiceConfiguration>>();
+		 activeConfigurations = new HashMap<IProject, IServiceConfiguration>();
+		 configurations = new HashMap<String, IServiceConfiguration>();
+		 projectServices = new HashMap<IProject, Set<IService>>();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
 	 */
@@ -276,5 +300,102 @@ public class ServiceModelManager implements IServiceModelManager {
 	public IService getService(String id) {
 		loadServices();
 		return services.get(id);
+	}
+	
+	/**
+	 * Saves the service model configuration to the given <code>file</code>.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * @param file
+	 * @throws IOException 
+	 */
+	public void saveModelConfiguration(File file) throws IOException {
+		saveModelConfiguration(projectConfigurations, file);
+	}
+	
+	static void saveModelConfiguration(Map<IProject, Set<IServiceConfiguration>> model, File file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		
+		XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
+		try {
+			for (Entry<IProject, Set<IServiceConfiguration>> entry  : model.entrySet()) {
+				IProject project = entry.getKey();
+				String projectName = project.getName();
+				
+				IMemento projectMemento = rootMemento.createChild(PROJECT_ELEMENT_NAME);
+				projectMemento.putString(ATTR_NAME, projectName);
+				
+				Set<IServiceConfiguration> configurations = entry.getValue();
+				for (IServiceConfiguration config : configurations) {
+					String configurationName = config.getName();
+					
+					IMemento configMemento = projectMemento.createChild(SERVICE_CONFIGURATION_ELEMENT_NAME);
+					configMemento.putString(ATTR_NAME, configurationName);
+					
+					Set<IService> services = config.getServices();
+					for (IService service : services) {
+						String serviceId = service.getId();
+						IServiceProvider provider = config.getServiceProvider(service);
+						String providerId = provider.getId();
+						
+						IMemento serviceMemento = configMemento.createChild(SERVICE_ELEMENT_NAME);
+						serviceMemento.putString(ATTR_ID, serviceId);
+						serviceMemento.putString(ATTR_PROVIDER_ID, providerId);
+						
+						IMemento providerMemento = serviceMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+						provider.saveState(providerMemento);
+					}
+				}
+			}
+			rootMemento.save(writer);
+		} finally {
+			writer.close();
+		}
+	}
+	
+	/**
+	 * Replaces the current service model configuration with what is
+	 * specified in the given <code>file</code>.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * @param file
+	 * @throws FileNotFoundException 
+	 */
+	public void loadModelConfiguration(File file) throws IOException, CoreException {
+		// Clear out the existing model
+		initialize();
+		
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		
+		try {
+			XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
+			
+			for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
+				String projectName = projectMemento.getString(ATTR_NAME);
+				IProject project = root.getProject(projectName);
+				
+				for (IMemento configMemento : projectMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
+					String configName = configMemento.getString(ATTR_NAME);
+					ServiceConfiguration config = new ServiceConfiguration(configName);
+					for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
+						String serviceId = serviceMemento.getString(ATTR_ID);
+						String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
+						
+						IService service = getService(serviceId);
+						IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+						IServiceProvider provider = getServiceProvider(descriptor);
+						IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+						provider.restoreState(providerMemento);
+						config.setServiceProvider(service, provider);
+					}
+					addConfiguration(project, config);
+				}
+			}
+		} finally {
+			reader.close();
+		}
 	}
 }
