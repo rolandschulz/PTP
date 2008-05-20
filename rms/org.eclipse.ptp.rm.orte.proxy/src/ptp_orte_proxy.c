@@ -444,9 +444,13 @@ sendJobSubErrorEvent(int trans_id, char *jobSubId, char *msg)
 
 
 static void
-sendJobTerminateErrorEvent(int trans_id, char *msg)
+sendJobTerminateErrorEvent(int trans_id, int id, char *msg)
 {
-	proxy_svr_queue_msg(orte_proxy, proxy_terminatejob_error_event(trans_id, RTEV_ERROR_JOB, msg));
+	char *	job_id;
+	
+	asprintf(&job_id, "%d", id);
+	
+	proxy_svr_queue_msg(orte_proxy, proxy_terminatejob_error_event(trans_id, job_id, RTEV_ERROR_JOB, msg));
 }
 
 static void
@@ -676,7 +680,6 @@ ORTECheckErrorCode(int trans_id, int type, int rc)
 			fprintf(stderr, "ARgh!  An error!\n"); fflush(stderr);
 			fprintf(stderr, "ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
 		}
-		sendErrorEvent(trans_id, type, (char *)ORTE_ERROR_NAME(rc));
 		return 1;
 	}
 	
@@ -1183,7 +1186,10 @@ do_orte_init(int trans_id, char *universe_name)
 
 	rc = orte_init(true);
 	
-	if(ORTECheckErrorCode(trans_id, RTEV_ERROR_ORTE_INIT, rc)) return 1;
+	if(ORTECheckErrorCode(trans_id, RTEV_ERROR_ORTE_INIT, rc)) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, (char *)ORTE_ERROR_NAME(rc));
+		return 1;
+	}
 	
 	/* this code was given to me to put in here to force the system to populate the node segment
 	 * in ORTE.  It basically crashes us if we use our own universe name.  I'm leaving it here
@@ -1354,7 +1360,10 @@ subscribe_proc(ptp_job * job, int procid)
 	subs = &sub;
 	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
 	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
+	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, (char *)ORTE_ERROR_NAME(rc));
+		return 1;
+	}
 	
 	return 0;
 }
@@ -1554,7 +1563,10 @@ subscribe_bproc(void)
 	subs = &sub;
 	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
 	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
+	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, (char *)ORTE_ERROR_NAME(rc));
+		return 1;
+	}
 	
 	return 0;
 }
@@ -1618,7 +1630,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	
 	if (proxy_state != STATE_INIT) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
-		return 0;
+		return PROXY_RES_OK;
 	}
 	
 	/*
@@ -1628,7 +1640,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 		if (proxy_test_attribute(PROTOCOL_VERSION_ATTR, args[i])) {
 			if (strcmp(proxy_get_attribute_value_str(args[i]), WIRE_PROTOCOL_VERSION) != 0) {
 				sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
-				return 0;
+				return PROXY_RES_OK;
 			}
 		} else if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
 			gBaseID = proxy_get_attribute_value_int(args[i]);
@@ -1644,7 +1656,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	 */
 	if (gBaseID < 0) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "no base ID supplied");
-		return 0;
+		return PROXY_RES_OK;
 	}
 	
 	/*
@@ -1660,14 +1672,14 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	if (pipe(pfd) < 0)
 	{
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
-		return 0;
+		return PROXY_RES_OK;
 	}
 	
 	switch(orted_pid = fork()) {
 	case -1:
 		{
 			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
-			return 1;
+			return PROXY_RES_OK;
 		}
 		break;
 		
@@ -1764,14 +1776,14 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			 */
 			(void)kill(orted_pid, SIGKILL);
 			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "select() returned error");
-			return 0;
+			return PROXY_RES_OK;
 		case 0:
 			/*
 			 * Timeout. Kill off orted (if it's running) and shut down.
 			 */
 			(void)kill(orted_pid, SIGKILL);
 			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
-			return 0;
+			return PROXY_RES_OK;
 		default:
 			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
 				buf[n] = '\0';
@@ -1788,7 +1800,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 		
 		if (do_orte_init(trans_id, universe_name) != 0) {
 			free(universe_name);
-			return 0;
+			return PROXY_RES_OK;
 		}
 		
 		free(universe_name);
@@ -1810,7 +1822,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 		break;
 	}
 	
-	return 0;
+	return PROXY_RES_OK;
 }
 
 /**
@@ -2063,7 +2075,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 			sendJobSubErrorEvent(trans_id, jobsubid, (char *)ORTE_ERROR_NAME(rc));
 			OBJ_RELEASE(app_context);
 			ORTE_ERROR_LOG(rc);
-			return rc;
+			return PROXY_RES_OK;
 		}
 
 		debug_context = OBJ_NEW(orte_app_context_t);
@@ -2095,7 +2107,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 			OBJ_RELEASE(app_context);
 			OBJ_RELEASE(debug_context);
 			ORTE_ERROR_LOG(rc);
-			return rc;
+			return PROXY_RES_OK;
 		}
 
 		if (debug_level > 0) {
@@ -2186,7 +2198,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	ptp_job *	j;
 	
 	if (proxy_state != STATE_RUNNING) {
-		sendJobTerminateErrorEvent(trans_id, "must call INIT first");
+		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "Must call INIT first");
 		return PROXY_RES_OK;
 	}
 	
@@ -2197,13 +2209,13 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (jobid < 0) {
-		sendJobTerminateErrorEvent(trans_id, "no such job");
+		sendJobTerminateErrorEvent(trans_id, jobid, "Invalid job ID");
 		return PROXY_RES_OK;
 	}
 	
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->terminating) {
-			sendJobTerminateErrorEvent(trans_id, "Job termination already requested");
+			sendJobTerminateErrorEvent(trans_id, jobid, "Job termination already requested");
 			return PROXY_RES_OK;
 		}
 		
@@ -2215,8 +2227,8 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
 		
 		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_JOB, rc)) {
-			sendJobTerminateErrorEvent(trans_id, "terminate job command failed");
-			return 1;
+			sendJobTerminateErrorEvent(trans_id, jobid, (char *)ORTE_ERROR_NAME(rc));
+			return PROXY_RES_OK;
 		}
 		
 		sendOKEvent(trans_id);
