@@ -746,16 +746,19 @@ public abstract class AbstractRuntimeResourceManager extends
 			subLock.unlock();
 		}
 		
-		fireError(e.getErrorMessage());	
+		fireError("Error while submitting job: " + e.getErrorMessage());	
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
-	public void handleEvent(
-			IRuntimeTerminateJobErrorEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeTerminateJobErrorEvent e) {
+		IPJob job = this.getJobControl(e.getJobID());
+		String name = e.getJobID();
+		if (job != null) {
+			name = job.getName();
+		}
+		fireError("Error while terminating job \"" + name + "\": " + e.getErrorMessage());
 	}
 
 	/**
