@@ -466,27 +466,23 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				removeCommand(command);
 			}
 		} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
-			if (event instanceof IProxyErrorEvent) {
-				if (event instanceof IProxyRuntimeSubmitJobErrorEvent) {
-					fireProxyRuntimeSubmitJobErrorEvent(eventFactory
-							.newProxyRuntimeSubmitJobErrorEvent(event
-									.getTransactionID(), event.getAttributes()));
-				} else {
-					fireProxyRuntimeErrorStateEvent(eventFactory
-							.newProxyRuntimeErrorStateEvent());
-				}
+			if (event instanceof IProxyRuntimeSubmitJobErrorEvent) {
+				fireProxyRuntimeSubmitJobErrorEvent(eventFactory
+						.newProxyRuntimeSubmitJobErrorEvent(event
+								.getTransactionID(), event.getAttributes()));
+			} else if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeErrorStateEvent(eventFactory
+						.newProxyRuntimeErrorStateEvent());
 			}
 			removeCommand(command);
 		} else if (command instanceof IProxyRuntimeTerminateJobCommand) {
-			if (event instanceof IProxyErrorEvent) {
-				if (event instanceof IProxyErrorEvent) {
-					fireProxyRuntimeTerminateJobErrorEvent(eventFactory
-							.newProxyRuntimeTerminateJobErrorEvent(event
-									.getTransactionID(), event.getAttributes()));
-				} else {
-					fireProxyRuntimeErrorStateEvent(eventFactory
-							.newProxyRuntimeErrorStateEvent());
-				}
+			if (event instanceof IProxyRuntimeTerminateJobErrorEvent) {
+				fireProxyRuntimeTerminateJobErrorEvent(eventFactory
+						.newProxyRuntimeTerminateJobErrorEvent(event
+								.getTransactionID(), event.getAttributes()));
+			} else if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeErrorStateEvent(eventFactory
+						.newProxyRuntimeErrorStateEvent());
 			}
 			removeCommand(command);
 		}
@@ -897,7 +893,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException(
-									"Could not find command for event in INIT");
+									"Could not find command for event [" 
+										+ event.toString() + "] in INIT");
 						}
 					} else {
 						state = ProxyState.ERROR;
@@ -948,7 +945,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException(
-									"Could not find command for event in MODEL_DEF");
+									"Could not find command for event [" 
+										+ event.toString() + "] in MODEL_DEF");
 						}
 					} else {
 						state = ProxyState.ERROR;
@@ -981,7 +979,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					} else {
 						state = ProxyState.ERROR;
 						throw new IllegalStateException(
-								"Could not find command for event in RUNNING");
+								"Could not find command for event [" 
+									+ event.toString() + "] in RUNNING");
 					}
 				}
 				break;
