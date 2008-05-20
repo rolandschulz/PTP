@@ -99,7 +99,7 @@ proxy_msg *	proxy_shutdown_event(int trans_id);
 proxy_msg *	proxy_message_event(int trans_id, char *level, int code, char *fmt, ...);
 proxy_msg *	proxy_error_event(int trans_id, int code, char *fmt, ...);
 proxy_msg *	proxy_submitjob_error_event(int trans_id, char *jobSubId, int code, char *msg);
-proxy_msg *	proxy_terminatejob_error_event(int trans_id, int code, char *msg);
+proxy_msg *	proxy_terminatejob_error_event(int trans_id, char *job_id, int code, char *msg);
 proxy_msg *	proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int disp, int def);
 proxy_msg *	proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, int disp, char *def);
 proxy_msg *	proxy_new_machine_event(int trans_id, char *rm_id, char *machine_id_range, char *name, char *state);
