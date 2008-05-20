@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -50,6 +53,7 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.EditResourceManagerAction;
@@ -271,8 +275,14 @@ public class ResourceManagerView extends ViewPart {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 		 */
-		public void handleEvent(IResourceManagerErrorEvent e) {
+		public void handleEvent(final IResourceManagerErrorEvent e) {
 			refreshViewer(e.getSource());
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					IStatus status = new Status(IStatus.ERROR, PTPUIPlugin.PLUGIN_ID, e.getMessage());
+					ErrorDialog.openError(PTPUIPlugin.getDisplay().getActiveShell(), "Resource Manager Error", "The \"" + e.getSource().getName() + "\" resource manager reported the following error", status);
+				}
+			});
 		}
 	}
 
