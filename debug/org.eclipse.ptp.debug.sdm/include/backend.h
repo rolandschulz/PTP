@@ -57,9 +57,9 @@ struct dbg_backend_funcs {
 	int	(*datareadmemory)(long, char*, char*, int, int, int, char*);
 	int	(*datawritememory)(long, char*, char*, int, char*);
 	int (*listsignals)(char*);
-	int (*signalinfo)(char*);
+	int (*signalinfo)(char*); /* deprecated */
 	int (*clihandle)(char*);
-	int (*dataevaluateexpression)(char*);
+	int (*dataevaluateexpression)(char*); /* deprecated */
 	int (*getpartialaif)(char*, char*, int, int);
 	int (*variabledelete)(char*);
 	int (*quit)(void);
