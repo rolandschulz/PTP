@@ -43,7 +43,6 @@ import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
-import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
@@ -616,7 +615,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
 			IntegerAttribute codeAttr = (IntegerAttribute) mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
 			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
-			StringAttribute jobIdAttr = (StringAttribute) mgr.getAttribute(ElementAttributes.getIdAttributeDefinition());
+			StringAttribute jobIdAttr = (StringAttribute) mgr.getAttribute(JobAttributes.getJobIdAttributeDefinition());
 			if (codeAttr == null || msgAttr == null || jobIdAttr == null) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "TerminateJobErrorEvent: missing attibutes"));				
 			} else {
