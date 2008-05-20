@@ -139,15 +139,16 @@ proxy_submitjob_error_event(int trans_id, char *jobSubId, int code, char *msg)
 
 /*
  * TERMINATEJOB ERROR EVENT. Used to indicate an error when attempting
- * to submit a job. The jobSubId argument is the job submission ID
- * that was specified to the submitJob command.
+ * to terminate a job. The jobId argument is the job ID
+ * that was specified to the terminateJob command.
  */
 proxy_msg *
-proxy_terminatejob_error_event(int trans_id, int code, char *msg)
+proxy_terminatejob_error_event(int trans_id, char *jobId, int code, char *msg)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_TERMINATEJOB_ERROR, trans_id);
 	
-	proxy_msg_add_int(m, 2); /* 2 attributes */
+	proxy_msg_add_int(m, 3); /* 3 attributes */
+	proxy_msg_add_keyval_string(m, JOB_ID_ATTR, jobId);
 	proxy_msg_add_keyval_int(m, ERROR_CODE_ATTR, code);
 	proxy_msg_add_keyval_string(m, ERROR_MSG_ATTR, msg);
 
