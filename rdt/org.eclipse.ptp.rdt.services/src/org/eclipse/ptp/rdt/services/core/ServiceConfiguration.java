@@ -54,4 +54,17 @@ public class ServiceConfiguration implements IServiceConfiguration {
 	public Set<IService> getServices() {
 		return Collections.unmodifiableSet(fServiceToProviderMap.keySet());
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof IServiceConfiguration) {
+			return fName.equals(((IServiceConfiguration) o).getName());
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return fName.hashCode();
+	}
 }
