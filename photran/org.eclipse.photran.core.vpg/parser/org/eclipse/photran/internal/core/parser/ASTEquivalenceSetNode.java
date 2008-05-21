@@ -10,76 +10,85 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEquivalenceSetNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEquivalenceSetNode extends ASTNode
 {
-    ASTEquivalenceSetNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTEquivalenceSetNode
+    ASTVariableNode variable; // in ASTEquivalenceSetNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTEquivalenceSetNode
+    IASTListNode<ASTEquivalenceObjectListNode> equivalentObjects; // in ASTEquivalenceSetNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTEquivalenceSetNode
+
+    public ASTVariableNode getVariable()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.variable;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setVariable(ASTVariableNode newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.variable = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTEquivalenceObjectListNode> getEquivalentObjects()
+    {
+        return this.equivalentObjects;
+    }
+
+    public void setEquivalentObjects(IASTListNode<ASTEquivalenceObjectListNode> newValue)
+    {
+        this.equivalentObjects = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEquivalenceSetNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTEquivalenceObjectListNode getEquivalentObjects()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_SET_404)
-            return (ASTEquivalenceObjectListNode)getChild(3);
-        else
-            return null;
+        return 5;
     }
 
-    public ASTVariableNode getInitialVariable()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_SET_404)
-            return (ASTVariableNode)((ASTEquivalenceObjectNode)getChild(1)).getVariable();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.variable;
+        case 2:  return this.hiddenTComma;
+        case 3:  return this.equivalentObjects;
+        case 4:  return this.hiddenTRparen;
+        default: return null;
+        }
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 0)
-            return false;
-        else if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 2)
-            return false;
-        else if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 4)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.EQUIVALENCE_SET_404 && index == 1)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.variable = (ASTVariableNode)value;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.equivalentObjects = (IASTListNode<ASTEquivalenceObjectListNode>)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

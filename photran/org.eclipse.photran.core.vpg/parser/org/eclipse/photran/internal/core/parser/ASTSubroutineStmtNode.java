@@ -10,178 +10,116 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutineStmtNode extends InteriorNodeWithErrorRecoverySymbols
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
 {
-    ASTSubroutineStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTSubroutineStmtNode
+    IASTListNode<ASTPrefixSpecNode> prefixSpecList; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSubroutine; // in ASTSubroutineStmtNode
+    ASTSubroutineNameNode subroutineName; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSubroutineStmtNode
+    IASTListNode<ASTSubroutineParNode> subroutinePars; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTSubroutineStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production, discardedSymbols);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTPrefixSpecNode> getPrefixSpecList()
     {
-        visitor.visitASTSubroutineStmtNode(this);
+        return this.prefixSpecList;
     }
+
+    public void setPrefixSpecList(IASTListNode<ASTPrefixSpecNode> newValue)
+    {
+        this.prefixSpecList = newValue;
+    }
+
 
     public ASTSubroutineNameNode getSubroutineName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_STMT_998)
-            return (ASTSubroutineNameNode)getChild(2);
-        else if (getProduction() == Production.SUBROUTINE_STMT_999)
-            return (ASTSubroutineNameNode)getChild(2);
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return (ASTSubroutineNameNode)getChild(2);
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18)
-            return (ASTSubroutineNameNode)getChild(2);
-        else
-            return null;
+        return this.subroutineName;
     }
 
-    public ASTSubroutineParsNode getSubroutinePars()
+    public void setSubroutineName(ASTSubroutineNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return (ASTSubroutineParsNode)getChild(4);
-        else
-            return null;
+        this.subroutineName = newValue;
     }
 
-    public boolean hasSubroutinePars()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return getChild(4) != null;
-        else
-            return false;
+    public IASTListNode<ASTSubroutineParNode> getSubroutinePars()
+    {
+        return this.subroutinePars;
     }
 
-    public Token getLabel()
+    public void setSubroutinePars(IASTListNode<ASTSubroutineParNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_STMT_998)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SUBROUTINE_STMT_999)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.subroutinePars = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.SUBROUTINE_STMT_998)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SUBROUTINE_STMT_999)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTSubroutineStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTPrefixSpecListNode getPrefixSpecList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_STMT_998)
-            return (ASTPrefixSpecListNode)((ASTSubroutinePrefixNode)getChild(1)).getPrefixSpecList();
-        else if (getProduction() == Production.SUBROUTINE_STMT_999)
-            return (ASTPrefixSpecListNode)((ASTSubroutinePrefixNode)getChild(1)).getPrefixSpecList();
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return (ASTPrefixSpecListNode)((ASTSubroutinePrefixNode)getChild(1)).getPrefixSpecList();
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18)
-            return (ASTPrefixSpecListNode)((ASTSubroutinePrefixNode)getChild(1)).getPrefixSpecList();
-        else
-            return null;
+        return 8;
     }
 
-    public boolean hasPrefixSpecList()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_STMT_998)
-            return ((ASTSubroutinePrefixNode)getChild(1)).hasPrefixSpecList();
-        else if (getProduction() == Production.SUBROUTINE_STMT_999)
-            return ((ASTSubroutinePrefixNode)getChild(1)).hasPrefixSpecList();
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000)
-            return ((ASTSubroutinePrefixNode)getChild(1)).hasPrefixSpecList();
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18)
-            return ((ASTSubroutinePrefixNode)getChild(1)).hasPrefixSpecList();
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.prefixSpecList;
+        case 2:  return this.hiddenTSubroutine;
+        case 3:  return this.subroutineName;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.subroutinePars;
+        case 6:  return this.hiddenTRparen;
+        case 7:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.SUBROUTINE_STMT_998 && index == 3)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_STMT_999 && index == 3)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_STMT_999 && index == 4)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_STMT_999 && index == 5)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000 && index == 3)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000 && index == 5)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000 && index == 6)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.SUBROUTINE_STMT_998 && index == 0)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_998 && index == 1)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_999 && index == 0)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_999 && index == 1)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000 && index == 0)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_1000 && index == 1)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18 && index == 0)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_STMT_ERROR_18 && index == 1)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value;
+        case 2:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.subroutineName = (ASTSubroutineNameNode)value;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

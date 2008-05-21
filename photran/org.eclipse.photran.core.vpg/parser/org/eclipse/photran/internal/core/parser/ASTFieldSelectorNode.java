@@ -10,100 +10,96 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFieldSelectorNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFieldSelectorNode extends ASTNode
 {
-    ASTFieldSelectorNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTFieldSelectorNode
+    IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTFieldSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTFieldSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hasDerivedTypeComponentRef; // in ASTFieldSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTFieldSelectorNode
+
+    public IASTListNode<ASTSectionSubscriptNode> getSectionSubscriptList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTFieldSelectorNode(this);
+        return this.sectionSubscriptList;
     }
 
-    public ASTSectionSubscriptListNode getSectionSubscriptList()
+    public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_437)
-            return (ASTSectionSubscriptListNode)getChild(1);
-        else
-            return null;
+        this.sectionSubscriptList = newValue;
     }
 
-    public boolean hasSectionSubscriptList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_437)
-            return getChild(1) != null;
-        else
-            return false;
-    }
 
     public boolean hasDerivedTypeComponentRef()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_437)
-            return getChild(3) != null;
-        else if (getProduction() == Production.FIELD_SELECTOR_438)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.hasDerivedTypeComponentRef != null;
     }
 
-    public Token getComponentName()
+    public void setHasDerivedTypeComponentRef(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FIELD_SELECTOR_437)
-            return (Token)((ASTNameNode)getChild(4)).getName();
-        else if (getProduction() == Production.FIELD_SELECTOR_438)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else
-            return null;
+        this.hasDerivedTypeComponentRef = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
     {
-        if (getProduction() == Production.FIELD_SELECTOR_437 && index == 0)
-            return false;
-        else if (getProduction() == Production.FIELD_SELECTOR_437 && index == 2)
-            return false;
-        else
-            return true;
+        return this.name;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.FIELD_SELECTOR_437 && index == 4)
-            return true;
-        else if (getProduction() == Production.FIELD_SELECTOR_438 && index == 1)
-            return true;
-        else
-            return false;
+        this.name = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTFieldSelectorNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.sectionSubscriptList;
+        case 2:  return this.hiddenTRparen;
+        case 3:  return this.hasDerivedTypeComponentRef;
+        case 4:  return this.name;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hasDerivedTypeComponentRef = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

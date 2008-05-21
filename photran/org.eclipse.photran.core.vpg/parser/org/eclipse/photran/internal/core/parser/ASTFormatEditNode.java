@@ -10,140 +10,104 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFormatEditNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFormatEditNode extends ASTNode
 {
-    ASTFormatEditNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token pConst; // in ASTFormatEditNode
+    org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTFormatEditNode
+    ASTEditElementNode editElement; // in ASTFormatEditNode
+    org.eclipse.photran.internal.core.lexer.Token hexConst; // in ASTFormatEditNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getPConst()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.pConst;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setPConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.pConst = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getIntConst()
     {
-        visitor.visitASTFormatEditNode(this);
+        return this.intConst;
     }
+
+    public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.intConst = newValue;
+    }
+
 
     public ASTEditElementNode getEditElement()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_EDIT_876)
-            return (ASTEditElementNode)getChild(0);
-        else if (getProduction() == Production.FORMAT_EDIT_877)
-            return (ASTEditElementNode)getChild(1);
-        else if (getProduction() == Production.FORMAT_EDIT_880)
-            return (ASTEditElementNode)getChild(1);
-        else if (getProduction() == Production.FORMAT_EDIT_881)
-            return (ASTEditElementNode)getChild(2);
-        else
-            return null;
+        return this.editElement;
     }
 
-    public boolean hasEditElement()
+    public void setEditElement(ASTEditElementNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_EDIT_876)
-            return getChild(0) != null;
-        else if (getProduction() == Production.FORMAT_EDIT_877)
-            return getChild(1) != null;
-        else if (getProduction() == Production.FORMAT_EDIT_880)
-            return getChild(1) != null;
-        else if (getProduction() == Production.FORMAT_EDIT_881)
-            return getChild(2) != null;
-        else
-            return false;
+        this.editElement = newValue;
     }
 
-    public Token getIntConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_EDIT_877)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.FORMAT_EDIT_881)
-            return (Token)getChild(1);
-        else
-            return null;
+    public org.eclipse.photran.internal.core.lexer.Token getHexConst()
+    {
+        return this.hexConst;
     }
 
-    public boolean hasIntConst()
+    public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_EDIT_877)
-            return getChild(0) != null;
-        else if (getProduction() == Production.FORMAT_EDIT_881)
-            return getChild(1) != null;
-        else
-            return false;
+        this.hexConst = newValue;
     }
 
-    public Token getHexConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORMAT_EDIT_878)
-            return (Token)getChild(0);
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTFormatEditNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public boolean hasHexConst()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_EDIT_878)
-            return getChild(0) != null;
-        else
-            return false;
+        return 4;
     }
 
-    public Token getPConst()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_EDIT_879)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.FORMAT_EDIT_880)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.FORMAT_EDIT_881)
-            return (Token)getChild(0);
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.pConst;
+        case 1:  return this.intConst;
+        case 2:  return this.editElement;
+        case 3:  return this.hexConst;
+        default: return null;
+        }
     }
 
-    public boolean hasPConst()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_EDIT_879)
-            return getChild(0) != null;
-        else if (getProduction() == Production.FORMAT_EDIT_880)
-            return getChild(0) != null;
-        else if (getProduction() == Production.FORMAT_EDIT_881)
-            return getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.editElement = (ASTEditElementNode)value;
+        case 3:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

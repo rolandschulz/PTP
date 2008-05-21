@@ -5,7 +5,7 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramNameNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTProgramUnitNode;
+import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.tests.AbstractSourceEditorTestCase;
 
 public class TestChangeText extends AbstractSourceEditorTestCase
@@ -13,8 +13,8 @@ public class TestChangeText extends AbstractSourceEditorTestCase
     public void testChangeProggie() throws Exception
     {
         ASTExecutableProgramNode ast = load("hello-1-initial.f90");
-        ASTProgramUnitNode programUnit1 = ast.getProgramUnit(0);
-        ASTMainProgramNode mainProgram = programUnit1.getMainProgram();
+        IProgramUnit programUnit1 = ast.getProgramUnitList().get(0);
+        ASTMainProgramNode mainProgram = (ASTMainProgramNode)programUnit1;
         ASTProgramStmtNode programStmt = mainProgram.getProgramStmt();
         ASTProgramNameNode programName = programStmt.getProgramName();
         Token proggie = programName.getProgramName();

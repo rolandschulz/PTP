@@ -10,128 +10,96 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTBlockDataStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTBlockDataStmtNode extends ASTNode
 {
-    ASTBlockDataStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token blockDataToken; // in ASTBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTData; // in ASTBlockDataStmtNode
+    ASTBlockDataNameNode blockDataName; // in ASTBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTBlockDataStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTBlockDataStmtNode(this);
+        return this.label;
     }
 
-    public Token getBlockDataToken()
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BLOCK_DATA_STMT_913)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_914)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915)
-            return (Token)getChild(1);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_916)
-            return (Token)getChild(1);
-        else
-            return null;
+        this.label = newValue;
     }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getBlockDataToken()
+    {
+        return this.blockDataToken;
+    }
+
+    public void setBlockDataToken(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.blockDataToken = newValue;
+    }
+
 
     public ASTBlockDataNameNode getBlockDataName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BLOCK_DATA_STMT_913)
-            return (ASTBlockDataNameNode)getChild(2);
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915)
-            return (ASTBlockDataNameNode)getChild(3);
-        else
-            return null;
+        return this.blockDataName;
     }
 
-    public Token getLabel()
+    public void setBlockDataName(ASTBlockDataNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BLOCK_DATA_STMT_913)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.BLOCK_DATA_STMT_914)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.BLOCK_DATA_STMT_916)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.blockDataName = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.BLOCK_DATA_STMT_913)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.BLOCK_DATA_STMT_914)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.BLOCK_DATA_STMT_916)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTBlockDataStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.BLOCK_DATA_STMT_913 && index == 3)
-            return false;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_914 && index == 2)
-            return false;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915 && index == 2)
-            return false;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915 && index == 4)
-            return false;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_916 && index == 2)
-            return false;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_916 && index == 3)
-            return false;
-        else
-            return true;
+        return 5;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.BLOCK_DATA_STMT_913 && index == 0)
-            return true;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_914 && index == 0)
-            return true;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_915 && index == 0)
-            return true;
-        else if (getProduction() == Production.BLOCK_DATA_STMT_916 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.blockDataToken;
+        case 2:  return this.hiddenTData;
+        case 3:  return this.blockDataName;
+        case 4:  return this.hiddenTEos;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.blockDataToken = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTData = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.blockDataName = (ASTBlockDataNameNode)value;
+        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

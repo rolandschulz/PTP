@@ -25,14 +25,15 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTBodyNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.parser.IBodyConstruct;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SourceEditor;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
 /**
@@ -93,54 +94,35 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
     // Change
     ///////////////////////////////////////////////////////////////////////////
 
-    /*
-     * Change creation is complicated by the fact that, due to the internal structure of the AST,
-     * we cannot call any accessor methods on AST nodes after the tree has been modified.  Therefore, we
-     * must determine what nodes to delete, design the new nodes to insert, and determine where to insert
-     * them *before* making any changes to the AST.  This is done by the constructModifications() method;
-     * the actual changes are placed into a list of Runnables, which is executed after constructModifications()
-     * completes.  Notice that there are no AST accessor methods executed by any of the Runnables; only
-     * pointers to specific nodes are referenced.
-     */
-    
     @Override
     protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
     {
         assert this.selectedScope != null;
 
-        for (Runnable command : constructModifications())
-            command.run();
-        		
-        this.addChangeFromModifiedAST(this.fileInEditor, progressMonitor);
-        vpg.releaseAllASTs();
-    }
-
-    private List<Runnable> constructModifications()
-    {
-    	List<Runnable> commands = new LinkedList<Runnable>();
-
-    	for (ScopingNode scope : selectedScope.getAllContainedScopes())
-    	{
+        for (ScopingNode scope : selectedScope.getAllContainedScopes())
+        {
             if (!scope.isImplicitNone()
                     && !(scope instanceof ASTExecutableProgramNode)
                     && !(scope instanceof ASTDerivedTypeDefNode))
             {
-            	ASTImplicitStmtNode implicitStmt = findExistingImplicitStatement(scope);
-                if (implicitStmt != null) commands.add(cut(implicitStmt));
-            	
-                ASTBodyNode newStmts = constructDeclarations(scope);
-                commands.add(insert(newStmts, scope));
+                ASTImplicitStmtNode implicitStmt = findExistingImplicitStatement(scope);
+                if (implicitStmt != null) implicitStmt.removeFromTree();
+                
+                IASTListNode<IBodyConstruct> newDeclarations = constructDeclarations(scope);
+                scope.getBody().addAll(0, newDeclarations);
+                Reindenter.reindent(newDeclarations, astOfFileInEditor);
             }
-    	}
-    	
-    	return commands;
+        }
+        		
+        this.addChangeFromModifiedAST(this.fileInEditor, progressMonitor);
+        vpg.releaseAllASTs();
     }
 
     private ASTImplicitStmtNode findExistingImplicitStatement(final ScopingNode scope)
     {
         try
         {
-            scope.visitTopDownUsing(new ASTVisitor()
+            scope.accept(new ASTVisitor()
             {
                 @Override
                 public void visitASTImplicitStmtNode(ASTImplicitStmtNode node)
@@ -157,7 +139,7 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
         return null;
     }
     
-    private ASTBodyNode constructDeclarations(final ScopingNode scope)
+    private IASTListNode<IBodyConstruct> constructDeclarations(final ScopingNode scope)
     {
         final ArrayList<Definition> definitions = new ArrayList<Definition>(16);
         
@@ -199,29 +181,5 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
 		Type type = def.getType();
 		String typeString = type == null ? "type(unknown)" : type.toString(); // TODO
 		return typeString + " :: " + def.getCanonicalizedName() + EOL;
-	}
-
-	private Runnable cut(final ASTImplicitStmtNode implicitStmt)
-	{
-		return new Runnable()
-		{
-			public void run()
-			{
-				SourceEditor.cut(implicitStmt);
-			}
-		};
-	}
-
-	private Runnable insert(final ASTBodyNode stmtSeq, final ScopingNode scope)
-	{
-        final InteriorNode headerStmt = scope.getHeaderStmt();
-		
-		return new Runnable()
-		{
-			public void run()
-			{
-				SourceEditor.pasteAfterHeaderStmt(stmtSeq, scope, headerStmt, astOfFileInEditor);
-			}
-		};
 	}
 }

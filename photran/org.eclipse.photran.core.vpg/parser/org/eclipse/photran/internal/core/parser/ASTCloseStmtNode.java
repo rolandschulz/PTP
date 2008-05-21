@@ -10,89 +10,89 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCloseStmtNode extends InteriorNode implements IActionStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTCloseStmtNode extends ASTNode implements IActionStmt
 {
-    ASTCloseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTCloseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTClose; // in ASTCloseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCloseStmtNode
+    IASTListNode<ASTCloseSpecListNode> closeSpecList; // in ASTCloseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCloseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCloseStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTCloseSpecListNode> getCloseSpecList()
     {
-        visitor.visitIActionStmt(this);
+        return this.closeSpecList;
+    }
+
+    public void setCloseSpecList(IASTListNode<ASTCloseSpecListNode> newValue)
+    {
+        this.closeSpecList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
         visitor.visitASTCloseStmtNode(this);
+        visitor.visitIActionStmt(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTCloseSpecListNode getCloseSpecList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CLOSE_STMT_757)
-            return (ASTCloseSpecListNode)getChild(3);
-        else
-            return null;
+        return 6;
     }
 
-    public Token getLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CLOSE_STMT_757)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTClose;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.closeSpecList;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public boolean hasLabel()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CLOSE_STMT_757)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.CLOSE_STMT_757 && index == 1)
-            return false;
-        else if (getProduction() == Production.CLOSE_STMT_757 && index == 2)
-            return false;
-        else if (getProduction() == Production.CLOSE_STMT_757 && index == 4)
-            return false;
-        else if (getProduction() == Production.CLOSE_STMT_757 && index == 5)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.CLOSE_STMT_757 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTClose = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.closeSpecList = (IASTListNode<ASTCloseSpecListNode>)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

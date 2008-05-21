@@ -10,76 +10,93 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTIntentSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTIntentSpecNode extends ASTNode
 {
-    ASTIntentSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTIntentSpecNode(this);
-    }
-
-    public boolean isIntentIn()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTENT_SPEC_287)
-            return getChild(0) != null;
-        else
-            return false;
-    }
+    org.eclipse.photran.internal.core.lexer.Token isIntentOut; // in ASTIntentSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isIntentIn; // in ASTIntentSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isIntentInOut; // in ASTIntentSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTOut; // in ASTIntentSpecNode
 
     public boolean isIntentOut()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTENT_SPEC_288)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isIntentOut != null;
     }
+
+    public void setIsIntentOut(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntentOut = newValue;
+    }
+
+
+    public boolean isIntentIn()
+    {
+        return this.isIntentIn != null;
+    }
+
+    public void setIsIntentIn(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntentIn = newValue;
+    }
+
 
     public boolean isIntentInOut()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTENT_SPEC_289)
-            return getChild(0) != null;
-        else if (getProduction() == Production.INTENT_SPEC_290)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isIntentInOut != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setIsIntentInOut(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.INTENT_SPEC_290 && index == 1)
-            return false;
-        else
-            return true;
+        this.isIntentInOut = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTIntentSpecNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.isIntentOut;
+        case 1:  return this.isIntentIn;
+        case 2:  return this.isIntentInOut;
+        case 3:  return this.hiddenTOut;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

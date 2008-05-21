@@ -10,91 +10,111 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTGenericSpecNode extends InteriorNode implements IAccessId
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTGenericSpecNode extends ASTNode implements IAccessId
 {
-    ASTGenericSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIAccessId(this);
-        visitor.visitASTGenericSpecNode(this);
-    }
+    org.eclipse.photran.internal.core.lexer.Token isDefinedOperator; // in ASTGenericSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isAssignmentOperator; // in ASTGenericSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTGenericSpecNode
+    ASTDefinedOperatorNode definedOperator; // in ASTGenericSpecNode
+    org.eclipse.photran.internal.core.lexer.Token equalsToken; // in ASTGenericSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTGenericSpecNode
 
     public boolean isDefinedOperator()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_951)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isDefinedOperator != null;
     }
 
-    public ASTOperatorNode getDefinedOperator()
+    public void setIsDefinedOperator(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_951)
-            return (ASTOperatorNode)getChild(2);
-        else
-            return null;
+        this.isDefinedOperator = newValue;
     }
+
 
     public boolean isAssignmentOperator()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_952)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isAssignmentOperator != null;
     }
 
-    public Token getEqualsToken()
+    public void setIsAssignmentOperator(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.GENERIC_SPEC_952)
-            return (Token)getChild(2);
-        else
-            return null;
+        this.isAssignmentOperator = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public ASTDefinedOperatorNode getDefinedOperator()
     {
-        if (getProduction() == Production.GENERIC_SPEC_951 && index == 1)
-            return false;
-        else if (getProduction() == Production.GENERIC_SPEC_951 && index == 3)
-            return false;
-        else if (getProduction() == Production.GENERIC_SPEC_952 && index == 1)
-            return false;
-        else if (getProduction() == Production.GENERIC_SPEC_952 && index == 3)
-            return false;
-        else
-            return true;
+        return this.definedOperator;
+    }
+
+    public void setDefinedOperator(ASTDefinedOperatorNode newValue)
+    {
+        this.definedOperator = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getEqualsToken()
+    {
+        return this.equalsToken;
+    }
+
+    public void setEqualsToken(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.equalsToken = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTGenericSpecNode(this);
+        visitor.visitIAccessId(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 6;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.isDefinedOperator;
+        case 1:  return this.isAssignmentOperator;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.definedOperator;
+        case 4:  return this.equalsToken;
+        case 5:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.isDefinedOperator = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isAssignmentOperator = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.definedOperator = (ASTDefinedOperatorNode)value;
+        case 4:  this.equalsToken = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

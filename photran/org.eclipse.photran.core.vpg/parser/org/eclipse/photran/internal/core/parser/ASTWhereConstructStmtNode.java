@@ -10,118 +10,105 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTWhereConstructStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTWhereConstructStmtNode extends ASTNode
 {
-    ASTWhereConstructStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTWhereConstructStmtNode
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTWhereConstructStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTWhereConstructStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTWhereConstructStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTWhereConstructStmtNode
+    ASTMaskExprNode maskExpr; // in ASTWhereConstructStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTWhereConstructStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTWhereConstructStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
     {
-        visitor.visitASTWhereConstructStmtNode(this);
+        return this.name;
     }
+
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.name = newValue;
+    }
+
 
     public ASTMaskExprNode getMaskExpr()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
-            return (ASTMaskExprNode)getChild(5);
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614)
-            return (ASTMaskExprNode)getChild(3);
-        else
-            return null;
+        return this.maskExpr;
     }
 
-    public Token getLabel()
+    public void setMaskExpr(ASTMaskExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.maskExpr = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTWhereConstructStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getWhereConstructName()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else
-            return null;
+        return 8;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 2)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 3)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 4)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 6)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 7)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 1)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 2)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 4)
-            return false;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 5)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.name;
+        case 2:  return this.hiddenTColon;
+        case 3:  return this.hiddenTWhere;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.maskExpr;
+        case 6:  return this.hiddenTRparen;
+        case 7:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 0)
-            return true;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_613 && index == 1)
-            return true;
-        else if (getProduction() == Production.WHERE_CONSTRUCT_STMT_614 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.maskExpr = (ASTMaskExprNode)value;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

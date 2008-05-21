@@ -10,961 +10,216 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAssignmentStmtNode extends InteriorNodeWithErrorRecoverySymbols implements IActionStmt, IForallBodyConstruct, IWhereBodyConstruct
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt, IBodyConstruct, ICaseBodyConstruct, IExecutableConstruct, IExecutionPartConstruct, IForallBodyConstruct, IWhereBodyConstruct
 {
-    ASTAssignmentStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTLblDefNode lblDef; // in ASTAssignmentStmtNode
+    ASTNameNode lhsVariable; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTAssignmentStmtNode
+    IASTListNode<ASTSFExprListNode> lhsExprList; // in ASTAssignmentStmtNode
+    IASTListNode<ASTSFDummyArgNameListNode> lhsNameList; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTPercent; // in ASTAssignmentStmtNode
+    IASTListNode<ASTDataRefNode> derivedTypeComponentRef; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenLparen2; // in ASTAssignmentStmtNode
+    IASTListNode<ASTSectionSubscriptNode> componentSectionSubscriptList; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenRparen2; // in ASTAssignmentStmtNode
+    ASTSubstringRangeNode substringRange; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isPointerAssignment; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTAssignmentStmtNode
+    ASTExprNode rhs; // in ASTAssignmentStmtNode
+    ASTTargetNode target; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTAssignmentStmtNode
+
+    public ASTLblDefNode getLblDef()
     {
-         super(production, discardedSymbols);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIActionStmt(this);
-        visitor.visitIForallBodyConstruct(this);
-        visitor.visitIWhereBodyConstruct(this);
-        visitor.visitASTAssignmentStmtNode(this);
+        return this.lblDef;
     }
 
-    public ASTExpressionNode getRhs()
+    public void setLblDef(ASTLblDefNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_556)
-            return (ASTExpressionNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557)
-            return (ASTExpressionNode)getChild(6);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return (ASTExpressionNode)getChild(7);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return (ASTExpressionNode)getChild(7);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560)
-            return (ASTExpressionNode)getChild(5);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return (ASTExpressionNode)getChild(8);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return (ASTExpressionNode)getChild(9);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return (ASTExpressionNode)getChild(8);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return (ASTExpressionNode)getChild(11);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (ASTExpressionNode)getChild(12);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return (ASTExpressionNode)getChild(8);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return (ASTExpressionNode)getChild(11);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (ASTExpressionNode)getChild(12);
-        else
-            return null;
+        this.lblDef = newValue;
     }
 
-    public ASTSFExprListNode getLhsExprList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGNMENT_STMT_557)
-            return (ASTSFExprListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return (ASTSFExprListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return (ASTSFExprListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return (ASTSFExprListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (ASTSFExprListNode)getChild(3);
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return (ASTSFExprListNode)getChild(3);
-        else
-            return null;
+    public ASTNameNode getLhsVariable()
+    {
+        return this.lhsVariable;
     }
 
-    public boolean hasLhsExprList()
+    public void setLhsVariable(ASTNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_557)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return getChild(3) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return getChild(3) != null;
-        else
-            return false;
+        this.lhsVariable = newValue;
     }
+
+
+    public IASTListNode<ASTSFExprListNode> getLhsExprList()
+    {
+        return this.lhsExprList;
+    }
+
+    public void setLhsExprList(IASTListNode<ASTSFExprListNode> newValue)
+    {
+        this.lhsExprList = newValue;
+    }
+
+
+    public IASTListNode<ASTSFDummyArgNameListNode> getLhsNameList()
+    {
+        return this.lhsNameList;
+    }
+
+    public void setLhsNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
+    {
+        this.lhsNameList = newValue;
+    }
+
+
+    public IASTListNode<ASTDataRefNode> getDerivedTypeComponentRef()
+    {
+        return this.derivedTypeComponentRef;
+    }
+
+    public void setDerivedTypeComponentRef(IASTListNode<ASTDataRefNode> newValue)
+    {
+        this.derivedTypeComponentRef = newValue;
+    }
+
+
+    public IASTListNode<ASTSectionSubscriptNode> getComponentSectionSubscriptList()
+    {
+        return this.componentSectionSubscriptList;
+    }
+
+    public void setComponentSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
+    {
+        this.componentSectionSubscriptList = newValue;
+    }
+
 
     public ASTSubstringRangeNode getSubstringRange()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return (ASTSubstringRangeNode)getChild(5);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return (ASTSubstringRangeNode)getChild(5);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return (ASTSubstringRangeNode)getChild(7);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (ASTSubstringRangeNode)getChild(10);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (ASTSubstringRangeNode)getChild(10);
-        else
-            return null;
+        return this.substringRange;
     }
 
-    public boolean hasSubstringRange()
+    public void setSubstringRange(ASTSubstringRangeNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return getChild(5) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return getChild(5) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return getChild(7) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return getChild(10) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return getChild(10) != null;
-        else
-            return false;
+        this.substringRange = newValue;
     }
 
-    public ASTSFDummyArgNameListNode getLhsNameList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return (ASTSFDummyArgNameListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return (ASTSFDummyArgNameListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return (ASTSFDummyArgNameListNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (ASTSFDummyArgNameListNode)getChild(3);
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return (ASTSFDummyArgNameListNode)getChild(3);
-        else
-            return null;
-    }
-
-    public boolean hasLhsNameList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return getChild(3) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return getChild(3) != null;
-        else
-            return false;
-    }
-
-    public ASTDataRefNode getDerivedTypeComponentRef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_560)
-            return (ASTDataRefNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return (ASTDataRefNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return (ASTDataRefNode)getChild(3);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return (ASTDataRefNode)getChild(3);
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return (ASTDataRefNode)getChild(6);
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return (ASTDataRefNode)getChild(6);
-        else
-            return null;
-    }
-
-    public boolean hasDerivedTypeComponentRef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_560)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return getChild(6) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return getChild(6) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return getChild(6) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return getChild(6) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return getChild(6) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return getChild(6) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return getChild(3) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return getChild(6) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return getChild(6) != null;
-        else
-            return false;
-    }
-
-    public ASTSectionSubscriptListNode getComponentSectionSubscriptList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return (ASTSectionSubscriptListNode)getChild(5);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return (ASTSectionSubscriptListNode)getChild(5);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return (ASTSectionSubscriptListNode)getChild(8);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (ASTSectionSubscriptListNode)getChild(8);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return (ASTSectionSubscriptListNode)getChild(8);
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (ASTSectionSubscriptListNode)getChild(8);
-        else
-            return null;
-    }
-
-    public boolean hasComponentSectionSubscriptList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return getChild(5) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return getChild(5) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return getChild(8) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return getChild(8) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return getChild(8) != null;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return getChild(8) != null;
-        else
-            return false;
-    }
 
     public boolean isPointerAssignment()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return getChild(2) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return getChild(4) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return getChild(7) != null;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return getChild(7) != null;
-        else
-            return false;
+        return this.isPointerAssignment != null;
     }
 
-    public Token getLabel()
+    public void setIsPointerAssignment(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_556)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.isPointerAssignment = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSIGNMENT_STMT_556)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public ASTExprNode getRhs()
+    {
+        return this.rhs;
     }
 
-    public Token getLhsVariableName()
+    public void setRhs(ASTExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSIGNMENT_STMT_556)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else
-            return null;
+        this.rhs = newValue;
     }
 
-    public ASTExpressionNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return (ASTExpressionNode)((ASTTargetNode)getChild(3)).getExpr();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return (ASTExpressionNode)((ASTTargetNode)getChild(5)).getExpr();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return (ASTExpressionNode)((ASTTargetNode)getChild(8)).getExpr();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return (ASTExpressionNode)((ASTTargetNode)getChild(8)).getExpr();
-        else
-            return null;
+    public ASTTargetNode getTarget()
+    {
+        return this.target;
     }
 
-    public boolean hasExpr()
+    public void setTarget(ASTTargetNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return ((ASTTargetNode)getChild(3)).hasExpr();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return ((ASTTargetNode)getChild(5)).hasExpr();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return ((ASTTargetNode)getChild(8)).hasExpr();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return ((ASTTargetNode)getChild(8)).hasExpr();
-        else
-            return false;
+        this.target = newValue;
     }
 
-    public boolean isNull()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593)
-            return ((ASTTargetNode)getChild(3)).isNull();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594)
-            return ((ASTTargetNode)getChild(5)).isNull();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595)
-            return ((ASTTargetNode)getChild(8)).isNull();
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596)
-            return ((ASTTargetNode)getChild(8)).isNull();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTAssignmentStmtNode(this);
+        visitor.visitIActionStmt(this);
+        visitor.visitIBodyConstruct(this);
+        visitor.visitICaseBodyConstruct(this);
+        visitor.visitIExecutableConstruct(this);
+        visitor.visitIExecutionPartConstruct(this);
+        visitor.visitIForallBodyConstruct(this);
+        visitor.visitIWhereBodyConstruct(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 4)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 2)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 6)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 2)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 4)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 5)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 9)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 2)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 4)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 5)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 8)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 8)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 8)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 10)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 10)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 12)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 11)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 13)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 10)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 12)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 11)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 13)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 4)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 2)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 6)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 2)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 4)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 5)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 9)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 2)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 4)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 5)
-            return false;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 8)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 8)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 6)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 8)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 10)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 10)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 12)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 11)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 13)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 10)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 12)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 4)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 5)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 7)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 9)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 11)
-            return false;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 13)
-            return false;
-        else
-            return true;
+        return 17;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 3)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 5)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 8)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 8)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_593 && index == 3)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_594 && index == 5)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_595 && index == 8)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 1)
-            return true;
-        else if (getProduction() == Production.POINTER_ASSIGNMENT_STMT_596 && index == 8)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_556 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_557 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_558 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_559 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_560 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_561 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_562 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_563 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_564 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_565 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_566 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_567 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_568 && index == 1)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSIGNMENT_STMT_ERROR_2 && index == 1)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.lblDef;
+        case 1:  return this.lhsVariable;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.lhsExprList;
+        case 4:  return this.lhsNameList;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.hiddenTPercent;
+        case 7:  return this.derivedTypeComponentRef;
+        case 8:  return this.hiddenLparen2;
+        case 9:  return this.componentSectionSubscriptList;
+        case 10: return this.hiddenRparen2;
+        case 11: return this.substringRange;
+        case 12: return this.isPointerAssignment;
+        case 13: return this.hiddenTEquals;
+        case 14: return this.rhs;
+        case 15: return this.target;
+        case 16: return this.hiddenTEos;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.lblDef = (ASTLblDefNode)value;
+        case 1:  this.lhsVariable = (ASTNameNode)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.lhsExprList = (IASTListNode<ASTSFExprListNode>)value;
+        case 4:  this.lhsNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value;
+        case 8:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
+        case 10: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 11: this.substringRange = (ASTSubstringRangeNode)value;
+        case 12: this.isPointerAssignment = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 13: this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 14: this.rhs = (ASTExprNode)value;
+        case 15: this.target = (ASTTargetNode)value;
+        case 16: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

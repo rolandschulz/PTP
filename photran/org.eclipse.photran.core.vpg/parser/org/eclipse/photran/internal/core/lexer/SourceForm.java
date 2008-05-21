@@ -24,19 +24,19 @@ public abstract class SourceForm
 {
     private SourceForm() {;}
     
-    abstract IAccumulatingLexer createLexer(InputStream in, String filename) throws IOException;
+    abstract IAccumulatingLexer createLexer(InputStream in, String filename, boolean accumulateWhitetext) throws IOException;
     
     public static final SourceForm UNPREPROCESSED_FREE_FORM = new SourceForm()
     {
-        IAccumulatingLexer createLexer(InputStream in, String filename) throws IOException
+        IAccumulatingLexer createLexer(InputStream in, String filename, boolean accumulateWhitetext) throws IOException
         {
-            return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename, ASTTokenFactory.getInstance())));
+            return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename, ASTTokenFactory.getInstance(), accumulateWhitetext)));
         }
     };
     
     public static final SourceForm FIXED_FORM = new SourceForm()
     {
-        IAccumulatingLexer createLexer(InputStream in, String filename) throws IOException
+        IAccumulatingLexer createLexer(InputStream in, String filename, boolean accumulateWhitetext) throws IOException
         {
             return new LexerPhase3(new FixedFormLexerPhase2(in, filename, ASTTokenFactory.getInstance()));
         }
@@ -49,9 +49,9 @@ public abstract class SourceForm
     {
         return new SourceForm()
         {
-            IAccumulatingLexer createLexer(InputStream in, String filename) throws IOException
+            IAccumulatingLexer createLexer(InputStream in, String filename, boolean accumulateWhitetext) throws IOException
             {
-                return new LexerPhase3(new FreeFormLexerPhase2(new PreprocessingFreeFormLexerPhase1(in, filename, callback)));
+                return new LexerPhase3(new FreeFormLexerPhase2(new PreprocessingFreeFormLexerPhase1(in, filename, callback, accumulateWhitetext)));
             }
         };
     }

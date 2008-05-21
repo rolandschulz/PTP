@@ -10,64 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutineParNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSubroutineParNode extends ASTNode
 {
-    ASTSubroutineParNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSubroutineParNode
+    org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTSubroutineParNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.variableName;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.variableName = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTSubroutineParNode(this);
-    }
+
 
     public boolean isAsterisk()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_PAR_1006)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isAsterisk != null;
     }
 
-    public Token getVariableName()
+    public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_PAR_1005)
-            return (Token)((ASTDummyArgNameNode)getChild(0)).getVariableName();
-        else
-            return null;
+        this.isAsterisk = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.SUBROUTINE_PAR_1005 && index == 0)
-            return true;
-        else
-            return false;
+        visitor.visitASTSubroutineParNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.variableName;
+        case 1:  return this.isAsterisk;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

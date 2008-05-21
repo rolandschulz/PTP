@@ -22,10 +22,11 @@ import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
-import org.eclipse.photran.internal.core.parser.ASTOnlyListNode;
-import org.eclipse.photran.internal.core.parser.ASTRenameListNode;
+import org.eclipse.photran.internal.core.parser.ASTOnlyNode;
+import org.eclipse.photran.internal.core.parser.ASTRenameNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**
@@ -87,9 +88,11 @@ public class ModuleLoader extends BindingCollector
 
     @Override public void visitASTUseStmtNode(ASTUseStmtNode node)
     {
+        super.traverseChildren(node);
+        
         try
         {
-        	vpg.markFileAsImportingModule(fileContainingUseStmt, node.getModuleName().getText());
+        	vpg.markFileAsImportingModule(fileContainingUseStmt, node.getName().getText());
 
 	        if (this.shouldImportModules)
 	        	loadModule(node);
@@ -104,7 +107,7 @@ public class ModuleLoader extends BindingCollector
 	private void loadModule(ASTUseStmtNode node) throws Exception
 	{
 		this.useStmt = node;
-		this.moduleNameToken = useStmt.getModuleName();
+		this.moduleNameToken = useStmt.getName();
 		this.moduleName = PhotranVPG.canonicalizeIdentifier(moduleNameToken.getText());
 		
 		progressMonitor.subTask("Loading module " + moduleName + "...");
@@ -125,7 +128,7 @@ public class ModuleLoader extends BindingCollector
         ASTModuleNode result = null;
         try
         {
-            vpg.acquireTransientAST(file).visitTopDownUsing(new ASTVisitor()
+            vpg.acquireTransientAST(file).accept(new ASTVisitor()
             {
                 @Override
                 public void visitASTModuleNode(ASTModuleNode node)
@@ -133,6 +136,8 @@ public class ModuleLoader extends BindingCollector
                     String thisModule = PhotranVPG.canonicalizeIdentifier(node.getModuleStmt().getModuleName().getModuleName().getText());
                     if (thisModule.equals(moduleName))
                     	throw new Notification(node);
+                    
+                    //traverseChildren(node);
                 }
             });
         }
@@ -148,7 +153,7 @@ public class ModuleLoader extends BindingCollector
     	List<IFile> files = vpg.findFilesThatExportModule(moduleName);
         if (files.isEmpty())
         {
-            vpg.logError("There are no files that export a module named " + moduleName, useStmt.getModuleName().getTokenRef());
+            vpg.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTokenRef());
             return;
         }
 
@@ -157,7 +162,7 @@ public class ModuleLoader extends BindingCollector
         {
             vpg.logError("The module " + moduleName + " could not be found in any of the"
             			+ " folders in the module paths for this project.  However, it was found in a folder not in the"
-            			+ " module path.", useStmt.getModuleName().getTokenRef());
+            			+ " module path.", useStmt.getName().getTokenRef());
             return;
         }
         
@@ -203,7 +208,7 @@ public class ModuleLoader extends BindingCollector
 		ASTModuleNode moduleNode = findModuleIn(file);
 		if (moduleNode == null) return; // Shouldn't happen if VPG is up to date
 		
-		bind(useStmt.getModuleName(), moduleNode.getRepresentativeToken());
+		bind(useStmt.getName(), moduleNode.getRepresentativeToken());
 		
 		ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
 		
@@ -211,14 +216,14 @@ public class ModuleLoader extends BindingCollector
 			if (shouldImportDefinition(def))
 				importDefinition(def, newScope);
 		
-		bindIdentifiersIn(useStmt.getRenameList(), moduleNode);
-		bindIdentifiersIn(useStmt.getOnlyList(), moduleNode);
+		bindIdentifiersInRenameList(useStmt.getRenameList(), moduleNode);
+		bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleNode);
 	}
 
 	private boolean shouldImportDefinition(Definition def)
 	{
-		ASTRenameListNode renameList = useStmt.getRenameList();
-		ASTOnlyListNode onlyList = useStmt.getOnlyList();
+		IASTListNode<ASTRenameNode> renameList = useStmt.getRenameList();
+		IASTListNode<ASTOnlyNode> onlyList = useStmt.getOnlyList();
 		
 		if (renameList == null && onlyList == null)
 		{
@@ -228,7 +233,7 @@ public class ModuleLoader extends BindingCollector
 		{
 			for (int i = 0; i < renameList.size(); i++)
 			{
-				String entityBeingRenamed = PhotranVPG.canonicalizeIdentifier(renameList.getRename(i).getOldName().getText());
+				String entityBeingRenamed = PhotranVPG.canonicalizeIdentifier(renameList.get(i).getName().getText());
 				if (def.matches(entityBeingRenamed))
 						return false;
 			}
@@ -239,9 +244,9 @@ public class ModuleLoader extends BindingCollector
 		{
 	        for (int i = 0; i < onlyList.size(); i++)
 	        {
-	        	Token useName = onlyList.getOnly(i).getOldName();
+	        	Token useName = onlyList.get(i).getName();
 	        	String entityToImport = useName == null ? null : PhotranVPG.canonicalizeIdentifier(useName.getText());
-	        	boolean isRenamed = onlyList.getOnly(i).isRenamed();
+	        	boolean isRenamed = onlyList.get(i).isRenamed();
 	        	
 	            if (def.matches(entityToImport) && !isRenamed) return true;
 	        }
@@ -250,27 +255,27 @@ public class ModuleLoader extends BindingCollector
 		}
 	}
 	
-	private void bindIdentifiersIn(ASTRenameListNode renameList, ASTModuleNode moduleNode) throws Exception
+	private void bindIdentifiersInRenameList(IASTListNode<ASTRenameNode> renameList, ASTModuleNode moduleNode) throws Exception
 	{
 		if (renameList == null) return;
 		
 		for (int i = 0; i < renameList.size(); i++)
         {
-            Token newName = renameList.getRename(i).getNewName();
-            Token oldName = renameList.getRename(i).getOldName();
+            Token newName = renameList.get(i).getNewName();
+            Token oldName = renameList.get(i).getName();
             
             bindPossiblyRenamedIdentifier(newName, oldName, moduleNode);
         }
 	}
 
-	private void bindIdentifiersIn(ASTOnlyListNode onlyList, ASTModuleNode moduleNode) throws Exception
+	private void bindIdentifiersInOnlyList(IASTListNode<ASTOnlyNode> onlyList, ASTModuleNode moduleNode) throws Exception
 	{
 		if (onlyList == null) return;
 		
 		for (int i = 0; i < onlyList.size(); i++)
         {
-            Token newName = onlyList.getOnly(i).getNewName();
-            Token oldName = onlyList.getOnly(i).getOldName();
+            Token newName = onlyList.get(i).getNewName();
+            Token oldName = onlyList.get(i).getName();
             
             if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleNode);
         }

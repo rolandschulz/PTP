@@ -10,66 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSavedEntityNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSavedEntityNode extends ASTNode
 {
-    ASTSavedEntityNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSavedEntityNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash; // in ASTSavedEntityNode
+    org.eclipse.photran.internal.core.lexer.Token commonBlockName; // in ASTSavedEntityNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash2; // in ASTSavedEntityNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.variableName;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.variableName = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getCommonBlockName()
+    {
+        return this.commonBlockName;
+    }
+
+    public void setCommonBlockName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.commonBlockName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSavedEntityNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getVariableName()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVED_ENTITY_335)
-            return (Token)((ASTVariableNameNode)getChild(0)).getVariableName();
-        else
-            return null;
+        return 4;
     }
 
-    public Token getCommonBlockName()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVED_ENTITY_336)
-            return (Token)((ASTSavedCommonBlockNode)getChild(0)).getCommonBlockName();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.variableName;
+        case 1:  return this.hiddenTSlash;
+        case 2:  return this.commonBlockName;
+        case 3:  return this.hiddenTSlash2;
+        default: return null;
+        }
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.SAVED_ENTITY_335 && index == 0)
-            return true;
-        else if (getProduction() == Production.SAVED_ENTITY_336 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

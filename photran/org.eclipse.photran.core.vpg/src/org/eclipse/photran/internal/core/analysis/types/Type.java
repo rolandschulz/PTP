@@ -13,8 +13,9 @@ package org.eclipse.photran.internal.core.analysis.types;
 import java.io.Serializable;
 
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTSectionSubscriptListNode;
+import org.eclipse.photran.internal.core.parser.ASTSectionSubscriptNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 
 /**
  * An incomplete representation of the type of a Fortran expression or variable.
@@ -243,7 +244,7 @@ public abstract class Type implements Serializable
         }
     };
 
-    public Type resolveSectionSubscriptList(ASTSectionSubscriptListNode list) throws TypeError
+    public Type resolveSectionSubscriptList(ASTListNode<ASTSectionSubscriptNode> list) throws TypeError
     {
         // TODO Implement
         throw new TypeError(null, "NOT IMPLEMENTED");

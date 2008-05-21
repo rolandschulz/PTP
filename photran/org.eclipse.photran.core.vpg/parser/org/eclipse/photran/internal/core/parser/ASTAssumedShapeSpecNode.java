@@ -10,69 +10,65 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTAssumedShapeSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAssumedShapeSpecNode extends ASTNode
 {
-    ASTAssumedShapeSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTExprNode lb; // in ASTAssumedShapeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTAssumedShapeSpecNode
+
+    public ASTExprNode getLb()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        return this.lb;
     }
 
-    public ASTExpressionNode getLb()
+    public void setLb(ASTExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304)
-            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(0)).getLb();
-        else
-            return null;
+        this.lb = newValue;
     }
 
-    public boolean hasLb()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304)
-            return ((ASTLowerBoundNode)getChild(0)).hasLb();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTAssumedShapeSpecNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304 && index == 1)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SHAPE_SPEC_305 && index == 0)
-            return false;
-        else
-            return true;
+        return 2;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.ASSUMED_SHAPE_SPEC_304 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.lb;
+        case 1:  return this.hiddenTColon;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.lb = (ASTExprNode)value;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -16,10 +16,10 @@ import java.io.Serializable;
 
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTImplicitSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitSpecNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * An IMPLICIT specification.
@@ -70,15 +70,17 @@ public class ImplicitSpec implements Serializable
      * Create an implicit spec for the given <T_xImplicitSpecList> parse tree node
      * @param txImplicitSpecList
      */
-    public ImplicitSpec(ASTImplicitSpecListNode implicitSpecList)
+    public ImplicitSpec(IASTListNode<ASTImplicitSpecNode> implicitSpecList)
     {
     	toString = "Implicit Enabled -" + getSourceCodeFromASTNode(implicitSpecList);
     	
-        implicitSpecList.visitTopDownUsing(new ASTVisitor()
+        implicitSpecList.accept(new ASTVisitor()
         {
             @Override
             public void visitASTImplicitSpecNode(ASTImplicitSpecNode implicitSpec)
             {
+                // traverseChildren(implicitSpec);
+                
                 // <T_xImplicitSpec> ::= <xTypeSpec> T_xImpl
                 
                 Type type = Type.parse(implicitSpec.getTypeSpec());
@@ -146,7 +148,7 @@ public class ImplicitSpec implements Serializable
     }
     
     // Copied from SourcePrinter; refactor somehow
-    private static String getSourceCodeFromASTNode(CSTNode node)
+    private static String getSourceCodeFromASTNode(IASTNode node)
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         node.printOn(new PrintStream(out), null);

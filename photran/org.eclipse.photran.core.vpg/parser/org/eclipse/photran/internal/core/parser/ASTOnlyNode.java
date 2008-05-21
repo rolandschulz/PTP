@@ -10,98 +10,104 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTOnlyNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTOnlyNode extends ASTNode
 {
-    ASTOnlyNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token newName; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token isRenamed; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTOnlyNode
+    ASTGenericSpecNode genericSpec; // in ASTOnlyNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getNewName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTOnlyNode(this);
+        return this.newName;
     }
 
-    public ASTGenericSpecNode getGenericSpec()
+    public void setNewName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ONLY_910)
-            return (ASTGenericSpecNode)getChild(0);
-        else
-            return null;
+        this.newName = newValue;
     }
 
-    public boolean hasGenericSpec()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ONLY_910)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public Token getNewName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ONLY_911)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
 
     public boolean isRenamed()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ONLY_911)
-            return getChild(1) != null;
-        else
-            return false;
+        return this.isRenamed != null;
     }
 
-    public Token getOldName()
+    public void setIsRenamed(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ONLY_911)
-            return (Token)((ASTUseNameNode)getChild(2)).getName();
-        else if (getProduction() == Production.ONLY_912)
-            return (Token)((ASTUseNameNode)getChild(0)).getName();
-        else
-            return null;
+        this.isRenamed = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
     {
-        if (getProduction() == Production.ONLY_911 && index == 2)
-            return true;
-        else if (getProduction() == Production.ONLY_912 && index == 0)
-            return true;
-        else
-            return false;
+        return this.name;
+    }
+
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.name = newValue;
+    }
+
+
+    public ASTGenericSpecNode getGenericSpec()
+    {
+        return this.genericSpec;
+    }
+
+    public void setGenericSpec(ASTGenericSpecNode newValue)
+    {
+        this.genericSpec = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTOnlyNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.newName;
+        case 1:  return this.isRenamed;
+        case 2:  return this.name;
+        case 3:  return this.genericSpec;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isRenamed = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.genericSpec = (ASTGenericSpecNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

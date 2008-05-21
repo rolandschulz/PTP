@@ -10,125 +10,103 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTWriteStmtNode extends InteriorNode implements IActionStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTWriteStmtNode extends ASTNode implements IActionStmt
 {
-    ASTWriteStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTWriteStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTWrite; // in ASTWriteStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTWriteStmtNode
+    IASTListNode<ASTIoControlSpecListNode> ioControlSpecList; // in ASTWriteStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTWriteStmtNode
+    ASTOutputItemListNode outputItemList; // in ASTWriteStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTWriteStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIActionStmt(this);
-        visitor.visitASTWriteStmtNode(this);
+        return this.label;
     }
 
-    public ASTIoControlSpecListNode getIoControlSpecList()
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WRITE_STMT_783)
-            return (ASTIoControlSpecListNode)getChild(3);
-        else if (getProduction() == Production.WRITE_STMT_784)
-            return (ASTIoControlSpecListNode)getChild(3);
-        else
-            return null;
+        this.label = newValue;
     }
+
+
+    public IASTListNode<ASTIoControlSpecListNode> getIoControlSpecList()
+    {
+        return this.ioControlSpecList;
+    }
+
+    public void setIoControlSpecList(IASTListNode<ASTIoControlSpecListNode> newValue)
+    {
+        this.ioControlSpecList = newValue;
+    }
+
 
     public ASTOutputItemListNode getOutputItemList()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WRITE_STMT_783)
-            return (ASTOutputItemListNode)getChild(5);
-        else
-            return null;
+        return this.outputItemList;
     }
 
-    public boolean hasOutputItemList()
+    public void setOutputItemList(ASTOutputItemListNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WRITE_STMT_783)
-            return getChild(5) != null;
-        else
-            return false;
+        this.outputItemList = newValue;
     }
 
-    public Token getLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WRITE_STMT_783)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.WRITE_STMT_784)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTWriteStmtNode(this);
+        visitor.visitIActionStmt(this);
+        visitor.visitASTNode(this);
     }
 
-    public boolean hasLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WRITE_STMT_783)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.WRITE_STMT_784)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        return 7;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.WRITE_STMT_783 && index == 1)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_783 && index == 2)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_783 && index == 4)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_783 && index == 6)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_784 && index == 1)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_784 && index == 2)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_784 && index == 4)
-            return false;
-        else if (getProduction() == Production.WRITE_STMT_784 && index == 5)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTWrite;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.ioControlSpecList;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.outputItemList;
+        case 6:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.WRITE_STMT_783 && index == 0)
-            return true;
-        else if (getProduction() == Production.WRITE_STMT_784 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTWrite = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.ioControlSpecList = (IASTListNode<ASTIoControlSpecListNode>)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.outputItemList = (ASTOutputItemListNode)value;
+        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,322 +10,127 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSFExprListNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSFExprListNode extends ASTNode
 {
-    protected int count = -1;
+    IASTListNode<ASTSFDummyArgNameListNode> SFDummyArgNameList; // in ASTSFExprListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTSFExprListNode
+    ASTSectionSubscriptNode sectionSubscript; // in ASTSFExprListNode
+    ASTSFExprNode lb; // in ASTSFExprListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTSFExprListNode
+    ASTExprNode ub; // in ASTSFExprListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTSFExprListNode
+    ASTExprNode step; // in ASTSFExprListNode
 
-    ASTSFExprListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public IASTListNode<ASTSFDummyArgNameListNode> getSFDummyArgNameList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTSFExprListNode
-               && grandparent instanceof ASTSFExprListNode
-               && ((ASTSFExprListNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.SFDummyArgNameList;
     }
 
-    /**
-     * @return the number of ASTSFExprListNode nodes in this list
-     */
-    public int size()
+    public void setSFDummyArgNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTSFExprListNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.SFDummyArgNameList = newValue;
     }
-    
-    ASTSFExprListNode recurseToIndex(int listIndex)
+
+
+    public ASTSectionSubscriptNode getSectionSubscript()
     {
-        ASTSFExprListNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTSFExprListNode)node.getRecursiveNode();
-        }
-        return node;
+        return this.sectionSubscript;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+    public void setSectionSubscript(ASTSectionSubscriptNode newValue)
+    {
+        this.sectionSubscript = newValue;
+    }
+
+
+    public ASTSFExprNode getLb()
+    {
+        return this.lb;
+    }
+
+    public void setLb(ASTSFExprNode newValue)
+    {
+        this.lb = newValue;
+    }
+
+
+    public ASTExprNode getUb()
+    {
+        return this.ub;
+    }
+
+    public void setUb(ASTExprNode newValue)
+    {
+        this.ub = newValue;
+    }
+
+
+    public ASTExprNode getStep()
+    {
+        return this.step;
+    }
+
+    public void setStep(ASTExprNode newValue)
+    {
+        this.step = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSFExprListNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getLb(int listIndex)
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_552)
-            return (ASTExpressionNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_553)
-            return (ASTExpressionNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_571)
-            return (ASTExpressionNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_572)
-            return (ASTExpressionNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_573)
-            return (ASTExpressionNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_577)
-            return (ASTExpressionNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFEXPR_LIST_578)
-            return (ASTExpressionNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFEXPR_LIST_579)
-            return (ASTExpressionNode)node.getChild(2);
-        else
-            return null;
+        return 8;
     }
 
-    public boolean hasLb(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_552)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_553)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_571)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_572)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_573)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_577)
-            return node.getChild(2) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_578)
-            return node.getChild(2) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_579)
-            return node.getChild(2) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.SFDummyArgNameList;
+        case 1:  return this.hiddenTComma;
+        case 2:  return this.sectionSubscript;
+        case 3:  return this.lb;
+        case 4:  return this.hiddenTColon;
+        case 5:  return this.ub;
+        case 6:  return this.hiddenTColon2;
+        case 7:  return this.step;
+        default: return null;
+        }
     }
 
-    public ASTExpressionNode getUb(int listIndex)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_552)
-            return (ASTExpressionNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFEXPR_LIST_554)
-            return (ASTExpressionNode)node.getChild(1);
-        else if (node.getProduction() == Production.SFEXPR_LIST_570)
-            return (ASTExpressionNode)node.getChild(1);
-        else if (node.getProduction() == Production.SFEXPR_LIST_573)
-            return (ASTExpressionNode)node.getChild(2);
-        else if (node.getProduction() == Production.SFEXPR_LIST_576)
-            return (ASTExpressionNode)node.getChild(3);
-        else if (node.getProduction() == Production.SFEXPR_LIST_579)
-            return (ASTExpressionNode)node.getChild(4);
-        else
-            return null;
-    }
-
-    public boolean hasUb(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_552)
-            return node.getChild(2) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_554)
-            return node.getChild(1) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_570)
-            return node.getChild(1) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_573)
-            return node.getChild(2) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_576)
-            return node.getChild(3) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_579)
-            return node.getChild(4) != null;
-        else
-            return false;
-    }
-
-    public ASTExpressionNode getStep(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_552)
-            return (ASTExpressionNode)node.getChild(4);
-        else if (node.getProduction() == Production.SFEXPR_LIST_553)
-            return (ASTExpressionNode)node.getChild(3);
-        else if (node.getProduction() == Production.SFEXPR_LIST_554)
-            return (ASTExpressionNode)node.getChild(3);
-        else if (node.getProduction() == Production.SFEXPR_LIST_555)
-            return (ASTExpressionNode)node.getChild(2);
-        else
-            return null;
-    }
-
-    public boolean hasStep(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_552)
-            return node.getChild(4) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_553)
-            return node.getChild(3) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_554)
-            return node.getChild(3) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_555)
-            return node.getChild(2) != null;
-        else
-            return false;
-    }
-
-    private ASTSFExprListNode getRecursiveNode()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SFEXPR_LIST_574)
-            return (ASTSFExprListNode)getChild(0);
-        else
-            return null;
-    }
-
-    public ASTSectionSubscriptNode getSectionSubscript(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_574)
-            return (ASTSectionSubscriptNode)node.getChild(2);
-        else
-            return null;
-    }
-
-    public ASTSFDummyArgNameListNode getSFDummyArgNameList(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_575)
-            return (ASTSFDummyArgNameListNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_576)
-            return (ASTSFDummyArgNameListNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_577)
-            return (ASTSFDummyArgNameListNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_578)
-            return (ASTSFDummyArgNameListNode)node.getChild(0);
-        else if (node.getProduction() == Production.SFEXPR_LIST_579)
-            return (ASTSFDummyArgNameListNode)node.getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasSFDummyArgNameList(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTSFExprListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.SFEXPR_LIST_575)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_576)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_577)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_578)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.SFEXPR_LIST_579)
-            return node.getChild(0) != null;
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.SFEXPR_LIST_552 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_552 && index == 3)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_553 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_553 && index == 2)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_554 && index == 0)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_554 && index == 2)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_555 && index == 0)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_555 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_569 && index == 0)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_570 && index == 0)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_572 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_573 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_574 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_575 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_575 && index == 2)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_576 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_576 && index == 2)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_577 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_578 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_578 && index == 3)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_579 && index == 1)
-            return false;
-        else if (getProduction() == Production.SFEXPR_LIST_579 && index == 3)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.sectionSubscript = (ASTSectionSubscriptNode)value;
+        case 3:  this.lb = (ASTSFExprNode)value;
+        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.ub = (ASTExprNode)value;
+        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.step = (ASTExprNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

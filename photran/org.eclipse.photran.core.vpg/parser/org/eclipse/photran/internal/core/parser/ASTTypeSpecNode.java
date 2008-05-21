@@ -10,200 +10,197 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTTypeSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTTypeSpecNode extends ASTNode
 {
-    ASTTypeSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTTypeSpecNode(this);
-    }
-
-    public boolean isInteger()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_234)
-            return getChild(0) != null;
-        else if (getProduction() == Production.TYPE_SPEC_240)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public boolean isReal()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_235)
-            return getChild(0) != null;
-        else if (getProduction() == Production.TYPE_SPEC_241)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public boolean isDouble()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_236)
-            return getChild(0) != null;
-        else if (getProduction() == Production.TYPE_SPEC_242)
-            return getChild(0) != null;
-        else
-            return false;
-    }
+    org.eclipse.photran.internal.core.lexer.Token isComplex; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isInteger; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isCharacter; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isReal; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isLogical; // in ASTTypeSpecNode
+    ASTKindSelectorNode kindSelector; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isDerivedType; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token typeName; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeSpecNode
+    ASTCharSelectorNode charSelector; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isDouble; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTPrecision; // in ASTTypeSpecNode
 
     public boolean isComplex()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_237)
-            return getChild(0) != null;
-        else if (getProduction() == Production.TYPE_SPEC_243)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isComplex != null;
     }
 
-    public boolean isLogical()
+    public void setIsComplex(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_238)
-            return getChild(0) != null;
-        else if (getProduction() == Production.TYPE_SPEC_245)
-            return getChild(0) != null;
-        else
-            return false;
+        this.isComplex = newValue;
     }
+
+
+    public boolean isInteger()
+    {
+        return this.isInteger != null;
+    }
+
+    public void setIsInteger(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isInteger = newValue;
+    }
+
 
     public boolean isCharacter()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_239)
-            return getChild(0) != null;
-        else if (getProduction() == Production.TYPE_SPEC_244)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isCharacter != null;
     }
+
+    public void setIsCharacter(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isCharacter = newValue;
+    }
+
+
+    public boolean isReal()
+    {
+        return this.isReal != null;
+    }
+
+    public void setIsReal(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isReal = newValue;
+    }
+
+
+    public boolean isLogical()
+    {
+        return this.isLogical != null;
+    }
+
+    public void setIsLogical(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isLogical = newValue;
+    }
+
 
     public ASTKindSelectorNode getKindSelector()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_240)
-            return (ASTKindSelectorNode)getChild(1);
-        else if (getProduction() == Production.TYPE_SPEC_241)
-            return (ASTKindSelectorNode)getChild(1);
-        else if (getProduction() == Production.TYPE_SPEC_243)
-            return (ASTKindSelectorNode)getChild(1);
-        else if (getProduction() == Production.TYPE_SPEC_245)
-            return (ASTKindSelectorNode)getChild(1);
-        else
-            return null;
+        return this.kindSelector;
     }
 
-    public boolean hasKindSelector()
+    public void setKindSelector(ASTKindSelectorNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_240)
-            return getChild(1) != null;
-        else if (getProduction() == Production.TYPE_SPEC_241)
-            return getChild(1) != null;
-        else if (getProduction() == Production.TYPE_SPEC_243)
-            return getChild(1) != null;
-        else if (getProduction() == Production.TYPE_SPEC_245)
-            return getChild(1) != null;
-        else
-            return false;
+        this.kindSelector = newValue;
     }
 
-    public ASTCharSelectorNode getCharSelector()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_244)
-            return (ASTCharSelectorNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasCharSelector()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_244)
-            return getChild(1) != null;
-        else
-            return false;
-    }
 
     public boolean isDerivedType()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_246)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.isDerivedType != null;
     }
 
-    public Token getTypeName()
+    public void setIsDerivedType(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TYPE_SPEC_246)
-            return (Token)((ASTTypeNameNode)getChild(2)).getTypeName();
-        else
-            return null;
+        this.isDerivedType = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public org.eclipse.photran.internal.core.lexer.Token getTypeName()
     {
-        if (getProduction() == Production.TYPE_SPEC_242 && index == 1)
-            return false;
-        else if (getProduction() == Production.TYPE_SPEC_246 && index == 1)
-            return false;
-        else if (getProduction() == Production.TYPE_SPEC_246 && index == 3)
-            return false;
-        else
-            return true;
+        return this.typeName;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    public void setTypeName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.TYPE_SPEC_246 && index == 2)
-            return true;
-        else
-            return false;
+        this.typeName = newValue;
+    }
+
+
+    public ASTCharSelectorNode getCharSelector()
+    {
+        return this.charSelector;
+    }
+
+    public void setCharSelector(ASTCharSelectorNode newValue)
+    {
+        this.charSelector = newValue;
+    }
+
+
+    public boolean isDouble()
+    {
+        return this.isDouble != null;
+    }
+
+    public void setIsDouble(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDouble = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTTypeSpecNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 13;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.isComplex;
+        case 1:  return this.isInteger;
+        case 2:  return this.isCharacter;
+        case 3:  return this.isReal;
+        case 4:  return this.isLogical;
+        case 5:  return this.kindSelector;
+        case 6:  return this.isDerivedType;
+        case 7:  return this.hiddenTLparen;
+        case 8:  return this.typeName;
+        case 9:  return this.hiddenTRparen;
+        case 10: return this.charSelector;
+        case 11: return this.isDouble;
+        case 12: return this.hiddenTPrecision;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.isComplex = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isInteger = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.isCharacter = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.isReal = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.isLogical = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.kindSelector = (ASTKindSelectorNode)value;
+        case 6:  this.isDerivedType = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 10: this.charSelector = (ASTCharSelectorNode)value;
+        case 11: this.isDouble = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 12: this.hiddenTPrecision = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,66 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDataStmtSetNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTDataStmtSetNode extends ASTNode
 {
-    ASTDataStmtSetNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<IDataStmtObject> dataStmtObjectList; // in ASTDataStmtSetNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash; // in ASTDataStmtSetNode
+    IASTListNode<ASTDataStmtValueNode> dataStmtValueList; // in ASTDataStmtSetNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash2; // in ASTDataStmtSetNode
+
+    public IASTListNode<IDataStmtObject> getDataStmtObjectList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.dataStmtObjectList;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setDataStmtObjectList(IASTListNode<IDataStmtObject> newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.dataStmtObjectList = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTDataStmtValueNode> getDataStmtValueList()
+    {
+        return this.dataStmtValueList;
+    }
+
+    public void setDataStmtValueList(IASTListNode<ASTDataStmtValueNode> newValue)
+    {
+        this.dataStmtValueList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDataStmtSetNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTDataStmtObjectListNode getDataStmtObjectList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_SET_371)
-            return (ASTDataStmtObjectListNode)getChild(0);
-        else
-            return null;
+        return 4;
     }
 
-    public ASTDataStmtValueListNode getDataStmtValueList()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_SET_371)
-            return (ASTDataStmtValueListNode)getChild(2);
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.dataStmtObjectList;
+        case 1:  return this.hiddenTSlash;
+        case 2:  return this.dataStmtValueList;
+        case 3:  return this.hiddenTSlash2;
+        default: return null;
+        }
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.DATA_STMT_SET_371 && index == 1)
-            return false;
-        else if (getProduction() == Production.DATA_STMT_SET_371 && index == 3)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.dataStmtObjectList = (IASTListNode<IDataStmtObject>)value;
+        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.dataStmtValueList = (IASTListNode<ASTDataStmtValueNode>)value;
+        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

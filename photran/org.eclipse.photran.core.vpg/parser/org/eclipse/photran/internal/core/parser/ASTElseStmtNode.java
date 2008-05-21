@@ -10,114 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTElseStmtNode extends InteriorNodeWithErrorRecoverySymbols
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTElseStmtNode extends ASTNodeWithErrorRecoverySymbols
 {
-    ASTElseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTElseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTElse; // in ASTElseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token endName; // in ASTElseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTElseStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production, discardedSymbols);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getEndName()
+    {
+        return this.endName;
+    }
+
+    public void setEndName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.endName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTElseStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_STMT_669)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ELSE_STMT_670)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ELSE_STMT_ERROR_9)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        return 4;
     }
 
-    public boolean hasLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_STMT_669)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ELSE_STMT_670)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ELSE_STMT_ERROR_9)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTElse;
+        case 2:  return this.endName;
+        case 3:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public Token getEndName()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_STMT_670)
-            return (Token)((ASTEndNameNode)getChild(2)).getEndName();
-        else
-            return null;
-    }
-
-    public boolean hasEndName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_STMT_670)
-            return ((ASTEndNameNode)getChild(2)).hasEndName();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.ELSE_STMT_669 && index == 1)
-            return false;
-        else if (getProduction() == Production.ELSE_STMT_669 && index == 2)
-            return false;
-        else if (getProduction() == Production.ELSE_STMT_670 && index == 1)
-            return false;
-        else if (getProduction() == Production.ELSE_STMT_670 && index == 3)
-            return false;
-        else if (getProduction() == Production.ELSE_STMT_ERROR_9 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.ELSE_STMT_669 && index == 0)
-            return true;
-        else if (getProduction() == Production.ELSE_STMT_670 && index == 0)
-            return true;
-        else if (getProduction() == Production.ELSE_STMT_670 && index == 2)
-            return true;
-        else if (getProduction() == Production.ELSE_STMT_ERROR_9 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

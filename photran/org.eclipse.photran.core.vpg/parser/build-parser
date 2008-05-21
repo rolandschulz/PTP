@@ -3,13 +3,13 @@
 SRCDIR=`pwd`
 
 cd org/eclipse/photran/internal/core/parser
-cp GenericParseTreeVisitor.java $SRCDIR
 
 echo Deleting old files...
 rm -f *.java
 
 echo Generating parser and AST classes...
-java -Xmx256M -jar $SRCDIR/ludwig.jar \
+java -Xmx256M -cp $SRCDIR/ludwig.jar \
+	Main_LALR1_Java_AST_Prototype \
 	-shift T_COMMA "<IoControlSpecList>" \
 	-reduce "<SFVarName>" "<SFDummyArgName>" \
 	-package "org.eclipse.photran.internal.core.parser" \
@@ -22,37 +22,18 @@ java -Xmx256M -jar $SRCDIR/ludwig.jar \
 	-onError "throw new Exception(\"Syntax error: Unexpected \" + lookahead.getTerminal().toString() + \" (\" + (lookahead.getFile()==null ? \"\" : lookahead.getFile().getName() + \", \") + \"line \" + lookahead.getLine() + \", column \" + lookahead.getCol() + \")\");" \
 	-lexerClass IAccumulatingLexer \
 	-parserClass Parser \
-	-tokenClass Token \
+	-tokenType "org.eclipse.photran.internal.core.lexer.Token" \
 	-autolabel true \
-	-generateTerminalClass false \
-	-generateLexerInterface false \
-	-generateTokenClass false \
+	-genTerminalClass false \
+	-genLexerInterface false \
+	-genTokenClass false \
+	-enablePreproc String \
 	$SRCDIR/fortran95.bnf
 
 echo Applying patches...
-#for file in AST*Node.java; do
-#  patch $file <$SRCDIR/ASTNode.patch
-#done
-#patch ASTVisitor.java <$SRCDIR/ASTVisitor.patch
-
-patch Parser.java <$SRCDIR/Parser.patch
-
-for file in Parser.java AST*Node.java AST*Base.java; do
-  sed -e 's/getCSTParent/getParent/g' $file >$file.x
-  mv -f $file.x $file
-done
-
-#for file in ASTExecutableProgramNode ASTMainProgramNode ASTFunctionSubprogramNode ASTSubroutineSubprogramNode ASTModuleNode ASTBlockDataSubprogramNode ASTDerivedTypeDefNode ASTInterfaceBlockNode; do
-#  sed -e 's/extends InteriorNode/extends ScopingNode/' $file.java >$file.java.x
-#  sed -e 's/import org.eclipse.photran.internal.core.lexer.Token/import org.eclipse.photran.internal.core.analysis.binding.ScopingNode/' $file.java.x >$file.java
-#  rm -f $file.java.x
-#done
-
 for file in *.java; do
   patch $file <$SRCDIR/Copyright.patch >/dev/null
 done
-
-mv $SRCDIR/GenericParseTreeVisitor.java .
 
 echo "Done"
 find . -name "*.rej"

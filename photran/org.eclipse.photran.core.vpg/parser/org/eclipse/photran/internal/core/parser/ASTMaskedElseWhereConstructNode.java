@@ -10,134 +10,118 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTMaskedElseWhereConstructNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTMaskedElseWhereConstructNode extends ASTNode
 {
-    ASTMaskedElseWhereConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTMaskedElseWhereConstructNode(this);
-    }
+    ASTMaskedElseWhereStmtNode maskedElseWhereStmt; // in ASTMaskedElseWhereConstructNode
+    IASTListNode<IWhereBodyConstruct> whereBodyConstructBlock; // in ASTMaskedElseWhereConstructNode
+    ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTMaskedElseWhereConstructNode
+    ASTEndWhereStmtNode endWhereStmt; // in ASTMaskedElseWhereConstructNode
+    ASTElseWhereConstructNode elseWhereConstruct; // in ASTMaskedElseWhereConstructNode
 
     public ASTMaskedElseWhereStmtNode getMaskedElseWhereStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return (ASTMaskedElseWhereStmtNode)getChild(0);
-        else
-            return null;
+        return this.maskedElseWhereStmt;
     }
 
-    public ASTEndWhereStmtNode getEndWhereStmt()
+    public void setMaskedElseWhereStmt(ASTMaskedElseWhereStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return (ASTEndWhereStmtNode)((ASTWhereRangeNode)getChild(1)).getEndWhereStmt();
-        else
-            return null;
+        this.maskedElseWhereStmt = newValue;
     }
 
-    public boolean hasEndWhereStmt()
+
+    public IASTListNode<IWhereBodyConstruct> getWhereBodyConstructBlock()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return ((ASTWhereRangeNode)getChild(1)).hasEndWhereStmt();
-        else
-            return false;
+        return this.whereBodyConstructBlock;
     }
 
-    public ASTWhereBodyConstructBlockNode getWhereBodyConstructBlock()
+    public void setWhereBodyConstructBlock(IASTListNode<IWhereBodyConstruct> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return (ASTWhereBodyConstructBlockNode)((ASTWhereRangeNode)getChild(1)).getWhereBodyConstructBlock();
-        else
-            return null;
+        this.whereBodyConstructBlock = newValue;
     }
 
-    public boolean hasWhereBodyConstructBlock()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return ((ASTWhereRangeNode)getChild(1)).hasWhereBodyConstructBlock();
-        else
-            return false;
-    }
 
     public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return (ASTMaskedElseWhereConstructNode)((ASTWhereRangeNode)getChild(1)).getMaskedElseWhereConstruct();
-        else
-            return null;
+        return this.maskedElseWhereConstruct;
     }
 
-    public boolean hasMaskedElseWhereConstruct()
+    public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return ((ASTWhereRangeNode)getChild(1)).hasMaskedElseWhereConstruct();
-        else
-            return false;
+        this.maskedElseWhereConstruct = newValue;
     }
+
+
+    public ASTEndWhereStmtNode getEndWhereStmt()
+    {
+        return this.endWhereStmt;
+    }
+
+    public void setEndWhereStmt(ASTEndWhereStmtNode newValue)
+    {
+        this.endWhereStmt = newValue;
+    }
+
 
     public ASTElseWhereConstructNode getElseWhereConstruct()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return (ASTElseWhereConstructNode)((ASTWhereRangeNode)getChild(1)).getElseWhereConstruct();
-        else
-            return null;
+        return this.elseWhereConstruct;
     }
 
-    public boolean hasElseWhereConstruct()
+    public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607)
-            return ((ASTWhereRangeNode)getChild(1)).hasElseWhereConstruct();
-        else
-            return false;
+        this.elseWhereConstruct = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.MASKED_ELSE_WHERE_CONSTRUCT_607 && index == 1)
-            return true;
-        else
-            return false;
+        visitor.visitASTMaskedElseWhereConstructNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.maskedElseWhereStmt;
+        case 1:  return this.whereBodyConstructBlock;
+        case 2:  return this.maskedElseWhereConstruct;
+        case 3:  return this.endWhereStmt;
+        case 4:  return this.elseWhereConstruct;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.maskedElseWhereStmt = (ASTMaskedElseWhereStmtNode)value;
+        case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
+        case 2:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value;
+        case 3:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
+        case 4:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

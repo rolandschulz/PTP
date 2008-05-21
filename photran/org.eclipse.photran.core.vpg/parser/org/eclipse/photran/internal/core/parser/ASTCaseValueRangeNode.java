@@ -10,88 +10,79 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCaseValueRangeNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTCaseValueRangeNode extends ASTNode
 {
-    ASTCaseValueRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTExprNode lb; // in ASTCaseValueRangeNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTCaseValueRangeNode
+    ASTExprNode ub; // in ASTCaseValueRangeNode
+
+    public ASTExprNode getLb()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.lb;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLb(ASTExprNode newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.lb = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getUb()
+    {
+        return this.ub;
+    }
+
+    public void setUb(ASTExprNode newValue)
+    {
+        this.ub = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCaseValueRangeNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getLb()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_VALUE_RANGE_697)
-            return (ASTExpressionNode)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_698)
-            return (ASTExpressionNode)getChild(0);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_700)
-            return (ASTExpressionNode)getChild(0);
-        else
-            return null;
+        return 3;
     }
 
-    public boolean hasLb()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_VALUE_RANGE_697)
-            return getChild(0) != null;
-        else if (getProduction() == Production.CASE_VALUE_RANGE_698)
-            return getChild(0) != null;
-        else if (getProduction() == Production.CASE_VALUE_RANGE_700)
-            return getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.lb;
+        case 1:  return this.hiddenTColon;
+        case 2:  return this.ub;
+        default: return null;
+        }
     }
 
-    public ASTExpressionNode getUb()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_VALUE_RANGE_699)
-            return (ASTExpressionNode)getChild(1);
-        else if (getProduction() == Production.CASE_VALUE_RANGE_700)
-            return (ASTExpressionNode)getChild(2);
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.CASE_VALUE_RANGE_698 && index == 1)
-            return false;
-        else if (getProduction() == Production.CASE_VALUE_RANGE_699 && index == 0)
-            return false;
-        else if (getProduction() == Production.CASE_VALUE_RANGE_700 && index == 1)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.lb = (ASTExprNode)value;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.ub = (ASTExprNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,165 +10,109 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEndfileStmtNode extends InteriorNode implements IActionStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEndfileStmtNode extends ASTNode implements IActionStmt
 {
-    ASTEndfileStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndfileStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndfileStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndfile; // in ASTEndfileStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTFile; // in ASTEndfileStmtNode
+    ASTUnitIdentifierNode unitIdentifier; // in ASTEndfileStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTEndfileStmtNode
+    IASTListNode<ASTPositionSpecListNode> positionSpecList; // in ASTEndfileStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTEndfileStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndfileStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIActionStmt(this);
-        visitor.visitASTEndfileStmtNode(this);
-    }
+
 
     public ASTUnitIdentifierNode getUnitIdentifier()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ENDFILE_STMT_824)
-            return (ASTUnitIdentifierNode)getChild(2);
-        else if (getProduction() == Production.ENDFILE_STMT_826)
-            return (ASTUnitIdentifierNode)getChild(3);
-        else
-            return null;
+        return this.unitIdentifier;
     }
 
-    public boolean hasUnitIdentifier()
+    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ENDFILE_STMT_824)
-            return getChild(2) != null;
-        else if (getProduction() == Production.ENDFILE_STMT_826)
-            return getChild(3) != null;
-        else
-            return false;
+        this.unitIdentifier = newValue;
     }
 
-    public ASTPositionSpecListNode getPositionSpecList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ENDFILE_STMT_825)
-            return (ASTPositionSpecListNode)getChild(3);
-        else if (getProduction() == Production.ENDFILE_STMT_827)
-            return (ASTPositionSpecListNode)getChild(4);
-        else
-            return null;
+    public IASTListNode<ASTPositionSpecListNode> getPositionSpecList()
+    {
+        return this.positionSpecList;
     }
 
-    public boolean hasPositionSpecList()
+    public void setPositionSpecList(IASTListNode<ASTPositionSpecListNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ENDFILE_STMT_825)
-            return getChild(3) != null;
-        else if (getProduction() == Production.ENDFILE_STMT_827)
-            return getChild(4) != null;
-        else
-            return false;
+        this.positionSpecList = newValue;
     }
 
-    public Token getLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ENDFILE_STMT_824)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ENDFILE_STMT_825)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ENDFILE_STMT_826)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.ENDFILE_STMT_827)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTEndfileStmtNode(this);
+        visitor.visitIActionStmt(this);
+        visitor.visitASTNode(this);
     }
 
-    public boolean hasLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ENDFILE_STMT_824)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ENDFILE_STMT_825)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ENDFILE_STMT_826)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.ENDFILE_STMT_827)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        return 9;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.ENDFILE_STMT_824 && index == 1)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_824 && index == 3)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_825 && index == 1)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_825 && index == 2)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_825 && index == 4)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_825 && index == 5)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_826 && index == 1)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_826 && index == 2)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_826 && index == 4)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_827 && index == 1)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_827 && index == 2)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_827 && index == 3)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_827 && index == 5)
-            return false;
-        else if (getProduction() == Production.ENDFILE_STMT_827 && index == 6)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTEnd;
+        case 2:  return this.hiddenTEndfile;
+        case 3:  return this.hiddenTFile;
+        case 4:  return this.unitIdentifier;
+        case 5:  return this.hiddenTLparen;
+        case 6:  return this.positionSpecList;
+        case 7:  return this.hiddenTRparen;
+        case 8:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.ENDFILE_STMT_824 && index == 0)
-            return true;
-        else if (getProduction() == Production.ENDFILE_STMT_825 && index == 0)
-            return true;
-        else if (getProduction() == Production.ENDFILE_STMT_826 && index == 0)
-            return true;
-        else if (getProduction() == Production.ENDFILE_STMT_827 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTEndfile = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTFile = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
+        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.positionSpecList = (IASTListNode<ASTPositionSpecListNode>)value;
+        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

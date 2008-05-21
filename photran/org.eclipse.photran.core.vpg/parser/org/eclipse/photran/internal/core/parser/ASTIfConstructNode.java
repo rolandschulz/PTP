@@ -10,157 +10,133 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTIfConstructNode extends InteriorNode implements IExecutableConstruct
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTIfConstructNode extends ASTNode implements IExecutableConstruct
 {
-    ASTIfConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIExecutableConstruct(this);
-        visitor.visitASTIfConstructNode(this);
-    }
+    ASTIfThenStmtNode ifThenStmt; // in ASTIfConstructNode
+    IASTListNode<IExecutionPartConstruct> thenBody; // in ASTIfConstructNode
+    IASTListNode<ASTElseIfConstructNode> elseIfParts; // in ASTIfConstructNode
+    ASTElseStmtNode elseStmt; // in ASTIfConstructNode
+    IASTListNode<IExecutionPartConstruct> elseBody; // in ASTIfConstructNode
+    ASTEndIfStmtNode endIfStmt; // in ASTIfConstructNode
 
     public ASTIfThenStmtNode getIfThenStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return (ASTIfThenStmtNode)getChild(0);
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return (ASTIfThenStmtNode)getChild(0);
-        else if (getProduction() == Production.IF_CONSTRUCT_656)
-            return (ASTIfThenStmtNode)getChild(0);
-        else if (getProduction() == Production.IF_CONSTRUCT_657)
-            return (ASTIfThenStmtNode)getChild(0);
-        else
-            return null;
+        return this.ifThenStmt;
     }
 
-    public ASTConditionalBodyNode getThenBody()
+    public void setIfThenStmt(ASTIfThenStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return (ASTConditionalBodyNode)getChild(1);
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return (ASTConditionalBodyNode)getChild(1);
-        else if (getProduction() == Production.IF_CONSTRUCT_656)
-            return (ASTConditionalBodyNode)getChild(1);
-        else if (getProduction() == Production.IF_CONSTRUCT_657)
-            return (ASTConditionalBodyNode)getChild(1);
-        else
-            return null;
+        this.ifThenStmt = newValue;
     }
 
-    public ASTElseIfPartsNode getElseIfParts()
+
+    public IASTListNode<IExecutionPartConstruct> getThenBody()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return (ASTElseIfPartsNode)getChild(2);
-        else if (getProduction() == Production.IF_CONSTRUCT_656)
-            return (ASTElseIfPartsNode)getChild(2);
-        else
-            return null;
+        return this.thenBody;
     }
 
-    public boolean hasElseIfParts()
+    public void setThenBody(IASTListNode<IExecutionPartConstruct> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return getChild(2) != null;
-        else if (getProduction() == Production.IF_CONSTRUCT_656)
-            return getChild(2) != null;
-        else
-            return false;
+        this.thenBody = newValue;
     }
+
+
+    public IASTListNode<ASTElseIfConstructNode> getElseIfParts()
+    {
+        return this.elseIfParts;
+    }
+
+    public void setElseIfParts(IASTListNode<ASTElseIfConstructNode> newValue)
+    {
+        this.elseIfParts = newValue;
+    }
+
 
     public ASTElseStmtNode getElseStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return (ASTElseStmtNode)getChild(3);
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return (ASTElseStmtNode)getChild(2);
-        else
-            return null;
+        return this.elseStmt;
     }
 
-    public boolean hasElseStmt()
+    public void setElseStmt(ASTElseStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return getChild(3) != null;
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return getChild(2) != null;
-        else
-            return false;
+        this.elseStmt = newValue;
     }
 
-    public ASTConditionalBodyNode getElseBody()
+
+    public IASTListNode<IExecutionPartConstruct> getElseBody()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return (ASTConditionalBodyNode)getChild(4);
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return (ASTConditionalBodyNode)getChild(3);
-        else
-            return null;
+        return this.elseBody;
     }
 
-    public boolean hasElseBody()
+    public void setElseBody(IASTListNode<IExecutionPartConstruct> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return getChild(4) != null;
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return getChild(3) != null;
-        else
-            return false;
+        this.elseBody = newValue;
     }
+
 
     public ASTEndIfStmtNode getEndIfStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        return this.endIfStmt;
+    }
 
-        if (getProduction() == Production.IF_CONSTRUCT_654)
-            return (ASTEndIfStmtNode)getChild(5);
-        else if (getProduction() == Production.IF_CONSTRUCT_655)
-            return (ASTEndIfStmtNode)getChild(4);
-        else if (getProduction() == Production.IF_CONSTRUCT_656)
-            return (ASTEndIfStmtNode)getChild(3);
-        else if (getProduction() == Production.IF_CONSTRUCT_657)
-            return (ASTEndIfStmtNode)getChild(2);
-        else
-            return null;
+    public void setEndIfStmt(ASTEndIfStmtNode newValue)
+    {
+        this.endIfStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTIfConstructNode(this);
+        visitor.visitIExecutableConstruct(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 6;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.ifThenStmt;
+        case 1:  return this.thenBody;
+        case 2:  return this.elseIfParts;
+        case 3:  return this.elseStmt;
+        case 4:  return this.elseBody;
+        case 5:  return this.endIfStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.ifThenStmt = (ASTIfThenStmtNode)value;
+        case 1:  this.thenBody = (IASTListNode<IExecutionPartConstruct>)value;
+        case 2:  this.elseIfParts = (IASTListNode<ASTElseIfConstructNode>)value;
+        case 3:  this.elseStmt = (ASTElseStmtNode)value;
+        case 4:  this.elseBody = (IASTListNode<IExecutionPartConstruct>)value;
+        case 5:  this.endIfStmt = (ASTEndIfStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

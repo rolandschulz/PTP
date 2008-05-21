@@ -22,8 +22,8 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * Implements the Display Symbol Table action in the Refactor/(Debugging) menu
@@ -43,11 +43,11 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 
             ps.println("SYMBOL TABLE - Derived from Virtual Program Graph");
             
-        	getAST().visitUsing(new GenericParseTreeVisitor()
+        	getAST().accept(new GenericASTVisitor()
         	{
         		private int indentation = 0;
         		
-				@Override public void preparingToVisitChildrenOf(InteriorNode node)
+				@Override public void visitASTNode(IASTNode node)
 				{
 					if (!(node instanceof ScopingNode)) return;
 					if (node instanceof ASTExecutableProgramNode && node.getParent() != null) return;
@@ -69,13 +69,9 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 						println("EXCEPTION: " + e.getClass().getName() + ": " + e.getMessage());
 						e.printStackTrace(ps);
 					}
-				}
-
-				@Override public void doneVisitingChildrenOf(InteriorNode node)
-				{
-					if (!(node instanceof ScopingNode)) return;
-					if (node instanceof ASTExecutableProgramNode && node.getParent() != null) return;
 					
+					traverseChildren(node);
+
 					indentation -= 4;
 				}
 

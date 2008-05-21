@@ -10,76 +10,93 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAllocationNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAllocationNode extends ASTNode
 {
-    ASTAllocationNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<ASTAllocateObjectNode> allocateObject; // in ASTAllocationNode
+    org.eclipse.photran.internal.core.lexer.Token hasAllocatedShape; // in ASTAllocationNode
+    IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTAllocationNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAllocationNode
+
+    public IASTListNode<ASTAllocateObjectNode> getAllocateObject()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTAllocationNode(this);
+        return this.allocateObject;
     }
 
-    public ASTAllocateObjectNode getAllocateObject()
+    public void setAllocateObject(IASTListNode<ASTAllocateObjectNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ALLOCATION_458)
-            return (ASTAllocateObjectNode)getChild(0);
-        else if (getProduction() == Production.ALLOCATION_459)
-            return (ASTAllocateObjectNode)getChild(0);
-        else
-            return null;
+        this.allocateObject = newValue;
     }
+
 
     public boolean hasAllocatedShape()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ALLOCATION_459)
-            return ((ASTAllocatedShapeNode)getChild(1)).hasAllocatedShape();
-        else
-            return false;
+        return this.hasAllocatedShape != null;
     }
 
-    public ASTSectionSubscriptListNode getSectionSubscriptList()
+    public void setHasAllocatedShape(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ALLOCATION_459)
-            return (ASTSectionSubscriptListNode)((ASTAllocatedShapeNode)getChild(1)).getSectionSubscriptList();
-        else
-            return null;
+        this.hasAllocatedShape = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public IASTListNode<ASTSectionSubscriptNode> getSectionSubscriptList()
     {
-        if (getProduction() == Production.ALLOCATION_459 && index == 1)
-            return true;
-        else
-            return false;
+        return this.sectionSubscriptList;
+    }
+
+    public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
+    {
+        this.sectionSubscriptList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTAllocationNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.allocateObject;
+        case 1:  return this.hasAllocatedShape;
+        case 2:  return this.sectionSubscriptList;
+        case 3:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.allocateObject = (IASTListNode<ASTAllocateObjectNode>)value;
+        case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

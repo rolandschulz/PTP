@@ -13,7 +13,7 @@ package org.eclipse.photran.internal.core.lexer;
 import java.util.Iterator;
 
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
  * Maintains a list of all of the tokens in a program, allowing them to be
@@ -35,7 +35,7 @@ public class TokenList
     public TokenList(ASTExecutableProgramNode ast)
     {
     	this();
-    	ast.visitUsing(new GenericParseTreeVisitor()
+    	ast.accept(new ASTVisitor()
     	{
 			public void visitToken(Token token)
 			{

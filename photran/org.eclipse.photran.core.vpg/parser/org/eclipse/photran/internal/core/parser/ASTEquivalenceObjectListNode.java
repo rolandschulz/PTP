@@ -10,128 +10,65 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEquivalenceObjectListNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEquivalenceObjectListNode extends ASTNode
 {
-    protected int count = -1;
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTEquivalenceObjectListNode
+    ASTVariableNode variable; // in ASTEquivalenceObjectListNode
 
-    ASTEquivalenceObjectListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public ASTVariableNode getVariable()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTEquivalenceObjectListNode
-               && grandparent instanceof ASTEquivalenceObjectListNode
-               && ((ASTEquivalenceObjectListNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.variable;
     }
 
-    /**
-     * @return the number of ASTEquivalenceObjectListNode nodes in this list
-     */
-    public int size()
+    public void setVariable(ASTVariableNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTEquivalenceObjectListNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.variable = newValue;
     }
-    
-    ASTEquivalenceObjectListNode recurseToIndex(int listIndex)
-    {
-        ASTEquivalenceObjectListNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTEquivalenceObjectListNode)node.getRecursiveNode();
-        }
-        return node;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEquivalenceObjectListNode(this);
+        visitor.visitASTNode(this);
     }
 
-    private ASTEquivalenceObjectListNode getRecursiveNode()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406)
-            return (ASTEquivalenceObjectListNode)getChild(0);
-        else
-            return null;
+        return 2;
     }
 
-    public ASTVariableNode getVariable(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTEquivalenceObjectListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_405)
-            return (ASTVariableNode)((ASTEquivalenceObjectNode)node.getChild(0)).getVariable();
-        else if (node.getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406)
-            return (ASTVariableNode)((ASTEquivalenceObjectNode)node.getChild(2)).getVariable();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.hiddenTComma;
+        case 1:  return this.variable;
+        default: return null;
+        }
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_405 && index == 0)
-            return true;
-        else if (getProduction() == Production.EQUIVALENCE_OBJECT_LIST_406 && index == 2)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.variable = (ASTVariableNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

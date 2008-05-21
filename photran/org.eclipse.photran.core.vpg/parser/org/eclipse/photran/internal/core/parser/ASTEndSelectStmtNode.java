@@ -10,136 +10,88 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEndSelectStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEndSelectStmtNode extends ASTNode
 {
-    ASTEndSelectStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndSelectStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndSelectStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSelect; // in ASTEndSelectStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndselect; // in ASTEndSelectStmtNode
+    org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndSelectStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndSelectStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getEndName()
+    {
+        return this.endName;
+    }
+
+    public void setEndName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.endName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEndSelectStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SELECT_STMT_689)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_SELECT_STMT_690)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_SELECT_STMT_691)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_SELECT_STMT_692)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        return 6;
     }
 
-    public boolean hasLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SELECT_STMT_689)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_SELECT_STMT_690)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_SELECT_STMT_691)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_SELECT_STMT_692)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTEnd;
+        case 2:  return this.hiddenTSelect;
+        case 3:  return this.hiddenTEndselect;
+        case 4:  return this.endName;
+        case 5:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public Token getEndName()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SELECT_STMT_690)
-            return (Token)((ASTEndNameNode)getChild(2)).getEndName();
-        else if (getProduction() == Production.END_SELECT_STMT_692)
-            return (Token)((ASTEndNameNode)getChild(3)).getEndName();
-        else
-            return null;
-    }
-
-    public boolean hasEndName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_SELECT_STMT_690)
-            return ((ASTEndNameNode)getChild(2)).hasEndName();
-        else if (getProduction() == Production.END_SELECT_STMT_692)
-            return ((ASTEndNameNode)getChild(3)).hasEndName();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.END_SELECT_STMT_689 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_689 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_690 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_690 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_691 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_691 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_691 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_692 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_692 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_SELECT_STMT_692 && index == 4)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.END_SELECT_STMT_689 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_SELECT_STMT_690 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_SELECT_STMT_690 && index == 2)
-            return true;
-        else if (getProduction() == Production.END_SELECT_STMT_691 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_SELECT_STMT_692 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_SELECT_STMT_692 && index == 3)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTEndselect = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

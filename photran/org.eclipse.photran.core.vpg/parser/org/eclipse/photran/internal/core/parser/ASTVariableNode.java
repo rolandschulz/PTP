@@ -10,156 +10,112 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTVariableNode extends InteriorNode implements IDataStmtObject, IInputItem
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputItem
 {
-    ASTVariableNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTVariableNode
+    IASTListNode<ASTDataRefNode> dataRef; // in ASTVariableNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTVariableNode
+    IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTVariableNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTVariableNode
+    ASTSubstringRangeNode substringRange; // in ASTVariableNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIDataStmtObject(this);
-        visitor.visitIInputItem(this);
-        visitor.visitASTVariableNode(this);
+        return this.stringConst;
     }
 
-    public ASTDataRefNode getDataRef()
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.VARIABLE_419)
-            return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.VARIABLE_420)
-            return (ASTDataRefNode)getChild(0);
-        else if (getProduction() == Production.VARIABLE_421)
-            return (ASTDataRefNode)getChild(0);
-        else
-            return null;
+        this.stringConst = newValue;
     }
 
-    public boolean hasDataRef()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_419)
-            return getChild(0) != null;
-        else if (getProduction() == Production.VARIABLE_420)
-            return getChild(0) != null;
-        else if (getProduction() == Production.VARIABLE_421)
-            return getChild(0) != null;
-        else
-            return false;
+    public IASTListNode<ASTDataRefNode> getDataRef()
+    {
+        return this.dataRef;
     }
 
-    public ASTSectionSubscriptListNode getSectionSubscriptList()
+    public void setDataRef(IASTListNode<ASTDataRefNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.VARIABLE_420)
-            return (ASTSectionSubscriptListNode)getChild(2);
-        else if (getProduction() == Production.VARIABLE_421)
-            return (ASTSectionSubscriptListNode)getChild(2);
-        else
-            return null;
+        this.dataRef = newValue;
     }
 
-    public boolean hasSectionSubscriptList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_420)
-            return getChild(2) != null;
-        else if (getProduction() == Production.VARIABLE_421)
-            return getChild(2) != null;
-        else
-            return false;
+    public IASTListNode<ASTSectionSubscriptNode> getSectionSubscriptList()
+    {
+        return this.sectionSubscriptList;
     }
+
+    public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
+    {
+        this.sectionSubscriptList = newValue;
+    }
+
 
     public ASTSubstringRangeNode getSubstringRange()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.VARIABLE_421)
-            return (ASTSubstringRangeNode)getChild(4);
-        else if (getProduction() == Production.VARIABLE_422)
-            return (ASTSubstringRangeNode)((ASTSubstrConstNode)getChild(0)).getSubstringRange();
-        else
-            return null;
+        return this.substringRange;
     }
 
-    public boolean hasSubstringRange()
+    public void setSubstringRange(ASTSubstringRangeNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.VARIABLE_421)
-            return getChild(4) != null;
-        else if (getProduction() == Production.VARIABLE_422)
-            return ((ASTSubstrConstNode)getChild(0)).hasSubstringRange();
-        else
-            return false;
+        this.substringRange = newValue;
     }
 
-    public Token getStringConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.VARIABLE_422)
-            return (Token)((ASTSubstrConstNode)getChild(0)).getStringConst();
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTVariableNode(this);
+        visitor.visitIDataStmtObject(this);
+        visitor.visitIInputItem(this);
+        visitor.visitASTNode(this);
     }
 
-    public boolean hasStringConst()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.VARIABLE_422)
-            return ((ASTSubstrConstNode)getChild(0)).hasStringConst();
-        else
-            return false;
+        return 6;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.VARIABLE_420 && index == 1)
-            return false;
-        else if (getProduction() == Production.VARIABLE_420 && index == 3)
-            return false;
-        else if (getProduction() == Production.VARIABLE_421 && index == 1)
-            return false;
-        else if (getProduction() == Production.VARIABLE_421 && index == 3)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  return this.stringConst;
+        case 1:  return this.dataRef;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.sectionSubscriptList;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.substringRange;
+        default: return null;
+        }
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.VARIABLE_422 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.dataRef = (IASTListNode<ASTDataRefNode>)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.substringRange = (ASTSubstringRangeNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

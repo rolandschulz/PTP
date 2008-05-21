@@ -14,8 +14,8 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * The Reindenter is used to correct indentation when a node is pasted into an AST
@@ -29,7 +29,7 @@ import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
  */
 public class Reindenter
 {
-	public static void reindent(CSTNode node, IFortranAST ast)
+	public static void reindent(IASTNode node, IFortranAST ast)
     {
     	new Reindenter(node, ast);
     }
@@ -37,7 +37,7 @@ public class Reindenter
 	private IFortranAST ast;
 	private int lastLine;
 	
-    private Reindenter(CSTNode node, IFortranAST ast)
+    private Reindenter(IASTNode node, IFortranAST ast)
 	{
     	this.ast = ast;
     	
@@ -62,7 +62,7 @@ public class Reindenter
         
         final String indent = determineIndent(firstTokenBelow);
         
-        ast.visitUsing(new GenericParseTreeVisitor()
+        ast.accept(new ASTVisitor()
         {
             private boolean inFormatRegion = false;
             private Token previousToken = null;
@@ -136,11 +136,11 @@ public class Reindenter
     private int recomputeLineColInfo()
     {
     	LineColComputer lcc = new LineColComputer();
-    	ast.visitUsing(lcc);
+    	ast.accept(lcc);
     	return lcc.line; // line number of last token
     }
 
-    private final class LineColComputer extends GenericParseTreeVisitor
+    private final class LineColComputer extends ASTVisitor
     {
 		private int line = 1, col = 1;
 
@@ -233,16 +233,16 @@ public class Reindenter
 //     * @return the number of characters by which the source code in this node needs to be shifted
 //     * to the left so that the leftmost token will begin on column one.
 //     */
-//    private int getUnindentAmount(CSTNode node)
+//    private int getUnindentAmount(IASTNode node)
 //    {
 //        return Math.max(getStartColOfLeftmostBlockIn(node) - 1, 0);
 //    }
 
-    private Token findFirstTokenIn(final CSTNode node)
+    private Token findFirstTokenIn(final IASTNode node)
     {
         try
         {
-            node.visitUsing(new GenericParseTreeVisitor()
+            node.accept(new ASTVisitor()
             {
                 public void visitToken(Token token)
                 {
@@ -257,7 +257,7 @@ public class Reindenter
         return null;
     }
 
-    private Token findLastTokenIn(final CSTNode node)
+    private Token findLastTokenIn(final IASTNode node)
     {
         return new Object()
         {
@@ -265,7 +265,7 @@ public class Reindenter
             
             public Token getLastToken()
             {
-                node.visitUsing(new GenericParseTreeVisitor()
+                node.accept(new ASTVisitor()
                 {
                     public void visitToken(Token token)
                     {
@@ -282,7 +282,7 @@ public class Reindenter
 //     * @return the leftmost column at which a token in this PartialProgram is positioned
 //     * (useful for unindenting code)
 //     */
-//    private int getStartColOfLeftmostBlockIn(final CSTNode node)
+//    private int getStartColOfLeftmostBlockIn(final IASTNode node)
 //    {
 //        return new Object()
 //        {

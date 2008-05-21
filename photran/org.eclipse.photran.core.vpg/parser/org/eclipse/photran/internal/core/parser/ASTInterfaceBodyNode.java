@@ -10,111 +10,119 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInterfaceBodyNode extends InteriorNode implements IInterfaceSpecification
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecification
 {
-    ASTInterfaceBodyNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIInterfaceSpecification(this);
-        visitor.visitASTInterfaceBodyNode(this);
-    }
+    ASTFunctionStmtNode functionStmt; // in ASTInterfaceBodyNode
+    ASTSubroutineStmtNode subroutineStmt; // in ASTInterfaceBodyNode
+    IASTListNode<ISpecificationPartConstruct> subprogramInterfaceBody; // in ASTInterfaceBodyNode
+    ASTEndSubroutineStmtNode endSubroutineStmt; // in ASTInterfaceBodyNode
+    ASTEndFunctionStmtNode endFunctionStmt; // in ASTInterfaceBodyNode
 
     public ASTFunctionStmtNode getFunctionStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_939)
-            return (ASTFunctionStmtNode)getChild(0);
-        else
-            return null;
+        return this.functionStmt;
     }
+
+    public void setFunctionStmt(ASTFunctionStmtNode newValue)
+    {
+        this.functionStmt = newValue;
+    }
+
 
     public ASTSubroutineStmtNode getSubroutineStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_940)
-            return (ASTSubroutineStmtNode)getChild(0);
-        else
-            return null;
+        return this.subroutineStmt;
     }
 
-    public ASTSubprogramInterfaceBodyNode getSubprogramInterfaceBody()
+    public void setSubroutineStmt(ASTSubroutineStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_939)
-            return (ASTSubprogramInterfaceBodyNode)((ASTFunctionInterfaceRangeNode)getChild(1)).getSubprogramInterfaceBody();
-        else if (getProduction() == Production.INTERFACE_BODY_940)
-            return (ASTSubprogramInterfaceBodyNode)((ASTSubroutineInterfaceRangeNode)getChild(1)).getSubprogramInterfaceBody();
-        else
-            return null;
+        this.subroutineStmt = newValue;
     }
 
-    public boolean hasSubprogramInterfaceBody()
+
+    public IASTListNode<ISpecificationPartConstruct> getSubprogramInterfaceBody()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_939)
-            return ((ASTFunctionInterfaceRangeNode)getChild(1)).hasSubprogramInterfaceBody();
-        else if (getProduction() == Production.INTERFACE_BODY_940)
-            return ((ASTSubroutineInterfaceRangeNode)getChild(1)).hasSubprogramInterfaceBody();
-        else
-            return false;
+        return this.subprogramInterfaceBody;
     }
 
-    public ASTEndFunctionStmtNode getEndFunctionStmt()
+    public void setSubprogramInterfaceBody(IASTListNode<ISpecificationPartConstruct> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_939)
-            return (ASTEndFunctionStmtNode)((ASTFunctionInterfaceRangeNode)getChild(1)).getEndFunctionStmt();
-        else
-            return null;
+        this.subprogramInterfaceBody = newValue;
     }
+
 
     public ASTEndSubroutineStmtNode getEndSubroutineStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INTERFACE_BODY_940)
-            return (ASTEndSubroutineStmtNode)((ASTSubroutineInterfaceRangeNode)getChild(1)).getEndSubroutineStmt();
-        else
-            return null;
+        return this.endSubroutineStmt;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    public void setEndSubroutineStmt(ASTEndSubroutineStmtNode newValue)
     {
-        if (getProduction() == Production.INTERFACE_BODY_939 && index == 1)
-            return true;
-        else if (getProduction() == Production.INTERFACE_BODY_940 && index == 1)
-            return true;
-        else
-            return false;
+        this.endSubroutineStmt = newValue;
+    }
+
+
+    public ASTEndFunctionStmtNode getEndFunctionStmt()
+    {
+        return this.endFunctionStmt;
+    }
+
+    public void setEndFunctionStmt(ASTEndFunctionStmtNode newValue)
+    {
+        this.endFunctionStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTInterfaceBodyNode(this);
+        visitor.visitIInterfaceSpecification(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.functionStmt;
+        case 1:  return this.subroutineStmt;
+        case 2:  return this.subprogramInterfaceBody;
+        case 3:  return this.endSubroutineStmt;
+        case 4:  return this.endFunctionStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.functionStmt = (ASTFunctionStmtNode)value;
+        case 1:  this.subroutineStmt = (ASTSubroutineStmtNode)value;
+        case 2:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value;
+        case 3:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value;
+        case 4:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

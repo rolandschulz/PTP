@@ -10,124 +10,121 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTOutputItemListNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTOutputItemListNode extends ASTNode
 {
-    ASTOutputItemListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTOutputItemList1Node outputItemList1; // in ASTOutputItemListNode
+    ASTExprNode singleExpr; // in ASTOutputItemListNode
+    ASTExprNode expr1; // in ASTOutputItemListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTOutputItemListNode
+    ASTExprNode expr2; // in ASTOutputItemListNode
+    ASTOutputImpliedDoNode outputImpliedDo; // in ASTOutputItemListNode
+
+    public ASTOutputItemList1Node getOutputItemList1()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.outputItemList1;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setOutputItemList1(ASTOutputItemList1Node newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.outputItemList1 = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getSingleExpr()
+    {
+        return this.singleExpr;
+    }
+
+    public void setSingleExpr(ASTExprNode newValue)
+    {
+        this.singleExpr = newValue;
+    }
+
+
+    public ASTExprNode getExpr1()
+    {
+        return this.expr1;
+    }
+
+    public void setExpr1(ASTExprNode newValue)
+    {
+        this.expr1 = newValue;
+    }
+
+
+    public ASTExprNode getExpr2()
+    {
+        return this.expr2;
+    }
+
+    public void setExpr2(ASTExprNode newValue)
+    {
+        this.expr2 = newValue;
+    }
+
+
+    public ASTOutputImpliedDoNode getOutputImpliedDo()
+    {
+        return this.outputImpliedDo;
+    }
+
+    public void setOutputImpliedDo(ASTOutputImpliedDoNode newValue)
+    {
+        this.outputImpliedDo = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTOutputItemListNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getSingleExpr()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_809)
-            return (ASTExpressionNode)getChild(0);
-        else
-            return null;
+        return 6;
     }
 
-    public int size()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return (int)((ASTOutputItemList1Node)getChild(0)).size();
-        else
-            return 0;
+        switch (index)
+        {
+        case 0:  return this.outputItemList1;
+        case 1:  return this.singleExpr;
+        case 2:  return this.expr1;
+        case 3:  return this.hiddenTComma;
+        case 4:  return this.expr2;
+        case 5:  return this.outputImpliedDo;
+        default: return null;
+        }
     }
 
-    public ASTExpressionNode getExpr1(int listIndex1)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return (ASTExpressionNode)((ASTOutputItemList1Node)getChild(0)).getExpr1(listIndex1);
-        else
-            return null;
-    }
-
-    public boolean hasExpr1(int listIndex1)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return ((ASTOutputItemList1Node)getChild(0)).hasExpr1(listIndex1);
-        else
-            return false;
-    }
-
-    public ASTExpressionNode getExpr2(int listIndex1)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return (ASTExpressionNode)((ASTOutputItemList1Node)getChild(0)).getExpr2(listIndex1);
-        else
-            return null;
-    }
-
-    public boolean hasExpr2(int listIndex1)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return ((ASTOutputItemList1Node)getChild(0)).hasExpr2(listIndex1);
-        else
-            return false;
-    }
-
-    public ASTOutputImpliedDoNode getOutputImpliedDo(int listIndex1)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return (ASTOutputImpliedDoNode)((ASTOutputItemList1Node)getChild(0)).getOutputImpliedDo(listIndex1);
-        else
-            return null;
-    }
-
-    public boolean hasOutputImpliedDo(int listIndex1)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810)
-            return ((ASTOutputItemList1Node)getChild(0)).hasOutputImpliedDo(listIndex1);
-        else
-            return false;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.OUTPUT_ITEM_LIST_810 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.outputItemList1 = (ASTOutputItemList1Node)value;
+        case 1:  this.singleExpr = (ASTExprNode)value;
+        case 2:  this.expr1 = (ASTExprNode)value;
+        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.expr2 = (ASTExprNode)value;
+        case 5:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

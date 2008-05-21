@@ -27,13 +27,11 @@ import org.eclipse.photran.internal.core.parser.ASTAccessSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
-import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 import bz.over.vpg.TokenRef;
 
@@ -145,7 +143,7 @@ public class Definition implements Serializable, Comparable<Definition>
     
     private boolean isInternal()
     {
-        for (CSTNode parent = tokenRef.findToken().getParent(); parent != null; parent = parent.getParent())
+        for (IASTNode parent = tokenRef.findToken().getParent(); parent != null; parent = parent.getParent())
             if (parent instanceof IInternalSubprogram)
                 return true;
         
@@ -313,12 +311,12 @@ public class Definition implements Serializable, Comparable<Definition>
     // | @:<AttrSpecSeq> T_COMMA <AttrSpec>
     
     /** Sets the attributes according to an AttrSpecSeq node */
-    void setAttributes(ASTAttrSpecSeqNode attrSpecSeq)
+    void setAttributes(IASTListNode<ASTAttrSpecSeqNode> listNode)
     {
-        if (attrSpecSeq == null) return;
+        if (listNode == null) return;
         
-        for (int i = 0; i < attrSpecSeq.size(); i++)
-            setAttribute(attrSpecSeq.getAttrSpec(i));
+        for (int i = 0; i < listNode.size(); i++)
+            setAttribute(listNode.get(i).getAttrSpec());
     }
 
     // # R503
@@ -469,7 +467,7 @@ public class Definition implements Serializable, Comparable<Definition>
             {
                 isScopingUnit = (localScope != tok.getEnclosingScope());
                 
-                InteriorNode headerStmt;
+                IASTNode headerStmt;
                 if (isScopingUnit)
                     headerStmt = localScope.getHeaderStmt();
                 else
@@ -477,8 +475,8 @@ public class Definition implements Serializable, Comparable<Definition>
                 
                 if (headerStmt != null)
                 {
-                    Token first = FortranRefactoring.findFirstTokenIn(headerStmt);
-                    Token last = FortranRefactoring.findLastTokenIn(headerStmt);
+                    Token first = headerStmt.findFirstToken();
+                    Token last = headerStmt.findLastToken();
                     if (first != null) commentsBefore = first.getWhiteBefore();
                     if (last != null) commentsAfter = last.getWhiteAfter();
                     
@@ -492,9 +490,9 @@ public class Definition implements Serializable, Comparable<Definition>
         return commentsBefore + describe(name) + "\n" + commentsAfter;
     }
     
-    private InteriorNode findEnclosingSpecificationStmt(Token tok)
+    private IASTNode findEnclosingSpecificationStmt(Token tok)
     {
-        for (InteriorNode candidate = tok.getParent(); candidate != null; candidate = candidate.getParent())
+        for (IASTNode candidate = tok.getParent(); candidate != null; candidate = candidate.getParent())
             if (candidate instanceof ISpecificationStmt)
                 return candidate;
         

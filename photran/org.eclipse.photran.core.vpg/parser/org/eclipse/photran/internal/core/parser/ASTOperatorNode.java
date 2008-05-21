@@ -10,768 +10,342 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTOperatorNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTOperatorNode extends ASTNode
 {
-    ASTOperatorNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTOperatorNode(this);
-    }
-
-    public boolean hasPowerOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POWER_OP_125)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasPowerOp();
-        else
-            return false;
-    }
-
-    public boolean hasTimesOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MULT_OP_126)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasTimesOp();
-        else
-            return false;
-    }
-
-    public boolean hasDivideOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MULT_OP_127)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasDivideOp();
-        else
-            return false;
-    }
-
-    public boolean hasPlusOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ADD_OP_128)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasPlusOp();
-        else
-            return false;
-    }
-
-    public boolean hasMinusOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ADD_OP_129)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasMinusOp();
-        else
-            return false;
-    }
-
-    public boolean hasConcatOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONCAT_OP_132)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasConcatOp();
-        else
-            return false;
-    }
-
-    public boolean hasEqOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_133)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasEqOp();
-        else
-            return false;
-    }
-
-    public boolean hasNeOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_134)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasNeOp();
-        else
-            return false;
-    }
+    org.eclipse.photran.internal.core.lexer.Token hasLtOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasTimesOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasEqvOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasMinusOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasOrOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasGeOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasNotOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasEqOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasNeqvOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasNeOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasAndOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasPowerOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasSlashEqOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasLeOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token definedUnaryOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasPlusOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token definedBinaryOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasGtOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasEqEqOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasConcatOp; // in ASTOperatorNode
+    org.eclipse.photran.internal.core.lexer.Token hasDivideOp; // in ASTOperatorNode
 
     public boolean hasLtOp()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_135)
-            return getChild(0) != null;
-        else if (getProduction() == Production.REL_OP_136)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasLtOp();
-        else
-            return false;
+        return this.hasLtOp != null;
     }
 
-    public boolean hasLeOp()
+    public void setHasLtOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_137)
-            return getChild(0) != null;
-        else if (getProduction() == Production.REL_OP_138)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasLeOp();
-        else
-            return false;
+        this.hasLtOp = newValue;
     }
 
-    public boolean hasGtOp()
+
+    public boolean hasTimesOp()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_139)
-            return getChild(0) != null;
-        else if (getProduction() == Production.REL_OP_140)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasGtOp();
-        else
-            return false;
+        return this.hasTimesOp != null;
     }
 
-    public boolean hasGeOp()
+    public void setHasTimesOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_141)
-            return getChild(0) != null;
-        else if (getProduction() == Production.REL_OP_142)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasGeOp();
-        else
-            return false;
+        this.hasTimesOp = newValue;
     }
 
-    public boolean hasEqEqOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_143)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasEqEqOp();
-        else
-            return false;
-    }
-
-    public boolean hasSlashEqOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.REL_OP_144)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasSlashEqOp();
-        else
-            return false;
-    }
-
-    public boolean hasNotOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.NOT_OP_145)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasNotOp();
-        else
-            return false;
-    }
-
-    public boolean hasAndOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AND_OP_146)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasAndOp();
-        else
-            return false;
-    }
-
-    public boolean hasOrOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.OR_OP_147)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasOrOp();
-        else
-            return false;
-    }
 
     public boolean hasEqvOp()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIV_OP_148)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasEqvOp();
-        else
-            return false;
+        return this.hasEqvOp != null;
     }
+
+    public void setHasEqvOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasEqvOp = newValue;
+    }
+
+
+    public boolean hasMinusOp()
+    {
+        return this.hasMinusOp != null;
+    }
+
+    public void setHasMinusOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasMinusOp = newValue;
+    }
+
+
+    public boolean hasOrOp()
+    {
+        return this.hasOrOp != null;
+    }
+
+    public void setHasOrOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasOrOp = newValue;
+    }
+
+
+    public boolean hasGeOp()
+    {
+        return this.hasGeOp != null;
+    }
+
+    public void setHasGeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasGeOp = newValue;
+    }
+
+
+    public boolean hasNotOp()
+    {
+        return this.hasNotOp != null;
+    }
+
+    public void setHasNotOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasNotOp = newValue;
+    }
+
+
+    public boolean hasEqOp()
+    {
+        return this.hasEqOp != null;
+    }
+
+    public void setHasEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasEqOp = newValue;
+    }
+
 
     public boolean hasNeqvOp()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIV_OP_149)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasNeqvOp();
-        else
-            return false;
+        return this.hasNeqvOp != null;
     }
 
-    public Token getCustomDefinedOp()
+    public void setHasNeqvOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DEFINED_OPERATOR_150)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return (Token)((ASTOperatorNode)getChild(0)).getCustomDefinedOp();
-        else
-            return null;
+        this.hasNeqvOp = newValue;
     }
 
-    public boolean hasCustomDefinedOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DEFINED_OPERATOR_150)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasCustomDefinedOp();
-        else
-            return false;
+    public boolean hasNeOp()
+    {
+        return this.hasNeOp != null;
     }
 
-    public Token getDefinedUnaryOp()
+    public void setHasNeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DEFINED_UNARY_OP_160)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedUnaryOp();
-        else
-            return null;
+        this.hasNeOp = newValue;
     }
 
-    public boolean hasDefinedUnaryOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DEFINED_UNARY_OP_160)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedUnaryOp();
-        else
-            return false;
+    public boolean hasAndOp()
+    {
+        return this.hasAndOp != null;
     }
 
-    public Token getDefinedBinaryOp()
+    public void setHasAndOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DEFINED_BINARY_OP_161)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return (Token)((ASTOperatorNode)getChild(0)).getDefinedBinaryOp();
-        else
-            return null;
+        this.hasAndOp = newValue;
     }
 
-    public boolean hasDefinedBinaryOp()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.DEFINED_BINARY_OP_161)
-            return getChild(0) != null;
-        else if (getProduction() == Production.DEFINED_OPERATOR_151)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_152)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_153)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_154)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_155)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_156)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_157)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_158)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else if (getProduction() == Production.DEFINED_OPERATOR_159)
-            return ((ASTOperatorNode)getChild(0)).hasDefinedBinaryOp();
-        else
-            return false;
+    public boolean hasPowerOp()
+    {
+        return this.hasPowerOp != null;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    public void setHasPowerOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.DEFINED_OPERATOR_151 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_152 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_153 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_154 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_155 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_156 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_157 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_158 && index == 0)
-            return true;
-        else if (getProduction() == Production.DEFINED_OPERATOR_159 && index == 0)
-            return true;
-        else
-            return false;
+        this.hasPowerOp = newValue;
+    }
+
+
+    public boolean hasSlashEqOp()
+    {
+        return this.hasSlashEqOp != null;
+    }
+
+    public void setHasSlashEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasSlashEqOp = newValue;
+    }
+
+
+    public boolean hasLeOp()
+    {
+        return this.hasLeOp != null;
+    }
+
+    public void setHasLeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasLeOp = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getDefinedUnaryOp()
+    {
+        return this.definedUnaryOp;
+    }
+
+    public void setDefinedUnaryOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.definedUnaryOp = newValue;
+    }
+
+
+    public boolean hasPlusOp()
+    {
+        return this.hasPlusOp != null;
+    }
+
+    public void setHasPlusOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasPlusOp = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getDefinedBinaryOp()
+    {
+        return this.definedBinaryOp;
+    }
+
+    public void setDefinedBinaryOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.definedBinaryOp = newValue;
+    }
+
+
+    public boolean hasGtOp()
+    {
+        return this.hasGtOp != null;
+    }
+
+    public void setHasGtOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasGtOp = newValue;
+    }
+
+
+    public boolean hasEqEqOp()
+    {
+        return this.hasEqEqOp != null;
+    }
+
+    public void setHasEqEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasEqEqOp = newValue;
+    }
+
+
+    public boolean hasConcatOp()
+    {
+        return this.hasConcatOp != null;
+    }
+
+    public void setHasConcatOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasConcatOp = newValue;
+    }
+
+
+    public boolean hasDivideOp()
+    {
+        return this.hasDivideOp != null;
+    }
+
+    public void setHasDivideOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasDivideOp = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTOperatorNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 21;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hasLtOp;
+        case 1:  return this.hasTimesOp;
+        case 2:  return this.hasEqvOp;
+        case 3:  return this.hasMinusOp;
+        case 4:  return this.hasOrOp;
+        case 5:  return this.hasGeOp;
+        case 6:  return this.hasNotOp;
+        case 7:  return this.hasEqOp;
+        case 8:  return this.hasNeqvOp;
+        case 9:  return this.hasNeOp;
+        case 10: return this.hasAndOp;
+        case 11: return this.hasPowerOp;
+        case 12: return this.hasSlashEqOp;
+        case 13: return this.hasLeOp;
+        case 14: return this.definedUnaryOp;
+        case 15: return this.hasPlusOp;
+        case 16: return this.definedBinaryOp;
+        case 17: return this.hasGtOp;
+        case 18: return this.hasEqEqOp;
+        case 19: return this.hasConcatOp;
+        case 20: return this.hasDivideOp;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 10: this.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 11: this.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 12: this.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 13: this.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 14: this.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 15: this.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 16: this.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 17: this.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 18: this.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 19: this.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 20: this.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

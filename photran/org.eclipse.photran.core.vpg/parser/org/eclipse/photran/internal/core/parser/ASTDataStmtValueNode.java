@@ -10,130 +10,113 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDataStmtValueNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTDataStmtValueNode extends ASTNode
 {
-    ASTDataStmtValueNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTDataStmtValueNode(this);
-    }
+    org.eclipse.photran.internal.core.lexer.Token hasConstIntKind; // in ASTDataStmtValueNode
+    ASTNamedConstantUseNode namedConstKind; // in ASTDataStmtValueNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTDataStmtValueNode
+    ASTConstantNode constant; // in ASTDataStmtValueNode
+    org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTDataStmtValueNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDataStmtValueNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDataStmtValueNode
 
     public boolean hasConstIntKind()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_VALUE_386)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.hasConstIntKind != null;
     }
+
+    public void setHasConstIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasConstIntKind = newValue;
+    }
+
 
     public ASTNamedConstantUseNode getNamedConstKind()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_VALUE_387)
-            return (ASTNamedConstantUseNode)getChild(0);
-        else
-            return null;
+        return this.namedConstKind;
     }
 
-    public boolean hasNamedConstKind()
+    public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_VALUE_387)
-            return getChild(0) != null;
-        else
-            return false;
+        this.namedConstKind = newValue;
     }
+
 
     public ASTConstantNode getConstant()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_VALUE_385)
-            return (ASTConstantNode)((ASTDataStmtConstantNode)getChild(0)).getConstant();
-        else if (getProduction() == Production.DATA_STMT_VALUE_386)
-            return (ASTConstantNode)((ASTDataStmtConstantNode)getChild(2)).getConstant();
-        else if (getProduction() == Production.DATA_STMT_VALUE_387)
-            return (ASTConstantNode)((ASTDataStmtConstantNode)getChild(2)).getConstant();
-        else
-            return null;
+        return this.constant;
     }
 
-    public boolean hasConstant()
+    public void setConstant(ASTConstantNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_VALUE_385)
-            return ((ASTDataStmtConstantNode)getChild(0)).hasConstant();
-        else if (getProduction() == Production.DATA_STMT_VALUE_386)
-            return ((ASTDataStmtConstantNode)getChild(2)).hasConstant();
-        else if (getProduction() == Production.DATA_STMT_VALUE_387)
-            return ((ASTDataStmtConstantNode)getChild(2)).hasConstant();
-        else
-            return false;
+        this.constant = newValue;
     }
+
 
     public boolean isNull()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DATA_STMT_VALUE_385)
-            return ((ASTDataStmtConstantNode)getChild(0)).isNull();
-        else if (getProduction() == Production.DATA_STMT_VALUE_386)
-            return ((ASTDataStmtConstantNode)getChild(2)).isNull();
-        else if (getProduction() == Production.DATA_STMT_VALUE_387)
-            return ((ASTDataStmtConstantNode)getChild(2)).isNull();
-        else
-            return false;
+        return this.isNull != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setIsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.DATA_STMT_VALUE_386 && index == 1)
-            return false;
-        else if (getProduction() == Production.DATA_STMT_VALUE_387 && index == 1)
-            return false;
-        else
-            return true;
+        this.isNull = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.DATA_STMT_VALUE_385 && index == 0)
-            return true;
-        else if (getProduction() == Production.DATA_STMT_VALUE_386 && index == 2)
-            return true;
-        else if (getProduction() == Production.DATA_STMT_VALUE_387 && index == 2)
-            return true;
-        else
-            return false;
+        visitor.visitASTDataStmtValueNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 7;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hasConstIntKind;
+        case 1:  return this.namedConstKind;
+        case 2:  return this.hiddenTAsterisk;
+        case 3:  return this.constant;
+        case 4:  return this.isNull;
+        case 5:  return this.hiddenTLparen;
+        case 6:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hasConstIntKind = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.namedConstKind = (ASTNamedConstantUseNode)value;
+        case 2:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.constant = (ASTConstantNode)value;
+        case 4:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

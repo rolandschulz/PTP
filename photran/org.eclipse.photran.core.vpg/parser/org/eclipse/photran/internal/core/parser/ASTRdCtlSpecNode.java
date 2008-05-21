@@ -10,94 +10,96 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTRdCtlSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTRdCtlSpecNode extends ASTNode
 {
-    ASTRdCtlSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTRdCtlSpecNode(this);
-    }
-
-    public ASTRdIoCtlSpecListNode getRdIoCtlSpecList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_CTL_SPEC_770)
-            return (ASTRdIoCtlSpecListNode)getChild(1);
-        else
-            return null;
-    }
-
-    public ASTExpressionNode getReadUnitExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_CTL_SPEC_769)
-            return (ASTExpressionNode)((ASTRdUnitIdNode)getChild(0)).getReadUnitExpr();
-        else
-            return null;
-    }
-
-    public boolean hasReadUnitExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_CTL_SPEC_769)
-            return ((ASTRdUnitIdNode)getChild(0)).hasReadUnitExpr();
-        else
-            return false;
-    }
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTRdCtlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token readUnitIsAsterisk; // in ASTRdCtlSpecNode
+    IASTListNode<ASTRdIoCtlSpecListNode> rdIoCtlSpecList; // in ASTRdCtlSpecNode
+    ASTUFExprNode readUnitExpr; // in ASTRdCtlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTRdCtlSpecNode
 
     public boolean readUnitIsAsterisk()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.RD_CTL_SPEC_769)
-            return ((ASTRdUnitIdNode)getChild(0)).readUnitIsAsterisk();
-        else
-            return false;
+        return this.readUnitIsAsterisk != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setReadUnitIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.RD_CTL_SPEC_770 && index == 0)
-            return false;
-        else if (getProduction() == Production.RD_CTL_SPEC_770 && index == 2)
-            return false;
-        else
-            return true;
+        this.readUnitIsAsterisk = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public IASTListNode<ASTRdIoCtlSpecListNode> getRdIoCtlSpecList()
     {
-        if (getProduction() == Production.RD_CTL_SPEC_769 && index == 0)
-            return true;
-        else
-            return false;
+        return this.rdIoCtlSpecList;
+    }
+
+    public void setRdIoCtlSpecList(IASTListNode<ASTRdIoCtlSpecListNode> newValue)
+    {
+        this.rdIoCtlSpecList = newValue;
+    }
+
+
+    public ASTUFExprNode getReadUnitExpr()
+    {
+        return this.readUnitExpr;
+    }
+
+    public void setReadUnitExpr(ASTUFExprNode newValue)
+    {
+        this.readUnitExpr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTRdCtlSpecNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.readUnitIsAsterisk;
+        case 2:  return this.rdIoCtlSpecList;
+        case 3:  return this.readUnitExpr;
+        case 4:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.rdIoCtlSpecList = (IASTListNode<ASTRdIoCtlSpecListNode>)value;
+        case 3:  this.readUnitExpr = (ASTUFExprNode)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

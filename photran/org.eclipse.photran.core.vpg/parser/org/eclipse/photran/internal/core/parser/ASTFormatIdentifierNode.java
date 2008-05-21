@@ -10,86 +10,90 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFormatIdentifierNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFormatIdentifierNode extends ASTNode
 {
-    ASTFormatIdentifierNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTCExprNode formatExpr; // in ASTFormatIdentifierNode
+    org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTFormatIdentifierNode
+    ASTLblRefNode formatLbl; // in ASTFormatIdentifierNode
+
+    public ASTCExprNode getFormatExpr()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTFormatIdentifierNode(this);
+        return this.formatExpr;
     }
 
-    public ASTLblRefNode getFormatLbl()
+    public void setFormatExpr(ASTCExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_IDENTIFIER_802)
-            return (ASTLblRefNode)getChild(0);
-        else
-            return null;
+        this.formatExpr = newValue;
     }
 
-    public boolean hasFormatLbl()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_IDENTIFIER_802)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public ASTExpressionNode getFormatExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_IDENTIFIER_803)
-            return (ASTExpressionNode)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasFormatExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORMAT_IDENTIFIER_803)
-            return getChild(0) != null;
-        else
-            return false;
-    }
 
     public boolean formatIsAsterisk()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        return this.formatIsAsterisk != null;
+    }
 
-        if (getProduction() == Production.FORMAT_IDENTIFIER_804)
-            return getChild(0) != null;
-        else
-            return false;
+    public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.formatIsAsterisk = newValue;
+    }
+
+
+    public ASTLblRefNode getFormatLbl()
+    {
+        return this.formatLbl;
+    }
+
+    public void setFormatLbl(ASTLblRefNode newValue)
+    {
+        this.formatLbl = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTFormatIdentifierNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.formatExpr;
+        case 1:  return this.formatIsAsterisk;
+        case 2:  return this.formatLbl;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.formatExpr = (ASTCExprNode)value;
+        case 1:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.formatLbl = (ASTLblRefNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

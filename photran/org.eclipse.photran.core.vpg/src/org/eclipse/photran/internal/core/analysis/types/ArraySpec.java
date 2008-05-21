@@ -18,7 +18,8 @@ import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedShapeSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedSizeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTDeferredShapeSpecListNode;
-import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecListNode;
+import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
  * An array specification: A "smart" representation of an ArraySpec AST node.
@@ -60,10 +61,10 @@ public class ArraySpec implements Serializable
     //        <ExplicitShapeSpec>
     //      | @:<ExplicitShapeSpecList> T_COMMA <ExplicitShapeSpec>
 
-    private void parseExplicitShapeArray(ASTExplicitShapeSpecListNode node)
+    private void parseExplicitShapeArray(IASTListNode<ASTExplicitShapeSpecNode> node)
     {
         for (int i = 0; i < node.size(); i++)
-            dimensions.add(0, new Dimension(node.getExplicitShapeSpec(i)));
+            dimensions.add(0, new Dimension(node.get(i)));
     }
     
     //    # R519
@@ -83,7 +84,7 @@ public class ArraySpec implements Serializable
     //      | <DeferredShapeSpecList> T_COMMA <LowerBound> T_COLON
     //      | @:<AssumedShapeSpecList> T_COMMA <AssumedShapeSpec>
 
-    private void parseAssumedShapeArray(ASTAssumedShapeSpecListNode assumedShapeSpecList)
+    private void parseAssumedShapeArray(IASTListNode<ASTAssumedShapeSpecListNode> assumedShapeSpecList)
     {
         assumedOrDeferredShape = true;
     }
@@ -95,7 +96,7 @@ public class ArraySpec implements Serializable
     //
     //    <DeferredShapeSpec> ::= T_COLON
 
-    private void parseDeferredShapeArray(ASTDeferredShapeSpecListNode deferredShapeSpecList)
+    private void parseDeferredShapeArray(IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList)
     {
         assumedOrDeferredShape = true;
     }

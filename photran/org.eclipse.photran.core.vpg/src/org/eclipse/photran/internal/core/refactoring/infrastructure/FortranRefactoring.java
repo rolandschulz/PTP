@@ -35,21 +35,18 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.util.IterableWrapper;
-import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.core.vpg.util.OffsetLength;
+import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTBodyNode;
-import org.eclipse.photran.internal.core.parser.ASTExpressionNode;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.parser.Parser.Nonterminal;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.text.edits.ReplaceEdit;
 
 import bz.over.vpg.TokenRef;
@@ -244,7 +241,7 @@ public abstract class FortranRefactoring extends Refactoring
      */
     protected IBodyConstruct parseLiteralStatement(String string)
     {
-        return parseLiteralStatementSequence(string).getBodyConstruct(0);
+        return parseLiteralStatementSequence(string).get(0);
     }
     
     /**
@@ -262,14 +259,14 @@ public abstract class FortranRefactoring extends Refactoring
      * program be syntactically correct.
      * </pre>
      */
-    protected ASTBodyNode parseLiteralStatementSequence(String string)
+    protected IASTListNode<IBodyConstruct> parseLiteralStatementSequence(String string)
     {
         string = "program p\n" + string + "\nend program";
         try
         {
-            IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(string.getBytes()), "(none)", SourceForm.UNPREPROCESSED_FREE_FORM);
+            IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(string.getBytes()), "(none)", SourceForm.UNPREPROCESSED_FREE_FORM, true);
             if (parser == null) parser = new Parser();
-            return new FortranAST(null, parser.parse(lexer), lexer.getTokenList()).getRoot().getProgramUnit(0).getMainProgram().getBody();
+            return ((ASTMainProgramNode)new FortranAST(null, parser.parse(lexer), lexer.getTokenList()).getRoot().getProgramUnitList().get(0)).getBody();
         }
         catch (Exception e)
         {
@@ -278,25 +275,25 @@ public abstract class FortranRefactoring extends Refactoring
     }
     private Parser parser = null;
 
-    /**
-     * Parses the given Fortran expression.
-     * <p>
-     * Internally, <code>string</code> is embedded into the following program
-     * <pre>
-     * program p
-     *   x = (string is placed here)
-     * end program
-     * </pre>
-     * which is parsed and the resulting expression extracted and returned,
-     * so <code>string</code> must "make sense" (syntactically) in this context.
-     * No semantic analysis is done; it is only necessary that the
-     * program be syntactically correct.
-     */
-    protected ASTExpressionNode parseLiteralExpression(String string)
-    {
-        IBodyConstruct stmt = parseLiteralStatement("x = " + string);
-        return ((ASTAssignmentStmtNode)stmt).getExpr();
-    }
+//    /**
+//     * Parses the given Fortran expression.
+//     * <p>
+//     * Internally, <code>string</code> is embedded into the following program
+//     * <pre>
+//     * program p
+//     *   x = (string is placed here)
+//     * end program
+//     * </pre>
+//     * which is parsed and the resulting expression extracted and returned,
+//     * so <code>string</code> must "make sense" (syntactically) in this context.
+//     * No semantic analysis is done; it is only necessary that the
+//     * program be syntactically correct.
+//     */
+//    protected ASTExpressionNode parseLiteralExpression(String string)
+//    {
+//        IBodyConstruct stmt = parseLiteralStatement("x = " + string);
+//        return ((ASTAssignmentStmtNode)stmt).getExpr();
+//    }
 
     // USER INTERACTION ///////////////////////////////////////////////////////
     
@@ -367,28 +364,28 @@ public abstract class FortranRefactoring extends Refactoring
         return null;
     }
     
-    protected InteriorNode findEnclosingNode(IFortranAST ast, ITextSelection selection)
+    protected IASTNode findEnclosingNode(IFortranAST ast, ITextSelection selection)
     {
         Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = this.findLastTokenBefore(ast, OffsetLength.getPositionPastEnd(selection.getOffset(), selection.getLength()));
         if (firstToken == null || lastToken == null) return null;
 
-        for (InteriorNode parent = lastToken.getParent(); parent != null; parent = parent.getParent())
+        for (IASTNode parent = lastToken.getParent(); parent != null; parent = parent.getParent())
             if (contains(parent, firstToken))
                 return parent;
         
         return null;
     }
     
-    protected boolean nodeExactlyEnclosesRegion(InteriorNode parent, Token firstToken, Token lastToken)
+    protected boolean nodeExactlyEnclosesRegion(IASTNode parent, Token firstToken, Token lastToken)
     {
-        return findFirstTokenIn(parent) == firstToken && findLastTokenIn(parent) == lastToken;
+        return parent.findFirstToken() == firstToken && parent.findLastToken() == lastToken;
     }
     
-    protected boolean nodeExactlyEnclosesRegion(InteriorNode node, IFortranAST ast, ITextSelection selection)
+    protected boolean nodeExactlyEnclosesRegion(IASTNode node, IFortranAST ast, ITextSelection selection)
     {
-        Token firstInNode = this.findFirstTokenIn(node);
-        Token lastInNode = this.findLastTokenIn(node);
+        Token firstInNode = node.findFirstToken();
+        Token lastInNode = node.findLastToken();
         
         Token firstInSel = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastInSel = this.findLastTokenBefore(ast, OffsetLength.getPositionPastEnd(selection.getOffset(), selection.getLength()));
@@ -401,71 +398,67 @@ public abstract class FortranRefactoring extends Refactoring
             && lastInNode == lastInSel;
     }
 
-    protected InteriorNode findEnclosingNode(IFortranAST ast, ITextSelection selection, Nonterminal nodeType, boolean allowNesting)
-    {
-        InteriorNode smallestEnclosure = findEnclosingNode(ast, selection);
-        if (smallestEnclosure == null) return null;
-        
-        for (InteriorNode n = smallestEnclosure; n != null; n = n.getParent())
-        {
-            if (n.getNonterminal() == nodeType)
-            {
-                if (allowNesting)
-                    return n;
-                else if (n.getParent() == null)
-                    return null;
-                else if (n.getParent().getNonterminal() != nodeType)
-                    return n;
-                else if (n.getParent().getNonterminal() == nodeType)
-                    continue;
-            }
-        }
-        
-        return null;
-    }
+//    protected IASTNode findEnclosingNode(IFortranAST ast, ITextSelection selection, Nonterminal nodeType, boolean allowNesting)
+//    {
+//        IASTNode smallestEnclosure = findEnclosingNode(ast, selection);
+//        if (smallestEnclosure == null) return null;
+//        
+//        for (IASTNode n = smallestEnclosure; n != null; n = n.getParent())
+//        {
+//            if (n.getNonterminal() == nodeType)
+//            {
+//                if (allowNesting)
+//                    return n;
+//                else if (n.getParent() == null)
+//                    return null;
+//                else if (n.getParent().getNonterminal() != nodeType)
+//                    return n;
+//                else if (n.getParent().getNonterminal() == nodeType)
+//                    continue;
+//            }
+//        }
+//        
+//        return null;
+//    }
     
-    private boolean contains(InteriorNode target, Token token)
+    private boolean contains(IASTNode target, Token token)
     {
-        for (InteriorNode node = token.getParent(); node != null; node = node.getParent())
+        for (IASTNode node = token.getParent(); node != null; node = node.getParent())
             if (node == target)
                 return true;
         return false;
     }
 
-    protected ASTBodyNode findEnclosingBodyNode(IFortranAST ast, ITextSelection selection)
+    protected IASTListNode<IBodyConstruct> findEnclosingBodyNode(IFortranAST ast, ITextSelection selection)
     {
         Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
         if (firstToken == null || lastToken == null) return null;
 
-        ASTBodyNode bodyAtBeginning = this.findEnclosingBodyNode(firstToken);
-        ASTBodyNode bodyAtEnd = this.findEnclosingBodyNode(lastToken);
+        IASTListNode<IBodyConstruct> bodyAtBeginning = this.findEnclosingBodyNode(firstToken);
+        IASTListNode<IBodyConstruct> bodyAtEnd = this.findEnclosingBodyNode(lastToken);
         if (bodyAtBeginning == null || bodyAtEnd == null || bodyAtBeginning != bodyAtEnd) return null;
 
         return bodyAtBeginning;
     }
     
-    private ASTBodyNode findEnclosingBodyNode(Token token)
+    private IASTListNode<IBodyConstruct> findEnclosingBodyNode(Token token)
     {
-        InteriorNode currentNode = token.getParent();
-        
-        while (currentNode != null && (!isBodyNode(currentNode) || isNestedBodyNode(currentNode)))
-            currentNode = currentNode.getParent();
-
-        return (ASTBodyNode)currentNode;
+        ScopingNode scope = token.findNearestAncestor(ScopingNode.class);
+        return scope == null ? null : scope.getBody();
     }
 
-    private boolean isBodyNode(InteriorNode currentNode)
-    {
-        return currentNode instanceof ASTBodyNode;
-    }
-
-    private boolean isNestedBodyNode(InteriorNode currentNode)
-    {
-        return isBodyNode(currentNode)
-               && currentNode.getParent() != null
-               && currentNode.getParent() instanceof ASTBodyNode;
-    }
+//    private boolean isBodyNode(IASTNode currentNode)
+//    {
+//        return currentNode instanceof ASTBodyNode;
+//    }
+//
+//    private boolean isNestedBodyNode(IASTNode currentNode)
+//    {
+//        return isBodyNode(currentNode)
+//               && currentNode.getParent() != null
+//               && currentNode.getParent() instanceof ASTBodyNode;
+//    }
 
     private Token findFirstTokenAfter(IFortranAST ast, final int targetFileOffset)
     {
@@ -488,78 +481,35 @@ public abstract class FortranRefactoring extends Refactoring
         return null;
     }
 
-    protected static class StatementSequence
-    {
-        public ASTBodyNode body = null;
-        public List<IBodyConstruct> statements = new ArrayList<IBodyConstruct>();
-    }
+//    protected static class StatementSequence
+//    {
+//        public ASTBodyNode body = null;
+//        public List<IBodyConstruct> statements = new ArrayList<IBodyConstruct>();
+//    }
     
-    protected StatementSequence findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
+    protected List<IBodyConstruct> findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
     {
-        StatementSequence stmtSeq = new StatementSequence();
+        IASTListNode<IBodyConstruct> body = this.findEnclosingBodyNode(ast, selection);
+        if (body == null) return null;
         
-        stmtSeq.body = this.findEnclosingBodyNode(ast, selection);
-        if (stmtSeq.body == null) return null;
+        List<IBodyConstruct> result = new ArrayList<IBodyConstruct>();
         
-        for (int i = 0; i < stmtSeq.body.size(); i++)
+        for (int i = 0; i < body.size(); i++)
         {
-            IBodyConstruct thisBodyConstruct = stmtSeq.body.getBodyConstruct(i);
+            IBodyConstruct thisBodyConstruct = body.get(i);
             
-            Token firstToken = findFirstTokenIn((InteriorNode)thisBodyConstruct);
-            Token lastToken = findLastTokenIn((InteriorNode)thisBodyConstruct);
+            Token firstToken = thisBodyConstruct.findFirstToken();
+            Token lastToken = thisBodyConstruct.findLastToken();
             
             boolean containsStart = OffsetLength.contains(selection.getOffset(), selection.getLength(), firstToken.getFileOffset(), firstToken.getLength());
             boolean containsEnd = OffsetLength.contains(selection.getOffset(), selection.getLength(), lastToken.getFileOffset(), lastToken.getLength());
             
             if (containsStart != containsEnd) return null; // "You must select entire statements.");
             
-            if (containsStart && containsEnd) stmtSeq.statements.add(thisBodyConstruct);
+            if (containsStart && containsEnd) result.add(thisBodyConstruct);
         }
         
-        return stmtSeq;
-    }
-
-    // PARSE TREE SEARCHING ///////////////////////////////////////////////////
-    
-    public static Token findFirstTokenIn(InteriorNode node)
-    {
-        try
-        {
-            node.visitUsing(new GenericParseTreeVisitor()
-            {
-                @Override
-                public void visitToken(Token token)
-                {
-                    throw new Notification(token);
-                }
-                
-            });
-        }
-        catch (Notification n)
-        {
-            return (Token)n.getResult();
-        }
-        return null;
-    }
-    
-    private final static class LastTokenVisitor extends GenericParseTreeVisitor
-    {
-        private Token lastToken;
-        
-        @Override
-        public void visitToken(Token token)
-        {
-            lastToken = token;
-        }
-        
-        public Token getLastToken() { return lastToken; }
-    }
-
-    public static Token findLastTokenIn(InteriorNode node)
-    {
-        LastTokenVisitor lastTokenVisitor = new LastTokenVisitor();
-        node.visitUsing(lastTokenVisitor);
-        return lastTokenVisitor.getLastToken();
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////

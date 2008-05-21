@@ -10,175 +10,85 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTNamelistGroupsNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTNamelistGroupsNode extends ASTNode
 {
-    protected int count = -1;
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTNamelistGroupsNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash; // in ASTNamelistGroupsNode
+    org.eclipse.photran.internal.core.lexer.Token namelistGroupName; // in ASTNamelistGroupsNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash2; // in ASTNamelistGroupsNode
+    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTNamelistGroupsNode
 
-    ASTNamelistGroupsNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public org.eclipse.photran.internal.core.lexer.Token getNamelistGroupName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTNamelistGroupsNode
-               && grandparent instanceof ASTNamelistGroupsNode
-               && ((ASTNamelistGroupsNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.namelistGroupName;
     }
 
-    /**
-     * @return the number of ASTNamelistGroupsNode nodes in this list
-     */
-    public int size()
+    public void setNamelistGroupName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTNamelistGroupsNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.namelistGroupName = newValue;
     }
-    
-    ASTNamelistGroupsNode recurseToIndex(int listIndex)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
     {
-        ASTNamelistGroupsNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTNamelistGroupsNode)node.getRecursiveNode();
-        }
-        return node;
+        return this.variableName;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.variableName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTNamelistGroupsNode(this);
+        visitor.visitASTNode(this);
     }
 
-    private ASTNamelistGroupsNode getRecursiveNode()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.NAMELIST_GROUPS_397)
-            return (ASTNamelistGroupsNode)getChild(0);
-        else if (getProduction() == Production.NAMELIST_GROUPS_398)
-            return (ASTNamelistGroupsNode)getChild(0);
-        else if (getProduction() == Production.NAMELIST_GROUPS_399)
-            return (ASTNamelistGroupsNode)getChild(0);
-        else
-            return null;
+        return 5;
     }
 
-    public Token getNamelistGroupName(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_396)
-            return (Token)((ASTNamelistGroupNameNode)node.getChild(1)).getNamelistGroupName();
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_397)
-            return (Token)((ASTNamelistGroupNameNode)node.getChild(2)).getNamelistGroupName();
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_398)
-            return (Token)((ASTNamelistGroupNameNode)node.getChild(3)).getNamelistGroupName();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.hiddenTComma;
+        case 1:  return this.hiddenTSlash;
+        case 2:  return this.namelistGroupName;
+        case 3:  return this.hiddenTSlash2;
+        case 4:  return this.variableName;
+        default: return null;
+        }
     }
 
-    public Token getNamelistGroupObjectVariableName(int listIndex)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTNamelistGroupsNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.NAMELIST_GROUPS_396)
-            return (Token)((ASTNamelistGroupObjectNode)node.getChild(3)).getVariableName();
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_397)
-            return (Token)((ASTNamelistGroupObjectNode)node.getChild(4)).getVariableName();
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_398)
-            return (Token)((ASTNamelistGroupObjectNode)node.getChild(5)).getVariableName();
-        else if (node.getProduction() == Production.NAMELIST_GROUPS_399)
-            return (Token)((ASTNamelistGroupObjectNode)node.getChild(2)).getVariableName();
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 0)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 2)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 1)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 3)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 1)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 2)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 4)
-            return false;
-        else if (getProduction() == Production.NAMELIST_GROUPS_399 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 1)
-            return true;
-        else if (getProduction() == Production.NAMELIST_GROUPS_396 && index == 3)
-            return true;
-        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 2)
-            return true;
-        else if (getProduction() == Production.NAMELIST_GROUPS_397 && index == 4)
-            return true;
-        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 3)
-            return true;
-        else if (getProduction() == Production.NAMELIST_GROUPS_398 && index == 5)
-            return true;
-        else if (getProduction() == Production.NAMELIST_GROUPS_399 && index == 2)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.namelistGroupName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

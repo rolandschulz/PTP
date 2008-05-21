@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 
 /**
@@ -28,7 +31,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefac
  */
 public class ExtractProcedureRefactoring extends FortranRefactoring
 {
-	private StatementSequence stmtSeq = null;
+	private List<IBodyConstruct> stmtSeq = null;
 	private String name = null;
 	
     public ExtractProcedureRefactoring(IFile file, ITextSelection selection)

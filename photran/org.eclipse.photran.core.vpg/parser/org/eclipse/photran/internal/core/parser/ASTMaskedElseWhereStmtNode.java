@@ -10,176 +10,108 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTMaskedElseWhereStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTMaskedElseWhereStmtNode extends ASTNode
 {
-    ASTMaskedElseWhereStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTElse; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTElsewhere; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTMaskedElseWhereStmtNode
+    ASTExprNode maskExpr; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token endName; // in ASTMaskedElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTMaskedElseWhereStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getMaskExpr()
+    {
+        return this.maskExpr;
+    }
+
+    public void setMaskExpr(ASTExprNode newValue)
+    {
+        this.maskExpr = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getEndName()
+    {
+        return this.endName;
+    }
+
+    public void setEndName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.endName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTMaskedElseWhereStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        return 9;
     }
 
-    public boolean hasLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTElse;
+        case 2:  return this.hiddenTElsewhere;
+        case 3:  return this.hiddenTWhere;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.maskExpr;
+        case 6:  return this.hiddenTRparen;
+        case 7:  return this.endName;
+        case 8:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public ASTExpressionNode getMaskExpr()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619)
-            return (ASTExpressionNode)((ASTMaskExprNode)getChild(3)).getMaskExpr();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620)
-            return (ASTExpressionNode)((ASTMaskExprNode)getChild(3)).getMaskExpr();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621)
-            return (ASTExpressionNode)((ASTMaskExprNode)getChild(4)).getMaskExpr();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622)
-            return (ASTExpressionNode)((ASTMaskExprNode)getChild(4)).getMaskExpr();
-        else
-            return null;
-    }
-
-    public Token getEndName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620)
-            return (Token)((ASTEndNameNode)getChild(5)).getEndName();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622)
-            return (Token)((ASTEndNameNode)getChild(6)).getEndName();
-        else
-            return null;
-    }
-
-    public boolean hasEndName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620)
-            return ((ASTEndNameNode)getChild(5)).hasEndName();
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622)
-            return ((ASTEndNameNode)getChild(6)).hasEndName();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619 && index == 1)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619 && index == 2)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619 && index == 4)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619 && index == 5)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 1)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 2)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 4)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 6)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 1)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 2)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 3)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 5)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 6)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 1)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 2)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 3)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 5)
-            return false;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 7)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619 && index == 0)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_619 && index == 3)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 0)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 3)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_620 && index == 5)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 0)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_621 && index == 4)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 0)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 4)
-            return true;
-        else if (getProduction() == Production.MASKED_ELSE_WHERE_STMT_622 && index == 6)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTElsewhere = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.maskExpr = (ASTExprNode)value;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

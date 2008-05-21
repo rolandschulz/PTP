@@ -21,11 +21,9 @@ import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.util.OffsetLength;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.analysis.types.Type;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.CSTVisitor;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeUtil;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 
 import bz.over.vpg.VPGEdge;
 
@@ -34,7 +32,7 @@ import bz.over.vpg.VPGEdge;
  * 
  * @author Jeff Overbey
  */
-public class Token extends CSTNode implements IToken
+public class Token implements IToken, IASTNode
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fields
@@ -251,41 +249,71 @@ public class Token extends CSTNode implements IToken
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Visitor Support
+    // IASTNode Implementation
     ///////////////////////////////////////////////////////////////////////////
 
-    @Override protected void visitTopDownUsing(ASTVisitor visitor, boolean shouldVisitRoot)
+    private IASTNode parent = null;
+    
+    public IASTNode getParent()
     {
-        if (shouldVisitRoot)
-            visitor.visitToken(this);
+        return parent;
     }
 
-    @Override protected void visitBottomUpUsing(ASTVisitor visitor, boolean shouldVisitRoot)
+    public void setParent(IASTNode parent)
     {
-        if (shouldVisitRoot)
-            visitor.visitToken(this);
+        this.parent = parent;
     }
 
-    @Override public void visitTopDownUsing(CSTVisitor visitor)
-    {
-        visitor.visitToken(this);
-    }
-
-    @Override public void visitBottomUpUsing(CSTVisitor visitor)
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitToken(this);
     }
 
-    public void visitUsing(GenericParseTreeVisitor visitor)
+    public Token findFirstToken()
     {
-        visitor.visitToken(this);
+        return this;
     }
 
+    public Token findLastToken()
+    {
+        return this;
+    }
+
+    public <T extends IASTNode> T findNearestAncestor(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findNearestAncestor(this, targetClass);
+    }
+
+    public Iterable<? extends IASTNode> getChildren()
+    {
+        return new LinkedList<IASTNode>();
+    }
+
+    public boolean isFirstChildInList()
+    {
+        return ASTNodeUtil.isFirstChildInList(this);
+    }
+
+    public void replaceChild(IASTNode node, IASTNode withNode)
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void removeFromTree()
+    {
+        ASTNodeUtil.removeFromTree(this);
+    }
+    
+    public void replaceWith(IASTNode newNode)
+    {
+        ASTNodeUtil.replaceWith(this, newNode);
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     // Debugging Output
     ///////////////////////////////////////////////////////////////////////////
     
-    public String toString(int numSpaces) { return indent(numSpaces) + getDescription() + "\n"; }
+    //public String toString(int numSpaces) { return indent(numSpaces) + getDescription() + "\n"; }
 
     /**
      * Returns a string describing the token

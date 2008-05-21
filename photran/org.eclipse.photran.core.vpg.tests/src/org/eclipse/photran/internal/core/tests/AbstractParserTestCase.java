@@ -58,7 +58,7 @@ public abstract class AbstractParserTestCase extends TestCase
                     throw new FileNotFoundException("INCLUDE lines not supported in JUnit tests");
                 }
             }));*/
-            ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(file, sourceForm));
+            ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(file, sourceForm, true));
             assertTrue(ast != null);
             handleAST(ast);
         }

@@ -10,78 +10,99 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTInitializationNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTInitializationNode extends ASTNode
 {
-    ASTInitializationNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTInitializationNode(this);
-    }
+    org.eclipse.photran.internal.core.lexer.Token assignsExpr; // in ASTInitializationNode
+    ASTExprNode assignedExpr; // in ASTInitializationNode
+    org.eclipse.photran.internal.core.lexer.Token assignsNull; // in ASTInitializationNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTNull; // in ASTInitializationNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTInitializationNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTInitializationNode
 
     public boolean assignsExpr()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INITIALIZATION_271)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.assignsExpr != null;
     }
 
-    public ASTExpressionNode getAssignedExpr()
+    public void setAssignsExpr(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INITIALIZATION_271)
-            return (ASTExpressionNode)getChild(1);
-        else
-            return null;
+        this.assignsExpr = newValue;
     }
+
+
+    public ASTExprNode getAssignedExpr()
+    {
+        return this.assignedExpr;
+    }
+
+    public void setAssignedExpr(ASTExprNode newValue)
+    {
+        this.assignedExpr = newValue;
+    }
+
 
     public boolean assignsNull()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INITIALIZATION_272)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.assignsNull != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setAssignsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.INITIALIZATION_272 && index == 1)
-            return false;
-        else if (getProduction() == Production.INITIALIZATION_272 && index == 2)
-            return false;
-        else if (getProduction() == Production.INITIALIZATION_272 && index == 3)
-            return false;
-        else
-            return true;
+        this.assignsNull = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTInitializationNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 6;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.assignsExpr;
+        case 1:  return this.assignedExpr;
+        case 2:  return this.assignsNull;
+        case 3:  return this.hiddenTNull;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.assignsExpr = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.assignedExpr = (ASTExprNode)value;
+        case 2:  this.assignsNull = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTNull = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

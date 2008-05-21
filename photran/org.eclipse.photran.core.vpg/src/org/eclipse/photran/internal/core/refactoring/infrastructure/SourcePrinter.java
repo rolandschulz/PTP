@@ -15,7 +15,7 @@ import java.io.PrintStream;
 
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * Methods to reproduce source code from a (modified) AST.
@@ -48,7 +48,7 @@ public class SourcePrinter
     }
     
     /** @return the source code for the given AST node, with the user's comments, capitalization, etc. retained */
-    public static String getSourceCodeFromASTNode(CSTNode node)
+    public static String getSourceCodeFromASTNode(IASTNode node)
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         node.printOn(new PrintStream(out), null);

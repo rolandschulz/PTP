@@ -132,7 +132,8 @@ public class FortranEditorVPGTasks
                         String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
                         IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
                                                                             null,
-                                                                            SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject())));
+                                                                            SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject())),
+                                                                            false);
                         astRootNode = parser.parse(lexer);
                         if (astRootNode == null) return Status.OK_STATUS;
                         

@@ -10,85 +10,83 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEquivalenceStmtNode extends InteriorNode implements ISpecificationStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEquivalenceStmtNode extends ASTNode implements ISpecificationStmt
 {
-    ASTEquivalenceStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTEquivalenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquivalence; // in ASTEquivalenceStmtNode
+    IASTListNode<ASTEquivalenceSetNode> equivalenceSetList; // in ASTEquivalenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEquivalenceStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTEquivalenceSetNode> getEquivalenceSetList()
     {
-        visitor.visitISpecificationStmt(this);
+        return this.equivalenceSetList;
+    }
+
+    public void setEquivalenceSetList(IASTListNode<ASTEquivalenceSetNode> newValue)
+    {
+        this.equivalenceSetList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
         visitor.visitASTEquivalenceStmtNode(this);
+        visitor.visitISpecificationStmt(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTEquivalenceSetListNode getEquivalenceSetList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_STMT_401)
-            return (ASTEquivalenceSetListNode)getChild(2);
-        else
-            return null;
+        return 4;
     }
 
-    public Token getLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_STMT_401)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTEquivalence;
+        case 2:  return this.equivalenceSetList;
+        case 3:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public boolean hasLabel()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EQUIVALENCE_STMT_401)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.EQUIVALENCE_STMT_401 && index == 1)
-            return false;
-        else if (getProduction() == Production.EQUIVALENCE_STMT_401 && index == 3)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.EQUIVALENCE_STMT_401 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEquivalence = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.equivalenceSetList = (IASTListNode<ASTEquivalenceSetNode>)value;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

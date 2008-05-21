@@ -43,12 +43,14 @@
 #######################################################################################################################
 
 # R201
-<ExecutableProgram> ::= (superclass=ScopingNode)
-  |                       <ProgramUnit>
-  | @:<ExecutableProgram> <ProgramUnit>
+(customsuperclass=ScopingNode):<ExecutableProgram> ::= <ProgramUnitList>
+
+(list):<ProgramUnitList> ::=
+  |                   <ProgramUnit>
+  | <ProgramUnitList> <ProgramUnit>
 
 # R202
-<ProgramUnit> ::=
+(superclass):<ProgramUnit> ::=
   | <MainProgram>
   | <FunctionSubprogram>
   | <SubroutineSubprogram>
@@ -58,20 +60,20 @@
 # R203 chain rule eliminated
 
 # R1101 doesn't ensure ordering as the standard requires
-<MainProgram> ::= (superclass=ScopingNode)
-  |               ^:<MainRange>
-  | <ProgramStmt> ^:<MainRange>
+(customsuperclass=ScopingNode):<MainProgram> ::=
+  |               (inline):<MainRange>
+  | <ProgramStmt> (inline):<MainRange>
 
 <MainRange> ::=
-    <Body>                <EndProgramStmt>
-  | ^:<BodyPlusInternals> <EndProgramStmt>
-  |                       <EndProgramStmt>
+  | <Body>                       <EndProgramStmt>
+  | (inline):<BodyPlusInternals> <EndProgramStmt>
+  |                              <EndProgramStmt>
 
-<Body> ::=
-  |          <BodyConstruct>
-  | @:<Body> <BodyConstruct>
+(list):<Body> ::=
+  |        <BodyConstruct>
+  | <Body> <BodyConstruct>
 
-<BodyConstruct> ::= (oneof)
+(superclass):<BodyConstruct> ::=
   | <SpecificationPartConstruct>
   | <ExecutableConstruct>
 
@@ -82,59 +84,59 @@
 #######################################################################################################################
 
 # R1216
-<FunctionSubprogram> ::= (superclass=ScopingNode)
-  <FunctionStmt> ^:<FunctionRange>
+(customsuperclass=ScopingNode):<FunctionSubprogram> ::=
+  <FunctionStmt> (inline):<FunctionRange>
 
 <FunctionRange> ::=
-  | <Body>                <EndFunctionStmt>
-  |                       <EndFunctionStmt>
-  | ^:<BodyPlusInternals> <EndFunctionStmt>
+  | <Body>                       <EndFunctionStmt>
+  |                              <EndFunctionStmt>
+  | (inline):<BodyPlusInternals> <EndFunctionStmt>
 
 # R1221
-<SubroutineSubprogram> ::= (superclass=ScopingNode)
-  <SubroutineStmt> ^:<SubroutineRange>
+(customsuperclass=ScopingNode):<SubroutineSubprogram> ::=
+  <SubroutineStmt> (inline):<SubroutineRange>
 
 <SubroutineRange> ::=
-  | <Body>                <EndSubroutineStmt>
-  |                       <EndSubroutineStmt>
-  | ^:<BodyPlusInternals> <EndSubroutineStmt>
+  | <Body>                       <EndSubroutineStmt>
+  |                              <EndSubroutineStmt>
+  | (inline):<BodyPlusInternals> <EndSubroutineStmt>
 
 #######################################################################################################################
 # Section 11 Rules
 #######################################################################################################################
 
 # R1104
-<Module> ::= (superclass=ScopingNode)
-  <ModuleStmt> ^:<ModuleBlock>
+(customsuperclass=ScopingNode):<Module> ::=
+  <ModuleStmt> (inline):<ModuleBlock>
 
 <ModuleBlock> ::=
   | <ModuleBody> <EndModuleStmt>
   |              <EndModuleStmt>
 
-#<ModuleBody> ::=
-#  |                <SpecificationPartConstruct>
-#  |                <ModuleSubprogramPartConstruct>
-#  | @:<ModuleBody> <SpecificationPartConstruct>
-#  | @:<ModuleBody> <ModuleSubprogramPartConstruct>
+#(list):<ModuleBody> ::=
+#  |              <SpecificationPartConstruct>
+#  |              <ModuleSubprogramPartConstruct>
+#  | <ModuleBody> <SpecificationPartConstruct>
+#  | <ModuleBody> <ModuleSubprogramPartConstruct>
 #JO--X
-<ModuleBody> ::=
-  | @:<ModuleBody> <ModuleBodyConstruct>
-  |                <ModuleBodyConstruct>
+(list):<ModuleBody> ::=
+  | <ModuleBody> <ModuleBodyConstruct>
+  |              <ModuleBodyConstruct>
 
-<ModuleBodyConstruct> ::= (oneof)
+(superclass):<ModuleBodyConstruct> ::=
   | <SpecificationPartConstruct>
   | <ModuleSubprogramPartConstruct>
 
 # R1112
-<BlockDataSubprogram> ::= (superclass=ScopingNode)
+(customsuperclass=ScopingNode):<BlockDataSubprogram> ::=
   | <BlockDataStmt> <BlockDataBody> <EndBlockDataStmt>
   | <BlockDataStmt>                 <EndBlockDataStmt>
 
-<BlockDataBody> ::=
-  |                   <BlockDataBodyConstruct>
-  | @:<BlockDataBody> <BlockDataBodyConstruct>
+(list):<BlockDataBody> ::=
+  |                 <BlockDataBodyConstruct>
+  | <BlockDataBody> <BlockDataBodyConstruct>
 
-<BlockDataBodyConstruct> ::= (oneof)
+(superclass):<BlockDataBodyConstruct> ::=
   <SpecificationPartConstruct>
 
 #######################################################################################################################
@@ -142,7 +144,7 @@
 #######################################################################################################################
 
 # R204 doesn't ensure ordering as the standard requires
-<SpecificationPartConstruct> ::= (oneof)
+(superclass):<SpecificationPartConstruct> ::=
   | <UseStmt>
   | <ImplicitStmt>
   | <ParameterStmt>
@@ -155,7 +157,7 @@
 # R206 see R204
 
 # R207 also see R204
-<DeclarationConstruct> ::= (oneof)
+(superclass):<DeclarationConstruct> ::=
   | <DerivedTypeDef>
   | <InterfaceBlock>
   | <TypeDeclarationStmt>
@@ -164,45 +166,45 @@
 # R208
 
 # R209
-<ExecutionPartConstruct> ::= (oneof)
+(superclass):<ExecutionPartConstruct> ::=
   | <ObsoleteExecutionPartConstruct>
   | <ExecutableConstruct>
   | <FormatStmt>
   | <EntryStmt>
 
-<ObsoleteExecutionPartConstruct> ::=  (oneof) <DataStmt>
+(superclass):<ObsoleteExecutionPartConstruct> ::= <DataStmt>
 
 ## R210
-#<BodyPlusInternals> ::=
+#(list):<BodyPlusInternals> ::=
 #  | <Body> <ContainsStmt> <InternalSubprogram>
 #  |        <ContainsStmt> <InternalSubprogram>
-#  | @:<BodyPlusInternals> <InternalSubprogram>
+#  | <BodyPlusInternals> <InternalSubprogram>
 #JO--Y
 # R210
 <BodyPlusInternals> ::=
   | <Body> <ContainsStmt> <InternalSubprograms>
   |        <ContainsStmt> <InternalSubprograms>
-<InternalSubprograms> ::=
-  |                         <InternalSubprogram>
-  | @:<InternalSubprograms> <InternalSubprogram>
+(list):<InternalSubprograms> ::=
+  |                       <InternalSubprogram>
+  | <InternalSubprograms> <InternalSubprogram>
 
 # R211
-<InternalSubprogram> ::= (oneof)
+(superclass):<InternalSubprogram> ::=
   | <FunctionSubprogram>
   | <SubroutineSubprogram>
 
 # R212 doesn't ensure ordering as standard requires
-<ModuleSubprogramPartConstruct> ::= (oneof)
+(superclass):<ModuleSubprogramPartConstruct> ::=
   | <ContainsStmt>
   | <ModuleSubprogram>
 
 # R213
-<ModuleSubprogram> ::= (oneof)
+(superclass):<ModuleSubprogram> ::=
   | <FunctionSubprogram>
   | <SubroutineSubprogram>
 
 # R214
-<SpecificationStmt> ::= (oneof)
+(superclass):<SpecificationStmt> ::=
   | <AccessStmt>
   | <AllocatableStmt>
   | <CommonStmt>
@@ -219,7 +221,7 @@
   | <TargetStmt>
 
 # R215
-<ExecutableConstruct> ::= (oneof)
+(superclass):<ExecutableConstruct> ::=
   | <ActionStmt>
   | <CaseConstruct>
   | <DoConstruct>
@@ -230,7 +232,7 @@
   # see the note on R818
 
 # R216
-<ActionStmt> ::= (oneof)
+(superclass):<ActionStmt> ::=
   | <ObsoleteActionStmt>
   | <AllocateStmt>
   | <AssignmentStmt>
@@ -256,8 +258,13 @@
   | <StopStmt>
   | <WhereStmt>
   | <WriteStmt>
+#(superclass):<ActionStmt> ::=
+  | <AssignStmt>
+  | <AssignedGotoStmt>
+  | <PauseStmt>
 
-<ObsoleteActionStmt> ::= (oneof)
+
+(superclass):<ObsoleteActionStmt> ::=
   | <StmtFunctionStmt>
   | <ArithmeticIfStmt>
   | <ComputedGotoStmt>
@@ -274,17 +281,17 @@
 # R305
 # Dirk Rossow added T_HCON
 <Constant> ::=
-  |               name*:<NamedConstantUse>
-  |                   *:<UnsignedArithmeticConstant>
-  |  hasPlus+:T_PLUS  *:<UnsignedArithmeticConstant>
-  | hasMinus+:T_MINUS *:<UnsignedArithmeticConstant>
-  |                                                      stringConst*:T_SCON
-  |        hasIntKind+:T_ICON             -:T_UNDERSCORE stringConst*:T_SCON
-  | namedConstantKind*:<NamedConstantUse> -:T_UNDERSCORE stringConst*:T_SCON
-  | logicalConst*:<LogicalConstant>
-  | *:<StructureConstructor>
-  | *:<BozLiteralConstant>
-  | hollerithConst*:T_HCON
+  |               name:<NamedConstantUse>
+  |                    <UnsignedArithmeticConstant>
+  |  hasPlus(bool):T_PLUS  <UnsignedArithmeticConstant>
+  | hasMinus(bool):T_MINUS <UnsignedArithmeticConstant>
+  |                                                      stringConst:T_SCON
+  |        hasIntKind(bool):T_ICON             -:T_UNDERSCORE stringConst:T_SCON
+  | namedConstantKind:<NamedConstantUse> -:T_UNDERSCORE stringConst:T_SCON
+  | logicalConst:<LogicalConstant>
+  | <StructureConstructor>
+  | <BozLiteralConstant>
+  | hollerithConst:T_HCON
 
 # R306 chain rule deleted
 
@@ -304,80 +311,80 @@
 #######################################################################################################################
 
 # R708
-<PowerOp> ::= (class=ASTOperatorNode) hasPowerOp+:T_POW
+ASTOperatorNode:<PowerOp> ::= hasPowerOp(bool):T_POW
 
 # R709
-<MultOp> ::= (class=ASTOperatorNode)
-  | hasTimesOp+:T_ASTERISK
-  | hasDivideOp+:T_SLASH
+ASTOperatorNode:<MultOp> ::=
+  | hasTimesOp(bool):T_ASTERISK
+  | hasDivideOp(bool):T_SLASH
 
 # R710
-<AddOp> ::= (class=ASTOperatorNode)
-  | hasPlusOp+:T_PLUS
-  | hasMinusOp+:T_MINUS
+ASTOperatorNode:<AddOp> ::=
+  | hasPlusOp(bool):T_PLUS
+  | hasMinusOp(bool):T_MINUS
 
 <Sign> ::=
-    hasPlusSign+:T_PLUS
-  | hasMinusSign+:T_MINUS
+    hasPlusSign(bool):T_PLUS
+  | hasMinusSign(bool):T_MINUS
 
 # R712
-<ConcatOp> ::= (class=ASTOperatorNode) hasConcatOp+:T_SLASHSLASH
+ASTOperatorNode:<ConcatOp> ::= hasConcatOp(bool):T_SLASHSLASH
 
 # R714
-<RelOp> ::= (class=ASTOperatorNode)
-  |      hasEqOp+:T_EQ
-  |      hasNeOp+:T_NE
-  |      hasLtOp+:T_LT
-  |      hasLtOp+:T_LESSTHAN
-  |      hasLeOp+:T_LE
-  |      hasLeOp+:T_LESSTHANEQ
-  |      hasGtOp+:T_GT
-  |      hasGtOp+:T_GREATERTHAN
-  |      hasGeOp+:T_GE
-  |      hasGeOp+:T_GREATERTHANEQ
-  |    hasEqEqOp+:T_EQEQ
-  | hasSlashEqOp+:T_SLASHEQ
+ASTOperatorNode:<RelOp> ::=
+  |      hasEqOp(bool):T_EQ
+  |      hasNeOp(bool):T_NE
+  |      hasLtOp(bool):T_LT
+  |      hasLtOp(bool):T_LESSTHAN
+  |      hasLeOp(bool):T_LE
+  |      hasLeOp(bool):T_LESSTHANEQ
+  |      hasGtOp(bool):T_GT
+  |      hasGtOp(bool):T_GREATERTHAN
+  |      hasGeOp(bool):T_GE
+  |      hasGeOp(bool):T_GREATERTHANEQ
+  |    hasEqEqOp(bool):T_EQEQ
+  | hasSlashEqOp(bool):T_SLASHEQ
 
 # R719
-<NotOp> ::= (class=ASTOperatorNode) hasNotOp+:T_NOT
+ASTOperatorNode:<NotOp> ::= hasNotOp(bool):T_NOT
 
 # R720
-<AndOp> ::= (class=ASTOperatorNode) hasAndOp+:T_AND
+ASTOperatorNode:<AndOp> ::= hasAndOp(bool):T_AND
 
 # R721
-<OrOp> ::= (class=ASTOperatorNode) hasOrOp+:T_OR
+ASTOperatorNode:<OrOp> ::= hasOrOp(bool):T_OR
 
 # R722
-<EquivOp> ::= (class=ASTOperatorNode)
-  |  hasEqvOp+:T_EQV
-  | hasNeqvOp+:T_NEQV
+ASTOperatorNode:<EquivOp> ::=
+  |  hasEqvOp(bool):T_EQV
+  | hasNeqvOp(bool):T_NEQV
 
 # R311
-<DefinedOperator> ::= (class=ASTOperatorNode)
-  | customDefinedOp*:T_XDOP
-  | ^:<ConcatOp>
-  | ^:<PowerOp>
-  | ^:<MultOp>
-  | ^:<AddOp>
-  | ^:<RelOp>
-  | ^:<NotOp>
-  | ^:<AndOp>
-  | ^:<OrOp>
-  | ^:<EquivOp>
+<DefinedOperator> ::=
+  | customDefinedOp:T_XDOP
+  | <ConcatOp>
+  | <PowerOp>
+  | <MultOp>
+  | <AddOp>
+  | <RelOp>
+  | <NotOp>
+  | <AndOp>
+  | <OrOp>
+  | <EquivOp>
 
 # R704
-<DefinedUnaryOp> ::= (class=ASTOperatorNode)
-  definedUnaryOp*:T_XDOP
+ASTOperatorNode:<DefinedUnaryOp> ::=
+  definedUnaryOp:T_XDOP
 
 # R724
-<DefinedBinaryOp> ::= (class=ASTOperatorNode)
-  definedBinaryOp*:T_XDOP
+ASTOperatorNode:<DefinedBinaryOp> ::=
+  definedBinaryOp:T_XDOP
 
 # R312 recognized semantically
 
 # R313 recognized by the lexical analyzer as T_ICON
 <Label> ::=
-  label*:T_ICON
+  label:T_ICON
 
 #######################################################################################################################
 # Section 4 Rules
@@ -391,26 +398,26 @@
 
 # R404
 <UnsignedArithmeticConstant> ::=
-  |     intConst*:T_ICON
-  |    realConst*:T_RCON
-  |     dblConst*:T_DCON
-  | complexConst*:<ComplexConst>
-  |     intConst*:T_ICON -:T_UNDERSCORE UnsignedArithConst^:<KindParam>
-  |    realConst*:T_RCON -:T_UNDERSCORE UnsignedArithConst^:<KindParam>
-  |     dblConst*:T_DCON -:T_UNDERSCORE UnsignedArithConst^:<KindParam>
+  |     intConst:T_ICON
+  |    realConst:T_RCON
+  |     dblConst:T_DCON
+  | complexConst:<ComplexConst>
+  |     intConst:T_ICON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
+  |    realConst:T_RCON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
+  |     dblConst:T_DCON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
 
 # R405
 <KindParam> ::=
-  |        intKind*:T_ICON
-  | namedConstKind*:<NamedConstantUse>
+  |        intKind:T_ICON
+  | namedConstKind:<NamedConstantUse>
 
 # R406 see R305
 
 # R407
 <BozLiteralConstant> ::=
-  | binaryConst*:T_BCON
-  |  octalConst*:T_OCON
-  |    hexConst*:T_ZCON
+  | binaryConst:T_BCON
+  |  octalConst:T_OCON
+  |    hexConst:T_ZCON
 
 # R408 recognized by the lexical analyzer as T_BCON
 
@@ -437,120 +444,120 @@
 
 # R421
 <LogicalConstant> ::=
-  |  isTrue+:T_TRUE
-  | isFalse+:T_FALSE
-  |  isTrue+:T_TRUE  -:T_UNDERSCORE ^:<KindParam>
-  | isFalse+:T_FALSE -:T_UNDERSCORE ^:<KindParam>
+  |  isTrue(bool):T_TRUE
+  | isFalse(bool):T_FALSE
+  |  isTrue(bool):T_TRUE  -:T_UNDERSCORE (inline):<KindParam>
+  | isFalse(bool):T_FALSE -:T_UNDERSCORE (inline):<KindParam>
 
 # R422 This does not enforce the required sequence
-<DerivedTypeDef> ::= (superclass=ScopingNode)
+(customsuperclass=ScopingNode):<DerivedTypeDef> ::=
   <DerivedTypeStmt> <DerivedTypeBody> <EndTypeStmt>
 
-<DerivedTypeBody> ::=
-  |                     <DerivedTypeBodyConstruct>
-  | @:<DerivedTypeBody> <DerivedTypeBodyConstruct>
+(list):<DerivedTypeBody> ::=
+  |                   <DerivedTypeBodyConstruct>
+  | <DerivedTypeBody> <DerivedTypeBodyConstruct>
 
-<DerivedTypeBodyConstruct> ::= (oneof)
+(superclass):<DerivedTypeBodyConstruct> ::=
   | <PrivateSequenceStmt>
   | <ComponentDefStmt>
 
 # R423
 <DerivedTypeStmt> ::=
-  | ^:<LblDef> -:T_TYPE                                            ^:<TypeName> -:T_EOS
-  | ^:<LblDef> -:T_TYPE                        -:T_COLON -:T_COLON ^:<TypeName> -:T_EOS
-  | ^:<LblDef> -:T_TYPE -:T_COMMA <AccessSpec> -:T_COLON -:T_COLON ^:<TypeName> -:T_EOS
+  | (inline):<LblDef> -:T_TYPE                                            (inline):<TypeName> -:T_EOS
+  | (inline):<LblDef> -:T_TYPE                        -:T_COLON -:T_COLON (inline):<TypeName> -:T_EOS
+  | (inline):<LblDef> -:T_TYPE -:T_COMMA <AccessSpec> -:T_COLON -:T_COLON (inline):<TypeName> -:T_EOS
 
 # R424
 <PrivateSequenceStmt> ::=
-  | ^:<LblDef>  privateToken:T_PRIVATE   isPrivate+:T_EOS
-  | ^:<LblDef> sequenceToken:T_SEQUENCE isSequence+:T_EOS
+  | (inline):<LblDef>  privateToken:T_PRIVATE   isPrivate(bool):T_EOS
+  | (inline):<LblDef> sequenceToken:T_SEQUENCE isSequence(bool):T_EOS
 
 # R425
 <ComponentDefStmt> ::=
-  | ^:<LblDef> <TypeSpec> -:T_COMMA <ComponentAttrSpecList> -:T_COLON -:T_COLON <ComponentDeclList> -:T_EOS
-  | ^:<LblDef> <TypeSpec>                                   -:T_COLON -:T_COLON <ComponentDeclList> -:T_EOS
-  | ^:<LblDef> <TypeSpec>                                                       <ComponentDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec> -:T_COMMA <ComponentAttrSpecList> -:T_COLON -:T_COLON <ComponentDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec>                                   -:T_COLON -:T_COLON <ComponentDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec>                                                       <ComponentDeclList> -:T_EOS
 
 # R426
-<ComponentAttrSpecList> ::=
-  |                                     <ComponentAttrSpec>
-  | @:<ComponentAttrSpecList> -:T_COMMA <ComponentAttrSpec>
+(list):<ComponentAttrSpecList> ::=
+  |                                   <ComponentAttrSpec>
+  | <ComponentAttrSpecList> -:T_COMMA <ComponentAttrSpec>
 
 <ComponentAttrSpec> ::=
-  |     pointer+:T_POINTER
-  |   dimension+:T_DIMENSION -:T_LPAREN <ComponentArraySpec> -:T_RPAREN
+  |     pointer(bool):T_POINTER
+  |   dimension(bool):T_DIMENSION -:T_LPAREN <ComponentArraySpec> -:T_RPAREN
 # JO -- Added these
-  | allocatable+:T_ALLOCATABLE
-  |            *:<AccessSpec>
+  | allocatable(bool):T_ALLOCATABLE
+  |                   <AccessSpec>
 
 # R427
-<ComponentArraySpec> ::= (oneof)
+<ComponentArraySpec> ::=
   | <ExplicitShapeSpecList>
   | <DeferredShapeSpecList>
 
 # R428
-<ComponentDeclList> ::=
-  |                                 <ComponentDecl>
-  | @:<ComponentDeclList> -:T_COMMA <ComponentDecl>
+(list):<ComponentDeclList> ::=
+  |                               <ComponentDecl>
+  | <ComponentDeclList> -:T_COMMA <ComponentDecl>
 
 <ComponentDecl> ::=
-  | <ComponentName> -:T_LPAREN   *:<ComponentArraySpec> -:T_RPAREN -:T_ASTERISK *:<CharLength> *:<ComponentInitialization>
-  | <ComponentName> -:T_LPAREN   *:<ComponentArraySpec> -:T_RPAREN                             *:<ComponentInitialization>
-  | <ComponentName>                                                -:T_ASTERISK *:<CharLength> *:<ComponentInitialization>
-  | <ComponentName>                                                                            *:<ComponentInitialization>
-  | <ComponentName> -:T_LPAREN   *:<ComponentArraySpec> -:T_RPAREN -:T_ASTERISK *:<CharLength>
-  | <ComponentName> -:T_LPAREN   *:<ComponentArraySpec> -:T_RPAREN
-  | <ComponentName>                                                -:T_ASTERISK *:<CharLength>
+  | <ComponentName> -:T_LPAREN  <ComponentArraySpec> -:T_RPAREN -:T_ASTERISK <CharLength> <ComponentInitialization>
+  | <ComponentName> -:T_LPAREN  <ComponentArraySpec> -:T_RPAREN                           <ComponentInitialization>
+  | <ComponentName>                                             -:T_ASTERISK <CharLength> <ComponentInitialization>
+  | <ComponentName>                                                                       <ComponentInitialization>
+  | <ComponentName> -:T_LPAREN  <ComponentArraySpec> -:T_RPAREN -:T_ASTERISK <CharLength>
+  | <ComponentName> -:T_LPAREN  <ComponentArraySpec> -:T_RPAREN
+  | <ComponentName>                                             -:T_ASTERISK <CharLength>
   | <ComponentName>
 
 # R429
 <ComponentInitialization> ::=
-  | assignsExpr+:T_EQUALS        assignedExpr:<Expr>
-  | assignsNull+:T_EQGREATERTHAN -:T_NULL -:T_LPAREN -:T_RPAREN
+  | assignsExpr(bool):T_EQUALS        assignedExpr:<Expr>
+  | assignsNull(bool):T_EQGREATERTHAN -:T_NULL -:T_LPAREN -:T_RPAREN
 
 # R430
 <EndTypeStmt> ::=
-  | ^:<LblDef> -:T_ENDTYPE      *:<TypeName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_TYPE *:<TypeName> -:T_EOS
-  | ^:<LblDef> -:T_ENDTYPE                   -:T_EOS
-  | ^:<LblDef> -:T_END -:T_TYPE              -:T_EOS
+  | (inline):<LblDef> -:T_ENDTYPE      <TypeName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_TYPE <TypeName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDTYPE                 -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_TYPE            -:T_EOS
 
 # R431
-<StructureConstructor> ::= <TypeName> -:T_LPAREN ^:<ExprList> -:T_RPAREN
+<StructureConstructor> ::= <TypeName> -:T_LPAREN <ExprList> -:T_RPAREN
 
-<ExprList> ::=
-  |                        <Expr>
-  | @:<ExprList> -:T_COMMA <Expr>
+(list):<ExprList> ::=
+  |                      <Expr>
+  | <ExprList> -:T_COMMA <Expr>
 
 # R432
-<ArrayConstructor> ::= -:T_LPARENSLASH ^:<AcValueList> -:T_SLASHRPAREN
+<ArrayConstructor> ::= -:T_LPARENSLASH <AcValueList> -:T_SLASHRPAREN
 
 ## R433 Why <AcValueList1>?
-#<AcValueList> ::= (oneof)
+#(superclass):<AcValueList> ::=
 #  | <Expr>
 #  | <AcValueList1>
 #
-#<AcValueList1> ::=
+#(list):<AcValueList1> ::=
 #  | <Expr> -:T_COMMA expr2:<Expr>
 #  | <Expr> -:T_COMMA <AcImpliedDo>
 #  | <AcImpliedDo>
-#  | @:<AcValueList1> -:T_COMMA <Expr>
-#  | @:<AcValueList1> -:T_COMMA <AcImpliedDo>
+#  | <AcValueList1> -:T_COMMA <Expr>
+#  | <AcValueList1> -:T_COMMA <AcImpliedDo>
 #JO--X
 # R433
-<AcValueList> ::=
-  |                           <AcValue>
-  | @:<AcValueList> -:T_COMMA <AcValue>
+(list):<AcValueList> ::=
+  |                         <AcValue>
+  | <AcValueList> -:T_COMMA <AcValue>
 <AcValue> ::=
-  | *:<Expr>
-  | *:<AcImpliedDo>
+  | <Expr>
+  | <AcImpliedDo>
 
 # R434
 <AcImpliedDo> ::=
-  | -:T_LPAREN                *:<Expr>        -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                       -:T_RPAREN
-  | -:T_LPAREN                *:<Expr>        -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
-  | -:T_LPAREN nestedImpliedDo*:<AcImpliedDo> -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                       -:T_RPAREN
-  | -:T_LPAREN nestedImpliedDo*:<AcImpliedDo> -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
+  | -:T_LPAREN                 <Expr>        -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                       -:T_RPAREN
+  | -:T_LPAREN                 <Expr>        -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
+  | -:T_LPAREN nestedImpliedDo:<AcImpliedDo> -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                       -:T_RPAREN
+  | -:T_LPAREN nestedImpliedDo:<AcImpliedDo> -:T_COMMA <ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
 
 # R435 chain rule deleted
 
@@ -562,70 +569,70 @@
 
 # R501
 <TypeDeclarationStmt> ::=
-  | ^:<LblDef> <TypeSpec> *:<AttrSpecSeq> -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
-  | ^:<LblDef> <TypeSpec>                 -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
-  | ^:<LblDef> <TypeSpec>                                     <EntityDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec> <AttrSpecSeq> -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec>               -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec>                                   <EntityDeclList> -:T_EOS
 
-<AttrSpecSeq> ::=
-  |                 -:T_COMMA <AttrSpec>
-  | @:<AttrSpecSeq> -:T_COMMA <AttrSpec>
+(list):<AttrSpecSeq> ::=
+  |               -:T_COMMA <AttrSpec>
+  | <AttrSpecSeq> -:T_COMMA <AttrSpec>
 
 # R502
 <TypeSpec> ::=
-  |     isInteger+:T_INTEGER
-  |        isReal+:T_REAL
-  |      isDouble+:T_DOUBLEPRECISION
-  |     isComplex+:T_COMPLEX
-  |     isLogical+:T_LOGICAL
-  |   isCharacter+:T_CHARACTER
-  |     isInteger+:T_INTEGER              *:<KindSelector>
-  |        isReal+:T_REAL                 *:<KindSelector>
-  |      isDouble+:T_DOUBLE -:T_PRECISION
-  |     isComplex+:T_COMPLEX              *:<KindSelector>
-  |   isCharacter+:T_CHARACTER            *:<CharSelector>
-  |     isLogical+:T_LOGICAL              *:<KindSelector>
-  | isDerivedType+:T_TYPE -:T_LPAREN ^:<TypeName> -:T_RPAREN
+  |     isInteger(bool):T_INTEGER
+  |        isReal(bool):T_REAL
+  |      isDouble(bool):T_DOUBLEPRECISION
+  |     isComplex(bool):T_COMPLEX
+  |     isLogical(bool):T_LOGICAL
+  |   isCharacter(bool):T_CHARACTER
+  |     isInteger(bool):T_INTEGER              <KindSelector>
+  |        isReal(bool):T_REAL                 <KindSelector>
+  |      isDouble(bool):T_DOUBLE -:T_PRECISION
+  |     isComplex(bool):T_COMPLEX              <KindSelector>
+  |   isCharacter(bool):T_CHARACTER            <CharSelector>
+  |     isLogical(bool):T_LOGICAL              <KindSelector>
+  | isDerivedType(bool):T_TYPE -:T_LPAREN (inline):<TypeName> -:T_RPAREN
 
 # R503
 <AttrSpec> ::=
-  |              *:<AccessSpec>
-  |   isParameter+:T_PARAMETER
-  | isAllocatable+:T_ALLOCATABLE
-  |   isDimension+:T_DIMENSION -:T_LPAREN <ArraySpec>  -:T_RPAREN
-  |    isExternal+:T_EXTERNAL
-  |      isIntent+:T_INTENT    -:T_LPAREN <IntentSpec> -:T_RPAREN
-  |   isIntrinsic+:T_INTRINSIC
-  |    isOptional+:T_OPTIONAL
-  |     isPointer+:T_POINTER
-  |        isSave+:T_SAVE
-  |      isTarget+:T_TARGET
+  |                     <AccessSpec>
+  |   isParameter(bool):T_PARAMETER
+  | isAllocatable(bool):T_ALLOCATABLE
+  |   isDimension(bool):T_DIMENSION -:T_LPAREN <ArraySpec>  -:T_RPAREN
+  |    isExternal(bool):T_EXTERNAL
+  |      isIntent(bool):T_INTENT    -:T_LPAREN <IntentSpec> -:T_RPAREN
+  |   isIntrinsic(bool):T_INTRINSIC
+  |    isOptional(bool):T_OPTIONAL
+  |     isPointer(bool):T_POINTER
+  |        isSave(bool):T_SAVE
+  |      isTarget(bool):T_TARGET
 
 # R504
-<EntityDeclList> ::=
-  |                              <EntityDecl>
-  | @:<EntityDeclList> -:T_COMMA <EntityDecl>
+(list):<EntityDeclList> ::=
+  |                            <EntityDecl>
+  | <EntityDeclList> -:T_COMMA <EntityDecl>
 
 <EntityDecl> ::=
   | <ObjectName>
-  | <ObjectName>                                                                 *:<Initialization>
-  | <ObjectName>                                     -:T_ASTERISK *:<CharLength>
-  | <ObjectName>                                     -:T_ASTERISK *:<CharLength> *:<Initialization>
-  | <ObjectName> -:T_LPAREN *:<ArraySpec> -:T_RPAREN
-  | <ObjectName> -:T_LPAREN *:<ArraySpec> -:T_RPAREN                             *:<Initialization>
-  | <ObjectName> -:T_LPAREN *:<ArraySpec> -:T_RPAREN -:T_ASTERISK *:<CharLength>
-  | <ObjectName> -:T_LPAREN *:<ArraySpec> -:T_RPAREN -:T_ASTERISK *:<CharLength> *:<Initialization>
-  | ^:<InvalidEntityDecl>
+  | <ObjectName>                                                             <Initialization>
+  | <ObjectName>                                   -:T_ASTERISK <CharLength>
+  | <ObjectName>                                   -:T_ASTERISK <CharLength> <Initialization>
+  | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN
+  | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN                           <Initialization>
+  | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_ASTERISK <CharLength>
+  | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_ASTERISK <CharLength> <Initialization>
+  | (inline):<InvalidEntityDecl>
 
 # JO -- Added error production
 <InvalidEntityDecl> ::=
-  | <ObjectName> -:T_ASTERISK *:<CharLength> -:T_LPAREN *:<ArraySpec> -:T_RPAREN
-  | <ObjectName> -:T_ASTERISK *:<CharLength> -:T_LPAREN *:<ArraySpec> -:T_RPAREN *:<Initialization>
+  | <ObjectName> asterisk2(omit):T_ASTERISK initial-char-length:<CharLength> lparen2(omit):T_LPAREN <ArraySpec> rparen2(omit):T_RPAREN
+  | <ObjectName> asterisk2(omit):T_ASTERISK initial-char-length:<CharLength> lparen2(omit):T_LPAREN <ArraySpec> rparen2(omit):T_RPAREN <Initialization>
   | <ObjectName> (error) T_EOS
 
 # R505
 <Initialization> ::=
-  | assignsExpr+:T_EQUALS        assignedExpr:<Expr>
-  | assignsNull+:T_EQGREATERTHAN -:T_NULL -:T_LPAREN -:T_RPAREN
+  | assignsExpr(bool):T_EQUALS        assignedExpr:<Expr>
+  | assignsNull(bool):T_EQGREATERTHAN -:T_NULL -:T_LPAREN -:T_RPAREN
 
 # R506 Should this be 'kind=' or 'kind' '='?
 <KindSelector> ::=
@@ -634,7 +641,7 @@
 
 ## R507
 #<CharSelector> ::=
-#  | ^:<LengthSelector>
+#  | (inline):<LengthSelector>
 #  | -:T_LPAREN T_LENEQ <CharLenParamValue> -:T_COMMA T_KINDEQ <Expr> -:T_RPAREN
 #  | -:T_LPAREN T_LENEQ <CharLenParamValue> -:T_COMMA          <Expr> -:T_RPAREN
 #  | -:T_LPAREN                                       T_KINDEQ <Expr> -:T_RPAREN
@@ -657,31 +664,31 @@
 #JO--X
 # R507, R508, R509, R510
 <CharSelector> ::=
-  | -:T_ASTERISK ^:<CharLength>
-  | -:T_LPAREN   -:T_LENEQ  ^:<CharLenParamValue> -:T_COMMA -:T_KINDEQ kindExpr*:<Expr> -:T_RPAREN
-  | -:T_LPAREN   -:T_LENEQ  ^:<CharLenParamValue> -:T_COMMA            kindExpr*:<Expr> -:T_RPAREN
-  | -:T_LPAREN                                              -:T_KINDEQ kindExpr*:<Expr> -:T_RPAREN
-  | -:T_LPAREN   -:T_LENEQ  ^:<CharLenParamValue> -:T_RPAREN
-  | -:T_LPAREN              ^:<CharLenParamValue> -:T_RPAREN
+  | -:T_ASTERISK (inline):<CharLength>
+  | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_COMMA -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
+  | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_COMMA            kindExpr:<Expr> -:T_RPAREN
+  | -:T_LPAREN                                              -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
+  | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_RPAREN
+  | -:T_LPAREN              (inline):<CharLenParamValue> -:T_RPAREN
 <CharLenParamValue> ::=
-  | lengthExpr*:<Expr>
-  | isAssumedLength+:T_ASTERISK
+  | lengthExpr:<Expr>
+  | isAssumedLength(bool):T_ASTERISK
 # R509
 <CharLength> ::=
-  | -:T_LPAREN ^:<CharLenParamValue> -:T_RPAREN
-  | constIntLength*:T_ICON
+  | -:T_LPAREN (inline):<CharLenParamValue> -:T_RPAREN
+  | constIntLength:T_ICON
 
 # R511
 <AccessSpec> ::=
-  | isPublic+:T_PUBLIC
-  | isPrivate+:T_PRIVATE
+  | isPublic(bool):T_PUBLIC
+  | isPrivate(bool):T_PRIVATE
 
 # R512
 <IntentSpec> ::=
-  |    isIntentIn+:T_IN
-  |   isIntentOut+:T_OUT
-  | isIntentInOut+:T_INOUT
-  | isIntentInOut+:T_IN -:T_OUT
+  |    isIntentIn(bool):T_IN
+  |   isIntentOut(bool):T_OUT
+  | isIntentInOut(bool):T_INOUT
+  | isIntentInOut(bool):T_IN -:T_OUT
 
 # R513 see 16
 <ArraySpec> ::=
@@ -691,203 +698,203 @@
   | <DeferredShapeSpecList>
 
 # JO -- Looks like <DeferredShapeSpecList> is in here since <LowerBound> is actually optional
-<AssumedShapeSpecList> ::=
-  |                                     ^:<LowerBound> -:T_COLON
-  | *:<DeferredShapeSpecList> -:T_COMMA ^:<LowerBound> -:T_COLON
-  | @:<AssumedShapeSpecList>  -:T_COMMA ^:<AssumedShapeSpec>
+(list):<AssumedShapeSpecList> ::=
+  |                                   (inline):<LowerBound> -:T_COLON
+  | <DeferredShapeSpecList> -:T_COMMA (inline):<LowerBound> -:T_COLON
+  | <AssumedShapeSpecList>  -:T_COMMA (inline):<AssumedShapeSpec>
 
 # R514
-<ExplicitShapeSpecList> ::=
-  |                                     <ExplicitShapeSpec>
-  | @:<ExplicitShapeSpecList> -:T_COMMA <ExplicitShapeSpec>
+(list):<ExplicitShapeSpecList> ::=
+  |                                   <ExplicitShapeSpec>
+  | <ExplicitShapeSpecList> -:T_COMMA <ExplicitShapeSpec>
 
 <ExplicitShapeSpec> ::=
-  | ^:<LowerBound> -:T_COLON ^:<UpperBound>
-  |                          ^:<UpperBound>
+  | (inline):<LowerBound> -:T_COLON (inline):<UpperBound>
+  |                          (inline):<UpperBound>
 
 # R515
-<LowerBound> ::= Lb*:<Expr>
+<LowerBound> ::= Lb:<Expr>
 
 # R516
-<UpperBound> ::= Ub*:<Expr>
+<UpperBound> ::= Ub:<Expr>
 
 # R517
 <AssumedShapeSpec> ::=
-  | ^:<LowerBound> -:T_COLON
+  | (inline):<LowerBound> -:T_COLON
   |                -:T_COLON
 
 # R518
-<DeferredShapeSpecList> ::=
-  |                                     ^:<DeferredShapeSpec>
-  | @:<DeferredShapeSpecList> -:T_COMMA ^:<DeferredShapeSpec>
+(list):<DeferredShapeSpecList> ::=
+  |                                   (inline):<DeferredShapeSpec>
+  | <DeferredShapeSpecList> -:T_COMMA (inline):<DeferredShapeSpec>
 
 <DeferredShapeSpec> ::= -:T_COLON
 
 # R519
 <AssumedSizeSpec> ::=
-  |                                                              -:T_ASTERISK
-  |                                     ^:<LowerBound> -:T_COLON -:T_ASTERISK
-  | *:<ExplicitShapeSpecList> -:T_COMMA                          -:T_ASTERISK
-  | *:<ExplicitShapeSpecList> -:T_COMMA ^:<LowerBound> -:T_COLON -:T_ASTERISK
+  |                                                                   -:T_ASTERISK
+  |                                   (inline):<LowerBound> -:T_COLON -:T_ASTERISK
+  | <ExplicitShapeSpecList> -:T_COMMA                                 -:T_ASTERISK
+  | <ExplicitShapeSpecList> -:T_COMMA (inline):<LowerBound> -:T_COLON -:T_ASTERISK
 
 # R520
 <IntentStmt> ::=
-  | ^:<LblDef> -:T_INTENT -:T_LPAREN <IntentSpec> -:T_RPAREN                     variableList:<IntentParList> -:T_EOS
-  | ^:<LblDef> -:T_INTENT -:T_LPAREN <IntentSpec> -:T_RPAREN -:T_COLON -:T_COLON variableList:<IntentParList> -:T_EOS
+  | (inline):<LblDef> -:T_INTENT -:T_LPAREN <IntentSpec> -:T_RPAREN                     variableList:<IntentParList> -:T_EOS
+  | (inline):<LblDef> -:T_INTENT -:T_LPAREN <IntentSpec> -:T_RPAREN -:T_COLON -:T_COLON variableList:<IntentParList> -:T_EOS
 
-<IntentParList> ::=
-                                ^:<IntentPar>
-  | @:<IntentParList> -:T_COMMA ^:<IntentPar>
+(list):<IntentParList> ::=
+                              (inline):<IntentPar>
+  | <IntentParList> -:T_COMMA (inline):<IntentPar>
 
 <IntentPar> ::=
-  ^:<DummyArgName>
+  (inline):<DummyArgName>
 
 # R521
 <OptionalStmt> ::=
-  | ^:<LblDef> -:T_OPTIONAL                     variableList:<OptionalParList> -:T_EOS
-  | ^:<LblDef> -:T_OPTIONAL -:T_COLON -:T_COLON variableList:<OptionalParList> -:T_EOS
+  | (inline):<LblDef> -:T_OPTIONAL                     variableList:<OptionalParList> -:T_EOS
+  | (inline):<LblDef> -:T_OPTIONAL -:T_COLON -:T_COLON variableList:<OptionalParList> -:T_EOS
 
-<OptionalParList> ::=
-  |                               ^:<OptionalPar>
-  | @:<OptionalParList> -:T_COMMA ^:<OptionalPar>
+(list):<OptionalParList> ::=
+  |                             (inline):<OptionalPar>
+  | <OptionalParList> -:T_COMMA (inline):<OptionalPar>
 
-<OptionalPar> ::= ^:<DummyArgName>
+<OptionalPar> ::= (inline):<DummyArgName>
 
 # R522
 <AccessStmt> ::=
-  | ^:<LblDef> <AccessSpec> -:T_COLON -:T_COLON <AccessIdList> -:T_EOS
-  | ^:<LblDef> <AccessSpec>                     <AccessIdList> -:T_EOS
-  | ^:<LblDef> <AccessSpec>                                    -:T_EOS
+  | (inline):<LblDef> <AccessSpec> -:T_COLON -:T_COLON <AccessIdList> -:T_EOS
+  | (inline):<LblDef> <AccessSpec>                     <AccessIdList> -:T_EOS
+  | (inline):<LblDef> <AccessSpec>                                    -:T_EOS
 
 
 # R523
-<AccessIdList> ::=
-  |                            <AccessId>
-  | @:<AccessIdList> -:T_COMMA <AccessId>
+(list):<AccessIdList> ::=
+  |                          <AccessId>
+  | <AccessIdList> -:T_COMMA <AccessId>
 
-<AccessId> ::= (oneof)
+(superclass):<AccessId> ::=
   | <GenericName>
   | <GenericSpec>
 
 # R524
 <SaveStmt> ::=
-  | ^:<LblDef> -:T_SAVE                                                     -:T_EOS
-  | ^:<LblDef> -:T_SAVE                     variableList:<SavedEntityList> -:T_EOS
-  | ^:<LblDef> -:T_SAVE -:T_COLON -:T_COLON variableList:<SavedEntityList> -:T_EOS
+  | (inline):<LblDef> -:T_SAVE                                                     -:T_EOS
+  | (inline):<LblDef> -:T_SAVE                     variableList:<SavedEntityList> -:T_EOS
+  | (inline):<LblDef> -:T_SAVE -:T_COLON -:T_COLON variableList:<SavedEntityList> -:T_EOS
 
 
 # R525
-<SavedEntityList> ::=
-  |                               <SavedEntity>
-  | @:<SavedEntityList> -:T_COMMA <SavedEntity>
+(list):<SavedEntityList> ::=
+  |                             <SavedEntity>
+  | <SavedEntityList> -:T_COMMA <SavedEntity>
 
 <SavedEntity> ::=
-  | ^:<VariableName>
-  | ^:<SavedCommonBlock>
+  | (inline):<VariableName>
+  | (inline):<SavedCommonBlock>
 
-<SavedCommonBlock> ::= -:T_SLASH ^:<CommonBlockName> -:T_SLASH
+<SavedCommonBlock> ::= -:T_SLASH (inline):<CommonBlockName> -:T_SLASH
 
 # R526
 <DimensionStmt> ::=
-  | ^:<LblDef> -:T_DIMENSION -:T_COLON -:T_COLON <ArrayDeclaratorList> -:T_EOS
-  | ^:<LblDef> -:T_DIMENSION                     <ArrayDeclaratorList> -:T_EOS
+  | (inline):<LblDef> -:T_DIMENSION -:T_COLON -:T_COLON <ArrayDeclaratorList> -:T_EOS
+  | (inline):<LblDef> -:T_DIMENSION                     <ArrayDeclaratorList> -:T_EOS
 
-<ArrayDeclaratorList> ::=
-  |                                   <ArrayDeclarator>
-  | @:<ArrayDeclaratorList> -:T_COMMA <ArrayDeclarator>
+(list):<ArrayDeclaratorList> ::=
+  |                                 <ArrayDeclarator>
+  | <ArrayDeclaratorList> -:T_COMMA <ArrayDeclarator>
 
-# JO -- *:<ArraySpec> since pulled up into common block
-<ArrayDeclarator> ::= ^:<VariableName> -:T_LPAREN *:<ArraySpec> -:T_RPAREN
+# JO -- <ArraySpec> since pulled up into common block
+<ArrayDeclarator> ::= (inline):<VariableName> -:T_LPAREN <ArraySpec> -:T_RPAREN
 
 # R527
 <AllocatableStmt> ::=
-  | ^:<LblDef> -:T_ALLOCATABLE -:T_COLON -:T_COLON <ArrayAllocationList> -:T_EOS
-  | ^:<LblDef> -:T_ALLOCATABLE                     <ArrayAllocationList> -:T_EOS
+  | (inline):<LblDef> -:T_ALLOCATABLE -:T_COLON -:T_COLON <ArrayAllocationList> -:T_EOS
+  | (inline):<LblDef> -:T_ALLOCATABLE                     <ArrayAllocationList> -:T_EOS
 
-<ArrayAllocationList> ::=
-  |                                   <ArrayAllocation>
-  | @:<ArrayAllocationList> -:T_COMMA <ArrayAllocation>
+(list):<ArrayAllocationList> ::=
+  |                                 <ArrayAllocation>
+  | <ArrayAllocationList> -:T_COMMA <ArrayAllocation>
 
 <ArrayAllocation> ::=
-  | ^:<ArrayName>
-  | ^:<ArrayName> -:T_LPAREN *:<DeferredShapeSpecList> -:T_RPAREN
+  | (inline):<ArrayName>
+  | (inline):<ArrayName> -:T_LPAREN <DeferredShapeSpecList> -:T_RPAREN
 
 
 # R528   <ObjectName> renamed to <PointerName> to simplify Semantic Analysis
 <PointerStmt> ::=
-  | ^:<LblDef> -:T_POINTER -:T_COLON -:T_COLON <PointerStmtObjectList> -:T_EOS
-  | ^:<LblDef> -:T_POINTER                     <PointerStmtObjectList> -:T_EOS
+  | (inline):<LblDef> -:T_POINTER -:T_COLON -:T_COLON <PointerStmtObjectList> -:T_EOS
+  | (inline):<LblDef> -:T_POINTER                     <PointerStmtObjectList> -:T_EOS
 
-<PointerStmtObjectList> ::=
-  |                                     <PointerStmtObject>
-  | @:<PointerStmtObjectList> -:T_COMMA <PointerStmtObject>
+(list):<PointerStmtObjectList> ::=
+  |                                   <PointerStmtObject>
+  | <PointerStmtObjectList> -:T_COMMA <PointerStmtObject>
 
 <PointerStmtObject> ::=
-  | ^:<PointerName>
-  | ^:<PointerName> -:T_LPAREN *:<DeferredShapeSpecList> -:T_RPAREN
+  | (inline):<PointerName>
+  | (inline):<PointerName> -:T_LPAREN <DeferredShapeSpecList> -:T_RPAREN
 
 <PointerName> ::= pointerName:T_IDENT
 
 # R529   <ObjectName> renamed to <TargetName> to simplify Semantic Analysis
 <TargetStmt> ::=
-  | ^:<LblDef> -:T_TARGET -:T_COLON -:T_COLON <TargetObjectList> -:T_EOS
-  | ^:<LblDef> -:T_TARGET                     <TargetObjectList> -:T_EOS
+  | (inline):<LblDef> -:T_TARGET -:T_COLON -:T_COLON <TargetObjectList> -:T_EOS
+  | (inline):<LblDef> -:T_TARGET                     <TargetObjectList> -:T_EOS
 
-<TargetObjectList> ::=
-  |                                <TargetObject>
-  | @:<TargetObjectList> -:T_COMMA <TargetObject>
+(list):<TargetObjectList> ::=
+  |                              <TargetObject>
+  | <TargetObjectList> -:T_COMMA <TargetObject>
 
 <TargetObject> ::=
-  | ^:<TargetName>
-  | ^:<TargetName> -:T_LPAREN *:<ArraySpec> -:T_RPAREN
+  | (inline):<TargetName>
+  | (inline):<TargetName> -:T_LPAREN <ArraySpec> -:T_RPAREN
 
 <TargetName> ::= targetName:T_IDENT
 
 # R530
 <ParameterStmt> ::=
-  ^:<LblDef> -:T_PARAMETER -:T_LPAREN <NamedConstantDefList> -:T_RPAREN -:T_EOS
+  (inline):<LblDef> -:T_PARAMETER -:T_LPAREN <NamedConstantDefList> -:T_RPAREN -:T_EOS
 
 # R531
-<NamedConstantDefList> ::=
-  |                                    <NamedConstantDef>
-  | @:<NamedConstantDefList> -:T_COMMA <NamedConstantDef>
+(list):<NamedConstantDefList> ::=
+  |                                  <NamedConstantDef>
+  | <NamedConstantDefList> -:T_COMMA <NamedConstantDef>
 
-<NamedConstantDef> ::= ^:<NamedConstant> -:T_EQUALS initializationExpr:<Expr>
+<NamedConstantDef> ::= (inline):<NamedConstant> -:T_EQUALS initializationExpr:<Expr>
 
 # R532
 # JO -- Added error production
 <DataStmt> ::=
-  | ^:<LblDef> -:T_DATA <Datalist> -:T_EOS
-  | ^:<LblDef> -:T_DATA (error) T_EOS
+  | (inline):<LblDef> -:T_DATA <Datalist> -:T_EOS
+  | (inline):<LblDef> -:T_DATA (error) T_EOS
 
-<Datalist> ::=
-  |                        <DataStmtSet>
-  | @:<Datalist>           <DataStmtSet>
-  | @:<Datalist> -:T_COMMA <DataStmtSet>
+(list):<Datalist> ::=
+  |                      <DataStmtSet>
+  | <Datalist>           <DataStmtSet>
+  | <Datalist> -:T_COMMA <DataStmtSet>
 
 # R533
 <DataStmtSet> ::= <DataStmtObjectList> -:T_SLASH <DataStmtValueList> -:T_SLASH
 
 # R534
-<DataStmtObjectList> ::=
-  |                                  <DataStmtObject>
-  | @:<DataStmtObjectList> -:T_COMMA <DataStmtObject>
+(list):<DataStmtObjectList> ::=
+  |                                <DataStmtObject>
+  | <DataStmtObjectList> -:T_COMMA <DataStmtObject>
 
-<DataStmtObject> ::= (oneof)
+(superclass):<DataStmtObject> ::=
   | <Variable>
   | <DataImpliedDo>
 
 # R535 <Expr> must be scalar-int-expr
 <DataImpliedDo> ::=
-  | -:T_LPAREN <DataIDoObjectList> -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
-  | -:T_LPAREN <DataIDoObjectList> -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step*:<Expr> -:T_RPAREN
+  | -:T_LPAREN <DataIDoObjectList> -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
+  | -:T_LPAREN <DataIDoObjectList> -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
 
 # R536 <StructureComponent> must be <ScalarStructureComponent>
-<DataIDoObjectList> ::=
-  |                                 <DataIDoObject>
-  | @:<DataIDoObjectList> -:T_COMMA <DataIDoObject>
+(list):<DataIDoObjectList> ::=
+  |                               <DataIDoObject>
+  | <DataIDoObjectList> -:T_COMMA <DataIDoObject>
 
-<DataIDoObject> ::= (oneof)
+(superclass):<DataIDoObject> ::=
   | <ArrayElement>
   | <DataImpliedDo>
   | <StructureComponent>
@@ -895,31 +902,31 @@
 # R537 chain rule deleted
 
 # R538
-<DataStmtValueList> ::=
-  |                                 <DataStmtValue>
-  | @:<DataStmtValueList> -:T_COMMA <DataStmtValue>
+(list):<DataStmtValueList> ::=
+  |                               <DataStmtValue>
+  | <DataStmtValueList> -:T_COMMA <DataStmtValue>
 
 <DataStmtValue> ::=
-  |                                                    ^:<DataStmtConstant>
-  | hasConstIntKind+:T_ICON               -:T_ASTERISK ^:<DataStmtConstant>
-  | namedConstKind*:<NamedConstantUse> -:T_ASTERISK ^:<DataStmtConstant>
+  |                                                    (inline):<DataStmtConstant>
+  | hasConstIntKind(bool):T_ICON               -:T_ASTERISK (inline):<DataStmtConstant>
+  | namedConstKind:<NamedConstantUse> -:T_ASTERISK (inline):<DataStmtConstant>
 
 # R539 chain rule deleted
 
 # R540 only a subset of <constant> is allowed
 <DataStmtConstant> ::=
-  | *:<Constant>
-  | isNull+:T_NULL -:T_LPAREN -:T_RPAREN
+  | <Constant>
+  | isNull(bool):T_NULL -:T_LPAREN -:T_RPAREN
 
 # R541
 <ImplicitStmt> ::=
-  | ^:<LblDef> implicitToken:T_IMPLICIT *:<ImplicitSpecList>   -:T_EOS
-  | ^:<LblDef> implicitToken:T_IMPLICIT isImplicitNone+:T_NONE -:T_EOS
+  | (inline):<LblDef> implicitToken:T_IMPLICIT <ImplicitSpecList>   -:T_EOS
+  | (inline):<LblDef> implicitToken:T_IMPLICIT isImplicitNone(bool):T_NONE -:T_EOS
 
 # R542
-<ImplicitSpecList> ::=
-  |                                <ImplicitSpec>
-  | @:<ImplicitSpecList> -:T_COMMA <ImplicitSpec>
+(list):<ImplicitSpecList> ::=
+  |                              <ImplicitSpec>
+  | <ImplicitSpecList> -:T_COMMA <ImplicitSpec>
 
 <ImplicitSpec> ::= <TypeSpec> charRanges:T_xImpl
 
@@ -927,46 +934,46 @@
 
 # R544
 <NamelistStmt> ::=
-  ^:<LblDef> T_NAMELIST <NamelistGroups> -:T_EOS
+  (inline):<LblDef> T_NAMELIST <NamelistGroups> -:T_EOS
 
-<NamelistGroups> ::=
-  |                              -:T_SLASH ^:<NamelistGroupName> -:T_SLASH namelistGroupObject^:<NamelistGroupObject>
-  | @:<NamelistGroups>           -:T_SLASH ^:<NamelistGroupName> -:T_SLASH namelistGroupObject^:<NamelistGroupObject>
-  | @:<NamelistGroups> -:T_COMMA -:T_SLASH ^:<NamelistGroupName> -:T_SLASH namelistGroupObject^:<NamelistGroupObject>
-  | @:<NamelistGroups> -:T_COMMA                                           namelistGroupObject^:<NamelistGroupObject>
+(list):<NamelistGroups> ::=
+  |                            -:T_SLASH (inline):<NamelistGroupName> -:T_SLASH namelistGroupObject(inline):<NamelistGroupObject>
+  | <NamelistGroups>           -:T_SLASH (inline):<NamelistGroupName> -:T_SLASH namelistGroupObject(inline):<NamelistGroupObject>
+  | <NamelistGroups> -:T_COMMA -:T_SLASH (inline):<NamelistGroupName> -:T_SLASH namelistGroupObject(inline):<NamelistGroupObject>
+  | <NamelistGroups> -:T_COMMA                                           namelistGroupObject(inline):<NamelistGroupObject>
 
 # R545
-<NamelistGroupObject> ::= ^:<VariableName>
+<NamelistGroupObject> ::= (inline):<VariableName>
 
 # R546
 <EquivalenceStmt> ::=
-  ^:<LblDef> -:T_EQUIVALENCE <EquivalenceSetList> -:T_EOS
+  (inline):<LblDef> -:T_EQUIVALENCE <EquivalenceSetList> -:T_EOS
 
 # R547
-<EquivalenceSetList> ::=
-  |                                  <EquivalenceSet>
-  | @:<EquivalenceSetList> -:T_COMMA <EquivalenceSet>
+(list):<EquivalenceSetList> ::=
+  |                                <EquivalenceSet>
+  | <EquivalenceSetList> -:T_COMMA <EquivalenceSet>
 
-<EquivalenceSet> ::= -:T_LPAREN Initial^:<EquivalenceObject> -:T_COMMA equivalentObjects:<EquivalenceObjectList> -:T_RPAREN
+<EquivalenceSet> ::= -:T_LPAREN Initial(inline):<EquivalenceObject> -:T_COMMA equivalentObjects:<EquivalenceObjectList> -:T_RPAREN
 
 # R548
-<EquivalenceObjectList> ::=
-  |                                     ^:<EquivalenceObject>
-  | @:<EquivalenceObjectList> -:T_COMMA ^:<EquivalenceObject>
+(list):<EquivalenceObjectList> ::=
+  |                                   (inline):<EquivalenceObject>
+  | <EquivalenceObjectList> -:T_COMMA (inline):<EquivalenceObject>
 
 # JO -- Changed xVariable to <Variable>
 <EquivalenceObject> ::= <Variable>
 
 ## R549
 #<CommonStmt> ::=
-#  ^:<LblDef> T_COMMON <Comlist> -:T_EOS
+#  (inline):<LblDef> T_COMMON <Comlist> -:T_EOS
 #
-#<Comlist> ::=
-#  |                                  <CommonBlockObject>
-#  |                       <Comblock> <CommonBlockObject>
-#  | @:<Comlist> -:T_COMMA            <CommonBlockObject>
-#  | @:<Comlist>           <Comblock> <CommonBlockObject>
-#  | @:<Comlist> -:T_COMMA <Comblock> <CommonBlockObject>
+#(list):<Comlist> ::=
+#  |                                <CommonBlockObject>
+#  |                     <Comblock> <CommonBlockObject>
+#  | <Comlist> -:T_COMMA            <CommonBlockObject>
+#  | <Comlist>           <Comblock> <CommonBlockObject>
+#  | <Comlist> -:T_COMMA <Comblock> <CommonBlockObject>
 #
 #<Comblock> ::=
 #  | T_SLASH                   T_SLASH
@@ -974,23 +981,23 @@
 #JO--X
 # R549
 <CommonStmt> ::=
-  ^:<LblDef> -:T_COMMON <CommonBlockList> -:T_EOS
-<CommonBlockList> ::=
-  |                               <CommonBlock>
-  | @:<CommonBlockList>           <CommonBlock>
-  | @:<CommonBlockList> -:T_COMMA <CommonBlock>
+  (inline):<LblDef> -:T_COMMON <CommonBlockList> -:T_EOS
+(list):<CommonBlockList> ::=
+  |                             <CommonBlock>
+  | <CommonBlockList>           <CommonBlock>
+  | <CommonBlockList> -:T_COMMA <CommonBlock>
 <CommonBlock> ::=
   |                                             <CommonBlockObjectList>
   | -:T_SLASH                         -:T_SLASH <CommonBlockObjectList>
-  | -:T_SLASH name*:<CommonBlockName> -:T_SLASH <CommonBlockObjectList>
-<CommonBlockObjectList> ::=
-  |                           <CommonBlockObject>
-  | @:<CommonBlockObjectList> <CommonBlockObject>
+  | -:T_SLASH name:<CommonBlockName> -:T_SLASH <CommonBlockObjectList>
+(list):<CommonBlockObjectList> ::=
+  |                         <CommonBlockObject>
+  | <CommonBlockObjectList> <CommonBlockObject>
 
 # R550
 <CommonBlockObject> ::=
-  | ^:<VariableName>
-  | ^:<ArrayDeclarator>
+  | (inline):<VariableName>
+  | (inline):<ArrayDeclarator>
 
 
 #######################################################################################################################
@@ -1000,20 +1007,20 @@
 # R601 The various forms of variables have to be recognized semantically;
 # JO -- Added substring of constant strings
 <Variable> ::= 
-  | *:<DataRef>
-  | *:<DataRef> -:T_LPAREN *:<SectionSubscriptList> -:T_RPAREN
-  | *:<DataRef> -:T_LPAREN *:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | ^:<SubstrConst>
+  | <DataRef>
+  | <DataRef> -:T_LPAREN <SectionSubscriptList> -:T_RPAREN
+  | <DataRef> -:T_LPAREN <SectionSubscriptList> -:T_RPAREN <SubstringRange>
+  | (inline):<SubstrConst>
 
 # JO -- Added substring of constant strings
 <SubstrConst> ::=
-  stringConst*:T_SCON *:<SubstringRange>
+  stringConst:T_SCON <SubstringRange>
 
 <VariableName> ::= variableName:T_IDENT
 
 <ScalarVariable> ::=
-  | ^:<VariableName>
-  | ^:<ArrayElement>
+  | (inline):<VariableName>
+  | (inline):<ArrayElement>
 
 # R603-R608 chain rules deleted
 
@@ -1025,32 +1032,32 @@
 <SubstringRange> ::= -:T_LPAREN <SubscriptTriplet> -:T_RPAREN
 
 # R612
-<DataRef> ::= (class=ASTDataRefNode)
-  | ^:<Name>
-  | @:<DataRef>                                                                           hasDerivedTypeComponentName+:T_PERCENT Component^:<Name>
-  | @:<DataRef> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN hasDerivedTypeComponentName+:T_PERCENT Component^:<Name>
+(list):<DataRef> ::=
+  | (inline):<Name>
+  | <DataRef>                                                                           hasDerivedTypeComponentName(bool):T_PERCENT Component(inline):<Name>
+  | <DataRef> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN hasDerivedTypeComponentName(bool):T_PERCENT Component(inline):<Name>
 
-<SFDataRef> ::= (class=ASTDataRefNode)
-  | ^:<Name>                                                                                hasDerivedTypeComponentName+:T_PERCENT Component^:<Name>
-  | ^:<Name>      -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | @:<SFDataRef>                                                                           hasDerivedTypeComponentName+:T_PERCENT Component^:<Name>
-  | @:<SFDataRef> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN hasDerivedTypeComponentName+:T_PERCENT Component^:<Name>
+(list):<SFDataRef> ::=
+  | (inline):<Name>                                                                               hasDerivedTypeComponentName(bool):T_PERCENT ComponentName:<Name>
+  | (inline):<Name>      -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN
+  | <SFDataRef>                                                                                   hasDerivedTypeComponentName(bool):T_PERCENT ComponentName:<Name>
+  | <SFDataRef>          -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN hasDerivedTypeComponentName(bool):T_PERCENT ComponentName:<Name>
 
 # R613 chain rule deleted;
 
 # R614
-<StructureComponent> ::=
-  | *:<VariableName>       <FieldSelector>
-  | @:<StructureComponent> <FieldSelector>
+(list):<StructureComponent> ::=
+  | <VariableName>       <FieldSelector>
+  | <StructureComponent> <FieldSelector>
 
 <FieldSelector> ::=
-  | -:T_LPAREN *:<SectionSubscriptList> -:T_RPAREN hasDerivedTypeComponentRef+:T_PERCENT Component^:<Name>
-  |                                                hasDerivedTypeComponentRef+:T_PERCENT Component^:<Name>
+  | -:T_LPAREN <SectionSubscriptList> -:T_RPAREN hasDerivedTypeComponentRef(bool):T_PERCENT Component(inline):<Name>
+  |                                                hasDerivedTypeComponentRef(bool):T_PERCENT Component(inline):<Name>
 
 # R615
 <ArrayElement> ::=
-  | ^:<VariableName>       -:T_LPAREN <SectionSubscriptList> -:T_RPAREN
-  | *:<StructureComponent> -:T_LPAREN <SectionSubscriptList> -:T_RPAREN
+  | (inline):<VariableName>       -:T_LPAREN <SectionSubscriptList> -:T_RPAREN
+  | <StructureComponent> -:T_LPAREN <SectionSubscriptList> -:T_RPAREN
 
 # R616 Recognized semantically?
 
@@ -1058,13 +1065,13 @@
 <Subscript> ::= SubscriptExpr:<Expr>
 
 # R618 Recognized semantically?
-<SectionSubscriptList> ::=
-  |                                    <SectionSubscript>
-  | @:<SectionSubscriptList> -:T_COMMA <SectionSubscript>
+(list):<SectionSubscriptList> ::=
+  |                                  <SectionSubscript>
+  | <SectionSubscriptList> -:T_COMMA <SectionSubscript>
 
 <SectionSubscript> ::=
-  | *:<Expr>
-  | *:<SubscriptTriplet>
+  | <Expr>
+  | <SubscriptTriplet>
 
 # R619
 <SubscriptTriplet> ::=
@@ -1083,34 +1090,34 @@
 
 # R622
 <AllocateStmt> ::=
-  | ^:<LblDef> -:T_ALLOCATE -:T_LPAREN <AllocationList> -:T_COMMA -:T_STATEQ statusVariable*:<Variable> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_ALLOCATE -:T_LPAREN <AllocationList>                                                 -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_ALLOCATE -:T_LPAREN <AllocationList> -:T_COMMA -:T_STATEQ statusVariable:<Variable> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_ALLOCATE -:T_LPAREN <AllocationList>                                                 -:T_RPAREN -:T_EOS
 
 # R623 chain rule deleted
 
 # R624
-<AllocationList> ::=
-  |                              <Allocation>
-  | @:<AllocationList> -:T_COMMA <Allocation>
+(list):<AllocationList> ::=
+  |                            <Allocation>
+  | <AllocationList> -:T_COMMA <Allocation>
 
 <Allocation> ::=
   | <AllocateObject>
-  | <AllocateObject> ^:<AllocatedShape>
+  | <AllocateObject> (inline):<AllocatedShape>
 
-<AllocatedShape> ::= hasAllocatedShape+:T_LPAREN <SectionSubscriptList> -:T_RPAREN
+<AllocatedShape> ::= hasAllocatedShape(bool):T_LPAREN <SectionSubscriptList> -:T_RPAREN
 
 # Need to use <SectionSubscriptList> here to solve an LALR(1) conflict with the
 # <FieldSelector> in R625.  (Can't tell which we have until the character
 # following the right paren, but we must reduce WITHIN the parens.)
 
 # R625
-<AllocateObjectList> ::=
+(list):<AllocateObjectList> ::=
   |                                  <AllocateObject>
-  | @:<AllocateObjectList> -:T_COMMA <AllocateObject>
+  | <AllocateObjectList> -:T_COMMA <AllocateObject>
 
-<AllocateObject> ::=
+(list):<AllocateObject> ::=
   | <VariableName>
-  | @:<AllocateObject> <FieldSelector>
+  | <AllocateObject> <FieldSelector>
 
 # R626
 # Omitted to solve LALR(1) conflict.  see R624
@@ -1123,27 +1130,27 @@
 
 # R629
 <NullifyStmt> ::=
-  ^:<LblDef> -:T_NULLIFY -:T_LPAREN <PointerObjectList> -:T_RPAREN -:T_EOS
+  (inline):<LblDef> -:T_NULLIFY -:T_LPAREN <PointerObjectList> -:T_RPAREN -:T_EOS
 
-<PointerObjectList> ::=
-  |                                 <PointerObject>
-  | @:<PointerObjectList> -:T_COMMA <PointerObject>
+(list):<PointerObjectList> ::=
+  |                               <PointerObject>
+  | <PointerObjectList> -:T_COMMA <PointerObject>
 
 # R630
 <PointerObject> ::=
   | <Name>
   | <PointerField>
 
-<PointerField> ::=
-  | <Name> -:T_LPAREN *:<SFExprList>         -:T_RPAREN hasDerivedTypeComponentRef+:T_PERCENT component^:<Name>
-  | <Name> -:T_LPAREN *:<SFDummyArgNameList> -:T_RPAREN hasDerivedTypeComponentRef+:T_PERCENT component^:<Name>
-  | <Name>                                              hasDerivedTypeComponentRef+:T_PERCENT component^:<Name>
-  | @:<PointerField> ^:<FieldSelector>
+(list):<PointerField> ::=
+  | <Name> -:T_LPAREN <SFExprList>         -:T_RPAREN hasDerivedTypeComponentRef(bool):T_PERCENT componentName:<Name>
+  | <Name> -:T_LPAREN <SFDummyArgNameList> -:T_RPAREN hasDerivedTypeComponentRef(bool):T_PERCENT componentName:<Name>
+  | <Name>                                            hasDerivedTypeComponentRef(bool):T_PERCENT componentName:<Name>
+  | <PointerField> <FieldSelector>
 
 # R631
 <DeallocateStmt> ::=
-  | ^:<LblDef> -:T_DEALLOCATE -:T_LPAREN <AllocateObjectList> -:T_COMMA -:T_STATEQ statusVariable*:<Variable> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_DEALLOCATE -:T_LPAREN <AllocateObjectList>                                                 -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_DEALLOCATE -:T_LPAREN <AllocateObjectList> -:T_COMMA -:T_STATEQ statusVariable:<Variable> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_DEALLOCATE -:T_LPAREN <AllocateObjectList>                                                 -:T_RPAREN -:T_EOS
 
 #######################################################################################################################
 # Section 7 Rules, continued (Primary)
@@ -1154,270 +1161,270 @@
 
 # R701
 # JO -- Added substring of constant strings
-<Primary> ::= (class=ASTPrimaryBase,protected,instantiate=ASTPrimaryNode)
-  | logicalConst*:<LogicalConstant>
-  | stringConst*:T_SCON
-  | ^:<UnsignedArithmeticConstant>
-  | *:<ArrayConstructor>
-  | *:<Name>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | ^:<FunctionReference>
-  | ^:<FunctionReference> *:<SubstringRange>
-  | ^:<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | ^:<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | ^:<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | -:T_LPAREN nestedExpression*:<Expr> -:T_RPAREN
-  | ^:<SubstrConst>
+<Primary> ::=
+  | logicalConst:<LogicalConstant>
+  | stringConst:T_SCON
+  | (inline):<UnsignedArithmeticConstant>
+  | <ArrayConstructor>
+  | <Name>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN <SubstringRange>
+  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | (inline):<FunctionReference>
+  | (inline):<FunctionReference> <SubstringRange>
+  | (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | -:T_LPAREN nestedExpression:<Expr> -:T_RPAREN
+  | (inline):<SubstrConst>
 
-<CPrimary> ::= (class=ASTPrimaryBase,protected,instantiate=ASTPrimaryNode)
-  | ^:<COperand>
-  | -:T_LPAREN nestedExpression*:<CExpr> -:T_RPAREN
+<CPrimary> ::=
+  | (inline):<COperand>
+  | -:T_LPAREN nestedExpression:<CExpr> -:T_RPAREN
 
-<COperand> ::= (class=ASTPrimaryBase,protected,instantiate=ASTPrimaryNode)
-  | stringConst*:T_SCON
-  | *:<Name>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | ^:<FunctionReference>
+<COperand> ::=
+  | stringConst:T_SCON
+  | <Name>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN
+  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | (inline):<FunctionReference>
 
 # Dirk Rossow: Added <SubstringRange> to allow: write(text(1)(2:20),*) 'hello'
-<UFPrimary> ::= (class=ASTPrimaryBase,protected,instantiate=ASTPrimaryNode)
-  | intConst*:T_ICON
-  | stringConst*:T_SCON
-  | ^:<FunctionReference>
-  | *:<Name>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name>                                                                           -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef>
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN
-  | *:<Name> -:T_LPAREN primarySectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange>
-  | -:T_LPAREN nestedExpression*:<UFExpr> -:T_RPAREN
+<UFPrimary> ::=
+  | intConst:T_ICON
+  | stringConst:T_SCON
+  | (inline):<FunctionReference>
+  | <Name>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN <SubstringRange>
+  | <Name>                                                                           -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | <Name>                                                                           -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | <Name>                                                                           -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | -:T_LPAREN nestedExpression:<UFExpr> -:T_RPAREN
 
 # R702 chain rule deleted
 
 # R703
-<Level1Expr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  |                    rhsPrimary*:<Primary>
-  | ^:<DefinedUnaryOp> rhsPrimary*:<Primary>
+<Level1Expr> ::=
+  |                  rhsPrimary:<Primary>
+  | <DefinedUnaryOp> rhsPrimary:<Primary>
 
 # R704 defined in source form
 
 # R705
-<MultOperand> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<Level1Expr>
-  | lhsExpr*:<Level1Expr> ^:<PowerOp> rhsExpr*:<MultOperand>
+<MultOperand> ::=
+  | <Level1Expr>
+  | lhsExpr:<Level1Expr> <PowerOp> rhsExpr:<MultOperand>
 
-<UFFactor> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | rhsPrimary*:<UFPrimary>
-  | lhsPrimary*:<UFPrimary> ^:<PowerOp> rhsExpr*:<UFFactor>
+<UFFactor> ::=
+  | rhsPrimary:<UFPrimary>
+  | lhsPrimary:<UFPrimary> <PowerOp> rhsExpr:<UFFactor>
 
 # R706
-<AddOperand> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<MultOperand>
-  | lhsExpr*:<AddOperand> ^:<MultOp> rhsExpr*:<MultOperand>
+<AddOperand> ::=
+  | <MultOperand>
+  | lhsExpr:<AddOperand> <MultOp> rhsExpr:<MultOperand>
 
-<UFTerm> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<UFFactor>
-  | lhsExpr*:<UFTerm> ^:<MultOp>      rhsExpr*:<UFFactor>
-  | lhsExpr*:<UFTerm> ^:<ConcatOp> rhsPrimary*:<UFPrimary>
+<UFTerm> ::=
+  | <UFFactor>
+  | lhsExpr:<UFTerm> <MultOp>      rhsExpr:<UFFactor>
+  | lhsExpr:<UFTerm> <ConcatOp> rhsPrimary:<UFPrimary>
 
 # R707
-<Level2Expr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<AddOperand>
-  |                    rhs^:<Sign>  rhsExpr*:<AddOperand>
-  | lhsExpr*:<Level2Expr> ^:<AddOp> rhsExpr*:<AddOperand>
+<Level2Expr> ::=
+  | <AddOperand>
+  |                    rhs:<Sign>  rhsExpr:<AddOperand>
+  | lhsExpr:<Level2Expr> <AddOp> rhsExpr:<AddOperand>
 # We need to distinguish unary operators
-<UFExpr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<UFTerm>
-  |               rhs2^:<Sign>  rhsExpr*:<UFTerm>
-  | lhsExpr*:<UFExpr> ^:<AddOp> rhsExpr*:<UFTerm>
+<UFExpr> ::=
+  | <UFTerm>
+  |               rhs2:<Sign>  rhsExpr:<UFTerm>
+  | lhsExpr:<UFExpr> <AddOp> rhsExpr:<UFTerm>
 
 # R708-710 defined in source form
 
 # R711 
-<Level3Expr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<Level2Expr>
-  | lhsExpr*:<Level3Expr> ^:<ConcatOp> rhsExpr*:<Level2Expr>
+<Level3Expr> ::=
+  | <Level2Expr>
+  | lhsExpr:<Level3Expr> <ConcatOp> rhsExpr:<Level2Expr>
 
-<CExpr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | rhsPrimary*:<CPrimary>
-  | lhsExpr*:<CExpr> ^:<ConcatOp> rhsPrimary*:<CPrimary>
+<CExpr> ::=
+  | rhsPrimary:<CPrimary>
+  | lhsExpr:<CExpr> <ConcatOp> rhsPrimary:<CPrimary>
 
 # R712 defined in source form
 
 # R713
-<Level4Expr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<Level3Expr>
-  | lhsExpr*:<Level3Expr> ^:<RelOp> rhsExpr*:<Level3Expr>
+<Level4Expr> ::=
+  | <Level3Expr>
+  | lhsExpr:<Level3Expr> <RelOp> rhsExpr:<Level3Expr>
 
 # R714 defined in source form
 
 # R715
-<AndOperand> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<Level4Expr>
-  | ^:<NotOp> rhsExpr*:<Level4Expr>
+<AndOperand> ::=
+  | <Level4Expr>
+  | <NotOp> rhsExpr:<Level4Expr>
 
 # R716
-<OrOperand> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<AndOperand>
-  | lhsExpr*:<OrOperand> ^:<AndOp> rhsExpr*:<AndOperand>
+<OrOperand> ::=
+  | <AndOperand>
+  | lhsExpr:<OrOperand> <AndOp> rhsExpr:<AndOperand>
 
 # R717
-<EquivOperand> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<OrOperand>
-  | lhsExpr*:<EquivOperand> ^:<OrOp> rhsExpr*:<OrOperand>
+<EquivOperand> ::=
+  | <OrOperand>
+  | lhsExpr:<EquivOperand> <OrOp> rhsExpr:<OrOperand>
 
 # R718
-<Level5Expr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<EquivOperand>
-  | lhsExpr*:<Level5Expr> ^:<EquivOp> rhsExpr*:<EquivOperand>
+<Level5Expr> ::=
+  | <EquivOperand>
+  | lhsExpr:<Level5Expr> <EquivOp> rhsExpr:<EquivOperand>
 
 # R719-722 defined in source form
 
 # R723
-<Expr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<Level5Expr>
-  | lhsExpr*:<Expr> ^:<DefinedBinaryOp> rhsExpr*:<Level5Expr>
+<Expr> ::=
+  | <Level5Expr>
+  | lhsExpr:<Expr> <DefinedBinaryOp> rhsExpr:<Level5Expr>
 
-<SFExprList> ::=
-  | lb*:<SFExpr> -:T_COLON ub*:<Expr> -:T_COLON step*:<Expr>
-  | lb*:<SFExpr> -:T_COLON            -:T_COLON step*:<Expr>
-  |              -:T_COLON ub*:<Expr> -:T_COLON step*:<Expr>
-  |              -:T_COLON            -:T_COLON step*:<Expr>
+(list):<SFExprList> ::=
+  | lb:<SFExpr> -:T_COLON ub:<Expr> -:T_COLON step:<Expr>
+  | lb:<SFExpr> -:T_COLON            -:T_COLON step:<Expr>
+  |              -:T_COLON ub:<Expr> -:T_COLON step:<Expr>
+  |              -:T_COLON            -:T_COLON step:<Expr>
+#(list):<SFExprList> ::=
+  | -:T_COLON
+  | -:T_COLON ub:<Expr>
+  | lb:<SFExpr>
+  | lb:<SFExpr> -:T_COLON
+  | lb:<SFExpr> -:T_COLON ub:<Expr>
+  | <SFExprList> -:T_COMMA <SectionSubscript>
+  | <SFDummyArgNameList> -:T_COMMA -:T_COLON
+  | <SFDummyArgNameList> -:T_COMMA -:T_COLON ub:<Expr>
+  | <SFDummyArgNameList> -:T_COMMA lb:<SFExpr>
+  | <SFDummyArgNameList> -:T_COMMA lb:<SFExpr> -:T_COLON
+  | <SFDummyArgNameList> -:T_COMMA lb:<SFExpr> -:T_COLON ub:<Expr>
+
 
 # R724 defined in source form
 
 # R725-R734 chain rule deleted
 
 # R735 - JO - Macro substituted; added error production
-<AssignmentStmt> ::= (class=ASTAssignmentStmtNode)
-  | ^:<LblDef> lhsVariable^:<Name>                                                                                                                                                                                                       -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsExprList*:<SFExprList>         -:T_RPAREN                                                                                                                                               -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsExprList*:<SFExprList>         -:T_RPAREN                                                                                                                            *:<SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsNameList*:<SFDummyArgNameList> -:T_RPAREN                                                                                                                            *:<SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+ASTAssignmentStmtNode:<AssignmentStmt> ::=
+  | <LblDef> lhsVariable:<Name>                                                                                                                                                                                                       -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN                                                                                                                                               -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
   
-  | ^:<LblDef> lhsVariable^:<Name>                                                         -:T_PERCENT derivedTypeComponentRef*:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name>                                                         -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name>                                                         -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsExprList*:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsExprList*:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsExprList*:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
   
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsNameList*:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsNameList*:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsNameList*:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> -:T_LPAREN componentSectionSubscriptList*:<SectionSubscriptList> -:T_RPAREN *:<SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | ^:<LblDef> lhsVariable^:<Name> (error) T_EOS
+  | <LblDef> lhsVariable:<Name> (error) T_EOS
 
-<SFExprList> ::=
-  | -:T_COLON
-  | -:T_COLON ub*:<Expr>
-  | lb*:<SFExpr>
-  | lb*:<SFExpr> -:T_COLON
-  | lb*:<SFExpr> -:T_COLON ub*:<Expr>
-  | @:<SFExprList> -:T_COMMA <SectionSubscript>
-  | *:<SFDummyArgNameList> -:T_COMMA -:T_COLON
-  | *:<SFDummyArgNameList> -:T_COMMA -:T_COLON ub*:<Expr>
-  | *:<SFDummyArgNameList> -:T_COMMA lb*:<SFExpr>
-  | *:<SFDummyArgNameList> -:T_COMMA lb*:<SFExpr> -:T_COLON
-  | *:<SFDummyArgNameList> -:T_COMMA lb*:<SFExpr> -:T_COLON ub*:<Expr>
+<SFExpr> ::=
+  | <SFTerm>
+  |                rhs:<Sign>  rhsExpr:<AddOperand>
+  | lhsExpr:<SFExpr> <AddOp> rhsExpr:<AddOperand>
 
-<SFExpr> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<SFTerm>
-  |                rhs^:<Sign>  rhsExpr*:<AddOperand>
-  | lhsExpr*:<SFExpr> ^:<AddOp> rhsExpr*:<AddOperand>
+<SFTerm> ::=
+  | <SFFactor>
+  | lhsExpr:<SFTerm> <MultOp> rhsExpr:<MultOperand>
 
-<SFTerm> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | ^:<SFFactor>
-  | lhsExpr*:<SFTerm> ^:<MultOp> rhsExpr*:<MultOperand>
+<SFFactor> ::=
+  | rhsPrimary:<SFPrimary>
+  | lhsPrimary:<SFPrimary> <PowerOp> rhsExpr:<MultOperand>
 
-<SFFactor> ::= (class=ASTExpressionBase,protected,instantiate=ASTExpressionNode)
-  | rhsPrimary*:<SFPrimary>
-  | lhsPrimary*:<SFPrimary> ^:<PowerOp> rhsExpr*:<MultOperand>
-
-<SFPrimary> ::= (class=ASTPrimaryBase,protected,instantiate=ASTPrimaryNode)
-  | *:<ArrayConstructor>
-  | intConst*:T_ICON
-  | ^:<SFVarName>
-  | *:<SFDataRef>
-  | ^:<FunctionReference>
-  | -:T_LPAREN nestedExpression*:<Expr> -:T_RPAREN
+<SFPrimary> ::=
+  | <ArrayConstructor>
+  | intConst:T_ICON
+  | <SFVarName>
+  | <SFDataRef>
+  | <FunctionReference>
+  | -:T_LPAREN nestedExpression:<Expr> -:T_RPAREN
 
 #<AssignmentStmt> ::=
-#  ^:<LblDef> <Name> T_PERCENT <DataRef> 
+#  (inline):<LblDef> <Name> T_PERCENT <DataRef> 
 #    ( -:T_LPAREN <SectionSubscriptList> -:T_RPAREN ( <SubstringRange> )? )? 
 #    T_EQUALS <Expr> -:T_EOS |
-#  ^:<LblDef> <Name> -:T_LPAREN <SFExprList> -:T_RPAREN T_PERCENT <DataRef> 
+#  (inline):<LblDef> <Name> -:T_LPAREN <SFExprList> -:T_RPAREN T_PERCENT <DataRef> 
 #    ( -:T_LPAREN <SectionSubscriptList> -:T_RPAREN ( <SubstringRange> )? )? 
 #    T_EQUALS <Expr> -:T_EOS |
-#  ^:<LblDef> <Name> -:T_LPAREN <SFDummyArgNameList> -:T_RPAREN T_PERCENT <DataRef> 
+#  (inline):<LblDef> <Name> -:T_LPAREN <SFDummyArgNameList> -:T_RPAREN T_PERCENT <DataRef> 
 #    ( -:T_LPAREN <SectionSubscriptList> -:T_RPAREN ( <SubstringRange> )? )? T_EQUALS 
 #        <Expr> -:T_EOS ;
 
 # R736
-<PointerAssignmentStmt> ::= (class=ASTAssignmentStmtNode)
-  | ^:<LblDef> lhsVariable^:<Name>                                                                                                        isPointerAssignment+:T_EQGREATERTHAN ^:<Target> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name>                                                         -:T_PERCENT derivedTypeComponentRef*:<DataRef> isPointerAssignment+:T_EQGREATERTHAN ^:<Target> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsExprList*:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> isPointerAssignment+:T_EQGREATERTHAN ^:<Target> -:T_EOS
-  | ^:<LblDef> lhsVariable^:<Name> -:T_LPAREN lhsNameList*:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef*:<DataRef> isPointerAssignment+:T_EQGREATERTHAN ^:<Target> -:T_EOS
+ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
+  | <LblDef> lhsVariable:<Name>                                                                                                        isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
 
 # R737
 # JO - Added NULL() target
 <Target> ::=
-  | *:<Expr>
-  | isNull+:T_NULL -:T_LPAREN -:T_RPAREN
+  | <Expr>
+  | isNull(bool):T_NULL -:T_LPAREN -:T_RPAREN
 
 # R738
 <WhereStmt> ::=
-  ^:<LblDef> -:T_WHERE -:T_LPAREN <MaskExpr> -:T_RPAREN <AssignmentStmt>
+  (inline):<LblDef> -:T_WHERE -:T_LPAREN <MaskExpr> -:T_RPAREN <AssignmentStmt>
 
 # R739 parallels if ... then ...elseif... else ... endif construct
 <WhereConstruct> ::=
-  <WhereConstructStmt> ^:<WhereRange>
+  <WhereConstructStmt> (inline):<WhereRange>
 
 <WhereRange> ::=
-  |                             *:<EndWhereStmt>
-  | *:<WhereBodyConstructBlock> *:<EndWhereStmt>
-  |                             *:<MaskedElseWhereConstruct>
-  | *:<WhereBodyConstructBlock> *:<MaskedElseWhereConstruct>
-  |                             *:<ElseWhereConstruct>
-  | *:<WhereBodyConstructBlock> *:<ElseWhereConstruct>
+  |                             <EndWhereStmt>
+  | <WhereBodyConstructBlock> <EndWhereStmt>
+  |                             <MaskedElseWhereConstruct>
+  | <WhereBodyConstructBlock> <MaskedElseWhereConstruct>
+  |                             <ElseWhereConstruct>
+  | <WhereBodyConstructBlock> <ElseWhereConstruct>
 
 <MaskedElseWhereConstruct> ::=
-  <MaskedElseWhereStmt> ^:<WhereRange>
+  <MaskedElseWhereStmt> (inline):<WhereRange>
 
 <ElseWhereConstruct> ::=
-  <ElseWhereStmt> ^:<ElseWherePart>
+  <ElseWhereStmt> (inline):<ElseWherePart>
 
 <ElseWherePart> ::=
   |                           <EndWhereStmt>
   | <WhereBodyConstructBlock> <EndWhereStmt>
 
-<WhereBodyConstructBlock> ::=
-  |                             <WhereBodyConstruct>
-  | @:<WhereBodyConstructBlock> <WhereBodyConstruct>
+(list):<WhereBodyConstructBlock> ::=
+  |                           <WhereBodyConstruct>
+  | <WhereBodyConstructBlock> <WhereBodyConstruct>
 
 # R740
 <WhereConstructStmt> ::=
-  | ^:<LblDef> WhereConstruct^:<Name> -:T_COLON -:T_WHERE -:T_LPAREN <MaskExpr> -:T_RPAREN -:T_EOS
-  | ^:<LblDef>                                  -:T_WHERE -:T_LPAREN <MaskExpr> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> WhereConstruct(inline):<Name> -:T_COLON -:T_WHERE -:T_LPAREN <MaskExpr> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef>                                  -:T_WHERE -:T_LPAREN <MaskExpr> -:T_RPAREN -:T_EOS
 
 # R741
-<WhereBodyConstruct> ::= (oneof)
+(superclass):<WhereBodyConstruct> ::=
   | <AssignmentStmt>
   | <WhereStmt>
   | <WhereConstruct>
@@ -1429,56 +1436,56 @@
 
 # R744
 <MaskedElseWhereStmt> ::=
-  | ^:<LblDef> -:T_ELSEWHERE      -:T_LPAREN ^:<MaskExpr> -:T_RPAREN             -:T_EOS
-  | ^:<LblDef> -:T_ELSEWHERE      -:T_LPAREN ^:<MaskExpr> -:T_RPAREN ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_WHERE -:T_LPAREN ^:<MaskExpr> -:T_RPAREN             -:T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_WHERE -:T_LPAREN ^:<MaskExpr> -:T_RPAREN ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSEWHERE      -:T_LPAREN (inline):<MaskExpr> -:T_RPAREN             -:T_EOS
+  | (inline):<LblDef> -:T_ELSEWHERE      -:T_LPAREN (inline):<MaskExpr> -:T_RPAREN (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_WHERE -:T_LPAREN (inline):<MaskExpr> -:T_RPAREN             -:T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_WHERE -:T_LPAREN (inline):<MaskExpr> -:T_RPAREN (inline):<EndName> -:T_EOS
 
 # R745
 <ElseWhereStmt> ::=
-  | ^:<LblDef> -:T_ELSEWHERE                  -:T_EOS
-  | ^:<LblDef> -:T_ELSEWHERE      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_WHERE             -:T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_WHERE ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSEWHERE                  -:T_EOS
+  | (inline):<LblDef> -:T_ELSEWHERE      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_WHERE             -:T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_WHERE (inline):<EndName> -:T_EOS
 
 # R746
 <EndWhereStmt> ::=
-  | ^:<LblDef> -:T_ENDWHERE                  -:T_EOS
-  | ^:<LblDef> -:T_ENDWHERE      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_WHERE             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_WHERE ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDWHERE                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDWHERE      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_WHERE             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_WHERE (inline):<EndName> -:T_EOS
 
 # R747
 <ForallConstruct> ::=
   | <ForallConstructStmt>                <EndForallStmt>
-  | <ForallConstructStmt> *:<ForallBody> <EndForallStmt>
+  | <ForallConstructStmt> <ForallBody> <EndForallStmt>
 
-<ForallBody> ::=
-  |                <ForallBodyConstruct>
-  | @:<ForallBody> <ForallBodyConstruct>
+(list):<ForallBody> ::=
+  |              <ForallBodyConstruct>
+  | <ForallBody> <ForallBodyConstruct>
 
 # R748
 # JO -- Added error productions
 <ForallConstructStmt> ::=
-  | ^:<LblDef>                    -:T_FORALL ^:<ForallHeader> -:T_EOS
-  | ^:<LblDef> ^:<Name> -:T_COLON -:T_FORALL ^:<ForallHeader> -:T_EOS
-  | ^:<LblDef>                    -:T_FORALL (error) T_EOS
-  | ^:<LblDef> ^:<Name> -:T_COLON -:T_FORALL (error) T_EOS
+  | (inline):<LblDef>                    -:T_FORALL (inline):<ForallHeader> -:T_EOS
+  | (inline):<LblDef> (inline):<Name> -:T_COLON -:T_FORALL (inline):<ForallHeader> -:T_EOS
+  | (inline):<LblDef>                    -:T_FORALL (error) T_EOS
+  | (inline):<LblDef> (inline):<Name> -:T_COLON -:T_FORALL (error) T_EOS
 
 # R749
 <ForallHeader> ::=
   | -:T_LPAREN <ForallTripletSpecList>                              -:T_RPAREN
-  | -:T_LPAREN <ForallTripletSpecList> -:T_COMMA *:<ScalarMaskExpr> -:T_RPAREN
+  | -:T_LPAREN <ForallTripletSpecList> -:T_COMMA <ScalarMaskExpr> -:T_RPAREN
 
-<ScalarMaskExpr> ::= ^:<MaskExpr>
+<ScalarMaskExpr> ::= (inline):<MaskExpr>
 
 # R750
 <ForallTripletSpecList> ::=
-  | <Name> -:T_EQUALS Lb^:<Subscript> -:T_COLON Ub^:<Subscript>
-  | <Name> -:T_EQUALS Lb^:<Subscript> -:T_COLON Ub^:<Subscript> -:T_COLON stepExpr:<Expr>
+  | <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript>
+  | <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript> -:T_COLON stepExpr:<Expr>
 
 # R751
-<ForallBodyConstruct> ::= (oneof)
+(superclass):<ForallBodyConstruct> ::=
   | <AssignmentStmt>
   | <PointerAssignmentStmt>
   | <WhereStmt>
@@ -1490,15 +1497,15 @@
 
 # R753
 <EndForallStmt> ::=
-  | ^:<LblDef> -:T_END -:T_FORALL             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_FORALL ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ENDFORALL                  -:T_EOS
-  | ^:<LblDef> -:T_ENDFORALL      ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_FORALL             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_FORALL (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDFORALL                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDFORALL      (inline):<EndName> -:T_EOS
 
 # R754
 <ForallStmt> ::=
-    ^:<LblDef> -:T_FORALL ^:<ForallHeader> assignment*:<AssignmentStmt>        -:T_EOS
-  | ^:<LblDef> -:T_FORALL ^:<ForallHeader> assignment*:<PointerAssignmentStmt> -:T_EOS
+    (inline):<LblDef> -:T_FORALL (inline):<ForallHeader> assignment:<AssignmentStmt>        -:T_EOS
+  | (inline):<LblDef> -:T_FORALL (inline):<ForallHeader> assignment:<PointerAssignmentStmt> -:T_EOS
 
 #######################################################################################################################
 # Section 8 Rules
@@ -1508,95 +1515,95 @@
 
 ## R802
 #<IfConstruct> ::=
-#  <IfThenStmt> ^:<ThenPart>
+#  <IfThenStmt> (inline):<ThenPart>
 #
 #<ThenPart> ::=
-#  |                     *:<EndIfStmt>
-#  | *:<ConditionalBody> *:<EndIfStmt>
-#  |                     *:<ElseIfConstruct>
-#  | *:<ConditionalBody> *:<ElseIfConstruct>
-#  |                     *:<ElseConstruct>
-#  | *:<ConditionalBody> *:<ElseConstruct>
+#  |                     <EndIfStmt>
+#  | <ConditionalBody> <EndIfStmt>
+#  |                     <ElseIfConstruct>
+#  | <ConditionalBody> <ElseIfConstruct>
+#  |                     <ElseConstruct>
+#  | <ConditionalBody> <ElseConstruct>
 #
 #<ElseIfConstruct> ::=
-#  <ElseIfStmt> ^:<ThenPart>
+#  <ElseIfStmt> (inline):<ThenPart>
 #
 #<ElseConstruct> ::=
-#  <ElseStmt> ^:<ElsePart>
+#  <ElseStmt> (inline):<ElsePart>
 #
 #<ElsePart> ::=
 #  |                     <EndIfStmt>
-#  | *:<ConditionalBody> <EndIfStmt>
+#  | <ConditionalBody> <EndIfStmt>
 #
-#<ConditionalBody> ::=
+#(list):<ConditionalBody> ::=
 #  |                     <ExecutionPartConstruct>
-#  | @:<ConditionalBody> <ExecutionPartConstruct>
+#  | <ConditionalBody> <ExecutionPartConstruct>
 #JO--X
 <IfConstruct> ::=
-  | <IfThenStmt> thenBody:<ConditionalBody> *:<ElseIfParts> *:<ElseStmt> elseBody*:<ConditionalBody> <EndIfStmt>
-  | <IfThenStmt> thenBody:<ConditionalBody>                 *:<ElseStmt> elseBody*:<ConditionalBody> <EndIfStmt>
-  | <IfThenStmt> thenBody:<ConditionalBody> *:<ElseIfParts>                                          <EndIfStmt>
+  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts> <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>
+  | <IfThenStmt> thenBody:<ConditionalBody>                 <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>
+  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts>                                          <EndIfStmt>
   | <IfThenStmt> thenBody:<ConditionalBody>                                                          <EndIfStmt>
-<ElseIfParts> ::=
-  |                 <ElseIfConstruct>
-  | @:<ElseIfParts> <ElseIfConstruct>
+(list):<ElseIfParts> ::=
+  |               <ElseIfConstruct>
+  | <ElseIfParts> <ElseIfConstruct>
 <ElseIfConstruct> ::=
   | <ElseIfStmt> elseIfBody:<ConditionalBody>
-<ConditionalBody> ::=
+(list):<ConditionalBody> ::=
   | (empty)
-  | @:<ConditionalBody> <ExecutionPartConstruct>
+  | <ConditionalBody> <ExecutionPartConstruct>
 
 # R803
 # JO -- Added error production
 <IfThenStmt> ::=
-  | ^:<LblDef>                               -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
-  | ^:<LblDef> IfConstruct^:<Name> -:T_COLON -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
-  | ^:<LblDef>                               -:T_IF (error) T_THEN
-  | ^:<LblDef> IfConstruct^:<Name> -:T_COLON -:T_IF (error) T_THEN
+  | (inline):<LblDef>                               -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
+  | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
+  | (inline):<LblDef>                               -:T_IF (error) T_THEN
+  | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF (error) T_THEN
 
 # R804
 # JO -- Added error production
 <ElseIfStmt> ::=
-  | ^:<LblDef> -:T_ELSEIF      -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN             -:T_EOS
-  | ^:<LblDef> -:T_ELSEIF      -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN             -:T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ELSEIF      (error) T_EOS
-  | ^:<LblDef> -:T_ELSE -:T_IF (error) T_EOS
+  | (inline):<LblDef> -:T_ELSEIF      -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN             -:T_EOS
+  | (inline):<LblDef> -:T_ELSEIF      -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN             -:T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSEIF      (error) T_EOS
+  | (inline):<LblDef> -:T_ELSE -:T_IF (error) T_EOS
 
 # R805
 # JO -- Added error production
 <ElseStmt> ::=
-  | ^:<LblDef> -:T_ELSE             -:T_EOS
-  | ^:<LblDef> -:T_ELSE ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ELSE    (error)    T_EOS
+  | (inline):<LblDef> -:T_ELSE             -:T_EOS
+  | (inline):<LblDef> -:T_ELSE (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ELSE    (error)    T_EOS
 
 # R806
 <EndIfStmt> ::=
-  | ^:<LblDef> -:T_ENDIF                  -:T_EOS
-  | ^:<LblDef> -:T_ENDIF      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_IF             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_IF ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDIF                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDIF      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_IF             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_IF (inline):<EndName> -:T_EOS
 
 # R807
 # JO -- Added error production
 <IfStmt> ::=
-  | ^:<LblDef> T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN <ActionStmt>
-  | ^:<LblDef> T_IF (error) T_EOS
+  | (inline):<LblDef> T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN <ActionStmt>
+  | (inline):<LblDef> T_IF (error) T_EOS
 
 # R808
 <CaseConstruct> ::=
-  <SelectCaseStmt> ^:<SelectCaseRange>
+  <SelectCaseStmt> (inline):<SelectCaseRange>
 
 <SelectCaseRange> ::=
-  | *:<SelectCaseBody> <EndSelectStmt>
-  |                    <EndSelectStmt>
+  | <SelectCaseBody> <EndSelectStmt>
+  |                  <EndSelectStmt>
 
-<SelectCaseBody> ::=
-  |                    <CaseBodyConstruct>  # JO--X Was  | <CaseStmt>
-  | @:<SelectCaseBody> <CaseBodyConstruct>
+(list):<SelectCaseBody> ::=
+  |                  <CaseBodyConstruct>  # JO--X Was  | <CaseStmt>
+  | <SelectCaseBody> <CaseBodyConstruct>
 
-<CaseBodyConstruct> ::= (oneof)
+(superclass):<CaseBodyConstruct> ::=
   | <CaseStmt>
   | <ExecutionPartConstruct>
 
@@ -1604,51 +1611,51 @@
 # R809 chain rule eliminated
 # JO -- Added error production
 <SelectCaseStmt> ::=
-  | ^:<LblDef> SelectConstruct^:<Name> -:T_COLON -:T_SELECTCASE      -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
-  | ^:<LblDef>                                   -:T_SELECTCASE      -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> SelectConstruct^:<Name> -:T_COLON -:T_SELECT -:T_CASE -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
-  | ^:<LblDef>                                   -:T_SELECT -:T_CASE -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> SelectConstruct^:<Name> -:T_COLON -:T_SELECTCASE      (error) T_EOS
-  | ^:<LblDef>                                   -:T_SELECTCASE      (error) T_EOS
-  | ^:<LblDef> SelectConstruct^:<Name> -:T_COLON -:T_SELECT -:T_CASE (error) T_EOS
-  | ^:<LblDef>                                   -:T_SELECT -:T_CASE (error) T_EOS
+  | (inline):<LblDef> SelectConstruct(inline):<Name> -:T_COLON -:T_SELECTCASE      -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef>                                   -:T_SELECTCASE      -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> SelectConstruct(inline):<Name> -:T_COLON -:T_SELECT -:T_CASE -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef>                                   -:T_SELECT -:T_CASE -:T_LPAREN selectionExpression:<Expr> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> SelectConstruct(inline):<Name> -:T_COLON -:T_SELECTCASE      (error) T_EOS
+  | (inline):<LblDef>                                   -:T_SELECTCASE      (error) T_EOS
+  | (inline):<LblDef> SelectConstruct(inline):<Name> -:T_COLON -:T_SELECT -:T_CASE (error) T_EOS
+  | (inline):<LblDef>                                   -:T_SELECT -:T_CASE (error) T_EOS
 
 # R810
 # JO -- Added error production
 <CaseStmt> ::=
-  | ^:<LblDef> -:T_CASE ^:<CaseSelector>          -:T_EOS
-  | ^:<LblDef> -:T_CASE ^:<CaseSelector> *:<Name> -:T_EOS
-  | ^:<LblDef> -:T_CASE (error) T_EOS
+  | (inline):<LblDef> -:T_CASE (inline):<CaseSelector>          -:T_EOS
+  | (inline):<LblDef> -:T_CASE (inline):<CaseSelector> <Name> -:T_EOS
+  | (inline):<LblDef> -:T_CASE (error) T_EOS
 
 # R811
 <EndSelectStmt> ::=
-  | ^:<LblDef> -:T_ENDSELECT                  -:T_EOS
-  | ^:<LblDef> -:T_ENDSELECT      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_SELECT             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_SELECT ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDSELECT                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDSELECT      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_SELECT             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_SELECT (inline):<EndName> -:T_EOS
 
 # R812 chain rules deleted
 
 # R813
 <CaseSelector> ::=
-  | -:T_LPAREN caseValueRangeListSelector*:<CaseValueRangeList> -:T_RPAREN
-  | hasDefaultSelector+:T_DEFAULT
+  | -:T_LPAREN caseValueRangeListSelector:<CaseValueRangeList> -:T_RPAREN
+  | hasDefaultSelector(bool):T_DEFAULT
 
-<CaseValueRangeList> ::=
-  |                                  <CaseValueRange>
-  | @:<CaseValueRangeList> -:T_COMMA <CaseValueRange>
+(list):<CaseValueRangeList> ::=
+  |                                <CaseValueRange>
+  | <CaseValueRangeList> -:T_COMMA <CaseValueRange>
 
 # R814
 <CaseValueRange> ::=
-  | lb*:<Expr>
-  | lb*:<Expr> -:T_COLON
+  | lb:<Expr>
+  | lb:<Expr> -:T_COLON
   |            -:T_COLON ub:<Expr>
-  | lb*:<Expr> -:T_COLON ub:<Expr>
+  | lb:<Expr> -:T_COLON ub:<Expr>
 
 # R815 chain rules deleted
 
 # R816
-<DoConstruct> ::= ^:<BlockDoConstruct>
+<DoConstruct> ::= (inline):<BlockDoConstruct>
 
 # R817
 # Block DO constructs cannot be recognized syntactically because there is
@@ -1661,29 +1668,29 @@
 
 # R818
 <LabelDoStmt> ::=
-  | ^:<LblDef>                               -:T_DO *:<LblRef> ^:<CommaLoopControl> -:T_EOS
-  | ^:<LblDef>                               -:T_DO *:<LblRef>                      -:T_EOS
-  | ^:<LblDef>                               -:T_DO            ^:<CommaLoopControl> -:T_EOS
-  | ^:<LblDef>                               -:T_DO                                 -:T_EOS
-  | ^:<LblDef> DoConstruct^:<Name> -:T_COLON -:T_DO *:<LblRef> ^:<CommaLoopControl> -:T_EOS
-  | ^:<LblDef> DoConstruct^:<Name> -:T_COLON -:T_DO *:<LblRef>                      -:T_EOS
-  | ^:<LblDef> DoConstruct^:<Name> -:T_COLON -:T_DO            ^:<CommaLoopControl> -:T_EOS
-  | ^:<LblDef> DoConstruct^:<Name> -:T_COLON -:T_DO                                 -:T_EOS
+  | (inline):<LblDef>                               -:T_DO <LblRef> (inline):<CommaLoopControl> -:T_EOS
+  | (inline):<LblDef>                               -:T_DO <LblRef>                      -:T_EOS
+  | (inline):<LblDef>                               -:T_DO            (inline):<CommaLoopControl> -:T_EOS
+  | (inline):<LblDef>                               -:T_DO                                 -:T_EOS
+  | (inline):<LblDef> DoConstruct(inline):<Name> -:T_COLON -:T_DO <LblRef> (inline):<CommaLoopControl> -:T_EOS
+  | (inline):<LblDef> DoConstruct(inline):<Name> -:T_COLON -:T_DO <LblRef>                      -:T_EOS
+  | (inline):<LblDef> DoConstruct(inline):<Name> -:T_COLON -:T_DO            (inline):<CommaLoopControl> -:T_EOS
+  | (inline):<LblDef> DoConstruct(inline):<Name> -:T_COLON -:T_DO                                 -:T_EOS
 
 # R819 chain rule deleted
 
 # R820 chain rule deleted
 
 # R821 see 40
-# JO -- *:<LoopControl> since pulled up into <LabelDoStmt>
+# JO -- <LoopControl> since pulled up into <LabelDoStmt>
 <CommaLoopControl> ::=
-  | -:T_COMMA *:<LoopControl>
-  |           *:<LoopControl>
+  | -:T_COMMA <LoopControl>
+  |           <LoopControl>
 
 <LoopControl> ::=
-  | loop^:<VariableName> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>
-  | loop^:<VariableName> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step*:<Expr>
-  | -:T_WHILE -:T_LPAREN whileExpr*:<Expr> -:T_RPAREN
+  | loop(inline):<VariableName> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>
+  | loop(inline):<VariableName> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr>
+  | -:T_WHILE -:T_LPAREN whileExpr:<Expr> -:T_RPAREN
 
 # R822 chain rule deleted
 
@@ -1693,26 +1700,26 @@
 
 # R825
 <EndDoStmt> ::=
-  | ^:<LblDef> -:T_ENDDO                  -:T_EOS
-  | ^:<LblDef> -:T_ENDDO      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_DO             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_DO ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDDO                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDDO      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_DO             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_DO (inline):<EndName> -:T_EOS
 
 # R826-R833 enforced semantically
 
 # R834
 <CycleStmt> ::=
-  | ^:<LblDef> -:T_CYCLE        -:T_EOS
-  | ^:<LblDef> -:T_CYCLE ^:<Name> -:T_EOS
+  | (inline):<LblDef> -:T_CYCLE        -:T_EOS
+  | (inline):<LblDef> -:T_CYCLE (inline):<Name> -:T_EOS
 
 # R835
 <ExitStmt> ::=
-  | ^:<LblDef> -:T_EXIT        -:T_EOS
-  | ^:<LblDef> -:T_EXIT ^:<Name> -:T_EOS
+  | (inline):<LblDef> -:T_EXIT        -:T_EOS
+  | (inline):<LblDef> -:T_EXIT (inline):<Name> -:T_EOS
 
 # R836
 <GotoStmt> ::=
-  ^:<LblDef> ^:<GoToKw> Goto^:<LblRef> -:T_EOS
+  (inline):<LblDef> (inline):<GoToKw> GotoLblRef:<LblRef> -:T_EOS
 
 <GoToKw> ::=
   | -:T_GOTO
@@ -1720,30 +1727,30 @@
 
 # R837
 <ComputedGotoStmt> ::=
-  | ^:<LblDef> ^:<GoToKw> -:T_LPAREN <LblRefList> -:T_RPAREN   <Expr>     -:T_EOS
-  | ^:<LblDef> ^:<GoToKw> -:T_LPAREN <LblRefList> -:T_RPAREN ^:<CommaExp> -:T_EOS
+  | (inline):<LblDef> (inline):<GoToKw> -:T_LPAREN <LblRefList> -:T_RPAREN   <Expr>     -:T_EOS
+  | (inline):<LblDef> (inline):<GoToKw> -:T_LPAREN <LblRefList> -:T_RPAREN (inline):<CommaExp> -:T_EOS
 
 <CommaExp> ::= -:T_COMMA <Expr>
 
-<LblRefList> ::=
-  |                          ^:<LblRef>
-  | @:<LblRefList> -:T_COMMA ^:<LblRef>
+(list):<LblRefList> ::=
+  |                        (inline):<LblRef>
+  | <LblRefList> -:T_COMMA (inline):<LblRef>
 
-<LblRef> ::= ^:<Label>
+<LblRef> ::= (inline):<Label>
 
 # R838
 <ArithmeticIfStmt> ::=
-  ^:<LblDef> -:T_IF -:T_LPAREN <Expr> -:T_RPAREN first:<LblRef> -:T_COMMA second:<LblRef> -:T_COMMA third:<LblRef> -:T_EOS
+  (inline):<LblDef> -:T_IF -:T_LPAREN <Expr> -:T_RPAREN first:<LblRef> -:T_COMMA second:<LblRef> -:T_COMMA third:<LblRef> -:T_EOS
 
 # R839
 <ContinueStmt> ::=
-  ^:<LblDef> -:T_CONTINUE -:T_EOS
+  (inline):<LblDef> -:T_CONTINUE -:T_EOS
 
 # R840
 <StopStmt> ::=
-  | ^:<LblDef> -:T_STOP                     -:T_EOS
-  | ^:<LblDef> -:T_STOP    intConst*:T_ICON -:T_EOS
-  | ^:<LblDef> -:T_STOP stringConst*:T_SCON -:T_EOS
+  | (inline):<LblDef> -:T_STOP                     -:T_EOS
+  | (inline):<LblDef> -:T_STOP    intConst:T_ICON -:T_EOS
+  | (inline):<LblDef> -:T_STOP stringConst:T_SCON -:T_EOS
 
 # R841 chain rule deleted
 
@@ -1753,8 +1760,8 @@
 
 # R901
 <UnitIdentifier> ::=
-  |  expression*:<UFExpr>
-  | hasAsterisk+:T_ASTERISK
+  |  expression:<UFExpr>
+  | hasAsterisk(bool):T_ASTERISK
 
 # R902 chain rule deleted
 
@@ -1762,146 +1769,146 @@
 
 # R904
 <OpenStmt> ::=
-  ^:<LblDef> -:T_OPEN -:T_LPAREN <ConnectSpecList> -:T_RPAREN -:T_EOS
+  (inline):<LblDef> -:T_OPEN -:T_LPAREN <ConnectSpecList> -:T_RPAREN -:T_EOS
 
 # R905
-<ConnectSpecList> ::=
+(list):<ConnectSpecList> ::=
   | <UnitIdentifier>
-  |                               <ConnectSpec>
-  | @:<ConnectSpecList> -:T_COMMA <ConnectSpec>
+  |                             <ConnectSpec>
+  | <ConnectSpecList> -:T_COMMA <ConnectSpec>
 
 <ConnectSpec> ::=
-  | -:T_UNITEQ                 *:<UnitIdentifier>
-  | -:T_ERREQ            errLbl*:<LblRef>
-  | -:T_FILEEQ         fileExpr*:<CExpr>
-  | -:T_STATUSEQ     statusExpr*:<CExpr>
-  | -:T_ACCESSEQ     accessExpr*:<CExpr>
-  | -:T_FORMEQ         formExpr*:<CExpr>
-  | -:T_RECLEQ         reclExpr*:<Expr>
-  | -:T_BLANKEQ       blankExpr*:<CExpr>
-  | -:T_IOSTATEQ      ioStatVar*:<ScalarVariable>
-  | -:T_POSITIONEQ positionExpr*:<CExpr>
-  | -:T_ACTIONEQ     actionExpr*:<CExpr>
-  | -:T_DELIMEQ       delimExpr*:<CExpr>
-  | -:T_PADEQ           padExpr*:<CExpr>
+  | -:T_UNITEQ                  <UnitIdentifier>
+  | -:T_ERREQ            errLbl:<LblRef>
+  | -:T_FILEEQ         fileExpr:<CExpr>
+  | -:T_STATUSEQ     statusExpr:<CExpr>
+  | -:T_ACCESSEQ     accessExpr:<CExpr>
+  | -:T_FORMEQ         formExpr:<CExpr>
+  | -:T_RECLEQ         reclExpr:<Expr>
+  | -:T_BLANKEQ       blankExpr:<CExpr>
+  | -:T_IOSTATEQ      ioStatVar:<ScalarVariable>
+  | -:T_POSITIONEQ positionExpr:<CExpr>
+  | -:T_ACTIONEQ     actionExpr:<CExpr>
+  | -:T_DELIMEQ       delimExpr:<CExpr>
+  | -:T_PADEQ           padExpr:<CExpr>
 
 # R906 chain rule deleted
 
 # R907
 <CloseStmt> ::=
-  ^:<LblDef> -:T_CLOSE -:T_LPAREN <CloseSpecList> -:T_RPAREN -:T_EOS
+  (inline):<LblDef> -:T_CLOSE -:T_LPAREN <CloseSpecList> -:T_RPAREN -:T_EOS
 
 # R908
-<CloseSpecList> ::=
+(list):<CloseSpecList> ::=
   | <UnitIdentifier>
-  |                             <CloseSpec>
-  | @:<CloseSpecList> -:T_COMMA <CloseSpec>
+  |                           <CloseSpec>
+  | <CloseSpecList> -:T_COMMA <CloseSpec>
 
 <CloseSpec> ::=
-  | -:T_UNITEQ             *:<UnitIdentifier>
-  | -:T_ERREQ        errLbl*:<LblRef>
-  | -:T_STATUSEQ statusExpr*:<CExpr>
-  | -:T_IOSTATEQ  ioStatVar*:<ScalarVariable>
+  | -:T_UNITEQ              <UnitIdentifier>
+  | -:T_ERREQ        errLbl:<LblRef>
+  | -:T_STATUSEQ statusExpr:<CExpr>
+  | -:T_IOSTATEQ  ioStatVar:<ScalarVariable>
 
 # R909
 <ReadStmt> ::=
-  | ^:<LblDef> -:T_READ *:<RdCtlSpec>         *:<InputItemList> -:T_EOS
-  | ^:<LblDef> -:T_READ *:<RdCtlSpec>                           -:T_EOS
-  | ^:<LblDef> -:T_READ *:<RdFmtId> -:T_COMMA *:<InputItemList> -:T_EOS
-  | ^:<LblDef> -:T_READ *:<RdFmtId>                             -:T_EOS
+  | (inline):<LblDef> -:T_READ <RdCtlSpec>         <InputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_READ <RdCtlSpec>                           -:T_EOS
+  | (inline):<LblDef> -:T_READ <RdFmtId> -:T_COMMA <InputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_READ <RdFmtId>                             -:T_EOS
 
 <RdCtlSpec> ::=
-  | ^:<RdUnitId>
+  | (inline):<RdUnitId>
   | -:T_LPAREN <RdIoCtlSpecList> -:T_RPAREN
 
 <RdUnitId> ::=
-  | -:T_LPAREN readUnitExpr*:<UFExpr>         -:T_RPAREN
-  | -:T_LPAREN readUnitIsAsterisk+:T_ASTERISK -:T_RPAREN
+  | -:T_LPAREN readUnitExpr:<UFExpr>         -:T_RPAREN
+  | -:T_LPAREN readUnitIsAsterisk(bool):T_ASTERISK -:T_RPAREN
 
-<RdIoCtlSpecList> ::=
-  | *:<UnitIdentifier> -:T_COMMA  *:<IoControlSpec>
-  | *:<UnitIdentifier> -:T_COMMA  *:<FormatIdentifier>
-  |                               *:<IoControlSpec>
-  | @:<RdIoCtlSpecList> -:T_COMMA *:<IoControlSpec>
+(list):<RdIoCtlSpecList> ::=
+  | <UnitIdentifier> -:T_COMMA  <IoControlSpec>
+  | <UnitIdentifier> -:T_COMMA  <FormatIdentifier>
+  |                             <IoControlSpec>
+  | <RdIoCtlSpecList> -:T_COMMA <IoControlSpec>
 
 <RdFmtId> ::=
-  | format^:<LblRef>
-  | formatIsAsterisk+:T_ASTERISK
-  | primary1*:<COperand>
-  | primary1*:<COperand>    ^:<ConcatOp> primary2*:<CPrimary>
-  |         ^:<RdFmtIdExpr> ^:<ConcatOp> primary2*:<CPrimary>
+  | format(inline):<LblRef>
+  | formatIsAsterisk(bool):T_ASTERISK
+  | primary1:<COperand>
+  | primary1:<COperand>    (inline):<ConcatOp> primary2:<CPrimary>
+  |         (inline):<RdFmtIdExpr> (inline):<ConcatOp> primary2:<CPrimary>
 
 <RdFmtIdExpr> ::= -:T_LPAREN formatIdExpr:<UFExpr> -:T_RPAREN
 
 # R910
 <WriteStmt> ::=
-  | ^:<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN *:<OutputItemList> -:T_EOS
-  | ^:<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN                    -:T_EOS
+  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN <OutputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN                  -:T_EOS
 
 # R911
 <PrintStmt> ::=
-  | ^:<LblDef> -:T_PRINT <FormatIdentifier> -:T_COMMA *:<OutputItemList> -:T_EOS
-  | ^:<LblDef> -:T_PRINT <FormatIdentifier>                              -:T_EOS
+  | (inline):<LblDef> -:T_PRINT <FormatIdentifier> -:T_COMMA <OutputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_PRINT <FormatIdentifier>                            -:T_EOS
 
 # R912
 #  JO -- $-:T_COMMA in Eli grammar indicated conflict resolution
-<IoControlSpecList> ::=
-  | *:<UnitIdentifier>
-  | *:<UnitIdentifier>    -:T_COMMA *:<FormatIdentifier>
-  | *:<UnitIdentifier>    -:T_COMMA *:<IoControlSpec>
-  |                                 *:<IoControlSpec>
-  | @:<IoControlSpecList> -:T_COMMA *:<IoControlSpec>
+(list):<IoControlSpecList> ::=
+  | <UnitIdentifier>
+  | <UnitIdentifier>    -:T_COMMA <FormatIdentifier>
+  | <UnitIdentifier>    -:T_COMMA <IoControlSpec>
+  |                               <IoControlSpec>
+  | <IoControlSpecList> -:T_COMMA <IoControlSpec>
 
 <IoControlSpec> ::=
-  | -:T_FMTEQ                *:<FormatIdentifier>
-  | -:T_UNITEQ               *:<UnitIdentifier>
-  | -:T_RECEQ         recExpr*:<Expr>
-  | -:T_ENDEQ         endExpr*:<LblRef>
-  | -:T_ERREQ          errLbl*:<LblRef>
-  | -:T_IOSTATEQ    ioStatVar*:<ScalarVariable>
-  | -:T_NMLEQ                *:<NamelistGroupName>
-  | -:T_ADVANCEEQ advanceExpr*:<CExpr>
-  | -:T_SIZEEQ        sizeVar*:<Variable>
-  | -:T_EOREQ          eorLbl*:<LblRef>
+  | -:T_FMTEQ                 <FormatIdentifier>
+  | -:T_UNITEQ                <UnitIdentifier>
+  | -:T_RECEQ         recExpr:<Expr>
+  | -:T_ENDEQ         endExpr:<LblRef>
+  | -:T_ERREQ          errLbl:<LblRef>
+  | -:T_IOSTATEQ    ioStatVar:<ScalarVariable>
+  | -:T_NMLEQ                 <NamelistGroupName>
+  | -:T_ADVANCEEQ advanceExpr:<CExpr>
+  | -:T_SIZEEQ        sizeVar:<Variable>
+  | -:T_EOREQ          eorLbl:<LblRef>
 # JO -- Was T_OR, which is incorrect
 
 # R913
 <FormatIdentifier> ::=
-  | formatLbl*:<LblRef>
-  | formatExpr*:<CExpr>
-  | formatIsAsterisk+:T_ASTERISK
+  | formatLbl:<LblRef>
+  | formatExpr:<CExpr>
+  | formatIsAsterisk(bool):T_ASTERISK
 
 # R914
-<InputItemList> ::=
-  |                             <InputItem>
-  | @:<InputItemList> -:T_COMMA <InputItem>
+(list):<InputItemList> ::=
+  |                           <InputItem>
+  | <InputItemList> -:T_COMMA <InputItem>
 
-<InputItem> ::= (oneof)
+(superclass):<InputItem> ::=
   | <Variable>
   | <InputImpliedDo>
 
 # R915
 <OutputItemList> ::=
   | singleExpr:<Expr>
-  | ^:<OutputItemList1>
+  | (inline):<OutputItemList1>
 
 <OutputItemList1> ::=
-  | expr1*:<Expr> -:T_COMMA expr2*:<Expr>
-  | expr1*:<Expr> -:T_COMMA *:<OutputImpliedDo>
-  | *:<OutputImpliedDo>
-  | @:<OutputItemList1> -:T_COMMA expr2*:<Expr>
-  | @:<OutputItemList1> -:T_COMMA *:<OutputImpliedDo>
+  | expr1:<Expr> -:T_COMMA expr2:<Expr>
+  | expr1:<Expr> -:T_COMMA <OutputImpliedDo>
+  | <OutputImpliedDo>
+  | <OutputItemList1> -:T_COMMA expr2:<Expr>
+  | <OutputItemList1> -:T_COMMA <OutputImpliedDo>
 
 # R916
 <InputImpliedDo> ::=
-  | -:T_LPAREN <InputItemList> -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
-  | -:T_LPAREN <InputItemList> -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step*:<Expr> -:T_RPAREN
+  | -:T_LPAREN <InputItemList> -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
+  | -:T_LPAREN <InputItemList> -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
 
 <OutputImpliedDo> ::=
-  | -:T_LPAREN <Expr>            -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
-  | -:T_LPAREN <Expr>            -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step*:<Expr> -:T_RPAREN
-  | -:T_LPAREN <OutputItemList1> -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
-  | -:T_LPAREN <OutputItemList1> -:T_COMMA ^:<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step*:<Expr> -:T_RPAREN
+  | -:T_LPAREN <Expr>            -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
+  | -:T_LPAREN <Expr>            -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
+  | -:T_LPAREN <OutputItemList1> -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                        -:T_RPAREN
+  | -:T_LPAREN <OutputItemList1> -:T_COMMA (inline):<ImpliedDoVariable> -:T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> -:T_COMMA step:<Expr> -:T_RPAREN
 
 # R917 chain rule deleted
 
@@ -1909,69 +1916,69 @@
 
 # R919
 <BackspaceStmt> ::=
-  | ^:<LblDef> -:T_BACKSPACE *:<UnitIdentifier>                         -:T_EOS
-  | ^:<LblDef> -:T_BACKSPACE -:T_LPAREN *:<PositionSpecList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_BACKSPACE <UnitIdentifier>                         -:T_EOS
+  | (inline):<LblDef> -:T_BACKSPACE -:T_LPAREN <PositionSpecList> -:T_RPAREN -:T_EOS
 
 # R920
 <EndfileStmt> ::=
-  | ^:<LblDef> -:T_ENDFILE      *:<UnitIdentifier>                         -:T_EOS
-  | ^:<LblDef> -:T_ENDFILE      -:T_LPAREN *:<PositionSpecList> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_END -:T_FILE *:<UnitIdentifier>                         -:T_EOS
-  | ^:<LblDef> -:T_END -:T_FILE -:T_LPAREN *:<PositionSpecList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_ENDFILE      <UnitIdentifier>                         -:T_EOS
+  | (inline):<LblDef> -:T_ENDFILE      -:T_LPAREN <PositionSpecList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_FILE <UnitIdentifier>                         -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_FILE -:T_LPAREN <PositionSpecList> -:T_RPAREN -:T_EOS
 
 # R921
 <RewindStmt> ::=
-  | ^:<LblDef> -:T_REWIND *:<UnitIdentifier>                         -:T_EOS
-  | ^:<LblDef> -:T_REWIND -:T_LPAREN *:<PositionSpecList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_REWIND <UnitIdentifier>                         -:T_EOS
+  | (inline):<LblDef> -:T_REWIND -:T_LPAREN <PositionSpecList> -:T_RPAREN -:T_EOS
 
 # R922
-<PositionSpecList> ::=
-  | *:<UnitIdentifier> -:T_COMMA <PositionSpec>
+(list):<PositionSpecList> ::=
+  | <UnitIdentifier> -:T_COMMA <PositionSpec>
   | <PositionSpec>
-  | @:<PositionSpecList> -:T_COMMA <PositionSpec>
+  | <PositionSpecList> -:T_COMMA <PositionSpec>
 
 <PositionSpec> ::=
-  | -:T_UNITEQ            *:<UnitIdentifier>
-  | -:T_ERREQ       errLbl*:<LblRef>
-  | -:T_IOSTATEQ ioStatVar*:<ScalarVariable>
+  | -:T_UNITEQ            <UnitIdentifier>
+  | -:T_ERREQ       errLbl:<LblRef>
+  | -:T_IOSTATEQ ioStatVar:<ScalarVariable>
 
 # R923
 <InquireStmt> ::=
-  | ^:<LblDef> -:T_INQUIRE -:T_LPAREN *:<InquireSpecList> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_INQUIRE -:T_LPAREN -:T_IOLENGTHEQ ioLengthVar*:<ScalarVariable> -:T_RPAREN *:<OutputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_INQUIRE -:T_LPAREN <InquireSpecList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_INQUIRE -:T_LPAREN -:T_IOLENGTHEQ ioLengthVar:<ScalarVariable> -:T_RPAREN <OutputItemList> -:T_EOS
 
 # R924
-<InquireSpecList> ::=
-  | *:<UnitIdentifier>
-  | *:<InquireSpec>
-  | @:<InquireSpecList> -:T_COMMA *:<InquireSpec>
+(list):<InquireSpecList> ::=
+  | <UnitIdentifier>
+  | <InquireSpec>
+  | <InquireSpecList> -:T_COMMA <InquireSpec>
 
 <InquireSpec> ::=
-  | -:T_UNITEQ                       *:<UnitIdentifier>
-  | -:T_FILEEQ               fileExpr*:<CExpr>
-  | -:T_ERREQ                  errVar*:<LblRef>
-  | -:T_IOSTATEQ            ioStatVar*:<ScalarVariable>
-  | -:T_EXISTEQ              existVar*:<ScalarVariable>
-  | -:T_OPENEDEQ            openedVar*:<ScalarVariable>
-  | -:T_NUMBEREQ            numberVar*:<ScalarVariable>
-  | -:T_NAMEDEQ              namedVar*:<ScalarVariable>
-  | -:T_NAMEEQ                nameVar*:<ScalarVariable>
-  | -:T_ACCESSEQ            accessVar*:<ScalarVariable>
-  | -:T_SEQUENTIALEQ    sequentialVar*:<ScalarVariable>
-  | -:T_DIRECTEQ            directVar*:<ScalarVariable>
-  | -:T_FORMEQ                formVar*:<ScalarVariable>
-  | -:T_FORMATTEDEQ     formattedVar*:<ScalarVariable>
-  | -:T_UNFORMATTEDEQ unformattedVar*:<ScalarVariable>
-  | -:T_RECLEQ              reclExpr*:<Expr>
-  | -:T_NEXTRECEQ         nextRecVar*:<ScalarVariable>
-  | -:T_BLANKEQ             blankVar*:<ScalarVariable>
-  | -:T_POSITIONEQ       positionVar*:<ScalarVariable>
-  | -:T_ACTIONEQ           actionVar*:<ScalarVariable>
-  | -:T_READEQ               readVar*:<ScalarVariable>
-  | -:T_WRITEEQ             writeVar*:<ScalarVariable>
-  | -:T_READWRITEEQ     readWriteVar*:<ScalarVariable>
-  | -:T_DELIMEQ             delimVar*:<ScalarVariable>
-  | -:T_PADEQ                 padVar*:<ScalarVariable>
+  | -:T_UNITEQ                       <UnitIdentifier>
+  | -:T_FILEEQ               fileExpr:<CExpr>
+  | -:T_ERREQ                  errVar:<LblRef>
+  | -:T_IOSTATEQ            ioStatVar:<ScalarVariable>
+  | -:T_EXISTEQ              existVar:<ScalarVariable>
+  | -:T_OPENEDEQ            openedVar:<ScalarVariable>
+  | -:T_NUMBEREQ            numberVar:<ScalarVariable>
+  | -:T_NAMEDEQ              namedVar:<ScalarVariable>
+  | -:T_NAMEEQ                nameVar:<ScalarVariable>
+  | -:T_ACCESSEQ            accessVar:<ScalarVariable>
+  | -:T_SEQUENTIALEQ    sequentialVar:<ScalarVariable>
+  | -:T_DIRECTEQ            directVar:<ScalarVariable>
+  | -:T_FORMEQ                formVar:<ScalarVariable>
+  | -:T_FORMATTEDEQ     formattedVar:<ScalarVariable>
+  | -:T_UNFORMATTEDEQ unformattedVar:<ScalarVariable>
+  | -:T_RECLEQ              reclExpr:<Expr>
+  | -:T_NEXTRECEQ         nextRecVar:<ScalarVariable>
+  | -:T_BLANKEQ             blankVar:<ScalarVariable>
+  | -:T_POSITIONEQ       positionVar:<ScalarVariable>
+  | -:T_ACTIONEQ           actionVar:<ScalarVariable>
+  | -:T_READEQ               readVar:<ScalarVariable>
+  | -:T_WRITEEQ             writeVar:<ScalarVariable>
+  | -:T_READWRITEEQ     readWriteVar:<ScalarVariable>
+  | -:T_DELIMEQ             delimVar:<ScalarVariable>
+  | -:T_PADEQ                 padVar:<ScalarVariable>
 
 #######################################################################################################################
 # Section 10 Rules
@@ -1980,37 +1987,37 @@
 # I have trouble verifying this section because of its reliance on lexical analysis
 # R1001
 <FormatStmt> ::=
-  | ^:<LblDef> -:T_FORMAT -:T_LPAREN             -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_FORMAT -:T_LPAREN *:<FmtSpec> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_FORMAT (error) T_EOS
+  | (inline):<LblDef> -:T_FORMAT -:T_LPAREN             -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_FORMAT -:T_LPAREN <FmtSpec> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_FORMAT (error) T_EOS
 
 # R1002
-<FmtSpec> ::=
-  |                                     *:<FormatEdit>
-  |                       ^:<Formatsep>
-  |                       ^:<Formatsep> *:<FormatEdit>
-  | @:<FmtSpec>           ^:<Formatsep>
-  | @:<FmtSpec>           ^:<Formatsep> *:<FormatEdit>
-  | @:<FmtSpec> -:T_COMMA               *:<FormatEdit>
-  | @:<FmtSpec> -:T_COMMA ^:<Formatsep>
-  | @:<FmtSpec> -:T_COMMA ^:<Formatsep> *:<FormatEdit>
+(list):<FmtSpec> ::=
+  |                                   <FormatEdit>
+  |                     (inline):<Formatsep>
+  |                     (inline):<Formatsep> <FormatEdit>
+  | <FmtSpec>           (inline):<Formatsep>
+  | <FmtSpec>           (inline):<Formatsep> <FormatEdit>
+  | <FmtSpec> -:T_COMMA               <FormatEdit>
+  | <FmtSpec> -:T_COMMA (inline):<Formatsep>
+  | <FmtSpec> -:T_COMMA (inline):<Formatsep> <FormatEdit>
 
 # R1003
 <FormatEdit> ::=
-  |                                   *:<EditElement>
-  |                  intConst*:T_ICON *:<EditElement>
-  | hexConst*:T_XCON
-  |   pConst*:T_PCON
-  |   pConst*:T_PCON                  *:<EditElement>
-  |   pConst*:T_PCON intConst*:T_ICON *:<EditElement>
+  |                                   <EditElement>
+  |                  intConst:T_ICON <EditElement>
+  | hexConst:T_XCON
+  |   pConst:T_PCON
+  |   pConst:T_PCON                  <EditElement>
+  |   pConst:T_PCON intConst:T_ICON <EditElement>
 
 # Dirk Rossow added T_HCON
 <EditElement> ::=
-  |  floatConst*:T_FCON
-  | stringConst*:T_SCON
-  |  identifier*:T_IDENT
-  |   hollerith*:T_HCON
-  | -:T_LPAREN *:<FmtSpec> -:T_RPAREN
+  |  floatConst:T_FCON
+  | stringConst:T_SCON
+  |  identifier:T_IDENT
+  |   hollerith:T_HCON
+  | -:T_LPAREN <FmtSpec> -:T_RPAREN
 
 # R1004 chain rule deleted
 
@@ -2018,8 +2025,8 @@
 
 # R1010
 <Formatsep> ::=
-  | slashFormatSep+:T_SLASH
-  | colonFormatSep+:T_COLON
+  | slashFormatSep(bool):T_SLASH
+  | colonFormatSep(bool):T_COLON
 
 #######################################################################################################################
 # Section 11 Rules, continued
@@ -2029,53 +2036,53 @@
 
 # R1102
 <ProgramStmt> ::=
-  ^:<LblDef> programToken:T_PROGRAM <ProgramName> -:T_EOS
+  (inline):<LblDef> programToken:T_PROGRAM <ProgramName> -:T_EOS
 
 # R1103
 <EndProgramStmt> ::=
-  | ^:<LblDef> endToken:T_END                         -:T_EOS
-  | ^:<LblDef> endToken:T_ENDPROGRAM                  -:T_EOS
-  | ^:<LblDef> endToken:T_ENDPROGRAM      ^:<EndName> -:T_EOS
-  | ^:<LblDef> endToken:T_END -:T_PROGRAM             -:T_EOS
-  | ^:<LblDef> endToken:T_END -:T_PROGRAM ^:<EndName> -:T_EOS
+  | (inline):<LblDef> endToken:T_END                         -:T_EOS
+  | (inline):<LblDef> endToken:T_ENDPROGRAM                  -:T_EOS
+  | (inline):<LblDef> endToken:T_ENDPROGRAM      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> endToken:T_END -:T_PROGRAM             -:T_EOS
+  | (inline):<LblDef> endToken:T_END -:T_PROGRAM (inline):<EndName> -:T_EOS
 
 # R1104 see high level syntax
 
 # R1105
 <ModuleStmt> ::=
-  ^:<LblDef> -:T_MODULE <ModuleName> -:T_EOS
+  (inline):<LblDef> -:T_MODULE <ModuleName> -:T_EOS
 
 # R1106
 <EndModuleStmt> ::=
-  | ^:<LblDef> -:T_END                        -:T_EOS
-  | ^:<LblDef> -:T_ENDMODULE                  -:T_EOS
-  | ^:<LblDef> -:T_ENDMODULE      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_MODULE             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_MODULE ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END                        -:T_EOS
+  | (inline):<LblDef> -:T_ENDMODULE                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDMODULE      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_MODULE             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_MODULE (inline):<EndName> -:T_EOS
 
 # R1107
 <UseStmt> ::=
-  | ^:<LblDef> useToken:T_USE Module^:<Name>                                           -:T_EOS
-  | ^:<LblDef> useToken:T_USE Module^:<Name> -:T_COMMA *:<RenameList>                  -:T_EOS
-  | ^:<LblDef> useToken:T_USE Module^:<Name> -:T_COMMA -:T_ONLY -:T_COLON              -:T_EOS
-  | ^:<LblDef> useToken:T_USE Module^:<Name> -:T_COMMA -:T_ONLY -:T_COLON *:<OnlyList> -:T_EOS
+  | (inline):<LblDef> useToken:T_USE Module(inline):<Name>                                           -:T_EOS
+  | (inline):<LblDef> useToken:T_USE Module(inline):<Name> -:T_COMMA <RenameList>                  -:T_EOS
+  | (inline):<LblDef> useToken:T_USE Module(inline):<Name> -:T_COMMA -:T_ONLY -:T_COLON              -:T_EOS
+  | (inline):<LblDef> useToken:T_USE Module(inline):<Name> -:T_COMMA -:T_ONLY -:T_COLON <OnlyList> -:T_EOS
 
-<RenameList> ::=
+(list):<RenameList> ::=
   |                          <Rename>
-  | @:<RenameList> -:T_COMMA <Rename>
+  | <RenameList> -:T_COMMA <Rename>
 
-<OnlyList> ::=
-  |                        <Only>
-  | @:<OnlyList> -:T_COMMA <Only>
+(list):<OnlyList> ::=
+  |                      <Only>
+  | <OnlyList> -:T_COMMA <Only>
 
 # R1108
-<Rename> ::= newName:T_IDENT -:T_EQGREATERTHAN Old^:<UseName>
+<Rename> ::= newName:T_IDENT -:T_EQGREATERTHAN Old(inline):<UseName>
 
 # R1109
 <Only> ::=
-  | *:<GenericSpec>
-  | newName:T_IDENT isRenamed+:T_EQGREATERTHAN Old^:<UseName>
-  |                                            Old^:<UseName>
+  | <GenericSpec>
+  | newName:T_IDENT isRenamed(bool):T_EQGREATERTHAN Old(inline):<UseName>
+  |                                            Old(inline):<UseName>
 
 # R1110 chain rule deleted
 
@@ -2085,140 +2092,140 @@
 
 # R1113
 <BlockDataStmt> ::=
-  | ^:<LblDef> blockDataToken:T_BLOCKDATA      <BlockDataName> -:T_EOS
-  | ^:<LblDef> blockDataToken:T_BLOCKDATA                      -:T_EOS
-  | ^:<LblDef> blockDataToken:T_BLOCK -:T_DATA <BlockDataName> -:T_EOS
-  | ^:<LblDef> blockDataToken:T_BLOCK -:T_DATA                 -:T_EOS
+  | (inline):<LblDef> blockDataToken:T_BLOCKDATA      <BlockDataName> -:T_EOS
+  | (inline):<LblDef> blockDataToken:T_BLOCKDATA                      -:T_EOS
+  | (inline):<LblDef> blockDataToken:T_BLOCK -:T_DATA <BlockDataName> -:T_EOS
+  | (inline):<LblDef> blockDataToken:T_BLOCK -:T_DATA                 -:T_EOS
 
 # R1114
 <EndBlockDataStmt> ::=
-    ^:<LblDef> -:T_END                                -:T_EOS
-  | ^:<LblDef> -:T_ENDBLOCKDATA                       -:T_EOS
-  | ^:<LblDef> -:T_ENDBLOCKDATA           ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_BLOCKDATA                  -:T_EOS
-  | ^:<LblDef> -:T_END -:T_BLOCKDATA      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_ENDBLOCK -:T_DATA                  -:T_EOS
-  | ^:<LblDef> -:T_ENDBLOCK -:T_DATA      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_BLOCK -:T_DATA             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_BLOCK -:T_DATA ^:<EndName> -:T_EOS
+    (inline):<LblDef> -:T_END                                -:T_EOS
+  | (inline):<LblDef> -:T_ENDBLOCKDATA                       -:T_EOS
+  | (inline):<LblDef> -:T_ENDBLOCKDATA           (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_BLOCKDATA                  -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_BLOCKDATA      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDBLOCK -:T_DATA                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDBLOCK -:T_DATA      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_BLOCK -:T_DATA             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_BLOCK -:T_DATA (inline):<EndName> -:T_EOS
 
 #######################################################################################################################
 # Section 12 Rules, continued
 #######################################################################################################################
 
 # R1201
-<InterfaceBlock> ::= (superclass=ScopingNode)
-  <InterfaceStmt> ^:<InterfaceRange>
+(customsuperclass=ScopingNode):<InterfaceBlock> ::=
+  <InterfaceStmt> (inline):<InterfaceRange>
 
 <InterfaceRange> ::=
   <InterfaceBlockBody> <EndInterfaceStmt>
 
-<InterfaceBlockBody> ::=
-  |                        <InterfaceSpecification>
-  | @:<InterfaceBlockBody> <InterfaceSpecification>
+(list):<InterfaceBlockBody> ::=
+  |                      <InterfaceSpecification>
+  | <InterfaceBlockBody> <InterfaceSpecification>
 
 # R1202
-<InterfaceSpecification> ::= (oneof)
+(superclass):<InterfaceSpecification> ::=
   | <InterfaceBody>
   | <ModuleProcedureStmt>
 
 # R1203
 <InterfaceStmt> ::=
-  | ^:<LblDef> interfaceToken:T_INTERFACE *:<GenericName> -:T_EOS
-  | ^:<LblDef> interfaceToken:T_INTERFACE *:<GenericSpec> -:T_EOS
-  | ^:<LblDef> interfaceToken:T_INTERFACE                 -:T_EOS
+  | (inline):<LblDef> interfaceToken:T_INTERFACE <GenericName> -:T_EOS
+  | (inline):<LblDef> interfaceToken:T_INTERFACE <GenericSpec> -:T_EOS
+  | (inline):<LblDef> interfaceToken:T_INTERFACE                 -:T_EOS
 
 # R1204
 <EndInterfaceStmt> ::=
-  | ^:<LblDef> -:T_ENDINTERFACE                  -:T_EOS
-  | ^:<LblDef> -:T_ENDINTERFACE      *:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_INTERFACE             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_INTERFACE *:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_ENDINTERFACE                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDINTERFACE      <EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_INTERFACE             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_INTERFACE <EndName> -:T_EOS
 
 # R1205
 <InterfaceBody> ::=
-  | <FunctionStmt> ^:<FunctionInterfaceRange>
-  | <SubroutineStmt> ^:<SubroutineInterfaceRange>
+  | <FunctionStmt> (inline):<FunctionInterfaceRange>
+  | <SubroutineStmt> (inline):<SubroutineInterfaceRange>
 
 <FunctionInterfaceRange> ::=
-  | *:<SubprogramInterfaceBody> <EndFunctionStmt>
+  | <SubprogramInterfaceBody> <EndFunctionStmt>
   |                             <EndFunctionStmt>
 
 <SubroutineInterfaceRange> ::=
-  | *:<SubprogramInterfaceBody> <EndSubroutineStmt>
+  | <SubprogramInterfaceBody> <EndSubroutineStmt>
   |                             <EndSubroutineStmt>
 
-<SubprogramInterfaceBody> ::=
+(list):<SubprogramInterfaceBody> ::=
   | <SpecificationPartConstruct>
-  | @:<SubprogramInterfaceBody> <SpecificationPartConstruct>
+  | <SubprogramInterfaceBody> <SpecificationPartConstruct>
 
 # R1206
 <ModuleProcedureStmt> ::=
-  ^:<LblDef> -:T_MODULE -:T_PROCEDURE <ProcedureNameList> -:T_EOS
+  (inline):<LblDef> -:T_MODULE -:T_PROCEDURE <ProcedureNameList> -:T_EOS
 
-<ProcedureNameList> ::=
-  |                                 ^:<ProcedureName>
-  | @:<ProcedureNameList> -:T_COMMA ^:<ProcedureName>
+(list):<ProcedureNameList> ::=
+  |                               (inline):<ProcedureName>
+  | <ProcedureNameList> -:T_COMMA (inline):<ProcedureName>
 
 <ProcedureName> ::= procedureName:T_IDENT
 
 # R1207
 <GenericSpec> ::=
-  |    isDefinedOperator+:T_OPERATOR   -:T_LPAREN   <DefinedOperator>  -:T_RPAREN
-  | isAssignmentOperator+:T_ASSIGNMENT -:T_LPAREN equalsToken:T_EQUALS -:T_RPAREN
+  |    isDefinedOperator(bool):T_OPERATOR   -:T_LPAREN   <DefinedOperator>  -:T_RPAREN
+  | isAssignmentOperator(bool):T_ASSIGNMENT -:T_LPAREN equalsToken:T_EQUALS -:T_RPAREN
 
 # R1208
 <ExternalStmt> ::=
-  | ^:<LblDef> -:T_EXTERNAL                     <ExternalNameList> -:T_EOS
-  | ^:<LblDef> -:T_EXTERNAL -:T_COLON -:T_COLON <ExternalNameList> -:T_EOS
+  | (inline):<LblDef> -:T_EXTERNAL                     <ExternalNameList> -:T_EOS
+  | (inline):<LblDef> -:T_EXTERNAL -:T_COLON -:T_COLON <ExternalNameList> -:T_EOS
 
-<ExternalNameList> ::=
-  |                                ^:<ExternalName>
-  | @:<ExternalNameList> -:T_COMMA ^:<ExternalName>
+(list):<ExternalNameList> ::=
+  |                              (inline):<ExternalName>
+  | <ExternalNameList> -:T_COMMA (inline):<ExternalName>
 
 # R1209
 <IntrinsicStmt> ::=
-  | ^:<LblDef> -:T_INTRINSIC                     <IntrinsicList> -:T_EOS
-  | ^:<LblDef> -:T_INTRINSIC -:T_COLON -:T_COLON <IntrinsicList> -:T_EOS
+  | (inline):<LblDef> -:T_INTRINSIC                     <IntrinsicList> -:T_EOS
+  | (inline):<LblDef> -:T_INTRINSIC -:T_COLON -:T_COLON <IntrinsicList> -:T_EOS
 
-<IntrinsicList> ::=
-  |                             ^:<IntrinsicProcedureName>
-  | @:<IntrinsicList> -:T_COMMA ^:<IntrinsicProcedureName>
+(list):<IntrinsicList> ::=
+  |                           (inline):<IntrinsicProcedureName>
+  | <IntrinsicList> -:T_COMMA (inline):<IntrinsicProcedureName>
 
 # R1210
 # JO -- name* since pulled up into <Primary>
 <FunctionReference> ::=
-  | name*:<Name> -:T_LPAREN                     -:T_RPAREN
-  | name*:<Name> -:T_LPAREN *:<FunctionArgList> -:T_RPAREN
+  | name:<Name> -:T_LPAREN                     -:T_RPAREN
+  | name:<Name> -:T_LPAREN <FunctionArgList> -:T_RPAREN
 
 # R1211
 <CallStmt> ::=
-  | ^:<LblDef> -:T_CALL ^:<SubroutineNameUse>                                             -:T_EOS
-  | ^:<LblDef> -:T_CALL ^:<SubroutineNameUse> -:T_LPAREN                       -:T_RPAREN -:T_EOS
-  | ^:<LblDef> -:T_CALL ^:<SubroutineNameUse> -:T_LPAREN *:<SubroutineArgList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse>                                             -:T_EOS
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse> -:T_LPAREN                       -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse> -:T_LPAREN <SubroutineArgList> -:T_RPAREN -:T_EOS
 
-<SubroutineArgList> ::=
+(list):<SubroutineArgList> ::=
   | <SubroutineArg>
-  | @:<SubroutineArgList> -:T_COMMA <SubroutineArg>
+  | <SubroutineArgList> -:T_COMMA <SubroutineArg>
 
 
 # R1212
 # Functions initially recognized as arrays resolved semantically
-<FunctionArgList> ::=
+(list):<FunctionArgList> ::=
   | <FunctionArg>
-  | *:<SectionSubscriptList> -:T_COMMA <FunctionArg>
-  | @:<FunctionArgList> -:T_COMMA <FunctionArg>
+  | <SectionSubscriptList> -:T_COMMA <FunctionArg>
+  | <FunctionArgList> -:T_COMMA <FunctionArg>
 
-<FunctionArg> ::= ^:<Name> -:T_EQUALS <Expr>
+<FunctionArg> ::= (inline):<Name> -:T_EQUALS <Expr>
 
 # Dirk Rossow added T_HCON
 <SubroutineArg> ::=
-  |                     *:<Expr>
-  |                     -:T_ASTERISK Asterisk^:<LblRef>
-  | ^:<Name> -:T_EQUALS *:<Expr>
-  | ^:<Name> -:T_EQUALS -:T_ASTERISK Asterisk^:<LblRef>
-  |                     hollerith*:T_HCON
-  | ^:<Name> -:T_EQUALS hollerith*:T_HCON
+  |                     <Expr>
+  |                     -:T_ASTERISK Asterisk(inline):<LblRef>
+  | (inline):<Name> -:T_EQUALS <Expr>
+  | (inline):<Name> -:T_EQUALS -:T_ASTERISK Asterisk(inline):<LblRef>
+  |                     hollerith:T_HCON
+  | (inline):<Name> -:T_EQUALS hollerith:T_HCON
 
 # R1213 chain rule deleted
 
@@ -2230,107 +2237,107 @@
 
 # R1217 chain rule deleted
 <FunctionStmt> ::=
-  | ^:<LblDef> ^:<FunctionPrefix> <FunctionName> -:T_LPAREN                  -:T_RPAREN                                                                -:T_EOS
-  | ^:<LblDef> ^:<FunctionPrefix> <FunctionName> -:T_LPAREN                  -:T_RPAREN hasResultClause+:T_RESULT -:T_LPAREN Result^:<Name> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> ^:<FunctionPrefix> <FunctionName> -:T_LPAREN *:<FunctionPars> -:T_RPAREN                                                                -:T_EOS
-  | ^:<LblDef> ^:<FunctionPrefix> <FunctionName> -:T_LPAREN *:<FunctionPars> -:T_RPAREN hasResultClause+:T_RESULT -:T_LPAREN Result^:<Name> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> ^:<FunctionPrefix> <FunctionName> (error) T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                  -:T_RPAREN                                                                -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                  -:T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN                                                                -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> (error) T_EOS
 
-<FunctionPars> ::=
+(list):<FunctionPars> ::=
   | <FunctionPar>
-  | @:<FunctionPars> -:T_COMMA <FunctionPar>
+  | <FunctionPars> -:T_COMMA <FunctionPar>
 
-<FunctionPar> ::= ^:<DummyArgName>
+<FunctionPar> ::= (inline):<DummyArgName>
 
 # R1218
 <FunctionPrefix> ::=
   |                    -:T_FUNCTION
-  | *:<PrefixSpecList> -:T_FUNCTION
+  | <PrefixSpecList> -:T_FUNCTION
 
-<PrefixSpecList> ::=
+(list):<PrefixSpecList> ::=
   |                    <PrefixSpec>
-  | @:<PrefixSpecList> <PrefixSpec>
+  | <PrefixSpecList> <PrefixSpec>
 
 
 # R1219
 <PrefixSpec> ::=
-  |            *:<TypeSpec> 
-  | isRecursive+:T_RECURSIVE
-  |      isPure+:T_PURE
-  | isElemental+:T_ELEMENTAL
+  |            <TypeSpec> 
+  | isRecursive(bool):T_RECURSIVE
+  |      isPure(bool):T_PURE
+  | isElemental(bool):T_ELEMENTAL
 
 
 # R1220
 <EndFunctionStmt> ::=
-  | ^:<LblDef> -:T_END                          -:T_EOS
-  | ^:<LblDef> -:T_ENDFUNCTION                  -:T_EOS
-  | ^:<LblDef> -:T_ENDFUNCTION      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_FUNCTION             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_FUNCTION ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END                          -:T_EOS
+  | (inline):<LblDef> -:T_ENDFUNCTION                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDFUNCTION      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_FUNCTION             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_FUNCTION (inline):<EndName> -:T_EOS
 
 # R1221 see high level syntax
 
 # R1222
 <SubroutineStmt> ::=
-  | ^:<LblDef> ^:<SubroutinePrefix> <SubroutineName>                                          -:T_EOS
-  | ^:<LblDef> ^:<SubroutinePrefix> <SubroutineName> -:T_LPAREN                    -:T_RPAREN -:T_EOS
-  | ^:<LblDef> ^:<SubroutinePrefix> <SubroutineName> -:T_LPAREN *:<SubroutinePars> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> ^:<SubroutinePrefix> <SubroutineName> (error) T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName>                                          -:T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN                    -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN <SubroutinePars> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> (error) T_EOS
 
 <SubroutinePrefix> ::=
   |                    -:T_SUBROUTINE
-  | *:<PrefixSpecList> -:T_SUBROUTINE
+  | <PrefixSpecList> -:T_SUBROUTINE
 
-<SubroutinePars> ::=
+(list):<SubroutinePars> ::=
   | <SubroutinePar>
-  | @:<SubroutinePars> -:T_COMMA <SubroutinePar>
+  | <SubroutinePars> -:T_COMMA <SubroutinePar>
 
 # R1223
 <SubroutinePar> ::=
-  | ^:<DummyArgName>
-  | isAsterisk+:T_ASTERISK
+  | (inline):<DummyArgName>
+  | isAsterisk(bool):T_ASTERISK
 
 
 # R1224
 <EndSubroutineStmt> ::=
-  | ^:<LblDef> -:T_END -:T_EOS
-  | ^:<LblDef> -:T_ENDSUBROUTINE                  -:T_EOS
-  | ^:<LblDef> -:T_ENDSUBROUTINE      ^:<EndName> -:T_EOS
-  | ^:<LblDef> -:T_END -:T_SUBROUTINE             -:T_EOS
-  | ^:<LblDef> -:T_END -:T_SUBROUTINE ^:<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_EOS
+  | (inline):<LblDef> -:T_ENDSUBROUTINE                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDSUBROUTINE      (inline):<EndName> -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_SUBROUTINE             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_SUBROUTINE (inline):<EndName> -:T_EOS
 
 # R1225 - JO - Macro substituted
 <EntryStmt> ::=
-  | ^:<LblDef> -:T_ENTRY ^:<EntryName>                                          -:T_EOS
-  | ^:<LblDef> -:T_ENTRY ^:<EntryName> -:T_LPAREN *:<SubroutinePars> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_ENTRY (inline):<EntryName>                                          -:T_EOS
+  | (inline):<LblDef> -:T_ENTRY (inline):<EntryName> -:T_LPAREN <SubroutinePars> -:T_RPAREN -:T_EOS
 
-# | ^:<LblDef> T_ENTRY <EntryName> -:T_LPAREN                  -:T_RPAREN 
+# | (inline):<LblDef> T_ENTRY <EntryName> -:T_LPAREN                  -:T_RPAREN 
 #     T_RESULT -:T_LPAREN <Name> -:T_RPAREN -:T_EOS
-# | ^:<LblDef> T_ENTRY <EntryName> -:T_LPAREN <SubroutinePars> -:T_RPAREN 
+# | (inline):<LblDef> T_ENTRY <EntryName> -:T_LPAREN <SubroutinePars> -:T_RPAREN 
 #     T_RESULT -:T_LPAREN <Name> -:T_RPAREN -:T_EOS
 
 # R1226
 <ReturnStmt> ::=
-  | ^:<LblDef> -:T_RETURN          -:T_EOS
-  | ^:<LblDef> -:T_RETURN *:<Expr> -:T_EOS
+  | (inline):<LblDef> -:T_RETURN          -:T_EOS
+  | (inline):<LblDef> -:T_RETURN <Expr> -:T_EOS
 
 # R1227
 <ContainsStmt> ::=
-  ^:<LblDef> -:T_CONTAINS -:T_EOS
+  (inline):<LblDef> -:T_CONTAINS -:T_EOS
 
 # R1228
 # This may turn out to be an assignment statement, but the form given here
 # allows for name analysis in the case that it actually IS a statement
 # function definition;
-<StmtFunctionStmt> ::= ^:<LblDef> <Name> ^:<StmtFunctionRange>
+<StmtFunctionStmt> ::= (inline):<LblDef> <Name> (inline):<StmtFunctionRange>
 
 <StmtFunctionRange> ::=
   | -:T_LPAREN                      -:T_RPAREN -:T_EQUALS <Expr> -:T_EOS
   | -:T_LPAREN <SFDummyArgNameList> -:T_RPAREN -:T_EQUALS <Expr> -:T_EOS
 
-<SFDummyArgNameList> ::=
-  |                                  ^:<SFDummyArgName>
-  | @:<SFDummyArgNameList> -:T_COMMA ^:<SFDummyArgName>
+(list):<SFDummyArgNameList> ::=
+  |                                (inline):<SFDummyArgName>
+  | <SFDummyArgNameList> -:T_COMMA (inline):<SFDummyArgName>
 
 #######################################################################################################################
 # Additional Rules
@@ -2339,7 +2346,7 @@
 # Nonterminal symbols that are not defined in the standard
 <ArrayName> ::= arrayName:T_IDENT
 
-<BlockDataName> ::= blockDataName*:T_IDENT
+<BlockDataName> ::= blockDataName:T_IDENT
 
 <CommonBlockName> ::= commonBlockName:T_IDENT
 
@@ -2347,7 +2354,7 @@
 
 <DummyArgName> ::= variableName:T_IDENT
 
-<EndName> ::= endName*:T_IDENT
+<EndName> ::= endName:T_IDENT
 
 <EntryName> ::= entryName:T_IDENT
 
@@ -2369,10 +2376,10 @@
 
 <ProgramName> ::= programName:T_IDENT
 
-<SFDummyArgName> ::= variable^:<Name>
+<SFDummyArgName> ::= variable(inline):<Name>
 # JO - Was T_IDENT but caused r/r conflict
 
-<SFVarName> ::= *:<Name>
+<SFVarName> ::= <Name>
 # JO - Was T_IDENT but caused r/r conflict
 
 <SubroutineName> ::= subroutineName:T_IDENT
@@ -2385,7 +2392,7 @@
 
 <LblDef> ::=
   | (empty)
-  | ^:<Label>
+  | (inline):<Label>
 
 #######################################################################################################################
 # Deleted Features
@@ -2405,31 +2412,25 @@
 # Punt on this as it involves introducing more complicated
 # conditional compilation features in main standard
 
-# R216
-<ActionStmt> ::= (oneof)
-  | <AssignStmt>
-  | <AssignedGotoStmt>
-  | <PauseStmt>
-
-
 # Pause statement
 <PauseStmt> ::=
-  | ^:<LblDef> -:T_PAUSE                     -:T_EOS
-  | ^:<LblDef> -:T_PAUSE    intConst*:T_ICON -:T_EOS
-  | ^:<LblDef> -:T_PAUSE stringConst*:T_SCON -:T_EOS
+  | (inline):<LblDef> -:T_PAUSE                     -:T_EOS
+  | (inline):<LblDef> -:T_PAUSE    intConst:T_ICON -:T_EOS
+  | (inline):<LblDef> -:T_PAUSE stringConst:T_SCON -:T_EOS
 
 # Assign Statement
 <AssignStmt> ::=
-  ^:<LblDef> -:T_ASSIGN Assigned^:<LblRef> -:T_TO ^:<VariableName> -:T_EOS
+  #(inline):<LblDef> -:T_ASSIGN Assigned(inline):<LblRef> -:T_TO (inline):<VariableName> -:T_EOS
+  (inline):<LblDef> -:T_ASSIGN AssignedLblRef:<LblRef> -:T_TO (inline):<VariableName> -:T_EOS
 
 
 # Assigned GOTO Statement
 <AssignedGotoStmt> ::=
-  | ^:<LblDef> ^:<GoToKw> ^:<VariableName>                                       -:T_EOS
-  | ^:<LblDef> ^:<GoToKw> ^:<VariableName>  -:T_LPAREN *:<LblRefList> -:T_RPAREN -:T_EOS
-  | ^:<LblDef> ^:<GoToKw> ^:<VariableComma> -:T_LPAREN *:<LblRefList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<GoToKw> (inline):<VariableName>                                       -:T_EOS
+  | (inline):<LblDef> (inline):<GoToKw> (inline):<VariableName>  -:T_LPAREN <LblRefList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<GoToKw> (inline):<VariableComma> -:T_LPAREN <LblRefList> -:T_RPAREN -:T_EOS
 
-<VariableComma> ::= ^:<VariableName> -:T_COMMA
+<VariableComma> ::= (inline):<VariableName> -:T_COMMA
 
 # H edit descriptor
 

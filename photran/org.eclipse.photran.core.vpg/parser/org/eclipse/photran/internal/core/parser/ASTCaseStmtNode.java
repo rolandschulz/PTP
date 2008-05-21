@@ -10,153 +10,117 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols implements ICaseBodyConstruct
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements ICaseBodyConstruct
 {
-    ASTCaseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTCase; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCaseStmtNode
+    IASTListNode<ASTCaseValueRangeNode> caseValueRangeListSelector; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCaseStmtNode
+    ASTNameNode name; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCaseStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production, discardedSymbols);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitICaseBodyConstruct(this);
-        visitor.visitASTCaseStmtNode(this);
+        return this.label;
     }
 
-    public ASTNameNode getName()
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_688)
-            return (ASTNameNode)getChild(3);
-        else
-            return null;
+        this.label = newValue;
     }
 
-    public boolean hasName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CASE_STMT_688)
-            return getChild(3) != null;
-        else
-            return false;
+    public IASTListNode<ASTCaseValueRangeNode> getCaseValueRangeListSelector()
+    {
+        return this.caseValueRangeListSelector;
     }
 
-    public Token getLabel()
+    public void setCaseValueRangeListSelector(IASTListNode<ASTCaseValueRangeNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_687)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.CASE_STMT_688)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.CASE_STMT_ERROR_15)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.caseValueRangeListSelector = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_687)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.CASE_STMT_688)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.CASE_STMT_ERROR_15)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
-
-    public ASTCaseValueRangeListNode getCaseValueRangeListSelector()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_687)
-            return (ASTCaseValueRangeListNode)((ASTCaseSelectorNode)getChild(2)).getCaseValueRangeListSelector();
-        else if (getProduction() == Production.CASE_STMT_688)
-            return (ASTCaseValueRangeListNode)((ASTCaseSelectorNode)getChild(2)).getCaseValueRangeListSelector();
-        else
-            return null;
-    }
-
-    public boolean hasCaseValueRangeListSelector()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_687)
-            return ((ASTCaseSelectorNode)getChild(2)).hasCaseValueRangeListSelector();
-        else if (getProduction() == Production.CASE_STMT_688)
-            return ((ASTCaseSelectorNode)getChild(2)).hasCaseValueRangeListSelector();
-        else
-            return false;
-    }
 
     public boolean hasDefaultSelector()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CASE_STMT_687)
-            return ((ASTCaseSelectorNode)getChild(2)).hasDefaultSelector();
-        else if (getProduction() == Production.CASE_STMT_688)
-            return ((ASTCaseSelectorNode)getChild(2)).hasDefaultSelector();
-        else
-            return false;
+        return this.hasDefaultSelector != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setHasDefaultSelector(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.CASE_STMT_687 && index == 1)
-            return false;
-        else if (getProduction() == Production.CASE_STMT_687 && index == 3)
-            return false;
-        else if (getProduction() == Production.CASE_STMT_688 && index == 1)
-            return false;
-        else if (getProduction() == Production.CASE_STMT_688 && index == 4)
-            return false;
-        else if (getProduction() == Production.CASE_STMT_ERROR_15 && index == 1)
-            return false;
-        else
-            return true;
+        this.hasDefaultSelector = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public ASTNameNode getName()
     {
-        if (getProduction() == Production.CASE_STMT_687 && index == 0)
-            return true;
-        else if (getProduction() == Production.CASE_STMT_687 && index == 2)
-            return true;
-        else if (getProduction() == Production.CASE_STMT_688 && index == 0)
-            return true;
-        else if (getProduction() == Production.CASE_STMT_688 && index == 2)
-            return true;
-        else if (getProduction() == Production.CASE_STMT_ERROR_15 && index == 0)
-            return true;
-        else
-            return false;
+        return this.name;
+    }
+
+    public void setName(ASTNameNode newValue)
+    {
+        this.name = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTCaseStmtNode(this);
+        visitor.visitICaseBodyConstruct(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 8;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTCase;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.caseValueRangeListSelector;
+        case 4:  return this.hasDefaultSelector;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.name;
+        case 7:  return this.hiddenTEos;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value;
+        case 4:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.name = (ASTNameNode)value;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

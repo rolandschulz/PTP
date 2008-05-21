@@ -10,53 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTElseWherePartNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTElseWherePartNode extends ASTNode
 {
-    ASTElseWherePartNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<IWhereBodyConstruct> whereBodyConstructBlock; // in ASTElseWherePartNode
+    ASTEndWhereStmtNode endWhereStmt; // in ASTElseWherePartNode
+
+    public IASTListNode<IWhereBodyConstruct> getWhereBodyConstructBlock()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.whereBodyConstructBlock;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setWhereBodyConstructBlock(IASTListNode<IWhereBodyConstruct> newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.whereBodyConstructBlock = newValue;
     }
+
 
     public ASTEndWhereStmtNode getEndWhereStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_WHERE_PART_609)
-            return (ASTEndWhereStmtNode)getChild(0);
-        else if (getProduction() == Production.ELSE_WHERE_PART_610)
-            return (ASTEndWhereStmtNode)getChild(1);
-        else
-            return null;
+        return this.endWhereStmt;
     }
 
-    public ASTWhereBodyConstructBlockNode getWhereBodyConstructBlock()
+    public void setEndWhereStmt(ASTEndWhereStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        this.endWhereStmt = newValue;
+    }
 
-        if (getProduction() == Production.ELSE_WHERE_PART_610)
-            return (ASTWhereBodyConstructBlockNode)getChild(0);
-        else
-            return null;
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTElseWherePartNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.whereBodyConstructBlock;
+        case 1:  return this.endWhereStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
+        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

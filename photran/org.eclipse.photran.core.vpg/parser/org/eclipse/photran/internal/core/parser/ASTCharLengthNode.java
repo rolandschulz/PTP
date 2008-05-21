@@ -10,104 +10,96 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCharLengthNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTCharLengthNode extends ASTNode
 {
-    ASTCharLengthNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
+    ASTExprNode lengthExpr; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCharLengthNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTCharLengthNode(this);
+        return this.constIntLength;
     }
 
-    public Token getConstIntLength()
+    public void setConstIntLength(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_LENGTH_284)
-            return (Token)getChild(0);
-        else
-            return null;
+        this.constIntLength = newValue;
     }
 
-    public boolean hasConstIntLength()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_LENGTH_284)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public ASTExpressionNode getLengthExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_LENGTH_283)
-            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(1)).getLengthExpr();
-        else
-            return null;
-    }
-
-    public boolean hasLengthExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_LENGTH_283)
-            return ((ASTCharLenParamValueNode)getChild(1)).hasLengthExpr();
-        else
-            return false;
-    }
 
     public boolean isAssumedLength()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_LENGTH_283)
-            return ((ASTCharLenParamValueNode)getChild(1)).isAssumedLength();
-        else
-            return false;
+        return this.isAssumedLength != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.CHAR_LENGTH_283 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_LENGTH_283 && index == 2)
-            return false;
-        else
-            return true;
+        this.isAssumedLength = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public ASTExprNode getLengthExpr()
     {
-        if (getProduction() == Production.CHAR_LENGTH_283 && index == 1)
-            return true;
-        else
-            return false;
+        return this.lengthExpr;
+    }
+
+    public void setLengthExpr(ASTExprNode newValue)
+    {
+        this.lengthExpr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTCharLengthNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.constIntLength;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.isAssumedLength;
+        case 3:  return this.lengthExpr;
+        case 4:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.lengthExpr = (ASTExprNode)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

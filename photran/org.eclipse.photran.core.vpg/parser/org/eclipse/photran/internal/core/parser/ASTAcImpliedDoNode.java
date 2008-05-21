@@ -10,194 +10,150 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAcImpliedDoNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAcImpliedDoNode extends ASTNode
 {
-    ASTAcImpliedDoNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTAcImpliedDoNode(this);
-    }
-
-    public ASTExpressionNode getExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return (ASTExpressionNode)getChild(1);
-        else if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return (ASTExpressionNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return getChild(1) != null;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTImpliedDoVariableNode getImpliedDoVariable()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return (ASTImpliedDoVariableNode)getChild(3);
-        else if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return (ASTImpliedDoVariableNode)getChild(3);
-        else if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (ASTImpliedDoVariableNode)getChild(3);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTImpliedDoVariableNode)getChild(3);
-        else
-            return null;
-    }
-
-    public ASTExpressionNode getLb()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return (ASTExpressionNode)getChild(5);
-        else if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return (ASTExpressionNode)getChild(5);
-        else if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (ASTExpressionNode)getChild(5);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTExpressionNode)getChild(5);
-        else
-            return null;
-    }
-
-    public ASTExpressionNode getUb()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return (ASTExpressionNode)getChild(7);
-        else if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return (ASTExpressionNode)getChild(7);
-        else if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (ASTExpressionNode)getChild(7);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTExpressionNode)getChild(7);
-        else
-            return null;
-    }
-
-    public ASTExpressionNode getStep()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return (ASTExpressionNode)getChild(9);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTExpressionNode)getChild(9);
-        else
-            return null;
-    }
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTAcImpliedDoNode
+    ASTAcImpliedDoNode nestedImpliedDo; // in ASTAcImpliedDoNode
+    ASTExprNode expr; // in ASTAcImpliedDoNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTAcImpliedDoNode
+    ASTImpliedDoVariableNode impliedDoVariable; // in ASTAcImpliedDoNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTAcImpliedDoNode
+    ASTExprNode lb; // in ASTAcImpliedDoNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma2; // in ASTAcImpliedDoNode
+    ASTExprNode ub; // in ASTAcImpliedDoNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma3; // in ASTAcImpliedDoNode
+    ASTExprNode step; // in ASTAcImpliedDoNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAcImpliedDoNode
 
     public ASTAcImpliedDoNode getNestedImpliedDo()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (ASTAcImpliedDoNode)getChild(1);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTAcImpliedDoNode)getChild(1);
-        else
-            return null;
+        return this.nestedImpliedDo;
     }
 
-    public boolean hasNestedImpliedDo()
+    public void setNestedImpliedDo(ASTAcImpliedDoNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return getChild(1) != null;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return getChild(1) != null;
-        else
-            return false;
+        this.nestedImpliedDo = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public ASTExprNode getExpr()
     {
-        if (getProduction() == Production.AC_IMPLIED_DO_225 && index == 0)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_225 && index == 2)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_225 && index == 4)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_225 && index == 6)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_225 && index == 8)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 0)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 2)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 4)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 6)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 8)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 10)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_227 && index == 0)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_227 && index == 2)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_227 && index == 4)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_227 && index == 6)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_227 && index == 8)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 0)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 2)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 4)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 6)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 8)
-            return false;
-        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 10)
-            return false;
-        else
-            return true;
+        return this.expr;
+    }
+
+    public void setExpr(ASTExprNode newValue)
+    {
+        this.expr = newValue;
+    }
+
+
+    public ASTImpliedDoVariableNode getImpliedDoVariable()
+    {
+        return this.impliedDoVariable;
+    }
+
+    public void setImpliedDoVariable(ASTImpliedDoVariableNode newValue)
+    {
+        this.impliedDoVariable = newValue;
+    }
+
+
+    public ASTExprNode getLb()
+    {
+        return this.lb;
+    }
+
+    public void setLb(ASTExprNode newValue)
+    {
+        this.lb = newValue;
+    }
+
+
+    public ASTExprNode getUb()
+    {
+        return this.ub;
+    }
+
+    public void setUb(ASTExprNode newValue)
+    {
+        this.ub = newValue;
+    }
+
+
+    public ASTExprNode getStep()
+    {
+        return this.step;
+    }
+
+    public void setStep(ASTExprNode newValue)
+    {
+        this.step = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTAcImpliedDoNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 12;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.nestedImpliedDo;
+        case 2:  return this.expr;
+        case 3:  return this.hiddenTComma;
+        case 4:  return this.impliedDoVariable;
+        case 5:  return this.hiddenTEquals;
+        case 6:  return this.lb;
+        case 7:  return this.hiddenTComma2;
+        case 8:  return this.ub;
+        case 9:  return this.hiddenTComma3;
+        case 10: return this.step;
+        case 11: return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.nestedImpliedDo = (ASTAcImpliedDoNode)value;
+        case 2:  this.expr = (ASTExprNode)value;
+        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.impliedDoVariable = (ASTImpliedDoVariableNode)value;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.lb = (ASTExprNode)value;
+        case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.ub = (ASTExprNode)value;
+        case 9:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 10: this.step = (ASTExprNode)value;
+        case 11: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

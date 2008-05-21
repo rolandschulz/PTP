@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.core;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
@@ -18,8 +17,8 @@ import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 
 /**
  * The root of the Fortran AST (implementation of <code>IFortranAST</code>)
@@ -41,24 +40,9 @@ public class FortranAST implements IFortranAST
         		token.setFile(file);
     }
 
-    public void visitBottomUpUsing(ASTVisitor visitor)
+    public void accept(IASTVisitor visitor)
     {
-        root.visitBottomUpUsing(visitor);
-    }
-    
-    public void visitOnlyThisNodeUsing(ASTVisitor visitor)
-    {
-        root.visitOnlyThisNodeUsing(visitor);
-    }
-    
-    public void visitTopDownUsing(ASTVisitor visitor)
-    {
-        root.visitTopDownUsing(visitor);
-    }
-    
-    public void visitUsing(GenericParseTreeVisitor visitor)
-    {
-        root.visitUsing(visitor);
+        root.accept(visitor);
     }
     
     public ASTExecutableProgramNode getRoot()

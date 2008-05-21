@@ -28,7 +28,6 @@ import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SourceEditor;
 
 /**
  * Refactoring to rename identifiers in Fortran programs.
@@ -278,11 +277,11 @@ public class RenameRefactoring extends FortranRefactoring
             vpg.acquirePermanentAST(file);
             
             if (definitionToRename.getTokenRef().getFile().equals(file))
-                SourceEditor.changeTokenText(definitionToRename.getTokenRef().findToken(), newName);
+                definitionToRename.getTokenRef().findToken().setText(newName);
             
             for (PhotranTokenRef ref : allReferences)
                 if (ref.getFile().equals(file))
-                    SourceEditor.changeTokenText(ref.findToken(), newName);
+                    ref.findToken().setText(newName);
             
             addChangeFromModifiedAST(file, pm);
             

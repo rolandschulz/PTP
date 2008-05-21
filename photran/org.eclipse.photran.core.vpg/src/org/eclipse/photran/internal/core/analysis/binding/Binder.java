@@ -16,24 +16,24 @@ public class Binder
         long[] t = new long[6];
         t[0] = System.currentTimeMillis();
         
-        ast.visitTopDownUsing(new ImplicitSpecCollector());
+        ast.accept(new ImplicitSpecCollector());
         t[1] = System.currentTimeMillis();
         sb.append("Impl: " + (t[1] - t[0]));
         
-        ast.visitBottomUpUsing(new DefinitionCollector(file));
+        ast.accept(new DefinitionCollector(file));
         t[2] = System.currentTimeMillis();
         sb.append(", Def: " + (t[2] - t[1]));
         
-        ast.visitBottomUpUsing(new SpecificationCollector());
+        ast.accept(new SpecificationCollector());
         t[3] = System.currentTimeMillis();
         sb.append(", Spec: " + (t[3] - t[2]));
         
-        ast.visitBottomUpUsing(new ModuleLoader(file, new NullProgressMonitor()));
+        ast.accept(new ModuleLoader(file, new NullProgressMonitor()));
         // TODO: Type check here so derived type components can be resolved
         t[4] = System.currentTimeMillis();
         sb.append(", Mod: " + (t[4] - t[3]));
         
-        ast.visitBottomUpUsing(new ReferenceCollector());
+        ast.accept(new ReferenceCollector());
         t[5] = System.currentTimeMillis();
         sb.append(", Ref: " + (t[5] - t[4]));
         

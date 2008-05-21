@@ -10,132 +10,88 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEndTypeStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEndTypeStmtNode extends ASTNode
 {
-    ASTEndTypeStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTType; // in ASTEndTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndtype; // in ASTEndTypeStmtNode
+    ASTTypeNameNode typeName; // in ASTEndTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndTypeStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTEndTypeStmtNode(this);
-    }
+
 
     public ASTTypeNameNode getTypeName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_TYPE_STMT_213)
-            return (ASTTypeNameNode)getChild(2);
-        else if (getProduction() == Production.END_TYPE_STMT_214)
-            return (ASTTypeNameNode)getChild(3);
-        else
-            return null;
+        return this.typeName;
     }
 
-    public boolean hasTypeName()
+    public void setTypeName(ASTTypeNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_TYPE_STMT_213)
-            return getChild(2) != null;
-        else if (getProduction() == Production.END_TYPE_STMT_214)
-            return getChild(3) != null;
-        else
-            return false;
+        this.typeName = newValue;
     }
 
-    public Token getLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.END_TYPE_STMT_213)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_TYPE_STMT_214)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_TYPE_STMT_215)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_TYPE_STMT_216)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTEndTypeStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public boolean hasLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_TYPE_STMT_213)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_TYPE_STMT_214)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_TYPE_STMT_215)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_TYPE_STMT_216)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        return 6;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.END_TYPE_STMT_213 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_213 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_214 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_214 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_214 && index == 4)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_215 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_215 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_216 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_216 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_TYPE_STMT_216 && index == 3)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTEnd;
+        case 2:  return this.hiddenTType;
+        case 3:  return this.hiddenTEndtype;
+        case 4:  return this.typeName;
+        case 5:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.END_TYPE_STMT_213 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_TYPE_STMT_214 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_TYPE_STMT_215 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_TYPE_STMT_216 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTEndtype = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.typeName = (ASTTypeNameNode)value;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

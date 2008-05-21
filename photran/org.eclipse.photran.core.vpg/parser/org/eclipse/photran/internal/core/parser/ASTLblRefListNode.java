@@ -10,141 +10,65 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTLblRefListNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTLblRefListNode extends ASTNode
 {
-    protected int count = -1;
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTLblRefListNode
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTLblRefListNode
 
-    ASTLblRefListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTLblRefListNode
-               && grandparent instanceof ASTLblRefListNode
-               && ((ASTLblRefListNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.label;
     }
 
-    /**
-     * @return the number of ASTLblRefListNode nodes in this list
-     */
-    public int size()
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTLblRefListNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.label = newValue;
     }
-    
-    ASTLblRefListNode recurseToIndex(int listIndex)
-    {
-        ASTLblRefListNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTLblRefListNode)node.getRecursiveNode();
-        }
-        return node;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTLblRefListNode(this);
+        visitor.visitASTNode(this);
     }
 
-    private ASTLblRefListNode getRecursiveNode()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LBL_REF_LIST_731)
-            return (ASTLblRefListNode)getChild(0);
-        else
-            return null;
+        return 2;
     }
 
-    public Token getLabel(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTLblRefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.LBL_REF_LIST_730)
-            return (Token)((ASTLblRefNode)node.getChild(0)).getLabel();
-        else if (node.getProduction() == Production.LBL_REF_LIST_731)
-            return (Token)((ASTLblRefNode)node.getChild(2)).getLabel();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.hiddenTComma;
+        case 1:  return this.label;
+        default: return null;
+        }
     }
 
-    public boolean hasLabel(int listIndex)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTLblRefListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.LBL_REF_LIST_730)
-            return ((ASTLblRefNode)node.getChild(0)).hasLabel();
-        else if (node.getProduction() == Production.LBL_REF_LIST_731)
-            return ((ASTLblRefNode)node.getChild(2)).hasLabel();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.LBL_REF_LIST_731 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.LBL_REF_LIST_730 && index == 0)
-            return true;
-        else if (getProduction() == Production.LBL_REF_LIST_731 && index == 2)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,61 +10,65 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTFunctionPrefixNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFunctionPrefixNode extends ASTNode
 {
-    ASTFunctionPrefixNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<ASTPrefixSpecNode> prefixSpecList; // in ASTFunctionPrefixNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTFunction; // in ASTFunctionPrefixNode
+
+    public IASTListNode<ASTPrefixSpecNode> getPrefixSpecList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        return this.prefixSpecList;
     }
 
-    public ASTPrefixSpecListNode getPrefixSpecList()
+    public void setPrefixSpecList(IASTListNode<ASTPrefixSpecNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_PREFIX_986)
-            return (ASTPrefixSpecListNode)getChild(0);
-        else
-            return null;
+        this.prefixSpecList = newValue;
     }
 
-    public boolean hasPrefixSpecList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_PREFIX_986)
-            return getChild(0) != null;
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTFunctionPrefixNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.FUNCTION_PREFIX_985 && index == 0)
-            return false;
-        else if (getProduction() == Production.FUNCTION_PREFIX_986 && index == 1)
-            return false;
-        else
-            return true;
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.prefixSpecList;
+        case 1:  return this.hiddenTFunction;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value;
+        case 1:  this.hiddenTFunction = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

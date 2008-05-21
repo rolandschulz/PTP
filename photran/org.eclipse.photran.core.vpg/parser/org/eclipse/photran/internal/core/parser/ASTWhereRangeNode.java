@@ -10,131 +10,104 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTWhereRangeNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTWhereRangeNode extends ASTNode
 {
-    ASTWhereRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<IWhereBodyConstruct> whereBodyConstructBlock; // in ASTWhereRangeNode
+    ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTWhereRangeNode
+    ASTEndWhereStmtNode endWhereStmt; // in ASTWhereRangeNode
+    ASTElseWhereConstructNode elseWhereConstruct; // in ASTWhereRangeNode
+
+    public IASTListNode<IWhereBodyConstruct> getWhereBodyConstructBlock()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        return this.whereBodyConstructBlock;
     }
 
-    public ASTEndWhereStmtNode getEndWhereStmt()
+    public void setWhereBodyConstructBlock(IASTListNode<IWhereBodyConstruct> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_601)
-            return (ASTEndWhereStmtNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_602)
-            return (ASTEndWhereStmtNode)getChild(1);
-        else
-            return null;
+        this.whereBodyConstructBlock = newValue;
     }
 
-    public boolean hasEndWhereStmt()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_601)
-            return getChild(0) != null;
-        else if (getProduction() == Production.WHERE_RANGE_602)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTWhereBodyConstructBlockNode getWhereBodyConstructBlock()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_602)
-            return (ASTWhereBodyConstructBlockNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_604)
-            return (ASTWhereBodyConstructBlockNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_606)
-            return (ASTWhereBodyConstructBlockNode)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasWhereBodyConstructBlock()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_602)
-            return getChild(0) != null;
-        else if (getProduction() == Production.WHERE_RANGE_604)
-            return getChild(0) != null;
-        else if (getProduction() == Production.WHERE_RANGE_606)
-            return getChild(0) != null;
-        else
-            return false;
-    }
 
     public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_603)
-            return (ASTMaskedElseWhereConstructNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_604)
-            return (ASTMaskedElseWhereConstructNode)getChild(1);
-        else
-            return null;
+        return this.maskedElseWhereConstruct;
     }
 
-    public boolean hasMaskedElseWhereConstruct()
+    public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_603)
-            return getChild(0) != null;
-        else if (getProduction() == Production.WHERE_RANGE_604)
-            return getChild(1) != null;
-        else
-            return false;
+        this.maskedElseWhereConstruct = newValue;
     }
+
+
+    public ASTEndWhereStmtNode getEndWhereStmt()
+    {
+        return this.endWhereStmt;
+    }
+
+    public void setEndWhereStmt(ASTEndWhereStmtNode newValue)
+    {
+        this.endWhereStmt = newValue;
+    }
+
 
     public ASTElseWhereConstructNode getElseWhereConstruct()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_RANGE_605)
-            return (ASTElseWhereConstructNode)getChild(0);
-        else if (getProduction() == Production.WHERE_RANGE_606)
-            return (ASTElseWhereConstructNode)getChild(1);
-        else
-            return null;
+        return this.elseWhereConstruct;
     }
 
-    public boolean hasElseWhereConstruct()
+    public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        this.elseWhereConstruct = newValue;
+    }
 
-        if (getProduction() == Production.WHERE_RANGE_605)
-            return getChild(0) != null;
-        else if (getProduction() == Production.WHERE_RANGE_606)
-            return getChild(1) != null;
-        else
-            return false;
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTWhereRangeNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.whereBodyConstructBlock;
+        case 1:  return this.maskedElseWhereConstruct;
+        case 2:  return this.endWhereStmt;
+        case 3:  return this.elseWhereConstruct;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
+        case 1:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value;
+        case 2:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
+        case 3:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

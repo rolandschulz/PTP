@@ -10,76 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAcValueNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAcValueNode extends ASTNode
 {
-    ASTAcValueNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTExprNode expr; // in ASTAcValueNode
+    ASTAcImpliedDoNode acImpliedDo; // in ASTAcValueNode
+
+    public ASTExprNode getExpr()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTAcValueNode(this);
+        return this.expr;
     }
 
-    public ASTExpressionNode getExpr()
+    public void setExpr(ASTExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_VALUE_223)
-            return (ASTExpressionNode)getChild(0);
-        else
-            return null;
+        this.expr = newValue;
     }
 
-    public boolean hasExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_VALUE_223)
-            return getChild(0) != null;
-        else
-            return false;
-    }
 
     public ASTAcImpliedDoNode getAcImpliedDo()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_VALUE_224)
-            return (ASTAcImpliedDoNode)getChild(0);
-        else
-            return null;
+        return this.acImpliedDo;
     }
 
-    public boolean hasAcImpliedDo()
+    public void setAcImpliedDo(ASTAcImpliedDoNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        this.acImpliedDo = newValue;
+    }
 
-        if (getProduction() == Production.AC_VALUE_224)
-            return getChild(0) != null;
-        else
-            return false;
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTAcValueNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.expr;
+        case 1:  return this.acImpliedDo;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.expr = (ASTExprNode)value;
+        case 1:  this.acImpliedDo = (ASTAcImpliedDoNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

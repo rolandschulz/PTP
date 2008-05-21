@@ -10,43 +10,57 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTGoToKwNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTGoToKwNode extends ASTNode
 {
-    ASTGoToKwNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTGoto; // in ASTGoToKwNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTGo; // in ASTGoToKwNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTTo; // in ASTGoToKwNode
+
+    public void accept(IASTVisitor visitor)
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        visitor.visitASTGoToKwNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.GO_TO_KW_725 && index == 0)
-            return false;
-        else if (getProduction() == Production.GO_TO_KW_726 && index == 0)
-            return false;
-        else if (getProduction() == Production.GO_TO_KW_726 && index == 1)
-            return false;
-        else
-            return true;
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTGoto;
+        case 1:  return this.hiddenTGo;
+        case 2:  return this.hiddenTTo;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

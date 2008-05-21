@@ -15,8 +15,7 @@ import java.util.Iterator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 
 /**
  * Interface implemented by the Fortran abstract syntax tree
@@ -29,10 +28,7 @@ public interface IFortranAST extends Iterable<Token>
     // Visitor Support
     ///////////////////////////////////////////////////////////////////////////
 
-    public void visitTopDownUsing(ASTVisitor visitor);
-    public void visitBottomUpUsing(ASTVisitor visitor);
-    public void visitOnlyThisNodeUsing(ASTVisitor visitor);
-    public void visitUsing(GenericParseTreeVisitor visitor);
+    public void accept(IASTVisitor visitor);
     
     ///////////////////////////////////////////////////////////////////////////
     // Other Methods

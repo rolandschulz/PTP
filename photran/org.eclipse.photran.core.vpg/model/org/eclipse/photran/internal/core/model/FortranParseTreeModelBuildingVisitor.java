@@ -1,12 +1,17 @@
 package org.eclipse.photran.internal.core.model;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.internal.core.model.Parent;
+import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * This visitor is used to build the Outline view when the user chooses the (debugging) option to
@@ -16,7 +21,7 @@ import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
  * 
  * @author joverbey
  */
-public final class FortranParseTreeModelBuildingVisitor extends GenericParseTreeVisitor
+public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisitor
 {
     // --INFRASTRUCTURE--------------------------------------------------
 
@@ -44,21 +49,21 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericParseTree
             return (Parent)parentElementStack.getLast();
     }
 
-    private boolean isCurrentParent(InteriorNode node)
+    private boolean isCurrentParent(IASTNode node)
     {
         if (parentParseTreeNodeStack.isEmpty())
             return false;
         else
-            return node == (InteriorNode)parentParseTreeNodeStack.getLast();
+            return node == (IASTNode)parentParseTreeNodeStack.getLast();
     }
 
-    private void beginAddingChildrenFor(InteriorNode parseTreeNode, FortranElement element)
+    private void beginAddingChildrenFor(IASTNode parseTreeNode, FortranElement element)
     {
         parentParseTreeNodeStack.addLast(parseTreeNode);
         parentElementStack.addLast(element);
     }
 
-    private void doneAddingChildrenFor(InteriorNode node)
+    private void doneAddingChildrenFor(IASTNode node)
     {
         if (isCurrentParent(node))
         {
@@ -69,19 +74,13 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericParseTree
 
     // --VISITOR METHODS-------------------------------------------------
 
-    public void preparingToVisitChildrenOf(InteriorNode node)
+    private String methodName = "";
+    
+    @SuppressWarnings("unchecked")
+    @Override public void visitASTNode(IASTNode node)
     {
-        // beginAddingChildrenFor is called in addToModel
-    }
-
-    public void doneVisitingChildrenOf(InteriorNode node)
-    {
-        doneAddingChildrenFor(node);
-    }
-
-    public void visitParseTreeNode(InteriorNode node)
-    {
-        FortranElement element = new FortranElement.UnknownNode(getCurrentParent(),node.getNonterminal().toString());
+        String description = methodName + node.getClass().getSimpleName();
+        FortranElement element = new FortranElement.UnknownNode(getCurrentParent(), description);
 
 //        Token firstToken = ParseTreeSearcher.findFirstTokenIn(node);
 //        Token lastToken = ParseTreeSearcher.findLastTokenIn(node);
@@ -103,19 +102,110 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericParseTree
         }
 
         beginAddingChildrenFor(node, element);
+
+        if (node instanceof IASTListNode<?>)
+        {
+            IASTListNode<? extends IASTNode> list = (IASTListNode<? extends IASTNode>)node;
+            
+            for (int i = 0; i < list.size(); i++)
+            {
+                methodName = "get(" + i + "): ";
+                list.get(i).accept(this);
+            }
+        }
+        else
+        {
+            for (java.lang.reflect.Method m : node.getClass().getMethods())
+            {
+                if (m.getDeclaringClass() == node.getClass()
+                        && m.getReturnType() != null
+                        && m.getParameterTypes().length == 0
+                        && !m.getName().equals("getParent")
+                        && !m.getName().equals("getChildren")
+                        && !m.getName().equals("findFirstToken")
+                        && !m.getName().equals("findLastToken")
+                        && IASTNode.class.isAssignableFrom(m.getReturnType()))
+                {
+                    try
+                    {
+                        methodName = m.getName() + "(): ";
+                        IASTNode n = ((IASTNode)m.invoke(node, (Object[])null));
+                        if (n == null)
+                            modelBuilder.addF90Element(
+                                new FortranElement.UnknownNode(getCurrentParent(),
+                                    methodName + "null"));
+                        else
+                            n.accept(this);
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        ;
+                    }
+                    catch (IllegalAccessException e)
+                    {
+                        ;
+                    }
+                    catch (InvocationTargetException e)
+                    {
+                        ;
+                    }
+                    catch (CModelException e)
+                    {
+                        ;
+                    }
+                }
+            }
+        }
+        
+        doneAddingChildrenFor(node);
     }
 
-    public void visitToken(Token token)
+    @Override public void visitToken(Token token)
     {
-        FortranElement element = new FortranElement.UnknownNode(getCurrentParent(), token.getDescription());
+        String description = methodName + token.getClass().getSimpleName();
+        FortranElement element = new FortranElement.UnknownNode(getCurrentParent(), description);
         element.setIdentifier(token);
         try
         {
             modelBuilder.addF90Element(element);
+            
+            beginAddingChildrenFor(token, element);
+            
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getTerminal(): Terminal." + findTerminal(token.getTerminal())));
+            
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getText(): \"" + token.getText().replaceAll("\\n", "\\\\n") + "\""));
+            
+            doneAddingChildrenFor(token);
         }
         catch (CModelException e)
         {
             ;
         }
+    }
+
+    private String findTerminal(Terminal terminal)
+    {
+        for (java.lang.reflect.Field f : Terminal.class.getFields())
+        {
+            try
+            {
+                if (f.get(null) == terminal)
+                    return f.getName();
+            }
+            catch (IllegalArgumentException e)
+            {
+                ;
+            }
+            catch (IllegalAccessException e)
+            {
+                ;
+            }
+        }
+        
+        return "?";
     }
 }

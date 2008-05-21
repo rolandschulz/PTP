@@ -10,252 +10,205 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTConstantNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTConstantNode extends ASTNode
 {
-    ASTConstantNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTConstantNode(this);
-    }
-
-    public ASTNamedConstantUseNode getName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_112)
-            return (ASTNamedConstantUseNode)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_112)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public ASTUnsignedArithmeticConstantNode getUnsignedArithmeticConstant()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_113)
-            return (ASTUnsignedArithmeticConstantNode)getChild(0);
-        else if (getProduction() == Production.CONSTANT_114)
-            return (ASTUnsignedArithmeticConstantNode)getChild(1);
-        else if (getProduction() == Production.CONSTANT_115)
-            return (ASTUnsignedArithmeticConstantNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasUnsignedArithmeticConstant()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_113)
-            return getChild(0) != null;
-        else if (getProduction() == Production.CONSTANT_114)
-            return getChild(1) != null;
-        else if (getProduction() == Production.CONSTANT_115)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public boolean hasPlus()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_114)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public boolean hasMinus()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_115)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public Token getStringConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_116)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.CONSTANT_117)
-            return (Token)getChild(2);
-        else if (getProduction() == Production.CONSTANT_118)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public boolean hasStringConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_116)
-            return getChild(0) != null;
-        else if (getProduction() == Production.CONSTANT_117)
-            return getChild(2) != null;
-        else if (getProduction() == Production.CONSTANT_118)
-            return getChild(2) != null;
-        else
-            return false;
-    }
+    org.eclipse.photran.internal.core.lexer.Token hasIntKind; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hasPlus; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hasMinus; // in ASTConstantNode
+    ASTUnsignedArithmeticConstantNode unsignedArithmeticConstant; // in ASTConstantNode
+    ASTNamedConstantUseNode namedConstantKind; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTConstantNode
+    ASTStructureConstructorNode structureConstructor; // in ASTConstantNode
+    ASTBozLiteralConstantNode bozLiteralConstant; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hollerithConst; // in ASTConstantNode
+    ASTLogicalConstantNode logicalConst; // in ASTConstantNode
+    ASTNamedConstantUseNode name; // in ASTConstantNode
 
     public boolean hasIntKind()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_117)
-            return getChild(0) != null;
-        else
-            return false;
+        return this.hasIntKind != null;
     }
+
+    public void setHasIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasIntKind = newValue;
+    }
+
+
+    public boolean hasPlus()
+    {
+        return this.hasPlus != null;
+    }
+
+    public void setHasPlus(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasPlus = newValue;
+    }
+
+
+    public boolean hasMinus()
+    {
+        return this.hasMinus != null;
+    }
+
+    public void setHasMinus(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasMinus = newValue;
+    }
+
+
+    public ASTUnsignedArithmeticConstantNode getUnsignedArithmeticConstant()
+    {
+        return this.unsignedArithmeticConstant;
+    }
+
+    public void setUnsignedArithmeticConstant(ASTUnsignedArithmeticConstantNode newValue)
+    {
+        this.unsignedArithmeticConstant = newValue;
+    }
+
 
     public ASTNamedConstantUseNode getNamedConstantKind()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_118)
-            return (ASTNamedConstantUseNode)getChild(0);
-        else
-            return null;
+        return this.namedConstantKind;
     }
 
-    public boolean hasNamedConstantKind()
+    public void setNamedConstantKind(ASTNamedConstantUseNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_118)
-            return getChild(0) != null;
-        else
-            return false;
+        this.namedConstantKind = newValue;
     }
 
-    public ASTLogicalConstantNode getLogicalConst()
+
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_119)
-            return (ASTLogicalConstantNode)getChild(0);
-        else
-            return null;
+        return this.stringConst;
     }
 
-    public boolean hasLogicalConst()
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_119)
-            return getChild(0) != null;
-        else
-            return false;
+        this.stringConst = newValue;
     }
+
 
     public ASTStructureConstructorNode getStructureConstructor()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_120)
-            return (ASTStructureConstructorNode)getChild(0);
-        else
-            return null;
+        return this.structureConstructor;
     }
 
-    public boolean hasStructureConstructor()
+    public void setStructureConstructor(ASTStructureConstructorNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_120)
-            return getChild(0) != null;
-        else
-            return false;
+        this.structureConstructor = newValue;
     }
+
 
     public ASTBozLiteralConstantNode getBozLiteralConstant()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_121)
-            return (ASTBozLiteralConstantNode)getChild(0);
-        else
-            return null;
+        return this.bozLiteralConstant;
     }
 
-    public boolean hasBozLiteralConstant()
+    public void setBozLiteralConstant(ASTBozLiteralConstantNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_121)
-            return getChild(0) != null;
-        else
-            return false;
+        this.bozLiteralConstant = newValue;
     }
 
-    public Token getHollerithConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.CONSTANT_122)
-            return (Token)getChild(0);
-        else
-            return null;
+    public org.eclipse.photran.internal.core.lexer.Token getHollerithConst()
+    {
+        return this.hollerithConst;
     }
 
-    public boolean hasHollerithConst()
+    public void setHollerithConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CONSTANT_122)
-            return getChild(0) != null;
-        else
-            return false;
+        this.hollerithConst = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public ASTLogicalConstantNode getLogicalConst()
     {
-        if (getProduction() == Production.CONSTANT_117 && index == 1)
-            return false;
-        else if (getProduction() == Production.CONSTANT_118 && index == 1)
-            return false;
-        else
-            return true;
+        return this.logicalConst;
+    }
+
+    public void setLogicalConst(ASTLogicalConstantNode newValue)
+    {
+        this.logicalConst = newValue;
+    }
+
+
+    public ASTNamedConstantUseNode getName()
+    {
+        return this.name;
+    }
+
+    public void setName(ASTNamedConstantUseNode newValue)
+    {
+        this.name = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTConstantNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 12;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hasIntKind;
+        case 1:  return this.hasPlus;
+        case 2:  return this.hasMinus;
+        case 3:  return this.unsignedArithmeticConstant;
+        case 4:  return this.namedConstantKind;
+        case 5:  return this.hiddenTUnderscore;
+        case 6:  return this.stringConst;
+        case 7:  return this.structureConstructor;
+        case 8:  return this.bozLiteralConstant;
+        case 9:  return this.hollerithConst;
+        case 10: return this.logicalConst;
+        case 11: return this.name;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hasIntKind = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hasPlus = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hasMinus = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.unsignedArithmeticConstant = (ASTUnsignedArithmeticConstantNode)value;
+        case 4:  this.namedConstantKind = (ASTNamedConstantUseNode)value;
+        case 5:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.structureConstructor = (ASTStructureConstructorNode)value;
+        case 8:  this.bozLiteralConstant = (ASTBozLiteralConstantNode)value;
+        case 9:  this.hollerithConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 10: this.logicalConst = (ASTLogicalConstantNode)value;
+        case 11: this.name = (ASTNamedConstantUseNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

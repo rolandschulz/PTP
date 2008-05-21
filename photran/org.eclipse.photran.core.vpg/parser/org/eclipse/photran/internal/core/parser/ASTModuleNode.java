@@ -10,74 +10,91 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTModuleNode extends ScopingNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTModuleNode extends ScopingNode implements IProgramUnit
 {
-    ASTModuleNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTModuleNode(this);
-    }
+    ASTModuleStmtNode moduleStmt; // in ASTModuleNode
+    IASTListNode<IModuleBodyConstruct> moduleBody; // in ASTModuleNode
+    ASTEndModuleStmtNode endModuleStmt; // in ASTModuleNode
 
     public ASTModuleStmtNode getModuleStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MODULE_25)
-            return (ASTModuleStmtNode)getChild(0);
-        else
-            return null;
+        return this.moduleStmt;
     }
 
-    public ASTModuleBodyNode getModuleBody()
+    public void setModuleStmt(ASTModuleStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MODULE_25)
-            return (ASTModuleBodyNode)((ASTModuleBlockNode)getChild(1)).getModuleBody();
-        else
-            return null;
+        this.moduleStmt = newValue;
     }
+
+
+    public IASTListNode<IModuleBodyConstruct> getModuleBody()
+    {
+        return this.moduleBody;
+    }
+
+    public void setModuleBody(IASTListNode<IModuleBodyConstruct> newValue)
+    {
+        this.moduleBody = newValue;
+    }
+
 
     public ASTEndModuleStmtNode getEndModuleStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.MODULE_25)
-            return (ASTEndModuleStmtNode)((ASTModuleBlockNode)getChild(1)).getEndModuleStmt();
-        else
-            return null;
+        return this.endModuleStmt;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    public void setEndModuleStmt(ASTEndModuleStmtNode newValue)
     {
-        if (getProduction() == Production.MODULE_25 && index == 1)
-            return true;
-        else
-            return false;
+        this.endModuleStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTModuleNode(this);
+        visitor.visitIProgramUnit(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.moduleStmt;
+        case 1:  return this.moduleBody;
+        case 2:  return this.endModuleStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.moduleStmt = (ASTModuleStmtNode)value;
+        case 1:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value;
+        case 2:  this.endModuleStmt = (ASTEndModuleStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

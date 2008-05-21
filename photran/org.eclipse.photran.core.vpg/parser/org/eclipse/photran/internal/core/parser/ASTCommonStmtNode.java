@@ -10,85 +10,83 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCommonStmtNode extends InteriorNode implements ISpecificationStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTCommonStmtNode extends ASTNode implements ISpecificationStmt
 {
-    ASTCommonStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTCommonStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTCommon; // in ASTCommonStmtNode
+    IASTListNode<ASTCommonBlockListNode> commonBlockList; // in ASTCommonStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCommonStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTCommonBlockListNode> getCommonBlockList()
     {
-        visitor.visitISpecificationStmt(this);
+        return this.commonBlockList;
+    }
+
+    public void setCommonBlockList(IASTListNode<ASTCommonBlockListNode> newValue)
+    {
+        this.commonBlockList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
         visitor.visitASTCommonStmtNode(this);
+        visitor.visitISpecificationStmt(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTCommonBlockListNode getCommonBlockList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMMON_STMT_408)
-            return (ASTCommonBlockListNode)getChild(2);
-        else
-            return null;
+        return 4;
     }
 
-    public Token getLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMMON_STMT_408)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTCommon;
+        case 2:  return this.commonBlockList;
+        case 3:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public boolean hasLabel()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMMON_STMT_408)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.COMMON_STMT_408 && index == 1)
-            return false;
-        else if (getProduction() == Production.COMMON_STMT_408 && index == 3)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.COMMON_STMT_408 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTCommon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.commonBlockList = (IASTListNode<ASTCommonBlockListNode>)value;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

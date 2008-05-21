@@ -10,72 +10,79 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTNamedConstantDefNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTNamedConstantDefNode extends ASTNode
 {
-    ASTNamedConstantDefNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token namedConstant; // in ASTNamedConstantDefNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTNamedConstantDefNode
+    ASTExprNode initializationExpr; // in ASTNamedConstantDefNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getNamedConstant()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.namedConstant;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setNamedConstant(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.namedConstant = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getInitializationExpr()
+    {
+        return this.initializationExpr;
+    }
+
+    public void setInitializationExpr(ASTExprNode newValue)
+    {
+        this.initializationExpr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTNamedConstantDefNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getInitializationExpr()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_366)
-            return (ASTExpressionNode)getChild(2);
-        else
-            return null;
+        return 3;
     }
 
-    public Token getNamedConstant()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_366)
-            return (Token)((ASTNamedConstantNode)getChild(0)).getNamedConstant();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.namedConstant;
+        case 1:  return this.hiddenTEquals;
+        case 2:  return this.initializationExpr;
+        default: return null;
+        }
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_366 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.NAMED_CONSTANT_DEF_366 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.namedConstant = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.initializationExpr = (ASTExprNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

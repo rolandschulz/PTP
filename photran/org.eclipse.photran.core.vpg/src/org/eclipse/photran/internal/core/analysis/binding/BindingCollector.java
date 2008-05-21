@@ -21,7 +21,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
  * Abstract superclass providing utility methods for the various ASTVisitors

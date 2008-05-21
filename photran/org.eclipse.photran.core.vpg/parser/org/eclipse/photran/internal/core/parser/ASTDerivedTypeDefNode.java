@@ -10,67 +10,91 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
+
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
 public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationConstruct
 {
-    ASTDerivedTypeDefNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIDeclarationConstruct(this);
-        visitor.visitASTDerivedTypeDefNode(this);
-    }
+    ASTDerivedTypeStmtNode derivedTypeStmt; // in ASTDerivedTypeDefNode
+    IASTListNode<IDerivedTypeBodyConstruct> derivedTypeBody; // in ASTDerivedTypeDefNode
+    ASTEndTypeStmtNode endTypeStmt; // in ASTDerivedTypeDefNode
 
     public ASTDerivedTypeStmtNode getDerivedTypeStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DERIVED_TYPE_DEF_180)
-            return (ASTDerivedTypeStmtNode)getChild(0);
-        else
-            return null;
+        return this.derivedTypeStmt;
     }
 
-    public ASTDerivedTypeBodyNode getDerivedTypeBody()
+    public void setDerivedTypeStmt(ASTDerivedTypeStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DERIVED_TYPE_DEF_180)
-            return (ASTDerivedTypeBodyNode)getChild(1);
-        else
-            return null;
+        this.derivedTypeStmt = newValue;
     }
+
+
+    public IASTListNode<IDerivedTypeBodyConstruct> getDerivedTypeBody()
+    {
+        return this.derivedTypeBody;
+    }
+
+    public void setDerivedTypeBody(IASTListNode<IDerivedTypeBodyConstruct> newValue)
+    {
+        this.derivedTypeBody = newValue;
+    }
+
 
     public ASTEndTypeStmtNode getEndTypeStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        return this.endTypeStmt;
+    }
 
-        if (getProduction() == Production.DERIVED_TYPE_DEF_180)
-            return (ASTEndTypeStmtNode)getChild(2);
-        else
-            return null;
+    public void setEndTypeStmt(ASTEndTypeStmtNode newValue)
+    {
+        this.endTypeStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTDerivedTypeDefNode(this);
+        visitor.visitIDeclarationConstruct(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.derivedTypeStmt;
+        case 1:  return this.derivedTypeBody;
+        case 2:  return this.endTypeStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.derivedTypeStmt = (ASTDerivedTypeStmtNode)value;
+        case 1:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value;
+        case 2:  this.endTypeStmt = (ASTEndTypeStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

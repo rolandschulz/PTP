@@ -10,84 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTStructureConstructorNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTStructureConstructorNode extends ASTNode
 {
-    ASTStructureConstructorNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTStructureConstructorNode(this);
-    }
+    ASTTypeNameNode typeName; // in ASTStructureConstructorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTStructureConstructorNode
+    IASTListNode<ASTExprNode> exprList; // in ASTStructureConstructorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTStructureConstructorNode
 
     public ASTTypeNameNode getTypeName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STRUCTURE_CONSTRUCTOR_217)
-            return (ASTTypeNameNode)getChild(0);
-        else
-            return null;
+        return this.typeName;
     }
 
-    public int size()
+    public void setTypeName(ASTTypeNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STRUCTURE_CONSTRUCTOR_217)
-            return (int)((ASTExprListNode)getChild(2)).size();
-        else
-            return 0;
+        this.typeName = newValue;
     }
 
-    public ASTExpressionNode getExpr(int listIndex1)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STRUCTURE_CONSTRUCTOR_217)
-            return (ASTExpressionNode)((ASTExprListNode)getChild(2)).getExpr(listIndex1);
-        else
-            return null;
+    public IASTListNode<ASTExprNode> getExprList()
+    {
+        return this.exprList;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setExprList(IASTListNode<ASTExprNode> newValue)
     {
-        if (getProduction() == Production.STRUCTURE_CONSTRUCTOR_217 && index == 1)
-            return false;
-        else if (getProduction() == Production.STRUCTURE_CONSTRUCTOR_217 && index == 3)
-            return false;
-        else
-            return true;
+        this.exprList = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.STRUCTURE_CONSTRUCTOR_217 && index == 2)
-            return true;
-        else
-            return false;
+        visitor.visitASTStructureConstructorNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.typeName;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.exprList;
+        case 3:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.typeName = (ASTTypeNameNode)value;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.exprList = (IASTListNode<ASTExprNode>)value;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

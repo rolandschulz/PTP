@@ -15,8 +15,8 @@ import java.io.PrintStream;
 import java.io.Serializable;
 
 import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
-import org.eclipse.photran.internal.core.parser.ASTExpressionNode;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.ASTExprNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * Contains the <b>lower and upper bounds</b> of one dimension of an explicit-shape array.
@@ -37,8 +37,8 @@ public class Dimension implements Serializable
 
     public Dimension(ASTExplicitShapeSpecNode node)
     {
-        ASTExpressionNode lbound = node.getLb();
-        ASTExpressionNode ubound = node.getUb();
+        ASTExprNode lbound = node.getLb();
+        ASTExprNode ubound = node.getUb();
         
         lboundAsString = lbound == null ? null : getSourceCodeFromASTNode(lbound);
         uboundAsString = ubound == null ? null : getSourceCodeFromASTNode(ubound);
@@ -74,7 +74,7 @@ public class Dimension implements Serializable
     }
     
     // Copied from SourcePrinter; refactor somehow
-    private static String getSourceCodeFromASTNode(CSTNode node)
+    private static String getSourceCodeFromASTNode(IASTNode node)
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         node.printOn(new PrintStream(out), null);

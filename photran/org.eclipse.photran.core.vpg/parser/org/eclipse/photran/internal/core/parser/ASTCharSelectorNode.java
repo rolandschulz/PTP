@@ -10,196 +10,122 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTCharSelectorNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTCharSelectorNode extends ASTNode
 {
-    ASTCharSelectorNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLeneq; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharSelectorNode
+    ASTExprNode lengthExpr; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTKindeq; // in ASTCharSelectorNode
+    ASTExprNode kindExpr; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCharSelectorNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTCharSelectorNode(this);
+        return this.constIntLength;
     }
 
-    public ASTExpressionNode getKindExpr()
+    public void setConstIntLength(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_276)
-            return (ASTExpressionNode)getChild(5);
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return (ASTExpressionNode)getChild(4);
-        else if (getProduction() == Production.CHAR_SELECTOR_278)
-            return (ASTExpressionNode)getChild(2);
-        else
-            return null;
+        this.constIntLength = newValue;
     }
 
-    public boolean hasKindExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_276)
-            return getChild(5) != null;
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return getChild(4) != null;
-        else if (getProduction() == Production.CHAR_SELECTOR_278)
-            return getChild(2) != null;
-        else
-            return false;
-    }
-
-    public Token getConstIntLength()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_275)
-            return (Token)((ASTCharLengthNode)getChild(1)).getConstIntLength();
-        else
-            return null;
-    }
-
-    public boolean hasConstIntLength()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_275)
-            return ((ASTCharLengthNode)getChild(1)).hasConstIntLength();
-        else
-            return false;
-    }
-
-    public ASTExpressionNode getLengthExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_275)
-            return (ASTExpressionNode)((ASTCharLengthNode)getChild(1)).getLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_276)
-            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(2)).getLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(2)).getLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(2)).getLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return (ASTExpressionNode)((ASTCharLenParamValueNode)getChild(1)).getLengthExpr();
-        else
-            return null;
-    }
-
-    public boolean hasLengthExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_275)
-            return ((ASTCharLengthNode)getChild(1)).hasLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_276)
-            return ((ASTCharLenParamValueNode)getChild(2)).hasLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return ((ASTCharLenParamValueNode)getChild(2)).hasLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return ((ASTCharLenParamValueNode)getChild(2)).hasLengthExpr();
-        else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return ((ASTCharLenParamValueNode)getChild(1)).hasLengthExpr();
-        else
-            return false;
-    }
 
     public boolean isAssumedLength()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.CHAR_SELECTOR_275)
-            return ((ASTCharLengthNode)getChild(1)).isAssumedLength();
-        else if (getProduction() == Production.CHAR_SELECTOR_276)
-            return ((ASTCharLenParamValueNode)getChild(2)).isAssumedLength();
-        else if (getProduction() == Production.CHAR_SELECTOR_277)
-            return ((ASTCharLenParamValueNode)getChild(2)).isAssumedLength();
-        else if (getProduction() == Production.CHAR_SELECTOR_279)
-            return ((ASTCharLenParamValueNode)getChild(2)).isAssumedLength();
-        else if (getProduction() == Production.CHAR_SELECTOR_280)
-            return ((ASTCharLenParamValueNode)getChild(1)).isAssumedLength();
-        else
-            return false;
+        return this.isAssumedLength != null;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (getProduction() == Production.CHAR_SELECTOR_275 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 1)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 3)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 4)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 6)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 1)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 3)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 5)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_278 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_278 && index == 1)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_278 && index == 3)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 1)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 3)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_280 && index == 0)
-            return false;
-        else if (getProduction() == Production.CHAR_SELECTOR_280 && index == 2)
-            return false;
-        else
-            return true;
+        this.isAssumedLength = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public ASTExprNode getLengthExpr()
     {
-        if (getProduction() == Production.CHAR_SELECTOR_275 && index == 1)
-            return true;
-        else if (getProduction() == Production.CHAR_SELECTOR_276 && index == 2)
-            return true;
-        else if (getProduction() == Production.CHAR_SELECTOR_277 && index == 2)
-            return true;
-        else if (getProduction() == Production.CHAR_SELECTOR_279 && index == 2)
-            return true;
-        else if (getProduction() == Production.CHAR_SELECTOR_280 && index == 1)
-            return true;
-        else
-            return false;
+        return this.lengthExpr;
+    }
+
+    public void setLengthExpr(ASTExprNode newValue)
+    {
+        this.lengthExpr = newValue;
+    }
+
+
+    public ASTExprNode getKindExpr()
+    {
+        return this.kindExpr;
+    }
+
+    public void setKindExpr(ASTExprNode newValue)
+    {
+        this.kindExpr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTCharSelectorNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 10;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTAsterisk;
+        case 1:  return this.constIntLength;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.hiddenTLeneq;
+        case 4:  return this.isAssumedLength;
+        case 5:  return this.lengthExpr;
+        case 6:  return this.hiddenTComma;
+        case 7:  return this.hiddenTKindeq;
+        case 8:  return this.kindExpr;
+        case 9:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.lengthExpr = (ASTExprNode)value;
+        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.kindExpr = (ASTExprNode)value;
+        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

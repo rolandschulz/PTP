@@ -6,7 +6,7 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
-import org.eclipse.photran.internal.core.parser.ASTComponentDeclListNode;
+import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
@@ -19,10 +19,9 @@ import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
  * This parse tree visitor is used by the <code>FortranModelBuilder</code> to create the model you
@@ -32,7 +31,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefac
  * 
  * @author joverbey
  */
-public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
+public final class FortranModelBuildingVisitor extends GenericASTVisitor
 {
     // --INFRASTRUCTURE--------------------------------------------------
 
@@ -63,15 +62,15 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
             return (Parent)parentElementStack.getLast();
     }
 
-    private boolean isCurrentParent(InteriorNode node)
+    private boolean isCurrentParent(IASTNode node)
     {
         if (parentParseTreeNodeStack.isEmpty())
             return false;
         else
-            return node == (InteriorNode)parentParseTreeNodeStack.getLast();
+            return node == (IASTNode)parentParseTreeNodeStack.getLast();
     }
 
-    private void addToModel(InteriorNode parseTreeNode, FortranElement element)
+    private void addToModel(IASTNode parseTreeNode, FortranElement element)
     {
         try
         {
@@ -96,13 +95,13 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
         }
     }
 
-    private void beginAddingChildrenFor(InteriorNode parseTreeNode, FortranElement element)
+    private void beginAddingChildrenFor(IASTNode parseTreeNode, FortranElement element)
     {
         parentParseTreeNodeStack.addLast(parseTreeNode);
         parentElementStack.addLast(element);
     }
 
-    private void doneAddingChildrenFor(InteriorNode node)
+    private void doneAddingChildrenFor(IASTNode node)
     {
         if (isCurrentParent(node))
         {
@@ -113,23 +112,20 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
 
     // --VISITOR METHODS-------------------------------------------------
     
-    public void preparingToVisitChildrenOf(InteriorNode node)
+    @Override public void visitASTNode(IASTNode node)
     {
         // beginAddingChildrenFor is called in addToModel
-        node.visitOnlyThisNodeUsing(elementMappingVisitor);
-    }
-
-    public void doneVisitingChildrenOf(InteriorNode node)
-    {
+        node.accept(elementMappingVisitor);
+        traverseChildren(node);
         doneAddingChildrenFor(node);
     }
 
-    private class ElementMappingVisitor extends ASTVisitor
+    private class ElementMappingVisitor extends GenericASTVisitor
     {
-        private <T extends FortranElement> T setPos(T element, InteriorNode astNode)
+        private <T extends FortranElement> T setPos(T element, IASTNode astNode)
         {
-            Token first = FortranRefactoring.findFirstTokenIn(astNode);
-            Token last = FortranRefactoring.findLastTokenIn(astNode);
+            Token first = astNode.findFirstToken();
+            Token last = astNode.findLastToken();
             if (first != null && last != null)
             {
                 element.setPos(first.getFileOffset(), last.getFileOffset()+last.getLength()-first.getFileOffset());
@@ -180,16 +176,15 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
     
         public void visitASTComponentDefStmtNode(ASTComponentDefStmtNode node)
         {
-            ASTComponentDeclListNode list = node.getComponentDeclList();
-            for (int i = 0; i < list.size(); i++)
-				addToModelNoChildren(setPos(new FortranElement.Variable(getCurrentParent(), list.getComponentDecl(i).getComponentName().getComponentName()), node));
+            for (ASTComponentDeclNode decl : node.getComponentDeclList())
+                addToModelNoChildren(setPos(new FortranElement.Variable(getCurrentParent(), decl.getComponentName().getComponentName()), node));
         }
     
         public void visitASTExternalStmtNode(ASTExternalStmtNode node)
         {
-            ASTExternalNameListNode list = node.getExternalNameList();
+            IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
             for (int i = 0; i < list.size(); i++)
-                addToModel(node, setPos(new FortranElement.Variable(getCurrentParent(), list.getExternalName(i)), node));
+                addToModel(node, setPos(new FortranElement.Variable(getCurrentParent(), list.get(i).getExternalName()), node));
         }
     
         public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
@@ -202,9 +197,9 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
     
         public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node)
         {
-            ASTIntrinsicListNode list = node.getIntrinsicList();
+            IASTListNode<ASTIntrinsicListNode> list = node.getIntrinsicList();
             for (int i = 0; i < list.size(); i++)
-                addToModel(node, setPos(new FortranElement.Variable(getCurrentParent(), list.getIntrinsicProcedureName(i)), node));
+                addToModel(node, setPos(new FortranElement.Variable(getCurrentParent(), list.get(i).getIntrinsicProcedureName()), node));
         }
         
         public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node)

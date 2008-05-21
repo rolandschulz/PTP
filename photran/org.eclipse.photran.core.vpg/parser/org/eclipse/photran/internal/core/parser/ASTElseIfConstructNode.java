@@ -10,56 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTElseIfConstructNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTElseIfConstructNode extends ASTNode
 {
-    ASTElseIfConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTElseIfConstructNode(this);
-    }
+    ASTElseIfStmtNode elseIfStmt; // in ASTElseIfConstructNode
+    IASTListNode<IExecutionPartConstruct> elseIfBody; // in ASTElseIfConstructNode
 
     public ASTElseIfStmtNode getElseIfStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ELSE_IF_CONSTRUCT_660)
-            return (ASTElseIfStmtNode)getChild(0);
-        else
-            return null;
+        return this.elseIfStmt;
     }
 
-    public ASTConditionalBodyNode getElseIfBody()
+    public void setElseIfStmt(ASTElseIfStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        this.elseIfStmt = newValue;
+    }
 
-        if (getProduction() == Production.ELSE_IF_CONSTRUCT_660)
-            return (ASTConditionalBodyNode)getChild(1);
-        else
-            return null;
+
+    public IASTListNode<IExecutionPartConstruct> getElseIfBody()
+    {
+        return this.elseIfBody;
+    }
+
+    public void setElseIfBody(IASTListNode<IExecutionPartConstruct> newValue)
+    {
+        this.elseIfBody = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTElseIfConstructNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.elseIfStmt;
+        case 1:  return this.elseIfBody;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.elseIfStmt = (ASTElseIfStmtNode)value;
+        case 1:  this.elseIfBody = (IASTListNode<IExecutionPartConstruct>)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

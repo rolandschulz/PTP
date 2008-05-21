@@ -10,210 +10,97 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEndBlockDataStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEndBlockDataStmtNode extends ASTNode
 {
-    ASTEndBlockDataStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndblockdata; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTBlock; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTBlockdata; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndblock; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTData; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndBlockDataStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndBlockDataStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getEndName()
+    {
+        return this.endName;
+    }
+
+    public void setEndName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.endName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEndBlockDataStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getLabel()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_BLOCK_DATA_STMT_917)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_918)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_919)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_920)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_922)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        return 9;
     }
 
-    public boolean hasLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_BLOCK_DATA_STMT_917)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_918)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_919)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_920)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_922)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTEndblockdata;
+        case 2:  return this.hiddenTEnd;
+        case 3:  return this.hiddenTBlock;
+        case 4:  return this.hiddenTBlockdata;
+        case 5:  return this.hiddenTEndblock;
+        case 6:  return this.hiddenTData;
+        case 7:  return this.endName;
+        case 8:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public Token getEndName()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_BLOCK_DATA_STMT_919)
-            return (Token)((ASTEndNameNode)getChild(2)).getEndName();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921)
-            return (Token)((ASTEndNameNode)getChild(3)).getEndName();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923)
-            return (Token)((ASTEndNameNode)getChild(3)).getEndName();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925)
-            return (Token)((ASTEndNameNode)getChild(4)).getEndName();
-        else
-            return null;
-    }
-
-    public boolean hasEndName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.END_BLOCK_DATA_STMT_919)
-            return ((ASTEndNameNode)getChild(2)).hasEndName();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921)
-            return ((ASTEndNameNode)getChild(3)).hasEndName();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923)
-            return ((ASTEndNameNode)getChild(3)).hasEndName();
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925)
-            return ((ASTEndNameNode)getChild(4)).hasEndName();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.END_BLOCK_DATA_STMT_917 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_917 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_918 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_918 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_919 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_919 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_920 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_920 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_920 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921 && index == 4)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_922 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_922 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_922 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923 && index == 4)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924 && index == 4)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925 && index == 1)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925 && index == 2)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925 && index == 3)
-            return false;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925 && index == 5)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.END_BLOCK_DATA_STMT_917 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_918 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_919 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_919 && index == 2)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_920 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_921 && index == 3)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_922 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_923 && index == 3)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_924 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925 && index == 0)
-            return true;
-        else if (getProduction() == Production.END_BLOCK_DATA_STMT_925 && index == 4)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEndblockdata = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTBlock = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTBlockdata = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTEndblock = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.hiddenTData = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

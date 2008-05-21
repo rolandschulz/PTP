@@ -10,66 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTUnitIdentifierNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTUnitIdentifierNode extends ASTNode
 {
-    ASTUnitIdentifierNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    ASTUFExprNode expression; // in ASTUnitIdentifierNode
+    org.eclipse.photran.internal.core.lexer.Token hasAsterisk; // in ASTUnitIdentifierNode
+
+    public ASTUFExprNode getExpression()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTUnitIdentifierNode(this);
+        return this.expression;
     }
 
-    public ASTExpressionNode getExpression()
+    public void setExpression(ASTUFExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.UNIT_IDENTIFIER_738)
-            return (ASTExpressionNode)getChild(0);
-        else
-            return null;
+        this.expression = newValue;
     }
 
-    public boolean hasExpression()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.UNIT_IDENTIFIER_738)
-            return getChild(0) != null;
-        else
-            return false;
-    }
 
     public boolean hasAsterisk()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        return this.hasAsterisk != null;
+    }
 
-        if (getProduction() == Production.UNIT_IDENTIFIER_739)
-            return getChild(0) != null;
-        else
-            return false;
+    public void setHasAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasAsterisk = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTUnitIdentifierNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.expression;
+        case 1:  return this.hasAsterisk;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.expression = (ASTUFExprNode)value;
+        case 1:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

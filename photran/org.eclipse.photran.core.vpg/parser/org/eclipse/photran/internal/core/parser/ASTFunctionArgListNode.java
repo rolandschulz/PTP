@@ -10,144 +10,79 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFunctionArgListNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFunctionArgListNode extends ASTNode
 {
-    protected int count = -1;
+    IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTFunctionArgListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTFunctionArgListNode
+    ASTFunctionArgNode functionArg; // in ASTFunctionArgListNode
 
-    ASTFunctionArgListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public IASTListNode<ASTSectionSubscriptNode> getSectionSubscriptList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTFunctionArgListNode
-               && grandparent instanceof ASTFunctionArgListNode
-               && ((ASTFunctionArgListNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.sectionSubscriptList;
     }
 
-    /**
-     * @return the number of ASTFunctionArgListNode nodes in this list
-     */
-    public int size()
+    public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTFunctionArgListNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.sectionSubscriptList = newValue;
     }
-    
-    ASTFunctionArgListNode recurseToIndex(int listIndex)
+
+
+    public ASTFunctionArgNode getFunctionArg()
     {
-        ASTFunctionArgListNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTFunctionArgListNode)node.getRecursiveNode();
-        }
-        return node;
+        return this.functionArg;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+    public void setFunctionArg(ASTFunctionArgNode newValue)
+    {
+        this.functionArg = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFunctionArgListNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTFunctionArgNode getFunctionArg(int listIndex)
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFunctionArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_ARG_LIST_968)
-            return (ASTFunctionArgNode)node.getChild(0);
-        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_969)
-            return (ASTFunctionArgNode)node.getChild(2);
-        else if (node.getProduction() == Production.FUNCTION_ARG_LIST_970)
-            return (ASTFunctionArgNode)node.getChild(2);
-        else
-            return null;
+        return 3;
     }
 
-    public ASTSectionSubscriptListNode getSectionSubscriptList(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFunctionArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_ARG_LIST_969)
-            return (ASTSectionSubscriptListNode)node.getChild(0);
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.sectionSubscriptList;
+        case 1:  return this.hiddenTComma;
+        case 2:  return this.functionArg;
+        default: return null;
+        }
     }
 
-    public boolean hasSectionSubscriptList(int listIndex)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFunctionArgListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FUNCTION_ARG_LIST_969)
-            return node.getChild(0) != null;
-        else
-            return false;
-    }
-
-    private ASTFunctionArgListNode getRecursiveNode()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_ARG_LIST_970)
-            return (ASTFunctionArgListNode)getChild(0);
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.FUNCTION_ARG_LIST_969 && index == 1)
-            return false;
-        else if (getProduction() == Production.FUNCTION_ARG_LIST_970 && index == 1)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.functionArg = (ASTFunctionArgNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

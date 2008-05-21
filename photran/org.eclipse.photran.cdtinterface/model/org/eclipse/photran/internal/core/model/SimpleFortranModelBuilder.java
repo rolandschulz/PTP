@@ -81,7 +81,7 @@ public class SimpleFortranModelBuilder implements IFortranModelBuilder
             
               ILexer lexer =
                   isFixedForm ? (ILexer)new FixedFormLexerPhase2(in, filename, SimpleTokenFactory.getInstance())
-                              : (ILexer)new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename, SimpleTokenFactory.getInstance()));
+                              : (ILexer)new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename, SimpleTokenFactory.getInstance(), false));
 
               buildModel(lexer);
 

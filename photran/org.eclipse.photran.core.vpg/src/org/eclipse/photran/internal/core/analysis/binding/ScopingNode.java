@@ -56,11 +56,12 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeNameNode;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.parser.Parser.Production;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 import bz.over.vpg.TokenRef;
 
@@ -71,16 +72,11 @@ import bz.over.vpg.TokenRef;
  * 
  * @author Jeff Overbey
  */
-public abstract class ScopingNode extends InteriorNode
+public abstract class ScopingNode extends ASTNode
 {
-	public ScopingNode(Production p)
-	{
-		super(p);
-	}
-
-    public static ScopingNode getEnclosingScope(CSTNode node)
+    public static ScopingNode getEnclosingScope(IASTNode node)
     {
-        for (CSTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
+        for (IASTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
         {
             if (isScopingNode(candidate))
             {
@@ -97,9 +93,9 @@ public abstract class ScopingNode extends InteriorNode
         return null;
     }
 
-    public static ScopingNode getLocalScope(CSTNode node)
+    public static ScopingNode getLocalScope(IASTNode node)
     {
-        for (CSTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
+        for (IASTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
             if (isScopingNode(candidate))
                 return (ScopingNode)candidate;
         
@@ -122,11 +118,11 @@ public abstract class ScopingNode extends InteriorNode
 	 * interface names, subroutine names, and function names in the beginning and ending
 	 * statements for their respective scoping nodes.
 	 */
-    private static boolean shouldBeBoundToOuterScope(CSTNode node)
+    private static boolean shouldBeBoundToOuterScope(IASTNode node)
     {
-    	CSTNode parent = node.getParent();
+    	IASTNode parent = node.getParent();
     	if (parent == null) return false;
-    	CSTNode grandparent = parent.getParent();
+    	IASTNode grandparent = parent.getParent();
     	if (grandparent == null) return false;
     	
     	if (parent instanceof ASTProgramNameNode
@@ -160,15 +156,15 @@ public abstract class ScopingNode extends InteriorNode
     	else return false;
 	}
 
-	private static boolean inAnonymousInterface(CSTNode n)
+	private static boolean inAnonymousInterface(IASTNode n)
 	{
-		for (InteriorNode node = n.getParent(); node != null; node = node.getParent())
+		for (IASTNode node = n.getParent(); node != null; node = node.getParent())
 			if (node instanceof ASTInterfaceBlockNode && isAnonymousInterface((ASTInterfaceBlockNode)node))
 				return true;
 		return false;
 	}
 
-	public static boolean isScopingNode(CSTNode node)
+	public static boolean isScopingNode(IASTNode node)
     {
     	return node instanceof ASTExecutableProgramNode
     		|| node instanceof ASTMainProgramNode
@@ -193,11 +189,13 @@ public abstract class ScopingNode extends InteriorNode
     
     public ScopingNode getGlobalScope()
     {
-    	CSTNode result = this;
+    	IASTNode result = this;
     	
     	// Find root of AST (i.e., topmost ASTExecutableProgramNode)
     	while (result.getParent() != null) result = result.getParent();
     	
+    	if (!(result instanceof ASTExecutableProgramNode))
+    	    System.err.println("!");
     	return (ScopingNode)result;
     }
 
@@ -210,7 +208,7 @@ public abstract class ScopingNode extends InteriorNode
     	{
     		try
     		{
-	    		this.visitUsing(new GenericParseTreeVisitor()
+	    		this.accept(new ASTVisitor()
 	    		{
 					@Override public void visitToken(Token token)
 					{
@@ -280,30 +278,55 @@ public abstract class ScopingNode extends InteriorNode
     	}
     }
 
-    public InteriorNode getHeaderStmt()
-	{
-    	// TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
-    	// AND DYNAMICALLY DISPATCHED TO!
-    	
-    	if (this instanceof ASTExecutableProgramNode)
-    		return null;
-    	else if (this instanceof ASTMainProgramNode)
-    		return ((ASTMainProgramNode)this).getProgramStmt();
-    	else if (this instanceof ASTFunctionSubprogramNode)
-    		return ((ASTFunctionSubprogramNode)this).getFunctionStmt();
-    	else if (this instanceof ASTSubroutineSubprogramNode)
-    		return ((ASTSubroutineSubprogramNode)this).getSubroutineStmt();
-    	else if (this instanceof ASTModuleNode)
-    		return ((ASTModuleNode)this).getModuleStmt();
-    	else if (this instanceof ASTBlockDataSubprogramNode)
-    		return ((ASTBlockDataSubprogramNode)this).getBlockDataStmt();
-    	else if (this instanceof ASTDerivedTypeDefNode)
-    		return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt();
-    	else if (this instanceof ASTInterfaceBlockNode)
-    		return ((ASTInterfaceBlockNode)this).getInterfaceStmt();
-    	else
-    		throw new UnsupportedOperationException();
-	}
+    public ASTNode getHeaderStmt()
+    {
+        // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+        // AND DYNAMICALLY DISPATCHED TO!
+        
+        if (this instanceof ASTExecutableProgramNode)
+            return null;
+        else if (this instanceof ASTMainProgramNode)
+            return ((ASTMainProgramNode)this).getProgramStmt();
+        else if (this instanceof ASTFunctionSubprogramNode)
+            return ((ASTFunctionSubprogramNode)this).getFunctionStmt();
+        else if (this instanceof ASTSubroutineSubprogramNode)
+            return ((ASTSubroutineSubprogramNode)this).getSubroutineStmt();
+        else if (this instanceof ASTModuleNode)
+            return ((ASTModuleNode)this).getModuleStmt();
+        else if (this instanceof ASTBlockDataSubprogramNode)
+            return ((ASTBlockDataSubprogramNode)this).getBlockDataStmt();
+        else if (this instanceof ASTDerivedTypeDefNode)
+            return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt();
+        else if (this instanceof ASTInterfaceBlockNode)
+            return ((ASTInterfaceBlockNode)this).getInterfaceStmt();
+        else
+            throw new UnsupportedOperationException();
+    }
+
+    public IASTListNode<IBodyConstruct> getBody()
+    {
+        // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+        // AND DYNAMICALLY DISPATCHED TO!
+        
+        if (this instanceof ASTExecutableProgramNode)
+            return null;
+        else if (this instanceof ASTMainProgramNode)
+            return ((ASTMainProgramNode)this).getBody();
+        else if (this instanceof ASTFunctionSubprogramNode)
+            return ((ASTFunctionSubprogramNode)this).getBody();
+        else if (this instanceof ASTSubroutineSubprogramNode)
+            return ((ASTSubroutineSubprogramNode)this).getBody();
+        else if (this instanceof ASTModuleNode)
+            return ((ASTModuleNode)this).getBody();
+        else if (this instanceof ASTBlockDataSubprogramNode)
+            return ((ASTBlockDataSubprogramNode)this).getBody();
+        else if (this instanceof ASTDerivedTypeDefNode)
+            return ((ASTDerivedTypeDefNode)this).getBody();
+        else if (this instanceof ASTInterfaceBlockNode)
+            return ((ASTInterfaceBlockNode)this).getBody();
+        else
+            throw new UnsupportedOperationException();
+    }
 
     public boolean isInternal()
     {
@@ -327,7 +350,7 @@ public abstract class ScopingNode extends InteriorNode
     
     public boolean isParentScopeOf(ScopingNode scope)
     {
-    	for (CSTNode node = scope.getParent(); node != null && node.getParent() != null; node = node.getParent())
+    	for (IASTNode node = scope.getParent(); node != null && node.getParent() != null; node = node.getParent())
     		if (node == this)
     			return true;
     	
@@ -339,14 +362,14 @@ public abstract class ScopingNode extends InteriorNode
     {
 		final List<ScopingNode> scopes = new LinkedList<ScopingNode>();
 
-		this.visitUsing(new GenericParseTreeVisitor()
+		this.accept(new ASTVisitor()
 		{
-			@Override public void visitParseTreeNode(InteriorNode node)
+			@Override public void visitASTNode(IASTNode node)
 			{
 				if (isScopingNode(node))
 					scopes.add((ScopingNode)node);
+				super.visitASTNode(node);
 			}
-			
 		});
 
 	    return scopes;
@@ -540,11 +563,11 @@ public abstract class ScopingNode extends InteriorNode
     // TODO: This was copied from FortranRefactoring.java
     // Parse Tree Searching ///////////////////////////////////////////////////
     
-    protected Token findFirstTokenIn(InteriorNode node)
+    protected Token findFirstTokenIn(ASTNode node)
     {
         try
         {
-            node.visitUsing(new GenericParseTreeVisitor()
+            node.accept(new ASTVisitor()
             {
                 @Override
                 public void visitToken(Token token)
@@ -561,7 +584,7 @@ public abstract class ScopingNode extends InteriorNode
         return null;
     }
     
-    private final static class LastTokenVisitor extends GenericParseTreeVisitor
+    private final static class LastTokenVisitor extends ASTVisitor
     {
         private Token lastToken;
         
@@ -574,10 +597,10 @@ public abstract class ScopingNode extends InteriorNode
         public Token getLastToken() { return lastToken; }
     }
 
-    protected Token findLastTokenIn(InteriorNode node)
+    protected Token findLastTokenIn(ASTNode node)
     {
         LastTokenVisitor lastTokenVisitor = new LastTokenVisitor();
-        node.visitUsing(lastTokenVisitor);
+        node.accept(lastTokenVisitor);
         return lastTokenVisitor.getLastToken();
     }
 }

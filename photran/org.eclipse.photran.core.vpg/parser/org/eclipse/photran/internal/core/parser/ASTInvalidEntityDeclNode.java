@@ -10,131 +10,113 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTInvalidEntityDeclNode extends InteriorNodeWithErrorRecoverySymbols
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTInvalidEntityDeclNode extends ASTNodeWithErrorRecoverySymbols
 {
-    ASTInvalidEntityDeclNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production, discardedSymbols);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
+    ASTObjectNameNode objectName; // in ASTInvalidEntityDeclNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenAsterisk2; // in ASTInvalidEntityDeclNode
+    ASTCharLengthNode initialCharLength; // in ASTInvalidEntityDeclNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenLparen2; // in ASTInvalidEntityDeclNode
+    ASTArraySpecNode arraySpec; // in ASTInvalidEntityDeclNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenRparen2; // in ASTInvalidEntityDeclNode
+    ASTInitializationNode initialization; // in ASTInvalidEntityDeclNode
 
     public ASTObjectNameNode getObjectName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
-            return (ASTObjectNameNode)getChild(0);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return (ASTObjectNameNode)getChild(0);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_ERROR_0)
-            return (ASTObjectNameNode)getChild(0);
-        else
-            return null;
+        return this.objectName;
     }
 
-    public ASTCharLengthNode getCharLength()
+    public void setObjectName(ASTObjectNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
-            return (ASTCharLengthNode)getChild(2);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return (ASTCharLengthNode)getChild(2);
-        else
-            return null;
+        this.objectName = newValue;
     }
 
-    public boolean hasCharLength()
+
+    public ASTCharLengthNode getInitialCharLength()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
-            return getChild(2) != null;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return getChild(2) != null;
-        else
-            return false;
+        return this.initialCharLength;
     }
+
+    public void setInitialCharLength(ASTCharLengthNode newValue)
+    {
+        this.initialCharLength = newValue;
+    }
+
 
     public ASTArraySpecNode getArraySpec()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
-            return (ASTArraySpecNode)getChild(4);
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return (ASTArraySpecNode)getChild(4);
-        else
-            return null;
+        return this.arraySpec;
     }
 
-    public boolean hasArraySpec()
+    public void setArraySpec(ASTArraySpecNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269)
-            return getChild(4) != null;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return getChild(4) != null;
-        else
-            return false;
+        this.arraySpec = newValue;
     }
+
 
     public ASTInitializationNode getInitialization()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return (ASTInitializationNode)getChild(6);
-        else
-            return null;
+        return this.initialization;
     }
 
-    public boolean hasInitialization()
+    public void setInitialization(ASTInitializationNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.INVALID_ENTITY_DECL_270)
-            return getChild(6) != null;
-        else
-            return false;
+        this.initialization = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.INVALID_ENTITY_DECL_269 && index == 1)
-            return false;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_269 && index == 3)
-            return false;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_269 && index == 5)
-            return false;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270 && index == 1)
-            return false;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270 && index == 3)
-            return false;
-        else if (getProduction() == Production.INVALID_ENTITY_DECL_270 && index == 5)
-            return false;
-        else
-            return true;
+        visitor.visitASTInvalidEntityDeclNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 7;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.objectName;
+        case 1:  return this.hiddenAsterisk2;
+        case 2:  return this.initialCharLength;
+        case 3:  return this.hiddenLparen2;
+        case 4:  return this.arraySpec;
+        case 5:  return this.hiddenRparen2;
+        case 6:  return this.initialization;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.objectName = (ASTObjectNameNode)value;
+        case 1:  this.hiddenAsterisk2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.initialCharLength = (ASTCharLengthNode)value;
+        case 3:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.arraySpec = (ASTArraySpecNode)value;
+        case 5:  this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.initialization = (ASTInitializationNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

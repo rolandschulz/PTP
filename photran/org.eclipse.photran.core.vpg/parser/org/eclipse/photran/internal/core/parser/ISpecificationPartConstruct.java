@@ -10,8 +10,21 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
+import java.io.PrintStream;
+import java.util.Iterator;
+
+import java.util.List;
+
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public interface ISpecificationPartConstruct extends IBlockDataBodyConstruct, IBodyConstruct, IModuleBodyConstruct
+public interface ISpecificationPartConstruct extends IASTNode, IBlockDataBodyConstruct, IBodyConstruct, IModuleBodyConstruct
 {
 }
+

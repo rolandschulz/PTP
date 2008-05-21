@@ -23,15 +23,15 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
     private FortranPreprocessor preprocessor;
     private String lastDirective;
 
-    public PreprocessingFreeFormLexerPhase1(InputStream in, String filename, IncludeLoaderCallback callback) throws IOException
+    public PreprocessingFreeFormLexerPhase1(InputStream in, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
-        this(new FortranPreprocessor(new LineAppendingInputStream(in), filename, callback), filename, ASTTokenFactory.getInstance());
+        this(new FortranPreprocessor(new LineAppendingInputStream(in), filename, callback), filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }
     
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
-    private PreprocessingFreeFormLexerPhase1(FortranPreprocessor preprocessor, String filename, TokenFactory tokenFactory)
+    private PreprocessingFreeFormLexerPhase1(FortranPreprocessor preprocessor, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
-        super(preprocessor, filename, tokenFactory);
+        super(preprocessor, filename, tokenFactory, accumulateWhitetext);
         this.preprocessor = preprocessor;
         this.lastDirective = null;
     }

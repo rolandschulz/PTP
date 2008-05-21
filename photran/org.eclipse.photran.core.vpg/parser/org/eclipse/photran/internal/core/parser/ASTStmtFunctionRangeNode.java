@@ -10,75 +10,88 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTStmtFunctionRangeNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTStmtFunctionRangeNode extends ASTNode
 {
-    ASTStmtFunctionRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTStmtFunctionRangeNode
+    IASTListNode<ASTSFDummyArgNameListNode> SFDummyArgNameList; // in ASTStmtFunctionRangeNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTStmtFunctionRangeNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTStmtFunctionRangeNode
+    ASTExprNode expr; // in ASTStmtFunctionRangeNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTStmtFunctionRangeNode
+
+    public IASTListNode<ASTSFDummyArgNameListNode> getSFDummyArgNameList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        return this.SFDummyArgNameList;
     }
 
-    public ASTExpressionNode getExpr()
+    public void setSFDummyArgNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1018)
-            return (ASTExpressionNode)getChild(3);
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019)
-            return (ASTExpressionNode)getChild(4);
-        else
-            return null;
+        this.SFDummyArgNameList = newValue;
     }
 
-    public ASTSFDummyArgNameListNode getSFDummyArgNameList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1019)
-            return (ASTSFDummyArgNameListNode)getChild(1);
-        else
-            return null;
+    public ASTExprNode getExpr()
+    {
+        return this.expr;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    public void setExpr(ASTExprNode newValue)
     {
-        if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 0)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 1)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 2)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1018 && index == 4)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 0)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 2)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 3)
-            return false;
-        else if (getProduction() == Production.STMT_FUNCTION_RANGE_1019 && index == 5)
-            return false;
-        else
-            return true;
+        this.expr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTStmtFunctionRangeNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 6;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.SFDummyArgNameList;
+        case 2:  return this.hiddenTRparen;
+        case 3:  return this.hiddenTEquals;
+        case 4:  return this.expr;
+        case 5:  return this.hiddenTEos;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.expr = (ASTExprNode)value;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

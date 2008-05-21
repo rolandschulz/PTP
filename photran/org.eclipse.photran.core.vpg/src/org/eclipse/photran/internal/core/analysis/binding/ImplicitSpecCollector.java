@@ -52,48 +52,56 @@ class ImplicitSpecCollector extends BindingCollector
     	
     	try { vpg.setScopeImplicitSpec(node.getImplicitToken().getEnclosingScope(), implicitSpec); }
     	catch (Exception e) { throw new Error(e); }
+    	
+    	super.traverseChildren(node);
     }
-
-    
 
 	@Override public void visitASTExecutableProgramNode(ASTExecutableProgramNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 
 	@Override public void visitASTMainProgramNode(ASTMainProgramNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 
 	@Override public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 	
 	@Override public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 
 	@Override public void visitASTModuleNode(ASTModuleNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 
 	@Override public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 
 	@Override public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 
 	@Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
 	{
 		setDefaultImplicitSpec(node);
+        super.traverseChildren(node);
 	}
 	
 	private void setDefaultImplicitSpec(ScopingNode node)

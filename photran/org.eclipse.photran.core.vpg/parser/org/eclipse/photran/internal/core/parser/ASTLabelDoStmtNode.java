@@ -10,248 +10,116 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTLabelDoStmtNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTLabelDoStmtNode extends ASTNode
 {
-    ASTLabelDoStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTLabelDoStmtNode
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTLabelDoStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTLabelDoStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTDo; // in ASTLabelDoStmtNode
+    ASTLblRefNode lblRef; // in ASTLabelDoStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTLabelDoStmtNode
+    ASTLoopControlNode loopControl; // in ASTLabelDoStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTLabelDoStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
     {
-        visitor.visitASTLabelDoStmtNode(this);
+        return this.name;
     }
+
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.name = newValue;
+    }
+
 
     public ASTLblRefNode getLblRef()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_703)
-            return (ASTLblRefNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
-            return (ASTLblRefNode)getChild(2);
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
-            return (ASTLblRefNode)getChild(4);
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
-            return (ASTLblRefNode)getChild(4);
-        else
-            return null;
+        return this.lblRef;
     }
 
-    public boolean hasLblRef()
+    public void setLblRef(ASTLblRefNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_703)
-            return getChild(2) != null;
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
-            return getChild(2) != null;
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
-            return getChild(4) != null;
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
-            return getChild(4) != null;
-        else
-            return false;
+        this.lblRef = newValue;
     }
 
-    public Token getLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_703)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_710)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
-    }
-
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_703)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_704)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_706)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.LABEL_DO_STMT_710)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
 
     public ASTLoopControlNode getLoopControl()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_703)
-            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(3)).getLoopControl();
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
-            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(2)).getLoopControl();
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
-            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(5)).getLoopControl();
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (ASTLoopControlNode)((ASTCommaLoopControlNode)getChild(4)).getLoopControl();
-        else
-            return null;
+        return this.loopControl;
     }
 
-    public boolean hasLoopControl()
+    public void setLoopControl(ASTLoopControlNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.LABEL_DO_STMT_703)
-            return ((ASTCommaLoopControlNode)getChild(3)).hasLoopControl();
-        else if (getProduction() == Production.LABEL_DO_STMT_705)
-            return ((ASTCommaLoopControlNode)getChild(2)).hasLoopControl();
-        else if (getProduction() == Production.LABEL_DO_STMT_707)
-            return ((ASTCommaLoopControlNode)getChild(5)).hasLoopControl();
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
-            return ((ASTCommaLoopControlNode)getChild(4)).hasLoopControl();
-        else
-            return false;
+        this.loopControl = newValue;
     }
 
-    public Token getDoConstructName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.LABEL_DO_STMT_707)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.LABEL_DO_STMT_708)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.LABEL_DO_STMT_709)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.LABEL_DO_STMT_710)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTLabelDoStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.LABEL_DO_STMT_703 && index == 1)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_703 && index == 4)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_704 && index == 1)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_704 && index == 3)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 1)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 3)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_706 && index == 1)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_706 && index == 2)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 2)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 3)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 6)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 2)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 3)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 5)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 2)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 3)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 5)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 2)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 3)
-            return false;
-        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 4)
-            return false;
-        else
-            return true;
+        return 8;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.LABEL_DO_STMT_703 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_703 && index == 3)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_704 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_705 && index == 2)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_706 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 1)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_707 && index == 5)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_708 && index == 1)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 1)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_709 && index == 4)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 0)
-            return true;
-        else if (getProduction() == Production.LABEL_DO_STMT_710 && index == 1)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.name;
+        case 2:  return this.hiddenTColon;
+        case 3:  return this.hiddenTDo;
+        case 4:  return this.lblRef;
+        case 5:  return this.hiddenTComma;
+        case 6:  return this.loopControl;
+        case 7:  return this.hiddenTEos;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTDo = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.lblRef = (ASTLblRefNode)value;
+        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.loopControl = (ASTLoopControlNode)value;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,116 +10,85 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAssumedSizeSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAssumedSizeSpecNode extends ASTNode
 {
-    ASTAssumedSizeSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<ASTExplicitShapeSpecNode> explicitShapeSpecList; // in ASTAssumedSizeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTAssumedSizeSpecNode
+    ASTExprNode lb; // in ASTAssumedSizeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTAssumedSizeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTAssumedSizeSpecNode
+
+    public IASTListNode<ASTExplicitShapeSpecNode> getExplicitShapeSpecList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.explicitShapeSpecList;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.explicitShapeSpecList = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getLb()
+    {
+        return this.lb;
+    }
+
+    public void setLb(ASTExprNode newValue)
+    {
+        this.lb = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAssumedSizeSpecNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExplicitShapeSpecListNode getExplicitShapeSpecList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
-            return (ASTExplicitShapeSpecListNode)getChild(0);
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
-            return (ASTExplicitShapeSpecListNode)getChild(0);
-        else
-            return null;
+        return 5;
     }
 
-    public boolean hasExplicitShapeSpecList()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_311)
-            return getChild(0) != null;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
-            return getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.explicitShapeSpecList;
+        case 1:  return this.hiddenTComma;
+        case 2:  return this.lb;
+        case 3:  return this.hiddenTColon;
+        case 4:  return this.hiddenTAsterisk;
+        default: return null;
+        }
     }
 
-    public ASTExpressionNode getLb()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310)
-            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(0)).getLb();
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
-            return (ASTExpressionNode)((ASTLowerBoundNode)getChild(2)).getLb();
-        else
-            return null;
-    }
-
-    public boolean hasLb()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310)
-            return ((ASTLowerBoundNode)getChild(0)).hasLb();
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312)
-            return ((ASTLowerBoundNode)getChild(2)).hasLb();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_309 && index == 0)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_310 && index == 1)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_310 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_311 && index == 1)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_311 && index == 2)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 1)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 3)
-            return false;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 4)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.ASSUMED_SIZE_SPEC_310 && index == 0)
-            return true;
-        else if (getProduction() == Production.ASSUMED_SIZE_SPEC_312 && index == 2)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.lb = (ASTExprNode)value;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

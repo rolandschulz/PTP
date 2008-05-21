@@ -10,111 +10,119 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTPrivateSequenceStmtNode extends InteriorNode implements IDerivedTypeBodyConstruct
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeBodyConstruct
 {
-    ASTPrivateSequenceStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTPrivateSequenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token sequenceToken; // in ASTPrivateSequenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token privateToken; // in ASTPrivateSequenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isPrivate; // in ASTPrivateSequenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isSequence; // in ASTPrivateSequenceStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIDerivedTypeBodyConstruct(this);
-        visitor.visitASTPrivateSequenceStmtNode(this);
+        return this.label;
     }
 
-    public Token getPrivateToken()
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
-            return (Token)getChild(1);
-        else
-            return null;
+        this.label = newValue;
     }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getSequenceToken()
+    {
+        return this.sequenceToken;
+    }
+
+    public void setSequenceToken(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.sequenceToken = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getPrivateToken()
+    {
+        return this.privateToken;
+    }
+
+    public void setPrivateToken(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.privateToken = newValue;
+    }
+
 
     public boolean isPrivate()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
-            return getChild(2) != null;
-        else
-            return false;
+        return this.isPrivate != null;
     }
 
-    public Token getSequenceToken()
+    public void setIsPrivate(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
-            return (Token)getChild(1);
-        else
-            return null;
+        this.isPrivate = newValue;
     }
+
 
     public boolean isSequence()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
-            return getChild(2) != null;
-        else
-            return false;
+        return this.isSequence != null;
     }
 
-    public Token getLabel()
+    public void setIsSequence(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.isSequence = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTPrivateSequenceStmtNode(this);
+        visitor.visitIDerivedTypeBodyConstruct(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_188 && index == 0)
-            return true;
-        else if (getProduction() == Production.PRIVATE_SEQUENCE_STMT_189 && index == 0)
-            return true;
-        else
-            return false;
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.sequenceToken;
+        case 2:  return this.privateToken;
+        case 3:  return this.isPrivate;
+        case 4:  return this.isSequence;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.sequenceToken = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.isSequence = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,262 +10,218 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTIoControlSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTIoControlSpecNode extends ASTNode
 {
-    ASTIoControlSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTIoControlSpecNode(this);
-    }
-
-    public ASTFormatIdentifierNode getFormatIdentifier()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_792)
-            return (ASTFormatIdentifierNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasFormatIdentifier()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_792)
-            return getChild(1) != null;
-        else
-            return false;
-    }
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAdvanceeq; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSizeeq; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUniteq; // in ASTIoControlSpecNode
+    ASTUnitIdentifierNode unitIdentifier; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTReceq; // in ASTIoControlSpecNode
+    ASTVariableNode sizeVar; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEoreq; // in ASTIoControlSpecNode
+    ASTLblRefNode eorLbl; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTNmleq; // in ASTIoControlSpecNode
+    ASTCExprNode advanceExpr; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTFmteq; // in ASTIoControlSpecNode
+    ASTFormatIdentifierNode formatIdentifier; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTErreq; // in ASTIoControlSpecNode
+    ASTLblRefNode errLbl; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTIostateq; // in ASTIoControlSpecNode
+    ASTScalarVariableNode ioStatVar; // in ASTIoControlSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndeq; // in ASTIoControlSpecNode
+    ASTLblRefNode endExpr; // in ASTIoControlSpecNode
+    ASTNamelistGroupNameNode namelistGroupName; // in ASTIoControlSpecNode
+    ASTExprNode recExpr; // in ASTIoControlSpecNode
 
     public ASTUnitIdentifierNode getUnitIdentifier()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_793)
-            return (ASTUnitIdentifierNode)getChild(1);
-        else
-            return null;
+        return this.unitIdentifier;
     }
 
-    public boolean hasUnitIdentifier()
+    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_793)
-            return getChild(1) != null;
-        else
-            return false;
+        this.unitIdentifier = newValue;
     }
 
-    public ASTExpressionNode getRecExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_794)
-            return (ASTExpressionNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasRecExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_794)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTLblRefNode getEndExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_795)
-            return (ASTLblRefNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasEndExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_795)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTLblRefNode getErrLbl()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_796)
-            return (ASTLblRefNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasErrLbl()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_796)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTScalarVariableNode getIoStatVar()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_797)
-            return (ASTScalarVariableNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasIoStatVar()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_797)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTNamelistGroupNameNode getNamelistGroupName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_798)
-            return (ASTNamelistGroupNameNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasNamelistGroupName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_798)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    public ASTExpressionNode getAdvanceExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_799)
-            return (ASTExpressionNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasAdvanceExpr()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_799)
-            return getChild(1) != null;
-        else
-            return false;
-    }
 
     public ASTVariableNode getSizeVar()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_800)
-            return (ASTVariableNode)getChild(1);
-        else
-            return null;
+        return this.sizeVar;
     }
 
-    public boolean hasSizeVar()
+    public void setSizeVar(ASTVariableNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_800)
-            return getChild(1) != null;
-        else
-            return false;
+        this.sizeVar = newValue;
     }
+
 
     public ASTLblRefNode getEorLbl()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_801)
-            return (ASTLblRefNode)getChild(1);
-        else
-            return null;
+        return this.eorLbl;
     }
 
-    public boolean hasEorLbl()
+    public void setEorLbl(ASTLblRefNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.IO_CONTROL_SPEC_801)
-            return getChild(1) != null;
-        else
-            return false;
+        this.eorLbl = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public ASTCExprNode getAdvanceExpr()
     {
-        if (getProduction() == Production.IO_CONTROL_SPEC_792 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_793 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_794 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_795 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_796 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_797 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_798 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_799 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_800 && index == 0)
-            return false;
-        else if (getProduction() == Production.IO_CONTROL_SPEC_801 && index == 0)
-            return false;
-        else
-            return true;
+        return this.advanceExpr;
+    }
+
+    public void setAdvanceExpr(ASTCExprNode newValue)
+    {
+        this.advanceExpr = newValue;
+    }
+
+
+    public ASTFormatIdentifierNode getFormatIdentifier()
+    {
+        return this.formatIdentifier;
+    }
+
+    public void setFormatIdentifier(ASTFormatIdentifierNode newValue)
+    {
+        this.formatIdentifier = newValue;
+    }
+
+
+    public ASTLblRefNode getErrLbl()
+    {
+        return this.errLbl;
+    }
+
+    public void setErrLbl(ASTLblRefNode newValue)
+    {
+        this.errLbl = newValue;
+    }
+
+
+    public ASTScalarVariableNode getIoStatVar()
+    {
+        return this.ioStatVar;
+    }
+
+    public void setIoStatVar(ASTScalarVariableNode newValue)
+    {
+        this.ioStatVar = newValue;
+    }
+
+
+    public ASTLblRefNode getEndExpr()
+    {
+        return this.endExpr;
+    }
+
+    public void setEndExpr(ASTLblRefNode newValue)
+    {
+        this.endExpr = newValue;
+    }
+
+
+    public ASTNamelistGroupNameNode getNamelistGroupName()
+    {
+        return this.namelistGroupName;
+    }
+
+    public void setNamelistGroupName(ASTNamelistGroupNameNode newValue)
+    {
+        this.namelistGroupName = newValue;
+    }
+
+
+    public ASTExprNode getRecExpr()
+    {
+        return this.recExpr;
+    }
+
+    public void setRecExpr(ASTExprNode newValue)
+    {
+        this.recExpr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTIoControlSpecNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 20;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTAdvanceeq;
+        case 1:  return this.hiddenTSizeeq;
+        case 2:  return this.hiddenTUniteq;
+        case 3:  return this.unitIdentifier;
+        case 4:  return this.hiddenTReceq;
+        case 5:  return this.sizeVar;
+        case 6:  return this.hiddenTEoreq;
+        case 7:  return this.eorLbl;
+        case 8:  return this.hiddenTNmleq;
+        case 9:  return this.advanceExpr;
+        case 10: return this.hiddenTFmteq;
+        case 11: return this.formatIdentifier;
+        case 12: return this.hiddenTErreq;
+        case 13: return this.errLbl;
+        case 14: return this.hiddenTIostateq;
+        case 15: return this.ioStatVar;
+        case 16: return this.hiddenTEndeq;
+        case 17: return this.endExpr;
+        case 18: return this.namelistGroupName;
+        case 19: return this.recExpr;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTAdvanceeq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTSizeeq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
+        case 4:  this.hiddenTReceq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.sizeVar = (ASTVariableNode)value;
+        case 6:  this.hiddenTEoreq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.eorLbl = (ASTLblRefNode)value;
+        case 8:  this.hiddenTNmleq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.advanceExpr = (ASTCExprNode)value;
+        case 10: this.hiddenTFmteq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 11: this.formatIdentifier = (ASTFormatIdentifierNode)value;
+        case 12: this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 13: this.errLbl = (ASTLblRefNode)value;
+        case 14: this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 15: this.ioStatVar = (ASTScalarVariableNode)value;
+        case 16: this.hiddenTEndeq = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 17: this.endExpr = (ASTLblRefNode)value;
+        case 18: this.namelistGroupName = (ASTNamelistGroupNameNode)value;
+        case 19: this.recExpr = (ASTExprNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

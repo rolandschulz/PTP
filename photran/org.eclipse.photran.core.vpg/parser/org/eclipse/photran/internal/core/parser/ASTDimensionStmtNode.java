@@ -10,101 +10,89 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTDimensionStmtNode extends InteriorNode implements ISpecificationStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTDimensionStmtNode extends ASTNode implements ISpecificationStmt
 {
-    ASTDimensionStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTDimensionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTDimension; // in ASTDimensionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTDimensionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTDimensionStmtNode
+    IASTListNode<ASTArrayDeclaratorNode> arrayDeclaratorList; // in ASTDimensionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTDimensionStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTArrayDeclaratorNode> getArrayDeclaratorList()
     {
-        visitor.visitISpecificationStmt(this);
+        return this.arrayDeclaratorList;
+    }
+
+    public void setArrayDeclaratorList(IASTListNode<ASTArrayDeclaratorNode> newValue)
+    {
+        this.arrayDeclaratorList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
         visitor.visitASTDimensionStmtNode(this);
+        visitor.visitISpecificationStmt(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTArrayDeclaratorListNode getArrayDeclaratorList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DIMENSION_STMT_338)
-            return (ASTArrayDeclaratorListNode)getChild(4);
-        else if (getProduction() == Production.DIMENSION_STMT_339)
-            return (ASTArrayDeclaratorListNode)getChild(2);
-        else
-            return null;
+        return 6;
     }
 
-    public Token getLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DIMENSION_STMT_338)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.DIMENSION_STMT_339)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTDimension;
+        case 2:  return this.hiddenTColon;
+        case 3:  return this.hiddenTColon2;
+        case 4:  return this.arrayDeclaratorList;
+        case 5:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public boolean hasLabel()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.DIMENSION_STMT_338)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.DIMENSION_STMT_339)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.DIMENSION_STMT_338 && index == 1)
-            return false;
-        else if (getProduction() == Production.DIMENSION_STMT_338 && index == 2)
-            return false;
-        else if (getProduction() == Production.DIMENSION_STMT_338 && index == 3)
-            return false;
-        else if (getProduction() == Production.DIMENSION_STMT_338 && index == 5)
-            return false;
-        else if (getProduction() == Production.DIMENSION_STMT_339 && index == 1)
-            return false;
-        else if (getProduction() == Production.DIMENSION_STMT_339 && index == 3)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.DIMENSION_STMT_338 && index == 0)
-            return true;
-        else if (getProduction() == Production.DIMENSION_STMT_339 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTDimension = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.arrayDeclaratorList = (IASTListNode<ASTArrayDeclaratorNode>)value;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

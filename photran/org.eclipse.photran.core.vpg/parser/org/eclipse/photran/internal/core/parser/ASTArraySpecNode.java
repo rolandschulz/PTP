@@ -10,76 +10,104 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTArraySpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTArraySpecNode extends ASTNode
 {
-    ASTArraySpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList; // in ASTArraySpecNode
+    ASTAssumedSizeSpecNode assumedSizeSpec; // in ASTArraySpecNode
+    IASTListNode<ASTAssumedShapeSpecListNode> assumedShapeSpecList; // in ASTArraySpecNode
+    IASTListNode<ASTExplicitShapeSpecNode> explicitShapeSpecList; // in ASTArraySpecNode
+
+    public IASTListNode<ASTDeferredShapeSpecListNode> getDeferredShapeSpecList()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTArraySpecNode(this);
+        return this.deferredShapeSpecList;
     }
 
-    public ASTExplicitShapeSpecListNode getExplicitShapeSpecList()
+    public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_SPEC_291)
-            return (ASTExplicitShapeSpecListNode)getChild(0);
-        else
-            return null;
+        this.deferredShapeSpecList = newValue;
     }
+
 
     public ASTAssumedSizeSpecNode getAssumedSizeSpec()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_SPEC_292)
-            return (ASTAssumedSizeSpecNode)getChild(0);
-        else
-            return null;
+        return this.assumedSizeSpec;
     }
 
-    public ASTAssumedShapeSpecListNode getAssumedShapeSpecList()
+    public void setAssumedSizeSpec(ASTAssumedSizeSpecNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ARRAY_SPEC_293)
-            return (ASTAssumedShapeSpecListNode)getChild(0);
-        else
-            return null;
+        this.assumedSizeSpec = newValue;
     }
 
-    public ASTDeferredShapeSpecListNode getDeferredShapeSpecList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.ARRAY_SPEC_294)
-            return (ASTDeferredShapeSpecListNode)getChild(0);
-        else
-            return null;
+    public IASTListNode<ASTAssumedShapeSpecListNode> getAssumedShapeSpecList()
+    {
+        return this.assumedShapeSpecList;
+    }
+
+    public void setAssumedShapeSpecList(IASTListNode<ASTAssumedShapeSpecListNode> newValue)
+    {
+        this.assumedShapeSpecList = newValue;
+    }
+
+
+    public IASTListNode<ASTExplicitShapeSpecNode> getExplicitShapeSpecList()
+    {
+        return this.explicitShapeSpecList;
+    }
+
+    public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
+    {
+        this.explicitShapeSpecList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTArraySpecNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.deferredShapeSpecList;
+        case 1:  return this.assumedSizeSpec;
+        case 2:  return this.assumedShapeSpecList;
+        case 3:  return this.explicitShapeSpecList;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value;
+        case 1:  this.assumedSizeSpec = (ASTAssumedSizeSpecNode)value;
+        case 2:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value;
+        case 3:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

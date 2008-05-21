@@ -10,96 +10,123 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutineSubprogramNode extends ScopingNode implements IInternalSubprogram, IModuleSubprogram
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSubroutineSubprogramNode extends ScopingNode implements IInternalSubprogram, IModuleBodyConstruct, IModuleSubprogram, IModuleSubprogramPartConstruct, IProgramUnit
 {
-    ASTSubroutineSubprogramNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIModuleSubprogram(this);
-        visitor.visitIInternalSubprogram(this);
-        visitor.visitASTSubroutineSubprogramNode(this);
-    }
+    ASTSubroutineStmtNode subroutineStmt; // in ASTSubroutineSubprogramNode
+    IASTListNode<IBodyConstruct> body; // in ASTSubroutineSubprogramNode
+    ASTContainsStmtNode containsStmt; // in ASTSubroutineSubprogramNode
+    IASTListNode<IInternalSubprogram> internalSubprograms; // in ASTSubroutineSubprogramNode
+    ASTEndSubroutineStmtNode endSubroutineStmt; // in ASTSubroutineSubprogramNode
 
     public ASTSubroutineStmtNode getSubroutineStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTSubroutineStmtNode)getChild(0);
-        else
-            return null;
+        return this.subroutineStmt;
     }
 
-    public ASTBodyNode getBody()
+    public void setSubroutineStmt(ASTSubroutineStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTBodyNode)((ASTSubroutineRangeNode)getChild(1)).getBody();
-        else
-            return null;
+        this.subroutineStmt = newValue;
     }
 
-    public ASTEndSubroutineStmtNode getEndSubroutineStmt()
+
+    public IASTListNode<IBodyConstruct> getBody()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTEndSubroutineStmtNode)((ASTSubroutineRangeNode)getChild(1)).getEndSubroutineStmt();
-        else
-            return null;
+        return this.body;
     }
+
+    public void setBody(IASTListNode<IBodyConstruct> newValue)
+    {
+        this.body = newValue;
+    }
+
 
     public ASTContainsStmtNode getContainsStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTContainsStmtNode)((ASTSubroutineRangeNode)getChild(1)).getContainsStmt();
-        else
-            return null;
+        return this.containsStmt;
     }
 
-    public ASTInternalSubprogramsNode getInternalSubprograms()
+    public void setContainsStmt(ASTContainsStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTInternalSubprogramsNode)((ASTSubroutineRangeNode)getChild(1)).getInternalSubprograms();
-        else
-            return null;
+        this.containsStmt = newValue;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+
+    public IASTListNode<IInternalSubprogram> getInternalSubprograms()
     {
-        if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21 && index == 1)
-            return true;
-        else
-            return false;
+        return this.internalSubprograms;
+    }
+
+    public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
+    {
+        this.internalSubprograms = newValue;
+    }
+
+
+    public ASTEndSubroutineStmtNode getEndSubroutineStmt()
+    {
+        return this.endSubroutineStmt;
+    }
+
+    public void setEndSubroutineStmt(ASTEndSubroutineStmtNode newValue)
+    {
+        this.endSubroutineStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTSubroutineSubprogramNode(this);
+        visitor.visitIInternalSubprogram(this);
+        visitor.visitIModuleBodyConstruct(this);
+        visitor.visitIModuleSubprogram(this);
+        visitor.visitIModuleSubprogramPartConstruct(this);
+        visitor.visitIProgramUnit(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.subroutineStmt;
+        case 1:  return this.body;
+        case 2:  return this.containsStmt;
+        case 3:  return this.internalSubprograms;
+        case 4:  return this.endSubroutineStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.subroutineStmt = (ASTSubroutineStmtNode)value;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value;
+        case 2:  this.containsStmt = (ASTContainsStmtNode)value;
+        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value;
+        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

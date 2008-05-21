@@ -7,8 +7,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorVPGTask;
 
@@ -30,9 +30,9 @@ final class FortranCompletionProcessorVPGTask implements IFortranEditorVPGTask
             {
                 final HashMap<String, TreeSet<Definition>> defs = fortranCompletionProcessor.defs;
                 defs.clear();
-                ast.visitUsing(new GenericParseTreeVisitor()
+                ast.accept(new GenericASTVisitor()
                 {
-                    @Override public void visitParseTreeNode(InteriorNode node)
+                    @Override public void visitASTNode(IASTNode node)
                     {
                         if (ScopingNode.isScopingNode(node))
                         {
@@ -42,6 +42,8 @@ final class FortranCompletionProcessorVPGTask implements IFortranEditorVPGTask
                                 defs.put(qualifier, new TreeSet<Definition>());
                             defs.get(qualifier).addAll(n.getAllDefinitions());
                         }
+                        
+                        traverseChildren(node);
                     }
                 });
             }

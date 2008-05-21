@@ -21,10 +21,9 @@ import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockListNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTComponentDeclListNode;
+import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTEntityDeclListNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTEntryStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
@@ -47,6 +46,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
  * Visits an AST, binding identifier (T_IDENT) tokens in declaration statements.
@@ -76,6 +76,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTDerivedTypeStmtNode(ASTDerivedTypeStmtNode node)
     {
+        super.traverseChildren(node);
+        
         Definition d = addDefinition(node.getTypeName(), Definition.Classification.DERIVED_TYPE, Type.VOID);
         
         if (node.getAccessSpec() != null)
@@ -89,6 +91,8 @@ class DefinitionCollector extends BindingCollector
     
     @Override public void visitASTPrivateSequenceStmtNode(ASTPrivateSequenceStmtNode node)
     {
+        super.traverseChildren(node);
+        
         if (node.isPrivate())
         {
         	try
@@ -120,9 +124,11 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTComponentDefStmtNode(ASTComponentDefStmtNode node)
     {
-        ASTComponentDeclListNode decls = node.getComponentDeclList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTComponentDeclNode> decls = node.getComponentDeclList();
         for (int i = 0; i < decls.size(); i++)
-            addDefinition(decls.getComponentDecl(i).getComponentName().getComponentName(),
+            addDefinition(decls.get(i).getComponentName().getComponentName(),
                           Definition.Classification.DERIVED_TYPE_COMPONENT,
                           Type.parse(node.getTypeSpec()));
     }
@@ -140,10 +146,12 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTTypeDeclarationStmtNode(ASTTypeDeclarationStmtNode node)
     {
-        ASTEntityDeclListNode decls = node.getEntityDeclList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTEntityDeclNode> decls = node.getEntityDeclList();
         for (int i = 0; i < decls.size(); i++)
         {
-            ASTEntityDeclNode entityDecl = decls.getEntityDecl(i);
+            ASTEntityDeclNode entityDecl = decls.get(i);
             Token objectNameIdent = getObjectNameIdent(entityDecl);
             
             Definition def = addDefinition(objectNameIdent,
@@ -164,11 +172,13 @@ class DefinitionCollector extends BindingCollector
     
     private Token getObjectNameIdent(ASTEntityDeclNode entityDecl)
     {
+        super.traverseChildren(entityDecl);
         return entityDecl.getObjectName().getObjectName();
     }
     
     private ASTArraySpecNode getArraySpec(ASTEntityDeclNode entityDecl)
     {
+        super.traverseChildren(entityDecl);
         return entityDecl.getArraySpec();
     }
 
@@ -188,13 +198,15 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTAccessStmtNode(final ASTAccessStmtNode node)
     {
+        super.traverseChildren(node);
+        
         if (node.getAccessIdList() == null)
         {
         	if (node.getAccessSpec().isPrivate())
         	{
         		try
         		{
-        			setScopeDefaultVisibilityToPrivate(((Token)node.getAccessSpec().getChild(0)).getEnclosingScope());
+        			setScopeDefaultVisibilityToPrivate(node.getAccessSpec().findFirstToken().getEnclosingScope());
         		}
         		catch (Exception e)
         		{
@@ -219,11 +231,13 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTNamelistStmtNode(ASTNamelistStmtNode node)
     {
-        ASTNamelistGroupsNode groups = node.getNamelistGroups();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTNamelistGroupsNode> groups = node.getNamelistGroups();
         for (int i = 0; i < groups.size(); i++)
         {
-            Token name = groups.getNamelistGroupName(i);
-            Token object = groups.getNamelistGroupObjectVariableName(i);
+            Token name = groups.get(i).getNamelistGroupName();
+            Token object = groups.get(i).getVariableName();
             if (name != null) addDefinition(name,
                                             Definition.Classification.NAMELIST);
         }
@@ -251,10 +265,12 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTCommonStmtNode(ASTCommonStmtNode node)
     {
-        ASTCommonBlockListNode list = node.getCommonBlockList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTCommonBlockListNode> list = node.getCommonBlockList();
         for (int i = 0; i < list.size(); i++)
-            if (list.getCommonBlock(i).hasName())
-                addDefinition(list.getCommonBlock(i).getName().getCommonBlockName(),
+            if (list.get(i).getCommonBlock().getName() != null)
+                addDefinition(list.get(i).getCommonBlock().getName().getCommonBlockName(),
                               Definition.Classification.COMMON_BLOCK);
     }
 
@@ -265,7 +281,9 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTWhereConstructStmtNode(ASTWhereConstructStmtNode node)
     {
-        if (node.getWhereConstructName() != null) addDefinition(node.getWhereConstructName(),
+        super.traverseChildren(node);
+        
+        if (node.getName() != null) addDefinition(node.getName(),
                                                      Definition.Classification.WHERE,
                                                      Type.VOID);
     }
@@ -277,6 +295,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTForallConstructStmtNode(ASTForallConstructStmtNode node)
     {
+        super.traverseChildren(node);
+        
         if (node.getName() != null) addDefinition(node.getName(),
                                                   Definition.Classification.FORALL);
     }
@@ -288,7 +308,9 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTIfThenStmtNode(ASTIfThenStmtNode node)
     {
-        if (node.getIfConstructName() != null) addDefinition(node.getIfConstructName(),
+        super.traverseChildren(node);
+        
+        if (node.getName() != null) addDefinition(node.getName(),
                                                              Definition.Classification.IF);
     }
 
@@ -301,7 +323,9 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTSelectCaseStmtNode(ASTSelectCaseStmtNode node)
     {
-        if (node.getSelectConstructName() != null) addDefinition(node.getSelectConstructName(),
+        super.traverseChildren(node);
+        
+        if (node.getName() != null) addDefinition(node.getName(),
                                                                  Definition.Classification.SELECT);
     }
 
@@ -318,7 +342,9 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTLabelDoStmtNode(ASTLabelDoStmtNode node)
     {
-        if (node.getDoConstructName() != null) addDefinition(node.getDoConstructName(),
+        super.traverseChildren(node);
+        
+        if (node.getName() != null) addDefinition(node.getName(),
                                                              Definition.Classification.DO);
     }
 
@@ -328,6 +354,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTProgramStmtNode(ASTProgramStmtNode node)
     {
+        super.traverseChildren(node);
+        
         //NO!!! exitScope(); // We already pushed a Scope for a main program, just in case there was no ASTProgramStmt
         addDefinition(node.getProgramName().getProgramName(), Definition.Classification.MAIN_PROGRAM, Type.VOID);
     }
@@ -338,6 +366,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTModuleStmtNode(ASTModuleStmtNode node)
     {
+        super.traverseChildren(node);
+        
         addDefinition(node.getModuleName().getModuleName(), Definition.Classification.MODULE, Type.VOID);
         try { markModuleExport(file, node.getModuleName().getModuleName().getText()); }
         catch (Exception e) { throw new Error(e); }
@@ -350,6 +380,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTBlockDataStmtNode(ASTBlockDataStmtNode node)
     {
+        super.traverseChildren(node);
+        
         Token token = node.getBlockDataName() == null ? null : node.getBlockDataName().getBlockDataName();
         addDefinition(token, Definition.Classification.BLOCK_DATA, Type.VOID);
     }
@@ -362,6 +394,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTInterfaceStmtNode(ASTInterfaceStmtNode node)
     {
+        super.traverseChildren(node);
+        
         if (node.getGenericName() != null)
             addDefinition(node.getGenericName().getGenericName(), Definition.Classification.INTERFACE, Type.UNKNOWN);
         else if (node.getGenericSpec() != null)
@@ -379,9 +413,11 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTExternalStmtNode(ASTExternalStmtNode node)
     {
-        ASTExternalNameListNode list = node.getExternalNameList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
         for (int i = 0; i < list.size(); i++)
-            addDefinition(list.getExternalName(i), Definition.Classification.EXTERNAL, Type.UNKNOWN);
+            addDefinition(list.get(i).getExternalName(), Definition.Classification.EXTERNAL, Type.UNKNOWN);
         // TODO: addExternalDefinition
     }
 
@@ -396,9 +432,11 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node)
     {
-        ASTIntrinsicListNode list = node.getIntrinsicList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTIntrinsicListNode> list = node.getIntrinsicList();
         for (int i = 0; i < list.size(); i++)
-            addDefinition(list.getIntrinsicProcedureName(i), Definition.Classification.INTRINSIC, Type.UNKNOWN);
+            addDefinition(list.get(i).getIntrinsicProcedureName(), Definition.Classification.INTRINSIC, Type.UNKNOWN);
     }
 
     // # R1217 chain rule deleted
@@ -431,12 +469,14 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTFunctionStmtNode(ASTFunctionStmtNode node)
     {
+        super.traverseChildren(node);
+        
         Type type = Type.UNKNOWN;
         if (node.getPrefixSpecList() != null)
         {
             for (int i = 0; i < node.getPrefixSpecList().size(); i++)
             {
-                ASTTypeSpecNode typeSpec = node.getPrefixSpecList().getPrefixSpec(i).getTypeSpec();
+                ASTTypeSpecNode typeSpec = node.getPrefixSpecList().get(i).getTypeSpec();
                 if (typeSpec != null) type = Type.parse(typeSpec);
             }
         }
@@ -475,6 +515,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTSubroutineStmtNode(ASTSubroutineStmtNode node)
     {
+        super.traverseChildren(node);
+        
         addDefinition(node.getSubroutineName().getSubroutineName(), Definition.Classification.SUBROUTINE, Type.VOID);
     }
 
@@ -484,6 +526,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTEntryStmtNode(ASTEntryStmtNode node)
     {
+        super.traverseChildren(node);
+        
         throw new Notification("ENTRY statements are not currently supported.");
         
 //        // TO-DO: No syntax for function entries (with result parameter)
@@ -516,6 +560,8 @@ class DefinitionCollector extends BindingCollector
 
     @Override public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node)
     {
+        super.traverseChildren(node);
+        
         // Assume this is actually an assignment statement instead of a statement function
     }
 }

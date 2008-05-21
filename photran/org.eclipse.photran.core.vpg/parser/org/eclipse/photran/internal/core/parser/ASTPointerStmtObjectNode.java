@@ -10,88 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTPointerStmtObjectNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTPointerStmtObjectNode extends ASTNode
 {
-    ASTPointerStmtObjectNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token pointerName; // in ASTPointerStmtObjectNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTPointerStmtObjectNode
+    IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList; // in ASTPointerStmtObjectNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTPointerStmtObjectNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getPointerName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.pointerName;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setPointerName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.pointerName = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public IASTListNode<ASTDeferredShapeSpecListNode> getDeferredShapeSpecList()
+    {
+        return this.deferredShapeSpecList;
+    }
+
+    public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
+    {
+        this.deferredShapeSpecList = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPointerStmtObjectNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTDeferredShapeSpecListNode getDeferredShapeSpecList()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_STMT_OBJECT_354)
-            return (ASTDeferredShapeSpecListNode)getChild(2);
-        else
-            return null;
+        return 4;
     }
 
-    public boolean hasDeferredShapeSpecList()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_STMT_OBJECT_354)
-            return getChild(2) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.pointerName;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.deferredShapeSpecList;
+        case 3:  return this.hiddenTRparen;
+        default: return null;
+        }
     }
 
-    public Token getPointerName()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POINTER_STMT_OBJECT_353)
-            return (Token)((ASTPointerNameNode)getChild(0)).getPointerName();
-        else if (getProduction() == Production.POINTER_STMT_OBJECT_354)
-            return (Token)((ASTPointerNameNode)getChild(0)).getPointerName();
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.POINTER_STMT_OBJECT_354 && index == 1)
-            return false;
-        else if (getProduction() == Production.POINTER_STMT_OBJECT_354 && index == 3)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.POINTER_STMT_OBJECT_353 && index == 0)
-            return true;
-        else if (getProduction() == Production.POINTER_STMT_OBJECT_354 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.pointerName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

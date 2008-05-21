@@ -10,99 +10,106 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTWhereStmtNode extends InteriorNode implements IActionStmt, IForallBodyConstruct, IWhereBodyConstruct
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTWhereStmtNode extends ASTNode implements IActionStmt, IBodyConstruct, ICaseBodyConstruct, IExecutableConstruct, IExecutionPartConstruct, IForallBodyConstruct, IWhereBodyConstruct
 {
-    ASTWhereStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTWhereStmtNode
+    ASTMaskExprNode maskExpr; // in ASTWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTWhereStmtNode
+    ASTAssignmentStmtNode assignmentStmt; // in ASTWhereStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIActionStmt(this);
-        visitor.visitIForallBodyConstruct(this);
-        visitor.visitIWhereBodyConstruct(this);
-        visitor.visitASTWhereStmtNode(this);
-    }
+
 
     public ASTMaskExprNode getMaskExpr()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_599)
-            return (ASTMaskExprNode)getChild(3);
-        else
-            return null;
+        return this.maskExpr;
     }
+
+    public void setMaskExpr(ASTMaskExprNode newValue)
+    {
+        this.maskExpr = newValue;
+    }
+
 
     public ASTAssignmentStmtNode getAssignmentStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_599)
-            return (ASTAssignmentStmtNode)getChild(5);
-        else
-            return null;
+        return this.assignmentStmt;
     }
 
-    public Token getLabel()
+    public void setAssignmentStmt(ASTAssignmentStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.WHERE_STMT_599)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.assignmentStmt = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.WHERE_STMT_599)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTWhereStmtNode(this);
+        visitor.visitIActionStmt(this);
+        visitor.visitIBodyConstruct(this);
+        visitor.visitICaseBodyConstruct(this);
+        visitor.visitIExecutableConstruct(this);
+        visitor.visitIExecutionPartConstruct(this);
+        visitor.visitIForallBodyConstruct(this);
+        visitor.visitIWhereBodyConstruct(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.WHERE_STMT_599 && index == 1)
-            return false;
-        else if (getProduction() == Production.WHERE_STMT_599 && index == 2)
-            return false;
-        else if (getProduction() == Production.WHERE_STMT_599 && index == 4)
-            return false;
-        else
-            return true;
+        return 6;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.WHERE_STMT_599 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.hiddenTWhere;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.maskExpr;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.assignmentStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.maskExpr = (ASTMaskExprNode)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.assignmentStmt = (ASTAssignmentStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,82 +10,95 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTForallConstructNode extends InteriorNode implements IExecutableConstruct, IForallBodyConstruct
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, ICaseBodyConstruct, IExecutableConstruct, IExecutionPartConstruct, IForallBodyConstruct
 {
-    ASTForallConstructNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIExecutableConstruct(this);
-        visitor.visitIForallBodyConstruct(this);
-        visitor.visitASTForallConstructNode(this);
-    }
+    ASTForallConstructStmtNode forallConstructStmt; // in ASTForallConstructNode
+    IASTListNode<IForallBodyConstruct> forallBody; // in ASTForallConstructNode
+    ASTEndForallStmtNode endForallStmt; // in ASTForallConstructNode
 
     public ASTForallConstructStmtNode getForallConstructStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_CONSTRUCT_631)
-            return (ASTForallConstructStmtNode)getChild(0);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_632)
-            return (ASTForallConstructStmtNode)getChild(0);
-        else
-            return null;
+        return this.forallConstructStmt;
     }
+
+    public void setForallConstructStmt(ASTForallConstructStmtNode newValue)
+    {
+        this.forallConstructStmt = newValue;
+    }
+
+
+    public IASTListNode<IForallBodyConstruct> getForallBody()
+    {
+        return this.forallBody;
+    }
+
+    public void setForallBody(IASTListNode<IForallBodyConstruct> newValue)
+    {
+        this.forallBody = newValue;
+    }
+
 
     public ASTEndForallStmtNode getEndForallStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_CONSTRUCT_631)
-            return (ASTEndForallStmtNode)getChild(1);
-        else if (getProduction() == Production.FORALL_CONSTRUCT_632)
-            return (ASTEndForallStmtNode)getChild(2);
-        else
-            return null;
+        return this.endForallStmt;
     }
 
-    public ASTForallBodyNode getForallBody()
+    public void setEndForallStmt(ASTEndForallStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_CONSTRUCT_632)
-            return (ASTForallBodyNode)getChild(1);
-        else
-            return null;
+        this.endForallStmt = newValue;
     }
 
-    public boolean hasForallBody()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FORALL_CONSTRUCT_632)
-            return getChild(1) != null;
-        else
-            return false;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTForallConstructNode(this);
+        visitor.visitIBodyConstruct(this);
+        visitor.visitICaseBodyConstruct(this);
+        visitor.visitIExecutableConstruct(this);
+        visitor.visitIExecutionPartConstruct(this);
+        visitor.visitIForallBodyConstruct(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.forallConstructStmt;
+        case 1:  return this.forallBody;
+        case 2:  return this.endForallStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.forallConstructStmt = (ASTForallConstructStmtNode)value;
+        case 1:  this.forallBody = (IASTListNode<IForallBodyConstruct>)value;
+        case 2:  this.endForallStmt = (ASTEndForallStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

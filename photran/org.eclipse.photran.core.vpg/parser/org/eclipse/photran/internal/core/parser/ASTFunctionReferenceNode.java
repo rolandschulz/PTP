@@ -10,89 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTFunctionReferenceNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFunctionReferenceNode extends ASTNode
 {
-    ASTFunctionReferenceNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
+    ASTNameNode name; // in ASTFunctionReferenceNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTFunctionReferenceNode
+    IASTListNode<ASTFunctionArgListNode> functionArgList; // in ASTFunctionReferenceNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTFunctionReferenceNode
 
     public ASTNameNode getName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_REFERENCE_961)
-            return (ASTNameNode)getChild(0);
-        else if (getProduction() == Production.FUNCTION_REFERENCE_962)
-            return (ASTNameNode)getChild(0);
-        else
-            return null;
+        return this.name;
     }
 
-    public boolean hasName()
+    public void setName(ASTNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_REFERENCE_961)
-            return getChild(0) != null;
-        else if (getProduction() == Production.FUNCTION_REFERENCE_962)
-            return getChild(0) != null;
-        else
-            return false;
+        this.name = newValue;
     }
 
-    public ASTFunctionArgListNode getFunctionArgList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.FUNCTION_REFERENCE_962)
-            return (ASTFunctionArgListNode)getChild(2);
-        else
-            return null;
+    public IASTListNode<ASTFunctionArgListNode> getFunctionArgList()
+    {
+        return this.functionArgList;
     }
 
-    public boolean hasFunctionArgList()
+    public void setFunctionArgList(IASTListNode<ASTFunctionArgListNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FUNCTION_REFERENCE_962)
-            return getChild(2) != null;
-        else
-            return false;
+        this.functionArgList = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.FUNCTION_REFERENCE_961 && index == 1)
-            return false;
-        else if (getProduction() == Production.FUNCTION_REFERENCE_961 && index == 2)
-            return false;
-        else if (getProduction() == Production.FUNCTION_REFERENCE_962 && index == 1)
-            return false;
-        else if (getProduction() == Production.FUNCTION_REFERENCE_962 && index == 3)
-            return false;
-        else
-            return true;
+        visitor.visitASTFunctionReferenceNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 4;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.name;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.functionArgList;
+        case 3:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.name = (ASTNameNode)value;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.functionArgList = (IASTListNode<ASTFunctionArgListNode>)value;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

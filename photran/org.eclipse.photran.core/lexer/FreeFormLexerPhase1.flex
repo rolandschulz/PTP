@@ -45,6 +45,7 @@ import org.eclipse.core.resources.IFile;
 %ignorecase
 %type IToken
 %{
+	private boolean accumulateWhitetext;
 	private StringBuffer whiteBeforeSB = new StringBuffer();
 	protected IFile lastTokenFile = null;
 	protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
@@ -53,15 +54,18 @@ import org.eclipse.core.resources.IFile;
 	
 	private void storeNonTreeToken()
 	{
-		whiteBeforeSB.append(yytext());
+		if (accumulateWhitetext) whiteBeforeSB.append(yytext());
 	}
 	
 	private IToken token(Terminal terminal)
 	{
 		if (terminal == Terminal.END_OF_INPUT && lastToken != null)
 		{
-			lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
-			whiteBeforeSB = new StringBuffer();
+			if (accumulateWhitetext)
+			{
+				lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
+				whiteBeforeSB = new StringBuffer();
+			}
 		}
 		
 		if (terminal == Terminal.T_SCON)
@@ -80,12 +84,21 @@ import org.eclipse.core.resources.IFile;
 			lastTokenStreamOffset = yychar;
 			lastTokenLength = yylength();
 		}
-		lastToken = tokenFactory.createToken(terminal,
-		                 whiteBeforeSB.toString(),
-		                 terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
-		                 whiteAfterSB.toString());
-		whiteBeforeSB = new StringBuffer();
-		whiteAfterSB = new StringBuffer();
+		
+		if (accumulateWhitetext)
+		{
+			lastToken = tokenFactory.createToken(terminal,
+			                 whiteBeforeSB.toString(),
+			                 terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
+			                 whiteAfterSB.toString());
+			whiteBeforeSB = new StringBuffer();
+			whiteAfterSB = new StringBuffer();
+		}
+		else
+		{
+			lastToken = tokenFactory.createToken(terminal,
+			                 terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext());
+		}
 		return lastToken;
 	}
 
@@ -98,11 +111,12 @@ import org.eclipse.core.resources.IFile;
 	private String filename = "<stdin>";
 	protected TokenFactory tokenFactory;
     
-	public FreeFormLexerPhase1(java.io.InputStream in, String filename, TokenFactory tokenFactory)
+	public FreeFormLexerPhase1(java.io.InputStream in, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
 	{
 	    this(new LineAppendingInputStream(in));
 	    this.filename = filename;
 	    this.tokenFactory = tokenFactory;
+	    this.accumulateWhitetext = accumulateWhitetext;
 	}
 
     public String getFilename()

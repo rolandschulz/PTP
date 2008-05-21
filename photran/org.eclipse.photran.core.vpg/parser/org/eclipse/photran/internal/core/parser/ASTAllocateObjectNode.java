@@ -10,119 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTAllocateObjectNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTAllocateObjectNode extends ASTNode
 {
-    protected int count = -1;
+    ASTFieldSelectorNode fieldSelector; // in ASTAllocateObjectNode
+    ASTVariableNameNode variableName; // in ASTAllocateObjectNode
 
-    ASTAllocateObjectNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public ASTFieldSelectorNode getFieldSelector()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTAllocateObjectNode
-               && grandparent instanceof ASTAllocateObjectNode
-               && ((ASTAllocateObjectNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.fieldSelector;
     }
 
-    /**
-     * @return the number of ASTAllocateObjectNode nodes in this list
-     */
-    public int size()
+    public void setFieldSelector(ASTFieldSelectorNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTAllocateObjectNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.fieldSelector = newValue;
     }
-    
-    ASTAllocateObjectNode recurseToIndex(int listIndex)
+
+
+    public ASTVariableNameNode getVariableName()
     {
-        ASTAllocateObjectNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTAllocateObjectNode)node.getRecursiveNode();
-        }
-        return node;
+        return this.variableName;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+    public void setVariableName(ASTVariableNameNode newValue)
+    {
+        this.variableName = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllocateObjectNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTVariableNameNode getVariableName(int listIndex)
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTAllocateObjectNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ALLOCATE_OBJECT_463)
-            return (ASTVariableNameNode)node.getChild(0);
-        else
-            return null;
+        return 2;
     }
 
-    private ASTAllocateObjectNode getRecursiveNode()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.ALLOCATE_OBJECT_464)
-            return (ASTAllocateObjectNode)getChild(0);
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.fieldSelector;
+        case 1:  return this.variableName;
+        default: return null;
+        }
     }
 
-    public ASTFieldSelectorNode getFieldSelector(int listIndex)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTAllocateObjectNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.ALLOCATE_OBJECT_464)
-            return (ASTFieldSelectorNode)node.getChild(1);
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value;
+        case 1:  this.variableName = (ASTVariableNameNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

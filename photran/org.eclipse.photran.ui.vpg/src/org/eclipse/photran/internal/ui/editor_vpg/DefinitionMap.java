@@ -22,9 +22,9 @@ import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 public abstract class DefinitionMap<T>
 {
@@ -37,9 +37,9 @@ public abstract class DefinitionMap<T>
 
     public DefinitionMap(ASTExecutableProgramNode ast)
     {
-        ast.visitUsing(new GenericParseTreeVisitor()
+        ast.accept(new GenericASTVisitor()
         {
-            @Override public void visitParseTreeNode(InteriorNode node)
+            @Override public void visitASTNode(IASTNode node)
             {
                 if (ScopingNode.isScopingNode(node))
                     for (Definition def : ((ScopingNode)node).getAllDefinitions())
@@ -47,6 +47,8 @@ public abstract class DefinitionMap<T>
                         String qualifiedName = qualify(def.getTokenRef().findToken(), (ScopingNode)node);
                         definitions.put(qualifiedName, map(qualifiedName, def));
                     }
+                
+                traverseChildren(node);
             }
         });
         
@@ -187,7 +189,7 @@ public abstract class DefinitionMap<T>
         }
         
         GetScopeVisitor visitor = new GetScopeVisitor();
-        node.visitOnlyThisNodeUsing(visitor);
-        return node.getNonterminal() + "/" + visitor.name.toLowerCase() + ":";
+        node.accept(visitor);
+        return node.getClass().getName() + "/" + visitor.name.toLowerCase() + ":";
     }
 }

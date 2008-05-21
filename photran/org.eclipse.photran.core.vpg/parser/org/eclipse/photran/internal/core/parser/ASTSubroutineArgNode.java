@@ -10,154 +10,110 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSubroutineArgNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSubroutineArgNode extends ASTNode
 {
-    ASTSubroutineArgNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTSubroutineArgNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTSubroutineArgNode
+    ASTExprNode expr; // in ASTSubroutineArgNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTSubroutineArgNode
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTSubroutineArgNode
+    org.eclipse.photran.internal.core.lexer.Token hollerith; // in ASTSubroutineArgNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.name;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.name = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getExpr()
+    {
+        return this.expr;
+    }
+
+    public void setExpr(ASTExprNode newValue)
+    {
+        this.expr = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
+    {
+        return this.label;
+    }
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.label = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getHollerith()
+    {
+        return this.hollerith;
+    }
+
+    public void setHollerith(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hollerith = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubroutineArgNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getExpr()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_972)
-            return (ASTExpressionNode)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_974)
-            return (ASTExpressionNode)getChild(2);
-        else
-            return null;
+        return 6;
     }
 
-    public boolean hasExpr()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_972)
-            return getChild(0) != null;
-        else if (getProduction() == Production.SUBROUTINE_ARG_974)
-            return getChild(2) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.name;
+        case 1:  return this.hiddenTEquals;
+        case 2:  return this.expr;
+        case 3:  return this.hiddenTAsterisk;
+        case 4:  return this.label;
+        case 5:  return this.hollerith;
+        default: return null;
+        }
     }
 
-    public Token getHollerith()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_976)
-            return (Token)getChild(0);
-        else if (getProduction() == Production.SUBROUTINE_ARG_977)
-            return (Token)getChild(2);
-        else
-            return null;
-    }
-
-    public boolean hasHollerith()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_976)
-            return getChild(0) != null;
-        else if (getProduction() == Production.SUBROUTINE_ARG_977)
-            return getChild(2) != null;
-        else
-            return false;
-    }
-
-    public Token getAsteriskLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_973)
-            return (Token)((ASTLblRefNode)getChild(1)).getLabel();
-        else if (getProduction() == Production.SUBROUTINE_ARG_975)
-            return (Token)((ASTLblRefNode)getChild(3)).getLabel();
-        else
-            return null;
-    }
-
-    public boolean hasAsteriskLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_973)
-            return ((ASTLblRefNode)getChild(1)).hasLabel();
-        else if (getProduction() == Production.SUBROUTINE_ARG_975)
-            return ((ASTLblRefNode)getChild(3)).hasLabel();
-        else
-            return false;
-    }
-
-    public Token getName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SUBROUTINE_ARG_974)
-            return (Token)((ASTNameNode)getChild(0)).getName();
-        else if (getProduction() == Production.SUBROUTINE_ARG_975)
-            return (Token)((ASTNameNode)getChild(0)).getName();
-        else if (getProduction() == Production.SUBROUTINE_ARG_977)
-            return (Token)((ASTNameNode)getChild(0)).getName();
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.SUBROUTINE_ARG_973 && index == 0)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_ARG_974 && index == 1)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_ARG_975 && index == 1)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_ARG_975 && index == 2)
-            return false;
-        else if (getProduction() == Production.SUBROUTINE_ARG_977 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.SUBROUTINE_ARG_973 && index == 1)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_ARG_974 && index == 0)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_ARG_975 && index == 0)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_ARG_975 && index == 3)
-            return true;
-        else if (getProduction() == Production.SUBROUTINE_ARG_977 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.expr = (ASTExprNode)value;
+        case 3:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

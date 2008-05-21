@@ -13,26 +13,26 @@ package org.eclipse.photran.internal.core.analysis.binding;
 import java.util.List;
 
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.internal.core.parser.ASTAccessIdListNode;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAllocatableStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTArrayAllocationListNode;
-import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorListNode;
+import org.eclipse.photran.internal.core.parser.ASTArrayAllocationNode;
+import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorNode;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentParListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTNamedConstantDefListNode;
+import org.eclipse.photran.internal.core.parser.ASTNamedConstantDefNode;
 import org.eclipse.photran.internal.core.parser.ASTOptionalParListNode;
 import org.eclipse.photran.internal.core.parser.ASTOptionalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTParameterStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTPointerStmtObjectListNode;
+import org.eclipse.photran.internal.core.parser.ASTPointerStmtObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTSaveStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTSavedEntityListNode;
 import org.eclipse.photran.internal.core.parser.ASTSavedEntityNode;
-import org.eclipse.photran.internal.core.parser.ASTTargetObjectListNode;
+import org.eclipse.photran.internal.core.parser.ASTTargetObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTTargetStmtNode;
+import org.eclipse.photran.internal.core.parser.IAccessId;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
  * Visits specification statements in an AST, updating the corresponding
@@ -55,9 +55,11 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTIntentStmtNode(ASTIntentStmtNode node)
     {
-        ASTIntentParListNode list = node.getVariableList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTIntentParListNode> list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getVariableName(i));
+            bind(list.get(i).getVariableName());
     }
 
     // # R521
@@ -72,9 +74,11 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTOptionalStmtNode(ASTOptionalStmtNode node)
     {
-        ASTOptionalParListNode list = node.getVariableList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTOptionalParListNode> list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getVariableName(i));
+            bind(list.get(i).getVariableName());
     }
 
     // # R522
@@ -93,14 +97,16 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTAccessStmtNode(final ASTAccessStmtNode node)
     {
-        ASTAccessIdListNode list = node.getAccessIdList();
+        super.traverseChildren(node);
+        
+        IASTListNode<IAccessId> list = node.getAccessIdList();
         if (list == null) return; // This case handled in DefinitionCollector
 
         for (int i = 0; i < list.size(); i++)
         {
-            if (list.getAccessId(i) instanceof ASTGenericNameNode)
+            if (list.get(i) instanceof ASTGenericNameNode)
             {
-                List<PhotranTokenRef> bindings = bind(((ASTGenericNameNode)list.getAccessId(i)).getGenericName());
+                List<PhotranTokenRef> bindings = bind(((ASTGenericNameNode)list.get(i)).getGenericName());
 
                 try
                 {
@@ -137,11 +143,13 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTSaveStmtNode(ASTSaveStmtNode node)
     {
-        ASTSavedEntityListNode list = node.getVariableList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTSavedEntityNode> list = node.getVariableList();
         if (list == null) return;
         for (int i = 0; i < list.size(); i++)
         {
-            ASTSavedEntityNode entity = list.getSavedEntity(i);
+            ASTSavedEntityNode entity = list.get(i);
             if (entity.getVariableName() != null)
                 bind(entity.getVariableName());
             else if (entity.getCommonBlockName() != null)
@@ -161,17 +169,19 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTDimensionStmtNode(final ASTDimensionStmtNode node)
     {
-        final ASTArrayDeclaratorListNode decls = node.getArrayDeclaratorList();
+        super.traverseChildren(node);
+        
+        final IASTListNode<ASTArrayDeclaratorNode> decls = node.getArrayDeclaratorList();
         for (int i = 0; i < decls.size(); i++)
         {
-            List<PhotranTokenRef> bindings = bind(decls.getArrayDeclarator(i).getVariableName());
+            List<PhotranTokenRef> bindings = bind(decls.get(i).getVariableName());
 
             try
             {
 	            for (PhotranTokenRef tr : bindings)
 	            {
 	            	Definition def = vpg.getDefinitionFor(tr);
-	            	def.setArraySpec(decls.getArrayDeclarator(i).getArraySpec());
+	            	def.setArraySpec(decls.get(i).getArraySpec());
 	            	vpg.setDefinitionFor(tr, def);
 	            }
             }
@@ -196,9 +206,11 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTAllocatableStmtNode(ASTAllocatableStmtNode node)
     {
-        ASTArrayAllocationListNode list = node.getArrayAllocationList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTArrayAllocationNode> list = node.getArrayAllocationList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getArrayAllocation(i).getArrayName());
+            bind(list.get(i).getArrayName());
     }
 
     // # R528 /* <ObjectName> renamed to <PointerName> to simplify Sem. Anal. */
@@ -217,9 +229,11 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTPointerStmtNode(ASTPointerStmtNode node)
     {
-        ASTPointerStmtObjectListNode list = node.getPointerStmtObjectList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTPointerStmtObjectNode> list = node.getPointerStmtObjectList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getPointerStmtObject(i).getPointerName());
+            bind(list.get(i).getPointerName());
     }
 
     //
@@ -240,9 +254,11 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTTargetStmtNode(ASTTargetStmtNode node)
     {
-        ASTTargetObjectListNode list = node.getTargetObjectList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTTargetObjectNode> list = node.getTargetObjectList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getTargetObject(i).getTargetName());
+            bind(list.get(i).getTargetName());
     }
 
     // # R530
@@ -258,8 +274,10 @@ class SpecificationCollector extends BindingCollector
 
     @Override public void visitASTParameterStmtNode(ASTParameterStmtNode node)
     {
-        ASTNamedConstantDefListNode list = node.getNamedConstantDefList();
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTNamedConstantDefNode> list = node.getNamedConstantDefList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.getNamedConstantDef(i).getNamedConstant());
+            bind(list.get(i).getNamedConstant());
     }
 }

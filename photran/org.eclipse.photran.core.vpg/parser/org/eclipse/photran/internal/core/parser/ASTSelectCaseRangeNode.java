@@ -10,63 +10,76 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTSelectCaseRangeNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSelectCaseRangeNode extends ASTNode
 {
-    ASTSelectCaseRangeNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    IASTListNode<ICaseBodyConstruct> selectCaseBody; // in ASTSelectCaseRangeNode
+    ASTEndSelectStmtNode endSelectStmt; // in ASTSelectCaseRangeNode
+
+    public IASTListNode<ICaseBodyConstruct> getSelectCaseBody()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        return this.selectCaseBody;
     }
 
-    public ASTSelectCaseBodyNode getSelectCaseBody()
+    public void setSelectCaseBody(IASTListNode<ICaseBodyConstruct> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_RANGE_677)
-            return (ASTSelectCaseBodyNode)getChild(0);
-        else
-            return null;
+        this.selectCaseBody = newValue;
     }
 
-    public boolean hasSelectCaseBody()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_RANGE_677)
-            return getChild(0) != null;
-        else
-            return false;
-    }
 
     public ASTEndSelectStmtNode getEndSelectStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        return this.endSelectStmt;
+    }
 
-        if (getProduction() == Production.SELECT_CASE_RANGE_677)
-            return (ASTEndSelectStmtNode)getChild(1);
-        else if (getProduction() == Production.SELECT_CASE_RANGE_678)
-            return (ASTEndSelectStmtNode)getChild(0);
-        else
-            return null;
+    public void setEndSelectStmt(ASTEndSelectStmtNode newValue)
+    {
+        this.endSelectStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTSelectCaseRangeNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 2;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.selectCaseBody;
+        case 1:  return this.endSelectStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value;
+        case 1:  this.endSelectStmt = (ASTEndSelectStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,208 +10,111 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTSelectCaseStmtNode extends InteriorNodeWithErrorRecoverySymbols
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
 {
-    ASTSelectCaseStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSelectcase; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSelect; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTCase; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSelectCaseStmtNode
+    ASTExprNode selectionExpression; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTSelectCaseStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production, discardedSymbols);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
+    {
+        return this.name;
+    }
+
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.name = newValue;
+    }
+
+
+    public ASTExprNode getSelectionExpression()
+    {
+        return this.selectionExpression;
+    }
+
+    public void setSelectionExpression(ASTExprNode newValue)
+    {
+        this.selectionExpression = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSelectCaseStmtNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getSelectionExpression()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_683)
-            return (ASTExpressionNode)getChild(5);
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
-            return (ASTExpressionNode)getChild(3);
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
-            return (ASTExpressionNode)getChild(6);
-        else if (getProduction() == Production.SELECT_CASE_STMT_686)
-            return (ASTExpressionNode)getChild(4);
-        else
-            return null;
+        return 10;
     }
 
-    public Token getLabel()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_683)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_686)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.name;
+        case 2:  return this.hiddenTColon;
+        case 3:  return this.hiddenTSelectcase;
+        case 4:  return this.hiddenTSelect;
+        case 5:  return this.hiddenTCase;
+        case 6:  return this.hiddenTLparen;
+        case 7:  return this.selectionExpression;
+        case 8:  return this.hiddenTRparen;
+        case 9:  return this.hiddenTEos;
+        default: return null;
+        }
     }
 
-    public boolean hasLabel()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_683)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_684)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_686)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
-    }
-
-    public Token getSelectConstructName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SELECT_CASE_STMT_683)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.SELECT_CASE_STMT_685)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13)
-            return (Token)((ASTNameNode)getChild(1)).getName();
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 2)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 3)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 4)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 6)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 7)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 1)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 2)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 4)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 5)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 2)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 3)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 4)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 5)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 7)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 8)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 1)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 2)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 3)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 5)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 6)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 2)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 3)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12 && index == 1)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 2)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 3)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 4)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14 && index == 1)
-            return false;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14 && index == 2)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_683 && index == 1)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_684 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_685 && index == 1)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_686 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_11 && index == 1)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_12 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 0)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_13 && index == 1)
-            return true;
-        else if (getProduction() == Production.SELECT_CASE_STMT_ERROR_14 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTSelectcase = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.selectionExpression = (ASTExprNode)value;
+        case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

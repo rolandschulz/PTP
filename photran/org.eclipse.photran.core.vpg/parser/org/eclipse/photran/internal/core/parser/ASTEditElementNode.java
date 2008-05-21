@@ -10,146 +10,124 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTEditElementNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTEditElementNode extends ASTNode
 {
-    ASTEditElementNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token floatConst; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token hollerith; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token identifier; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTEditElementNode
+    IASTListNode<ASTFmtSpecNode> fmtSpec; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTEditElementNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getFloatConst()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.floatConst;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setFloatConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.floatConst = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getHollerith()
+    {
+        return this.hollerith;
+    }
+
+    public void setHollerith(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hollerith = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getIdentifier()
+    {
+        return this.identifier;
+    }
+
+    public void setIdentifier(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.identifier = newValue;
+    }
+
+
+    public IASTListNode<ASTFmtSpecNode> getFmtSpec()
+    {
+        return this.fmtSpec;
+    }
+
+    public void setFmtSpec(IASTListNode<ASTFmtSpecNode> newValue)
+    {
+        this.fmtSpec = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
+    {
+        return this.stringConst;
+    }
+
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.stringConst = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEditElementNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getFloatConst()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_882)
-            return (Token)getChild(0);
-        else
-            return null;
+        return 7;
     }
 
-    public boolean hasFloatConst()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_882)
-            return getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.floatConst;
+        case 1:  return this.hollerith;
+        case 2:  return this.identifier;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.fmtSpec;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.stringConst;
+        default: return null;
+        }
     }
 
-    public Token getStringConst()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_883)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasStringConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_883)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public Token getIdentifier()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_884)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasIdentifier()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_884)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public Token getHollerith()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_885)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasHollerith()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_885)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public ASTFmtSpecNode getFmtSpec()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_886)
-            return (ASTFmtSpecNode)getChild(1);
-        else
-            return null;
-    }
-
-    public boolean hasFmtSpec()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.EDIT_ELEMENT_886)
-            return getChild(1) != null;
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.EDIT_ELEMENT_886 && index == 0)
-            return false;
-        else if (getProduction() == Production.EDIT_ELEMENT_886 && index == 2)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

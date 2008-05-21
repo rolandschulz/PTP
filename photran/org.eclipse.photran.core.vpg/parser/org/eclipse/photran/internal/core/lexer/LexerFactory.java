@@ -28,18 +28,18 @@ public final class LexerFactory
 {
     private LexerFactory() {;}
     
-    public static IAccumulatingLexer createLexer(InputStream in, String filename, SourceForm sourceForm) throws IOException
+    public static IAccumulatingLexer createLexer(InputStream in, String filename, SourceForm sourceForm, boolean accumulateWhitetext) throws IOException
     {
-        return sourceForm.createLexer(in, filename);
+        return sourceForm.createLexer(in, filename, accumulateWhitetext);
     }
     
-    public static IAccumulatingLexer createLexer(File file, SourceForm sourceForm) throws IOException
+    public static IAccumulatingLexer createLexer(File file, SourceForm sourceForm, boolean accumulateWhitetext) throws IOException
     {
-        return createLexer(new BufferedInputStream(new FileInputStream(file)), file.getAbsolutePath(), sourceForm);
+        return createLexer(new BufferedInputStream(new FileInputStream(file)), file.getAbsolutePath(), sourceForm, accumulateWhitetext);
     }
     
-    public static IAccumulatingLexer createLexer(IFile file, SourceForm sourceForm) throws CoreException, IOException
+    public static IAccumulatingLexer createLexer(IFile file, SourceForm sourceForm, boolean accumulateWhitetext) throws CoreException, IOException
     {
-        return createLexer(file.getContents(), file.getName(), sourceForm);
+        return createLexer(file.getContents(), file.getName(), sourceForm, accumulateWhitetext);
     }
 }

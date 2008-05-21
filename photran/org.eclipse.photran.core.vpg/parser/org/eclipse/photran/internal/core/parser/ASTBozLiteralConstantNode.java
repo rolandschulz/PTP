@@ -10,96 +10,90 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTBozLiteralConstantNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTBozLiteralConstantNode extends ASTNode
 {
-    ASTBozLiteralConstantNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token binaryConst; // in ASTBozLiteralConstantNode
+    org.eclipse.photran.internal.core.lexer.Token octalConst; // in ASTBozLiteralConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hexConst; // in ASTBozLiteralConstantNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getBinaryConst()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.binaryConst;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setBinaryConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.binaryConst = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getOctalConst()
+    {
+        return this.octalConst;
+    }
+
+    public void setOctalConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.octalConst = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getHexConst()
+    {
+        return this.hexConst;
+    }
+
+    public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hexConst = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTBozLiteralConstantNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public Token getBinaryConst()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_172)
-            return (Token)getChild(0);
-        else
-            return null;
+        return 3;
     }
 
-    public boolean hasBinaryConst()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_172)
-            return getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.binaryConst;
+        case 1:  return this.octalConst;
+        case 2:  return this.hexConst;
+        default: return null;
+        }
     }
 
-    public Token getOctalConst()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_173)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasOctalConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_173)
-            return getChild(0) != null;
-        else
-            return false;
-    }
-
-    public Token getHexConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_174)
-            return (Token)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean hasHexConst()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BOZ_LITERAL_CONSTANT_174)
-            return getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

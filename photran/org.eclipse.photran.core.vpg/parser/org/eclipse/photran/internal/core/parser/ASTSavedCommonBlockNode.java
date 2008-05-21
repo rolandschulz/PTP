@@ -10,59 +10,68 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTSavedCommonBlockNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTSavedCommonBlockNode extends ASTNode
 {
-    ASTSavedCommonBlockNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash; // in ASTSavedCommonBlockNode
+    org.eclipse.photran.internal.core.lexer.Token commonBlockName; // in ASTSavedCommonBlockNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSlash2; // in ASTSavedCommonBlockNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getCommonBlockName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        return this.commonBlockName;
     }
 
-    public Token getCommonBlockName()
+    public void setCommonBlockName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.SAVED_COMMON_BLOCK_337)
-            return (Token)((ASTCommonBlockNameNode)getChild(1)).getCommonBlockName();
-        else
-            return null;
+        this.commonBlockName = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.SAVED_COMMON_BLOCK_337 && index == 0)
-            return false;
-        else if (getProduction() == Production.SAVED_COMMON_BLOCK_337 && index == 2)
-            return false;
-        else
-            return true;
+        visitor.visitASTSavedCommonBlockNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.SAVED_COMMON_BLOCK_337 && index == 1)
-            return true;
-        else
-            return false;
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTSlash;
+        case 1:  return this.commonBlockName;
+        case 2:  return this.hiddenTSlash2;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

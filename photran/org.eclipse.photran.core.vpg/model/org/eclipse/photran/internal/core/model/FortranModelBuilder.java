@@ -68,15 +68,16 @@ public class FortranModelBuilder implements IFortranModelBuilder
             lexer = LexerFactory.createLexer(
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file.getName(),
-                isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM);
+                isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM,
+                false);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
             IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
                         
             if (isParseTreeModelEnabled())
-                 ast.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
+                 ast.accept(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
             else
-                 ast.visitUsing(new FortranModelBuildingVisitor(translationUnit, this));
+                 ast.accept(new FortranModelBuildingVisitor(translationUnit, this));
             
             //FortranElement note = new FortranElement.UnknownNode(translationUnit, isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>");
             //this.addF90Element(note);

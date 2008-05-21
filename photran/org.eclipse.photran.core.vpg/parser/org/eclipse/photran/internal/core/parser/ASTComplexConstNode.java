@@ -10,68 +10,85 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTComplexConstNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTComplexConstNode extends ASTNode
 {
-    ASTComplexConstNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTComplexConstNode
+    ASTExprNode realPart; // in ASTComplexConstNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTComplexConstNode
+    ASTExprNode complexPart; // in ASTComplexConstNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTComplexConstNode
+
+    public ASTExprNode getRealPart()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.realPart;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setRealPart(ASTExprNode newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.realPart = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+
+    public ASTExprNode getComplexPart()
+    {
+        return this.complexPart;
+    }
+
+    public void setComplexPart(ASTExprNode newValue)
+    {
+        this.complexPart = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTComplexConstNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTExpressionNode getRealPart()
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPLEX_CONST_175)
-            return (ASTExpressionNode)getChild(1);
-        else
-            return null;
+        return 5;
     }
 
-    public ASTExpressionNode getComplexPart()
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.COMPLEX_CONST_175)
-            return (ASTExpressionNode)getChild(3);
-        else
-            return null;
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.realPart;
+        case 2:  return this.hiddenTComma;
+        case 3:  return this.complexPart;
+        case 4:  return this.hiddenTRparen;
+        default: return null;
+        }
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (getProduction() == Production.COMPLEX_CONST_175 && index == 0)
-            return false;
-        else if (getProduction() == Production.COMPLEX_CONST_175 && index == 2)
-            return false;
-        else if (getProduction() == Production.COMPLEX_CONST_175 && index == 4)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.realPart = (ASTExprNode)value;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.complexPart = (ASTExprNode)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

@@ -10,70 +10,91 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTBlockDataSubprogramNode extends ScopingNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramUnit
 {
-    ASTBlockDataSubprogramNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTBlockDataSubprogramNode(this);
-    }
+    ASTBlockDataStmtNode blockDataStmt; // in ASTBlockDataSubprogramNode
+    IASTListNode<IBlockDataBodyConstruct> blockDataBody; // in ASTBlockDataSubprogramNode
+    ASTEndBlockDataStmtNode endBlockDataStmt; // in ASTBlockDataSubprogramNode
 
     public ASTBlockDataStmtNode getBlockDataStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BLOCK_DATA_SUBPROGRAM_32)
-            return (ASTBlockDataStmtNode)getChild(0);
-        else if (getProduction() == Production.BLOCK_DATA_SUBPROGRAM_33)
-            return (ASTBlockDataStmtNode)getChild(0);
-        else
-            return null;
+        return this.blockDataStmt;
     }
 
-    public ASTBlockDataBodyNode getBlockDataBody()
+    public void setBlockDataStmt(ASTBlockDataStmtNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.BLOCK_DATA_SUBPROGRAM_32)
-            return (ASTBlockDataBodyNode)getChild(1);
-        else
-            return null;
+        this.blockDataStmt = newValue;
     }
+
+
+    public IASTListNode<IBlockDataBodyConstruct> getBlockDataBody()
+    {
+        return this.blockDataBody;
+    }
+
+    public void setBlockDataBody(IASTListNode<IBlockDataBodyConstruct> newValue)
+    {
+        this.blockDataBody = newValue;
+    }
+
 
     public ASTEndBlockDataStmtNode getEndBlockDataStmt()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
+        return this.endBlockDataStmt;
+    }
 
-        if (getProduction() == Production.BLOCK_DATA_SUBPROGRAM_32)
-            return (ASTEndBlockDataStmtNode)getChild(2);
-        else if (getProduction() == Production.BLOCK_DATA_SUBPROGRAM_33)
-            return (ASTEndBlockDataStmtNode)getChild(1);
-        else
-            return null;
+    public void setEndBlockDataStmt(ASTEndBlockDataStmtNode newValue)
+    {
+        this.endBlockDataStmt = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTBlockDataSubprogramNode(this);
+        visitor.visitIProgramUnit(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 3;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.blockDataStmt;
+        case 1:  return this.blockDataBody;
+        case 2:  return this.endBlockDataStmt;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.blockDataStmt = (ASTBlockDataStmtNode)value;
+        case 1:  this.blockDataBody = (IASTListNode<IBlockDataBodyConstruct>)value;
+        case 2:  this.endBlockDataStmt = (ASTEndBlockDataStmtNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

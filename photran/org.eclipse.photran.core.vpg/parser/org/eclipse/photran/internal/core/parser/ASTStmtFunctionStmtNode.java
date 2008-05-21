@@ -10,97 +10,117 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTStmtFunctionStmtNode extends InteriorNode implements IObsoleteActionStmt
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTStmtFunctionStmtNode extends ASTNode implements IObsoleteActionStmt
 {
-    ASTStmtFunctionStmtNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTStmtFunctionStmtNode
+    ASTNameNode name; // in ASTStmtFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTStmtFunctionStmtNode
+    IASTListNode<ASTSFDummyArgNameListNode> SFDummyArgNameList; // in ASTStmtFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTStmtFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTStmtFunctionStmtNode
+    ASTExprNode expr; // in ASTStmtFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTStmtFunctionStmtNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.label;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.label = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitIObsoleteActionStmt(this);
-        visitor.visitASTStmtFunctionStmtNode(this);
-    }
+
 
     public ASTNameNode getName()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1017)
-            return (ASTNameNode)getChild(1);
-        else
-            return null;
+        return this.name;
     }
 
-    public Token getLabel()
+    public void setName(ASTNameNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1017)
-            return (Token)((ASTLblDefNode)getChild(0)).getLabel();
-        else
-            return null;
+        this.name = newValue;
     }
 
-    public boolean hasLabel()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1017)
-            return ((ASTLblDefNode)getChild(0)).hasLabel();
-        else
-            return false;
+    public IASTListNode<ASTSFDummyArgNameListNode> getSFDummyArgNameList()
+    {
+        return this.SFDummyArgNameList;
     }
 
-    public ASTExpressionNode getExpr()
+    public void setSFDummyArgNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1017)
-            return (ASTExpressionNode)((ASTStmtFunctionRangeNode)getChild(2)).getExpr();
-        else
-            return null;
+        this.SFDummyArgNameList = newValue;
     }
 
-    public ASTSFDummyArgNameListNode getSFDummyArgNameList()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1017)
-            return (ASTSFDummyArgNameListNode)((ASTStmtFunctionRangeNode)getChild(2)).getSFDummyArgNameList();
-        else
-            return null;
+    public ASTExprNode getExpr()
+    {
+        return this.expr;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    public void setExpr(ASTExprNode newValue)
     {
-        if (getProduction() == Production.STMT_FUNCTION_STMT_1017 && index == 0)
-            return true;
-        else if (getProduction() == Production.STMT_FUNCTION_STMT_1017 && index == 2)
-            return true;
-        else
-            return false;
+        this.expr = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTStmtFunctionStmtNode(this);
+        visitor.visitIObsoleteActionStmt(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 8;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.label;
+        case 1:  return this.name;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.SFDummyArgNameList;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.hiddenTEquals;
+        case 6:  return this.expr;
+        case 7:  return this.hiddenTEos;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.name = (ASTNameNode)value;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.expr = (ASTExprNode)value;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

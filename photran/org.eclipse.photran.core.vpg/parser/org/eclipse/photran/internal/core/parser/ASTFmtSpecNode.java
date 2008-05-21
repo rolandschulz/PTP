@@ -10,215 +10,93 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTFmtSpecNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTFmtSpecNode extends ASTNode
 {
-    protected int count = -1;
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTFmtSpecNode
+    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFmtSpecNode
+    org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFmtSpecNode
+    ASTFormatEditNode formatEdit; // in ASTFmtSpecNode
 
-    ASTFmtSpecNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public boolean colonFormatSep()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTFmtSpecNode
-               && grandparent instanceof ASTFmtSpecNode
-               && ((ASTFmtSpecNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.colonFormatSep != null;
     }
 
-    /**
-     * @return the number of ASTFmtSpecNode nodes in this list
-     */
-    public int size()
+    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTFmtSpecNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.colonFormatSep = newValue;
     }
-    
-    ASTFmtSpecNode recurseToIndex(int listIndex)
+
+
+    public boolean slashFormatSep()
     {
-        ASTFmtSpecNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTFmtSpecNode)node.getRecursiveNode();
-        }
-        return node;
+        return this.slashFormatSep != null;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+    public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.slashFormatSep = newValue;
+    }
+
+
+    public ASTFormatEditNode getFormatEdit()
+    {
+        return this.formatEdit;
+    }
+
+    public void setFormatEdit(ASTFormatEditNode newValue)
+    {
+        this.formatEdit = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFmtSpecNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTFormatEditNode getFormatEdit(int listIndex)
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_868)
-            return (ASTFormatEditNode)node.getChild(0);
-        else if (node.getProduction() == Production.FMT_SPEC_870)
-            return (ASTFormatEditNode)node.getChild(1);
-        else if (node.getProduction() == Production.FMT_SPEC_872)
-            return (ASTFormatEditNode)node.getChild(2);
-        else if (node.getProduction() == Production.FMT_SPEC_873)
-            return (ASTFormatEditNode)node.getChild(2);
-        else if (node.getProduction() == Production.FMT_SPEC_875)
-            return (ASTFormatEditNode)node.getChild(3);
-        else
-            return null;
+        return 4;
     }
 
-    public boolean hasFormatEdit(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_868)
-            return node.getChild(0) != null;
-        else if (node.getProduction() == Production.FMT_SPEC_870)
-            return node.getChild(1) != null;
-        else if (node.getProduction() == Production.FMT_SPEC_872)
-            return node.getChild(2) != null;
-        else if (node.getProduction() == Production.FMT_SPEC_873)
-            return node.getChild(2) != null;
-        else if (node.getProduction() == Production.FMT_SPEC_875)
-            return node.getChild(3) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.hiddenTComma;
+        case 1:  return this.colonFormatSep;
+        case 2:  return this.slashFormatSep;
+        case 3:  return this.formatEdit;
+        default: return null;
+        }
     }
 
-    private ASTFmtSpecNode getRecursiveNode()
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FMT_SPEC_871)
-            return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_872)
-            return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_873)
-            return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_874)
-            return (ASTFmtSpecNode)getChild(0);
-        else if (getProduction() == Production.FMT_SPEC_875)
-            return (ASTFmtSpecNode)getChild(0);
-        else
-            return null;
-    }
-
-    public boolean slashFormatSep(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_869)
-            return ((ASTFormatsepNode)node.getChild(0)).slashFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_870)
-            return ((ASTFormatsepNode)node.getChild(0)).slashFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_871)
-            return ((ASTFormatsepNode)node.getChild(1)).slashFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_872)
-            return ((ASTFormatsepNode)node.getChild(1)).slashFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_874)
-            return ((ASTFormatsepNode)node.getChild(2)).slashFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_875)
-            return ((ASTFormatsepNode)node.getChild(2)).slashFormatSep();
-        else
-            return false;
-    }
-
-    public boolean colonFormatSep(int listIndex)
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTFmtSpecNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.FMT_SPEC_869)
-            return ((ASTFormatsepNode)node.getChild(0)).colonFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_870)
-            return ((ASTFormatsepNode)node.getChild(0)).colonFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_871)
-            return ((ASTFormatsepNode)node.getChild(1)).colonFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_872)
-            return ((ASTFormatsepNode)node.getChild(1)).colonFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_874)
-            return ((ASTFormatsepNode)node.getChild(2)).colonFormatSep();
-        else if (node.getProduction() == Production.FMT_SPEC_875)
-            return ((ASTFormatsepNode)node.getChild(2)).colonFormatSep();
-        else
-            return false;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.FMT_SPEC_873 && index == 1)
-            return false;
-        else if (getProduction() == Production.FMT_SPEC_874 && index == 1)
-            return false;
-        else if (getProduction() == Production.FMT_SPEC_875 && index == 1)
-            return false;
-        else
-            return true;
-    }
-
-    @Override protected boolean childIsPulledUp(int index)
-    {
-        if (getProduction() == Production.FMT_SPEC_869 && index == 0)
-            return true;
-        else if (getProduction() == Production.FMT_SPEC_870 && index == 0)
-            return true;
-        else if (getProduction() == Production.FMT_SPEC_871 && index == 1)
-            return true;
-        else if (getProduction() == Production.FMT_SPEC_872 && index == 1)
-            return true;
-        else if (getProduction() == Production.FMT_SPEC_874 && index == 2)
-            return true;
-        else if (getProduction() == Production.FMT_SPEC_875 && index == 2)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.formatEdit = (ASTFormatEditNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

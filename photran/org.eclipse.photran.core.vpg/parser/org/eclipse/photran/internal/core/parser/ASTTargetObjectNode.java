@@ -10,88 +10,82 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTTargetObjectNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTTargetObjectNode extends ASTNode
 {
-    ASTTargetObjectNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    org.eclipse.photran.internal.core.lexer.Token targetName; // in ASTTargetObjectNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTargetObjectNode
+    ASTArraySpecNode arraySpec; // in ASTTargetObjectNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTargetObjectNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getTargetName()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
+        return this.targetName;
     }
-        
-    @Override public InteriorNode getASTParent()
+
+    public void setTargetName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
+        this.targetName = newValue;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
-    {
-        visitor.visitASTTargetObjectNode(this);
-    }
+
 
     public ASTArraySpecNode getArraySpec()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TARGET_OBJECT_361)
-            return (ASTArraySpecNode)getChild(2);
-        else
-            return null;
+        return this.arraySpec;
     }
 
-    public boolean hasArraySpec()
+    public void setArraySpec(ASTArraySpecNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.TARGET_OBJECT_361)
-            return getChild(2) != null;
-        else
-            return false;
+        this.arraySpec = newValue;
     }
 
-    public Token getTargetName()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.TARGET_OBJECT_360)
-            return (Token)((ASTTargetNameNode)getChild(0)).getTargetName();
-        else if (getProduction() == Production.TARGET_OBJECT_361)
-            return (Token)((ASTTargetNameNode)getChild(0)).getTargetName();
-        else
-            return null;
+    public void accept(IASTVisitor visitor)
+    {
+        visitor.visitASTTargetObjectNode(this);
+        visitor.visitASTNode(this);
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+    @Override protected int getNumASTFields()
     {
-        if (getProduction() == Production.TARGET_OBJECT_361 && index == 1)
-            return false;
-        else if (getProduction() == Production.TARGET_OBJECT_361 && index == 3)
-            return false;
-        else
-            return true;
+        return 4;
     }
 
-    @Override protected boolean childIsPulledUp(int index)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (getProduction() == Production.TARGET_OBJECT_360 && index == 0)
-            return true;
-        else if (getProduction() == Production.TARGET_OBJECT_361 && index == 0)
-            return true;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.targetName;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.arraySpec;
+        case 3:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.targetName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.arraySpec = (ASTArraySpecNode)value;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

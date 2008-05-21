@@ -283,7 +283,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, 
 
 		try
 		{
-			IAccumulatingLexer lexer = LexerFactory.createLexer(file, sourceForm);
+			IAccumulatingLexer lexer = LexerFactory.createLexer(file, sourceForm, true);
 			long start = System.currentTimeMillis();
             ASTExecutableProgramNode ast = parser.parse(lexer);
             debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);

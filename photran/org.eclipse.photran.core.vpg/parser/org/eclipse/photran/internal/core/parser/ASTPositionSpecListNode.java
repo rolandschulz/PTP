@@ -10,144 +10,79 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-public class ASTPositionSpecListNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTPositionSpecListNode extends ASTNode
 {
-    protected int count = -1;
+    ASTUnitIdentifierNode unitIdentifier; // in ASTPositionSpecListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTPositionSpecListNode
+    ASTPositionSpecNode positionSpec; // in ASTPositionSpecListNode
 
-    ASTPositionSpecListNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
+    public ASTUnitIdentifierNode getUnitIdentifier()
     {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        // This is a recursive node in a list, so its logical parent node
-        // is the parent of the first node in the list
-    
-        InteriorNode parent = super.getParent();
-        InteriorNode grandparent = parent == null ? null : parent.getParent();
-        InteriorNode logicalParent = parent;
-        
-        while (parent != null && grandparent != null
-               && parent instanceof ASTPositionSpecListNode
-               && grandparent instanceof ASTPositionSpecListNode
-               && ((ASTPositionSpecListNode)grandparent).getRecursiveNode() == parent)
-        {
-            logicalParent = grandparent;
-            parent = grandparent;
-            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
-        }
-        
-        InteriorNode logicalGrandparent = logicalParent.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
-            return logicalParent.getASTParent();
-        else 
-            return logicalParent;
+        return this.unitIdentifier;
     }
 
-    /**
-     * @return the number of ASTPositionSpecListNode nodes in this list
-     */
-    public int size()
+    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods, including size(), cannot be called on the nodes of a CST after it has been modified");
-        
-        if (count >= 0) return count;
-        
-        count = 0;
-        ASTPositionSpecListNode node = this;
-        do
-        {
-            count++;
-            node = node.getRecursiveNode();
-        }
-        while (node != null);
-        
-        return count;
+        this.unitIdentifier = newValue;
     }
-    
-    ASTPositionSpecListNode recurseToIndex(int listIndex)
+
+
+    public ASTPositionSpecNode getPositionSpec()
     {
-        ASTPositionSpecListNode node = this;
-        for (int depth = size()-listIndex-1, i = 0; i < depth; i++)
-        {
-            if (node == null) throw new IllegalArgumentException("Index " + listIndex + " out of bounds (size: " + size() + ")");
-            node = (ASTPositionSpecListNode)node.getRecursiveNode();
-        }
-        return node;
+        return this.positionSpec;
     }
-    
-    @Override protected void visitThisNodeUsing(ASTVisitor visitor)
+
+    public void setPositionSpec(ASTPositionSpecNode newValue)
+    {
+        this.positionSpec = newValue;
+    }
+
+
+    public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPositionSpecListNode(this);
+        visitor.visitASTNode(this);
     }
 
-    public ASTUnitIdentifierNode getUnitIdentifier(int listIndex)
+    @Override protected int getNumASTFields()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTPositionSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POSITION_SPEC_LIST_830)
-            return (ASTUnitIdentifierNode)node.getChild(0);
-        else
-            return null;
+        return 3;
     }
 
-    public boolean hasUnitIdentifier(int listIndex)
+    @Override protected IASTNode getASTField(int index)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTPositionSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POSITION_SPEC_LIST_830)
-            return node.getChild(0) != null;
-        else
-            return false;
+        switch (index)
+        {
+        case 0:  return this.unitIdentifier;
+        case 1:  return this.hiddenTComma;
+        case 2:  return this.positionSpec;
+        default: return null;
+        }
     }
 
-    public ASTPositionSpecNode getPositionSpec(int listIndex)
+    @Override protected void setASTField(int index, IASTNode value)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        ASTPositionSpecListNode node = recurseToIndex(listIndex);
-        if (node.getProduction() == Production.POSITION_SPEC_LIST_830)
-            return (ASTPositionSpecNode)node.getChild(2);
-        else if (node.getProduction() == Production.POSITION_SPEC_LIST_831)
-            return (ASTPositionSpecNode)node.getChild(0);
-        else if (node.getProduction() == Production.POSITION_SPEC_LIST_832)
-            return (ASTPositionSpecNode)node.getChild(2);
-        else
-            return null;
-    }
-
-    private ASTPositionSpecListNode getRecursiveNode()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.POSITION_SPEC_LIST_832)
-            return (ASTPositionSpecListNode)getChild(0);
-        else
-            return null;
-    }
-
-    @Override protected boolean shouldVisitChild(int index)
-    {
-        if (getProduction() == Production.POSITION_SPEC_LIST_830 && index == 1)
-            return false;
-        else if (getProduction() == Production.POSITION_SPEC_LIST_832 && index == 1)
-            return false;
-        else
-            return true;
+        switch (index)
+        {
+        case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.positionSpec = (ASTPositionSpecNode)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+

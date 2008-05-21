@@ -10,79 +10,85 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import java.io.PrintStream;
+import java.util.Iterator;
 
-import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
-class ASTForallHeaderNode extends InteriorNode
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.lexer.Token;
+
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
+public class ASTForallHeaderNode extends ASTNode
 {
-    ASTForallHeaderNode(Production production, List<CSTNode> childNodes, List<CSTNode> discardedSymbols)
-    {
-         super(production);
-         
-         for (Object o : childNodes)
-             addChild((CSTNode)o);
-         constructionFinished();
-    }
-        
-    @Override public InteriorNode getASTParent()
-    {
-        InteriorNode actualParent = super.getParent();
-        
-        // If a node has been pulled up in an ACST, its physical parent in
-        // the CST is not its logical parent in the ACST
-        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
-            return actualParent.getParent();
-        else 
-            return actualParent;
-    }
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTForallHeaderNode
+    ASTForallTripletSpecListNode forallTripletSpecList; // in ASTForallHeaderNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTForallHeaderNode
+    ASTScalarMaskExprNode scalarMaskExpr; // in ASTForallHeaderNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTForallHeaderNode
 
     public ASTForallTripletSpecListNode getForallTripletSpecList()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_HEADER_637)
-            return (ASTForallTripletSpecListNode)getChild(1);
-        else if (getProduction() == Production.FORALL_HEADER_638)
-            return (ASTForallTripletSpecListNode)getChild(1);
-        else
-            return null;
+        return this.forallTripletSpecList;
     }
+
+    public void setForallTripletSpecList(ASTForallTripletSpecListNode newValue)
+    {
+        this.forallTripletSpecList = newValue;
+    }
+
 
     public ASTScalarMaskExprNode getScalarMaskExpr()
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_HEADER_638)
-            return (ASTScalarMaskExprNode)getChild(3);
-        else
-            return null;
+        return this.scalarMaskExpr;
     }
 
-    public boolean hasScalarMaskExpr()
+    public void setScalarMaskExpr(ASTScalarMaskExprNode newValue)
     {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.FORALL_HEADER_638)
-            return getChild(3) != null;
-        else
-            return false;
+        this.scalarMaskExpr = newValue;
     }
 
-    @Override protected boolean shouldVisitChild(int index)
+
+    public void accept(IASTVisitor visitor)
     {
-        if (getProduction() == Production.FORALL_HEADER_637 && index == 0)
-            return false;
-        else if (getProduction() == Production.FORALL_HEADER_637 && index == 2)
-            return false;
-        else if (getProduction() == Production.FORALL_HEADER_638 && index == 0)
-            return false;
-        else if (getProduction() == Production.FORALL_HEADER_638 && index == 2)
-            return false;
-        else if (getProduction() == Production.FORALL_HEADER_638 && index == 4)
-            return false;
-        else
-            return true;
+        visitor.visitASTForallHeaderNode(this);
+        visitor.visitASTNode(this);
+    }
+
+    @Override protected int getNumASTFields()
+    {
+        return 5;
+    }
+
+    @Override protected IASTNode getASTField(int index)
+    {
+        switch (index)
+        {
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.forallTripletSpecList;
+        case 2:  return this.hiddenTComma;
+        case 3:  return this.scalarMaskExpr;
+        case 4:  return this.hiddenTRparen;
+        default: return null;
+        }
+    }
+
+    @Override protected void setASTField(int index, IASTNode value)
+    {
+        switch (index)
+        {
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        default: throw new IllegalArgumentException("Invalid index");
+        }
     }
 }
+
