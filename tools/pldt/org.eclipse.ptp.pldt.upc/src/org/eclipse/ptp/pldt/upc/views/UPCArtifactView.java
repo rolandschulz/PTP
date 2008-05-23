@@ -17,7 +17,8 @@ import org.eclipse.ptp.pldt.upc.UPCPlugin;
 
 
 /**
- * A LAPI artifact view based on SimpleTableView Note that the ID must be unique.
+ * A UPC artifact view based on SimpleTableView <br>
+ * Note that the ID must be unique.
  * 
  */
 public class UPCArtifactView extends SimpleTableMarkerView
