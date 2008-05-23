@@ -24,8 +24,9 @@ import org.osgi.framework.BundleContext;
  */
 public class UPCPlugin extends AbstractUIPlugin {
 
-	//The shared instance.
+	/** The shared instance. */
 	private static UPCPlugin plugin;
+	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.upc";
 	
 	/**
 	 * The constructor.
@@ -85,6 +86,6 @@ public class UPCPlugin extends AbstractUIPlugin {
     
     public static String getPluginId()
     {
-        return "org.eclipse.ptp.pldt.lapi";
+        return PLUGIN_ID;
     }
 }
