@@ -1,0 +1,72 @@
+<h2>The <code>upc_all_gather_all</code> function</h2>
+
+<h4>Synopsis</h4>
+<pre>    
+    #include &lt;upc.h&gt;
+    #include &lt;upc_collective.h&gt;
+    void upc_all_gather_all(shared void * restrict dst,
+shared const void * restrict src, size_t nbytes,
+upc_flag_t flags);
+    </pre>
+<p>
+<h4>Description</h4>
+<p>
+The <code>upc_all_gather_all </code>  function 
+copies a block of memory from one shared
+memory area with affinity to the ith thread to the ith block of a shared
+memory area on each thread. The number of bytes in each block is <code>nbytes</code>.
+<p><code>nbytes</code> must be strictly greater than 0.
+<p>The upc_all_gather_all function treats the <code>src</code> pointer as if it pointed to a
+shared memory area of <code>nbytes</code> bytes on each thread and therefore had type:
+<pre>
+shared [nbytes] char[nbytes * THREADS]
+</pre>
+<p>and it treats the <code>dst</code>  pointer as if it pointed to a shared memory area with
+the type:
+shared [nbytes * THREADS] char[nbytes * THREADS * THREADS]
+<p>The targets of the <code>src</code> and <code>dst</code> pointers must have affinity to thread 0.
+<p>The <code>src</code> and <code>dst</code>  pointers are treated as if they have phase 0.
+<p>The effect is equivalent to copying the ith block of <code>nbytes</code> bytes pointed to
+by <code>src</code> to the ith block of <code>nbytes</code> bytes pointed to by <code>dst</code> that has affinity
+to each thread.
+
+
+
+<p>
+<ul>
+<li> EXAMPLE 1 <code>upc_all_gather_all </code> for the static THREADS translation environment.
+<pre>
+#include &lt;upc.h&gt;
+#include &lt;upc_collective.h&gt;
+#define NELEMS 10
+shared [NELEMS] int A[NELEMS*THREADS];
+shared [NELEMS*THREADS] int B[THREADS][NELEMS*THREADS];
+// Initialize A.
+upc_barrier;
+upc_all_gather_all( B, A, sizeof(int)*NELEMS,
+UPC_IN_NOSYNC | UPC_OUT_NOSYNC );
+upc_barrier;
+</pre>
+<li>EXAMPLE 2 <code>upc_all_gather_all </code> all for the dynamic THREADS translation
+environment.
+<pre>
+#include &lt;upc.h&gt;
+#include &lt;upc_collective.h&gt;
+#define NELEMS 10
+shared [NELEMS] int A[NELEMS*THREADS];
+shared int *Bdata;
+shared [] int *myB;
+Bdata = upc_all_alloc(THREADS*THREADS, NELEMS*sizeof(int));
+myB = (shared [] int *)&Bdata[MYTHREAD];
+// Bdata contains THREADS*THREADS*NELEMS elements.
+// myB is MYTHREADÕs row of Bdata.
+// Initialize A.
+upc_all_gather_all( Bdata, A, NELEMS*sizeof(int),
+UPC_IN_ALLSYNC | UPC_OUT_ALLSYNC );
+</pre>
+<li>
+<li>
+</ul>
+<p>&nbsp
+<p>&nbsp
+<p><a href="terms.html">Terms, definitions, and symbols</a><br><p><a href="index.html">Back to index of all UPC functions</a>

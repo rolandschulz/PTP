@@ -1,0 +1,56 @@
+<h2>The <code>upc_all_permute</code> function</h2>
+
+<h4>Synopsis</h4>
+<pre>    
+    #include &lt;upc.h&gt;
+    #include &lt;upc_collective.h&gt;
+    void upc_all_permute(shared void * restrict dst,
+        shared const void * restrict <code>src</code>,
+        shared const int * restrict perm,
+        size_t nbytes, upc_flag_t flags);
+</pre>
+<p>
+<h4>Description</h4>
+<p>
+The <code>upc_all_permute </code>  function 
+copies a block of memory from a shared memory
+area that has affinity to the ith thread to a block of a shared memory
+that has affinity to thread perm[i]. The number of bytes in each block is
+<code>nbytes</code>.
+<p><code>nbytes</code> must be strictly greater than 0.
+<p><code>perm[0..THREADS-1]</code> must contain <code>THREADS</code>
+distinct values: 
+<code>0, 1, ..., THREADS-1.</code>
+<p>The <code>upc_all_permute </code> function treats the <code>src</code> pointer and the <code>dst</code> pointer
+as if each pointed to a shared memory area of <code>nbytes</code> bytes on each thread
+and therefore had type:
+<pre>
+    shared [<code>nbytes</code>] char[<code>nbytes</code> * THREADS]
+    </pre>
+<p>The targets of the <code>src</code>, perm, and <code>dst</code> pointers must have affinity to thread 0.
+<p>The <code>src</code> and <code>dst</code> pointers are treated as if they have phase 0.
+<p>The effect is equivalent to copying the block of <code>nbytes</code> bytes that has affinity
+to thread i pointed to by <code>src</code> to the block of <code>nbytes</code> bytes that has affinity
+to thread perm[i] pointed to by <code>dst</code>.
+<ul>
+<li>EXAMPLE 1: <code>upc_all_permute</code>
+<pre>
+#include &lt;upc.h&gt;
+#include &lt;upc_collective.h&gt;
+#define NELEMS 10
+shared [NELEMS] int A[NELEMS*THREADS], B[NELEMS*THREADS];
+shared int P[THREADS];
+// Initialize A and P.
+upc_barrier;
+upc_all_permute( B, A, P, sizeof(int)*NELEMS,
+UPC_IN_NOSYNC | UPC_OUT_NOSYNC );
+upc_barrier;
+</pre>
+
+</ul>
+
+ 
+</ul>
+<p>&nbsp
+<p>&nbsp
+<p><a href="terms.html">Terms, definitions, and symbols</a><br><p><a href="index.html">Back to index of all UPC functions</a>
