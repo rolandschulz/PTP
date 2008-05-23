@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+         <page
+            class="org.eclipse.ptp.pldt.upc.prefs.UPCPreferencePage"
+            id="org.eclipse.ptp.pldt.upc.prefpage"
+            category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+            name="UPC"/>
+         
+   </extension>
+
+   <!--  UPC markers -->
+   <extension point="org.eclipse.core.resources.markers"
+		id="upcMarker"
+        name="upc Artifact Marker">
+      <super type="org.eclipse.core.resources.textmarker"/>
+   </extension>
+   <!-- this changes the marker image in the editor marker bar  -->
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.pldt.upc.upcMarker"
+            name="org.eclipse.ptp.pldt.upc.upcMarkerAnnotation">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.pldt.upc.upcMarkerAnnotation"
+            icon="icons/upc.gif" 
+            
+            presentationLayer="3"
+            label="upc Annotation Marker"
+            
+            textPreferenceKey="upcIndication"
+            textPreferenceValue="true"
+            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceValue="false"
+            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceValue="128,128,192"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="true"
+			showInNextPrevDropdownToolbarActionKey="showPortingInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            
+            includeOnPreferencePage="true"
+            isGoToPreviousNavigationTargetKey="isPortingGoToPreviousNavigationTarget"
+
+            isGoToNextNavigationTargetKey="isPortingRecordGoToNextNavigationTarget"
+            >
+      </specification>  
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="%viewcat.name"
+            id="org.eclipse.ptp.pldt.upc">
+      </category>
+      <view
+            name="%view.name"
+            icon="icons/upc.gif"
+            category="org.eclipse.ptp.pldt.upc"
+            class="org.eclipse.ptp.pldt.upc.views.UPCArtifactView"
+            id="org.eclipse.ptp.pldt.upc.views.upcArtifactView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.ui.CHelpProvider">
+      <provider
+            class="org.eclipse.ptp.pldt.upc.editorHelp.UPCCHelpInfoProvider"
+            id="org.eclipse.ptp.pldt.upc.editorHelp.UPCCHelpInfoProvider"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.pldt.upc.actions.RunAnalyseUPCcommandHandler"
+            id="org.eclipse.ptp.pldt.upc.command2"
+            name="find upc artifacts">
+      </command>
+   </extension>
+      <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+         <command
+               commandId="org.eclipse.ptp.pldt.upc.command2"
+               icon="icons/upc.gif"
+               label="Show UPC Artifacts">
+         </command>
+      </menuContribution>
+   </extension>
+</plugin>

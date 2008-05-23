@@ -1,0 +1,27 @@
+<h2 >The <code>upc_lock_attempt</code> function   </h2>
+
+<h4>Synopsis</h4>
+<p>
+
+<pre> 
+    #include &lt;upc.h&gt;
+    int upc_lock_attempt(upc_lock_t *ptr);               
+</pre>
+
+<p>
+<h4>Description</h4>
+
+<p>
+The <code>upc_lock_attempt</code>    function  attempts to set the state of the lock pointed
+to by <code>ptr</code> to locked.
+<p>If the lock is already in locked state due to the calling thread setting it to
+locked state, the result is undefined.
+<p>If the lock is already in locked state the function returns 0.
+<p>If the lock is in state unlocked, a single calling thread sets the state to locked
+and the function returns 1.
+<p>A null strict access is implied after a call to upc_lock_attempt() that returns
+1.
+
+<p>&nbsp
+<p>&nbsp
+<p><a href="terms.html">Terms, definitions, and symbols</a><br><p><a href="index.html">Back to index of all UPC functions</a>

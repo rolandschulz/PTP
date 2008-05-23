@@ -1,0 +1,91 @@
+<h4 id="top">UPC Terms, definitions and symbols</h4>
+<p>
+For the purpose of these specifications the following definitions apply.
+
+<dl>
+<dt><strong><strong>thread</strong></strong></dt>
+<dd>
+an instance of execution initiated by the execution environment at program
+startup.</dd>
+
+<dt><strong> </strong></dt>
+<dd> </dd>
+
+<dt><strong>object</strong></dt>
+<dd>
+region of data storage in the execution environment which can represent
+values.</dd>
+
+<dt><strong>shared object </strong></dt>
+<dd>
+an object allocated using a shared-qualified declarator or by a library function
+defined to create shared objects. 
+<p>Note: 
+All threads may access shared objects.</dd>
+
+<dt><strong>private object</strong></dt>
+<dd>
+any object which is not a shared object.
+<p>Note: Each thread declares and creates its own private objects which no
+other thread can access.</dd>
+<dt><strong> shared array</strong></dt>
+<dd>
+an array with elements that have shared qualified type.
+</dd>
+<dt><strong>affinity</strong></dt>
+<dd>
+logical association between shared objects and threads. Each element of data
+storage that contains shared objects has affinity to exactly one thread.
+</dd>
+<dt><strong>pointer-to-shared</strong></dt>
+<dd>
+a pointer whose referenced type is shared-qualified.
+</dd>
+<dt><strong> pointer-to-local</strong></dt>
+<dd>
+a pointer whose referenced type is not shared-qualified.
+</dd>
+<dt><strong>access</strong></dt>
+<dd>
+&lt;execution-time action&gt; to read or modify the value of an object by a thread.
+<p>The file scope declaration int y; creates a separate object for each thread to access.
+</dd>
+<dt><strong>shared access</strong></dt>
+<dd>
+an access using an expression whose type is shared-qualified.</dd>
+<dt><strong> strict shared read</strong></dt>
+<dd>
+a shared read access which is determined to be strict.</dd>
+<dt><strong>strict shared write</strong></dt>
+<dd>
+a shared modify access which is determined to be strict </dd>
+<dt><strong>relaxed shared read</strong></dt>
+<dd>
+a shared read access which is determined to be relaxed</dd>
+<dt><strong>relaxed shared write</strong></dt>
+<dd>
+a shared modify access which is determined to be relaxed </dd>
+<dt><strong>local access</strong></dt>
+<dd>
+an access using an expression whose type is not shared-qualified.
+</dd>
+<dt><strong>collective</strong></dt>
+<dd>
+a constraint placed on some language operations which requires evaluation
+of such operations to be matched across all threads. The behavior of collective
+operations is undefined unless all threads execute the same sequence of
+collective operations.</dd>
+<dt><strong>single-valued</strong></dt>
+<dd>
+an operand to a collective operation, which has the same value on every
+thread. The behavior of the operation is otherwise undefined.</dd>
+<dt><strong>phase</strong></dt>
+<dd>
+an unsigned integer value associated with a pointer-to-shared which indicates
+the element-offset within an affinity block; used in pointer-to-shared
+arithmetic to determine affinity boundaries</dd>
+</dl>
+<p>&nbsp
+<p>&nbsp
+<p><a href="#top">Back to  top</a>
+<p><a href="index.html">Back to index of all UPC functions</a>
