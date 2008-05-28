@@ -13,10 +13,9 @@ package org.eclipse.ptp.pldt.upc.actions;
 import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
+import org.eclipse.cdt.core.dom.upc.UPCLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
@@ -56,7 +55,7 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 			lang = tu.getLanguage();
             
 			IASTTranslationUnit atu = tu.getAST();
-			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
+			if (lang.getId().equals(UPCLanguage.ID)) {// cdt40
 				atu.accept(new UPCCASTVisitor(includes, fileName, msr));
 			} 
 
@@ -67,7 +66,26 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 		return msr;
 	}
 
-
+	/**
+	 * Determination of if a given filename is valid for our artifact analysis
+	 * @param filename
+	 * @return
+	 */
+	@Override
+	protected boolean validForAnalysis(String filename) {
+		int loc = filename.lastIndexOf(".");
+		if (loc <= 0) // if no dot, or filename is ".foo", not valid for
+						// analysis.
+			return false;
+		String ext = filename.substring(loc + 1);
+		ext = ext.toLowerCase();
+		boolean result = true;
+		if (ext.equals("upc")) 
+			result = true;
+		else
+			result = false;
+		return result;
+	}
 	protected List getIncludePath() {
 		return UPCPlugin.getDefault().getUPCIncludeDirs();
 	}

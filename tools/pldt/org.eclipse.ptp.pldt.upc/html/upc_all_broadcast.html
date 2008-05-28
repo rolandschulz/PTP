@@ -40,7 +40,7 @@ shared int B[THREADS];
 // Initialize A.
 upc_barrier;
 upc_all_broadcast( B, &A[1], sizeof(int),
-UPC_IN_NOSYNC | UPC_OUT_NOSYNC );
+                   UPC_IN_NOSYNC | UPC_OUT_NOSYNC );
 upc_barrier;
 </pre>
 
@@ -54,7 +54,7 @@ shared [] int A[NELEMS];
 shared [NELEMS] int B[NELEMS*THREADS];
 // Initialize A.
 upc_all_broadcast( B, A, sizeof(int)*NELEMS,
-UPC_IN_ALLSYNC | UPC_OUT_ALLSYNC );
+                   UPC_IN_ALLSYNC | UPC_OUT_ALLSYNC );
 </pre>
 <li>EXAMPLE 3 shows <code>(A[3],A[4])</code> is broadcast to <code>(B[0],B[1]), (B[10],B[11]),
 (B[20],B[21]), ..., (B[NELEMS*(THREADS-1)],B[NELEMS*(THREADS-1)+1]).</code>
@@ -68,7 +68,7 @@ shared [NELEMS] int B[NELEMS*THREADS];
 // Initialize A.
 upc_barrier;
 upc_all_broadcast( B, &A[3], sizeof(int)*2,
-UPC_IN_NOSYNC | UPC_OUT_NOSYNC );
+                   UPC_IN_NOSYNC | UPC_OUT_NOSYNC );
 upc_barrier;
 </pre>
 </ul>
