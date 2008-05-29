@@ -26,7 +26,7 @@ import org.eclipse.ptp.pldt.upc.UPCPlugin;
 import org.eclipse.ptp.pldt.upc.analysis.UPCCASTVisitor;
 
 /**
- * @author tibbitts
+ * @author Beth Tibbitts
  *
  */
 public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
@@ -46,8 +46,8 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 	 *            UPC include paths
 	 * @return
 	 */
-
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List includes) {
+	@Override
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List<String> includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
@@ -87,10 +87,11 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 			result = false;
 		return result;
 	}
-	protected List getIncludePath() {
+	@Override
+	protected List<String> getIncludePath() {
 		return UPCPlugin.getDefault().getUPCIncludeDirs();
 	}
-
+	@Override
 	protected void activateArtifactView() {
 		ViewActivater.activateView(UPCIDs.UPC_VIEW_ID);
 	}
