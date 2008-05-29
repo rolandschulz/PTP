@@ -20,13 +20,13 @@ import org.eclipse.ptp.pldt.upc.UPCPlugin;
 
 /**
  * UPC help book - this is the information that is used for the hover help
- * @author beth
+ * @author Beth Tibbitts
  *
  */
 public class UPCCHelpBook extends CHelpBookImpl {
 	private static final String TITLE = "UPC C Help Book";
 
-	@SuppressWarnings("unchecked")
+	
 	public UPCCHelpBook() {
         super(UPCPlugin.getPluginId());
 		// populate func map
@@ -54,15 +54,6 @@ public class UPCCHelpBook extends CHelpBookImpl {
         funcName2FuncInfo.put("upc_unlock", fps("upc_unlock", "", "upc_unlock description", "void", "upc_lock_t *ptr"));
         funcName2FuncInfo.put("upc_memcpy", fps("upc_memcpy", "", "upc_memcpy description", "void", "args"));
         
-        
-        
-        
-        
-        
-                
-     
-//        funcName2FuncInfo.put("LAPI_Fence", new FunctionSummary("LAPI_Fence", "", "DESC",
-//                new FunctionPrototypeSummary("LAPI_Fence", "int", "ARGS"), null));
 
         // set title
         setTitle(TITLE);
@@ -79,13 +70,8 @@ public class UPCCHelpBook extends CHelpBookImpl {
 	 */
 	protected IFunctionSummary fps(String name, String namespace, String description, String returnType, String args){
 		
-		//new FunctionSummaryImpl("upc_free", "", "upc_free test description",
-        //        new FunctionPrototypeSummaryImpl("upc_free", "void", "shared void *ptr"), null);
-		
 		IFunctionSummary fps = new FunctionSummaryImpl(name, namespace, description,
                 new FunctionPrototypeSummaryImpl(name, returnType, args), null);
 		return fps;
-		
-		//return new FunctionPrototypeSummaryImpl(name,returnType,args);
 	}
 }
