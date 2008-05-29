@@ -20,7 +20,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 
@@ -62,10 +64,23 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		if(traceOn)System.out.println("AnalysisDropdownHandler() ctor... should not be >1 of these");
 		assert(instance==null);  // we presume this is a singleton
 		instance=this;
-		// register to be notified of future selections
-		ISelectionService ss=CommonPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getSelectionService();
-		//String id=CommonPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite().getId();
-		ss.addSelectionListener(this);
+		ISelectionService ss=null;
+		try {
+			CommonPlugin p = CommonPlugin.getDefault();
+			IWorkbench w = p.getWorkbench();
+			IWorkbenchWindow wbw=w.getActiveWorkbenchWindow();//null
+			// register to be notified of future selections
+			ss = CommonPlugin.getDefault().getWorkbench()
+					.getActiveWorkbenchWindow().getSelectionService();
+			// String id=CommonPlugin.getDefault().getWorkbench().
+			// getActiveWorkbenchWindow
+			// ().getActivePage().getActivePart().getSite().getId();
+			ss.addSelectionListener(this);
+		} catch (Exception e) {
+			Throwable t=e.getCause();
+			e.printStackTrace();
+			return;// FIXME
+		}
 
 		// and cache the selection that was in effect now.
 		ISelection sel= ss.getSelection();//gives selection in ACTIVE PART.If editor was just opened, active part is probably the editor.
