@@ -362,7 +362,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					String filename = file.getName();
 					//String fn2 = ce.getElementName();// shd be filename too
 														// cdt40
-					if (AnalysisUtil.validForAnalysis(filename)) {
+					if (validForAnalysis(filename)) {
 						if (traceOn)
 							println(getSpaces(indent) + "file: " + filename);
 						results = analyse(monitor, (ITranslationUnit) ce,
@@ -607,6 +607,15 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		run();
 		AnalysisDropdownHandler.setLastHandledAnalysis(this, selection);
 	    return null;
+	}
+	
+	/**
+	 * Default determination of if a given filename is valid for our artifact analysis
+	 * @param filename
+	 * @return
+	 */
+	protected boolean validForAnalysis(String filename) {
+		return AnalysisUtil.validForAnalysis(filename);
 	}
 
 }
