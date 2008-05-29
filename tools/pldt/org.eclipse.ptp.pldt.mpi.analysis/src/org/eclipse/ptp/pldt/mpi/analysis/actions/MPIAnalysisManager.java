@@ -43,6 +43,7 @@ public class MPIAnalysisManager{
 	 */
 	public boolean run()
 	{	
+	  if(traceOn)System.out.println("MPI AM: 1. build CG");
 		cg_.buildCG();
 		//cg_.print();
 		/*
@@ -54,42 +55,47 @@ public class MPIAnalysisManager{
 			return;
 		}
 		*/
+    
 		btable_ = cg_.getBarrierTable();
-		if(traceOn)System.out.println("Call Graph finished !");
+		if(traceOn)System.out.println("2. Call Graph finished !");
 		
 		MPIBarrierExpr BE = new MPIBarrierExpr(btable_, cg_); 
 		BE.run();
-		if(traceOn)System.out.println("Barrier Expression Construction finished !");
+		if(traceOn)System.out.println("3. Barrier Expression Construction finished !");
 		
 		MPICFGBuilder cfg = new MPICFGBuilder(cg_);
 		cfg.run();
-		if(traceOn)System.out.println("Control Flow Graph Construction finished !");
+		if(traceOn)System.out.println("4. Control Flow Graph Construction finished !");
 		
 		MPIDUChain rd = new MPIDUChain(cg_);
 		rd.run();
-		if(traceOn)System.out.println("Reaching Definition and Phi Placement finished !");
+		if(traceOn)System.out.println("5. Reaching Definition and Phi Placement finished !");
 		
 		MPIMVAnalysis mva = new MPIMVAnalysis(cg_);
 		mva.run();
-		if(traceOn)System.out.println("Multi-valued Analysis finished !");
+		if(traceOn)System.out.println("6. Multi-valued Analysis finished !");
 		
 		MPIBarrierMatching bm = new MPIBarrierMatching(cg_, btable_);
 		bm.run();
-		if(traceOn)System.out.println("Barrier Matching finished! ");
+		if(traceOn)System.out.println("7. Barrier Matching finished! ");
 				
 		MPIBarrierAnalysisResults results = new MPIBarrierAnalysisResults();
 		results.setBarrierTable(btable_);
+		if(traceOn)System.out.println("8. ...got barrier table ");
 		
 		String markerID = IDs.barrierMarkerID;
 		MPIArtifactMarkingVisitor visitor = new MPIArtifactMarkingVisitor(markerID);
 		BarrierArtifacts ba = new BarrierArtifacts(cg_, visitor);
 		ba.run();
+		if(traceOn)System.out.println("9. ... got barrier artifacts ");
 		
 		MatchingSet msv = new MatchingSet(btable_);
 		msv.run();
+		if(traceOn)System.out.println("10. ...got matching set ");
 		
 		ShowErrors se = new ShowErrors(bm.getErrors());
 		boolean foundError = se.run();	
+		if(traceOn)System.out.println("11.  ... got errors (if any) ");
 
 		return foundError;
 		

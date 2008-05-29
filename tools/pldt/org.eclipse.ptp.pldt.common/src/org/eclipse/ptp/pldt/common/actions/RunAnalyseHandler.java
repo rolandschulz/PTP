@@ -129,5 +129,60 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 		}
 		return 0;
 	}
+	 @SuppressWarnings("unchecked")
+	  protected int countFilesSelected(String[] exts) {
+	    int count = 0;
+	    int countExt=0;
+	    // Get elements of a possible multiple selection
+	    Iterator iter = this.selection.iterator();
+	    while (iter.hasNext()) {
+	      Object obj = (Object) iter.next();
+	      // It can be a Project, Folder, File, etc...
+	      if (obj instanceof IAdaptable) {
+	        final IResource res = (IResource) ((IAdaptable) obj)
+	            .getAdapter(IResource.class);
+	        count = count + countFiles(res,exts);
+	      }
+	    }
+	    // System.out.println("number of files: " + count);
+	    return count;
+	  }
+	/**
+	 * count files ending in one of the given file extensions
+	 * 
+	 * @param res
+	 * @param exts array of extensions e.g. ".h", ".hpp" etc
+	 * @return
+	 */
+	protected int countFiles(IResource res, String[]exts) {
+	  if (res instanceof IFile) {
+	    IFile file = (IFile)res;
+	    String filename = file.getName();
+      for (int i = 0; i < exts.length; i++) {
+        String ext = exts[i];
+        if(filename.endsWith(ext)){
+          System.out.println("found "+ext+" in file: "+file.getName()+"  count+1");
+          return 1;
+        }
+      }
+        return 0;  // not found
+
+    } else if (res instanceof IContainer) {
+      int count = 0;
+  
+      try {
+        IResource[] kids = ((IContainer) res).members();
+        for (int i = 0; i < kids.length; i++) {
+          IResource child = kids[i];
+          count = count + countFiles(child,exts);
+        }
+        return count;
+      } catch (CoreException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    return 0;
+	}
 
 }

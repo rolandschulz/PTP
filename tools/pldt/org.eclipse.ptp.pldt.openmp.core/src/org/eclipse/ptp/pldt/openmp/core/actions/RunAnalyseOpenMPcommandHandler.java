@@ -159,7 +159,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		OpenMPScanReturn osr = (OpenMPScanReturn) results;
 
 		// This is for the openmp pragma view
-		List artifacts = osr.getOpenMPList();
+		List<Artifact> artifacts = osr.getOpenMPList();
 		visitor.visitFile(resource, artifacts);
 
 		// remove problems
@@ -167,10 +167,10 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 
 		// DPP - put in stuff for problems view
 		// Just subclass scanreturn and create markers for problems view here
-		List problems = osr.getProblems();
+		List<OpenMPError> problems = osr.getProblems();
 		if(traceOn)System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems.");
 		try {
-			for (Iterator i = problems.iterator(); i.hasNext();)
+			for (Iterator<OpenMPError> i = problems.iterator(); i.hasNext();)
 				processProblem((OpenMPError) i.next(), resource);
 		} catch (CoreException e) {
 			System.out.println("RunAnalysisOpenMP.processResults exception: "
@@ -224,7 +224,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	}
 
 
-	protected List getIncludePath() {
+	protected List<String> getIncludePath() {
 		return OpenMPPlugin.getDefault().getIncludeDirs();
 	}
 

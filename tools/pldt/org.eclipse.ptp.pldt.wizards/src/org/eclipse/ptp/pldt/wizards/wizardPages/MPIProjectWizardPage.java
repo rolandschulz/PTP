@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006,2007 IBM Corp. and others.
+ * Copyright (c) 2006, 2008 IBM Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,15 +16,15 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.cdt.ui.templateengine.AbstractWizardDataPage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.mpi.core.prefs.MPIPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -44,13 +44,15 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Wizard Page for collecting info about MPI project - appended to end of
- * "New Managed Make C project" wizard
+ * "C project" or "C++ project" wizard.
  * 
- * FIXME remove dup code, share with MPI version in a common class etc.
+ * Abstract class encapsulates common behavior between C and C++ 
+ * <p>
+ * TODO remove dup code, share MPI&OpenMP version in a common class etc.
  * @author Beth Tibbitts
  * 
  */
-public class MPIProjectWizardPage extends AbstractWizardDataPage {
+public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	public static final String DOT = ".";
 	private static final boolean traceOn=false;
 	public static final boolean wizardTraceOn=false;
@@ -58,7 +60,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	private Composite composite;
 	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage";
 
-	// The following are IDs for storing info in MBSPageData so it can be retrieved in MpiProjectRunnable
+	// The following are IDs for storing info in MBSPageData so it can be retrieved in MpiProjectProcess (ProcessRunner)
 	// when the wizard is done.
 	/**
 	 * Store in MBSPageData  (with this ID) whether user wants to include MPI info in the project.
@@ -107,7 +109,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	
 	private Button mpiSampleButton;
 
-	private IPreferenceStore preferenceStore;
+
 
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 	/**
@@ -115,6 +117,9 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 */
 	private boolean useMpiProjectSettings=true;
 	private String desc = "MPI Project Page";
+	
+	public static final String MPI_PROJECT_TYPE_C="C";
+	public static final String MPI_PROJECT_TYPE_CPP="C++";
 	
 	/**
 	 * The CDT new project wizard page for MPI projects.  
@@ -124,7 +129,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	 */
 	public MPIProjectWizardPage() throws CoreException {
 		super("MPI Project Settings");
-		
+		prefIDincludes=MpiIDs.MPI_INCLUDES;
 		if(wizardTraceOn)System.out.println("MPIProjectWizardPage().ctor...");
 
 		//CommonPlugin.log(IStatus.ERROR,"Test error");
@@ -132,31 +137,35 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		
 		// access the preference store from the MPI plugin
 		preferenceStore = MpiPlugin.getDefault().getPreferenceStore();
-		String mip=preferenceStore.getString(MpiIDs.MPI_INCLUDES);
+		String mip=preferenceStore.getString(prefIDincludes);
 		if(traceOn)System.out.println("Got mpi include pref from other plugin: "+mip);
 
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
 		defaultMpiIncludePath = mip;
 		if(defaultMpiIncludePath.length()==0) {
-			// warn if no MPI preferences have been set
-			showNoPrefs();
+			// warn if no MPI preferences have been set and allow user to set them right there
+			String newMip=showNoPrefs("MPI",prefIDincludes);
+			defaultMpiIncludePath=newMip;
 		}
 		setDefaultOtherNames(defaultMpiIncludePath);
 		// the following sets what will be remembered when we leave the page.
 		setCurrentMpiIncludePath(defaultMpiIncludePath);
-		
-		defaultMpiBuildCommand=preferenceStore.getString(MpiIDs.MPI_BUILD_CMD);
+
+		// defaultMpiBuildCommand depends on project type (will be different for C vs C++ for example)
+		defaultMpiBuildCommand=getDefaultMpiBuildCommand();
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
 		setCurrentMpiLinkCommand(defaultMpiBuildCommand);		
 	}
+
+	abstract protected String getDefaultMpiBuildCommand();
 
 	/**
 	 * Warn user that the MPI project preferences aren't set, and thus the new project wizard will not be very useful.
 	 * <br>
 	 */
 	private static boolean alreadyShown;
-	private static void showNoPrefs() {
+	private static void showNoPrefs1() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			StringBuffer buf=new StringBuffer("No MPI Preferences set; ");
@@ -212,7 +221,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 	/**
 	 * This sets what will be remembered for MPI include path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actually do the change
+	 * (so we can retrieve the information from the ProcessRunner to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -223,7 +232,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	}
 	/**
 	 * This sets what will be remembered for library name when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actualy do the change
+	 * (so we can retrieve the information from the ProcessRunner to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -237,7 +246,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	
 	/**
 	 * This sets what will be remembered for library search path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actually do the change
+	 * (so we can retrieve the information from the ProcessRunner to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -314,7 +323,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 			includePathField.setText(selectedDirectory);
 			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
-			// set value to where we can find it in the runnable later
+			// set value to where we can find it in the ProcessRunner later
 			setCurrentMpiIncludePath(selectedDirectory);
 		}
 	}
@@ -335,7 +344,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 			libPathField.setText(selectedDirectory);
 			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
-			// set value to where we can find it in the runnable later
+			// set value to where we can find it in the ProcessRunner later
 			setCurrentMpiLibPath(selectedDirectory);
 		}
 	}
@@ -395,7 +404,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		});
 
 		// how do we know when next/finish button pushed? we don't.
-		// we just store all info where we can find it when the MPIProjectRunnable runs after all the wizard pages are done.
+		// we just store all info where we can find it when the MPIProjectProcess (ProcessRunner) runs after all the wizard pages are done.
 		
 		libLabel=new Label(composite, SWT.NONE);
 		libLabel.setText("Library name:");
@@ -560,27 +569,7 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 		});
 
 		createUserEntryArea(group, defaultEnabled);
-/*		
- 		// mpi sample file now provided by project template (also openmp)
-		mpiSampleButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		mpiSampleButton.setText("Include sample MPI source file?");
-		mpiSampleButton.setSelection(false);
-		mpiSampleButton.setEnabled(false);
-		GridData gdSample=new GridData();
-		gdSample.horizontalSpan = columns;
-		mpiSampleButton.setLayoutData(gdSample);
-		mpiSampleButton.addSelectionListener(new SelectionAdapter() {
-		
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				boolean doit=mpiSampleButton.getSelection();
-				setCurrentMpiSample(doit);
-			}
-		
-		});
-		*/
 		setUserAreaEnabled(!defaultEnabled);
-
 	}
 
 	public void createControl(Composite parent) {
@@ -591,11 +580,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 		boolean defaultEnabled = true;
 		createContents(composite, defaultEnabled);
-	}
-
-	public void dispose() {
-		composite.dispose();
-
 	}
 
 	public Control getControl() {
@@ -609,7 +593,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 	public String getErrorMessage() {
 		return null;
-		// return new String("My error msg");
 	}
 
 	public Image getImage() {
@@ -617,7 +600,6 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 	}
 
 	public String getMessage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -711,6 +693,20 @@ public class MPIProjectWizardPage extends AbstractWizardDataPage {
 
 	public Map<String,String> getPageData() {
 		return pageData;
+	}
+	
+	/**
+	 * Determines whether we are in a C or C++ project template
+	 * @return
+	 */
+	abstract protected String getMpiProjectType();
+	
+	@Override
+	protected IPreferencePage getPreferencePage() {
+		if(preferencePage == null) {
+			preferencePage = new MPIPreferencePage();
+		}
+		return preferencePage;
 	}
 
 }

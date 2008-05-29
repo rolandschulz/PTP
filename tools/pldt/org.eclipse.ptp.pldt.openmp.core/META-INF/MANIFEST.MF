@@ -19,4 +19,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.pldt.openmp.ui.pv
 Eclipse-AutoStart: true
 Bundle-ClassPath: .
-Export-Package: org.eclipse.ptp.pldt.openmp.core
+Export-Package: org.eclipse.ptp.pldt.openmp.core,
+ org.eclipse.ptp.pldt.openmp.core.prefs

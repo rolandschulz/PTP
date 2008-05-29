@@ -15,10 +15,12 @@ import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
+import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
@@ -55,28 +57,30 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 		final String fileName = tu.getElementName();
 		ILanguage lang;
 		try {
-			lang = tu.getLanguage();
+			lang = tu.getLanguage(); 
             
-			IASTTranslationUnit atu = tu.getAST();
-			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
+			//long startTime = System.currentTimeMillis();
+      IASTTranslationUnit atu = getAST(tu); // use index; was tu.getAST();
+			//long endTime = System.currentTimeMillis();
+			//System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
+			String languageID=lang.getId();
+			if (languageID.equals(GCCLanguage.ID)) {// C
 				atu.accept(new MpiCASTVisitor(includes, fileName, msr));
-				// BRT FIXME  inconsistent way of accessing Language;
-				// clean up when Fortran is integrated here
-			} else if (atu instanceof CPPASTTranslationUnit) {
-				atu.accept(new MpiCPPASTVisitor(includes, fileName, msr));
-
+			}
+			else if (languageID.equals(GPPLanguage.ID)) { // C++
+			  atu.accept(new MpiCPPASTVisitor(includes, fileName, msr));
 			}
 
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project "+tu.getCProject()+" error="+e.getMessage());
 		}
 		return msr;
 	}
 
 
 	@Override
-	protected List getIncludePath() {
+	protected List<String> getIncludePath() {
 		return MpiPlugin.getDefault().getMpiIncludeDirs();
 	}
     @Override

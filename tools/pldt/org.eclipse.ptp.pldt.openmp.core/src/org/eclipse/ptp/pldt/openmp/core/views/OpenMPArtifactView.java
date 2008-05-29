@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactManager;
-import org.eclipse.ptp.pldt.common.IDs;
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ui.IEditorPart;
@@ -75,6 +74,7 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
             /* (non-Javadoc)
              * @see org.eclipse.jface.action.IAction#run()
              */
+            @SuppressWarnings("restriction")
             public void run()
             {
                 ISelection selection = viewer.getSelection();

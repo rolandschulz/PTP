@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ScanReturn;
+import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 
 /**
  * Save specific information on OpenMP artifacts and problems
@@ -26,7 +27,7 @@ import org.eclipse.ptp.pldt.common.ScanReturn;
  */
 public class OpenMPScanReturn extends ScanReturn
 {
-    private LinkedList problems_ = new LinkedList(); // of OpenMPError
+    private LinkedList<OpenMPError> problems_ = new LinkedList<OpenMPError>();  
     
     /**
      * OpenMPScanReturn - constructor
@@ -50,7 +51,7 @@ public class OpenMPScanReturn extends ScanReturn
      * getOpenMPList - get the pragma list
      * @return
      */
-    public List getOpenMPList()
+    public List<Artifact> getOpenMPList()
     {
         return getArtifactList();
     }
@@ -60,7 +61,7 @@ public class OpenMPScanReturn extends ScanReturn
      * addProblemst - add a set of problems to the list
      * @param errors - LinkedList
      */
-    public void addProblems(LinkedList errors)
+    public void addProblems(LinkedList<OpenMPError> errors)
     {
         if (errors.size()>0)  // 0 sized appends seem to add junk to problems_
           problems_.addAll(errors);
@@ -70,7 +71,7 @@ public class OpenMPScanReturn extends ScanReturn
      * getProblems - accessor to problems list
      * @return
      */
-    public LinkedList getProblems()
+    public LinkedList<OpenMPError> getProblems()
     {
         return problems_;
     }

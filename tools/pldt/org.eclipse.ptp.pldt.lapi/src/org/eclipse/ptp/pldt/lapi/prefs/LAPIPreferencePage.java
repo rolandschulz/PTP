@@ -37,7 +37,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class LAPIPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
     private static final String INCLUDES_PREFERENCE_LABEL  = "LAPI include paths:";
-    private static final String INCLUDES_PREFERENCE_BROWSE = "Please choose a directory:";
+    private static final String INCLUDES_PREFERENCE_BROWSE = "Please choose a directory for LAPI includes:";
     private static final String LAPI_HELP="Location of LAPI help files:";
     private static final String LAPI_HELP_DEFAULT="Use default";
     private static final String LAPI_HELP_DEFAULT_ID="lapiHelpUseDefault";

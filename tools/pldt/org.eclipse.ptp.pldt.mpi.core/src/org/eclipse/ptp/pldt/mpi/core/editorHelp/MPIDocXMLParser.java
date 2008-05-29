@@ -23,7 +23,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.cdt.ui.FunctionPrototypeSummary;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionPrototypeSummaryImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionSummaryImpl;
 import org.w3c.dom.Document;
@@ -39,7 +38,7 @@ public class MPIDocXMLParser {
 	{
 		File file = new File(args[0]);
 		try {
-			List functions = parseDOM(new FileInputStream(file), "cname");
+			List<FunctionSummaryImpl> functions = parseDOM(new FileInputStream(file), "cname");
 			System.out.println("num of functions gathered: "+functions.size());
             System.out.println("first function summary:");
             System.out.println((FunctionSummaryImpl)(functions.iterator().next()));

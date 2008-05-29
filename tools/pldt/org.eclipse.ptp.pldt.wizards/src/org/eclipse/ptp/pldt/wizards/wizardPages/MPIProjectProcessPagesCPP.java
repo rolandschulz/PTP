@@ -18,17 +18,17 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
 /**
- * Wizard Pages for MPI C projects
+ * Wizard Pages for MPI C++ projects as opposed to C projects
  * @author Beth Tibbitts
  *
  */
-public class MPIProjectProcessPages implements IPagesAfterTemplateSelectionProvider {
+public class MPIProjectProcessPagesCPP implements IPagesAfterTemplateSelectionProvider {
 	IWizardDataPage[] pages;
 	
 	public IWizardDataPage[] createAdditionalPages(IWorkbenchWizard wizard,
 			IWorkbench workbench, IStructuredSelection selection) {
 		try {
-			pages= new IWizardDataPage[] {new MPIProjectWizardPageC()};
+			pages= new IWizardDataPage[] {new MPIProjectWizardPageCPP()};
 			// TODO - log error
 		} catch(CoreException ce) {
 			pages= new IWizardDataPage[0];

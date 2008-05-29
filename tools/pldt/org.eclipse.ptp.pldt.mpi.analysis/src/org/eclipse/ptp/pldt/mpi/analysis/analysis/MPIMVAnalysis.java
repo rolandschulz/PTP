@@ -889,7 +889,7 @@ public class MPIMVAnalysis{
 	}
 	
 	
-	/* Work list containts two kinds of blocks:
+	/** Work list contains two kinds of blocks:
 	 * (1) where MPI_Comm_rank() is directly or indirectly called; 
 	 * (2) the entry block of a function that has some MV real parameters;
 	 * 
