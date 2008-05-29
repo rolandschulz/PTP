@@ -123,4 +123,10 @@
         
       </menuContribution>
    </extension>
+     <!-- Code templates -->
+   <extension point="org.eclipse.ui.editors.templates">
+   <include file="templates/mpi_templates.xml" />
+
+   </extension>
+
 </plugin>
