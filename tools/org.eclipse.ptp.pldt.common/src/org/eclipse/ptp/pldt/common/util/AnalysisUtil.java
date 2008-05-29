@@ -32,25 +32,26 @@ public class AnalysisUtil {
 
 	/**
 	 * Is the given filename a valid file for analysis processing? <br>
-	 * Currently this means, is it a .c or .cpp etc file? <br>
+	 * Currently this means, is it a .c or .cpp etc file, or .h or .hpp? <br>
 	 * Don't pollute this with fortran info - currently fortran processing is in
 	 * a completely different action.
 	 * 
 	 * @param filename
 	 * @return
 	 */
-	public static boolean validForAnalysis(String filename) {
+	public static boolean validForAnalysis(String filename, boolean isCPP) {
 		int loc = filename.lastIndexOf(".");
 		if (loc <= 0) // if no dot, or filename is ".foo", not valid for
 						// analysis.
 			return false;
 		String ext = filename.substring(loc + 1);
 		ext = ext.toLowerCase();
-		boolean result = true;
+		boolean result = false;
 		if (ext.startsWith("c")/* ||ext.startsWith("f") */) // c or fortran
 			result = true;
 		else
-			result = false;
+			if(isCPP && ext.startsWith("h")) // C++ can have code in header files
+			  result=true;
 		return result;
 	}
 

@@ -15,6 +15,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.ICContainer;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
@@ -24,10 +27,12 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -62,7 +67,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  */
 
 public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
-	private static /*final*/ boolean traceOn = false;
+	protected static /*final*/ boolean traceOn = false;
 
 	/**
 	 * indent amount for each level of nesting; useful when printing debug
@@ -149,8 +154,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			// get preference for include paths
 			final List<String> includes = getIncludePath();
 			if (areIncludePathsNeeded() && includes.isEmpty()) {
-				System.out
-						.println("RunAnalyseBase.run(), no include paths found.");
+				//System.out.println("RunAnalyseHandlerBase.run(), no include paths found.");
 				MessageDialog.openWarning(shell, name
 						+ " Include Paths Not Found",
 						"Please first specify the " + name
@@ -362,7 +366,10 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					String filename = file.getName();
 					//String fn2 = ce.getElementName();// shd be filename too
 														// cdt40
-					if (validForAnalysis(filename)) {
+				    boolean cpp = isCPPproject(ce);
+				    //if (AnalysisUtil.validForAnalysis(filename,cpp)) {
+				    
+					if (validForAnalysis(filename,cpp)) {
 						if (traceOn)
 							println(getSpaces(indent) + "file: " + filename);
 						results = analyse(monitor, (ITranslationUnit) ce,
@@ -444,6 +451,24 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 		return foundError;
 	}
+/**
+ * Determine if the project is a C++ project
+ * @param ce the ICElement representing a file 
+ * @return
+ */
+  protected boolean isCPPproject(ICElement ce) {
+    IProject p = ce.getCProject().getProject();
+    try {
+      IProjectNature nature = p.getNature("org.eclipse.cdt.core.ccnature");
+      if(nature!=null) {
+        return true;
+      }
+    } catch (CoreException e) {
+      // TODO Auto-generated catch block
+      //e.printStackTrace();
+    }
+    return false;
+  }
 
 	protected void processResults(ScanReturn results, IResource resource) {
 		List<Artifact> artifacts = results.getArtifactList();
@@ -468,6 +493,18 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			println("RunAnalyseBase:              file = " + tu.getLocation());
 
 		monitor.subTask(" on " + rawPath);
+		// did tu parse w/o errors?  If we can determine that, we can
+		// warn user; otherwise OpenMP analysis will, for example, "finish with errors"
+		// e.g. if header file can't be found.
+		/*
+		try {
+      IASTProblem[] problems  = CPPVisitor.getProblems(tu.getAST());
+      IASTProblem[] problems2 = CVisitor.getProblems(tu.getAST());
+    } catch (CoreException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+		*/
 		ScanReturn scanReturn = doArtifactAnalysis(tu, includes);
 		monitor.worked(1);
 		if (traceOn)
@@ -612,10 +649,33 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	/**
 	 * Default determination of if a given filename is valid for our artifact analysis
 	 * @param filename
+	 * @param isCPP  is the project a C++ project or not
 	 * @return
 	 */
-	protected boolean validForAnalysis(String filename) {
-		return AnalysisUtil.validForAnalysis(filename);
+	protected boolean validForAnalysis(String filename, boolean isCPP) {
+		return AnalysisUtil.validForAnalysis(filename,isCPP);
 	}
+
+  /**
+   * Get AST from index, not full tu
+   * @param tu translation unit from which to get the AST
+   * @return
+   */
+  protected IASTTranslationUnit getAST(ITranslationUnit tu) {
+    IIndex index;
+    try {
+      index = CCorePlugin.getIndexManager().getIndex(tu.getCProject());
+      IASTTranslationUnit ast = tu.getAST(index, ITranslationUnit.AST_SKIP_ALL_HEADERS);
+      //IASTTranslationUnit ast = tu.getAST(index, 0);
+      if(traceOn)System.out.println("    getAST(index,AST_SKIP_ALL_HEADERS)");
+      
+      return ast;
+    } catch (CoreException e) {
+      CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error getting AST (from index) for project "+tu.getCProject());
+      return null;
+    }
+    
+  }
+
 
 }

@@ -69,10 +69,11 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 	/**
 	 * Determination of if a given filename is valid for our artifact analysis
 	 * @param filename
+	 * @param isCPP  is the project a C++ project or not
 	 * @return
 	 */
 	@Override
-	protected boolean validForAnalysis(String filename) {
+	protected boolean validForAnalysis(String filename, boolean isCPP) {
 		int loc = filename.lastIndexOf(".");
 		if (loc <= 0) // if no dot, or filename is ".foo", not valid for
 						// analysis.

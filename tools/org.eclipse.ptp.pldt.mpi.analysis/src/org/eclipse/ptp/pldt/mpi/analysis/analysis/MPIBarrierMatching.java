@@ -477,7 +477,7 @@ public class MPIBarrierMatching {
 				}
 			}
 			else {
-				System.out.println("MPIBarrierMatching.getSourceInfo().. ! More than one IASTNodeLocation !");
+				//System.out.println("MPIBarrierMatching.getSourceInfo().. ! More than one IASTNodeLocation !");
 				// CASTCompoundStatement causes this.  Probably ok? assuming it descends into the child nodes
 				if(traceOn) {
 				if(node instanceof CASTCompoundStatement) {

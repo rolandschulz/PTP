@@ -40,7 +40,6 @@ import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
  * we have this opportunity to use that information to modify the include paths etc.
  * in the project
  * 
- * <p>Note: not sure we handle C++ projects correctly yet.
  * 
  * @author Beth Tibbitts
  *

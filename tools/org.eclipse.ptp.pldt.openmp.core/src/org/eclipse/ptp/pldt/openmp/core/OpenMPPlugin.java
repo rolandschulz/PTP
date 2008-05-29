@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -88,11 +88,11 @@ public class OpenMPPlugin extends AbstractUIPlugin {
      * 
      * @return
      */
-    public List /* of String */getIncludeDirs()
+    public List<String> getIncludeDirs()
     {
         String stringList = getPluginPreferences().getString(OPEN_MP_INCLUDES);
         StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
-        List dirs = new ArrayList();
+        List<String> dirs = new ArrayList<String>();
         while (st.hasMoreElements()) {
             dirs.add(st.nextToken());
         }

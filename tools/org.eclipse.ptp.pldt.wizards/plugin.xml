@@ -21,7 +21,7 @@
                   filterPattern=" "
                   id="org.eclipse.ptp.pldt.projects.MPIpiCPPproject"
                   location="templates/MPIpiCPPproject/template.xml"
-                  pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcessPages"
+                  pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcessPagesCPP"
                   projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
       <template

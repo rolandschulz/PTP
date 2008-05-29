@@ -61,7 +61,7 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase
 	}
 
 
-	protected List getIncludePath() {
+	protected List<String> getIncludePath() {
 		return LapiPlugin.getDefault().getLapiIncludeDirs();
 	}
 

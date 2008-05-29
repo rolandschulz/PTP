@@ -23,6 +23,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFieldReference;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTIdExpression;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTLinkageSpecification;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTUsingDirective;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 import org.eclipse.ptp.pldt.mpi.core.Messages;
@@ -134,5 +135,17 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 			name=rawSignature;
 		}
 		return name;
+	}
+	/**
+	 * Don't allow dynamic include path adding for C++ -- too complicated to know if something is an MPI artifact.
+	 * Consider implementing this later.
+	 */
+	@Override
+	 public boolean allowIncludePathAdd() {
+	    return false;
+	  }
+	@Override
+  public boolean addIncludePath( IPath path,  String name, boolean dontAskAgain) {
+	  return false;
 	}
 }

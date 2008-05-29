@@ -25,35 +25,57 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 
-
 /**
- * The main plugin class for PLDT
+ * The main plugin class for PLDT (PTP's Parallel Language Development Tools)
  * @author Beth Tibbitts
  */
 public class CommonPlugin extends AbstractUIPlugin {
 
-	//The shared instance.
+	/** The shared instance. */
 	private static CommonPlugin plugin;
-    // Resource bundle.
-    private ResourceBundle       resourceBundle;
-    
-    private static boolean eclipseTraceOn=false;
-    private static boolean haveReadTraceStatus=false;
-    
-    public static boolean getTraceOn(){
-    	if(!haveReadTraceStatus){
-    		String traceFilter=Platform.getDebugOption("org.eclipse.ptp.pldt.common/debug/pldtTrace");
-    		if(traceFilter!=null){
-    			System.out.println("CommonPlugin.getTraceOn(): pldtTrace trace filtering is on; traceFilter= "+traceFilter);
-    			eclipseTraceOn=true;
-    		}
-    		haveReadTraceStatus=true;
-    	}
-    	return eclipseTraceOn;
+	/** Resource bundle */
+	private ResourceBundle resourceBundle;
+
+	private static boolean eclipseTraceOn = false;
+	private static boolean haveReadTraceStatus = false;
+	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.common";
+	
+  /**
+   * To use dynamic tracing (User instructions):
+   * Create a file ".options" in the
+   * same directory as your eclipse executable. Put this in the file:
+   * 
+   * <pre>
+   *  org.eclipse.ptp.pldt.common/debug = true
+   *  org.eclipse.ptp.pldt.common/debug/pldtTrace = true
+   * </pre>
+   * 
+   * Then launch eclipse in debug mode using the -debug option, and mirror the
+   * Console view output to the command line console using the -consoleLog
+   * option. (Maybe Linux already spits out the console, not sure.)
+   * 
+   * <pre>
+   * eclipse - debug - consoleLog
+   * </pre>
+   * 
+   * When you run with this tracing enabled, it will print out a bunch of
+   * trace information to the console. At least MPI artifact analysis has been
+   * enabled for user-directed tracing.
+   * 
+   * @return
+   */
+	public static boolean getTraceOn() {
+		if (!haveReadTraceStatus) {
+			String traceFilter = Platform.getDebugOption("org.eclipse.ptp.pldt.common/debug/pldtTrace");
+			if (traceFilter != null) {
+				System.out.println("CommonPlugin.getTraceOn(): pldtTrace trace filtering is on; traceFilter= " + traceFilter);
+				eclipseTraceOn = true;
+			}
+			haveReadTraceStatus = true;
+		}
+		return eclipseTraceOn;
 	}
 
-
-	
 	/**
 	 * The constructor.
 	 */
@@ -78,10 +100,7 @@ public class CommonPlugin extends AbstractUIPlugin {
 			String msg="This is PLDT 2.0 which requires CDT Version 4.0.2 or higher.";
 				msg+="\nThis eclipse installation contains CDT version "+version;
 			MessageDialog.openError(null, "Version mismatch", msg);
-		}
-		
-		
-		
+		}		
 	}
 
 	/**
@@ -107,7 +126,7 @@ public class CommonPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.common", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
     /**
@@ -122,7 +141,6 @@ public class CommonPlugin extends AbstractUIPlugin {
         return display;
     }
     /**
-     * BRT using this?
      * Returns the plugin's resource bundle,
      */
     public ResourceBundle getResourceBundle()
@@ -137,7 +155,6 @@ public class CommonPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * BRT using this?
      * Returns the string from the plugin's resource bundle, or 'key' if not found.
      */
     public static String getResourceString(String key)

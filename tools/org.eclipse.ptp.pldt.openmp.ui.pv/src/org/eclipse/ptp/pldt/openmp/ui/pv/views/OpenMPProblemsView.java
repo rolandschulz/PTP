@@ -364,7 +364,7 @@ public class OpenMPProblemsView extends ViewPart {
 					try {
 						int depth = IResource.DEPTH_INFINITE;
 						wsResource.deleteMarkers(markerID_,false,depth);
-						//if(traceOn)
+						if(traceOn)
 							System.out.println("markers removed id="+markerID_);
 					} catch (CoreException e) {
 						System.out.println("RM: exception deleting markers.");

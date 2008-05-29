@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006,2007 IBM Corp. and others.
+ * Copyright (c) 2006,2008 IBM Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,13 +16,13 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.cdt.ui.templateengine.AbstractWizardDataPage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.swt.SWT;
@@ -43,14 +43,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Wizard Page for collecting info about OpenMP!! project - appended to end of
- * "New Managed Make C project" wizard
+ * Wizard Page for collecting info about OpenMP project - appended to end of
+ * "New  C project" wizard
  * 
- *  * FIXME remove dup code, share with MPI version in a common class etc.
+ * TODO remove dup code, share with MPI version in a common class etc.
  * @author Beth Tibbitts
  * 
  */
-public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
+public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	public static final String DOT = ".";
 	private static final boolean traceOn=false;
 	public static final boolean wizardTraceOn=false;
@@ -58,7 +58,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	private Composite composite;
 	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectWizardPage";
 
-	// The following are IDs for storing info in MBSPageData so it can be retrieved in OpenMPProjectRunnable
+	// The following are IDs for storing info in MBSPageData so it can be retrieved in OpenMPProjectProcess (ProcessRunner)
 	// when the wizard is done.
 	/**
 	 * Store in MBSPageData  (with this ID) whether user wants to include OpenMP info in the project.
@@ -107,8 +107,6 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	
 	private Button OpenMPSampleButton;
 
-	private IPreferenceStore preferenceStore;
-
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 	/**
 	 * By default we DO use OpenMP project settings in a new project.<br>
@@ -124,7 +122,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	 */
 	public OpenMPProjectWizardPage() throws CoreException {
 		super("OpenMP Project Settings");
-		
+		prefIDincludes=OpenMPIDs.OpenMP_INCLUDES;
 		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage().ctor...");
 
 		//CommonPlugin.log(IStatus.ERROR,"Test error");
@@ -132,15 +130,16 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 		
 		// access the preference store from the OpenMP plugin
 		preferenceStore = OpenMPPlugin.getDefault().getPreferenceStore();
-		String mip=preferenceStore.getString(OpenMPIDs.OpenMP_INCLUDES);
+		String mip=preferenceStore.getString(prefIDincludes);
 		if(traceOn)System.out.println("Got OpenMP include pref from other plugin: "+mip);
 
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
-		defaultOpenMPIncludePath = preferenceStore.getString(OpenMPIDs.OpenMP_INCLUDES);
+		defaultOpenMPIncludePath = preferenceStore.getString(prefIDincludes);
 		if(defaultOpenMPIncludePath.length()==0) {
-			// warn if no MPI preferences have been set
-			showNoPrefs();
+			// warn if no OpenMP preferences have been set
+			String newIncludePath=showNoPrefs("OpenMP",prefIDincludes);
+			defaultOpenMPIncludePath=newIncludePath;
 		}
 		setDefaultOtherNames(defaultOpenMPIncludePath);
 		// the following sets what will be remembered when we leave the page.
@@ -157,7 +156,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	 * TODO: do we need a "do not show this message again" setting? (af - yes please! ;)
 	 */
 	private static boolean alreadyShown;
-	private static void showNoPrefs() {
+	private static void showNoPrefs1() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			StringBuffer buf=new StringBuffer("No OpenMP Preferences set; ");
@@ -213,7 +212,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 
 	/**
 	 * This sets what will be remembered for OpenMP include path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actually do the change
+	 * (so we can retrieve the information from the ProcessRunner to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -224,7 +223,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	}
 	/**
 	 * This sets what will be remembered for library name when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actually do the change
+	 * (so we can retrieve the information from the ProcessRunner to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -238,7 +237,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 	
 	/**
 	 * This sets what will be remembered for library search path when we leave the wizard page
-	 * (so we can retrieve the information from the Runnable to actually do the change
+	 * (so we can retrieve the information from the ProcessRunner to actually do the change
 	 * to the project info)
 	 * 
 	 * @param path
@@ -315,7 +314,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 
 			includePathField.setText(selectedDirectory);
 			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
-			// set value to where we can find it in the runnable later
+			// set value to where we can find it in the ProcessRunner later
 			setCurrentOpenMPIncludePath(selectedDirectory);
 		}
 	}
@@ -336,7 +335,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 
 			libPathField.setText(selectedDirectory);
 			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
-			// set value to where we can find it in the runnable later
+			// set value to where we can find it in the ProcessRunner later
 			setCurrentOpenMPLibPath(selectedDirectory);
 		}
 	}
@@ -398,7 +397,7 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 		});
 
 		// how do we know when next/finish button pushed? we don't.
-		// we just store all info where we can find it when the MPIProjectRunnable runs after all the wizard pages are done.
+		// we just store all info where we can find it when the OpenMPProjectProcess(ProcessRunner) runs after all the wizard pages are done.
 		
 		libLabel=new Label(composite, SWT.NONE);
 		libLabel.setText("Library name:");
@@ -715,6 +714,13 @@ public class OpenMPProjectWizardPage extends AbstractWizardDataPage {
 
 	public Map<String,String> getPageData() {
 		return pageData;
+	}
+	@Override
+	protected IPreferencePage getPreferencePage() {
+		if(preferencePage == null) {
+			preferencePage = new org.eclipse.ptp.pldt.openmp.core.prefs.OpenMPPreferencePage();
+		}
+		return preferencePage;
 	}
 
 }
