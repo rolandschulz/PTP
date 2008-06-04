@@ -25,7 +25,7 @@ if (${rank} == 0){ // the master task
 	}
 	else{  // worker tasks
 		/* create message */
-			sprintf(${message}, "Hello from process %d!", my_rank);
+			sprintf(${message}, "Hello from process %d!", ${rank});
 			dest = 0;
 			/* use strlen+1 so that '\0' get transmitted */
 			MPI_Send(${message}, strlen(${message})+1, ${MPI_CHAR},
