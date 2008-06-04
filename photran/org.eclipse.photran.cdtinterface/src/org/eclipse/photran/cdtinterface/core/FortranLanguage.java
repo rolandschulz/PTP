@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
+import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -126,4 +127,11 @@ public class FortranLanguage extends AbstractLanguage
 //		else
 //			return super.getAdapter(adapter);
 //	}
+
+
+
+	public int getLinkageID()
+	{
+		return ILinkage.FORTRAN_LINKAGE_ID;
+	}
 }

@@ -19,6 +19,7 @@ import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
+import org.eclipse.cdt.internal.ui.text.CCompositeReconcilingStrategy;
 import org.eclipse.cdt.internal.ui.text.CReconciler;
 import org.eclipse.cdt.internal.ui.text.CReconcilingStrategy;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -390,7 +391,9 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
          */
         public IReconciler getReconciler(ISourceViewer sourceViewer)
         {
-            MonoReconciler r = new CReconciler(editor, new CReconcilingStrategy(editor));
+            //MonoReconciler r = new CReconciler(editor, new CReconcilingStrategy(editor));
+            MonoReconciler r = new CReconciler(editor,
+            	new CCompositeReconcilingStrategy(sourceViewer, editor, getConfiguredDocumentPartitioning(sourceViewer)));
             r.setIsIncrementalReconciler(false);
             r.setProgressMonitor(new NullProgressMonitor());
             r.setDelay(500);

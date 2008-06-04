@@ -23,7 +23,8 @@ public class FortranVPGSourceViewerConfigurationFactory implements IFortranSourc
             
             @Override public IReconciler getReconciler(ISourceViewer sourceViewer)
             {
-                MonoReconciler r = new CReconciler(editor, new FortranVPGReconcilingStrategy(editor));
+                MonoReconciler r = new CReconciler(editor,
+                		new FortranVPGReconcilingStrategy(sourceViewer, editor, getConfiguredDocumentPartitioning(sourceViewer)));
                 r.setIsIncrementalReconciler(false);
                 r.setProgressMonitor(new NullProgressMonitor());
                 r.setDelay(500);

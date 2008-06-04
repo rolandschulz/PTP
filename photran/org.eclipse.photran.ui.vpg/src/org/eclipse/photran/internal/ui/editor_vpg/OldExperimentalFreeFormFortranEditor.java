@@ -42,7 +42,10 @@ public class OldExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
         
         @Override public IReconciler getReconciler(ISourceViewer sourceViewer)
         {
-            MonoReconciler r = new CReconciler(editor, new FortranVPGReconcilingStrategy(OldExperimentalFreeFormFortranEditor.this));
+            MonoReconciler r = new CReconciler(editor,
+            	new FortranVPGReconcilingStrategy(sourceViewer,
+            			OldExperimentalFreeFormFortranEditor.this,
+            			getConfiguredDocumentPartitioning(sourceViewer)));
             r.setIsIncrementalReconciler(false);
             r.setProgressMonitor(new NullProgressMonitor());
             r.setDelay(2000);
