@@ -281,4 +281,10 @@
    <!--===============================-->
 
    <extension-point id="modelbuilder" name="Model Builder" schema="schema/modelbuilder.exsd"/>
+
+   <!--============================-->
+   <!-- DOM Parser Extension Point -->
+   <!--============================-->
+
+   <extension-point id="domparser" name="DOM Parser" schema="schema/domparser.exsd"/>
 </plugin>

@@ -28,6 +28,7 @@ import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.photran.cdtinterface.dom.IFortranDOMParser;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.model.IFortranModelBuilder;
 import org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder;
@@ -50,7 +51,7 @@ public class FortranLanguage extends AbstractLanguage
 	{
 	    IFortranModelBuilder modelBuilder = null;
 	    
-	    IConfigurationElement[] configs= Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.photran.cdtinterface.modelbuilder");
+	    IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.photran.cdtinterface.modelbuilder");
 	    if (configs.length > 0)
 	    {
 	        try { modelBuilder = (IFortranModelBuilder)configs[0].createExecutableExtension("class"); }
@@ -68,7 +69,11 @@ public class FortranLanguage extends AbstractLanguage
 			IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
 			IIndex index, IParserLogService log) throws CoreException
 	{
-		return null;
+        IFortranDOMParser domParser = getDOMParser();
+        if (domParser == null)
+            return null;
+        else
+            return domParser.getASTTranslationUnit(reader, scanInfo, fileCreator, index, log);
 	}
 
 	public IASTCompletionNode getCompletionNode(CodeReader reader,
@@ -76,30 +81,34 @@ public class FortranLanguage extends AbstractLanguage
 			IIndex index, IParserLogService log, int offset)
 			throws CoreException
 	{
-		return null;
+        IFortranDOMParser domParser = getDOMParser();
+        if (domParser == null)
+            return null;
+        else
+            return domParser.getCompletionNode(reader, scanInfo, fileCreator, index, log, offset);
 	}
 	
-	/**
-	 * Gather the list of IASTNames that appear the selection with the given start offset
-	 * and length in the given ITranslationUnit.
-	 * 
-	 * @param tu
-	 * @param start
-	 * @param length
-	 * @param style
-	 * @return
-	 */
 	public IASTName[] getSelectedNames(IASTTranslationUnit ast, int start, int length)
 	{
-		// TODO This needs to be implemented.  I just added an empty stub to satisfy the interface (C.E.Rasmussen)
-		return new IASTName[0];
+        IFortranDOMParser domParser = getDOMParser();
+        if (domParser == null)
+            return new IASTName[0];
+        else
+            return domParser.getSelectedNames(ast, start, length);
 	}
 
-	
-	
-	
-	
-	
+    private IFortranDOMParser getDOMParser()
+    {
+        IFortranDOMParser modelBuilder = null;
+        
+        IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.photran.cdtinterface.domparser");
+        if (configs.length > 0)
+        {
+            try { modelBuilder = (IFortranDOMParser)configs[0].createExecutableExtension("class"); }
+            catch (CoreException e) {;}
+        }
+        return modelBuilder;
+    }
 
 	// JO - This is not required as of CDT 4.0, but it is used by the Fortran dependency calculator, so I'm leaving it in...
     public Collection getRegisteredContentTypeIds()
@@ -127,8 +136,6 @@ public class FortranLanguage extends AbstractLanguage
 //		else
 //			return super.getAdapter(adapter);
 //	}
-
-
 
 	public int getLinkageID()
 	{
