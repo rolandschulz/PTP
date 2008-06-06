@@ -7,7 +7,6 @@
   </extension>
 
    <!-- VPG-based model builder -->
-
    <extension
          point="org.eclipse.photran.cdtinterface.modelbuilder">
       <modelbuilder
