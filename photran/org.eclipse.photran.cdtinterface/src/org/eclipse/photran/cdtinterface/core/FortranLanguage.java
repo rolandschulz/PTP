@@ -32,6 +32,7 @@ import org.eclipse.photran.cdtinterface.dom.IFortranDOMParser;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.model.IFortranModelBuilder;
 import org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
  * CDT extension language for Fortran
@@ -40,7 +41,10 @@ import org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder;
  */
 public class FortranLanguage extends AbstractLanguage
 {
-	public static final String LANGUAGE_ID = "org.eclipse.photran.cdtinterface.fortran";
+    public static final String LANGUAGE_ID = "org.eclipse.photran.cdtinterface.fortran";
+
+    public static final String FORTRAN_MODEL_BUILDER_EXTENSION_POINT_ID = "org.eclipse.photran.cdtinterface.modelbuilder";
+    public static final String FORTRAN_DOM_PARSER_EXTENSION_POINT_ID = "org.eclipse.photran.cdtinterface.domparser";
 
 	public String getId()
 	{
@@ -51,10 +55,11 @@ public class FortranLanguage extends AbstractLanguage
 	{
 	    IFortranModelBuilder modelBuilder = null;
 	    
-	    IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.photran.cdtinterface.modelbuilder");
+	    IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor(FORTRAN_MODEL_BUILDER_EXTENSION_POINT_ID);
 	    if (configs.length > 0)
 	    {
-	        try { modelBuilder = (IFortranModelBuilder)configs[0].createExecutableExtension("class"); }
+	        int index = findPreferredModelBuilder(configs);
+	        try { modelBuilder = (IFortranModelBuilder)configs[index].createExecutableExtension("class"); }
 	        catch (CoreException e) {;}
 	    }
 	        
@@ -65,7 +70,15 @@ public class FortranLanguage extends AbstractLanguage
 	    return modelBuilder;
 	}
 
-	public IASTTranslationUnit getASTTranslationUnit(CodeReader reader,
+    private int findPreferredModelBuilder(IConfigurationElement[] configs)
+    {
+        for (int i = 0; i < configs.length; i++)
+            if (configs[i].getAttribute("id").equals(FortranPreferences.PREFERRED_MODEL_BUILDER.getValue()))
+                return i;
+        return 0;
+    }
+
+    public IASTTranslationUnit getASTTranslationUnit(CodeReader reader,
 			IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
 			IIndex index, IParserLogService log) throws CoreException
 	{
@@ -101,13 +114,22 @@ public class FortranLanguage extends AbstractLanguage
     {
         IFortranDOMParser modelBuilder = null;
         
-        IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.photran.cdtinterface.domparser");
+        IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor(FORTRAN_DOM_PARSER_EXTENSION_POINT_ID);
         if (configs.length > 0)
         {
-            try { modelBuilder = (IFortranDOMParser)configs[0].createExecutableExtension("class"); }
+            int index = findPreferredDOMParser(configs);
+            try { modelBuilder = (IFortranDOMParser)configs[index].createExecutableExtension("class"); }
             catch (CoreException e) {;}
         }
         return modelBuilder;
+    }
+
+    private int findPreferredDOMParser(IConfigurationElement[] configs)
+    {
+        for (int i = 0; i < configs.length; i++)
+            if (configs[i].getAttribute("id").equals(FortranPreferences.PREFERRED_DOM_PARSER.getValue()))
+                return i;
+        return 0;
     }
 
 	// JO - This is not required as of CDT 4.0, but it is used by the Fortran dependency calculator, so I'm leaving it in...

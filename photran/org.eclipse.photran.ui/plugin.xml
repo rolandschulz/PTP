@@ -176,6 +176,12 @@
             class="org.eclipse.photran.internal.ui.preferences.EditorPreferencePage"
             id="org.eclipse.photran.ui.FortranEditorPreferencePage">
       </page>
+      <page
+            name="CDT Integration"
+            category="org.eclipse.photran.ui.MainFortranPreferencePage"
+            class="org.eclipse.photran.internal.ui.preferences.CDTFortranPreferencePage"
+            id="org.eclipse.photran.ui.CDTFortranPreferencePage">
+      </page>
    </extension>
 
    <!--=========================================-->

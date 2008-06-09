@@ -17,10 +17,10 @@ import org.eclipse.swt.graphics.RGB;
 
 /**
  * Provides access to all of the workspace-wide preferences for Photran.
- * 
+ * <p>
  * The user may set these via the standard Eclipse preferences mechanism
  * (usually by clicking Window > Preferences).
- * 
+ * <p>
  * <i>All Photran preferences must have a constant declared in this file
  * and should be accessed via that constant.  They should be implemented
  * as subclasses of <code>FortranPreference</code>.</i>
@@ -40,6 +40,9 @@ public final class FortranPreferences
     public static final FortranRGBPreference COLOR_KEYWORDS    = new FortranRGBPreference("keywords",    new RGB(127, 0,   85 ));
     public static final FortranRGBPreference COLOR_STRINGS     = new FortranRGBPreference("strings",     new RGB(42,  0,   255));
 
+    public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", "");
+    public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", "");
+    
     private FortranPreferences() {}
 
     /** Initializes/resets all Photran-specific preferences to their default values */

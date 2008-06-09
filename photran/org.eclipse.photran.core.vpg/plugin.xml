@@ -12,6 +12,6 @@
       <modelbuilder
             class="org.eclipse.photran.internal.core.model.FortranModelBuilder"
             id="defaultModelBilder"
-            name="Photran VPG Model Builder" />
+            name="Default Photran Model Builder" />
    </extension>
 </plugin>
