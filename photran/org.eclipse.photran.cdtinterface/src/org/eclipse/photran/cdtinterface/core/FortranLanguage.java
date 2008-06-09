@@ -138,29 +138,13 @@ public class FortranLanguage extends AbstractLanguage
         return Arrays.asList(new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE });
     }
 
-//	public Object getAdapter(Class adapter)
-//	{
-//		//System.out.println("getAdapter " + adapter.getName());
-//		
-//        if (adapter == IPDOMLinkageFactory.class)
-//			return new IPDOMLinkageFactory()
-//			{
-//				public PDOMLinkage getLinkage(PDOM pdom, int record)
-//				{
-//					return null; //return new PDOMFortranLinkage(pdom, record);
-//				}
-//
-//				public PDOMLinkage createLinkage(PDOM pdom) throws CoreException
-//				{
-//					return null; //return new PDOMFortranLinkage(pdom);
-//				}
-//			};
-//		else
-//			return super.getAdapter(adapter);
-//	}
-
 	public int getLinkageID()
 	{
-		return ILinkage.FORTRAN_LINKAGE_ID;
+	    // AbstractIndexerTask#runTask does not process FORTRAN_LINKAGE_ID
+	    // (and neither does the C/C++ Index view), so we'll pretend to be C
+	    
+		//return ILinkage.FORTRAN_LINKAGE_ID;
+	    
+	    return ILinkage.C_LINKAGE_ID;
 	}
 }
