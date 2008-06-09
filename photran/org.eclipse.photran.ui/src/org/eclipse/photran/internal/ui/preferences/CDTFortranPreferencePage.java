@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.preferences;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -70,6 +73,15 @@ public class CDTFortranPreferencePage extends AbstractFortranPreferencePage
         String[][] result = new String[configs.length][];
         for (int i = 0; i < configs.length; i++)
             result[i] = new String[] { configs[i].getAttribute("name"), configs[i].getAttribute("id") };
+        Arrays.sort(result, new Comparator()
+        {
+            public int compare(Object arg0, Object arg1)
+            {
+                String[] kvPair1 = (String[])arg0;
+                String[] kvPair2 = (String[])arg1;
+                return kvPair1[0].compareTo(kvPair2[0]);
+            }
+        });
         return result;
     }
 }
