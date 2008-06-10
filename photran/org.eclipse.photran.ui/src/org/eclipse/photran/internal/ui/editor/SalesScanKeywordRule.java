@@ -455,18 +455,18 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         
         public boolean retainAsKeyword(int column)
         {
-            System.out.println();
-            System.out.println("Column " + column + ": " + line.substring(column));
-            System.out.println("OC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical);
-            int precedingKeywordOffset = findPrecedingKeyword(column);
-            String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
-            System.out.println("Preceding token is " + precedingKeyword + " (column " + precedingKeywordOffset + ")");
-            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
-            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
-            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
-            
-            if (line.substring(column).startsWith("type"))
-                System.err.println("!!!"); // Put breakpoint here
+//            System.out.println();
+//            System.out.println("Column " + column + ": " + line.substring(column));
+//            System.out.println("OC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical);
+//            int precedingKeywordOffset = findPrecedingKeyword(column);
+//            String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
+//            System.out.println("Preceding token is " + precedingKeyword + " (column " + precedingKeywordOffset + ")");
+//            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
+//            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
+//            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
+//            
+//            if (line.substring(column).startsWith("type"))
+//                System.err.println("!!!"); // Put breakpoint here
             
             return internalRetainAsKeyword(column, keyword);
         }
