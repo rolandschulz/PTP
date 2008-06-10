@@ -337,8 +337,29 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             lineContainsColonColon = cc > 0;
             if (lineContainsColonColon) start = cc + 2; 
             
+            int pos = skipWhitespace(start);
+            if (pos >= 0 && Character.isDigit(line.charAt(pos)))
+            {
+                // Line starts with an integer label
+                pos = skipInteger(pos);
+                pos = skipWhitespace(pos);
+            }
+            return pos;
+        }
+
+        private int skipWhitespace(int start)
+        {
             for (pos = start; pos < length; pos++)
                 if (!Character.isWhitespace(line.charAt(pos)))
+                    return pos;
+            
+            return -1;
+        }
+
+        private int skipInteger(int start)
+        {
+            for (pos = start; pos < length; pos++)
+                if (!Character.isDigit(line.charAt(pos)))
                     return pos;
             
             return -1;
@@ -434,48 +455,73 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         
         public boolean retainAsKeyword(int column)
         {
-//            System.out.println(line.substring(column));
-//            System.out.println(line + "\nOC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical + "\n");
+            System.out.println();
+            System.out.println("Column " + column + ": " + line.substring(column));
+            System.out.println("OC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical);
+            int precedingKeywordOffset = findPrecedingKeyword(column);
+            String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
+            System.out.println("Preceding token is " + precedingKeyword + " (column " + precedingKeywordOffset + ")");
+            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
+            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
+            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
+            
+            if (line.substring(column).startsWith("type"))
+                System.err.println("!!!"); // Put breakpoint here
+            
+            return internalRetainAsKeyword(column, keyword);
+        }
 
+        private boolean internalRetainAsKeyword(int column, String keyword)
+        {
             if (column < 0) return false;
             if (salesRetainAsKeyword(column)) return true;
-            
-//            if (keyword.equalsIgnoreCase("then"))
-//            {
-//                String s = line.substring(firstTokenPos);
-//                return s.startsWith("if") || s.startsWith("IF");
-//            }
-            
-            int precedingKeywordOffset = findPrecedingKeyword(column);
-            if (precedingKeywordOffset == column) return false;
+            return applyKeywordRules(column, keyword);
+        }
 
-            if (!retainAsKeyword(precedingKeywordOffset)) return false;
-            
-            String precedingKeyword = line.substring(precedingKeywordOffset, column);
-            if (precedingKeyword.indexOf("(") >= 0) precedingKeyword = precedingKeyword.substring(0, precedingKeyword.indexOf("("));
-            precedingKeyword = precedingKeyword.trim();
-//            System.out.println("Preceding keyword is " + precedingKeyword);
+        private boolean applyKeywordRules(int column, String keyword)
+        {
+            // N.B. These rules apply regardless of the token preceding this one
+            if (keyword.equalsIgnoreCase("only"))
+                return openContextComma && match("use", firstTokenPos);
+            else if (keyword.equalsIgnoreCase("result"))
+                return letterFollowsParenthetical;
+            else if (keyword.equalsIgnoreCase("then"))
+                return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos));
+            else
+            {
+                int precedingKeywordOffset = findPrecedingKeyword(column);
+                if (precedingKeywordOffset == column) return false;
+                String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
+                if (!internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword)) return false;
+                return applyPrecedingKeywordRules(keyword, precedingKeyword);
+            }
+        }
 
+        private boolean applyPrecedingKeywordRules(String keyword, String precedingKeyword)
+        {
+            // N.B. These rules depend on the token preceding this one
             if (isType(keyword))
                 return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit");
-            else if (keyword.equalsIgnoreCase("none"))
-                return precedingKeyword.equalsIgnoreCase("implicit");
-            else if (keyword.equalsIgnoreCase("precision"))
-                return precedingKeyword.equalsIgnoreCase("double");
+            else if (keyword.equalsIgnoreCase("case"))
+                return precedingKeyword.equalsIgnoreCase("select");
             else if (keyword.equalsIgnoreCase("data"))
                 return precedingKeyword.equalsIgnoreCase("block");
             else if (keyword.equalsIgnoreCase("function"))
                 return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword);
+            else if (keyword.equalsIgnoreCase("if"))
+                return precedingKeyword.equalsIgnoreCase("else") || precedingKeyword.equalsIgnoreCase("end");
+            else if (keyword.equalsIgnoreCase("none"))
+                return precedingKeyword.equalsIgnoreCase("implicit");
+            else if (keyword.equalsIgnoreCase("precision"))
+                return precedingKeyword.equalsIgnoreCase("double");
+            else if (keyword.equalsIgnoreCase("type"))
+                return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit") || precedingKeyword.equalsIgnoreCase("end");
             else if (keyword.equalsIgnoreCase("while"))
                 return precedingKeyword.equalsIgnoreCase("do");
-            else if (keyword.equalsIgnoreCase("then"))
-                return !openContextEquals && !openContextComma && match("if", firstTokenPos);
-            else if (keyword.equalsIgnoreCase("result"))
-                return letterFollowsParenthetical;
             else
                 return precedingKeyword.equalsIgnoreCase("end");
         }
-        
+
         private boolean salesRetainAsKeyword(int column)
         {
             if (column == firstTokenPos)
@@ -517,8 +563,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 || kw.equalsIgnoreCase("doubleprecision")
                 || kw.equalsIgnoreCase("integer")
                 || kw.equalsIgnoreCase("logical")
-                || kw.equalsIgnoreCase("real")
-                || kw.equalsIgnoreCase("type");
+                || kw.equalsIgnoreCase("real");
         }
 
         private boolean isPrefixSpec(String kw)
@@ -567,6 +612,14 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             }
             
             return offset;
+        }
+        
+        private String precedingKeywordAsString(int column, int precedingKeywordOffset)
+        {
+            String precedingKeyword = line.substring(precedingKeywordOffset, column);
+            if (precedingKeyword.indexOf("(") >= 0) precedingKeyword = precedingKeyword.substring(0, precedingKeyword.indexOf("("));
+            precedingKeyword = precedingKeyword.trim();
+            return precedingKeyword;
         }
     }
 }
