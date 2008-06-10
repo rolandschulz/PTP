@@ -27,5 +27,6 @@ Export-Package: bz.over.vpg,
  org.eclipse.photran.internal.core.properties,
  org.eclipse.photran.internal.core.refactoring,
  org.eclipse.photran.internal.core.refactoring.infrastructure
-Bundle-ClassPath: vpg-eclipse.jar,
+Bundle-ClassPath: cdtdb-4.0.3-eclipse.jar,
+ vpg-eclipse.jar,
  .
