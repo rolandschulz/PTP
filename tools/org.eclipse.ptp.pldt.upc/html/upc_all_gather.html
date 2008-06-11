@@ -17,7 +17,7 @@ copies a block of shared memory that has
 affinity to the ith thread to the ith block of a shared memory area that has
 affinity to a single thread. The number of bytes in each block is <code>nbytes</code>.
 <p><code>nbytes</code> must be strictly greater than 0.
-<p>he upc all gather function treats the <code>src</code> pointer as if it pointed to a
+<p>The upc all gather function treats the <code>src</code> pointer as if it pointed to a
 shared memory area of <code>nbytes</code> bytes on each thread and therefore had type:
 <pre>
     shared [nbytes] char[nbytes * THREADS]
