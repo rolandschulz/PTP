@@ -46,4 +46,17 @@ public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
 	public String getServiceId() {
 		return serviceId;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof IServiceProviderDescriptor)) {
+			return false;
+		}
+		return id.equals(((IServiceProviderDescriptor) o).getId()); 
+	}
+	
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
 }

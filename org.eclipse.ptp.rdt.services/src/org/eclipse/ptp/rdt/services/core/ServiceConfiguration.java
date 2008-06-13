@@ -47,6 +47,8 @@ public class ServiceConfiguration implements IServiceConfiguration {
 	 * @see org.eclipse.ptp.rdt.services.core.IServiceConfiguration#setServiceProvider(org.eclipse.ptp.rdt.services.core.IService, org.eclipse.ptp.rdt.services.core.IServiceProvider)
 	 */
 	public void setServiceProvider(IService service, IServiceProvider provider) {
+		// Remove old mapping if one exists
+		fServiceToProviderMap.remove(service);
 		fServiceToProviderMap.put(service, provider);
 
 	}
