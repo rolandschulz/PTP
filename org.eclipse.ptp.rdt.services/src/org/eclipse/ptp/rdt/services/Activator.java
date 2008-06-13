@@ -40,11 +40,11 @@ public class Activator extends AbstractUIPlugin {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		ISavedState savedState = workspace.addSaveParticipant(this, new ServiceModelSaveParticipant());
 		
-		if (savedState != null) {
-			IPath statePath = savedState.lookup(getServiceModelStateFilePath());
-			ServiceModelManager manager = ServiceModelManager.getInstance();
-			manager.loadModelConfiguration(statePath.toFile());
-		}
+//		if (savedState != null) {
+//			IPath statePath = savedState.lookup(getServiceModelStateFilePath());
+//			ServiceModelManager manager = ServiceModelManager.getInstance();
+//			manager.loadModelConfiguration(statePath.toFile());
+//		}
 	}
 
 	@Override

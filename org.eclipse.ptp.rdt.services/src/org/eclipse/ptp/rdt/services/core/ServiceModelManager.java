@@ -93,6 +93,8 @@ public class ServiceModelManager implements IServiceModelManager {
 			confs = new HashSet<IServiceConfiguration>();
 		}
 		
+		// Remove old configuration if one exists
+		confs.remove(conf);
 		confs.add(conf);
 		projectConfigurations.put(project, confs);
 		configurations.put(conf.getName(), conf);
