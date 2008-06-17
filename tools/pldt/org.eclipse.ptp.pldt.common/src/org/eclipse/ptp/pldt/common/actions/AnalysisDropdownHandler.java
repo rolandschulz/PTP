@@ -20,9 +20,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 
@@ -66,29 +64,28 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		instance=this;
 		ISelectionService ss=null;
 		try {
-			CommonPlugin p = CommonPlugin.getDefault();
-			IWorkbench w = p.getWorkbench();
-			IWorkbenchWindow wbw=w.getActiveWorkbenchWindow();//null
 			// register to be notified of future selections
 			ss = CommonPlugin.getDefault().getWorkbench()
 					.getActiveWorkbenchWindow().getSelectionService();
-			// String id=CommonPlugin.getDefault().getWorkbench().
-			// getActiveWorkbenchWindow
-			// ().getActivePage().getActivePart().getSite().getId();
 			ss.addSelectionListener(this);
+			// and cache the selection that was in effect now.
+			ISelection sel= ss.getSelection();//gives selection in ACTIVE PART.If editor was just opened, active part is probably the editor.
+			//
+			if(sel instanceof IStructuredSelection) {
+				lastSelection=(IStructuredSelection)sel;
+				if(traceOn)
+					System.out.println("  ...got initial selection.");
+			}
 		} catch (Exception e) {
 			Throwable t=e.getCause();
-			e.printStackTrace();
-			return;// FIXME
+			//e.printStackTrace();
+			System.out.println("AnalysisDropdownHandler <init> "+ e.getMessage()+" cause: "+t.getMessage());
+			// FIXME this gets hit on target workbench shutdown. WHY?
+			//return;
+
 		}
 
-		// and cache the selection that was in effect now.
-		ISelection sel= ss.getSelection();//gives selection in ACTIVE PART.If editor was just opened, active part is probably the editor.
-		//
-		if(sel instanceof IStructuredSelection) {
-			lastSelection=(IStructuredSelection)sel;
-			if(traceOn)System.out.println("  ...got initial selection.");
-		}
+
 		// If we still don't know the selection then find out the selection in the
 		// project explorer view - its guess is probably right.
 		if (lastSelection == null) {
