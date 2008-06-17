@@ -24,6 +24,8 @@ final class FortranCompletionProcessorASTTask implements IFortranEditorASTTask
                           TokenList tokenList,
                           DefinitionMap<Definition> defMap)
     {
+        if (defMap == null) return true;
+        
         synchronized (fortranCompletionProcessor)
         {
             final ArrayList<String> scopes = fortranCompletionProcessor.scopes;

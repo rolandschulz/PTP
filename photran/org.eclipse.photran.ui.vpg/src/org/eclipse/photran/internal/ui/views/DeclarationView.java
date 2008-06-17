@@ -217,6 +217,8 @@ public class DeclarationView extends ViewPart
      */
     public synchronized void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap)
     {
+        if (defMap == null) return;
+        
         activeDefinitions = new DefinitionMap<String>(defMap)
         {
             @Override protected String map(String qualifiedName, Definition def)

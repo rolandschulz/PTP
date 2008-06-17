@@ -72,6 +72,8 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
                            TokenList tokenList,
                            DefinitionMap<Definition> defMap)
         {
+            if (defMap == null) return true;
+            
             final Definition def = defMap.lookup(selection, tokenList);
 
             // Run this in the UI thread
