@@ -9,6 +9,10 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
+/*
+ * Routing layer implementation. These routines implement a binomial tree-based router.
+ */
+
 #include <stdlib.h>
 
 #include "compat.h"
@@ -86,6 +90,8 @@ sdm_route_finalize(void)
 {
 	sdm_set_free(children);
 	sdm_set_free(descendents);
+	sdm_set_free(route);
+	sdm_set_free(reachable);
 	HashDestroy(child_descendents, set_free);
 }
 
@@ -161,16 +167,16 @@ sdm_route_set_size(int s)
 
 /*
  * Create a set containing our descendants. If descend is 0, only find immediate
- * children.
+ * children. Assumes that the size of the set will fit into an integer.
  */
 static void
 find_descendents(sdm_idset set, int id_p, int root, int size, int p2, int descend)
 {
-	int	i;
-	int high;
-	int	mask;
-	int child;
-	int child_p;
+	int				i;
+	int 			high;
+	int 			child;
+	int 			child_p;
+	unsigned int	mask;
 
 	high = high_bit(id_p);
 
@@ -185,7 +191,6 @@ find_descendents(sdm_idset set, int id_p, int root, int size, int p2, int descen
         }
     }
 }
-
 
 /*
  * Find MSB of value.
