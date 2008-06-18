@@ -29,19 +29,19 @@ import org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager;
  *
  */
 public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
-	private BitList terminatedProcs;
-	private BitList suspendedProcs;
-	private BitList registeredProcs;
-	private BitList pendingProcs;
-	private BitList canStepReturnProcs;
+	private BitList terminatedTasks;
+	private BitList suspendedTasks;
+	private BitList registeredTasks;
+	private BitList pendingTasks;
+	private BitList canStepReturnTasks;
 
 	public TaskManager(IPDISession session) {
 		super(session, false);
-		terminatedProcs = new BitList(session.getTotalTasks());
-		suspendedProcs = new BitList(session.getTotalTasks());
-		registeredProcs = new BitList(session.getTotalTasks());
-		pendingProcs = new BitList(session.getTotalTasks());
-		canStepReturnProcs = new BitList(session.getTotalTasks());
+		terminatedTasks = new BitList(session.getTotalTasks());
+		suspendedTasks = new BitList(session.getTotalTasks());
+		registeredTasks = new BitList(session.getTotalTasks());
+		pendingTasks = new BitList(session.getTotalTasks());
+		canStepReturnTasks = new BitList(session.getTotalTasks());
 	}
 	
 	/* (non-Javadoc)
@@ -63,7 +63,7 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getCanStepReturnTasks()
 	 */
 	public BitList getCanStepReturnTasks() {
-		return canStepReturnProcs;
+		return canStepReturnTasks;
 	}
 	
 	/* (non-Javadoc)
@@ -110,7 +110,7 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getPendingTasks()
 	 */
 	public BitList getPendingTasks() {
-		return pendingProcs;
+		return pendingTasks;
 	}
 	
 	/* (non-Javadoc)
@@ -125,7 +125,7 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getRegisteredTasks()
 	 */
 	public BitList getRegisteredTasks() {
-		return registeredProcs;
+		return registeredTasks;
 	}
 	
 	/* (non-Javadoc)
@@ -149,7 +149,7 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getSuspendedTasks()
 	 */
 	public BitList getSuspendedTasks() {
-		return suspendedProcs;
+		return suspendedTasks;
 	}
 	
 	/* (non-Javadoc)
@@ -164,7 +164,7 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getTerminatedTasks()
 	 */
 	public BitList getTerminatedTasks() {
-		return terminatedProcs;
+		return terminatedTasks;
 	}
 
 	/* (non-Javadoc)
@@ -222,20 +222,18 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setCanStepReturnTasks(boolean, org.eclipse.ptp.core.util.BitList)
 	 */
 	public void setCanStepReturnTasks(boolean isAdd, BitList tasks) {
-		BitList stepReturnTasks = getCanStepReturnTasks();
 		if (isAdd)
-			addTasks(stepReturnTasks, tasks);
+			canStepReturnTasks = addTasks(canStepReturnTasks, tasks);
 		else
-			removeTasks(stepReturnTasks, tasks);
+			removeTasks(canStepReturnTasks, tasks);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setPendingTasks(boolean, org.eclipse.ptp.core.util.BitList)
 	 */
 	public void setPendingTasks(boolean isAdd, BitList tasks) {
-		BitList pendingTasks = getPendingTasks();
 		if (isAdd)
-			addTasks(pendingTasks, tasks);
+			pendingTasks = addTasks(pendingTasks, tasks);
 		else
 			removeTasks(pendingTasks, tasks);
 	}
@@ -244,9 +242,8 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setRegisterTasks(boolean, org.eclipse.ptp.core.util.BitList)
 	 */
 	public void setRegisterTasks(boolean isAdd, BitList tasks) {
-		BitList registeredTasks = getRegisteredTasks();
 		if (isAdd)
-			addTasks(registeredTasks, tasks);
+			registeredTasks = addTasks(registeredTasks, tasks);
 		else
 			removeTasks(registeredTasks, tasks);
 	}
@@ -255,9 +252,8 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setSuspendTasks(boolean, org.eclipse.ptp.core.util.BitList)
 	 */
 	public void setSuspendTasks(boolean isAdd, BitList tasks) {
-		BitList suspendedTasks = getSuspendedTasks();
 		if (isAdd)
-			addTasks(suspendedTasks, tasks);
+			suspendedTasks = addTasks(suspendedTasks, tasks);
 		else {
 			removeTasks(suspendedTasks, tasks);
 			setCanStepReturnTasks(false, tasks);//remove can step return tasks			
@@ -268,9 +264,8 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setTerminateTasks(boolean, org.eclipse.ptp.core.util.BitList)
 	 */
 	public void setTerminateTasks(boolean isAdd, BitList tasks) {
-		BitList terminatedTasks = getTerminatedTasks();
 		if (isAdd) {
-			addTasks(terminatedTasks, tasks);
+			terminatedTasks = addTasks(terminatedTasks, tasks);
 			setSuspendTasks(false, tasks);//remove suspended tasks
 		}
 		else
@@ -282,11 +277,11 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 */
 	public void shutdown() {
 		/*
-		terminatedProcs = null;
-		suspendedProcs = null;
-		registeredProcs = null;
-		pendingProcs = null;
-		canStepReturnProcs = null;
+		terminatedTasks = null;
+		suspendedTasks = null;
+		registeredTasks = null;
+		pendingTasks = null;
+		canStepReturnTasks = null;
 		*/
 	}
 	
@@ -301,12 +296,13 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @param curTasks
 	 * @param newTasks
 	 */
-	private synchronized void addTasks(BitList curTasks, BitList newTasks) {
+	private synchronized BitList addTasks(BitList curTasks, BitList newTasks) {
 		if (curTasks.size() < newTasks.size()) {
 			newTasks.or(curTasks);
 			curTasks =  newTasks.copy();
 		}
 		curTasks.or(newTasks);
+		return curTasks;
 	}
 	
 	/**
