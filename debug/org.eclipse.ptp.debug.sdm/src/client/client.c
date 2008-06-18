@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -22,9 +22,9 @@
  * in the job being debugged, and is responsible for coordinating protocol
  * messages between the debug client interface (whatever that may be)
  * and the debug servers.
- * 
- * Note that there will be num_procs+1 [0..num_procs] processes in our 
- * communicator, where num_procs is the number of processes in the parallel 
+ *
+ * Note that there will be num_procs+1 [0..num_procs] processes in our
+ * communicator, where num_procs is the number of processes in the parallel
  * job being debugged. To simplify the accounting, we use the task id of
  * num_procs as the client task id and [0..num_procs-1] for the server
  * task ids.
@@ -41,8 +41,7 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 #include "handler.h"
-
-static int num_servers;
+#include "sdm.h"
 
 /*
  * Called by proxy when a new connection
@@ -57,7 +56,7 @@ new_connection(void)
 static int
 server_count(void)
 {
-	return num_servers;
+	return sdm_route_get_size();
 }
 
 static proxy_svr_helper_funcs helper_funcs = {
@@ -65,7 +64,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 	server_count
 };
 
-static proxy_cmd cmds[] = { 
+static proxy_cmd cmds[] = {
 	/* DBG_QUIT_CMD */						DbgClntQuit,
 	/* DBG_STARTSESSION_CMD */				DbgClntStartSession,
 	/* DBG_SETLINEBREAKPOINT_CMD */			DbgClntSetLineBreakpoint,
@@ -106,23 +105,28 @@ static proxy_commands	command_tab = {
 	cmds
 };
 
-void 
-client(int svr_num, int task_id, char *proxy, char *host, int port)
+void
+client(char *proxy, char *host, int port)
 {
-	num_servers = svr_num;
-	
-	if (DbgClntInit(svr_num, task_id, proxy, &helper_funcs, &command_tab) != DBGRES_OK ||
-			DbgClntCreateSession(svr_num, host, port) != DBGRES_OK) {
+	/*
+	 * FIXME: size is the number of processes being debugged *not* the number of debugger
+	 * processes (which includes the master). This should be supplied by the frontend or on
+	 * the command line. At the moment, we just exclude the master.
+	 */
+	int size = sdm_route_get_size() - 1;
+
+	if (DbgClntInit(size, sdm_route_get_id(), proxy, &helper_funcs, &command_tab) != DBGRES_OK ||
+			DbgClntCreateSession(size, host, port) != DBGRES_OK) {
 		fprintf(stderr, "%s\n", DbgGetErrorStr()); fflush(stderr);
 		DbgClntQuit(0, 0, NULL); //TODO fixme!
 		DbgClntProgress();
 		return;
 	}
-	
+
 	while (!DbgClntIsShutdown()) {
 		if (DbgClntProgress() != DBGRES_OK)
 			break;
 	}
-	
-	DbgClntFinish();	
+
+	DbgClntFinish();
 }
