@@ -31,5 +31,6 @@ Export-Package: org.eclipse.ptp.ui,
  org.eclipse.ptp.ui.model,
  org.eclipse.ptp.ui.preferences,
  org.eclipse.ptp.ui.utils,
+ org.eclipse.ptp.ui.utils.swt,
  org.eclipse.ptp.ui.views,
  org.eclipse.ptp.ui.wizards

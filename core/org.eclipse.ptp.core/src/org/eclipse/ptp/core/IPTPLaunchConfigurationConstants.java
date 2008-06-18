@@ -140,6 +140,18 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_REGISTER_GROUPS = PTP_LAUNCH_ID + ".DEBUGGER_REGISTER_GROUPS";
 	
 	/**
+	 * Launch configuration attribute key. The value is a boolean that states if the executable will be copied 
+	 * from the local machine to the remote machine.
+	 */
+	public static final String ATTR_COPY_EXECUTABLE = PTP_LAUNCH_ID + ".ATTR_COPY_EXECUTABLE_FROM_LOCAL";
+	
+	/**
+	 * Launch configuration attribute key. The value is the absolute path to the executable that will be copied
+	 * to the remote machine.
+	 */
+	public static final String ATTR_LOCAL_EXECUTABLE_PATH = PTP_LAUNCH_ID + ".ATTR_LOCAL_EXECUTABLE_PATH";
+	
+	/**
 	 *  Launch configuration attribute key. The value is the absolute path to the executable that
 	 *  is to be launched. If the executable is located on a remote machine, it is the path to the
 	 *  executable on this machine.
@@ -163,4 +175,22 @@ public interface IPTPLaunchConfigurationConstants {
 	 */
 	public static final int ERR_PROGRAM_NOT_EXIST = 104;
 	public static final int ERR_PROGRAM_NOT_BINARY = 107;
+
+	/**
+	 * Launch configuration attribute key. The value is a boolean flag indicating
+	 * if file synchronization will occur after the execution.
+	 */
+	public static final String ATTR_SYNC_AFTER = PTP_LAUNCH_ID + ".ATTR_SYNC_AFTER";
+	
+	/**
+	 * Launch configuration attribute key. The value is a boolean flag indicating
+	 * if file synchronization will occur before the execution.
+	 */
+	public static final String ATTR_SYNC_BEFORE = PTP_LAUNCH_ID + ".ATTR_SYNC_BEFORE";
+	
+	/**
+	 * Launch configuration attribute key. The value is a list of rules of 
+	 * synchronization.
+	 */
+	public static final String ATTR_SYNC_RULES = PTP_LAUNCH_ID + ".ATTR_SYNC_RULES";
 }

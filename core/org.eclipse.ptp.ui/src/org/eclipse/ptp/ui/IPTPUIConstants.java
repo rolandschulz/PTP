@@ -28,6 +28,7 @@ public interface IPTPUIConstants {
 	
 	public static final String VIEW_PARALLELMACHINES = PREFIX + "views.parallelMachinesView";
 	public static final String VIEW_PARALLELJOBS = PREFIX + "views.parallelJobsView";
+	public static final String VIEW_JOBSLIST = PREFIX + "views.JobsListView";
 	public static final String VIEW_PARALLELProcess = PREFIX + "views.parallelProcessView";
 	public static final String VIEW_RESOURCEMANAGER = PREFIX + "views.resourceManagerView";
 
