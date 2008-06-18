@@ -94,7 +94,7 @@ idset_to_bitset(sdm_idset ids)
  * call all registered event handlers.
  */
 static void
-dbg_clnt_cmd_completed(sdm_idset dest, char *msg, void *data)
+dbg_clnt_cmd_completed(sdm_id dest, sdm_idset src, char *msg, void *data)
 {
 	proxy_msg *	m;
 
@@ -106,7 +106,7 @@ dbg_clnt_cmd_completed(sdm_idset dest, char *msg, void *data)
  		 * don't include the bitset, it is only added prior to sending back
  		 * to the client.
  		 */
-		proxy_msg_insert_bitset(m, idset_to_bitset(dest), 0);
+		proxy_msg_insert_bitset(m, idset_to_bitset(src), 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
 	}
 }
