@@ -6,21 +6,21 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
  /*
   * Based on the QNX Java implementation of the MI interface
   */
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +39,7 @@ MIFrame *
 MIFrameNew(void)
 {
 	MIFrame *	frame;
-	
+
 	frame = (MIFrame *)malloc(sizeof(MIFrame));
 	frame->level = 0;
 	frame->line = 0;
@@ -47,7 +47,7 @@ MIFrameNew(void)
 	frame->func = NULL;
 	frame->file = NULL;
 	frame->args = NULL;
-	return frame;	
+	return frame;
 }
 
 void
@@ -67,24 +67,24 @@ MIFrameFree(MIFrame *frame)
 MIFrame *
 MIFrameParse(MIValue *tuple)
 {
-	char *		str;
+	char *		str = NULL;
 	char *		var;
 	MIValue *	value;
 	MIResult *	result;
 	List *		results = tuple->results;
 	MIFrame *	frame = MIFrameNew();
-	
+
 	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
 		var = result->variable;
 		value = result->value;
-	
+
 		if (value != NULL || value->type == MIValueTypeConst) {
 			str = value->cstring;
 		}
-	
-		if (strcmp(var, "level") == 0) { //$NON-NLS-1$
+
+		if (strcmp(var, "level") == 0 && str != NULL) { //$NON-NLS-1$
 			frame->level = (int)strtol(str, NULL, 10);
-		} else if (strcmp(var, "addr") == 0) { //$NON-NLS-1$
+		} else if (strcmp(var, "addr") == 0 && str != NULL) { //$NON-NLS-1$
 			frame->addr = strdup(str);
 		} else if (strcmp(var, "func") == 0) { //$NON-NLS-1$
 			frame->func = NULL;
@@ -101,15 +101,15 @@ MIFrameParse(MIValue *tuple)
 					frame->func = strdup(str);
 				}
 			}
-		} else if (strcmp(var, "file") == 0) { //$NON-NLS-1$
+		} else if (strcmp(var, "file") == 0 && str != NULL) { //$NON-NLS-1$
 			frame->file = strdup(str);
-		} else if (strcmp(var, "line") == 0) { //$NON-NLS-1$
+		} else if (strcmp(var, "line") == 0 && str != NULL) { //$NON-NLS-1$
 			frame->line = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "args") == 0) { //$NON-NLS-1$
 			frame->args = MIArgsParse(value);
 		}
 	}
-	
+
 	return frame;
 }
 
@@ -121,10 +121,10 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	MIResult *		result;
 	List *			frames = NULL;
 	MIValue * frameVal;
-	
+
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
-		
+
 	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "stack") == 0) {
@@ -156,7 +156,7 @@ MIFrameInfoParse(List *results)
 	MIResult *	result;
 	List *		frames = NULL;
 
-	//SetList(results); 
+	//SetList(results);
 	//if ((result = (MIResult *)GetListElement(results)) != NULL) {
 	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL;) {
 		if (strcmp(result->variable, "frame") == 0) {
@@ -177,10 +177,10 @@ List *
 MIGetFrameInfo(MICommand *cmd)
 {
 	MIResultRecord *	rr;
-	
+
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
-		
+
 	rr = cmd->output->rr;
 	return MIFrameInfoParse(rr->results);
 }
@@ -195,7 +195,7 @@ MIGetStackListLocalsInfo(MICommand *cmd)
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
-	
+
 	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "locals") == 0) {
@@ -218,9 +218,9 @@ MIGetStackListArgumentsInfo(MICommand *cmd)
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
-	
+
 	rr = cmd->output->rr;
-	SetList(rr->results); 
+	SetList(rr->results);
 	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
 		if (strcmp(result->variable, "stack-args") == 0) {
 			val = result->value;
@@ -238,13 +238,13 @@ MIFrameToString(MIFrame *f)
 	int			first = 1;
 	MIArg *		arg;
 	MIString *	str = MIStringNew("level=\"%d\"", f->level);
-	
+
 	MIStringAppend(str, MIStringNew(",addr=\"%s\"", f->addr));
 	MIStringAppend(str, MIStringNew(",func=\"%s\"", f->func));
 	MIStringAppend(str, MIStringNew(",file=\"%s\"", f->file));
 	MIStringAppend(str, MIStringNew(",line=\"%d\"", f->line));
 	MIStringAppend(str, MIStringNew(",args=["));
-	
+
 	for (SetList(f->args); (arg = (MIArg *)GetListElement(f->args)) != NULL; ) {
 		if (!first) {
 			MIStringAppend(str, MIStringNew(","));
@@ -254,12 +254,12 @@ MIFrameToString(MIFrame *f)
 		MIStringAppend(str, MIStringNew(",value=\"%s\"", arg->value));
 	}
 	MIStringAppend(str, MIStringNew("]"));
-		
+
 	return str;
 }
 
-int 
-MIGetStackInfoDepth(MICommand *cmd) 
+int
+MIGetStackInfoDepth(MICommand *cmd)
 {
 	MIValue * val;
 	MIResultRecord * rr;
@@ -267,9 +267,9 @@ MIGetStackInfoDepth(MICommand *cmd)
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return -1;
-		
+
 	rr = cmd->output->rr;
-	SetList(rr->results); 
+	SetList(rr->results);
 	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
 		if (strcmp(result->variable, "depth") == 0) {
 			val = result->value;
