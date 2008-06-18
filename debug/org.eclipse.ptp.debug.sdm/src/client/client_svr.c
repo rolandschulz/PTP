@@ -18,28 +18,15 @@
  ******************************************************************************/
 
 /*
- * Implement an O(log(N)) communication protocol.
- *
  * The model assumes that each process being debugged will have an associated
  * controller. The controllers are partitioned in a tree such that each controller
  * has a parent (apart from the SDM_MASTER) and multiple children (apart from the leaves).
- * The SDM_MASTER does not control a process; it instead manages commincation with the client.
+ * The SDM_MASTER does not control a process; it instead manages communication with the client.
+ *
  * A controller receives a message from its parent and is responsible for forwarding
- * it on to it's children. It is also responsible for receiving reply messages from
+ * the message to a set of destinations. It is also responsible for receiving reply messages from
  * the children, coalescing these into one or more reply messages and forwarding them
  * back to the parent.
- *
- * We assume there will be num_procs+1 (0..num_procs) processes in our communicator,
- * where 'num_procs' is the number of processes in the parallel
- * job being debugged. To simplify the accounting, we use the task id of
- * 'num_procs' as the task id of the SDM_MASTER and (0..num_procs-1) for the remaining
- * task ids.
- *
- * Since the partitioning algorithm assumes the SDM_MASTER has task id 0, we convert each
- * task id prior to a send or receive to an partition id:
- *
- *    part_id = (real_id + 1) % (num_procs+1)
- *
  */
 
 #ifdef __gnu_linux__
@@ -71,46 +58,50 @@
 
 /*
  * A request represents an asynchronous send/receive transaction between the client
- * and all servers. completed() is called once all replys have been received.
+ * and all servers. completed() is called once all replies have been received.
  */
 struct request {
 	int				id;				/* this request id */
 	int				active;			/* this request is active (i.e. has been forwarded) */
 	int				pending;		/* there are pending interrupts to be sent */
 	int				local;			/* this request must be executed locally */
+	sdm_id			src;			/* the source of this request */
 	sdm_idset		dest;			/* destination controllers */
 	sdm_idset		interrupt;		/* controllers to interrupt */
 	char *			msg;			/* buffer to send */
-	sdm_idset		outstanding;	/* controllers remaining to send replys */
+	sdm_idset		outstanding;	/* controllers remaining to send replies */
 	int				timeout;		/* wait timeout for this request (microseconds) */
 	void *			cb_data;		/* completed request callback data */
-	Hash *			replys;			/* hash of replys we've received */
+	Hash *			replys;			/* hash of replies we've received */
 	struct timeval	start_time;		/* time that timer was started */
 	int				timer_state;	/* state of timer */
 };
 typedef struct request	request;
 
 struct reply {
+	sdm_id		dest;				/* destination for this reply */
 	sdm_idset 	source;				/* controllers that have generated this message */
 	char *		msg;				/* message contents */
 };
 typedef struct reply	reply;
 
 static int				shutting_down = 0;
-static int				this;
-static int				parent;
+static sdm_id			this;
+static sdm_id			parent;
 static List *			all_requests;
 static struct request *	current_request;
-static void				(*cmd_completed_callback)(sdm_idset, char *, void *);
+static void				(*cmd_completed_callback)(sdm_id, sdm_idset, char *, void *);
 static void *			local_cmd_data;
 static void				(*local_cmd_callback)(char *, void *);
 static void *			int_cmd_data;
 static void				(*int_cmd_callback)(void *);
-static reply *			new_reply(sdm_idset, char *);
+static reply *			new_reply(sdm_id, sdm_idset, char *);
 static void				free_reply(reply *);
 static void				recv_callback(sdm_message msg);
 
-
+/*
+ * Convert a hexadecimal string into an integer.
+ */
 static unsigned int
 str_to_hex(char *str, char **end)
 {
@@ -129,6 +120,9 @@ str_to_hex(char *str, char **end)
 	return val;
 }
 
+/*
+ * Convert an integer to a hexadecimal string.
+ */
 static void
 hex_to_str(char *str, char **end, unsigned int val)
 {
@@ -136,8 +130,11 @@ hex_to_str(char *str, char **end, unsigned int val)
 	*end = str + HEX_LEN;
 }
 
+/*
+ * Callback when a request is completed.
+ */
 static void
-send_completed(Hash *h, void *data)
+request_completed(Hash *h, void *data)
 {
 	HashEntry *	he;
 	reply *		r;
@@ -147,7 +144,7 @@ send_completed(Hash *h, void *data)
 
 		if (cmd_completed_callback != NULL) {
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] CALLBACK %s for #%x\n", this, _set_to_str(r->source), he->h_hval);
-			cmd_completed_callback(r->source, r->msg, data);
+			cmd_completed_callback(r->dest, r->source, r->msg, data);
 		}
 
 		free_reply(r);
@@ -199,13 +196,18 @@ unpack_buffer(char *buf, int len, int *timeout, char **cmd)
 
 /*
  * Create a new request. We assume that there are no outstanding commands active for
- * any controllers in 'mask'. Interrupts do not have this restriction.
+ * any controllers in the destination set. Interrupts do not have this restriction.
  *
- * The set ((this | descendents) & mask) is all controllers that will respond to this request.
- * Once we have received replys from all controllers in this set, the request is complete.
+ * @param src is the source of the request. This is where the reply will be sent to.
+ * @param dest is the destination of the request. This is where the message will be forwarded to.
+ * @param msg is the message
+ * @param timeout is the time to wait before forwarding any replies. 0 means infinite.
+ *
+  * The outstanding set is all controllers that will respond to this request and once
+ * we have received replies from all controllers in this set, the request is complete.
  */
 static void
-new_request(sdm_idset dest, char *msg, int timeout, void *cbdata)
+new_request(sdm_id src, sdm_idset dest, char *msg, int timeout, void *cbdata)
 {
 	request *	r;
 	static int	id = 0;
@@ -215,6 +217,7 @@ new_request(sdm_idset dest, char *msg, int timeout, void *cbdata)
 	r->active = 0;
 	r->pending = 0;
 	r->local = sdm_set_contains(dest, this);
+	r->src = src;
 	r->dest = sdm_set_new();
 	sdm_set_union(r->dest, dest);
 	sdm_set_remove_element(r->dest, this);
@@ -234,6 +237,9 @@ new_request(sdm_idset dest, char *msg, int timeout, void *cbdata)
 			r->local ? "local" : "not local");
 }
 
+/*
+ * Request an interrupt to the pending request.
+ */
 static void
 request_interrupt(request *r, sdm_idset dest)
 {
@@ -247,6 +253,9 @@ request_interrupt(request *r, sdm_idset dest)
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request int %s, set=%s\n", this, _set_to_str(dest), _set_to_str(r->interrupt));
 }
 
+/*
+ * Free the request.
+ */
 static void
 free_request(request *r)
 {
@@ -259,12 +268,21 @@ free_request(request *r)
 	free(r);
 }
 
+/*
+ * Create a new reply. The reply may be only to a subset of the controllers
+ * specified in the request.
+ *
+ * @param dest is the destination to send the reply
+ * @param source is the source of the reply
+ * @param msg is the reply message
+ */
 static reply *
-new_reply(sdm_idset source, char *msg)
+new_reply(sdm_id dest, sdm_idset source, char *msg)
 {
 	reply *	r;
 
 	r = (reply *)malloc(sizeof(reply));
+	r->dest = dest;
 	r->source = sdm_set_new();
 	sdm_set_union(r->source, source);
 	r->msg = strdup(msg);
@@ -272,6 +290,9 @@ new_reply(sdm_idset source, char *msg)
 	return r;
 }
 
+/*
+ * Free the reply
+ */
 static void
 free_reply(reply *r)
 {
@@ -280,6 +301,9 @@ free_reply(reply *r)
 	free(r);
 }
 
+/*
+ * Start a timer
+ */
 static void
 start_timer(request *r)
 {
@@ -287,6 +311,9 @@ start_timer(request *r)
 	r->timer_state = TIMER_RUNNING;
 }
 
+/*
+ * Check if the timer has expired.
+ */
 static int
 check_timer(request *r)
 {
@@ -303,6 +330,9 @@ check_timer(request *r)
 	return r->timer_state;
 }
 
+/*
+ * Disable the timer
+ */
 static void
 disable_timer(request *r)
 {
@@ -311,19 +341,18 @@ disable_timer(request *r)
 
 /*
  * Register completion callback. This callback is made
- * when a controller has received replys from all it's
- * children, or the appropriate timout has expired.
+ * when a controller has received replies from all controllers
+ * in the destination set, or the appropriate timeout has expired.
  */
 void
-ClntSvrRegisterCompletionCallback(void (*func)(sdm_idset, char *, void *))
+ClntSvrRegisterCompletionCallback(void (*func)(sdm_id, sdm_idset, char *, void *))
 {
 	cmd_completed_callback = func;
 }
 
 /*
  * Register local command callback. This callback is made when
- * a command is received from the parent, and must be executed
- * by this controller.
+ * a command must be executed by this controller.
  */
 void
 ClntSvrRegisterLocalCmdCallback(void (*func)(char *, void *), void *data)
@@ -334,8 +363,7 @@ ClntSvrRegisterLocalCmdCallback(void (*func)(char *, void *), void *data)
 
 /*
  * Register an interrupt command callback. This callback is made when
- * a command is received from the parent, and must be executed
- * by this controller.
+ * an interrupt command must be executed by this controller.
  */
 void
 ClntSvrRegisterInterruptCmdCallback(void (*func)(void *), void *data)
@@ -345,12 +373,7 @@ ClntSvrRegisterInterruptCmdCallback(void (*func)(void *), void *data)
 }
 
 /*
- * Initialize partition. The bitset 'children' will contain all the immediate children
- * of this controller. The bitset 'descendents' will contain all children and their
- * descendents.
- *
- * Since the SDM_MASTER controller is assumed to be 'num_ctlrs' - 1, the bitsets only need
- * to contain bits for the possible children (i.e. 'numctlrs - 1' bits).
+ * Initialize the request/response handler.
  */
 void
 ClntSvrInit(int size, int my_id)
@@ -367,9 +390,7 @@ ClntSvrInit(int size, int my_id)
 }
 
 /*
- * Send a command to the controllers specified in bitset 'mask'. All controllers
- * actually get the command, only those in the bitset actually perform the command.
- * 'mask' is assumed to only contain non-SDM_MASTER controllers.
+ * Send a command to the controllers specified in the dest set.
  *
  * Commands can only be sent to controllers that do not have an active request pending. The
  * exception is the interrupt command which can be sent at any time. The response to
@@ -379,11 +400,14 @@ int
 ClntSvrSendCommand(sdm_idset dest, int timeout, char *cmd, void *cbdata)
 {
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] ClntSvrSendCommand %s\n", this, _set_to_str(dest));
-	new_request(dest, cmd, timeout, cbdata);
+	new_request(SDM_MASTER, dest, cmd, timeout, cbdata);
 
 	return 0;
 }
 
+/*
+ * Interrupt all active requests.
+ */
 static void
 interrupt_all_requests(sdm_idset dest)
 {
@@ -430,7 +454,7 @@ update_reply(request *req, sdm_idset source, char *msg, int hash)
 	 */
 	if ((r = HashSearch(req->replys, hash)) == NULL) {
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply #%x\n", this, hash);
-		r = new_reply(source, msg);
+		r = new_reply(req->src, source, msg);
 		HashInsert(req->replys, hash, (void *)r);
 	} else {
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x\n", this, hash);
@@ -455,7 +479,7 @@ update_reply(request *req, sdm_idset source, char *msg, int hash)
 }
 
 /*
- * Process local debugger message. Cannot be called by SDM_MASTER.
+ * Process local debugger message and update the appropriate reply. Cannot be called by SDM_MASTER.
  */
 void
 ClntSvrInsertMessage(char *msg)
@@ -475,6 +499,9 @@ ClntSvrInsertMessage(char *msg)
 	}
 }
 
+/*
+ * Send completed callback. Frees buffers allocated for send.
+ */
 static void
 send_finished(sdm_message msg)
 {
@@ -487,10 +514,10 @@ send_finished(sdm_message msg)
 }
 
 /*
- * Send a local debugger event back to our parent. Cannot be called by SDM_MASTER.
+ * Send a debugger event that originated from src to dest. Cannot be called by SDM_MASTER.
  */
 void
-ClntSvrSendReply(sdm_idset src, char *reply, void *data)
+ClntSvrSendReply(sdm_id dest, sdm_idset src, char *reply, void *data)
 {
 	int				buf_len;
 	int				reply_len;
@@ -507,11 +534,11 @@ ClntSvrSendReply(sdm_idset src, char *reply, void *data)
 	hex_to_str(reply_buf, &rem, hash);
 	memcpy(rem, reply, reply_len + 1);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send reply #%x to %d\n", this, hash, parent);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send reply #%x from %s to %d\n", this, hash, _set_to_str(src), dest);
 
 	msg = sdm_message_new();
 	sdm_message_set_data(msg, reply_buf, buf_len);
-	sdm_set_add_element(sdm_message_get_destination(msg), parent);
+	sdm_set_add_element(sdm_message_get_destination(msg), dest);
 	sdm_set_union(sdm_message_get_source(msg), src);
 	sdm_message_set_type(msg, SDM_MESSAGE_TYPE_NORMAL);
 	sdm_message_set_send_callback(msg, send_finished);
@@ -554,7 +581,7 @@ recv_callback(sdm_message msg)
 		 */
 		if (sdm_message_get_type(msg) == SDM_MESSAGE_TYPE_NORMAL) {
 			unpack_buffer(buf, len-1, &timeout, &cmd);
-			new_request(dest, cmd, timeout, NULL);
+			new_request(parent, dest, cmd, timeout, NULL);
 		} else {
 			interrupt_all_requests(dest);
 		}
@@ -600,10 +627,10 @@ flush_requests(void)
 	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
 		if (req->active) {
 			if (sdm_set_is_empty(req->outstanding)) {
-				send_completed(req->replys, req->cb_data);
+				request_completed(req->replys, req->cb_data);
 				free_request(req);
 			} else if (req->timeout > 0 && check_timer(req) == TIMER_EXPIRED) {
-				send_completed(req->replys, req->cb_data);
+				request_completed(req->replys, req->cb_data);
 				disable_timer(req);
 			}
 		}
@@ -611,7 +638,7 @@ flush_requests(void)
 }
 
 /*
- * Check and process commands from the parent and any replies from children.
+ * Check and process commands/responses.
  */
 int
 ClntSvrProgressCmds(void)
@@ -674,7 +701,7 @@ ClntSvrProgressCmds(void)
 }
 
 /*
- * Wait for any pending replys and flush requests before exiting
+ * Wait for any pending replies and flush requests before exiting
  */
 void
 ClntSvrFinish(void)
@@ -693,7 +720,7 @@ ClntSvrFinish(void)
 	}
 
 	/*
-	 * Process remaining requests, ignore messages from parent.
+	 * Process remaining requests.
 	 */
 	while (!EmptyList(all_requests)) {
 		sdm_message_progress();
