@@ -6,17 +6,17 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
  /*
   * Based on the QNX Java implementation of the MI interface
   */
@@ -47,7 +47,7 @@ void
 MIVarFree(MIVar *var)
 {
 	int i;
-	
+
 	if (var->name != NULL)
 		free(var->name);
 	if (var->type != NULL)
@@ -62,17 +62,17 @@ MIVarFree(MIVar *var)
 	free(var);
 }
 
-MIVarChange * 
+MIVarChange *
 MIVarChangeNew(void) {
 	MIVarChange *varchange = (MIVarChange *)malloc(sizeof(MIVarChange));
-	
+
 	varchange->name = NULL;
 	varchange->in_scope = 0;
 	varchange->type_changed = 0;
 	return varchange;
 }
 
-void 
+void
 MIVarChangeFree(MIVarChange *varchange) {
 	if (varchange->name != NULL)
 		free(varchange->name);
@@ -86,7 +86,7 @@ MIVarParse(List *results)
 	MIResult *	result;
 	MIVar *		var = MIVarNew();
 	char *		str;
-	
+
 	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
 		value = result->value;
 		if (value != NULL && value->type == MIValueTypeConst) {
@@ -105,16 +105,16 @@ MIVarParse(List *results)
 			var->exp = strdup(str);
 		}
 	}
-	
+
 	return var;
 }
 
 MIVar *
-MIGetVarCreateInfo(MICommand *cmd) 
+MIGetVarCreateInfo(MICommand *cmd)
 {
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
-		
+
 	return MIVarParse(cmd->output->rr->results);
 }
 
@@ -123,7 +123,7 @@ MIGetVarCreateInfo(MICommand *cmd)
  * to check for different format.
  * See PR 81019
  */
-void 
+void
 parseChildren(MIValue *val, List **res)
 {
 	MIValue *	value;
@@ -155,7 +155,7 @@ MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 	MIResult *		result;
 	MIResultRecord *	rr;
 	List *			children = NULL;
-	
+
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return;
 
@@ -232,12 +232,12 @@ void
 MIGetVarUpdateParseValue(MIValue* tuple, List* varchanges)
 {
 	MIResult * result;
-	char * str;
+	char * str = NULL;
 	char * var;
 	MIValue * value;
-	MIVarChange * varchange;
+	MIVarChange * varchange = NULL;
 	List * results = tuple->results;
-	
+
 	if (results != NULL) {
 		for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL;) {
 			var = result->variable;
@@ -248,12 +248,12 @@ MIGetVarUpdateParseValue(MIValue* tuple, List* varchanges)
 				MIGetVarUpdateParseValue(value, varchanges);
 				continue;
 			}
-			
+
 			if (value->type == MIValueTypeConst) {
 				str = value->cstring;
 			}
-			
-			if (strcmp(var, "name") == 0) {
+
+			if (strcmp(var, "name") == 0 && str != NULL) {
 				varchange = MIVarChangeNew();
 				varchange->name = strdup(str);
 				AddToList(varchanges, (void *)varchange);
@@ -290,7 +290,7 @@ MIGetVarUpdateParser(MIValue* miVal, List *varchanges)
 				MIGetVarUpdateParser(value, varchanges);
 			}
 		}
-	}	
+	}
 }
 
 void
@@ -334,7 +334,7 @@ MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var)
 	if (var == NULL)
 		var = MIVarNew();
 
-	results = cmd->output->rr->results;	
+	results = cmd->output->rr->results;
 	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
 		value = result->value;
 		if (value != NULL && value->type == MIValueTypeConst) {
