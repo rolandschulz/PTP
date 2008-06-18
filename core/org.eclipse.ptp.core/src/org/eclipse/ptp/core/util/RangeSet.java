@@ -35,15 +35,9 @@ public class RangeSet implements Iterable<String> {
 			for (String range : ranges) {
 				String[] vals = range.split("-");
 				if (vals.length == 1) {
-					try {
-						add(Integer.parseInt(vals[0]));
-					} catch (NumberFormatException e) {
-					}
+					add(Integer.parseInt(vals[0]));
 				} else {
-					try {
-						add(Integer.parseInt(vals[0]), Integer.parseInt(vals[1]));
-					} catch (NumberFormatException e) {
-					}					
+					add(Integer.parseInt(vals[0]), Integer.parseInt(vals[1]));
 				}
 			}
 		}
