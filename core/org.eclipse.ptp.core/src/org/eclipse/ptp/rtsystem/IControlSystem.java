@@ -33,20 +33,21 @@ import org.eclipse.ptp.core.elements.IPJob;
 public interface IControlSystem {	
 	
 	/**
-	 * Submits a job run given the attributes provided by the AttributeManager.  
+	 * Submits a job run using the submission ID and the attributes provided by the AttributeManager.  
 	 * The AttributeManager contains resource manager specific information about 
 	 * how the user wants to run the job, such as the program name, number of processes, etc.
 	 * 
-	 * submitJob returns a job submission ID that can be used to identify the new job that 
+	 * The job submission ID can be used to identify the new job that 
 	 * is created. The ID will be returned as an attribute on the new job.
 	 * 
 	 * This will call will result in either a new job event when the job is created
 	 * by the resource manager or an error event if the job submission fails.
 	 * 
+	 * @param subId
 	 * @param attrMgr 
 	 * @throws CoreException 
 	 */
-	public String submitJob(AttributeManager attrMgr) throws CoreException;
+	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 
