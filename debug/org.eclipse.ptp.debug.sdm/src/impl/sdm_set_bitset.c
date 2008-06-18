@@ -41,10 +41,11 @@ sdm_set_free(sdm_idset set)
 	free(set);
 }
 
-void
+sdm_idset
 sdm_set_clear(sdm_idset set)
 {
 	bitset_clear(set->set);
+	return set;
 }
 
 int
@@ -110,10 +111,11 @@ sdm_set_add_element(const sdm_idset set, const sdm_id id)
 	return set;
 }
 
-void
+sdm_idset
 sdm_set_remove_element(const sdm_idset set, const sdm_id id)
 {
 	bitset_unset(set->set, id);
+	return set;
 }
 
 sdm_idset
@@ -125,22 +127,25 @@ sdm_set_add_all(const sdm_idset set, const sdm_id id)
 	return set;
 }
 
-void
+sdm_idset
 sdm_set_union(const sdm_idset set1, const sdm_idset set2)
 {
 	bitset_oreq(set1->set, set2->set);
+	return set1;
 }
 
-void
+sdm_idset
 sdm_set_intersect(const sdm_idset set1, const sdm_idset set2)
 {
 	bitset_andeq(set1->set, set2->set);
+	return set1;
 }
 
-void
+sdm_idset
 sdm_set_diff(const sdm_idset set1, const sdm_idset set2)
 {
 	bitset_andeqnot(set1->set, set2->set);
+	return set1;
 }
 
 sdm_id

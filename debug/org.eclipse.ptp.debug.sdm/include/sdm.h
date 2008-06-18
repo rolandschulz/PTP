@@ -47,17 +47,17 @@ extern int sdm_message_progress(void);
  */
 extern sdm_idset sdm_set_new(void);
 extern void sdm_set_free(sdm_idset set);
-extern void sdm_set_clear(sdm_idset set);
+extern sdm_idset sdm_set_clear(sdm_idset set);
 extern int sdm_set_size(const sdm_idset set);
 extern sdm_idset sdm_set_add_element(const sdm_idset set, const sdm_id id);
-extern void sdm_set_remove_element(const sdm_idset set, const sdm_id id);
+extern sdm_idset sdm_set_remove_element(const sdm_idset set, const sdm_id id);
 extern sdm_idset sdm_set_add_all(const sdm_idset set, const sdm_id id);
 extern int sdm_set_is_subset(const sdm_idset set1, const sdm_idset set2);
 extern int sdm_set_is_empty(const sdm_idset set);
 extern int sdm_set_compare(const sdm_idset set1, const sdm_idset set2);
-extern void sdm_set_union(const sdm_idset set1, const sdm_idset set2);
-extern void sdm_set_intersect(const sdm_idset set1, const sdm_idset set2);
-extern void sdm_set_diff(const sdm_idset set1, const sdm_idset set2);
+extern sdm_idset sdm_set_union(const sdm_idset set1, const sdm_idset set2);
+extern sdm_idset sdm_set_intersect(const sdm_idset set1, const sdm_idset set2);
+extern sdm_idset sdm_set_diff(const sdm_idset set1, const sdm_idset set2);
 extern int sdm_set_contains(const sdm_idset set, const sdm_id id);
 extern sdm_id sdm_set_max(const sdm_idset set);
 extern sdm_id sdm_set_first(const sdm_idset set);
@@ -70,7 +70,7 @@ extern char *_set_to_str(const sdm_idset set);
 /*
  * Routing
  */
-extern int sdm_route_get_parent(void);
+extern sdm_id sdm_route_get_parent(void);
 extern sdm_id sdm_route_get_id(void);
 extern void sdm_route_set_id(sdm_id id);
 extern int sdm_route_get_size(void);
@@ -87,14 +87,14 @@ extern int sdm_aggregate(const sdm_message msg);
 /*
  * Protocol operations
  */
-extern int sdm_set_protocol_handler(int (*protocol_handler)(char *buf, int len));
-extern int sdm_process_message(const sdm_message msg);
+extern int sdm_protocol_set_handler(int (*protocol_handler)(char *buf, int len));
+extern int sdm_protocol_process_message(const sdm_message msg);
 
 /*
  * I/O forwarding
  */
-extern int sdm_set_stdin_handler(int fd_in, int fd_out, int (*stdin_handler)(int fd_in, int fd_out));
-extern int sdm_set_stdout_handler(int fd_in, int fd_out, int (*stdout_handler)(int fd_in, int fd_out));
-extern int sdm_set_stderr_handler(int fd_in, int fd_out, int (*stderr_handler)(int fd_in, int fd_out));
+extern int sdm_iof_set_stdin_handler(int fd_in, int fd_out, int (*stdin_handler)(int fd_in, int fd_out));
+extern int sdm_iof_set_stdout_handler(int fd_in, int fd_out, int (*stdout_handler)(int fd_in, int fd_out));
+extern int sdm_iof_set_stderr_handler(int fd_in, int fd_out, int (*stderr_handler)(int fd_in, int fd_out));
 
 #endif /* SDM_H_ */
