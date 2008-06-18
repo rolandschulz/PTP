@@ -20,9 +20,13 @@ package org.eclipse.ptp.launch.internal;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
@@ -52,6 +56,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -68,8 +73,12 @@ import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
@@ -98,6 +107,8 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		LaunchConfigurationDelegate {
+
+	public enum JobStatus {SUBMITTED, COMPLETED, ERROR}
 	
 	/**
 	 * The JobSubmission class encapsulates all the information used in 
@@ -107,19 +118,47 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	private class JobSubmission {
 		private ILaunchConfiguration configuration;
 		private String mode;
+		private String id;
+		private String error = null;
 		private IPLaunch launch;
 		private AttributeManager attrMgr;
 		private IPDebugger debugger;
-		
-		public JobSubmission(ILaunchConfiguration configuration, String mode, IPLaunch launch,
+		private JobStatus status = JobStatus.SUBMITTED;
+		private final ReentrantLock subLock = new ReentrantLock();;
+		private final Condition subCondition = subLock.newCondition();
+
+		public JobSubmission(int count, ILaunchConfiguration configuration, String mode, IPLaunch launch,
 				AttributeManager attrMgr, IPDebugger debugger) {
 			this.configuration = configuration;
 			this.mode = mode;
 			this.launch = launch;
 			this.attrMgr = attrMgr;
 			this.debugger = debugger;
+			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count);
 		}
 
+		/**
+		 * Wait for the job state to change
+		 * 
+		 * @return the state
+		 */
+		public JobStatus waitFor(IProgressMonitor monitor) {
+			subLock.lock();
+			try {
+				while (!monitor.isCanceled() && status != JobStatus.SUBMITTED) {
+					try {
+						subCondition.await(100, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						// Expect to be interrupted if monitor is canceled
+					}
+				}
+				
+				return status;
+			} finally {
+				subLock.unlock();
+			}
+		}
+		
 		/**
 		 * @return the attrMgr
 		 */
@@ -140,6 +179,20 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		public IPDebugger getDebugger() {
 			return debugger;
 		}
+		
+		/**
+		 * @return the error
+		 */
+		public String getError() {
+			return error;
+		}
+
+		/**
+		 * @return the job submission id
+		 */
+		public String getId() {
+			return id;
+		}
 
 		/**
 		 * @return the launch
@@ -147,12 +200,33 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		public IPLaunch getLaunch() {
 			return launch;
 		}
-
+		
 		/**
 		 * @return the mode
 		 */
 		public String getMode() {
 			return mode;
+		}
+		
+		/**
+		 * set the error
+		 */
+		public void setError(String error) {
+			this.error = error;
+			setStatus(JobStatus.ERROR);
+		}	
+		
+		/**
+		 * set the current status
+		 */
+		public void setStatus(JobStatus status) {
+			subLock.lock();
+			try {
+				this.status = status;
+				subCondition.signalAll();
+			} finally {
+				subLock.unlock();
+			}
 		}
 	}
 
@@ -174,6 +248,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			 */
 			final IResourceManager rm = e.getResourceManager();
 	        rm.addChildListener(resourceManagerChildListener);
+	        rm.addElementListener(resourceManagerListener);
 		}
 		
 		/* (non-Javadoc)
@@ -183,7 +258,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			/*
 			 * Removed resource manager child listener when resource manager is removed.
 			 */
-			e.getResourceManager().removeChildListener(resourceManagerChildListener);
+			final IResourceManager rm = e.getResourceManager();
+	        rm.removeChildListener(resourceManagerChildListener);
+	        rm.removeElementListener(resourceManagerListener);
 		}		
 	}
 
@@ -197,15 +274,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 				 * If the job state has changed to running, find the JobSubmission that 
 				 * corresponds to this job and perform remainder of job launch actions
 				 */
-				IAttribute<?,?,?> attr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
-				if (attr != null) {
-					JobAttributes.State state = (JobAttributes.State)((EnumeratedAttribute<?>)attr).getValue();
-					if (state == JobAttributes.State.RUNNING) {
-						synchronized (jobSubmissions) {
-							JobSubmission jobSub = jobSubmissions.get(job);
+				StringAttribute subAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				if (subAttr != null) {
+					IAttribute<?,?,?> attr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
+					if (attr != null) {
+						JobAttributes.State state = (JobAttributes.State)((EnumeratedAttribute<?>)attr).getValue();
+						if (state == JobAttributes.State.RUNNING) {
+							JobSubmission jobSub = jobSubmissions.remove(subAttr.getValue());
 							if (jobSub != null) {
+								jobSub.setStatus(JobStatus.COMPLETED);
 								doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
-								jobSubmissions.remove(job);
 							}
 						}
 					}
@@ -226,10 +304,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 				 * start a debug session. It's possible the job will never run, so we
 				 * need to clean up any debug sessions before exiting Eclipse.
 				 */
-				IAttribute<?,?,?> launchAttr = job.getAttribute(JobAttributes.getLaunchedByPTPFlagAttributeDefinition());
-				if (launchAttr != null && ((BooleanAttribute)launchAttr).getValue()) {
-					synchronized (jobSubmissions) {
-						JobSubmission jobSub = jobSubmissions.get(job);
+				StringAttribute subAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				if (subAttr != null) {
+					IAttribute<?,?,?> launchAttr = job.getAttribute(JobAttributes.getLaunchedByPTPFlagAttributeDefinition());
+					if (launchAttr != null && ((BooleanAttribute)launchAttr).getValue()) {
+						JobSubmission jobSub = jobSubmissions.get(subAttr.getValue());
 						if (jobSub == null) {
 							// recreate launch configuration
 							// jobSub = ....;
@@ -249,7 +328,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		public void handleEvent(IRemoveJobEvent e) {
 		}
 	}
-
+	
 	private final class RMChildListener implements IResourceManagerChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
@@ -293,6 +372,30 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			for (IPQueue queue : e.getQueues()) {
 				queue.removeChildListener(queueChildListener);
 			}
+		}
+	}
+
+	private final class RMListener implements IResourceManagerListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent)
+		 */
+		public void handleEvent(IResourceManagerChangeEvent e) {
+			// Ignore
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
+		 */
+		public void handleEvent(IResourceManagerErrorEvent e) {
+			// TODO Auto-generated method stub
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent)
+		 */
+		public void handleEvent(IResourceManagerSubmitJobErrorEvent e) {
+			JobSubmission jobSub = jobSubmissions.remove(e.getJobSubmissionId());
+			jobSub.setError(e.getMessage());
 		}
 	}
 	
@@ -419,16 +522,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
 	}
 	
+	private int jobCount = 0;
+
 	/*
 	 * Model listeners
 	 */
 	private final IModelManagerChildListener modelManagerChildListener = new MMChildListener();
 	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
+	private final IResourceManagerListener resourceManagerListener = new RMListener();
 	private final IQueueChildListener queueChildListener = new QueueChildListener();
 	/*
 	 * HashMap used to keep track of job submissions
 	 */
-	protected Map<IPJob, JobSubmission> jobSubmissions = new HashMap<IPJob, JobSubmission>();
+	protected Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 
 	public AbstractParallelLaunchConfigurationDelegate() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
@@ -438,6 +544,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		    		queue.addChildListener(queueChildListener);
 		    	}
 		        rm.addChildListener(resourceManagerChildListener);
+		        rm.addElementListener(resourceManagerListener);
 		    }
 		    mm.addListener(modelManagerChildListener);
 		}
@@ -610,40 +717,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
 	
 	/**
-	 * Get the path of the program to launch. No longer used since the program may not be
-	 * on the local machine.
-	 * 
-	 * @deprecated
-	 * 
-	 * @param configuration launch configuration
-	 * @return IPath corresponding to program executable
-	 * @throws CoreException
-	 */
-	protected IPath getProgramFile(ILaunchConfiguration configuration) throws CoreException {
-		IProject project = verifyProject(configuration);
-		String fileName = getProgramName(configuration);
-		if (fileName == null)
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_not_specified"), null, IStatus.INFO);
-
-		IPath programPath = new Path(fileName);
-		if (!programPath.isAbsolute()) {
-			programPath = project.getFile(programPath).getLocation();
-		}
-		if (!programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), 
-					new FileNotFoundException(
-							LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", programPath.toString())), 
-							IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
-		}
-		/* --old
-		IFile programPath = project.getFile(fileName);
-		if (programPath == null || !programPath.exists() || !programPath.getLocation().toFile().exists())
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", programPath.getLocation().toString())), IStatus.INFO);
-		*/
-		return programPath;
-	}
-	
-	/**
 	 * Get the IProject object from the project name.
 	 * 
      * @param project name of the project
@@ -750,37 +823,23 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @throws CoreException
 	 */
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch,
-			AttributeManager attrMgr, IPDebugger debugger, IProgressMonitor monitor) throws CoreException {
-		
-		synchronized (jobSubmissions) {
-			final IResourceManager rm = getResourceManager(configuration);
-			if (rm == null) {
-				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
-			}
+		AttributeManager attrMgr, IPDebugger debugger, IProgressMonitor monitor) throws CoreException {
 	
-			IPJob job = rm.submitJob(configuration, attrMgr, monitor);
+		final IResourceManager rm = getResourceManager(configuration);
+		if (rm == null) {
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
+		}
 
-			if (job != null) {
-				JobSubmission jobSub = new JobSubmission(configuration, mode, launch, attrMgr, debugger);
-				jobSubmissions.put(job, jobSub);
-			}
-		}
-	}
+		JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
+		jobSubmissions.put(jobSub.getId(), jobSub);
 	
-	/**
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 * @deprecated
-	 */
-	protected IBinaryObject verifyBinary(ILaunchConfiguration configuration) throws CoreException {
-		IProject project = verifyProject(configuration);
-		String fileName = getProgramName(configuration);
-		IPath programPath = new Path(fileName);
-		if (!programPath.isAbsolute()) {
-			programPath = project.getFile(programPath).getLocation();
+		rm.submitJob(jobSub.getId(), configuration, attrMgr, monitor);
+		
+		JobStatus status = jobSub.waitFor(monitor);
+		
+		if (status == JobStatus.ERROR) {
+			abort(jobSub.getError(), null, IStatus.ERROR);
 		}
-		return verifyBinary(project, programPath);
 	}
 	
 	/**
@@ -867,12 +926,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
      */
     protected IProject verifyProject(ILaunchConfiguration configuration) throws CoreException {
         String proName = getProjectName(configuration);
-        if (proName == null)
+        if (proName == null) {
    			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Project_not_specified"), null, IStatus.INFO);
-
+        }
+        
         IProject project = getProject(proName);
-        if (project == null || !project.exists() || !project.isOpen())
+        if (project == null || !project.exists() || !project.isOpen()) {
 			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Project_does_not_exist_or_is_not_a_project"), null, IStatus.INFO);
+        }
         
         return project;
     }
