@@ -23,7 +23,7 @@
 #include "sdm.h"
 #include "dbg_event.h"
 
-void	ClntSvrRegisterCompletionCallback(void (*)(sdm_idset, char *, void *));
+void	ClntSvrRegisterCompletionCallback(void (*)(sdm_id, sdm_idset, char *, void *));
 void	ClntSvrRegisterLocalCmdCallback(void (*func)(char *, void *), void *data);
 void	ClntSvrRegisterInterruptCmdCallback(void (*func)(void *), void *data);
 void	ClntSvrInit(int, int);
