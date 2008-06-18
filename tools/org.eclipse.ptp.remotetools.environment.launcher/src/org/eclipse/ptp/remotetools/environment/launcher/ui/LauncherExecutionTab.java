@@ -24,7 +24,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.remotetools.environment.launcher.RemoteLauncherPlugin;
 import org.eclipse.ptp.remotetools.environment.launcher.core.IRemoteLaunchAttributes;
 import org.eclipse.ptp.remotetools.environment.launcher.internal.LaunchObserverIterator;
-import org.eclipse.ptp.remotetools.utils.ui.swt.ToolKit;
+import org.eclipse.ptp.ui.utils.swt.ToolKit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;

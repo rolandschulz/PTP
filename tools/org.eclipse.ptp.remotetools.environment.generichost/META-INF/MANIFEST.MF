@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.utils,
- org.eclipse.ptp.remotetools.preferences
+ org.eclipse.ptp.remotetools.preferences,
+ org.eclipse.ptp.ui
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.remotetools.environment.generichost
