@@ -86,6 +86,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
@@ -105,6 +106,7 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerSubmitJobErrorEvent;
 
 /**
  * @author rsqrd
@@ -596,7 +598,18 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 */
 	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
-		return doSubmitJob(configuration, attrMgr, monitor);
+		return doSubmitJob(null, configuration, attrMgr, monitor);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(java.lang.String, 
+	 * 		org.eclipse.debug.core.ILaunchConfiguration, 
+	 * 		org.eclipse.ptp.core.attributes.AttributeManager, 
+	 * 		org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void submitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException {
+		doSubmitJob(subId, configuration, attrMgr, monitor);
 	}
 
 	/*
@@ -850,15 +863,15 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected abstract boolean doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Submit a job. Returns a job that represents the submitted job, or null if
-	 * the progress monitor was cancelled.
+	 * Submit a job with the supplied submission ID.Returns a job that represents the submitted job, or null if
+	 * the progress monitor was canceled.
 	 * 
+	 * @param subId
 	 * @param attrMgr
 	 * @param monitor
-	 * @return IPJob
 	 * @throws CoreException
 	 */
-	protected abstract IPJob doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected abstract IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException;
 
 	/**
@@ -871,6 +884,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;
 
 	/**
+	 * Propagate IChangedMachineEvent to listener
+	 * 
 	 * @param machine
 	 * @param collection
 	 */
@@ -883,6 +898,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
+	 * Propagate IChangedQueueEvent to listener
+	 * 
 	 * @param queue
 	 * @param collection
 	 */
@@ -895,10 +912,25 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
+	 * Propagate IResourceManagerErrorEvent to listener
+	 * 
 	 * @param message
 	 */
 	protected void fireError(String message) {
 		IResourceManagerErrorEvent e = new ResourceManagerErrorEvent(this, message);
+
+		for (Object listener : listeners.getListeners()) {
+			((IResourceManagerListener) listener).handleEvent(e);
+		}
+	}
+	
+	/**
+	 * Propagate IResourceManagerSubmitJobErrorEvent to listeners
+	 * 
+	 * @param id job submission id
+	 */
+	protected void fireSubmitJobError(String id, String message) {
+		IResourceManagerSubmitJobErrorEvent e = new ResourceManagerSubmitJobErrorEvent(this, id, message);
 
 		for (Object listener : listeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(e);
@@ -1215,7 +1247,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		job.addProcessAttributes(processes, attrs.getAttributes());
 		return true;
 	}
-
+	
 	/**
 	 * Update attributes on a collection of queues.
 	 * 

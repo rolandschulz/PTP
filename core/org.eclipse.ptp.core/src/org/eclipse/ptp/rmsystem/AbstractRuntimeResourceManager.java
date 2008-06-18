@@ -20,6 +20,7 @@ package org.eclipse.ptp.rmsystem;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
@@ -78,6 +78,14 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
+/**
+ * @author greg
+ *
+ */
+/**
+ * @author greg
+ *
+ */
 public abstract class AbstractRuntimeResourceManager extends
 		AbstractResourceManager implements IRuntimeEventListener {
 
@@ -87,13 +95,17 @@ public abstract class AbstractRuntimeResourceManager extends
 		private IPJob					job = null;
 		private JobSubState				state = JobSubState.SUBMITTED;
 		private String					reason;
+		private String					id;
 		private ILaunchConfiguration	configuration;
+		private final ReentrantLock 	subLock = new ReentrantLock();;
+		private final Condition 		subCondition = subLock.newCondition();
 		
-		/**
-		 * @return the configuration
-		 */
-		public ILaunchConfiguration getLaunchConfiguration() {
-			return configuration;
+		public JobSubmission(int count) {
+			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count);
+		}
+
+		public JobSubmission(String id) {
+			this.id = id;
 		}
 		
 		/**
@@ -104,6 +116,15 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		/**
+		 * Get the job submission ID
+		 * 
+		 * @return job submission ID
+		 */
+		public String getId() {
+			return id;
+		}
+		
+		/**
 		 * @return the job
 		 */
 		public IPJob getJob() {
@@ -111,24 +132,40 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		/**
-		 * @return the state
+		 * @return the configuration
 		 */
-		public JobSubState getState() {
-			return state;
+		public ILaunchConfiguration getLaunchConfiguration() {
+			return configuration;
 		}
 		
 		/**
-		 * @param configuaration the configuration to set
+		 * Wait for the job state to change
+		 * 
+		 * @return the state
 		 */
-		public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-			this.configuration = configuration;
+		public JobSubState waitFor(IProgressMonitor monitor) {
+			subLock.lock();
+			try {
+				while (!monitor.isCanceled() && state != JobSubState.SUBMITTED) {
+					try {
+						subCondition.await(100, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						// Expect to be interrupted if monitor is canceled
+					}
+				}
+				
+				return state;
+			} finally {
+				subLock.unlock();
+			}
 		}
 		
 		/**
 		 * @param reason the reason for the error
 		 */
-		public void setErrorReason(String reason) {
+		public void setError(String reason) {
 			this.reason = reason;
+			setState(JobSubState.ERROR);
 		}
 
 		/**
@@ -139,10 +176,23 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 
 		/**
+		 * @param configuaration the configuration to set
+		 */
+		public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+			this.configuration = configuration;
+		}
+		
+		/**
 		 * @param error the error to set
 		 */
 		public void setState(JobSubState state) {
-			this.state = state;
+			subLock.lock();
+			try {
+				this.state = state;
+				subCondition.signalAll();
+			} finally {
+				subLock.unlock();
+			}
 		}
 	}
 	
@@ -154,10 +204,8 @@ public abstract class AbstractRuntimeResourceManager extends
 	
 	private final ReentrantLock stateLock = new ReentrantLock();;
 	private final Condition stateCondition = stateLock.newCondition();
-	private final ReentrantLock subLock = new ReentrantLock();
-	private final Condition subCondition = subLock.newCondition();;
-	
-	private Map<String, JobSubmission> jobSubmissions = new HashMap<String, JobSubmission>();
+
+	private Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	
 	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
@@ -192,16 +240,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		 * Fatal error in the runtime system. Cancel any pending job submissions
 		 * and inform upper levels of the problem.
 		 */
-		subLock.lock();
-		try {
-			for (JobSubmission sub : jobSubmissions.values()) {
-				sub.setState(JobSubState.ERROR);
-				sub.setErrorReason("Fatal error ocurred in runtime system"); //$NON-NLS-1$
-			}
-			subCondition.signalAll();
-		} finally {
-			subLock.unlock();
+		for (JobSubmission sub : jobSubmissions.values()) {
+			sub.setError("Fatal error ocurred in runtime system"); //$NON-NLS-1$
 		}
+		jobSubmissions.clear();
 		
 		stateLock.lock();
 		try {
@@ -209,7 +251,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			state = RMState.ERROR;
 			errorMessage = null;
 			if (oldState == RMState.STOPPING) {
-				stateCondition.signal();
+				stateCondition.signalAll();
 			}
 			setState(ResourceManagerAttributes.State.ERROR);
 			cleanUp();
@@ -283,7 +325,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
 	public void handleEvent(IRuntimeMessageEvent e) {
-		MessageAttributes.Level level = e.getLevel();
+		//MessageAttributes.Level level = e.getLevel();
 		// FIXME: implement logging
 	}
 
@@ -314,17 +356,11 @@ public abstract class AbstractRuntimeResourceManager extends
 							/*
 							 * Notify any submitJob() calls that the job has been created
 							 */
-							subLock.lock();
-							try {
-								JobSubmission sub = jobSubmissions.get(jobSubAttr.getValue());
-								if (sub != null && sub.getState() == JobSubState.SUBMITTED) {
-									sub.setJob(job);
-									job.setLaunchConfiguration(sub.getLaunchConfiguration());
-									sub.setState(JobSubState.COMPLETED);
-									subCondition.signalAll();
-								}
-					        } finally {
-					        	subLock.unlock();
+							JobSubmission sub = jobSubmissions.remove(jobSubAttr.getValue());
+							if (sub != null) {
+								sub.setJob(job);
+								job.setLaunchConfiguration(sub.getLaunchConfiguration());
+								sub.setState(JobSubState.COMPLETED);
 							}
 						}
 				 	}
@@ -678,7 +714,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
             if (state == RMState.STARTING) {
              	state = RMState.STARTED;
-				stateCondition.signal();
+				stateCondition.signalAll();
             }
         } finally {
         	stateLock.unlock();
@@ -694,7 +730,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			RMState oldState = state;
 			state = RMState.STOPPED;
 			if (oldState == RMState.STOPPING) {
-				stateCondition.signal();
+				stateCondition.signalAll();
 			} else {
 				/*
 				 * This event has been generated by the runtime system. Let upper levels know
@@ -720,7 +756,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			if (state == RMState.STARTING) {
 				state = RMState.ERROR;
 				errorMessage = e.getErrorMessage();
-				stateCondition.signal();
+				stateCondition.signalAll();
 				return;
 			}
 		} finally {
@@ -732,21 +768,13 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
-		subLock.lock();
-		try {
-			if (e.getJobSubID() != null) {
-				JobSubmission sub = jobSubmissions.get(e.getJobSubID());
-				if (sub != null) {
-					sub.setState(JobSubState.ERROR);
-					sub.setErrorReason(e.getErrorMessage());
-					subCondition.signalAll();
-				}
+		if (e.getJobSubID() != null) {
+			JobSubmission sub = jobSubmissions.remove(e.getJobSubID());
+			if (sub != null) {
+				sub.setError(e.getErrorMessage());
 			}
-		} finally {
-			subLock.unlock();
 		}
-		
-		fireError("Error while submitting job: " + e.getErrorMessage());	
+		fireSubmitJobError(e.getJobSubID(), e.getErrorMessage());	
 	}
 
 	/* (non-Javadoc)
@@ -994,35 +1022,34 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(java.lang.String, org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	protected IPJob doSubmitJob(ILaunchConfiguration configuration, 
+	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, 
 			AttributeManager attrMgr, IProgressMonitor monitor) 
 			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		subLock.lock();
+		
+		IPJob job = null;
+	
 		try {
-			String jobSubId = runtimeSystem.submitJob(attrMgr);
-			JobSubmission sub = new JobSubmission();
+			JobSubmission sub = new JobSubmission(subId);
 			sub.setLaunchConfiguration(configuration);
-			jobSubmissions.put(jobSubId, sub);
+			jobSubmissions.put(subId, sub);
 			
-			while (!monitor.isCanceled()) {
-				if (sub.getState() != JobSubState.SUBMITTED) {
-					break;
-				}
-				try {
-					subCondition.await(500, TimeUnit.MILLISECONDS);
-				} catch (InterruptedException e) {
-					// Expect to be interrupted if monitor is canceled
-				}
+			runtimeSystem.submitJob(subId, attrMgr);
+			
+			/*
+			 * If subId is null then don't wait for the submission to complete.
+			 */
+			if (subId != null) {
+				return job;
 			}
+		
+			JobSubState state = sub.waitFor(monitor);
 			
-			IPJob job = null;
-			
-			switch (sub.getState()) {
+			switch (state) {
 			case SUBMITTED:
 				/*
 				 * The job submission process itself can't be canceled, so
@@ -1032,22 +1059,19 @@ public abstract class AbstractRuntimeResourceManager extends
 				break;
 				
 			case COMPLETED:
-				jobSubmissions.remove(jobSubId);
 				job = sub.getJob();
 				break;
 				
 			case ERROR:
-				jobSubmissions.remove(jobSubId);
 				throw new CoreException(new Status(IStatus.ERROR, 
 						PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 						sub.getErrorReason(), null));
 			}
-			return job;
-		}
-		finally {
-			subLock.unlock();
+		} finally {
 			monitor.done();
 		}
+		
+		return job;
 	}
 
 	/* (non-Javadoc)
