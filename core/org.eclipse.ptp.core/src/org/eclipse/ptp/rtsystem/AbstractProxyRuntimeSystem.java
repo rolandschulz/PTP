@@ -187,7 +187,6 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	private final static int ATTR_MIN_LEN = 5;
 	protected IProxyRuntimeClient proxy = null;
 	private AttributeDefinitionManager attrDefManager;
-	private int jobSubIdCount = 0;
 	private Map<String, AttributeManager> jobSubs = Collections.synchronizedMap(new HashMap<String, AttributeManager>());
 
 	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
@@ -637,20 +636,14 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	public abstract void startup(IProgressMonitor monitor) throws CoreException;
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(org.eclipse.ptp.core.attributes.AttributeManager)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public String submitJob(AttributeManager attrMgr) throws CoreException {
+	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
 		try {
-			/*
-			 * Add the job submission ID to the attributes. This is done here to force the
-			 * use of the ID.
-			 */
-			String id = getJobSubmissionID();
-			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(id);
+			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(subId);
 			attrMgr.addAttribute(jobSubAttr);
+			jobSubs.put(subId, attrMgr);
 			proxy.submitJob(attrMgr.toStringArray());
-			jobSubs.put(id, attrMgr);
-			return id;
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
@@ -961,10 +954,5 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} else {
 			return Locale.US;
 		}
-	}
-
-	private String getJobSubmissionID() {
-		long time = System.currentTimeMillis();
-		return "JOB_" + Long.toString(time) + Integer.toString(jobSubIdCount++);
 	}
 }
