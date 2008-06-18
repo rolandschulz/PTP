@@ -16,8 +16,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -48,7 +53,11 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
+import org.eclipse.ptp.internal.ui.actions.TerminateJobFromListAction;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.utils.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -83,6 +92,7 @@ public class JobsListView extends ViewPart {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 		 */
+		// Update the button here.
 		public void handleEvent(IRemoveResourceManagerEvent e) {
 			/*
 			 * Removed resource manager child listener when resource manager is removed.
@@ -118,6 +128,7 @@ public class JobsListView extends ViewPart {
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
 			refresh(null);
+			terminateAllAction.updateTerminateJobState();
 		}
 	}
 	
@@ -170,6 +181,7 @@ public class JobsListView extends ViewPart {
 	private static final String TAG_COLUMN_WIDTHS = "columnWidths"; //$NON-NLS-1$
 	private TableViewer viewer;
 	private IMemento memento;
+	private TerminateJobFromListAction terminateAllAction;
 
 	/*
 	 * Model listeners
@@ -179,6 +191,10 @@ public class JobsListView extends ViewPart {
 	private final IQueueChildListener queueChildListener = new QueueChildListener();
 
 	private final Set<IAttributeDefinition<?,?,?>> colDefs = Collections.synchronizedSet(new HashSet<IAttributeDefinition<?,?,?>>());
+	
+	public TableViewer getViewer() {
+		return viewer;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -223,6 +239,17 @@ public class JobsListView extends ViewPart {
 			}
 		});
 		getSite().setSelectionProvider(viewer);
+		
+		// Use view toolbar
+		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
+		
+		terminateAllAction = new TerminateJobFromListAction(this);
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
+		
+		
+		/*terminateAllAction = new TerminateJobAction(viewer);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);*/
 		
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		viewer.setInput(mm.getUniverse());
