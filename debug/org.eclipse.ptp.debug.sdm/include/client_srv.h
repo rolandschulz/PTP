@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,21 +16,21 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #ifndef _CLIENT_SRV_H_
 #define _CLIENT_SRV_H_
 
-#include "bitset.h"
+#include "sdm.h"
 #include "dbg_event.h"
 
-void	ClntSvrRegisterCompletionCallback(void (*)(bitset *, char *, void *));
+void	ClntSvrRegisterCompletionCallback(void (*)(sdm_idset, char *, void *));
 void	ClntSvrRegisterLocalCmdCallback(void (*func)(char *, void *), void *data);
 void	ClntSvrRegisterInterruptCmdCallback(void (*func)(void *), void *data);
 void	ClntSvrInit(int, int);
-int		ClntSvrSendCommand(bitset *, int, char *, char *);
-int		ClntSvrSendInterrupt(bitset *);
+int		ClntSvrSendCommand(sdm_idset, int, char *, char *);
+int		ClntSvrSendInterrupt(sdm_idset);
 void	ClntSvrInsertMessage(char *);
-void	ClntSvrSendReply(bitset *, char *, void *);
+void	ClntSvrSendReply(sdm_idset, char *, void *);
 int		ClntSvrProgressCmds(void);
 void	ClntSvrFinish(void);
 
