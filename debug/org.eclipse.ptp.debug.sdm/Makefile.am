@@ -11,7 +11,11 @@ sdm_SOURCES =				src/client/startup.c\
 							src/server/server_cmds.c \
 							src/server/backend.c \
 							src/server/gdbmi_backend.c \
-							src/server/test_backend.c
+							src/server/test_backend.c \
+							src/impl/sdm_route_binomial.c \
+							src/impl/sdm_set_bitset.c \
+							src/impl/sdm_message_ompi.c \
+							src/impl/sdm.c
 					
 sdm_CFLAGS =				-I./include -I./libaif -I./src/mi $(AM_CFLAGS)
 sdm_LDADD =					libdbgutils.a libmi.a libaif/libaif.a @SVR_LIBS@
