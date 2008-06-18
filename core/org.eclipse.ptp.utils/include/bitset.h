@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #ifndef _BITSET_H_
 #define _BITSET_H_
 
@@ -29,6 +29,9 @@
  */
 typedef unsigned int	bits;
 
+/*
+ * Bitset definition. Note that the LSB is bit number '0'.
+ */
 struct bitset {
 	unsigned int	bs_nbits;	/* total number of bits in set */
 	bits *			bs_bits;	/* actual bits (unused bits are always 0)*/
@@ -55,7 +58,7 @@ void		bitset_invert(bitset *b);					/* compute ~b */
 int			bitset_eq(bitset *b1, bitset *b2);			/* test if (b1 & b2) == b1 */
 int			bitset_compare(bitset *b1, bitset *b2);		/* test if (b1 & b2) != 0 */
 char *		bitset_to_str(bitset *b);					/* convert b to a portable string representation */
-bitset *	str_to_bitset(char *str);					/* convert a portable string represetation to a bitset */
+bitset *	str_to_bitset(char *str, char **end);		/* convert a portable string represetation to a bitset */
 int			bitset_count(bitset *b);					/* return the number of bits in the set */
 int			bitset_size(bitset *b);						/* number of bits this bitset can represent */
 char *		bitset_to_set(bitset *b);					/* convert b to set notation */
