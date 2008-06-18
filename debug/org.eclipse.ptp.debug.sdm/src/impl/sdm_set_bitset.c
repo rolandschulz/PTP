@@ -10,8 +10,7 @@
  *******************************************************************************/
 
 /*
- * Routing implementation. These routines implement the routing layer abstraction
- * using bitsets.
+ * ID set implementation. These routines implement a set abstraction using bitsets.
  */
 
 #include <stdlib.h>
