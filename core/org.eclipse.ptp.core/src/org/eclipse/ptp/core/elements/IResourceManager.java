@@ -158,15 +158,35 @@ public interface IResourceManager extends IPElement,
 
 	/**
 	 * Submit a job. The attribute manager must contain the appropriate attributes for
-	 * a successful job launch (e.g. the queue, etc.)
+	 * a successful job launch (e.g. the queue, etc.).
+	 * 
+	 * The method will return after an INewJobEvent has been received confirming that
+	 * the job has been submitted. 
 	 * 
 	 * @param configuration launch configuration used to submit the job. Can be null.
 	 * @param attrMgr attribute manager containing the job launch attributes
 	 * @param monitor progress monitor
-	 * @return a job object representing the submitted job
+	 * @return a job object representing the submitted job or null if the submission failed
 	 * @throws CoreException
 	 */
 	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, 
+			IProgressMonitor monitor) 
+		throws CoreException;
+
+	/**
+	 * Submit a job with the supplied submission ID. This ID can be used to identify the
+	 * job when an INewJobEvent is received.
+	 * 
+	 * The method will return immediately. It is up to the calling thread to check for
+	 * successful submission by registering a listener for INewJobEvent.
+	 * 
+	 * @param subId job submission ID
+	 * @param configuration launch configuration used to submit the job. Can be null.
+	 * @param attrMgr attribute manager containing the job launch attributes
+	 * @param monitor progress monitor
+	 * @throws CoreException
+	 */
+	public void submitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr,
 			IProgressMonitor monitor) 
 		throws CoreException;
 
