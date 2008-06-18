@@ -21,5 +21,4 @@ Export-Package:
  org.eclipse.ptp.remotetools.utils.linux.commandline,
  org.eclipse.ptp.remotetools.utils.network,
  org.eclipse.ptp.remotetools.utils.stream,
- org.eclipse.ptp.remotetools.utils.ui.swt,
  org.eclipse.ptp.remotetools.utils.verification
