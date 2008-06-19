@@ -314,7 +314,7 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public String submitJob(AttributeManager attrMgr) throws CoreException {
+	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
 		if (remoteServices == null) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Resource manager has not be initialized"));
 		}
@@ -326,8 +326,6 @@ public class OMPIRuntimeSystem extends AbstractRuntimeSystem {
 		} catch (InterruptedException e) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 		}
-		
-		return job.getSubmissionID();
 	}
 
 	/* (non-Javadoc)
