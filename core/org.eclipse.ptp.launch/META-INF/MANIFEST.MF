@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.core,
  org.eclipse.ptp.debug.core,
  org.eclipse.ptp.debug.ui,
- org.eclipse.cdt.core
+ org.eclipse.cdt.core,
+ org.eclipse.ptp.ui
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.launch,
  org.eclipse.ptp.launch.internal;x-internal:=true,

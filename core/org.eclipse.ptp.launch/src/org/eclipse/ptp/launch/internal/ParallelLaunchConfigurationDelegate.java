@@ -20,6 +20,7 @@ package org.eclipse.ptp.launch.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -34,6 +35,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -45,6 +47,8 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.data.ISynchronizationRule;
+import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -136,6 +140,13 @@ public class ParallelLaunchConfigurationDelegate
 		}
 		IPDebugger debugger = null;
 		IPJob job = null;
+		
+		monitor.worked(10); 
+		monitor.subTask("Copying data . . .");
+		
+		// All copy pre-"job submission" occurs here
+		copyExecutable(configuration, monitor);
+		doPreLaunchSynchronization(configuration, monitor);
 		
 		//switch perspective
 		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
