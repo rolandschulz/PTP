@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
+import java.io.File;
 import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IFile;
@@ -45,6 +46,7 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
@@ -88,14 +90,21 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	            handleApplicationButtonSelected();
 	        } else if (source == consoleButton) {
 	            updateLaunchConfigurationDialog();
+	        } else if (source == localAppButton) {
+	        	handleLocalApplicationButtonSelected();
+	        } else if (source == browseAppButton) {
+	        	handleBrowseLocalApplicationButtonSelected();
 	        }
 	    }
     }
     
     protected Text projText = null;
 	protected Text appText = null;
+	protected Text localAppText = null;
 	protected Button projButton = null; 
     protected Button appButton = null;
+    protected Button browseAppButton = null;
+    protected Button localAppButton = null;
     protected Button consoleButton = null;
 	protected WidgetListener listener = new WidgetListener();
 
@@ -138,6 +147,23 @@ public class ApplicationTab extends LaunchConfigurationTab {
 
 		createVerticalSpacer(mainComp, 2);
 
+		localAppButton = createCheckButton(mainComp, "Copy executable from local filesystem");
+		localAppButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		localAppButton.addSelectionListener(listener);
+		
+		Label localAppLabel = new Label(mainComp, SWT.NONE);
+		localAppLabel.setText("Path to the local file:");
+		localAppLabel.setLayoutData(spanGridData(-1, 2));
+		
+		localAppText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
+		localAppText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		localAppText.addModifyListener(listener);
+		
+		browseAppButton = createPushButton(mainComp, "Browse", null);
+		browseAppButton.addSelectionListener(listener);
+		
+		createVerticalSpacer(mainComp, 2);
+
 		consoleButton = createCheckButton(mainComp, LaunchMessages.getResourceString("ApplicationTab.Console")); //$NON-NLS-1$
 		consoleButton.setSelection(false);
 		consoleButton.addSelectionListener(listener);
@@ -166,10 +192,13 @@ public class ApplicationTab extends LaunchConfigurationTab {
         try {
             projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
             appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, EMPTY_STRING));
+            localAppText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH, EMPTY_STRING));
+            localAppButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false));
             consoleButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false));
         } catch (CoreException e) {
             setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage())); //$NON-NLS-1$
         }
+        handleLocalApplicationButtonSelected(); // Refreshes the local path textbox enable state.
     }
 	
     /* (non-Javadoc)
@@ -204,6 +233,21 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			setErrorMessage(LaunchMessages.getResourceString("ApplicationTab.Application_program_not_specified")); //$NON-NLS-1$
 			return false;
 		}
+		
+		if(localAppButton.getSelection()) {
+			name = getFieldContent(localAppText.getText());
+			if(name == null) {
+				setErrorMessage("Local file not specified");
+			}
+			File file = new File(name);
+			if(!file.isAbsolute()) {
+				setErrorMessage("Local file path must be absolute");
+			}
+			if(!file.exists() || !file.isFile()) {
+				setErrorMessage("Local file must exist and be valid");
+			}
+		}
+		
 		return true;
 	}
     
@@ -217,6 +261,12 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		configuration.setAttribute(
 				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 				getFieldContent(appText.getText()));
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE,
+				localAppButton.getSelection());
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH, 
+				getFieldContent(localAppText.getText()));
 		configuration.setAttribute(
 				IPTPLaunchConfigurationConstants.ATTR_CONSOLE,
 				consoleButton.getSelection());
@@ -240,6 +290,12 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		configuration.setAttribute(
 				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 				(String) null);
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE,
+				(String) null);
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH, 
+				false);
     }    
 
     /* (non-Javadoc)
@@ -432,4 +488,51 @@ public class ApplicationTab extends LaunchConfigurationTab {
     protected void updateLaunchConfigurationDialog() {
         super.updateLaunchConfigurationDialog();
     }	
+    
+    /**
+     * Disables copy of executable from local machine.
+     */
+    protected void handleLocalApplicationButtonSelected() {
+    	localAppText.setEnabled(localAppButton.getSelection());
+	}
+    
+    protected void handleBrowseLocalApplicationButtonSelected() {
+    	String initPath = localAppText.getText();
+    	if (initPath.equals(EMPTY_STRING)) {
+    	    final IProject project = getProject();
+    	    if (project == null) {
+    			MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("ApplicationTab.Project_required"), 
+    					LaunchMessages.getResourceString("ApplicationTab.Enter_project_before_browsing_for_program")); //$NON-NLS-1$
+    	        return;	        
+    	    }
+    	    initPath = getProject().getLocationURI().getPath();
+    	}
+    	IRemoteServices localServices = PTPRemotePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");// .getDefaultServices();
+    	if(localServices != null) {
+    		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
+			IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
+			IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
+			
+			IPath path = localFileManager.browseFile(getShell(), "Select the executable file to be copied", initPath);
+			if (path != null) {
+				localAppText.setText(path.toString());
+			}
+    	}
+    	
+       	/*IResourceManager rm = getResourceManager(getLaunchConfiguration());
+    	AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)rm).getConfiguration();
+    	IRemoteServices remServices = PTPRemotePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
+    	if (remServices != null) {
+    		IRemoteConnection remCon = remServices.getConnectionManager().getConnection(rmConf.getConnectionName());
+    		if (remCon != null) {
+    			IRemoteFileManager fileMgr = remServices.getFileManager(remCon);
+    			if (fileMgr != null) {
+    				IPath path = fileMgr.browseFile(getShell(), "Select application to execute", initPath);
+    				if (path != null) {
+    					appText.setText(path.toString());
+    				}
+    			}
+    		}
+    	};*/
+	}
 }

@@ -20,8 +20,10 @@ package org.eclipse.ptp.launch.internal;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,7 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -91,7 +94,14 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.data.DownloadRule;
+import org.eclipse.ptp.launch.data.ISynchronizationRule;
+import org.eclipse.ptp.launch.data.RuleFactory;
+import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
+import org.eclipse.ptp.launch.rulesengine.IRuleAction;
+import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.remote.IRemoteConnection;
@@ -106,8 +116,8 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
  *
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate extends
-		LaunchConfigurationDelegate {
-
+		LaunchConfigurationDelegate implements ILaunchProcessCallback {
+	private List extraSynchronizationRules;
 	public enum JobStatus {SUBMITTED, COMPLETED, ERROR}
 	
 	/**
@@ -717,6 +727,40 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
 	
 	/**
+	 * Get the path of the program to launch. No longer used since the program may not be
+	 * on the local machine.
+	 * 
+	 * @deprecated
+	 * 
+	 * @param configuration launch configuration
+	 * @return IPath corresponding to program executable
+	 * @throws CoreException
+	 */
+	protected IPath getProgramFile(ILaunchConfiguration configuration) throws CoreException {
+		IProject project = verifyProject(configuration);
+		String fileName = getProgramName(configuration);
+		if (fileName == null)
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_not_specified"), null, IStatus.INFO);
+
+		IPath programPath = new Path(fileName);
+		if (!programPath.isAbsolute()) {
+			programPath = project.getFile(programPath).getLocation();
+		}
+		if (!programPath.toFile().exists()) {
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), 
+					new FileNotFoundException(
+							LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", programPath.toString())), 
+							IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+		}
+		/* --old
+		IFile programPath = project.getFile(fileName);
+		if (programPath == null || !programPath.exists() || !programPath.getLocation().toFile().exists())
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", programPath.getLocation().toString())), IStatus.INFO);
+		 */
+		return programPath;
+	}
+
+	/**
 	 * Get the IProject object from the project name.
 	 * 
      * @param project name of the project
@@ -972,6 +1016,113 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
 	
 	/**
+	 * Check if the copy local file is enabled. If it is, copy the executable file from 
+	 * the local host to the remote host.
+	 * 
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyExecutable(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		boolean copyExecutable = 
+			configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false);
+
+		if(copyExecutable) {
+			// Get remote and local paths
+			String remotePath = getExecutablePath(configuration);
+			String localPath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH, 
+					(String)null);
+
+			// Check if local path is valid
+			if(localPath == null) {
+				// Throws exception
+			}
+
+			// Copy data
+			copyFileToRemoteHost(localPath, remotePath, configuration, monitor);
+		}
+	}
+
+	/**
+	 * Copy a data from a path (can be a file or directory) from the remote host to
+	 * the local host.
+	 * 
+	 * @param remotePath
+	 * @param localPath
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyFileFromRemoteHost(String remotePath, String localPath, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		
+		/*IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+		if (rm != null) {
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+				
+				IRemoteServices localServices = PTPRemotePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
+				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				if (remoteServices != null && localServices != null) {
+					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
+					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed*/
+					IRemoteFileManager localFileManager = getLocalFileManager(configuration);//localServices.getFileManager(lconn);
+
+					/*IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
+					IRemoteConnection rconn = rconnMgr.getConnection(remConf.getConnectionName());*/
+					IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);//remoteServices.getFileManager(rconn);
+
+					try {
+						IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
+
+						if(!rres.fetchInfo().exists()) {
+							// Local file not found!
+							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Remote resource doesn't exist!"));
+						}
+						IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
+
+						// Copy file
+						rres.copy(lres, EFS.OVERWRITE, monitor);
+					} catch (IOException e) {
+						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Could not retrieve remote resource info!"));
+					}
+	/*			}
+			} else {
+				// FIXME: work out what to do for RM's that don't extend AbstractRemoteResourceManagerConfiguration
+			}
+		}*/
+	}
+
+	/**
+	 * Copy a data from a path (can be a file or directory) from the local host to
+	 * the remote host.
+	 * 
+	 * @param localPath
+	 * @param remotePath
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyFileToRemoteHost(String localPath, String remotePath, ILaunchConfiguration configuration, 
+			IProgressMonitor monitor) throws CoreException {
+					IRemoteFileManager localFileManager = getLocalFileManager(configuration); 
+
+					IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);
+
+					try {
+						IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
+						if(!lres.fetchInfo().exists()) {
+							// Local file not found!
+							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Local resource doesn't exist!"));
+						}
+						IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
+
+						// Copy file
+						lres.copy(rres, EFS.OVERWRITE, monitor);
+
+					} catch (IOException e) {
+						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Could not retrieve local resource info!"));
+					}
+	}
+
+	/**
 	 * Verify the working directory. If no working directory is specified, the default is
 	 * the location of the executable.
 	 * 
@@ -993,4 +1144,128 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		}
 		return path.toString();        
     }
+
+	/**
+	 * This method does the synchronization step before the job submission
+	 * 
+	 * @param configuration
+	 * @param monitor
+	 */
+	protected void doPreLaunchSynchronization(ILaunchConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
+		boolean syncBefore = configuration.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_SYNC_BEFORE, false);
+		if(!syncBefore)
+			return;
+		
+		// This faction generate action objects which execute according to rules
+		RuleActionFactory ruleActFactory = new RuleActionFactory(configuration, this, monitor);
+		
+		List rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList());
+
+		// Iterate over rules executing them
+		for (Object ruleObj : rulesList) {
+			ISynchronizationRule syncRule = 
+				RuleFactory.createRuleFromString((String)ruleObj);
+			if(syncRule.isUploadRule()) {
+				// Execute the action
+				IRuleAction action = ruleActFactory.getAction(syncRule);
+				action.run();
+			}
+
+		}
+	}
+
+	protected void doPosLaunchSynchronization(ILaunchConfiguration configuration)  throws CoreException {
+		boolean syncAfter;
+		syncAfter = configuration.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_SYNC_AFTER, false);
+		if(!syncAfter)
+			return;
+		List rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList());
+		
+		// This faction generate action objects which execute according to rules
+		RuleActionFactory ruleActFactory = new RuleActionFactory(configuration, this, new NullProgressMonitor());
+
+		for (Object ruleObj : rulesList) {
+			ISynchronizationRule syncRule = 
+				RuleFactory.createRuleFromString((String)ruleObj);
+			if(syncRule.isDownloadRule()) {
+				// Execute the action
+				IRuleAction action = ruleActFactory.getAction(syncRule);
+				action.run();
+			}
+		}	
+	}
+	
+	/**
+	 * Returns the (possible empty) list of synchronization rule objects according to the rules described in the configuration.
+	 */
+	protected ISynchronizationRule[] getSynchronizeRules(ILaunchConfiguration configuration) throws CoreException {
+		List ruleStrings = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList());
+		List result = new ArrayList();
+		
+		for (Iterator iter = ruleStrings.iterator(); iter.hasNext();) {
+			String element = (String) iter.next();
+			try {
+				ISynchronizationRule rule = RuleFactory.createRuleFromString(element);
+				result.add(rule);
+			} catch (RuntimeException e) {
+				// FIXME Externalize
+				throw new CoreException(new Status(Status.ERROR, 
+						PTPLaunchPlugin.PLUGIN_ID, 
+						"Error converting rules"));
+			}
+		}
+		
+		return (ISynchronizationRule[]) result.toArray(new ISynchronizationRule[result.size()]);
+	}
+	
+	// Methods below implement the ILaunchProcessCallback interface
+	
+	public void addSynchronizationRule(ISynchronizationRule rule) {
+		extraSynchronizationRules.add(rule);
+	}
+	
+	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
+		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+		if (rm != null) {
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+
+				IRemoteServices localServices = PTPRemotePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
+				if (localServices != null) {
+					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
+					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
+					IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
+					
+					return localFileManager;
+				}
+			}
+		}
+
+		return null;
+	}
+	
+	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration) throws CoreException {
+		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+		if (rm != null) {
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+
+				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				if (remoteServices != null) {
+
+					IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
+					IRemoteConnection rconn = rconnMgr.getConnection(remConf.getConnectionName());
+					IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
+					
+					return remoteFileManager;
+				}
+			}
+		}
+		return null;
+	}
 }

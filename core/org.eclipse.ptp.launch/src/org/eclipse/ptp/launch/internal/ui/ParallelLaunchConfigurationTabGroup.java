@@ -27,6 +27,7 @@ import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.eclipse.ptp.launch.ui.ApplicationTab;
 import org.eclipse.ptp.launch.ui.ArgumentsTab;
 import org.eclipse.ptp.launch.ui.DebuggerTab;
+import org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab;
 import org.eclipse.ptp.launch.ui.ResourcesTab;
 
 /**
@@ -37,6 +38,7 @@ public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigura
     		ILaunchConfigurationTab tabs[] = {
         		new ResourcesTab(),
         		new ApplicationTab(), 
+        		new EnhancedSynchronizeTab(),
         		new DebuggerTab(false),
         		new ArgumentsTab(),
         		new SourceLookupTab(),
