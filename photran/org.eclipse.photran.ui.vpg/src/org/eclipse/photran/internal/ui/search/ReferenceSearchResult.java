@@ -120,7 +120,7 @@ public class ReferenceSearchResult
     public boolean isShownInEditor(Match match, IEditorPart editor)
     {
         IPath path = getFileName(editor);
-        return path.equals(((IFile)match.getElement()).getLocation());
+        return path != null && path.equals(((IFile)match.getElement()).getLocation());
     }
 
     /*

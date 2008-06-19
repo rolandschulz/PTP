@@ -27,11 +27,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTInitializationNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token assignsExpr; // in ASTInitializationNode
-    ASTExprNode assignedExpr; // in ASTInitializationNode
     org.eclipse.photran.internal.core.lexer.Token assignsNull; // in ASTInitializationNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTNull; // in ASTInitializationNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTInitializationNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTInitializationNode
+    ASTExprNode assignedExpr; // in ASTInitializationNode
 
     public boolean assignsExpr()
     {
@@ -44,17 +44,6 @@ public class ASTInitializationNode extends ASTNode
     }
 
 
-    public ASTExprNode getAssignedExpr()
-    {
-        return this.assignedExpr;
-    }
-
-    public void setAssignedExpr(ASTExprNode newValue)
-    {
-        this.assignedExpr = newValue;
-    }
-
-
     public boolean assignsNull()
     {
         return this.assignsNull != null;
@@ -63,6 +52,17 @@ public class ASTInitializationNode extends ASTNode
     public void setAssignsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.assignsNull = newValue;
+    }
+
+
+    public ASTExprNode getAssignedExpr()
+    {
+        return this.assignedExpr;
+    }
+
+    public void setAssignedExpr(ASTExprNode newValue)
+    {
+        this.assignedExpr = newValue;
     }
 
 
@@ -82,11 +82,11 @@ public class ASTInitializationNode extends ASTNode
         switch (index)
         {
         case 0:  return this.assignsExpr;
-        case 1:  return this.assignedExpr;
-        case 2:  return this.assignsNull;
-        case 3:  return this.hiddenTNull;
-        case 4:  return this.hiddenTLparen;
-        case 5:  return this.hiddenTRparen;
+        case 1:  return this.assignsNull;
+        case 2:  return this.hiddenTNull;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.assignedExpr;
         default: return null;
         }
     }
@@ -96,11 +96,11 @@ public class ASTInitializationNode extends ASTNode
         switch (index)
         {
         case 0:  this.assignsExpr = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.assignedExpr = (ASTExprNode)value;
-        case 2:  this.assignsNull = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTNull = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.assignsNull = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hiddenTNull = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.assignedExpr = (ASTExprNode)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

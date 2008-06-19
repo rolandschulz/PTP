@@ -125,7 +125,14 @@ public abstract class ScopingNode extends ASTNode
     	IASTNode grandparent = parent.getParent();
     	if (grandparent == null) return false;
     	
-    	if (parent instanceof ASTProgramNameNode
+    	if (isDeclStmtForScope(parent))
+    	{
+    	    if (parent instanceof ASTFunctionStmtNode && node == ((ASTFunctionStmtNode)parent).getName()) // result clause
+    	        return false;
+    	    else
+    	        return true;
+    	}
+    	else if (parent instanceof ASTProgramNameNode
     		|| parent instanceof ASTFunctionNameNode
     		|| parent instanceof ASTSubroutineNameNode
     		|| parent instanceof ASTModuleNameNode
@@ -137,24 +144,29 @@ public abstract class ScopingNode extends ASTNode
 		{
     		if (inAnonymousInterface(grandparent))
     			return false;
-    		else    		
-				return grandparent instanceof ASTProgramStmtNode
-					|| grandparent instanceof ASTFunctionStmtNode
-					|| grandparent instanceof ASTSubroutineStmtNode
-					|| grandparent instanceof ASTModuleStmtNode
-					|| grandparent instanceof ASTBlockDataStmtNode
-					|| grandparent instanceof ASTDerivedTypeStmtNode
-					|| grandparent instanceof ASTInterfaceStmtNode
-					|| grandparent instanceof ASTEndProgramStmtNode
-					|| grandparent instanceof ASTEndFunctionStmtNode
-					|| grandparent instanceof ASTEndSubroutineStmtNode
-					|| grandparent instanceof ASTEndModuleStmtNode
-					|| grandparent instanceof ASTEndBlockDataStmtNode
-					|| grandparent instanceof ASTEndTypeStmtNode
-					|| grandparent instanceof ASTEndInterfaceStmtNode;
+            else
+                return isDeclStmtForScope(grandparent);
 		}
     	else return false;
 	}
+
+    private static boolean isDeclStmtForScope(IASTNode node)
+    {
+        return node instanceof ASTProgramStmtNode
+        	|| node instanceof ASTFunctionStmtNode
+        	|| node instanceof ASTSubroutineStmtNode
+        	|| node instanceof ASTModuleStmtNode
+        	|| node instanceof ASTBlockDataStmtNode
+        	|| node instanceof ASTDerivedTypeStmtNode
+        	|| node instanceof ASTInterfaceStmtNode
+        	|| node instanceof ASTEndProgramStmtNode
+        	|| node instanceof ASTEndFunctionStmtNode
+        	|| node instanceof ASTEndSubroutineStmtNode
+        	|| node instanceof ASTEndModuleStmtNode
+        	|| node instanceof ASTEndBlockDataStmtNode
+        	|| node instanceof ASTEndTypeStmtNode
+        	|| node instanceof ASTEndInterfaceStmtNode;
+    }
 
 	private static boolean inAnonymousInterface(IASTNode n)
 	{
@@ -350,7 +362,7 @@ public abstract class ScopingNode extends ASTNode
     
     public boolean isParentScopeOf(ScopingNode scope)
     {
-    	for (IASTNode node = scope.getParent(); node != null && node.getParent() != null; node = node.getParent())
+    	for (IASTNode node = scope.getParent(); node != null; node = node.getParent())
     		if (node == this)
     			return true;
     	

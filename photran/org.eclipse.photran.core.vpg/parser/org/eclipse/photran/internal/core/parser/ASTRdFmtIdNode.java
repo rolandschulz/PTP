@@ -26,78 +26,34 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTRdFmtIdNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasMinusOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasOrOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasGtOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hasNeqvOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasLeOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasDivideOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasLtOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasGeOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasTimesOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hasPowerOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasEqOp; // in ASTRdFmtIdNode
-    ASTCOperandNode primary1; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasPlusOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasDivideOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasGeOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hasNeOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasEqEqOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasPlusOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasMinusOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasGtOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasEqvOp; // in ASTRdFmtIdNode
+    ASTCOperandNode primary1; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hasAndOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hasSlashEqOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasEqvOp; // in ASTRdFmtIdNode
-    org.eclipse.photran.internal.core.lexer.Token hasNotOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasLtOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasTimesOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasEqEqOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasLeOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token definedUnaryOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token definedBinaryOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasNotOp; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTRdFmtIdNode
     ASTUFExprNode formatIdExpr; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTRdFmtIdNode
     org.eclipse.photran.internal.core.lexer.Token hasConcatOp; // in ASTRdFmtIdNode
     ASTCPrimaryNode primary2; // in ASTRdFmtIdNode
-
-    public boolean formatIsAsterisk()
-    {
-        return this.formatIsAsterisk != null;
-    }
-
-    public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.formatIsAsterisk = newValue;
-    }
-
-
-    public boolean hasMinusOp()
-    {
-        return this.hasMinusOp != null;
-    }
-
-    public void setHasMinusOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasMinusOp = newValue;
-    }
-
-
-    public boolean hasOrOp()
-    {
-        return this.hasOrOp != null;
-    }
-
-    public void setHasOrOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasOrOp = newValue;
-    }
-
-
-    public boolean hasGtOp()
-    {
-        return this.hasGtOp != null;
-    }
-
-    public void setHasGtOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasGtOp = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token hasEqOp; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTRdFmtIdNode
+    org.eclipse.photran.internal.core.lexer.Token hasOrOp; // in ASTRdFmtIdNode
 
     public boolean hasNeqvOp()
     {
@@ -107,61 +63,6 @@ public class ASTRdFmtIdNode extends ASTNode
     public void setHasNeqvOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasNeqvOp = newValue;
-    }
-
-
-    public boolean hasLeOp()
-    {
-        return this.hasLeOp != null;
-    }
-
-    public void setHasLeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasLeOp = newValue;
-    }
-
-
-    public boolean hasDivideOp()
-    {
-        return this.hasDivideOp != null;
-    }
-
-    public void setHasDivideOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasDivideOp = newValue;
-    }
-
-
-    public boolean hasLtOp()
-    {
-        return this.hasLtOp != null;
-    }
-
-    public void setHasLtOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasLtOp = newValue;
-    }
-
-
-    public boolean hasGeOp()
-    {
-        return this.hasGeOp != null;
-    }
-
-    public void setHasGeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasGeOp = newValue;
-    }
-
-
-    public boolean hasTimesOp()
-    {
-        return this.hasTimesOp != null;
-    }
-
-    public void setHasTimesOp(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasTimesOp = newValue;
     }
 
 
@@ -176,36 +77,25 @@ public class ASTRdFmtIdNode extends ASTNode
     }
 
 
-    public boolean hasEqOp()
+    public boolean hasDivideOp()
     {
-        return this.hasEqOp != null;
+        return this.hasDivideOp != null;
     }
 
-    public void setHasEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasDivideOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasEqOp = newValue;
-    }
-
-
-    public ASTCOperandNode getPrimary1()
-    {
-        return this.primary1;
-    }
-
-    public void setPrimary1(ASTCOperandNode newValue)
-    {
-        this.primary1 = newValue;
+        this.hasDivideOp = newValue;
     }
 
 
-    public boolean hasPlusOp()
+    public boolean hasGeOp()
     {
-        return this.hasPlusOp != null;
+        return this.hasGeOp != null;
     }
 
-    public void setHasPlusOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasGeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasPlusOp = newValue;
+        this.hasGeOp = newValue;
     }
 
 
@@ -220,14 +110,58 @@ public class ASTRdFmtIdNode extends ASTNode
     }
 
 
-    public boolean hasEqEqOp()
+    public boolean hasPlusOp()
     {
-        return this.hasEqEqOp != null;
+        return this.hasPlusOp != null;
     }
 
-    public void setHasEqEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasPlusOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasEqEqOp = newValue;
+        this.hasPlusOp = newValue;
+    }
+
+
+    public boolean hasMinusOp()
+    {
+        return this.hasMinusOp != null;
+    }
+
+    public void setHasMinusOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasMinusOp = newValue;
+    }
+
+
+    public boolean hasGtOp()
+    {
+        return this.hasGtOp != null;
+    }
+
+    public void setHasGtOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasGtOp = newValue;
+    }
+
+
+    public boolean hasEqvOp()
+    {
+        return this.hasEqvOp != null;
+    }
+
+    public void setHasEqvOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasEqvOp = newValue;
+    }
+
+
+    public ASTCOperandNode getPrimary1()
+    {
+        return this.primary1;
+    }
+
+    public void setPrimary1(ASTCOperandNode newValue)
+    {
+        this.primary1 = newValue;
     }
 
 
@@ -253,25 +187,47 @@ public class ASTRdFmtIdNode extends ASTNode
     }
 
 
-    public boolean hasEqvOp()
+    public boolean hasLtOp()
     {
-        return this.hasEqvOp != null;
+        return this.hasLtOp != null;
     }
 
-    public void setHasEqvOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasLtOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasEqvOp = newValue;
+        this.hasLtOp = newValue;
     }
 
 
-    public boolean hasNotOp()
+    public boolean hasTimesOp()
     {
-        return this.hasNotOp != null;
+        return this.hasTimesOp != null;
     }
 
-    public void setHasNotOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasTimesOp(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasNotOp = newValue;
+        this.hasTimesOp = newValue;
+    }
+
+
+    public boolean hasEqEqOp()
+    {
+        return this.hasEqEqOp != null;
+    }
+
+    public void setHasEqEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasEqEqOp = newValue;
+    }
+
+
+    public boolean hasLeOp()
+    {
+        return this.hasLeOp != null;
+    }
+
+    public void setHasLeOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasLeOp = newValue;
     }
 
 
@@ -308,6 +264,17 @@ public class ASTRdFmtIdNode extends ASTNode
     }
 
 
+    public boolean hasNotOp()
+    {
+        return this.hasNotOp != null;
+    }
+
+    public void setHasNotOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasNotOp = newValue;
+    }
+
+
     public ASTUFExprNode getFormatIdExpr()
     {
         return this.formatIdExpr;
@@ -341,6 +308,39 @@ public class ASTRdFmtIdNode extends ASTNode
     }
 
 
+    public boolean hasEqOp()
+    {
+        return this.hasEqOp != null;
+    }
+
+    public void setHasEqOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasEqOp = newValue;
+    }
+
+
+    public boolean formatIsAsterisk()
+    {
+        return this.formatIsAsterisk != null;
+    }
+
+    public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.formatIsAsterisk = newValue;
+    }
+
+
+    public boolean hasOrOp()
+    {
+        return this.hasOrOp != null;
+    }
+
+    public void setHasOrOp(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasOrOp = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTRdFmtIdNode(this);
@@ -356,34 +356,34 @@ public class ASTRdFmtIdNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.formatIsAsterisk;
-        case 1:  return this.hasMinusOp;
-        case 2:  return this.hasOrOp;
-        case 3:  return this.hasGtOp;
-        case 4:  return this.hasNeqvOp;
-        case 5:  return this.hasLeOp;
-        case 6:  return this.hasDivideOp;
-        case 7:  return this.hasLtOp;
-        case 8:  return this.hasGeOp;
-        case 9:  return this.hasTimesOp;
-        case 10: return this.hasPowerOp;
-        case 11: return this.hasEqOp;
-        case 12: return this.primary1;
-        case 13: return this.hasPlusOp;
-        case 14: return this.hasNeOp;
-        case 15: return this.hasEqEqOp;
-        case 16: return this.hasAndOp;
-        case 17: return this.hasSlashEqOp;
-        case 18: return this.hasEqvOp;
+        case 0:  return this.hasNeqvOp;
+        case 1:  return this.hasPowerOp;
+        case 2:  return this.hasDivideOp;
+        case 3:  return this.hasGeOp;
+        case 4:  return this.hasNeOp;
+        case 5:  return this.hasPlusOp;
+        case 6:  return this.hasMinusOp;
+        case 7:  return this.hasGtOp;
+        case 8:  return this.hasEqvOp;
+        case 9:  return this.primary1;
+        case 10: return this.hasAndOp;
+        case 11: return this.hasSlashEqOp;
+        case 12: return this.hasLtOp;
+        case 13: return this.hasTimesOp;
+        case 14: return this.hasEqEqOp;
+        case 15: return this.hasLeOp;
+        case 16: return this.definedUnaryOp;
+        case 17: return this.label;
+        case 18: return this.definedBinaryOp;
         case 19: return this.hasNotOp;
-        case 20: return this.definedUnaryOp;
-        case 21: return this.label;
-        case 22: return this.definedBinaryOp;
-        case 23: return this.hiddenTLparen;
-        case 24: return this.formatIdExpr;
-        case 25: return this.hiddenTRparen;
-        case 26: return this.hasConcatOp;
-        case 27: return this.primary2;
+        case 20: return this.hiddenTLparen;
+        case 21: return this.formatIdExpr;
+        case 22: return this.hiddenTRparen;
+        case 23: return this.hasConcatOp;
+        case 24: return this.primary2;
+        case 25: return this.hasEqOp;
+        case 26: return this.formatIsAsterisk;
+        case 27: return this.hasOrOp;
         default: return null;
         }
     }
@@ -392,34 +392,34 @@ public class ASTRdFmtIdNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 8:  this.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 10: this.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 11: this.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 12: this.primary1 = (ASTCOperandNode)value;
-        case 13: this.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 14: this.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 15: this.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 16: this.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 17: this.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 18: this.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.primary1 = (ASTCOperandNode)value;
+        case 10: this.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 11: this.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 12: this.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 13: this.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 14: this.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 15: this.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 16: this.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 17: this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 18: this.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 19: this.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 20: this.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 21: this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 22: this.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 23: this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 24: this.formatIdExpr = (ASTUFExprNode)value;
-        case 25: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 26: this.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 27: this.primary2 = (ASTCPrimaryNode)value;
+        case 20: this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 21: this.formatIdExpr = (ASTUFExprNode)value;
+        case 22: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 23: this.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 24: this.primary2 = (ASTCPrimaryNode)value;
+        case 25: this.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 26: this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 27: this.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

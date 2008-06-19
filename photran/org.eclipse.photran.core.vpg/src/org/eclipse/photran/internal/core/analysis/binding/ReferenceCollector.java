@@ -276,7 +276,7 @@ class ReferenceCollector extends BindingCollector
         if (node.getName() != null)
         {
             // <Variable> is the only context where a <DataRef> does not refer to a member of a derived type 
-        	if (node.getParent() instanceof ASTVariableNode)
+        	if (!node.hasDerivedTypeComponentName() && node.getParent().getParent() instanceof ASTVariableNode)
         		bind(node.getName());
         	else
         		dontbind(node.getName());

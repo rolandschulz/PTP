@@ -49,8 +49,8 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
         		
 				@Override public void visitASTNode(IASTNode node)
 				{
-					if (!(node instanceof ScopingNode)) return;
-					if (node instanceof ASTExecutableProgramNode && node.getParent() != null) return;
+					if (!(node instanceof ScopingNode)) { traverseChildren(node); return; }
+					if (node instanceof ASTExecutableProgramNode && node.getParent() != null) { traverseChildren(node); return; }
 					
 					ScopingNode scope = (ScopingNode)node;
 					

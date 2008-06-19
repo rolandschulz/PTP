@@ -8,14 +8,14 @@ echo Deleting old files...
 rm -f *.java
 
 echo Generating parser and AST classes...
-java -Xmx256M -cp $SRCDIR/ludwig.jar \
+java -Xmx256M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-workspace/bz.over.templates/lib/js.jar \
 	Main_LALR1_Java_AST_Prototype \
 	-shift T_COMMA "<IoControlSpecList>" \
 	-reduce "<SFVarName>" "<SFDummyArgName>" \
 	-package "org.eclipse.photran.internal.core.parser" \
 	-prec "<DeferredShapeSpecList> > <AssumedShapeSpec>" \
 	-prec "<BodyPlusInternals> > <Label>, T_ICON" \
-	-prec "<LblDef>, <Label>, T_ICON > <ConditionalBody>, <ElseIfConstruct>" \
+	-prec "<LblDef>, <Label>, T_ICON < <ConditionalBody>, <ElseIfConstruct>" \
 	-shift T_IDENT "<CommonBlock>" \
 	-imports "import org.eclipse.photran.internal.core.lexer.*; \
                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;" \

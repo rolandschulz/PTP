@@ -26,24 +26,13 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTDataStmtValueNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hasConstIntKind; // in ASTDataStmtValueNode
     ASTNamedConstantUseNode namedConstKind; // in ASTDataStmtValueNode
+    org.eclipse.photran.internal.core.lexer.Token hasConstIntKind; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTDataStmtValueNode
-    ASTConstantNode constant; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDataStmtValueNode
-
-    public boolean hasConstIntKind()
-    {
-        return this.hasConstIntKind != null;
-    }
-
-    public void setHasConstIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasConstIntKind = newValue;
-    }
-
+    ASTConstantNode constant; // in ASTDataStmtValueNode
 
     public ASTNamedConstantUseNode getNamedConstKind()
     {
@@ -56,14 +45,14 @@ public class ASTDataStmtValueNode extends ASTNode
     }
 
 
-    public ASTConstantNode getConstant()
+    public boolean hasConstIntKind()
     {
-        return this.constant;
+        return this.hasConstIntKind != null;
     }
 
-    public void setConstant(ASTConstantNode newValue)
+    public void setHasConstIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.constant = newValue;
+        this.hasConstIntKind = newValue;
     }
 
 
@@ -75,6 +64,17 @@ public class ASTDataStmtValueNode extends ASTNode
     public void setIsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNull = newValue;
+    }
+
+
+    public ASTConstantNode getConstant()
+    {
+        return this.constant;
+    }
+
+    public void setConstant(ASTConstantNode newValue)
+    {
+        this.constant = newValue;
     }
 
 
@@ -93,13 +93,13 @@ public class ASTDataStmtValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.hasConstIntKind;
-        case 1:  return this.namedConstKind;
+        case 0:  return this.namedConstKind;
+        case 1:  return this.hasConstIntKind;
         case 2:  return this.hiddenTAsterisk;
-        case 3:  return this.constant;
-        case 4:  return this.isNull;
-        case 5:  return this.hiddenTLparen;
-        case 6:  return this.hiddenTRparen;
+        case 3:  return this.isNull;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.constant;
         default: return null;
         }
     }
@@ -108,13 +108,13 @@ public class ASTDataStmtValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasConstIntKind = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.namedConstKind = (ASTNamedConstantUseNode)value;
+        case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value;
+        case 1:  this.hasConstIntKind = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 2:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.constant = (ASTConstantNode)value;
-        case 4:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 6:  this.constant = (ASTConstantNode)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

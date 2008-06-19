@@ -1589,7 +1589,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 # JO -- Added error production
 <IfStmt> ::=
   | (inline):<LblDef> T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN <ActionStmt>
-  | (inline):<LblDef> T_IF (error) T_EOS
+#  | (inline):<LblDef> T_IF (error) T_EOS
 
 # R808
 <CaseConstruct> ::=
