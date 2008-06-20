@@ -1,7 +1,5 @@
 package org.eclipse.photran.core.vpg;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,22 +13,14 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.types.Type;
-import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
-import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
-import bz.over.vpg.VPGDependency;
 import bz.over.vpg.eclipse.EclipseVPG;
 
 /**
@@ -38,7 +28,7 @@ import bz.over.vpg.eclipse.EclipseVPG;
  * 
  * @author Jeff Overbey
  */
-public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB>
+public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB>
 {
 	// Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
 	// (since our parser declares classes with the same name)
@@ -154,6 +144,12 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, 
 		return System.getenv("TESTING") != null;
 	}
 
+    @Override
+    protected boolean shouldListFileInIndexerProgressMessages(String filename)
+    {
+        return !filename.startsWith("module:");
+    }
+
 	@Override
 	protected boolean shouldProcessFile(IFile file)
 	{
@@ -247,69 +243,6 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, 
 	protected PhotranTokenRef getTokenRef(Token forToken)
 	{
 		return forToken.getTokenRef();
-	}
-	
-	@Override
-	protected IFortranAST parse(final String filename)
-	{
-		if (filename.startsWith("module:")) return null;
-		
-		IFile file = getIFileForFilename(filename);
-
-		IContentType contentType2 = Platform.getContentTypeManager().findContentTypeFor(filename);
-		String contentType = contentType2 == null ? null : contentType2.getId();
-		// In CDT, String contentType = CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
-
-		SourceForm sourceForm;
-		if (contentType != null && contentType.equals(FIXED_FORM_CONTENT_TYPE))
-			sourceForm = SourceForm.FIXED_FORM;
-		else
-		{
-			sourceForm = SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject())
-			{
-				@Override
-				public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
-				{
-					// When we encounter an INCLUDE directive, set up a file dependency in the VPG
-					
-					db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(PhotranVPG.this,
-								filename,
-								getFilenameForIFile(getIncludedFile(fileToInclude))));
-					
-					return super.getIncludedFileAsStream(fileToInclude);
-				}
-			});
-		}
-
-		try
-		{
-			IAccumulatingLexer lexer = LexerFactory.createLexer(file, sourceForm, true);
-			long start = System.currentTimeMillis();
-            ASTExecutableProgramNode ast = parser.parse(lexer);
-            debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
-            return new FortranAST(file, ast, lexer.getTokenList());
-		}
-		catch (Exception e)
-		{
-			logError(e);
-			return null;
-		}
-	}
-
-	@Override
-	protected void populateVPG(String filename, IFortranAST ast)
-	{
-		if (!filename.startsWith("module:"))
-		{
-		    db.deleteAllIncomingDependenciesFor(filename);
-		    db.deleteAllOutgoingDependenciesFor(filename);
-		}
-		
-		if (ast == null) return;
-
-        long start = System.currentTimeMillis();
-		Binder.bind(ast, getIFileForFilename(filename));
-        debug("  - Elapsed time in Binder#bind: " + (System.currentTimeMillis()-start) + " ms", filename);
 	}
 	
 	public IFortranAST acquireTransientAST(IFile file)

@@ -21,7 +21,7 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor.FortranKeywordRuleBasedScanner;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
-import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
+import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorVPGTask;
 import org.eclipse.swt.SWT;
@@ -172,7 +172,7 @@ public class DeclarationView extends ViewPart
                                                  SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME).equals("true"))
             {
                 addCaretMovementListenerTo(editor);
-                FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
+                FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
                 tasks.addASTTask(this);
                 tasks.addVPGTask(this);
                 return editor;
@@ -198,7 +198,7 @@ public class DeclarationView extends ViewPart
         if (editor != null)
         {
             removeCaretMovementListenerFrom(editor);
-            FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
+            FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
             tasks.removeASTTask(this);
             tasks.removeVPGTask(this);
         }

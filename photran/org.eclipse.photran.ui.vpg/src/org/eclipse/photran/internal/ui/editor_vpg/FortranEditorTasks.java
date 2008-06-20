@@ -25,21 +25,21 @@ import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 
 import bz.over.vpg.eclipse.VPGJob;
 
-public class FortranEditorVPGTasks
+public class FortranEditorTasks
 {
     /**
-     * @return the instance of FortranEditorVPGTasks associated with the given
+     * @return the instance of FortranEditorTasks associated with the given
      * editor, creating the instance on-demand if necessary
      */
-    public static FortranEditorVPGTasks instance(AbstractFortranEditor editor)
+    public static FortranEditorTasks instance(AbstractFortranEditor editor)
     {
         if (editor.reconcilerTasks == null)
-            editor.reconcilerTasks = new FortranEditorVPGTasks(editor);
+            editor.reconcilerTasks = new FortranEditorTasks(editor);
         
-        return (FortranEditorVPGTasks)editor.reconcilerTasks;
+        return (FortranEditorTasks)editor.reconcilerTasks;
     }
 
-    private FortranEditorVPGTasks(AbstractFortranEditor editor)
+    private FortranEditorTasks(AbstractFortranEditor editor)
     {
         this.editor = editor;
         editor.reconcilerTasks = this;
@@ -121,7 +121,7 @@ public class FortranEditorVPGTasks
         {
             if (dispatchASTTasksJob != null) return; // Already running an update
 
-            dispatchASTTasksJob = new Job("Updating editor")
+            dispatchASTTasksJob = new Job("Updating Fortran editor with new parse information")
             {
                 @Override
                 protected IStatus run(IProgressMonitor monitor)
@@ -129,24 +129,28 @@ public class FortranEditorVPGTasks
                     ASTExecutableProgramNode astRootNode = null;
                     try
                     {
-                        String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
-                        IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
-                                                                            null,
-                                                                            SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject())),
-                                                                            false);
-                        astRootNode = parser.parse(lexer);
-                        if (astRootNode == null) return Status.OK_STATUS;
-                        
-                        HashSet<IFortranEditorASTTask> tasksToRemove = new HashSet<IFortranEditorASTTask>();
-                        synchronized (FortranEditorVPGTasks.instance(editor))
+                        if (editor.getDocumentProvider() != null)
                         {
-                            for (IFortranEditorASTTask task : FortranEditorVPGTasks.instance(editor).astTasks)
-                                if (!task.handle(astRootNode, lexer.getTokenList(), defMap))
-                                    tasksToRemove.add(task);
+                            String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
+                            
+                            IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
+                                                                                null,
+                                                                                SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject())),
+                                                                                false);
+                            astRootNode = parser.parse(lexer);
+                            if (astRootNode == null) return Status.OK_STATUS;
+                            
+                            HashSet<IFortranEditorASTTask> tasksToRemove = new HashSet<IFortranEditorASTTask>();
+                            synchronized (FortranEditorTasks.instance(editor))
+                            {
+                                for (IFortranEditorASTTask task : FortranEditorTasks.instance(editor).astTasks)
+                                    if (!task.handle(astRootNode, lexer.getTokenList(), defMap))
+                                        tasksToRemove.add(task);
+                            }
+                            FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                         }
-                        FortranEditorVPGTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                     }
-                    catch (Exception e)
+                    catch (Throwable e)
                     {
                         ;
                     }
@@ -165,15 +169,22 @@ public class FortranEditorVPGTasks
 
             if (vpgAST == null || vpg.db.isOutOfDate(PhotranVPG.getFilenameForIFile(editor.getIFile())))
             {
+                vpg.queueJobToEnsureVPGIsUpToDate();
+                
                 vpgAST = null;
-                updateVPGJob = new VPGJob<IFortranAST, Token>("Updating editor model")
+                updateVPGJob = new VPGJob<IFortranAST, Token>("Updating Fortran editor with new analysis information")
                 {
                     @Override
                     public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
                     {
                         vpgAST = vpg.acquireTransientAST(PhotranVPG.getFilenameForIFile(editor.getIFile()));
                         updateVPGJob = null;
-                        scheduleVPGTaskDispatchJob();
+                        //scheduleVPGTaskDispatchJob();
+                        
+                        defMap = createDefMap();
+                        for (IFortranEditorVPGTask task : FortranEditorTasks.instance(editor).vpgTasks)
+                            task.handle(editor.getIFile(), vpgAST, defMap);
+                        
                         return Status.OK_STATUS;
                     }
                 };
@@ -182,25 +193,25 @@ public class FortranEditorVPGTasks
             }
         }
 
-        private void scheduleVPGTaskDispatchJob()
-        {
-            dispatchVPGTasksJob = new Job("Updating editor")
-            {
-                @Override
-                protected IStatus run(IProgressMonitor monitor)
-                {
-                    if (vpgAST != null) // Parse might have failed
-                    {
-                        synchronized (FortranEditorVPGTasks.instance(editor))
-                        {
-                            defMap = createDefMap();
-                            for (IFortranEditorVPGTask task : FortranEditorVPGTasks.instance(editor).vpgTasks)
-                                task.handle(editor.getIFile(), vpgAST, defMap);
-                        }
-                    }
-                    dispatchVPGTasksJob = null;
-                    return Status.OK_STATUS;
-                }
+//        private void scheduleVPGTaskDispatchJob()
+//        {
+//            dispatchVPGTasksJob = new Job("Updating Fortran editor (3/3)")
+//            {
+//                @Override
+//                protected IStatus run(IProgressMonitor monitor)
+//                {
+//                    if (vpgAST != null) // Parse might have failed
+//                    {
+//                        synchronized (FortranEditorTasks.instance(editor))
+//                        {
+//                            defMap = createDefMap();
+//                            for (IFortranEditorVPGTask task : FortranEditorTasks.instance(editor).vpgTasks)
+//                                task.handle(editor.getIFile(), vpgAST, defMap);
+//                        }
+//                    }
+//                    dispatchVPGTasksJob = null;
+//                    return Status.OK_STATUS;
+//                }
 
                 private DefinitionMap<Definition> createDefMap()
                 {
@@ -212,9 +223,9 @@ public class FortranEditorVPGTasks
                         }
                     };
                 }
-            };
-            dispatchVPGTasksJob.setPriority(Job.DECORATE);
-            dispatchVPGTasksJob.schedule();
-        }
+//            };
+//            dispatchVPGTasksJob.setPriority(Job.DECORATE);
+//            dispatchVPGTasksJob.schedule();
+//        }
     }
 }

@@ -27,12 +27,12 @@ public class FortranVPGReconcilingStrategy extends CCompositeReconcilingStrategy
     @Override public void initialReconcile()
     {
         super.initialReconcile();
-        FortranEditorVPGTasks.instance(editor).getRunner().runTasks();
+        FortranEditorTasks.instance(editor).getRunner().runTasks();
     }
 
     @Override public void reconcile(IRegion region)
     {
         super.reconcile(region);
-        FortranEditorVPGTasks.instance(editor).getRunner().runTasks();
+        FortranEditorTasks.instance(editor).getRunner().runTasks();
     }
 }

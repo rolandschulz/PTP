@@ -19,7 +19,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
+import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
@@ -40,8 +40,8 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
         {
             final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
             
-            FortranEditorVPGTasks.instance(editor).addASTTask(new FortranCompletionProcessorASTTask(this));
-            FortranEditorVPGTasks.instance(editor).addVPGTask(new FortranCompletionProcessorVPGTask(this));
+            FortranEditorTasks.instance(editor).addASTTask(new FortranCompletionProcessorASTTask(this));
+            FortranEditorTasks.instance(editor).addVPGTask(new FortranCompletionProcessorVPGTask(this));
             
             ContentAssistant assistant = new ContentAssistant();
             for (String partitionType : AbstractFortranEditor.PARTITION_TYPES)

@@ -21,7 +21,7 @@ import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
-import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorVPGTasks;
+import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -36,6 +36,8 @@ import org.eclipse.ui.ide.IDE;
  * If multiple declarations are found, a dialog is opened so that the user can see the various declarations and
  * decide which to open.
  * 
+ * TODO: Open Declaration does not work on module names in USE statements since these are not in the DefinitionMap 
+ * 
  * @author Jeff Overbey
  */
 public class OpenDeclaration extends FortranEditorASTActionDelegate
@@ -47,7 +49,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
         Shell shell = editor.getShell();
         IWorkbenchPage page = editor.getEditorSite().getPage();
         
-        FortranEditorVPGTasks tasks = FortranEditorVPGTasks.instance(editor);
+        FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
         tasks.addASTTask(new OpenDeclarationASTTask(editor, selection, shell, page));
         tasks.getRunner().runTasks(false);
     }
