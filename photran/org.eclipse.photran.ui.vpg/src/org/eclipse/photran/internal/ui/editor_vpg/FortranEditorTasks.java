@@ -181,9 +181,12 @@ public class FortranEditorTasks
                         updateVPGJob = null;
                         //scheduleVPGTaskDispatchJob();
                         
-                        defMap = createDefMap();
-                        for (IFortranEditorVPGTask task : FortranEditorTasks.instance(editor).vpgTasks)
-                            task.handle(editor.getIFile(), vpgAST, defMap);
+                        if (vpgAST != null)
+                        {
+                            defMap = createDefMap();
+                            for (IFortranEditorVPGTask task : FortranEditorTasks.instance(editor).vpgTasks)
+                                task.handle(editor.getIFile(), vpgAST, defMap);
+                        }
                         
                         return Status.OK_STATUS;
                     }

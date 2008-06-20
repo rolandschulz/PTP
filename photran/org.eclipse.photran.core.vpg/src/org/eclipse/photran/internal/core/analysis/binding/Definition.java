@@ -88,8 +88,8 @@ public class Definition implements Serializable, Comparable<Definition>
     public static enum Visibility
     {
         PUBLIC,
-        PRIVATE,
-        INHERIT_FROM_SCOPE;
+        PRIVATE;
+        //INHERIT_FROM_SCOPE;
         
         @Override public String toString()
         {
@@ -110,13 +110,13 @@ public class Definition implements Serializable, Comparable<Definition>
     protected Definition() {}
     
     /** Creates a definition and binds it to the given token */
-    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, Type type)
+    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, Visibility visibility, Type type)
     {
         this.classification = classification;
     	this.tokenRef = tokenRef;
     	this.declaredName = declaredName;
     	this.canonicalizedName = canonicalize(declaredName);
-        this.visibility = Visibility.INHERIT_FROM_SCOPE;
+        this.visibility = visibility; //Visibility.INHERIT_FROM_SCOPE;
         this.type = type;
         this.arraySpec = null;
     }
@@ -275,8 +275,8 @@ public class Definition implements Serializable, Comparable<Definition>
         	if (arraySpec != null) result.append(arraySpec);
         }
         
-        if (visibility != Visibility.INHERIT_FROM_SCOPE)
-        	result.append(" (" + visibility + ")");
+//        if (visibility != Visibility.INHERIT_FROM_SCOPE)
+//        	result.append(" (" + visibility + ")");
         
         return result.toString();
     }
@@ -362,8 +362,8 @@ public class Definition implements Serializable, Comparable<Definition>
     boolean isPublic()
     {
         // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
-        return this.visibility.equals(Visibility.PUBLIC)
-            || this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
+        return this.visibility.equals(Visibility.PUBLIC);
+            //|| this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
     }
 
     public IMarker createMarker()

@@ -1,25 +1,20 @@
 package org.eclipse.photran.core.vpg;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCProjectNature;
-import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 import bz.over.vpg.eclipse.EclipseVPG;
 
@@ -46,12 +41,16 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	public static final int SCOPE_IS_INTERNAL_ANNOTATION_TYPE = 1;
 	public static final int SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE = 2;
 	public static final int DEFINITION_ANNOTATION_TYPE = 3;
-	public static final int TYPE_ANNOTATION_TYPE = 4;
+    public static final int TYPE_ANNOTATION_TYPE = 4;
+    public static final int MODULE_TOKENREF_ANNOTATION_TYPE = 5;
+    public static final int MODULE_SYMTAB_ANNOTATION_TYPE = 6;
 	
 	private static final String[] annotationTypeDescriptions = { "Default visibility for scope is private",
 	                                                             "Implicit spec for scope",
 	                                                             "Definition",
-	                                                             "Type" };
+	                                                             "Type",
+	                                                             "Module TokenRef",
+	                                                             "Module symbol table" };
 	
 	private static PhotranVPG instance = null;
 	public PhotranVPGDB db = null;
@@ -144,58 +143,6 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		return System.getenv("TESTING") != null;
 	}
 
-    @Override
-    protected boolean shouldListFileInIndexerProgressMessages(String filename)
-    {
-        return !filename.startsWith("module:");
-    }
-
-	@Override
-	protected boolean shouldProcessFile(IFile file)
-	{
-		String filename = file.getName();
-		return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
-	}
-	
-	private static boolean hasFixedFormContentType(String filename)
-	{
-		if (inTestingMode()) // Fortran content types not set in testing workspace
-			return filename.endsWith(".f");
-		else
-			return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
-	}
-	
-	private static boolean hasFreeFormContentType(String filename)
-	{
-		if (inTestingMode()) // Fortran content types not set in testing workspace
-			return filename.endsWith(".f90");
-		else
-			return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
-	}
-	
-	private static final String getContentType(String filename)
-	{
-		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
-		return contentType == null ? null : contentType.getId();
-		
-		// In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
-	}
-
-	@Override
-	protected boolean shouldProcessProject(IProject project)
-	{
-		try
-		{
-		    if (!project.isAccessible()) return false;
-		    if (!project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) return false;
-		    return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
-		}
-		catch (CoreException e)
-		{
-			throw new Error(e);
-		}
-	}
-
 	protected String describeEdgeType(int edgeType)
 	{
 		return edgeTypeDescriptions[edgeType];
@@ -222,11 +169,6 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		{
 			return db.describeToken(filename, offset, length);
 		}
-	}
-	
-	@Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)
-	{
-		return new PhotranTokenRef(filename, offset, length);
 	}
 
 	@Override
@@ -303,4 +245,19 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	{
 		return (Type)db.getAnnotation(tokenRef, TYPE_ANNOTATION_TYPE);
 	}
+    
+    public PhotranTokenRef getModuleTokenRef(String moduleName)
+    {
+        String filename = "module:" + canonicalizeIdentifier(moduleName);
+        PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+        return (PhotranTokenRef)db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Definition> getModuleSymbolTable(String moduleName)
+    {
+        String filename = "module:" + canonicalizeIdentifier(moduleName);
+        PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+        return (List<Definition>)db.getAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE);
+    }
 }

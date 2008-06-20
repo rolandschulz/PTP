@@ -16,11 +16,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
@@ -33,9 +31,9 @@ public abstract class BindingCollector extends ASTVisitor
 {
 	protected PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
 
-    protected void markModuleExport(IFile file, String moduleName)
+    protected void markModuleExport(IFile file, Token moduleName)
     {
-        vpg.markFileAsExportingModule(file, moduleName);
+        vpg.markFileAsExportingModule(file, moduleName.getText());
     }
 
     protected void setScopeDefaultVisibilityToPrivate(ScopingNode scope)
@@ -62,7 +60,8 @@ public abstract class BindingCollector extends ASTVisitor
     	
     	try
     	{
-            Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, type);
+    	    Visibility visibility = token.getEnclosingScope().isDefaultVisibilityPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC;
+            Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, visibility, type);
     		vpg.setDefinitionFor(token.getTokenRef(), definition);
     		vpg.markScope(token.getTokenRef(), token.getEnclosingScope());
     		return definition;

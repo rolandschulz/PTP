@@ -172,7 +172,7 @@ public class Intrinsics
     {
         public Intrinsic(String declaredName, PhotranTokenRef tokenRef)
         {
-        	super(declaredName, tokenRef, Definition.Classification.INTRINSIC, Type.UNKNOWN);
+        	super(declaredName, tokenRef, Definition.Classification.INTRINSIC, Visibility.PUBLIC, Type.UNKNOWN);
         }
 
         @Override

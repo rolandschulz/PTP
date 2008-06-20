@@ -203,22 +203,40 @@ public class ModuleLoader extends BindingCollector
 		return false;
 	}
 
-	private void bindToSymbolsIn(IFile file) throws Exception
-	{
-		ASTModuleNode moduleNode = findModuleIn(file);
-		if (moduleNode == null) return; // Shouldn't happen if VPG is up to date
-		
-		bind(useStmt.getName(), moduleNode.getRepresentativeToken());
-		
-		ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
-		
-		for (Definition def : moduleNode.getAllPublicDefinitions())
-			if (shouldImportDefinition(def))
-				importDefinition(def, newScope);
-		
-		bindIdentifiersInRenameList(useStmt.getRenameList(), moduleNode);
-		bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleNode);
-	}
+//    private void bindToSymbolsIn(IFile file) throws Exception
+//    {
+//        ASTModuleNode moduleNode = findModuleIn(file);
+//        if (moduleNode == null) return; // Shouldn't happen if VPG is up to date
+//        
+//        bind(useStmt.getName(), moduleNode.getRepresentativeToken());
+//        
+//        ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
+//        
+//        for (Definition def : moduleNode.getAllPublicDefinitions())
+//            if (shouldImportDefinition(def))
+//                importDefinition(def, newScope);
+//        
+//        bindIdentifiersInRenameList(useStmt.getRenameList(), moduleNode);
+//        bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleNode);
+//    }
+
+    private void bindToSymbolsIn(IFile file) throws Exception
+    {
+        PhotranTokenRef moduleToken = vpg.getModuleTokenRef(moduleName);
+        if (moduleToken == null) return; // Shouldn't happen if VPG is up to date
+        
+        bind(useStmt.getName(), moduleToken);
+        
+        ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
+        
+        List<Definition> moduleSymtab = vpg.getModuleSymbolTable(moduleName);
+        for (Definition def : moduleSymtab)
+            if (shouldImportDefinition(def))
+                importDefinition(def, newScope);
+        
+        bindIdentifiersInRenameList(useStmt.getRenameList(), moduleSymtab);
+        bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleSymtab);
+    }
 
 	private boolean shouldImportDefinition(Definition def)
 	{
@@ -255,7 +273,7 @@ public class ModuleLoader extends BindingCollector
 		}
 	}
 	
-	private void bindIdentifiersInRenameList(IASTListNode<ASTRenameNode> renameList, ASTModuleNode moduleNode) throws Exception
+	private void bindIdentifiersInRenameList(IASTListNode<ASTRenameNode> renameList, List<Definition> moduleSymtab) throws Exception
 	{
 		if (renameList == null) return;
 		
@@ -264,11 +282,11 @@ public class ModuleLoader extends BindingCollector
             Token newName = renameList.get(i).getNewName();
             Token oldName = renameList.get(i).getName();
             
-            bindPossiblyRenamedIdentifier(newName, oldName, moduleNode);
+            bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
         }
 	}
 
-	private void bindIdentifiersInOnlyList(IASTListNode<ASTOnlyNode> onlyList, ASTModuleNode moduleNode) throws Exception
+	private void bindIdentifiersInOnlyList(IASTListNode<ASTOnlyNode> onlyList, List<Definition> moduleSymtab) throws Exception
 	{
 		if (onlyList == null) return;
 		
@@ -277,21 +295,39 @@ public class ModuleLoader extends BindingCollector
             Token newName = onlyList.get(i).getNewName();
             Token oldName = onlyList.get(i).getName();
             
-            if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleNode);
+            if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
         }
 	}
 
-	private void bindPossiblyRenamedIdentifier(Token newName, Token oldName, ASTModuleNode moduleNode) throws Exception
-	{
-		List<PhotranTokenRef> definitionsInModule = moduleNode.manuallyResolve(oldName);
-		
-		for (PhotranTokenRef def : definitionsInModule)
-		{
-		    bindRenamedEntity(newName, def);
-			bind(oldName, def);
-		}
-		
-		Type type = definitionsInModule.size() == 1 ? vpg.getDefinitionFor(definitionsInModule.get(0)).getType() : Type.UNKNOWN;
-		addDefinition(newName, Definition.Classification.RENAMED_MODULE_ENTITY, type);
-	}
+    private void bindPossiblyRenamedIdentifier(Token newName, Token oldName, List<Definition> moduleSymtab) throws Exception
+    {
+        List<PhotranTokenRef> definitionsInModule = new LinkedList<PhotranTokenRef>();
+        String canonicalizedOldName = PhotranVPG.canonicalizeIdentifier(oldName.getText());
+        for (Definition def : moduleSymtab)
+            if (def.matches(canonicalizedOldName))
+                definitionsInModule.add(def.getTokenRef());
+        
+        for (PhotranTokenRef def : definitionsInModule)
+        {
+            bindRenamedEntity(newName, def);
+            bind(oldName, def);
+        }
+        
+        Type type = definitionsInModule.size() == 1 ? vpg.getDefinitionFor(definitionsInModule.get(0)).getType() : Type.UNKNOWN;
+        addDefinition(newName, Definition.Classification.RENAMED_MODULE_ENTITY, type);
+    }
+
+//    private void bindPossiblyRenamedIdentifier(Token newName, Token oldName, ASTModuleNode moduleNode) throws Exception
+//    {
+//        List<PhotranTokenRef> definitionsInModule = moduleNode.manuallyResolve(oldName);
+//        
+//        for (PhotranTokenRef def : definitionsInModule)
+//        {
+//            bindRenamedEntity(newName, def);
+//            bind(oldName, def);
+//        }
+//        
+//        Type type = definitionsInModule.size() == 1 ? vpg.getDefinitionFor(definitionsInModule.get(0)).getType() : Type.UNKNOWN;
+//        addDefinition(newName, Definition.Classification.RENAMED_MODULE_ENTITY, type);
+//    }
 }

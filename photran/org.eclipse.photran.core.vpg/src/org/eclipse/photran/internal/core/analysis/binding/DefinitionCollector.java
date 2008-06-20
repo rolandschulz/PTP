@@ -369,7 +369,13 @@ class DefinitionCollector extends BindingCollector
         super.traverseChildren(node);
         
         addDefinition(node.getModuleName().getModuleName(), Definition.Classification.MODULE, Type.VOID);
-        try { markModuleExport(file, node.getModuleName().getModuleName().getText()); }
+        try
+        {
+            Token moduleNameToken = node.getModuleName().getModuleName();
+            markModuleExport(file, moduleNameToken);
+            vpg.setModuleSymbolTable(moduleNameToken,
+                moduleNameToken.getEnclosingScope().getAllPublicDefinitions());
+        }
         catch (Exception e) { throw new Error(e); }
     }
 

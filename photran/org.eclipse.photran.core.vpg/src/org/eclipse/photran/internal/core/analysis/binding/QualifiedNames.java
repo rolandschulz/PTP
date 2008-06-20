@@ -1,17 +1,16 @@
-package org.eclipse.photran.internal.ui.editor_vpg;
+/*******************************************************************************
+ * Copyright (c) 2008 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    UIUC - Initial API and implementation
+ *******************************************************************************/
+package org.eclipse.photran.internal.core.analysis.binding;
 
-import java.util.HashMap;
-
-import org.eclipse.jface.text.TextSelection;
-import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.util.IterableWrapper;
-import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
-import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataNameNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
@@ -24,93 +23,16 @@ import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
-public abstract class DefinitionMap<T>
+/**
+ * 
+ * @author joverbey
+ */
+public class QualifiedNames
 {
-    private HashMap<String, T> definitions = new HashMap<String, T>();
+    private QualifiedNames() {}
     
-    public DefinitionMap(IFortranAST ast)
-    {
-        this(ast.getRoot());
-    }
-
-    public DefinitionMap(ASTExecutableProgramNode ast)
-    {
-        ast.accept(new GenericASTVisitor()
-        {
-            @Override public void visitASTNode(IASTNode node)
-            {
-                if (ScopingNode.isScopingNode(node))
-                    for (Definition def : ((ScopingNode)node).getAllDefinitions())
-                    {
-                        String name = def.getCanonicalizedName();
-                        String qualifiedName = qualify(name, (ScopingNode)node);
-                        definitions.put(qualifiedName, map(qualifiedName, def));
-                    }
-                
-                traverseChildren(node);
-            }
-        });
-        
-//        for (String def : definitions.keySet())
-//            System.out.println(def);
-    }
-
-    public DefinitionMap(DefinitionMap<Definition> other)
-    {
-        for (String key : other.definitions.keySet())
-            definitions.put(key, map(key, other.definitions.get(key)));
-    }
-
-    
-    protected abstract T map(String qualifiedName, Definition def);
-
-    public T lookup(TextSelection selection, TokenList tokenList)
-    {
-        return lookup(findTokenEnclosing(selection, tokenList));
-    }
-
-    public static Token findTokenEnclosing(TextSelection sel, TokenList tokenList)
-    {
-        return findTokenEnclosing(sel.getOffset(), tokenList);
-    }
-
-    public static Token findTokenEnclosing(int offset, TokenList tokenList)
-    {
-        for (int i = 0, size = tokenList.size(); i < size; i++)
-            if (tokenList.get(i).containsFileOffset(offset))
-                return tokenList.get(i);
-        return null;
-    }
-
-    public T lookup(Token token)
-    {
-        if (token == null || token.getTerminal() != Terminal.T_IDENT) return null;
-        
-        String qualifiedName = qualify(PhotranVPG.canonicalizeIdentifier(token.getText()), token.getEnclosingScope());
-        while (true)
-        {
-//            System.out.println("Checking " + qualifiedName);
-            if (definitions.containsKey(qualifiedName))
-                return definitions.get(qualifiedName);
-            
-            int index = qualifiedName.indexOf(':');
-            if (index < 0)
-            {
-                Definition intrinsic = Intrinsics.resolveIntrinsic(token);
-                if (intrinsic != null)
-                    return map(intrinsic.getCanonicalizedName(), intrinsic);
-                else
-                    return null;
-            }
-            else
-                qualifiedName = qualifiedName.substring(index+1);
-        }
-    }
-
-    public static String qualify(String canonicalizedName, ScopingNode initialScope)
+    public static String qualify(Token token, ScopingNode initialScope)
     {
         StringBuilder result = new StringBuilder();
         
@@ -118,7 +40,7 @@ public abstract class DefinitionMap<T>
         getQualifier(initialScope, result);
         
         // Then append the identifier
-        result.append(canonicalizedName);
+        result.append(token.getText().toLowerCase());
         
         return result.toString();
     }

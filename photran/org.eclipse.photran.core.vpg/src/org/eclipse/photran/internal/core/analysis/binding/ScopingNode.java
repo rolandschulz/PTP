@@ -22,6 +22,7 @@ import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.core.vpg.util.Notification;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
@@ -514,7 +515,7 @@ public abstract class ScopingNode extends ASTNode
     	
     	PhotranTokenRef tokenRef = identifier.getTokenRef();
 		Type type = implicitSpec.getType(name.charAt(0));
-		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, type);
+		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, Visibility.PUBLIC, type);
 		
     	vpg.setDefinitionFor(tokenRef, def);
     	vpg.markScope(tokenRef, this);

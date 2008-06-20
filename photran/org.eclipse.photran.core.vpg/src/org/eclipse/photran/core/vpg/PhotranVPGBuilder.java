@@ -12,8 +12,14 @@ package org.eclipse.photran.core.vpg;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
+import java.util.List;
 
+import org.eclipse.cdt.core.CCProjectNature;
+import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.FortranAST;
@@ -29,6 +35,7 @@ import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 import bz.over.vpg.VPGDependency;
 import bz.over.vpg.VPGEdge;
@@ -83,12 +90,78 @@ public class PhotranVPGBuilder extends PhotranVPG
 		else
 		    db.deleteAnnotation(scope.getRepresentativeToken(), SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
 	}
-	
-	public void setDefaultScopeVisibilityToPrivate(ScopingNode scope)
-	{
-	    db.setAnnotation(scope.getRepresentativeToken(), SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE, Boolean.TRUE);
-	}
     
+    public void setDefaultScopeVisibilityToPrivate(ScopingNode scope)
+    {
+        db.setAnnotation(scope.getRepresentativeToken(), SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE, Boolean.TRUE);
+    }
+    
+    public void setModuleSymbolTable(Token moduleNameToken, List<Definition> symbolTable)
+    {
+        String filename = "module:" + canonicalizeIdentifier(moduleNameToken.getText());
+        PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+        
+        db.setAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE, moduleNameToken.getTokenRef());
+        db.setAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE, (Serializable)symbolTable);
+    }
+
+    @Override
+    protected boolean shouldListFileInIndexerProgressMessages(String filename)
+    {
+        return !filename.startsWith("module:");
+    }
+
+    @Override
+    protected boolean shouldProcessFile(IFile file)
+    {
+        String filename = file.getName();
+        return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
+    }
+    
+    private static boolean hasFixedFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".f");
+        else
+            return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
+    }
+    
+    private static boolean hasFreeFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".f90");
+        else
+            return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
+    }
+    
+    private static final String getContentType(String filename)
+    {
+        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
+        return contentType == null ? null : contentType.getId();
+        
+        // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
+    }
+
+    @Override
+    protected boolean shouldProcessProject(IProject project)
+    {
+        try
+        {
+            if (!project.isAccessible()) return false;
+            if (!project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) return false;
+            return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
+        }
+        catch (CoreException e)
+        {
+            throw new Error(e);
+        }
+    }
+    
+    @Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)
+    {
+        return new PhotranTokenRef(filename, offset, length);
+    }
+
     @Override
     protected void calculateDependencies(final String filename)
     {
