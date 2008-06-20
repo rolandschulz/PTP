@@ -44,8 +44,12 @@ public abstract class DefinitionMap<T>
                 if (ScopingNode.isScopingNode(node))
                     for (Definition def : ((ScopingNode)node).getAllDefinitions())
                     {
-                        String qualifiedName = qualify(def.getTokenRef().findToken(), (ScopingNode)node);
-                        definitions.put(qualifiedName, map(qualifiedName, def));
+                        Token token = def.getTokenRef().findToken();
+                        if (token != null)
+                        {
+                            String qualifiedName = qualify(token, (ScopingNode)node);
+                            definitions.put(qualifiedName, map(qualifiedName, def));
+                        }
                     }
                 
                 traverseChildren(node);
