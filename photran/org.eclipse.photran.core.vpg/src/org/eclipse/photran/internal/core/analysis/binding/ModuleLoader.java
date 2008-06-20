@@ -40,6 +40,21 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
  */
 public class ModuleLoader extends BindingCollector
 {
+    // Visit USE statements first to make sure all definitions are imported;
+    // the annotate the "module:whatever" virtual file in the VPG with
+    // the full module symbol table
+    @Override
+    public void visitASTModuleNode(ASTModuleNode node)
+    {
+        traverseChildren(node);
+        
+        // TODO: Apply module paths
+        Token moduleName = node.getModuleStmt().getModuleName().getModuleName();
+        List<Definition> moduleSymtab = node.getAllPublicDefinitions();
+        //System.out.println(moduleName.getText() + ": " + moduleSymtab);
+        vpg.setModuleSymbolTable(moduleName, moduleSymtab);
+    }
+
     // # R1107
     // <UseStmt> ::=
     // | <LblDef> T_USE <Name>                                        T_EOS

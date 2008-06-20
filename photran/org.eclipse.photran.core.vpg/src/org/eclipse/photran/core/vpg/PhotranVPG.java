@@ -250,6 +250,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         String filename = "module:" + canonicalizeIdentifier(moduleName);
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+        //System.err.println("getModuleTokenRef(" + moduleName + ") returning " + db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE));
         return (PhotranTokenRef)db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE);
     }
     
@@ -258,6 +259,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         String filename = "module:" + canonicalizeIdentifier(moduleName);
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+        //System.err.println("getModuleSymbolTable(" + moduleName + ") returning " + db.getAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE));
         return (List<Definition>)db.getAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE);
     }
 }

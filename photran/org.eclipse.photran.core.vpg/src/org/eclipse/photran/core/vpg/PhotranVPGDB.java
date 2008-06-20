@@ -95,4 +95,16 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
     {
         super.db.clearDatabase();
     }
+
+    @Override
+    public void deleteAllEdgesAndAnnotationsFor(String filename)
+    {
+        // module:whatever entries do not have edges, but they have
+        // annotations.  However, these are populated when the
+        // corresponding "real" file (whatever.f90) is parsed.
+        // We should not delete them here, because populateVPG()
+        // will not reconstruct them.
+        if (!filename.startsWith("module:"))
+            super.deleteAllEdgesAndAnnotationsFor(filename);
+    }
 }

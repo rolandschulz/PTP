@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.binding;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
@@ -35,6 +37,7 @@ import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistGroupsNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
@@ -373,12 +376,11 @@ class DefinitionCollector extends BindingCollector
         {
             Token moduleNameToken = node.getModuleName().getModuleName();
             markModuleExport(file, moduleNameToken);
-            vpg.setModuleSymbolTable(moduleNameToken,
-                moduleNameToken.getEnclosingScope().getAllPublicDefinitions());
         }
         catch (Exception e) { throw new Error(e); }
     }
-
+    
+    
     // # R1113
     // <BlockDataStmt> ::=
     // <LblDef> T_BLOCKDATA <BlockDataName> T_EOS

@@ -103,6 +103,10 @@ public class PhotranVPGBuilder extends PhotranVPG
         
         db.setAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE, moduleNameToken.getTokenRef());
         db.setAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE, (Serializable)symbolTable);
+        
+        //System.err.println("Setting module symbol table for " + moduleNameToken.getText() + ":");
+        //System.err.println(" - TokenRef: " + getModuleTokenRef(moduleNameToken.getText()));
+        //System.err.println(" - Symtab:   " + getModuleSymbolTable(moduleNameToken.getText()));
     }
 
     @Override
