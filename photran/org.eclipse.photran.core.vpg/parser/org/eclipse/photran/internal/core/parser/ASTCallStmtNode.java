@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTCallStmtNode extends ASTNode implements IActionStmt
+public class ASTCallStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTCallStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTCall; // in ASTCallStmtNode

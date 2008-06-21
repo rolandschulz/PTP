@@ -1513,45 +1513,45 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R801 see the note on R818
 
-## R802
-#<IfConstruct> ::=
-#  <IfThenStmt> (inline):<ThenPart>
-#
-#<ThenPart> ::=
-#  |                     <EndIfStmt>
-#  | <ConditionalBody> <EndIfStmt>
-#  |                     <ElseIfConstruct>
-#  | <ConditionalBody> <ElseIfConstruct>
-#  |                     <ElseConstruct>
-#  | <ConditionalBody> <ElseConstruct>
-#
-#<ElseIfConstruct> ::=
-#  <ElseIfStmt> (inline):<ThenPart>
-#
-#<ElseConstruct> ::=
-#  <ElseStmt> (inline):<ElsePart>
-#
-#<ElsePart> ::=
-#  |                     <EndIfStmt>
-#  | <ConditionalBody> <EndIfStmt>
-#
-#(list):<ConditionalBody> ::=
-#  |                     <ExecutionPartConstruct>
-#  | <ConditionalBody> <ExecutionPartConstruct>
-#JO--X
+# R802
 <IfConstruct> ::=
-  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts> <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>
-  | <IfThenStmt> thenBody:<ConditionalBody>                 <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>
-  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts>                                          <EndIfStmt>
-  | <IfThenStmt> thenBody:<ConditionalBody>                                                          <EndIfStmt>
-(list):<ElseIfParts> ::=
-  |               <ElseIfConstruct>
-  | <ElseIfParts> <ElseIfConstruct>
+  <IfThenStmt> (inline):<ThenPart>
+
+<ThenPart> ::=
+  |                     <EndIfStmt>
+  | <ConditionalBody> <EndIfStmt>
+  |                     <ElseIfConstruct>
+  | <ConditionalBody> <ElseIfConstruct>
+  |                     <ElseConstruct>
+  | <ConditionalBody> <ElseConstruct>
+
 <ElseIfConstruct> ::=
-  | <ElseIfStmt> elseIfBody:<ConditionalBody>
+  <ElseIfStmt> (inline):<ThenPart>
+
+<ElseConstruct> ::=
+  <ElseStmt> (inline):<ElsePart>
+
+<ElsePart> ::=
+  |                     <EndIfStmt>
+  | <ConditionalBody> <EndIfStmt>
+
 (list):<ConditionalBody> ::=
-  | (empty)
+  |                     <ExecutionPartConstruct>
   | <ConditionalBody> <ExecutionPartConstruct>
+##JO--X
+#<IfConstruct> ::=
+#  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts> <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>
+#  | <IfThenStmt> thenBody:<ConditionalBody>                 <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>
+#  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts>                                          <EndIfStmt>
+#  | <IfThenStmt> thenBody:<ConditionalBody>                                                          <EndIfStmt>
+#(list):<ElseIfParts> ::=
+#  |               <ElseIfConstruct>
+#  | <ElseIfParts> <ElseIfConstruct>
+#<ElseIfConstruct> ::=
+#  | <ElseIfStmt> elseIfBody:<ConditionalBody>
+#(list):<ConditionalBody> ::=
+#  | (empty)
+#  | <ConditionalBody> <ExecutionPartConstruct>
 
 # R803
 # JO -- Added error production
@@ -2203,6 +2203,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse>                                             -:T_EOS
   | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse> -:T_LPAREN                       -:T_RPAREN -:T_EOS
   | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse> -:T_LPAREN <SubroutineArgList> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_CALL (error) -:T_EOS
 
 (list):<SubroutineArgList> ::=
   | <SubroutineArg>

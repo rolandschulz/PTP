@@ -24,24 +24,10 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTElseIfConstructNode extends ASTNode
+public class ASTElsePartNode extends ASTNode
 {
-    ASTElseIfStmtNode elseIfStmt; // in ASTElseIfConstructNode
-    IASTListNode<IExecutionPartConstruct> conditionalBody; // in ASTElseIfConstructNode
-    ASTElseIfConstructNode elseIfConstruct; // in ASTElseIfConstructNode
-    ASTElseConstructNode elseConstruct; // in ASTElseIfConstructNode
-    ASTEndIfStmtNode endIfStmt; // in ASTElseIfConstructNode
-
-    public ASTElseIfStmtNode getElseIfStmt()
-    {
-        return this.elseIfStmt;
-    }
-
-    public void setElseIfStmt(ASTElseIfStmtNode newValue)
-    {
-        this.elseIfStmt = newValue;
-    }
-
+    IASTListNode<IExecutionPartConstruct> conditionalBody; // in ASTElsePartNode
+    ASTEndIfStmtNode endIfStmt; // in ASTElsePartNode
 
     public IASTListNode<IExecutionPartConstruct> getConditionalBody()
     {
@@ -51,28 +37,6 @@ public class ASTElseIfConstructNode extends ASTNode
     public void setConditionalBody(IASTListNode<IExecutionPartConstruct> newValue)
     {
         this.conditionalBody = newValue;
-    }
-
-
-    public ASTElseIfConstructNode getElseIfConstruct()
-    {
-        return this.elseIfConstruct;
-    }
-
-    public void setElseIfConstruct(ASTElseIfConstructNode newValue)
-    {
-        this.elseIfConstruct = newValue;
-    }
-
-
-    public ASTElseConstructNode getElseConstruct()
-    {
-        return this.elseConstruct;
-    }
-
-    public void setElseConstruct(ASTElseConstructNode newValue)
-    {
-        this.elseConstruct = newValue;
     }
 
 
@@ -89,24 +53,21 @@ public class ASTElseIfConstructNode extends ASTNode
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTElseIfConstructNode(this);
+        visitor.visitASTElsePartNode(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 5;
+        return 2;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.elseIfStmt;
-        case 1:  return this.conditionalBody;
-        case 2:  return this.elseIfConstruct;
-        case 3:  return this.elseConstruct;
-        case 4:  return this.endIfStmt;
+        case 0:  return this.conditionalBody;
+        case 1:  return this.endIfStmt;
         default: return null;
         }
     }
@@ -115,11 +76,8 @@ public class ASTElseIfConstructNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.elseIfStmt = (ASTElseIfStmtNode)value;
-        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value;
-        case 2:  this.elseIfConstruct = (ASTElseIfConstructNode)value;
-        case 3:  this.elseConstruct = (ASTElseConstructNode)value;
-        case 4:  this.endIfStmt = (ASTEndIfStmtNode)value;
+        case 0:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value;
+        case 1:  this.endIfStmt = (ASTEndIfStmtNode)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

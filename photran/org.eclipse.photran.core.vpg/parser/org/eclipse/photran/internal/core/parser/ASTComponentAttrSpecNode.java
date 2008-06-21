@@ -26,24 +26,13 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTComponentAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token pointer; // in ASTComponentAttrSpecNode
     ASTAccessSpecNode accessSpec; // in ASTComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token pointer; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token dimension; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTComponentAttrSpecNode
     ASTComponentArraySpecNode componentArraySpec; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token allocatable; // in ASTComponentAttrSpecNode
-
-    public boolean pointer()
-    {
-        return this.pointer != null;
-    }
-
-    public void setPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.pointer = newValue;
-    }
-
 
     public ASTAccessSpecNode getAccessSpec()
     {
@@ -53,6 +42,17 @@ public class ASTComponentAttrSpecNode extends ASTNode
     public void setAccessSpec(ASTAccessSpecNode newValue)
     {
         this.accessSpec = newValue;
+    }
+
+
+    public boolean pointer()
+    {
+        return this.pointer != null;
+    }
+
+    public void setPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.pointer = newValue;
     }
 
 
@@ -104,8 +104,8 @@ public class ASTComponentAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.pointer;
-        case 1:  return this.accessSpec;
+        case 0:  return this.accessSpec;
+        case 1:  return this.pointer;
         case 2:  return this.dimension;
         case 3:  return this.hiddenTLparen;
         case 4:  return this.componentArraySpec;
@@ -119,8 +119,8 @@ public class ASTComponentAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.pointer = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.accessSpec = (ASTAccessSpecNode)value;
+        case 0:  this.accessSpec = (ASTAccessSpecNode)value;
+        case 1:  this.pointer = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 2:  this.dimension = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 4:  this.componentArraySpec = (ASTComponentArraySpecNode)value;
