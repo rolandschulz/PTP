@@ -33,7 +33,7 @@ public final class FortranPreprocessor extends InputStream
      * but a profile revealed that Stack#peek was consuming a large amount of time
      * due to repeated invocations.  Now, the #topStream field in this class is
      * accessed instead, resulting in a significant performance improvement
-     * (3700 ms down to 2500 ms on LexHugeFile).
+     * (3700 ms down to 2500 ms on HugeFile#testLexHugeFile unit test).
      */
     private static final class StreamStack
     {
