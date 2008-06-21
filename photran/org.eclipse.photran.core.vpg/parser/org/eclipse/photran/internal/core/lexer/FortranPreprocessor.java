@@ -28,53 +28,78 @@ import org.eclipse.photran.core.vpg.PhotranVPG;
  */
 public final class FortranPreprocessor extends InputStream
 {
+    /**
+     * Utility class.  Originally, we simply used a <pre>Stack<LineInputStream></pre>,
+     * but a profile revealed that Stack#peek was consuming a large amount of time
+     * due to repeated invocations.  Now, the #topStream field in this class is
+     * accessed instead, resulting in a significant performance improvement
+     * (3700 ms down to 2500 ms on LexHugeFile).
+     */
+    private static final class StreamStack
+    {
+        private Stack<LineInputStream> streamStack = new Stack<LineInputStream>();
+        private LineInputStream topStream = null;
+        
+        public void push(LineInputStream lineInputStream)
+        {
+            streamStack.push(lineInputStream);
+            topStream = lineInputStream;
+        }
+
+        public int size()
+        {
+            return streamStack.size();
+        }
+
+        public void pop()
+        {
+            streamStack.pop();
+            topStream = streamStack.isEmpty() ? null : streamStack.peek();
+        }
+    }
+    
 	private static final Pattern INCLUDE_LINE = Pattern.compile("[ \t]*[Ii][Nn][Cc][Ll][Uu][Dd][Ee][ \t]+[\"']([^\r\n\"]*)[\"'][ \t]*(![^\r\n]*)?[\r\n]*");
     private static final int INCLUDE_LINE_CAPTURING_GROUP_OF_FILENAME = 1;
     
     private IncludeLoaderCallback callback;
     
-    private Stack/*<LineInputStream>*/ streamStack;
+    private StreamStack streamStack;
     
     private int offset = 0, line = 1;
     
-    private LinkedList/*<String>*/ directivesInTopLevelFile;
-    private ArrayList/*<Integer>*/ directiveStartOffsets;
+    private LinkedList<String> directivesInTopLevelFile;
+    private ArrayList<Integer> directiveStartOffsets;
     
-    private LinkedList/*<String>*/ fileNames;
-    private ArrayList/*<Integer>*/ fileStartOffsets;
-    private ArrayList/*<Integer>*/ fileStartOffsetAdjustments;
-    private ArrayList/*<Integer>*/ fileStartLines;
-    private ArrayList/*<Integer>*/ fileStartLineAdjustments;
+    private LinkedList<String> fileNames;
+    private ArrayList<Integer> fileStartOffsets;
+    private ArrayList<Integer> fileStartOffsetAdjustments;
+    private ArrayList<Integer> fileStartLines;
+    private ArrayList<Integer> fileStartLineAdjustments;
     
     public FortranPreprocessor(InputStream readFrom, String filename, IncludeLoaderCallback callback) throws IOException
     {
         this.callback = callback;
         
-        streamStack = new Stack/*<LineInputStream>*/();
+        streamStack = new StreamStack();
         streamStack.push(new LineInputStream(readFrom, filename));
         
-        directivesInTopLevelFile = new LinkedList/*<String>*/();
+        directivesInTopLevelFile = new LinkedList<String>();
         directivesInTopLevelFile.add(null);
-        directiveStartOffsets = new ArrayList/*<Integer>*/();
+        directiveStartOffsets = new ArrayList<Integer>();
         directiveStartOffsets.add(new Integer(0));
         
-        fileNames = new LinkedList/*<String>*/();
+        fileNames = new LinkedList<String>();
         fileNames.add(filename);
-        fileStartOffsets = new ArrayList/*<Integer>*/();
+        fileStartOffsets = new ArrayList<Integer>();
         fileStartOffsets.add(new Integer(0));
-        fileStartOffsetAdjustments = new ArrayList/*<Integer>*/();
+        fileStartOffsetAdjustments = new ArrayList<Integer>();
         fileStartOffsetAdjustments.add(new Integer(0));
-        fileStartLines = new ArrayList/*<Integer>*/();
+        fileStartLines = new ArrayList<Integer>();
         fileStartLines.add(new Integer(1));
-        fileStartLineAdjustments = new ArrayList/*<Integer>*/();
+        fileStartLineAdjustments = new ArrayList<Integer>();
         fileStartLineAdjustments.add(new Integer(0));
     }
     
-    private LineInputStream currentStream()
-    {
-        return (LineInputStream)streamStack.peek();
-    }
-
     public String getFilenameAtOffset(int offset)
     {
         for (int i = fileStartOffsets.size()-1; i >= 0; i--)
@@ -126,9 +151,10 @@ public final class FortranPreprocessor extends InputStream
     
     public int read() throws IOException
     {
-        if (currentStream().atBOL()) checkForInclude();
-        if (currentStream().atEOF()) finishInclude();
-        int result = currentStream().read();
+        LineInputStream currentStream = streamStack.topStream;
+        if (currentStream.atBOL()) checkForInclude();
+        if (currentStream.atEOF()) finishInclude();
+        int result = currentStream.read();
         if (result >= 0)
         {
             offset++;
@@ -144,10 +170,10 @@ public final class FortranPreprocessor extends InputStream
 
     private void checkForInclude() throws FileNotFoundException, IOException
     {
-        Matcher m = INCLUDE_LINE.matcher(currentStream());
+        Matcher m = INCLUDE_LINE.matcher(streamStack.topStream);
         if (m.matches())
         {
-            LineInputStream origStream = currentStream();
+            LineInputStream origStream = streamStack.topStream;
             String includeLine = origStream.currentLine();
             String fileToInclude = m.group(INCLUDE_LINE_CAPTURING_GROUP_OF_FILENAME);
             
@@ -201,11 +227,11 @@ public final class FortranPreprocessor extends InputStream
         {
             streamStack.pop();
             
-            fileNames.add(currentStream().getFilename());
+            fileNames.add(streamStack.topStream.getFilename());
             fileStartOffsets.add(new Integer(offset));
-            fileStartOffsetAdjustments.add(new Integer(getOffsetAdjustment(currentStream().getRestartOffset())));
+            fileStartOffsetAdjustments.add(new Integer(getOffsetAdjustment(streamStack.topStream.getRestartOffset())));
             fileStartLines.add(new Integer(line));
-            fileStartLineAdjustments.add(new Integer(getLineAdjustment(currentStream().getRestartLine())));
+            fileStartLineAdjustments.add(new Integer(getLineAdjustment(streamStack.topStream.getRestartLine())));
         }
         
         // The above may have returned us to the top-level file
