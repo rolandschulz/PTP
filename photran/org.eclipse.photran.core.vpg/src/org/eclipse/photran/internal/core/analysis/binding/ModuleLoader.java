@@ -245,12 +245,19 @@ public class ModuleLoader extends BindingCollector
         ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
         
         List<Definition> moduleSymtab = vpg.getModuleSymbolTable(moduleName);
-        for (Definition def : moduleSymtab)
-            if (shouldImportDefinition(def))
-                importDefinition(def, newScope);
+        if (moduleSymtab == null) // Just in case
+        {
+            vpg.logError("Module " + moduleName + " not found in " + file.getFullPath().toOSString());
+        }
+        else
+        {
+            for (Definition def : moduleSymtab)
+                if (shouldImportDefinition(def))
+                    importDefinition(def, newScope);
         
-        bindIdentifiersInRenameList(useStmt.getRenameList(), moduleSymtab);
-        bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleSymtab);
+            bindIdentifiersInRenameList(useStmt.getRenameList(), moduleSymtab);
+            bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleSymtab);
+        }
     }
 
 	private boolean shouldImportDefinition(Definition def)
