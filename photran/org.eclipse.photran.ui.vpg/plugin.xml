@@ -290,6 +290,11 @@
                id="org.eclipse.photran.ui.DisplaySymbolTableAction"
                label="Display Symbol &amp;Table for Current File"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplayVPGErrorLog"
+               id="org.eclipse.photran.ui.DisplayVPGErrorLogAction"
+               label="Display VPG &amp;Error/Warning Log"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
          <!-- -->
          <action
                class="org.eclipse.photran.internal.ui.actions.ResetVPGStatistics"

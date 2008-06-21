@@ -1,6 +1,6 @@
 package org.eclipse.photran.core.vpg;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,14 +43,16 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	public static final int DEFINITION_ANNOTATION_TYPE = 3;
     public static final int TYPE_ANNOTATION_TYPE = 4;
     public static final int MODULE_TOKENREF_ANNOTATION_TYPE = 5;
-    public static final int MODULE_SYMTAB_ANNOTATION_TYPE = 6;
+    public static final int MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE = 6;
+    public static final int MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE = 7;
 	
 	private static final String[] annotationTypeDescriptions = { "Default visibility for scope is private",
 	                                                             "Implicit spec for scope",
 	                                                             "Definition",
 	                                                             "Type",
 	                                                             "Module TokenRef",
-	                                                             "Module symbol table" };
+	                                                             "Module symbol table entry count",
+	                                                             "Module symbol table entry" };
 	
 	private static PhotranVPG instance = null;
 	public PhotranVPGDB db = null;
@@ -254,12 +256,29 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return (PhotranTokenRef)db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE);
     }
     
-    @SuppressWarnings("unchecked")
     public List<Definition> getModuleSymbolTable(String moduleName)
     {
+        int entries = countModuleSymbolTableEntries(moduleName);
+        
+        if (entries == 0) return new LinkedList<Definition>();
+        
         String filename = "module:" + canonicalizeIdentifier(moduleName);
+        ArrayList<Definition> result = new ArrayList<Definition>(entries);
+        for (int i = 0; i < entries; i++)
+        {
+            PhotranTokenRef tokenRef = createTokenRef(filename, i, 0);
+            Object entry = db.getAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE);
+            if (entry != null && entry instanceof Definition)
+                result.add((Definition)entry);
+        }
+        return result;
+   }
+
+    protected int countModuleSymbolTableEntries(String canonicalizedModuleName)
+    {
+        String filename = "module:" + canonicalizedModuleName;
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
-        //System.err.println("getModuleSymbolTable(" + moduleName + ") returning " + db.getAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE));
-        return (List<Definition>)db.getAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE);
+        Object result = db.getAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE);
+        return result == null || !(result instanceof Integer) ? 0 : ((Integer)result).intValue();
     }
 }

@@ -33,37 +33,39 @@ public class HugeFile extends TestCase
 {
     private String hugeFile = null;
     
-    public void setUp()
-    {
-        long start = System.currentTimeMillis();
-        StringBuilder sb = new StringBuilder();
-        sb.append("program p\n");
-        for (int i = 0; i < 30000; i++)
-            sb.append("    print *, 3+4*5\n");
-            //sb.append("    print *, \"----+----|----+----|----+----|----+----|----+----|----+----|----+----|----+----|\"\n");
-        sb.append("end");
-        hugeFile = sb.toString();
-        System.out.println("String building: " + (System.currentTimeMillis() - start));
-    }
-
-    public void testLexHugeFile() throws Exception
-    {
-        ByteArrayInputStream in = new ByteArrayInputStream(hugeFile.getBytes());
-
-        long start = System.currentTimeMillis();
-        IAccumulatingLexer lexer = LexerFactory.createLexer(in, "<stdin>", SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)), true);
-        while (lexer.yylex().getTerminal() != Terminal.END_OF_INPUT)
-            ;
-        System.out.println("Lexing: " + (System.currentTimeMillis() - start));
-    }
-
-    public void testParseHugeFile() throws Exception
-    {
-        ByteArrayInputStream in = new ByteArrayInputStream(hugeFile.getBytes());
-
-        long start = System.currentTimeMillis();
-        IAccumulatingLexer lexer = LexerFactory.createLexer(in, "<stdin>", SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)), true);
-        new Parser().parse(lexer);
-        System.out.println("Parsing: " + (System.currentTimeMillis() - start));
-    }
+    public void test() { /* Uncomment below */ }
+    
+//    public void setUp()
+//    {
+//        long start = System.currentTimeMillis();
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("program p\n");
+//        for (int i = 0; i < 30000; i++)
+//            sb.append("    print *, 3+4*5\n");
+//            //sb.append("    print *, \"----+----|----+----|----+----|----+----|----+----|----+----|----+----|----+----|\"\n");
+//        sb.append("end");
+//        hugeFile = sb.toString();
+//        System.out.println("String building: " + (System.currentTimeMillis() - start));
+//    }
+//
+//    public void testLexHugeFile() throws Exception
+//    {
+//        ByteArrayInputStream in = new ByteArrayInputStream(hugeFile.getBytes());
+//
+//        long start = System.currentTimeMillis();
+//        IAccumulatingLexer lexer = LexerFactory.createLexer(in, "<stdin>", SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)), true);
+//        while (lexer.yylex().getTerminal() != Terminal.END_OF_INPUT)
+//            ;
+//        System.out.println("Lexing: " + (System.currentTimeMillis() - start));
+//    }
+//
+//    public void testParseHugeFile() throws Exception
+//    {
+//        ByteArrayInputStream in = new ByteArrayInputStream(hugeFile.getBytes());
+//
+//        long start = System.currentTimeMillis();
+//        IAccumulatingLexer lexer = LexerFactory.createLexer(in, "<stdin>", SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)), true);
+//        new Parser().parse(lexer);
+//        System.out.println("Parsing: " + (System.currentTimeMillis() - start));
+//    }
 }

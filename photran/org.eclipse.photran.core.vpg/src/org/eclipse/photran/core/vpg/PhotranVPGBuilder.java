@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.core.vpg;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.Serializable;
+import java.io.PrintStream;
 import java.util.List;
 
 import org.eclipse.cdt.core.CCProjectNature;
@@ -98,15 +99,40 @@ public class PhotranVPGBuilder extends PhotranVPG
     
     public void setModuleSymbolTable(Token moduleNameToken, List<Definition> symbolTable)
     {
+        clearModuleSymbolTableEntries(moduleNameToken);
+        
         String filename = "module:" + canonicalizeIdentifier(moduleNameToken.getText());
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
-        
         db.setAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE, moduleNameToken.getTokenRef());
-        db.setAnnotation(tokenRef, MODULE_SYMTAB_ANNOTATION_TYPE, (Serializable)symbolTable);
         
-        //System.err.println("Setting module symbol table for " + moduleNameToken.getText() + ":");
-        //System.err.println(" - TokenRef: " + getModuleTokenRef(moduleNameToken.getText()));
-        //System.err.println(" - Symtab:   " + getModuleSymbolTable(moduleNameToken.getText()));
+        int entries = 0;
+        for (Definition def : symbolTable)
+        {
+            tokenRef = createTokenRef(filename, entries++, 0);
+            db.setAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE, def);
+        }
+        
+        tokenRef = createTokenRef(filename, 0, 0);
+        db.setAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE, Integer.valueOf(entries));
+    }
+
+    private void clearModuleSymbolTableEntries(Token moduleNameToken)
+    {
+        String canonicalizedModuleName = canonicalizeIdentifier(moduleNameToken.getText());
+        int entries = countModuleSymbolTableEntries(canonicalizedModuleName);
+        if (entries > 0)
+        {
+            String filename = "module:" + canonicalizedModuleName;
+            
+            for (int i = 0; i < entries; i++)
+            {
+                PhotranTokenRef tokenRef = createTokenRef(filename, i, 0);
+                db.deleteAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE);
+            }
+            
+            PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+            db.setAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE, Integer.valueOf(0));
+        }
     }
 
     @Override
@@ -278,9 +304,24 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (Exception e)
         {
-            logError(e);
+            logError("Error parsing " + filename, e);
             return null;
         }
+    }
+
+    private void logError(String message, Exception e)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(message);
+        sb.append(": ");
+        sb.append(e.getMessage());
+        sb.append('\n');
+        sb.append(e.getClass().getName());
+        sb.append(":\n");
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        e.printStackTrace(new PrintStream(bs));
+        sb.append(bs);
+        super.logError(sb.toString());
     }
 
     @Override
