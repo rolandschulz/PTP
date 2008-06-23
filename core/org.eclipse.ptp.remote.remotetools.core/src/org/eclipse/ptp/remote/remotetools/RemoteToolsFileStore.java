@@ -250,13 +250,21 @@ public class RemoteToolsFileStore extends FileStore {
 			IProgressMonitor monitor) throws CoreException {
 		try {
 			boolean modified = false;
+			remoteItem.refreshAttributes();
 			if ((options & EFS.SET_ATTRIBUTES) != 0) {
 				//We cannot currently write isExecutable(), isHidden()
-				remoteItem.setWriteable(!info.getAttribute(EFS.ATTRIBUTE_READ_ONLY));
+				boolean writeable = !info.getAttribute(EFS.ATTRIBUTE_READ_ONLY);
+				remoteItem.setWriteable(writeable);
+				if(!this.isDirectory) {
+					boolean executable = info.getAttribute(EFS.ATTRIBUTE_EXECUTABLE);
+					IRemoteFile file = (IRemoteFile)remoteItem;
+					file.setExecutable(executable);
+				}
 				modified = true;
 			} 
 			if ((options & EFS.SET_LAST_MODIFIED) != 0) {
-				remoteItem.setModificationTime(info.getLastModified());
+				long modtime = info.getLastModified();
+				remoteItem.setModificationTime(modtime);
 				modified = true;
 			}
 			if (modified) {
