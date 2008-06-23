@@ -295,6 +295,23 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 								jobSub.setStatus(JobStatus.COMPLETED);
 								doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
 							}
+						} else if(state == JobAttributes.State.TERMINATED) {
+							synchronized (jobSubmissions) {
+								JobSubmission jobSub = jobSubmissions.get(job);
+								if(jobSub != null) {
+									ILaunchConfiguration lconf = jobSub.getConfiguration();
+
+									// If needed, copy data back.
+									try {
+										// Get the list of paths to be copied back.
+										doPosLaunchSynchronization(lconf);
+
+									} catch (CoreException e1) {
+										//FIXME Notifies error?
+									}
+								}
+							}
+
 						}
 					}
 				}
