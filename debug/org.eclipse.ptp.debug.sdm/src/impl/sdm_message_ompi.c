@@ -24,39 +24,18 @@
 #include "sdm.h"
 
 struct sdm_message {
-	sdm_idset	dest; /* All destinations */
-	sdm_idset	src; /* Source of the message */
-	char *		buf;
-	int			len;
-	int			tag;
-	void 		(*send_complete)(sdm_message msg);
+	sdm_idset		dest; 			/* Destinations of the message */
+	sdm_idset		src; 			/* Source of the message */
+	sdm_aggregate	aggregate;		/* Message aggregation */
+	char *			payload;		/* Payload */
+	int				payload_len;	/* Payload length */
+	char *			buf;			/* Receive buffer */
+	int				buf_len;		/* Receive buffer length */
+	void 			(*send_complete)(sdm_message msg);
 };
 
-static List *	send_list = NULL;
-
-static void (*sdm_recv_callback)(sdm_message msg);
-
-static void
-setenviron(char *str, int val)
-{
-	char *	buf;
-
-	asprintf(&buf, "%d", val);
-	setenv(str, buf, 1);
-	free(buf);
-}
-
-void
-sdm_message_set_send_callback(sdm_message msg, void (*callback)(sdm_message msg))
-{
-	msg->send_complete = callback;
-}
-
-void
-sdm_message_set_recv_callback(void (*callback)(sdm_message msg))
-{
-	sdm_recv_callback = callback;
-}
+static void 	(*sdm_recv_callback)(sdm_message msg);
+static void		setenviron(char *str, int val);
 
 /**
  * Initialize the runtime abstraction.
@@ -81,8 +60,6 @@ sdm_message_init(int argc, char *argv[])
 	MPI_Init(&argc, (char ***)&argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-	send_list = NewList();
 
 	sdm_route_set_size(size);
 	sdm_route_set_id(rank);
@@ -120,11 +97,10 @@ int
 sdm_message_send(const sdm_message msg)
 {
 	int			len;
+	int			agg_len;
 	int			src_len;
 	int			dest_len;
 	char *		p;
-	char *		src;
-	char *		dest;
 	char *		buf;
 	sdm_id		dest_id;
 	sdm_idset	route;
@@ -137,34 +113,33 @@ sdm_message_send(const sdm_message msg)
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send removing me from dest\n", sdm_route_get_id());
 	}
 
-	src = sdm_set_serialize(msg->src);
-	dest = sdm_set_serialize(msg->dest);
+	agg_len = sdm_aggregate_serialized_length(msg->aggregate);
+	src_len = sdm_set_serialized_length(msg->src);
+	dest_len = sdm_set_serialized_length(msg->dest);
+	len = agg_len + src_len + dest_len + msg->payload_len + 2;
+	p = buf = (char *)malloc(len);
 
-	src_len = strlen(src);
-	dest_len = strlen(dest);
-	len = src_len + dest_len + msg->len + 2;
-	p = buf = (char *)malloc(len * sizeof(char));
-	memcpy(p, src, src_len);
-	p += src_len;
-	memcpy(p, dest, dest_len);
-	p += dest_len;
-	memcpy(p, msg->buf, msg->len);
-
-	free(src);
-	free(dest);
+	sdm_aggregate_serialize(msg->aggregate, p, &p);
+	sdm_set_serialize(msg->src, p, &p);
+	sdm_set_serialize(msg->dest, p, &p);
+	memcpy(p, msg->payload, msg->payload_len);
 
 	route = sdm_route_get_route(msg->dest);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send dest %s route %s\n", sdm_route_get_id(),
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send src %s dest %s route %s\n", sdm_route_get_id(),
+		_set_to_str(msg->src),
 		_set_to_str(msg->dest),
 		_set_to_str(route));
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send {%s}\n", sdm_route_get_id(), buf);
+
 
 	for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
 		int err;
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending (tag %d, len %d) to %d\n", sdm_route_get_id(), msg->tag, len, dest_id);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
 
-		err = MPI_Send(buf, len, MPI_CHAR, dest_id, msg->tag, MPI_COMM_WORLD);
+		err = MPI_Send(buf, len, MPI_CHAR, dest_id, 0, MPI_COMM_WORLD);
 		if (err != MPI_SUCCESS) {
 			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Send failed!\n");
 			return -1;
@@ -190,12 +165,11 @@ sdm_message_progress(void)
 	int				avail;
 	int				len;
 	char *			p;
-	char *			src;
-	char *			dest;
+	char *			hdr;
 	char *			buf;
 	MPI_Status		stat;
 
-	err = MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &avail, &stat);
+	err = MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &avail, &stat);
 
 	if (err != MPI_SUCCESS) {
 		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Iprobe failed!\n");
@@ -203,65 +177,74 @@ sdm_message_progress(void)
 	}
 
 	if (avail) {
-		sdm_message msg = sdm_message_new();
-
 		MPI_Get_count(&stat, MPI_CHAR, &len);
 
 		buf = (char *)malloc(len * sizeof(char));
 
-		err = MPI_Recv(buf, len, MPI_CHAR, stat.MPI_SOURCE, stat.MPI_TAG, MPI_COMM_WORLD, &stat);
+		sdm_message msg = sdm_message_new(buf, len);
+
+		err = MPI_Recv(buf, len, MPI_CHAR, stat.MPI_SOURCE, 0, MPI_COMM_WORLD, &stat);
 
 		if (err != MPI_SUCCESS) {
 			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv failed!\n");
 			return -1;
 		}
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Received (tag %d, len %d) from %d\n", sdm_route_get_id(), stat.MPI_TAG, len, stat.MPI_SOURCE);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n", sdm_route_get_id(), len, stat.MPI_SOURCE);
 
-		src = buf;
-		sdm_set_deserialize(msg->src, src, &p);
-		len -= (p - src);
+		hdr = buf;
+		sdm_aggregate_deserialize(msg->aggregate, hdr, &p);
+		len -= (p - hdr);
 
-		dest = p;
-		sdm_set_deserialize(msg->dest, dest, &p);
-		len -= (p - dest);
+		hdr = p;
+		sdm_set_deserialize(msg->src, hdr, &p);
+		len -= (p - hdr);
 
-		msg->buf = p;
-		msg->len = len;
+		hdr = p;
+		sdm_set_deserialize(msg->dest, hdr, &p);
+		len -= (p - hdr);
 
-		sdm_message_set_type(msg, stat.MPI_TAG);
+		msg->payload = p;
+		msg->payload_len = len;
 
-		sdm_recv_callback(msg);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress <%s>@(%s,%s)\n", sdm_route_get_id(),
+				_aggregate_to_str(msg->aggregate),
+				_set_to_str(msg->src),
+				_set_to_str(msg->dest));
 
-		sdm_message_free(msg);
-		free(buf);
+		if (sdm_recv_callback  != NULL) {
+			sdm_recv_callback(msg);
+		}
 	}
 
 	return 0;
 }
 
-int
-sdm_message_get_type(const sdm_message msg)
+void
+sdm_message_set_send_callback(sdm_message msg, void (*callback)(sdm_message msg))
 {
-	return msg->tag;
+	msg->send_complete = callback;
 }
 
 void
-sdm_message_set_type(const sdm_message msg, int type)
+sdm_message_set_recv_callback(void (*callback)(sdm_message msg))
 {
-	msg->tag = type;
+	sdm_recv_callback = callback;
 }
 
 sdm_message
-sdm_message_new(void)
+sdm_message_new(char *buf, int len)
 {
 	sdm_message	msg = (sdm_message)malloc(sizeof(struct sdm_message));
 
 	msg->dest = sdm_set_new();
 	msg->src = sdm_set_new();
-	msg->buf = NULL;
-	msg->len = 0;
-	msg->tag = SDM_MESSAGE_TYPE_NORMAL;
+	sdm_set_add_element(msg->src, sdm_route_get_id());
+	msg->buf = buf;
+	msg->buf_len = len;
+	msg->payload = msg->buf;
+	msg->payload_len = msg->buf_len;
+	msg->aggregate = sdm_aggregate_new();
 	msg->send_complete = NULL;
 
 	return msg;
@@ -270,15 +253,17 @@ sdm_message_new(void)
 void
 sdm_message_free(sdm_message msg)
 {
-	sdm_set_free(msg->dest);
+	free(msg->buf);
 	sdm_set_free(msg->src);
+	sdm_set_free(msg->dest);
+	sdm_aggregate_free(msg->aggregate);
+	free(msg);
 }
 
-int
+void
 sdm_message_set_destination(const sdm_message msg, const sdm_idset dest_ids)
 {
 	sdm_set_union(msg->dest, dest_ids);
-	return 0;
 }
 
 sdm_idset
@@ -287,11 +272,10 @@ sdm_message_get_destination(const sdm_message msg)
 	return msg->dest;
 }
 
-int
-sdm_message_set_source(const sdm_message msg, const sdm_id source_id)
+void
+sdm_message_set_source(const sdm_message msg, const sdm_idset source)
 {
-	sdm_set_add_element(msg->src, source_id);
-	return 0;
+	sdm_set_union(msg->src, source);
 }
 
 sdm_idset
@@ -300,18 +284,25 @@ sdm_message_get_source(const sdm_message msg)
 	return msg->src;
 }
 
-int
-sdm_message_set_data(const sdm_message msg, char *buf, int len)
+void
+sdm_message_get_payload(const sdm_message msg, char **buf, int *len)
 {
-	msg->buf = buf;
-	msg->len = len;
-	return 0;
+	*buf = msg->payload;
+	*len = msg->payload_len;
 }
 
-int
-sdm_message_get_data(const sdm_message msg, char **buf, int *len)
+sdm_aggregate
+sdm_message_get_aggregate(const sdm_message msg)
 {
-	*buf = msg->buf;
-	*len = msg->len;
-	return 0;
+	return msg->aggregate;
+}
+
+static void
+setenviron(char *str, int val)
+{
+	char *	buf;
+
+	asprintf(&buf, "%d", val);
+	setenv(str, buf, 1);
+	free(buf);
 }

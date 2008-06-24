@@ -105,7 +105,14 @@ sdm_route_get_route(const sdm_idset dest)
 
 	sdm_set_clear(route);
 
-	if (my_id != SDM_MASTER && sdm_set_contains(dest, parent)) {
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_route_get_route dest %s, parent %d\n",
+			sdm_route_get_id(),
+			_set_to_str(dest),
+			parent);
+
+	if (my_id != SDM_MASTER &&
+			(sdm_set_contains(dest, parent) ||
+					sdm_set_contains(dest, SDM_MASTER))) {
 		sdm_set_add_element(route, parent);
 		return route;
 	}
