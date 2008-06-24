@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ui Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.rm.mpi.openmpi.ui;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.rm.mpi.openmpi.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.launch,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui,
+ org.eclipse.ptp.remote,
+ org.eclipse.ptp.rm.remote,
+ org.eclipse.ptp.rm.core,
+ org.eclipse.ptp.rm.ui,
+ org.eclipse.ptp.rm.mpi.openmpi.core,
+ org.eclipse.ptp.rm.remote,
+ org.eclipse.search
+Eclipse-LazyStart: true
