@@ -61,7 +61,7 @@ sdm_progress(void)
 
 /*
  * Process a received message. This implements the main communication engine
- * message processes algorithm.
+ * message processing algorithm.
  */
 static void
 recv_callback(sdm_message msg)
