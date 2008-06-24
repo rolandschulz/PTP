@@ -110,7 +110,6 @@ PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/client/sdm-client.$(OBJEXT) \
 	src/client/sdm-client_cmds.$(OBJEXT) \
-	src/client/sdm-client_svr.$(OBJEXT) \
 	src/server/sdm-server.$(OBJEXT) \
 	src/server/sdm-server_cmds.$(OBJEXT) \
 	src/server/sdm-backend.$(OBJEXT) \
@@ -119,7 +118,6 @@ am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/impl/sdm-sdm.$(OBJEXT) \
 	src/impl/sdm-sdm_aggregate_hash.$(OBJEXT) \
 	src/impl/sdm-sdm_message_ompi.$(OBJEXT) \
-	src/impl/sdm-sdm_payload.$(OBJEXT) \
 	src/impl/sdm-sdm_route_binomial.$(OBJEXT) \
 	src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
@@ -264,7 +262,6 @@ SUBDIRS = libaif
 sdm_SOURCES = src/client/startup.c\
 							src/client/client.c \
 							src/client/client_cmds.c \
-							src/client/client_svr.c \
 							src/server/server.c \
 							src/server/server_cmds.c \
 							src/server/backend.c \
@@ -273,7 +270,6 @@ sdm_SOURCES = src/client/startup.c\
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_message_ompi.c \
-							src/impl/sdm_payload.c \
 							src/impl/sdm_route_binomial.c \
 							src/impl/sdm_set_bitset.c
 
@@ -528,8 +524,6 @@ src/client/sdm-client.$(OBJEXT): src/client/$(am__dirstamp) \
 	src/client/$(DEPDIR)/$(am__dirstamp)
 src/client/sdm-client_cmds.$(OBJEXT): src/client/$(am__dirstamp) \
 	src/client/$(DEPDIR)/$(am__dirstamp)
-src/client/sdm-client_svr.$(OBJEXT): src/client/$(am__dirstamp) \
-	src/client/$(DEPDIR)/$(am__dirstamp)
 src/server/$(am__dirstamp):
 	@$(mkdir_p) src/server
 	@: > src/server/$(am__dirstamp)
@@ -557,8 +551,6 @@ src/impl/sdm-sdm.$(OBJEXT): src/impl/$(am__dirstamp) \
 src/impl/sdm-sdm_aggregate_hash.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_message_ompi.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_payload.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_route_binomial.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
@@ -598,12 +590,10 @@ mostlyclean-compile:
 	-rm -f src/client/libdbgclnt_a-client_interface.$(OBJEXT)
 	-rm -f src/client/sdm-client.$(OBJEXT)
 	-rm -f src/client/sdm-client_cmds.$(OBJEXT)
-	-rm -f src/client/sdm-client_svr.$(OBJEXT)
 	-rm -f src/client/sdm-startup.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_aggregate_hash.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_message_ompi.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_payload.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_route_binomial.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 	-rm -f src/mi/libmi_a-CLICommand.$(OBJEXT)
@@ -657,12 +647,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/libdbgclnt_a-client_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-client_cmds.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-client_svr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-startup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_payload.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLICommand.Po@am__quote@
@@ -1258,20 +1246,6 @@ src/client/sdm-client_cmds.obj: src/client/client_cmds.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client_cmds.obj `if test -f 'src/client/client_cmds.c'; then $(CYGPATH_W) 'src/client/client_cmds.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_cmds.c'; fi`
 
-src/client/sdm-client_svr.o: src/client/client_svr.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-client_svr.o -MD -MP -MF "src/client/$(DEPDIR)/sdm-client_svr.Tpo" -c -o src/client/sdm-client_svr.o `test -f 'src/client/client_svr.c' || echo '$(srcdir)/'`src/client/client_svr.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-client_svr.Tpo" "src/client/$(DEPDIR)/sdm-client_svr.Po"; else rm -f "src/client/$(DEPDIR)/sdm-client_svr.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client_svr.c' object='src/client/sdm-client_svr.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client_svr.o `test -f 'src/client/client_svr.c' || echo '$(srcdir)/'`src/client/client_svr.c
-
-src/client/sdm-client_svr.obj: src/client/client_svr.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-client_svr.obj -MD -MP -MF "src/client/$(DEPDIR)/sdm-client_svr.Tpo" -c -o src/client/sdm-client_svr.obj `if test -f 'src/client/client_svr.c'; then $(CYGPATH_W) 'src/client/client_svr.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_svr.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-client_svr.Tpo" "src/client/$(DEPDIR)/sdm-client_svr.Po"; else rm -f "src/client/$(DEPDIR)/sdm-client_svr.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client_svr.c' object='src/client/sdm-client_svr.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client_svr.obj `if test -f 'src/client/client_svr.c'; then $(CYGPATH_W) 'src/client/client_svr.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_svr.c'; fi`
-
 src/server/sdm-server.o: src/server/server.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/server/sdm-server.o -MD -MP -MF "src/server/$(DEPDIR)/sdm-server.Tpo" -c -o src/server/sdm-server.o `test -f 'src/server/server.c' || echo '$(srcdir)/'`src/server/server.c; \
 @am__fastdepCC_TRUE@	then mv -f "src/server/$(DEPDIR)/sdm-server.Tpo" "src/server/$(DEPDIR)/sdm-server.Po"; else rm -f "src/server/$(DEPDIR)/sdm-server.Tpo"; exit 1; fi
@@ -1383,20 +1357,6 @@ src/impl/sdm-sdm_message_ompi.obj: src/impl/sdm_message_ompi.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_ompi.c' object='src/impl/sdm-sdm_message_ompi.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_ompi.obj `if test -f 'src/impl/sdm_message_ompi.c'; then $(CYGPATH_W) 'src/impl/sdm_message_ompi.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_ompi.c'; fi`
-
-src/impl/sdm-sdm_payload.o: src/impl/sdm_payload.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_payload.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" -c -o src/impl/sdm-sdm_payload.o `test -f 'src/impl/sdm_payload.c' || echo '$(srcdir)/'`src/impl/sdm_payload.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_payload.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_payload.c' object='src/impl/sdm-sdm_payload.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_payload.o `test -f 'src/impl/sdm_payload.c' || echo '$(srcdir)/'`src/impl/sdm_payload.c
-
-src/impl/sdm-sdm_payload.obj: src/impl/sdm_payload.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_payload.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" -c -o src/impl/sdm-sdm_payload.obj `if test -f 'src/impl/sdm_payload.c'; then $(CYGPATH_W) 'src/impl/sdm_payload.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_payload.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_payload.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_payload.c' object='src/impl/sdm-sdm_payload.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_payload.obj `if test -f 'src/impl/sdm_payload.c'; then $(CYGPATH_W) 'src/impl/sdm_payload.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_payload.c'; fi`
 
 src/impl/sdm-sdm_route_binomial.o: src/impl/sdm_route_binomial.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_binomial.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" -c -o src/impl/sdm-sdm_route_binomial.o `test -f 'src/impl/sdm_route_binomial.c' || echo '$(srcdir)/'`src/impl/sdm_route_binomial.c; \
