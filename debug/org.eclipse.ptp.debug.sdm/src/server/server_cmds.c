@@ -48,6 +48,7 @@ static int svr_setwatchpoint(dbg_backend *, int, char **);
 static int svr_go(dbg_backend *, int, char **);
 static int svr_step(dbg_backend *, int, char **);
 static int svr_terminate(dbg_backend *, int, char **);
+static int svr_suspend(dbg_backend *, int, char **);
 static int svr_liststackframes(dbg_backend *, int, char **);
 static int svr_setcurrentstackframe(dbg_backend *, int, char **);
 static int svr_evaluateexpression(dbg_backend *, int, char **);
@@ -83,7 +84,7 @@ static svr_cmd svr_cmd_tab[] =
 	/* DBG_GO_CMD */					svr_go,
 	/* DBG_STEP_CMD */					svr_step,
 	/* DBG_TERMINATE_CMD */				svr_terminate,
-	/* DBG_INTERRUPT_CMD */				NULL,
+	/* DBG_SUSPEND_CMD */				svr_suspend,
 	/* DBG_LISTSTACKFRAMES_CMD */		svr_liststackframes,
 	/* DBG_SETCURRENTSTACKFRAME_CMD */	svr_setcurrentstackframe,
 	/* DBG_EVALUATEEXPRESSION_CMD */	svr_evaluateexpression,
@@ -192,7 +193,7 @@ svr_progress(dbg_backend *db)
 }
 
 int
-svr_interrupt(dbg_backend *db)
+svr_suspend(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->interrupt();
 }
