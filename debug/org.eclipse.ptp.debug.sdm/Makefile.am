@@ -6,7 +6,6 @@ noinst_PROGRAMS =			test_proxy test_proxy_rev test_mi
 sdm_SOURCES =				src/client/startup.c\
 							src/client/client.c \
 							src/client/client_cmds.c \
-							src/client/client_svr.c \
 							src/server/server.c \
 							src/server/server_cmds.c \
 							src/server/backend.c \
@@ -15,7 +14,6 @@ sdm_SOURCES =				src/client/startup.c\
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_message_ompi.c \
-							src/impl/sdm_payload.c \
 							src/impl/sdm_route_binomial.c \
 							src/impl/sdm_set_bitset.c
 					
