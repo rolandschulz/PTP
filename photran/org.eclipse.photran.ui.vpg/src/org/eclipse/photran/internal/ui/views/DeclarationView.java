@@ -1,5 +1,7 @@
 package org.eclipse.photran.internal.ui.views;
 
+import java.util.HashMap;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
@@ -28,9 +30,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -49,9 +54,9 @@ public class DeclarationView extends ViewPart
                IFortranEditorASTTask
 {
     private AbstractFortranEditor activeEditor = null;
-    private ASTExecutableProgramNode activeAST = null;
-    private TokenList activeTokenList = null;
-    private DefinitionMap<String> activeDefinitions = null;
+    private HashMap<String, ASTExecutableProgramNode> activeAST = new HashMap<String, ASTExecutableProgramNode>();
+    private HashMap<String, TokenList> activeTokenList = new HashMap<String, TokenList>();
+    private HashMap<String, DefinitionMap<String>> activeDefinitions = new HashMap<String, DefinitionMap<String>>();
     
     private SourceViewer viewer = null;
     private Document document = new Document();
@@ -164,7 +169,7 @@ public class DeclarationView extends ViewPart
      * 
      * See http://dev.eclipse.org/mhonarc/newsLists/news.eclipse.platform/msg44602.html
      */
-    private AbstractFortranEditor startObserving(AbstractFortranEditor editor)
+    private AbstractFortranEditor startObserving(final AbstractFortranEditor editor)
     {
         if (editor != null)
         {
@@ -175,6 +180,59 @@ public class DeclarationView extends ViewPart
                 FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
                 tasks.addASTTask(this);
                 tasks.addVPGTask(this);
+                
+                ((IPartService)getSite().getService(IPartService.class)).addPartListener(new IPartListener2()
+                {
+                    public void partActivated(IWorkbenchPartReference partRef)
+                    {
+                    }
+
+                    public void partBroughtToTop(IWorkbenchPartReference partRef)
+                    {
+                    }
+
+                    public void partClosed(IWorkbenchPartReference partRef)
+                    {
+                        if (partRef.getPart(false) == editor)
+                        {
+                            FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
+                            tasks.removeASTTask(DeclarationView.this);
+                            tasks.removeVPGTask(DeclarationView.this);
+                            
+                            IFile ifile = editor.getIFile();
+                            if (ifile != null)
+                            {
+                                String path = ifile.getFullPath().toPortableString();
+                                activeAST.remove(path);
+                                activeDefinitions.remove(path);
+                                activeTokenList.remove(path);
+                            }
+                        }
+                        ((IPartService)getSite().getService(IPartService.class)).removePartListener(this);
+                    }
+
+                    public void partDeactivated(IWorkbenchPartReference partRef)
+                    {
+                    }
+
+                    public void partHidden(IWorkbenchPartReference partRef)
+                    {
+                    }
+
+                    public void partInputChanged(IWorkbenchPartReference partRef)
+                    {
+                    }
+
+                    public void partOpened(IWorkbenchPartReference partRef)
+                    {
+                    }
+
+                    public void partVisible(IWorkbenchPartReference partRef)
+                    {
+                    }
+                });
+                
+                tasks.getRunner().runTasks(true);
                 return editor;
             }
         }
@@ -196,12 +254,7 @@ public class DeclarationView extends ViewPart
     {
         update("");
         if (editor != null)
-        {
             removeCaretMovementListenerFrom(editor);
-            FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
-            tasks.removeASTTask(this);
-            tasks.removeVPGTask(this);
-        }
     }
 
     private void removeCaretMovementListenerFrom(AbstractFortranEditor editor)
@@ -219,13 +272,13 @@ public class DeclarationView extends ViewPart
     {
         if (defMap == null) return;
         
-        activeDefinitions = new DefinitionMap<String>(defMap)
+        activeDefinitions.put(file.getFullPath().toPortableString(), new DefinitionMap<String>(defMap)
         {
             @Override protected String map(String qualifiedName, Definition def)
             {
                 return def.describe();
             }
-        };
+        });
     }
 
     /**
@@ -235,8 +288,9 @@ public class DeclarationView extends ViewPart
      */
     public synchronized boolean handle(ASTExecutableProgramNode ast, TokenList tokenList, DefinitionMap<Definition> defMap)
     {
-        activeAST = ast;
-        activeTokenList = tokenList;
+        String path = activeEditor.getIFile().getFullPath().toPortableString();
+        activeAST.put(path, ast);
+        activeTokenList.put(path, tokenList);
         return true;
     }
 
@@ -245,10 +299,15 @@ public class DeclarationView extends ViewPart
      */
     public synchronized void selectionChanged(SelectionChangedEvent event)
     {
-        if (event.getSelection() instanceof TextSelection && activeAST != null && activeDefinitions != null)
+        if (activeEditor == null) return;
+        String path = activeEditor.getIFile().getFullPath().toPortableString();
+        
+        TokenList tokenList = activeTokenList.get(path);
+        DefinitionMap<String> defMap = activeDefinitions.get(path);
+        if (event.getSelection() instanceof TextSelection && tokenList != null && defMap != null)
         {
-            String description = activeDefinitions.lookup((TextSelection)event.getSelection(), activeTokenList);
-            update(description == null ? "" : description);
+            String description = defMap.lookup((TextSelection)event.getSelection(), tokenList);
+            update(description == null ? "(Unable to locate declaration)" : description);
         }
         else
         {

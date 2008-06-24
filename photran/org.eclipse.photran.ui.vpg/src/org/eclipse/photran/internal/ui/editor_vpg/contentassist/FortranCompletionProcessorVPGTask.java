@@ -1,6 +1,7 @@
 package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
@@ -38,9 +39,12 @@ final class FortranCompletionProcessorVPGTask implements IFortranEditorVPGTask
                         {
                             ScopingNode n = (ScopingNode)node;
                             String qualifier = DefinitionMap.getQualifier(n);
-                            if (!defs.containsKey(qualifier))
-                                defs.put(qualifier, new TreeSet<Definition>());
-                            defs.get(qualifier).addAll(n.getAllDefinitions());
+                            List<Definition> allDefs = n.getAllDefinitions();
+                            
+                            TreeSet<Definition> set = defs.get(qualifier);
+                            if (set == null) set = new TreeSet<Definition>();
+                            set.addAll(allDefs);
+                            defs.put(qualifier, set);
                         }
                         
                         traverseChildren(node);

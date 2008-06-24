@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
@@ -45,9 +44,12 @@ public abstract class DefinitionMap<T>
                 if (ScopingNode.isScopingNode(node))
                     for (Definition def : ((ScopingNode)node).getAllDefinitions())
                     {
-                        String name = def.getCanonicalizedName();
-                        String qualifiedName = qualify(name, (ScopingNode)node);
-                        definitions.put(qualifiedName, map(qualifiedName, def));
+                        if (def != null)
+                        {
+                            String name = def.getCanonicalizedName();
+                            String qualifiedName = qualify(name, (ScopingNode)node);
+                            definitions.put(qualifiedName, map(qualifiedName, def));
+                        }
                     }
                 
                 traverseChildren(node);
