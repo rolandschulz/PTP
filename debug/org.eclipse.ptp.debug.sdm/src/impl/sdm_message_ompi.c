@@ -34,8 +34,10 @@ struct sdm_message {
 	void 			(*send_complete)(sdm_message msg);
 };
 
-static void 	(*sdm_recv_callback)(sdm_message msg);
-static void		setenviron(char *str, int val);
+static void (*sdm_recv_callback)(sdm_message msg) = NULL;
+static void	(*payload_callback)(char *buf, int len) = NULL;
+
+static void	setenviron(char *str, int val);
 
 /**
  * Initialize the runtime abstraction.
@@ -207,10 +209,11 @@ sdm_message_progress(void)
 		msg->payload = p;
 		msg->payload_len = len;
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress <%s>@(%s,%s)\n", sdm_route_get_id(),
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress <%s>@(%s,%s) {%s}\n", sdm_route_get_id(),
 				_aggregate_to_str(msg->aggregate),
 				_set_to_str(msg->src),
-				_set_to_str(msg->dest));
+				_set_to_str(msg->dest),
+				p);
 
 		if (sdm_recv_callback  != NULL) {
 			sdm_recv_callback(msg);
@@ -295,6 +298,20 @@ sdm_aggregate
 sdm_message_get_aggregate(const sdm_message msg)
 {
 	return msg->aggregate;
+}
+
+void
+sdm_message_set_payload_callback(void (*callback)(char *buf, int len))
+{
+	payload_callback = callback;
+}
+
+void
+sdm_message_deliver_payload(const sdm_message msg)
+{
+	if (payload_callback != NULL) {
+		payload_callback(msg->payload, msg->payload_len);
+	}
 }
 
 static void
