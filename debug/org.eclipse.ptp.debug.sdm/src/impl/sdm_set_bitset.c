@@ -14,6 +14,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "compat.h"
 #include "bitset.h"
@@ -153,10 +154,23 @@ sdm_set_max(const sdm_idset set)
 	return bitset_size(set->set) - 1;
 }
 
-char *
-sdm_set_serialize(const sdm_idset set)
+void
+sdm_set_serialize(const sdm_idset set, char *buf, char **end)
 {
-	return bitset_to_str(set->set);
+	char *	str = bitset_to_str(set->set);
+	int		len = strlen(str);
+
+	memcpy(buf, str, len);
+	free(str);
+	if (end != NULL) {
+		*end = buf + len;
+	}
+}
+
+int
+sdm_set_serialized_length(const sdm_idset set)
+{
+	return sizeof(int) * 2 + 1 + bitset_size(set->set) / 4;
 }
 
 void

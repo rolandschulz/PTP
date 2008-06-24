@@ -116,10 +116,12 @@ am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/server/sdm-backend.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT) \
 	src/server/sdm-test_backend.$(OBJEXT) \
-	src/impl/sdm-sdm_route_binomial.$(OBJEXT) \
-	src/impl/sdm-sdm_set_bitset.$(OBJEXT) \
+	src/impl/sdm-sdm.$(OBJEXT) \
+	src/impl/sdm-sdm_aggregate_hash.$(OBJEXT) \
 	src/impl/sdm-sdm_message_ompi.$(OBJEXT) \
-	src/impl/sdm-sdm.$(OBJEXT)
+	src/impl/sdm-sdm_payload.$(OBJEXT) \
+	src/impl/sdm-sdm_route_binomial.$(OBJEXT) \
+	src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
 sdm_DEPENDENCIES = libdbgutils.a libmi.a libaif/libaif.a
 am_test_mi_OBJECTS = src/mi/test_mi-test_mi.$(OBJEXT)
@@ -268,10 +270,12 @@ sdm_SOURCES = src/client/startup.c\
 							src/server/backend.c \
 							src/server/gdbmi_backend.c \
 							src/server/test_backend.c \
-							src/impl/sdm_route_binomial.c \
-							src/impl/sdm_set_bitset.c \
+							src/impl/sdm.c \
+							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_message_ompi.c \
-							src/impl/sdm.c
+							src/impl/sdm_payload.c \
+							src/impl/sdm_route_binomial.c \
+							src/impl/sdm_set_bitset.c
 
 sdm_CFLAGS = -I./include -I./libaif -I./src/mi $(AM_CFLAGS)
 sdm_LDADD = libdbgutils.a libmi.a libaif/libaif.a @SVR_LIBS@
@@ -548,13 +552,17 @@ src/impl/$(am__dirstamp):
 src/impl/$(DEPDIR)/$(am__dirstamp):
 	@$(mkdir_p) src/impl/$(DEPDIR)
 	@: > src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_route_binomial.$(OBJEXT): src/impl/$(am__dirstamp) \
+src/impl/sdm-sdm.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_set_bitset.$(OBJEXT): src/impl/$(am__dirstamp) \
+src/impl/sdm-sdm_aggregate_hash.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_message_ompi.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm.$(OBJEXT): src/impl/$(am__dirstamp) \
+src/impl/sdm-sdm_payload.$(OBJEXT): src/impl/$(am__dirstamp) \
+	src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/sdm-sdm_route_binomial.$(OBJEXT): src/impl/$(am__dirstamp) \
+	src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/sdm-sdm_set_bitset.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 sdm$(EXEEXT): $(sdm_OBJECTS) $(sdm_DEPENDENCIES) 
 	@rm -f sdm$(EXEEXT)
@@ -593,7 +601,9 @@ mostlyclean-compile:
 	-rm -f src/client/sdm-client_svr.$(OBJEXT)
 	-rm -f src/client/sdm-startup.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm.$(OBJEXT)
+	-rm -f src/impl/sdm-sdm_aggregate_hash.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_message_ompi.$(OBJEXT)
+	-rm -f src/impl/sdm-sdm_payload.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_route_binomial.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 	-rm -f src/mi/libmi_a-CLICommand.$(OBJEXT)
@@ -650,7 +660,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-client_svr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-startup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_payload.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLICommand.Po@am__quote@
@@ -1330,6 +1342,62 @@ src/server/sdm-test_backend.obj: src/server/test_backend.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/server/sdm-test_backend.obj `if test -f 'src/server/test_backend.c'; then $(CYGPATH_W) 'src/server/test_backend.c'; else $(CYGPATH_W) '$(srcdir)/src/server/test_backend.c'; fi`
 
+src/impl/sdm-sdm.o: src/impl/sdm.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm.Tpo" -c -o src/impl/sdm-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo" "src/impl/$(DEPDIR)/sdm-sdm.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/sdm-sdm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c
+
+src/impl/sdm-sdm.obj: src/impl/sdm.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm.Tpo" -c -o src/impl/sdm-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo" "src/impl/$(DEPDIR)/sdm-sdm.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/sdm-sdm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`
+
+src/impl/sdm-sdm_aggregate_hash.o: src/impl/sdm_aggregate_hash.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_aggregate_hash.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo" -c -o src/impl/sdm-sdm_aggregate_hash.o `test -f 'src/impl/sdm_aggregate_hash.c' || echo '$(srcdir)/'`src/impl/sdm_aggregate_hash.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_aggregate_hash.c' object='src/impl/sdm-sdm_aggregate_hash.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_aggregate_hash.o `test -f 'src/impl/sdm_aggregate_hash.c' || echo '$(srcdir)/'`src/impl/sdm_aggregate_hash.c
+
+src/impl/sdm-sdm_aggregate_hash.obj: src/impl/sdm_aggregate_hash.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_aggregate_hash.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo" -c -o src/impl/sdm-sdm_aggregate_hash.obj `if test -f 'src/impl/sdm_aggregate_hash.c'; then $(CYGPATH_W) 'src/impl/sdm_aggregate_hash.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_aggregate_hash.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_aggregate_hash.c' object='src/impl/sdm-sdm_aggregate_hash.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_aggregate_hash.obj `if test -f 'src/impl/sdm_aggregate_hash.c'; then $(CYGPATH_W) 'src/impl/sdm_aggregate_hash.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_aggregate_hash.c'; fi`
+
+src/impl/sdm-sdm_message_ompi.o: src/impl/sdm_message_ompi.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_ompi.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" -c -o src/impl/sdm-sdm_message_ompi.o `test -f 'src/impl/sdm_message_ompi.c' || echo '$(srcdir)/'`src/impl/sdm_message_ompi.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_ompi.c' object='src/impl/sdm-sdm_message_ompi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_ompi.o `test -f 'src/impl/sdm_message_ompi.c' || echo '$(srcdir)/'`src/impl/sdm_message_ompi.c
+
+src/impl/sdm-sdm_message_ompi.obj: src/impl/sdm_message_ompi.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_ompi.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" -c -o src/impl/sdm-sdm_message_ompi.obj `if test -f 'src/impl/sdm_message_ompi.c'; then $(CYGPATH_W) 'src/impl/sdm_message_ompi.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_ompi.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_ompi.c' object='src/impl/sdm-sdm_message_ompi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_ompi.obj `if test -f 'src/impl/sdm_message_ompi.c'; then $(CYGPATH_W) 'src/impl/sdm_message_ompi.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_ompi.c'; fi`
+
+src/impl/sdm-sdm_payload.o: src/impl/sdm_payload.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_payload.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" -c -o src/impl/sdm-sdm_payload.o `test -f 'src/impl/sdm_payload.c' || echo '$(srcdir)/'`src/impl/sdm_payload.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_payload.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_payload.c' object='src/impl/sdm-sdm_payload.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_payload.o `test -f 'src/impl/sdm_payload.c' || echo '$(srcdir)/'`src/impl/sdm_payload.c
+
+src/impl/sdm-sdm_payload.obj: src/impl/sdm_payload.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_payload.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" -c -o src/impl/sdm-sdm_payload.obj `if test -f 'src/impl/sdm_payload.c'; then $(CYGPATH_W) 'src/impl/sdm_payload.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_payload.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_payload.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_payload.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_payload.c' object='src/impl/sdm-sdm_payload.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_payload.obj `if test -f 'src/impl/sdm_payload.c'; then $(CYGPATH_W) 'src/impl/sdm_payload.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_payload.c'; fi`
+
 src/impl/sdm-sdm_route_binomial.o: src/impl/sdm_route_binomial.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_binomial.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" -c -o src/impl/sdm-sdm_route_binomial.o `test -f 'src/impl/sdm_route_binomial.c' || echo '$(srcdir)/'`src/impl/sdm_route_binomial.c; \
 @am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo"; exit 1; fi
@@ -1357,34 +1425,6 @@ src/impl/sdm-sdm_set_bitset.obj: src/impl/sdm_set_bitset.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_set_bitset.c' object='src/impl/sdm-sdm_set_bitset.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_set_bitset.obj `if test -f 'src/impl/sdm_set_bitset.c'; then $(CYGPATH_W) 'src/impl/sdm_set_bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_set_bitset.c'; fi`
-
-src/impl/sdm-sdm_message_ompi.o: src/impl/sdm_message_ompi.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_ompi.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" -c -o src/impl/sdm-sdm_message_ompi.o `test -f 'src/impl/sdm_message_ompi.c' || echo '$(srcdir)/'`src/impl/sdm_message_ompi.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_ompi.c' object='src/impl/sdm-sdm_message_ompi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_ompi.o `test -f 'src/impl/sdm_message_ompi.c' || echo '$(srcdir)/'`src/impl/sdm_message_ompi.c
-
-src/impl/sdm-sdm_message_ompi.obj: src/impl/sdm_message_ompi.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_ompi.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" -c -o src/impl/sdm-sdm_message_ompi.obj `if test -f 'src/impl/sdm_message_ompi.c'; then $(CYGPATH_W) 'src/impl/sdm_message_ompi.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_ompi.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_ompi.c' object='src/impl/sdm-sdm_message_ompi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_ompi.obj `if test -f 'src/impl/sdm_message_ompi.c'; then $(CYGPATH_W) 'src/impl/sdm_message_ompi.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_ompi.c'; fi`
-
-src/impl/sdm-sdm.o: src/impl/sdm.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm.Tpo" -c -o src/impl/sdm-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo" "src/impl/$(DEPDIR)/sdm-sdm.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/sdm-sdm.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c
-
-src/impl/sdm-sdm.obj: src/impl/sdm.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm.Tpo" -c -o src/impl/sdm-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo" "src/impl/$(DEPDIR)/sdm-sdm.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/sdm-sdm.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`
 
 src/mi/test_mi-test_mi.o: src/mi/test_mi.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mi_CFLAGS) $(CFLAGS) -MT src/mi/test_mi-test_mi.o -MD -MP -MF "src/mi/$(DEPDIR)/test_mi-test_mi.Tpo" -c -o src/mi/test_mi-test_mi.o `test -f 'src/mi/test_mi.c' || echo '$(srcdir)/'`src/mi/test_mi.c; \

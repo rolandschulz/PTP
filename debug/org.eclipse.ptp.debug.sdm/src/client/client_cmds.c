@@ -94,11 +94,15 @@ idset_to_bitset(sdm_idset ids)
  * call all registered event handlers.
  */
 static void
-dbg_clnt_cmd_completed(sdm_id dest, sdm_idset src, char *msg, void *data)
+dbg_clnt_cmd_completed(sdm_message msg, void *data)
 {
+	int			len;
+	char *		buf;
 	proxy_msg *	m;
 
- 	if (proxy_deserialize_msg(msg, strlen(msg), &m) < 0)
+	sdm_message_get_payload(msg, &buf, &len);
+
+ 	if (proxy_deserialize_msg(buf, len, &m) < 0)
  		fprintf(stderr, "bad conversion to proxy event");
  	else {
  		/*
@@ -106,9 +110,11 @@ dbg_clnt_cmd_completed(sdm_id dest, sdm_idset src, char *msg, void *data)
  		 * don't include the bitset, it is only added prior to sending back
  		 * to the client.
  		 */
-		proxy_msg_insert_bitset(m, idset_to_bitset(src), 0);
+		proxy_msg_insert_bitset(m, idset_to_bitset(sdm_message_get_source(msg)), 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
 	}
+
+ 	sdm_message_free(msg);
 }
 
 int

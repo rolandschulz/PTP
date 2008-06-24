@@ -15,10 +15,9 @@
 #include "compat.h"
 #include "sdm.h"
 
-extern int sdm_message_init(int argc, char *argv[]);
-extern int sdm_route_init(int argc, char *argv[]);
-extern void sdm_message_finalize(void);
-extern void sdm_route_finalize(void);
+static int	shutting_down = 0;
+
+static void	recv_callback(sdm_message msg);
 
 int
 sdm_init(int argc, char *argv[])
@@ -31,6 +30,12 @@ sdm_init(int argc, char *argv[])
 		return -1;
 	}
 
+	if (sdm_aggregate_init(argc, argv) < 0) {
+		return -1;
+	}
+
+	sdm_message_set_recv_callback(recv_callback);
+
 	return 0;
 }
 
@@ -40,6 +45,55 @@ sdm_init(int argc, char *argv[])
 void
 sdm_finalize(void)
 {
+	shutting_down = 1;
+
+	sdm_aggregate_finalize();
 	sdm_route_finalize();
 	sdm_message_finalize();
+}
+
+void
+sdm_progress(void)
+{
+	sdm_message_progress();
+	sdm_aggregate_progress();
+}
+
+/*
+ * Process a received message. This implements the main communication engine
+ * message processes algorithm.
+ */
+static void
+recv_callback(sdm_message msg)
+{
+	if (sdm_set_contains(sdm_message_get_source(msg), SDM_MASTER)) {
+		/*
+		 * Downstream message.
+		 */
+
+		if (shutting_down) {
+			/*
+			 * Stop processing downstream messages
+			 */
+			return;
+		}
+
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got downstream message\n", sdm_route_get_id());
+
+		sdm_aggregate_start(msg);
+
+		if (sdm_set_contains(sdm_message_get_destination(msg), sdm_route_get_id())) {
+			sdm_payload_deliver(msg);
+		}
+
+		sdm_message_set_send_callback(msg, sdm_message_free);
+		sdm_message_send(msg);
+	} else {
+		/*
+		 * Upstream message
+		 */
+
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got upstream message #%x\n", sdm_route_get_id());
+		sdm_aggregate_message(msg);
+	}
 }

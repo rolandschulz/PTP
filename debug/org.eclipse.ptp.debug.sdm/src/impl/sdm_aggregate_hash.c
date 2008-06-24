@@ -1,0 +1,523 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
+
+/*
+ * Message aggregation based on hashing the message contents.
+ */
+
+#include <sys/time.h>
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#include <getopt.h>
+
+#include "compat.h"
+#include "list.h"
+#include "hash.h"
+#include "sdm.h"
+
+struct sdm_aggregate {
+	unsigned int	value;
+};
+
+/*
+ * A request represents an asynchronous send/receive transaction between the client
+ * and all servers. completed() is called once all replies have been received.
+ */
+struct request {
+	int				id;				/* this request id */
+	int				active;			/* this request is active (i.e. has been forwarded) */
+	//int				pending;		/* there are pending interrupts to be sent */
+	//int				local;			/* this request must be executed locally */
+	sdm_id			src;			/* the source of this request */
+	sdm_idset		dest;			/* destination controllers */
+	//sdm_idset		interrupt;		/* controllers to interrupt */
+	//sdm_message		msg;			/* message to send */
+	sdm_idset		outstanding;	/* controllers remaining to send replies */
+	int				timeout;		/* wait timeout for this request (microseconds) */
+	void *			cb_data;		/* completed request callback data */
+	Hash *			replys;			/* hash of replies we've received */
+	struct timeval	start_time;		/* time that timer was started */
+	int				timer_state;	/* state of timer */
+};
+typedef struct request	request;
+
+static List *			all_requests;
+static struct request *	current_request;
+
+static void			new_request(sdm_id src, sdm_message msg, int timeout, void *cbdata);
+static void			free_request(request *);
+static void			update_reply(request *req, sdm_message msg, int hash);
+static void			interrupt_all_requests(sdm_idset dest);
+static unsigned int	str_to_hex(char *str, char **end);
+static void			hex_to_str(char *str, char **end, unsigned int val);
+static void			start_timer(request *r);
+static int			check_timer(request *r);
+static void			disable_timer(request *r);
+static void			request_completed(request *req);
+static void 		(*completion_callback)(const sdm_message msg, void *data);
+static void *		completion_data;
+
+#define HEX_LEN	8
+
+#define ELAPSED_TIME(t1, t2)	(((t1.tv_sec - t2.tv_sec) * 1000000) + (t1.tv_usec - t2.tv_usec))
+#define TIMER_RUNNING			0
+#define TIMER_EXPIRED			1
+#define TIMER_DISABLED			2
+
+int
+sdm_aggregate_init(int argc, char *argv[])
+{
+	all_requests = NewList();
+	current_request = NULL;
+	completion_callback = NULL;
+	return 0;
+}
+
+void
+sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
+{
+	hex_to_str(buf, end, a->value);
+}
+
+int
+sdm_aggregate_serialized_length(const sdm_aggregate a)
+{
+	return HEX_LEN;
+}
+
+void
+sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
+{
+	a->value = str_to_hex(str, end);
+}
+
+void
+sdm_aggregate_set_completion_callback(void (*callback)(const sdm_message msg, void *data), void *data)
+{
+	completion_callback = callback;
+	completion_data = data;
+}
+
+/*
+ * Start aggregation on a message.
+ */
+void
+sdm_aggregate_start(sdm_message msg)
+{
+	sdm_aggregate	a = sdm_message_get_aggregate(msg);
+
+	new_request(sdm_route_get_parent(), msg, a->value, NULL);
+}
+
+void
+sdm_aggregate_message(sdm_message msg)
+{
+	request *		req;
+	sdm_aggregate	a;
+
+	a = sdm_message_get_aggregate(msg);
+
+	/*
+	 * Find the request this reply is for.
+	 * Check if the request is completed.
+	 */
+	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message compare %s %s\n", sdm_route_get_id(),
+				_set_to_str(req->outstanding),
+				_set_to_str(sdm_message_get_source(msg)));
+
+		if (sdm_set_compare(req->outstanding, sdm_message_get_source(msg))) {
+			update_reply(req, msg, a->value);
+			break;
+		}
+	}
+}
+
+/*
+ * Check for completed or timed out commands
+ */
+void
+sdm_aggregate_progress(void)
+{
+	request *	req;
+
+	/*
+	 * Process command requests
+	 */
+	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
+#if 0
+		if (req->pending) {
+			if (!sdm_set_is_empty(sdm_route_get_route(req->interrupt))) {
+				msg = sdm_message_new();
+				sdm_set_union(sdm_message_get_destination(msg), req->interrupt);
+				sdm_set_add_element(sdm_message_get_source(msg), this);
+				pack_buffer(req->timeout, NULL, &buf, &len);
+				sdm_message_set_data(msg, buf, len+1);
+				sdm_message_set_type(msg, SDM_MESSAGE_TYPE_URGENT);
+				sdm_message_set_send_callback(msg, sdm_message_free);
+				sdm_message_send(msg);
+			}
+
+			if (sdm_set_contains(req->interrupt, this) && int_cmd_callback != NULL) {
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] running interrupt locally\n", this);
+				int_cmd_callback(local_cmd_data);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] finished interrupt command\n", this);
+			}
+
+			req->pending = 0;
+		}
+#endif
+
+		if (sdm_set_is_empty(req->outstanding)) {
+			request_completed(req);
+			free_request(req);
+		} else if (req->timeout > 0 && check_timer(req) == TIMER_EXPIRED) {
+			request_completed(req);
+			disable_timer(req);
+		}
+	}
+}
+
+void
+sdm_aggregate_finalize(void)
+{
+	request *	req;
+
+	/*
+	 * Remove all non-active requests
+	 */
+	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
+		if (!req->active) {
+			free_request(req);
+		}
+	}
+
+	/*
+	 * Process remaining requests.
+	 */
+	while (!EmptyList(all_requests)) {
+		sdm_message_progress();
+		sdm_aggregate_progress();
+	}
+}
+
+/*
+ * Force aggregation completion.
+ */
+void
+sdm_aggregate_finish(const sdm_message msg)
+{
+	//interrupt_all_requests(sdm_message_get_destination(msg));
+}
+
+sdm_aggregate
+sdm_aggregate_new(void)
+{
+	sdm_aggregate	a = (sdm_aggregate)malloc(sizeof(struct sdm_aggregate));
+
+	a->value = 0;
+	return a;
+}
+
+void
+sdm_aggregate_get_value(sdm_aggregate a, int type, ...)
+{
+	int	*		value;
+    va_list		ap;
+
+    va_start(ap, type);
+
+    switch (type) {
+    case SDM_AGGREGATE_TIMEOUT:
+    case SDM_AGGREGATE_HASH:
+    	value = va_arg(ap, int *);
+    	*value = a->value;
+    	break;
+    }
+
+    va_end(ap);
+}
+
+void
+sdm_aggregate_set_value(sdm_aggregate a, int type, ...)
+{
+	int		len;
+	char *	buf;
+    va_list	ap;
+
+    va_start(ap, type);
+
+    switch (type) {
+    case SDM_AGGREGATE_TIMEOUT:
+    	a->value = va_arg(ap, int);
+    	break;
+
+    case SDM_AGGREGATE_HASH:
+    	buf = va_arg(ap, char *);
+    	len = va_arg(ap, int);
+    	a->value = HashCompute(buf, len);
+    	break;
+    }
+
+    va_end(ap);
+}
+
+void
+sdm_aggregate_free(const sdm_aggregate a)
+{
+	free(a);
+}
+
+/********************************************/
+/********************************************/
+
+char *
+_aggregate_to_str(sdm_aggregate a)
+{
+	static char *	res = NULL;
+
+	if (res != NULL) {
+		free(res);
+	}
+
+	res = (char *)malloc(sizeof(int)*2+1);
+	hex_to_str(res, NULL, a->value);
+	return res;
+}
+
+/*
+ * Create a new request. We assume that there are no outstanding commands active for
+ * any controllers in the destination set. Interrupts do not have this restriction.
+ *
+ * @param src is the source of the request. This is where the reply will be sent to.
+ * @param dest is the destination of the request. This is where the message will be forwarded to.
+ * @param msg is the message
+ * @param timeout is the time to wait before forwarding any replies. 0 means infinite.
+ *
+ * The outstanding set is all controllers that will respond to this request and once
+ * we have received replies from all controllers in this set, the request is complete.
+ */
+static void
+new_request(sdm_id src, sdm_message msg, int timeout, void *cbdata)
+{
+	request *	r;
+	static int	id = 0;
+
+	r = (request *)malloc(sizeof(request));
+	r->id = id++;
+	r->active = 0;
+	r->src = src;
+	r->dest = sdm_set_new();
+	sdm_set_union(r->dest, sdm_message_get_destination(msg));
+	sdm_set_remove_element(r->dest, sdm_route_get_id());
+	r->timeout = timeout;
+	r->cb_data = cbdata;
+	r->timer_state = TIMER_DISABLED;
+	r->replys = HashCreate(sdm_route_get_size());
+	r->outstanding = sdm_set_new();
+	sdm_set_union(r->outstanding, sdm_route_reachable(sdm_message_get_destination(msg)));
+
+	AddToList(all_requests, (void *)r);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d (dest %s replies %s)\n",
+			sdm_route_get_id(), r->id, _set_to_str(r->dest), _set_to_str(r->outstanding));
+}
+
+/*
+ * Free the request.
+ */
+static void
+free_request(request *r)
+{
+	RemoveFromList(all_requests, (void *)r);
+	sdm_set_free(r->dest);
+	sdm_set_free(r->outstanding);
+	HashDestroy(r->replys, NULL);
+	free(r);
+}
+
+/*
+ * Convert a hexadecimal string into an integer.
+ */
+static unsigned int
+str_to_hex(char *str, char **end)
+{
+	int				n;
+	unsigned int	val = 0;
+
+	for (n = 0; n < HEX_LEN && *str != '\0' && isxdigit(*str); n++, str++) {
+		val <<= 4;
+		val += digittoint(*str);
+	}
+
+	if (end != NULL) {
+		*end = str;
+	}
+
+	return val;
+}
+
+/*
+ * Convert an integer to a hexadecimal string.
+ */
+static void
+hex_to_str(char *str, char **end, unsigned int val)
+{
+	sprintf(str, "%08x", val & 0xffffffff);
+	if (end != NULL) {
+		*end = str + HEX_LEN;
+	}
+}
+
+
+/*
+ * Callback when a request is completed.
+ */
+static void
+request_completed(request *req)
+{
+	HashEntry *	he;
+	sdm_message msg;
+
+	for (HashSet(req->replys); (he = HashGet(req->replys)) != NULL; ) {
+		msg = (sdm_message)he->h_data;
+
+		if (completion_callback != NULL) {
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request %d completed for #%x\n", sdm_route_get_id(),
+					req->id,
+					he->h_hval);
+			completion_callback(msg, req->cb_data);
+		}
+
+		HashRemove(req->replys, he->h_hval);
+	}
+}
+
+/*
+ * Start a timer
+ */
+static void
+start_timer(request *r)
+{
+	(void)gettimeofday(&r->start_time, NULL);
+	r->timer_state = TIMER_RUNNING;
+}
+
+/*
+ * Check if the timer has expired.
+ */
+static int
+check_timer(request *r)
+{
+	struct timeval	time;
+
+	if (r->timer_state == TIMER_RUNNING) {
+		(void)gettimeofday(&time, NULL);
+
+		if (ELAPSED_TIME(time, r->start_time) >= r->timeout) {
+			r->timer_state = TIMER_EXPIRED;
+		}
+	}
+
+	return r->timer_state;
+}
+
+/*
+ * Disable the timer
+ */
+static void
+disable_timer(request *r)
+{
+	r->timer_state = TIMER_DISABLED;
+}
+
+#if 0
+/*
+ * Request an interrupt to the pending request.
+ */
+static void
+request_interrupt(request *r, sdm_idset dest)
+{
+	if (!r->pending) {
+		sdm_set_clear(r->interrupt);
+		r->pending = 1;
+	}
+
+	sdm_set_union(r->interrupt, dest);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request int %s, set=%s\n", sdm_route_get_id(), _set_to_str(dest), _set_to_str(r->interrupt));
+}
+
+/*
+ * Interrupt all active requests.
+ */
+static void
+interrupt_all_requests(sdm_idset dest)
+{
+	sdm_idset	m;
+	request *	r;
+
+	for (SetList(all_requests); (r = (request *)GetListElement(all_requests)) != NULL; ) {
+		if (r->active) {
+			m = sdm_set_new();
+			sdm_set_union(m, dest);
+			sdm_set_intersect(m, r->outstanding);
+			if (!sdm_set_is_empty(m)) {
+				request_interrupt(r, m);
+			}
+			sdm_set_free(m);
+		}
+	}
+}
+#endif
+
+static void
+update_reply(request *req, sdm_message msg, int hash)
+{
+	sdm_message		reply_msg;
+	sdm_aggregate	na = sdm_message_get_aggregate(msg);
+
+	/*
+	 * Remove sources we have received replies from:
+	 */
+	sdm_set_diff(req->outstanding, sdm_message_get_source(msg));
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] reply updated: src=%d, agg_src=%s replies outstanding: %s\n",
+			sdm_route_get_id(),
+			sdm_message_get_source(msg),
+			_set_to_str(sdm_message_get_source(msg)),
+			_set_to_str(req->outstanding));
+
+	/*
+	 * Save reply if it is new, otherwise just update the reply set
+	 */
+	if ((reply_msg = (sdm_message)HashSearch(req->replys, na->value)) == NULL) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply #%x\n", sdm_route_get_id(), na->value);
+		HashInsert(req->replys, na->value, (void *)msg);
+	} else {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x with src %d\n",
+				sdm_route_get_id(),
+				na->value,
+				sdm_message_get_source(msg));
+		sdm_set_union(sdm_message_get_source(reply_msg), sdm_message_get_source(msg));
+		sdm_message_free(msg);
+	}
+
+	/*
+	 * Start timer if necessary
+	 */
+	if (req->timeout > 0 && check_timer(req) != TIMER_RUNNING && !sdm_set_is_empty(req->outstanding)) {
+		start_timer(req);
+	}
+}
