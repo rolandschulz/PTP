@@ -83,7 +83,7 @@ recv_callback(sdm_message msg)
 		sdm_aggregate_start(msg);
 
 		if (sdm_set_contains(sdm_message_get_destination(msg), sdm_route_get_id())) {
-			sdm_payload_deliver(msg);
+			sdm_message_deliver_payload(msg);
 		}
 
 		sdm_message_set_send_callback(msg, sdm_message_free);
