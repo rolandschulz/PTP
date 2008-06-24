@@ -39,47 +39,46 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "client_srv.h"
 #include "hash.h"
 #include "backend.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
+#include "sdm.h"
 
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
 extern int	svr_dispatch(dbg_backend *, char *);
 extern int	svr_progress(dbg_backend *);
-extern int	svr_interrupt(dbg_backend *);
 extern int	svr_isshutdown(void);
+
+static dbg_backend *	backend;
 
 static void
 event_callback(dbg_event *e, void *data)
 {
-	char *		msg;
+	int			len;
+	char *		buf;
+	sdm_message msg;
 
-	if (DbgSerializeEvent(e, &msg) < 0)
+	if (DbgSerializeEvent(e, &buf) < 0)
 		return;
 
-	ClntSvrInsertMessage(msg);
+	len = strlen(buf) + 1;
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] server event_callback '%s'\n", sdm_route_get_id(), buf);
+
+	msg = sdm_message_new(buf, len);
+	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
+	sdm_set_add_element(sdm_message_get_destination(msg), SDM_MASTER);
+
+	sdm_aggregate_message(msg);
 }
 
 static void
-do_normal_command(char *cmd, void *data)
+payload_callback(char *cmd, int len)
 {
-	dbg_backend *	dbgr = (dbg_backend *)data;
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "server payload_callback '%s'\n", cmd);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "executing local command '%s'\n", cmd);
-
-	(void)svr_dispatch(dbgr, cmd);
-}
-
-static void
-do_int_command(void *data)
-{
-	dbg_backend *	dbgr = (dbg_backend *)data;
-
-	DEBUG_PRINTS(DEBUG_LEVEL_SERVER, "executing interrupt command\n");
-
-	(void)svr_interrupt(dbgr);
+	(void)svr_dispatch(backend, cmd);
 }
 
 /*
@@ -114,18 +113,18 @@ server(dbg_backend *dbgr)
 {
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "starting server on [%d,%d]\n", sdm_route_get_id(), sdm_route_get_size());
 
-	ClntSvrInit(0, 0);
-	ClntSvrRegisterCompletionCallback(ClntSvrSendReply);
-	ClntSvrRegisterLocalCmdCallback(do_normal_command, (void *)dbgr);
-	ClntSvrRegisterInterruptCmdCallback(do_int_command, (void *)dbgr);
+	backend = dbgr;
+
+	sdm_message_set_payload_callback(payload_callback);
+	sdm_aggregate_set_completion_callback(sdm_message_send);
 
 	svr_init(dbgr, event_callback, NULL);
 
 	while (!svr_isshutdown()) {
-		ClntSvrProgressCmds();
+		sdm_progress();
 		svr_progress(dbgr);
 	}
 
-	ClntSvrFinish();
+	sdm_finalize();
 }
 
