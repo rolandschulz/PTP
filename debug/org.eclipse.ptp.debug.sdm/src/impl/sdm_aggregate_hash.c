@@ -36,16 +36,9 @@ struct sdm_aggregate {
  */
 struct request {
 	int				id;				/* this request id */
-	int				active;			/* this request is active (i.e. has been forwarded) */
-	//int				pending;		/* there are pending interrupts to be sent */
-	//int				local;			/* this request must be executed locally */
-	sdm_id			src;			/* the source of this request */
 	sdm_idset		dest;			/* destination controllers */
-	//sdm_idset		interrupt;		/* controllers to interrupt */
-	//sdm_message		msg;			/* message to send */
 	sdm_idset		outstanding;	/* controllers remaining to send replies */
 	int				timeout;		/* wait timeout for this request (microseconds) */
-	void *			cb_data;		/* completed request callback data */
 	Hash *			replys;			/* hash of replies we've received */
 	struct timeval	start_time;		/* time that timer was started */
 	int				timer_state;	/* state of timer */
@@ -55,18 +48,16 @@ typedef struct request	request;
 static List *			all_requests;
 static struct request *	current_request;
 
-static void			new_request(sdm_id src, sdm_message msg, int timeout, void *cbdata);
+static void			new_request(sdm_id src, sdm_message msg, int timeout);
 static void			free_request(request *);
 static void			update_reply(request *req, sdm_message msg, int hash);
-static void			interrupt_all_requests(sdm_idset dest);
 static unsigned int	str_to_hex(char *str, char **end);
 static void			hex_to_str(char *str, char **end, unsigned int val);
 static void			start_timer(request *r);
 static int			check_timer(request *r);
 static void			disable_timer(request *r);
 static void			request_completed(request *req);
-static void 		(*completion_callback)(const sdm_message msg, void *data);
-static void *		completion_data;
+static int	 		(*completion_callback)(const sdm_message msg);
 
 #define HEX_LEN	8
 
@@ -103,10 +94,9 @@ sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
 }
 
 void
-sdm_aggregate_set_completion_callback(void (*callback)(const sdm_message msg, void *data), void *data)
+sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg))
 {
 	completion_callback = callback;
-	completion_data = data;
 }
 
 /*
@@ -117,7 +107,7 @@ sdm_aggregate_start(sdm_message msg)
 {
 	sdm_aggregate	a = sdm_message_get_aggregate(msg);
 
-	new_request(sdm_route_get_parent(), msg, a->value, NULL);
+	new_request(sdm_route_get_parent(), msg, a->value);
 }
 
 void
@@ -156,29 +146,6 @@ sdm_aggregate_progress(void)
 	 * Process command requests
 	 */
 	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
-#if 0
-		if (req->pending) {
-			if (!sdm_set_is_empty(sdm_route_get_route(req->interrupt))) {
-				msg = sdm_message_new();
-				sdm_set_union(sdm_message_get_destination(msg), req->interrupt);
-				sdm_set_add_element(sdm_message_get_source(msg), this);
-				pack_buffer(req->timeout, NULL, &buf, &len);
-				sdm_message_set_data(msg, buf, len+1);
-				sdm_message_set_type(msg, SDM_MESSAGE_TYPE_URGENT);
-				sdm_message_set_send_callback(msg, sdm_message_free);
-				sdm_message_send(msg);
-			}
-
-			if (sdm_set_contains(req->interrupt, this) && int_cmd_callback != NULL) {
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] running interrupt locally\n", this);
-				int_cmd_callback(local_cmd_data);
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] finished interrupt command\n", this);
-			}
-
-			req->pending = 0;
-		}
-#endif
-
 		if (sdm_set_is_empty(req->outstanding)) {
 			request_completed(req);
 			free_request(req);
@@ -192,17 +159,6 @@ sdm_aggregate_progress(void)
 void
 sdm_aggregate_finalize(void)
 {
-	request *	req;
-
-	/*
-	 * Remove all non-active requests
-	 */
-	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
-		if (!req->active) {
-			free_request(req);
-		}
-	}
-
 	/*
 	 * Process remaining requests.
 	 */
@@ -225,7 +181,6 @@ sdm_aggregate
 sdm_aggregate_new(void)
 {
 	sdm_aggregate	a = (sdm_aggregate)malloc(sizeof(struct sdm_aggregate));
-
 	a->value = 0;
 	return a;
 }
@@ -300,7 +255,6 @@ _aggregate_to_str(sdm_aggregate a)
  * Create a new request. We assume that there are no outstanding commands active for
  * any controllers in the destination set. Interrupts do not have this restriction.
  *
- * @param src is the source of the request. This is where the reply will be sent to.
  * @param dest is the destination of the request. This is where the message will be forwarded to.
  * @param msg is the message
  * @param timeout is the time to wait before forwarding any replies. 0 means infinite.
@@ -309,20 +263,17 @@ _aggregate_to_str(sdm_aggregate a)
  * we have received replies from all controllers in this set, the request is complete.
  */
 static void
-new_request(sdm_id src, sdm_message msg, int timeout, void *cbdata)
+new_request(sdm_id src, sdm_message msg, int timeout)
 {
 	request *	r;
 	static int	id = 0;
 
 	r = (request *)malloc(sizeof(request));
 	r->id = id++;
-	r->active = 0;
-	r->src = src;
 	r->dest = sdm_set_new();
 	sdm_set_union(r->dest, sdm_message_get_destination(msg));
 	sdm_set_remove_element(r->dest, sdm_route_get_id());
 	r->timeout = timeout;
-	r->cb_data = cbdata;
 	r->timer_state = TIMER_DISABLED;
 	r->replys = HashCreate(sdm_route_get_size());
 	r->outstanding = sdm_set_new();
@@ -397,7 +348,7 @@ request_completed(request *req)
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request %d completed for #%x\n", sdm_route_get_id(),
 					req->id,
 					he->h_hval);
-			completion_callback(msg, req->cb_data);
+			completion_callback(msg);
 		}
 
 		HashRemove(req->replys, he->h_hval);
@@ -442,46 +393,6 @@ disable_timer(request *r)
 	r->timer_state = TIMER_DISABLED;
 }
 
-#if 0
-/*
- * Request an interrupt to the pending request.
- */
-static void
-request_interrupt(request *r, sdm_idset dest)
-{
-	if (!r->pending) {
-		sdm_set_clear(r->interrupt);
-		r->pending = 1;
-	}
-
-	sdm_set_union(r->interrupt, dest);
-
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request int %s, set=%s\n", sdm_route_get_id(), _set_to_str(dest), _set_to_str(r->interrupt));
-}
-
-/*
- * Interrupt all active requests.
- */
-static void
-interrupt_all_requests(sdm_idset dest)
-{
-	sdm_idset	m;
-	request *	r;
-
-	for (SetList(all_requests); (r = (request *)GetListElement(all_requests)) != NULL; ) {
-		if (r->active) {
-			m = sdm_set_new();
-			sdm_set_union(m, dest);
-			sdm_set_intersect(m, r->outstanding);
-			if (!sdm_set_is_empty(m)) {
-				request_interrupt(r, m);
-			}
-			sdm_set_free(m);
-		}
-	}
-}
-#endif
-
 static void
 update_reply(request *req, sdm_message msg, int hash)
 {
@@ -493,9 +404,8 @@ update_reply(request *req, sdm_message msg, int hash)
 	 */
 	sdm_set_diff(req->outstanding, sdm_message_get_source(msg));
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] reply updated: src=%d, agg_src=%s replies outstanding: %s\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] reply updated: src=%s replies outstanding: %s\n",
 			sdm_route_get_id(),
-			sdm_message_get_source(msg),
 			_set_to_str(sdm_message_get_source(msg)),
 			_set_to_str(req->outstanding));
 
@@ -506,10 +416,10 @@ update_reply(request *req, sdm_message msg, int hash)
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply #%x\n", sdm_route_get_id(), na->value);
 		HashInsert(req->replys, na->value, (void *)msg);
 	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x with src %d\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x with src %s\n",
 				sdm_route_get_id(),
 				na->value,
-				sdm_message_get_source(msg));
+				_set_to_str(sdm_message_get_source(msg)));
 		sdm_set_union(sdm_message_get_source(reply_msg), sdm_message_get_source(msg));
 		sdm_message_free(msg);
 	}
