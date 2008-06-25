@@ -37,7 +37,6 @@ struct sdm_aggregate {
  */
 struct request {
 	int				id;				/* this request id */
-	sdm_idset		dest;			/* destination controllers */
 	sdm_idset		outstanding;	/* controllers remaining to send replies */
 	int				timeout;		/* wait timeout for this request (microseconds) */
 	Hash *			replys;			/* hash of replies we've received */
@@ -49,7 +48,7 @@ typedef struct request	request;
 static List *			all_requests;
 static struct request *	current_request;
 
-static void			new_request(sdm_id src, sdm_message msg, int timeout);
+static void			new_request(sdm_idset dest, int timeout);
 static void			free_request(request *);
 static void			update_reply(request *req, sdm_message msg, int hash);
 static unsigned int	str_to_hex(char *str, char **end);
@@ -128,7 +127,7 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 			}
 		}
 	} else if (flags & SDM_AGGREGATE_DOWNSTREAM) {
-		new_request(sdm_route_get_parent(), msg, a->value);
+		new_request(sdm_message_get_destination(msg), a->value);
 	}
 }
 
@@ -241,37 +240,32 @@ _aggregate_to_str(sdm_aggregate a)
 }
 
 /*
- * Create a new request. We assume that there are no outstanding commands active for
- * any controllers in the destination set. Interrupts do not have this restriction.
+ * Create a new aggregration request.
  *
- * @param dest is the destination of the request. This is where the message will be forwarded to.
- * @param msg is the message
+ * @param dest is the destination of the message
  * @param timeout is the time to wait before forwarding any replies. 0 means infinite.
  *
  * The outstanding set is all controllers that will respond to this request and once
  * we have received replies from all controllers in this set, the request is complete.
  */
 static void
-new_request(sdm_id src, sdm_message msg, int timeout)
+new_request(sdm_idset dest, int timeout)
 {
 	request *	r;
 	static int	id = 0;
 
 	r = (request *)malloc(sizeof(request));
 	r->id = id++;
-	r->dest = sdm_set_new();
-	sdm_set_union(r->dest, sdm_message_get_destination(msg));
-	sdm_set_remove_element(r->dest, sdm_route_get_id());
 	r->timeout = timeout;
 	r->timer_state = TIMER_DISABLED;
 	r->replys = HashCreate(sdm_route_get_size());
 	r->outstanding = sdm_set_new();
-	sdm_set_union(r->outstanding, sdm_route_reachable(sdm_message_get_destination(msg)));
+	sdm_set_union(r->outstanding, sdm_route_reachable(dest));
 
 	AddToList(all_requests, (void *)r);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d (dest %s replies %s)\n",
-			sdm_route_get_id(), r->id, _set_to_str(r->dest), _set_to_str(r->outstanding));
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d expected replies %s)\n",
+			sdm_route_get_id(), r->id, _set_to_str(r->outstanding));
 }
 
 /*
@@ -281,7 +275,6 @@ static void
 free_request(request *r)
 {
 	RemoveFromList(all_requests, (void *)r);
-	sdm_set_free(r->dest);
 	sdm_set_free(r->outstanding);
 	HashDestroy(r->replys, NULL);
 	free(r);
