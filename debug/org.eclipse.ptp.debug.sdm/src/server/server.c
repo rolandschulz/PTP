@@ -81,6 +81,13 @@ payload_callback(char *cmd, int len)
 	(void)svr_dispatch(backend, cmd);
 }
 
+static int
+aggregate_callback(sdm_message msg) {
+	sdm_message_set_send_callback(msg, sdm_message_free);
+	sdm_message_send(msg);
+	return 0;
+}
+
 /*
  * Debug server implementation
  *
@@ -116,7 +123,7 @@ server(dbg_backend *dbgr)
 	backend = dbgr;
 
 	sdm_message_set_payload_callback(payload_callback);
-	sdm_aggregate_set_completion_callback(sdm_message_send);
+	sdm_aggregate_set_completion_callback(aggregate_callback);
 
 	svr_init(dbgr, event_callback, NULL);
 
