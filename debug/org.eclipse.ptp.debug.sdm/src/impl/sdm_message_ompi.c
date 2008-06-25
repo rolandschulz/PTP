@@ -120,20 +120,6 @@ sdm_message_send(const sdm_message msg)
 	}
 
 	/*
-	 * Create a serialized version of the message
-	 */
-	agg_len = sdm_aggregate_serialized_length(msg->aggregate);
-	src_len = sdm_set_serialized_length(msg->src);
-	dest_len = sdm_set_serialized_length(msg->dest);
-	len = agg_len + src_len + dest_len + msg->payload_len + 2;
-	p = buf = (char *)malloc(len);
-
-	sdm_aggregate_serialize(msg->aggregate, p, &p);
-	sdm_set_serialize(msg->src, p, &p);
-	sdm_set_serialize(msg->dest, p, &p);
-	memcpy(p, msg->payload, msg->payload_len);
-
-	/*
 	 * Compute the immediate destinations for the message
 	 */
 	route = sdm_route_get_route(msg->dest);
@@ -143,23 +129,44 @@ sdm_message_send(const sdm_message msg)
 		_set_to_str(msg->dest),
 		_set_to_str(route));
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send {%s}\n", sdm_route_get_id(), buf);
+	if (!sdm_set_is_empty(route)) {
+		/*
+		 * Create a serialized version of the message
+		 */
+		agg_len = sdm_aggregate_serialized_length(msg->aggregate);
+		src_len = sdm_set_serialized_length(msg->src);
+		dest_len = sdm_set_serialized_length(msg->dest);
+		len = agg_len + src_len + dest_len + msg->payload_len;
+		p = buf = (char *)malloc(len);
 
-	/*
-	 * Send the message to each destination. This could be replaced with ISend to parallelize the
-	 * sends, but since we're phasing out MPI we don't worry.
-	 */
+		sdm_aggregate_serialize(msg->aggregate, p, &p);
+		sdm_set_serialize(msg->src, p, &p);
+		sdm_set_serialize(msg->dest, p, &p);
+		memcpy(p, msg->payload, msg->payload_len);
 
-	for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
-		int err;
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send {%s}\n", sdm_route_get_id(), buf);
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
+		/*
+		 * Send the message to each destination. This could be replaced with ISend to parallelize the
+		 * sends, but since we're phasing out MPI we don't worry.
+		 */
 
-		err = MPI_Send(buf, len, MPI_CHAR, dest_id, 0, MPI_COMM_WORLD);
-		if (err != MPI_SUCCESS) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Send failed!\n");
-			return -1;
+		for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
+			int err;
+
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
+
+			err = MPI_Send(buf, len, MPI_CHAR, dest_id, 0, MPI_COMM_WORLD);
+			if (err != MPI_SUCCESS) {
+				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Send failed!\n");
+				return -1;
+			}
 		}
+
+		/*
+		 * Free resources.
+		 */
+		free(buf);
 	}
 
 	/*
@@ -168,11 +175,6 @@ sdm_message_send(const sdm_message msg)
 	if (msg->send_complete != NULL) {
 		msg->send_complete(msg);
 	}
-
-	/*
-	 * Free resources.
-	 */
-	free(buf);
 
 	return 0;
 }

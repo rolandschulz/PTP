@@ -264,7 +264,7 @@ new_request(sdm_idset dest, int timeout)
 
 	AddToList(all_requests, (void *)r);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d expected replies %s)\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d expected replies %s\n",
 			sdm_route_get_id(), r->id, _set_to_str(r->outstanding));
 }
 
