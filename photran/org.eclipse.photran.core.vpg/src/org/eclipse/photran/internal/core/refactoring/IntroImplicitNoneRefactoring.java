@@ -11,8 +11,6 @@
 package org.eclipse.photran.internal.core.refactoring;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -29,9 +27,8 @@ import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
@@ -122,7 +119,7 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
     {
         try
         {
-            scope.accept(new ASTVisitor()
+            scope.accept(new GenericASTVisitor()
             {
                 @Override
                 public void visitASTImplicitStmtNode(ASTImplicitStmtNode node)
