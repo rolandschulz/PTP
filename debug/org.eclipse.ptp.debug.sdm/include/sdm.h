@@ -8,8 +8,10 @@
 #ifndef SDM_H_
 #define SDM_H_
 
-#define SDM_AGGREGATE_TIMEOUT	0
-#define SDM_AGGREGATE_HASH		1
+#define SDM_AGGREGATE_UPSTREAM		0x00000001
+#define SDM_AGGREGATE_DOWNSTREAM	0x00000002
+#define SDM_AGGREGATE_TIMEOUT		0x00000004
+#define SDM_AGGREGATE_HASH			0x00000008
 
 struct sdm_idset;
 struct sdm_message;
@@ -100,8 +102,7 @@ extern void sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end);
 extern void sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg));
 extern void sdm_aggregate_get_value(const sdm_aggregate a, int type, ...);
 extern void sdm_aggregate_set_value(const sdm_aggregate a, int type, ...);
-extern void sdm_aggregate_start(const sdm_message msg);
-extern void sdm_aggregate_message(const sdm_message msg);
+extern void sdm_aggregate_message(const sdm_message msg, unsigned int flags);
 extern void sdm_aggregate_finish(const sdm_message msg);
 extern void	sdm_aggregate_progress(void);
 extern char * _aggregate_to_str(sdm_aggregate a);

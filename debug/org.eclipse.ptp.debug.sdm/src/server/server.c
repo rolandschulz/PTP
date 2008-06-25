@@ -70,7 +70,7 @@ event_callback(dbg_event *e, void *data)
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
 	sdm_set_add_element(sdm_message_get_destination(msg), SDM_MASTER);
 
-	sdm_aggregate_message(msg);
+	sdm_aggregate_message(msg, SDM_AGGREGATE_UPSTREAM);
 }
 
 static void
