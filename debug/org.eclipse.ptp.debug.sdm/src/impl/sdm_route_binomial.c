@@ -19,14 +19,14 @@
 #include "hash.h"
 #include "sdm.h"
 
-static int			size;
-static sdm_id		my_id;
-static sdm_id		parent;
-static Hash *		child_descendents;
-static sdm_idset	children;
-static sdm_idset	descendents;
-static sdm_idset	route;
-static sdm_idset	reachable;
+static int			size;				/* number of servers */
+static sdm_id		my_id;				/* our ID */
+static sdm_id		parent;				/* ID of our parent */
+static Hash *		child_descendants;	/* hash containing all descendants of each of our children */
+static sdm_idset	children;			/* contains all immediate children of the current location */
+static sdm_idset	descendants;		/* contains all children of the current location */
+static sdm_idset	route;				/* last computed route */
+static sdm_idset	reachable;			/* last set of reachable servers */
 
 int SDM_MASTER;
 
@@ -37,6 +37,9 @@ static void	find_descendents(sdm_idset set, int id_p, int root, int size, int p2
 
 #define NORMALIZE(this, size, root) (this + size - root) % size
 
+/*
+ * Initialize the routing layer based on a binomial distribution of nodes.
+ */
 int
 sdm_route_init(int argc, char *argv[]) {
 	int		p2;
@@ -48,7 +51,7 @@ sdm_route_init(int argc, char *argv[]) {
 	sdm_id	child;
 
 	children = sdm_set_new();
-	descendents = sdm_set_new();
+	descendants = sdm_set_new();
 	route = sdm_set_new();
 	reachable = sdm_set_new();
 
@@ -65,14 +68,14 @@ sdm_route_init(int argc, char *argv[]) {
     	parent = SDM_MASTER;
 
     find_descendents(children, this_p, root, size, p2, 0);
-    find_descendents(descendents, this_p, root, size, p2, 1);
+    find_descendents(descendants, this_p, root, size, p2, 1);
 
-    child_descendents = HashCreate(sdm_set_size(children)+1);
+    child_descendants = HashCreate(sdm_set_size(children)+1);
 
 	for (child = sdm_set_first(children); !sdm_set_done(children); child = sdm_set_next(children)) {
 		sdm_idset desc = sdm_set_new();
 		find_descendents(desc, NORMALIZE(child, size, root), root, size, p2, 1);
-		HashInsert(child_descendents, child, (void *)desc);
+		HashInsert(child_descendants, child, (void *)desc);
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] route for %d is %s \n", sdm_route_get_id(), child, _set_to_str(desc));
 	}
 
@@ -89,10 +92,10 @@ void
 sdm_route_finalize(void)
 {
 	sdm_set_free(children);
-	sdm_set_free(descendents);
+	sdm_set_free(descendants);
 	sdm_set_free(route);
 	sdm_set_free(reachable);
-	HashDestroy(child_descendents, set_free);
+	HashDestroy(child_descendants, set_free);
 }
 
 /*
@@ -118,7 +121,7 @@ sdm_route_get_route(const sdm_idset dest)
 	}
 
 	for (child = sdm_set_first(children); !sdm_set_done(children); child = sdm_set_next(children)) {
-		sdm_idset desc = (sdm_idset)HashSearch(child_descendents, child);
+		sdm_idset desc = (sdm_idset)HashSearch(child_descendants, child);
 		if (sdm_set_contains(dest, child) || sdm_set_compare(dest, desc)) {
 			sdm_set_add_element(route, child);
 		}
@@ -134,7 +137,7 @@ sdm_idset
 sdm_route_reachable(const sdm_idset dest)
 {
 	sdm_set_clear(reachable);
-	sdm_set_union(reachable, descendents);
+	sdm_set_union(reachable, descendants);
 	if (my_id != SDM_MASTER) {
 		sdm_set_add_element(reachable, my_id);
 	}

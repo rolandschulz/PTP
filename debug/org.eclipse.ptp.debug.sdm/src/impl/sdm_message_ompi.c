@@ -40,7 +40,11 @@ static void	(*payload_callback)(char *buf, int len) = NULL;
 static void	setenviron(char *str, int val);
 
 /**
- * Initialize the runtime abstraction.
+ * Initialize the runtime abstraction. The jobid is the job ID
+ * that was allocated by the OpenMPI runtime system. This is used
+ * to set an environment variable that will enable MPI_Init to
+ * establish communication.
+ *
  * @return 0 on success, -1 on failure
  */
 int
@@ -115,6 +119,9 @@ sdm_message_send(const sdm_message msg)
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send removing me from dest\n", sdm_route_get_id());
 	}
 
+	/*
+	 * Create a serialized version of the message
+	 */
 	agg_len = sdm_aggregate_serialized_length(msg->aggregate);
 	src_len = sdm_set_serialized_length(msg->src);
 	dest_len = sdm_set_serialized_length(msg->dest);
@@ -126,6 +133,9 @@ sdm_message_send(const sdm_message msg)
 	sdm_set_serialize(msg->dest, p, &p);
 	memcpy(p, msg->payload, msg->payload_len);
 
+	/*
+	 * Compute the immediate destinations for the message
+	 */
 	route = sdm_route_get_route(msg->dest);
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send src %s dest %s route %s\n", sdm_route_get_id(),
@@ -135,6 +145,10 @@ sdm_message_send(const sdm_message msg)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send {%s}\n", sdm_route_get_id(), buf);
 
+	/*
+	 * Send the message to each destination. This could be replaced with ISend to parallelize the
+	 * sends, but since we're phasing out MPI we don't worry.
+	 */
 
 	for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
 		int err;
@@ -148,15 +162,23 @@ sdm_message_send(const sdm_message msg)
 		}
 	}
 
+	/*
+	 * Notify that the send is complete.
+	 */
 	if (msg->send_complete != NULL) {
 		msg->send_complete(msg);
 	}
+
+	/*
+	 * Free resources.
+	 */
+	free(buf);
 
 	return 0;
 }
 
 /**
- * Message progress
+ * Message progress. Caller is responsible for freeing allocated message resources.
  *
  * @return 0 on success, -1 on failure
  */
