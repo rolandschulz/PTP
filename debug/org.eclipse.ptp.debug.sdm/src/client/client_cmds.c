@@ -126,7 +126,7 @@ send_command(sdm_idset dest, int timeout, char *cmd, void *cbdata)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send_command %s\n", sdm_route_get_id(), _set_to_str(dest));
 
-	msg = sdm_message_new(strdup(cmd), strlen(cmd)+1);
+	msg = sdm_message_new(cmd, strlen(cmd)+1);
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
 	sdm_set_union(sdm_message_get_destination(msg), dest);
 
@@ -230,7 +230,6 @@ DbgClntStartSession(int tid, int nargs, char **args)
 	res = send_command(dbg_procs, DBG_EV_WAITALL, buf, NULL);
 
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -260,7 +259,6 @@ DbgClntSetLineBreakpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -287,7 +285,6 @@ DbgClntSetFuncBreakpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -314,7 +311,6 @@ DbgClntDeleteBreakpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -341,7 +337,6 @@ DbgClntEnableBreakpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -368,7 +363,6 @@ DbgClntDisableBreakpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -395,7 +389,6 @@ DbgClntConditionBreakpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -422,7 +415,6 @@ DbgClntBreakpointAfter(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -449,7 +441,6 @@ DbgClntSetWatchpoint(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -479,7 +470,6 @@ DbgClntGo(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -506,7 +496,6 @@ DbgClntStep(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -533,7 +522,6 @@ DbgClntTerminate(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -560,7 +548,6 @@ DbgClntSuspend(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	bitset_free(set);
 
@@ -592,7 +579,6 @@ DbgClntListStackframes(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -619,7 +605,6 @@ DbgClntSetCurrentStackframe(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -649,7 +634,6 @@ DbgClntEvaluateExpression(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -676,7 +660,6 @@ DbgClntGetType(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -703,7 +686,6 @@ DbgClntListLocalVariables(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -730,7 +712,6 @@ DbgClntListArguments(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -757,7 +738,6 @@ DbgClntListGlobalVariables(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -784,7 +764,6 @@ DbgClntListInfoThreads(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -811,7 +790,6 @@ DbgClntSetThreadSelect(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -838,7 +816,6 @@ DbgClntStackInfoDepth(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -865,7 +842,6 @@ DbgClntDataReadMemory(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -892,7 +868,6 @@ DbgClntDataWriteMemory(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -919,7 +894,6 @@ DbgClntListSignals(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -946,7 +920,6 @@ DbgClntSignalInfo(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -973,7 +946,6 @@ DbgClntCLIHandle(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -994,7 +966,6 @@ DbgClntQuit(int tid, int nargs, char **args)
 	res = send_command(dbg_procs, DBG_EV_WAITALL, buf, NULL);
 
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -1089,7 +1060,6 @@ DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -1115,7 +1085,6 @@ DbgClntGetPartialAIF(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
@@ -1141,7 +1110,6 @@ DbgClntVariableDelete(int tid, int nargs, char **args)
 
 	bitset_free(set);
 	free_proxy_msg(msg);
-	free(buf);
 
 	return res;
 }
