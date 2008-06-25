@@ -32,7 +32,8 @@ struct sdm_aggregate {
 
 /*
  * A request represents an asynchronous send/receive transaction between the client
- * and all servers. completed() is called once all replies have been received.
+ * and all servers. The completion_callback() is called once all replies have been received
+ * for a particular request.
  */
 struct request {
 	int				id;				/* this request id */
@@ -110,6 +111,9 @@ sdm_aggregate_start(sdm_message msg)
 	new_request(sdm_route_get_parent(), msg, a->value);
 }
 
+/*
+ * Aggregate a received message
+ */
 void
 sdm_aggregate_message(sdm_message msg)
 {
@@ -393,6 +397,9 @@ disable_timer(request *r)
 	r->timer_state = TIMER_DISABLED;
 }
 
+/*
+ * Given a new message, try to aggregate it with any outstanding messages.
+ */
 static void
 update_reply(request *req, sdm_message msg, int hash)
 {
