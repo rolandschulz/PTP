@@ -1,6 +1,13 @@
-/**
- * 
- */
+/**********************************************************************
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.lapi.actions;
 
 import java.util.List;
@@ -9,7 +16,6 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
@@ -35,13 +41,12 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase
 	/**
 	 * Returns LAPI analysis artifacts for file
 	 * 
-	 * @param file
-	 * @param includes
-	 *            Lapi include paths
-	 * @return
+	 * @param tu the translation unit representing the file to be analyzed
+	 * @param includes list of Lapi include paths
+	 * @return analysis results
 	 */
-
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List includes) {
+	@Override
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List<String> includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
