@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005, 2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,11 @@ package org.eclipse.ptp.pldt.common.editorHelp;
 import org.eclipse.cdt.ui.IFunctionSummary;
 import org.eclipse.cdt.ui.IRequiredInclude;
 
+/**
+ * Used by all four PLDT types MPI, OpenMP, LAPI and UPC, to create the structures that hover help needs
+ * @author Beth Tibbitts
+ *
+ */
 public class FunctionSummaryImpl implements IFunctionSummary
 {
     private String                    name;
