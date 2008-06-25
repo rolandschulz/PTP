@@ -26,6 +26,7 @@ import org.eclipse.ptp.pldt.upc.UPCPlugin;
 import org.eclipse.ptp.pldt.upc.analysis.UPCCASTVisitor;
 
 /**
+ * The "Find UPC Artifacts" action/command
  * @author Beth Tibbitts
  *
  */
@@ -67,10 +68,14 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 	}
 
 	/**
-	 * Determination of if a given filename is valid for our artifact analysis
+	 * Determination of whether or not a given filename is valid for UPC artifact analysis
+	 * <br>TODO  Consider using language or content-type instead of file extension?
+	 * Re-visit after https://bugs.eclipse.org/bugs/show_bug.cgi?id=237331 is resolved (UPC  content-type not recognized)
+	 * 
 	 * @param filename
 	 * @param isCPP  is the project a C++ project or not
 	 * @return
+	 * 
 	 */
 	@Override
 	protected boolean validForAnalysis(String filename, boolean isCPP) {
