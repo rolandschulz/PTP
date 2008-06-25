@@ -14,7 +14,7 @@ sdm_SOURCES =				src/client/startup.c\
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_message_ompi.c \
-							src/impl/sdm_route_binomial.c \
+							src/impl/sdm_route_tree.c \
 							src/impl/sdm_set_bitset.c
 					
 sdm_CFLAGS =				-I./include -I./libaif -I./src/mi $(AM_CFLAGS)

@@ -10,7 +10,8 @@
  *******************************************************************************/
 
 /*
- * Routing layer implementation. These routines implement a binomial tree-based router.
+ * Routing layer implementation. These routines implement a tree-based router. The tree can
+ * be either binomial or balanced.
  */
 
 #include <stdlib.h>
@@ -18,6 +19,9 @@
 #include "compat.h"
 #include "hash.h"
 #include "sdm.h"
+
+#define ROUTE_BINOMIAL	0
+#define ROUTE_BALANCED	1
 
 static int			size;				/* number of servers */
 static sdm_id		my_id;				/* our ID */
@@ -38,7 +42,7 @@ static void	find_descendents(sdm_idset set, int id_p, int root, int size, int p2
 #define NORMALIZE(this, size, root) (this + size - root) % size
 
 /*
- * Initialize the routing layer based on a binomial distribution of nodes.
+ * Initialize the routing layer.
  */
 int
 sdm_route_init(int argc, char *argv[]) {

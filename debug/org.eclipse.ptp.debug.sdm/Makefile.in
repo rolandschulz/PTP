@@ -118,7 +118,7 @@ am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/impl/sdm-sdm.$(OBJEXT) \
 	src/impl/sdm-sdm_aggregate_hash.$(OBJEXT) \
 	src/impl/sdm-sdm_message_ompi.$(OBJEXT) \
-	src/impl/sdm-sdm_route_binomial.$(OBJEXT) \
+	src/impl/sdm-sdm_route_tree.$(OBJEXT) \
 	src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
 sdm_DEPENDENCIES = libdbgutils.a libmi.a libaif/libaif.a
@@ -270,7 +270,7 @@ sdm_SOURCES = src/client/startup.c\
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_message_ompi.c \
-							src/impl/sdm_route_binomial.c \
+							src/impl/sdm_route_tree.c \
 							src/impl/sdm_set_bitset.c
 
 sdm_CFLAGS = -I./include -I./libaif -I./src/mi $(AM_CFLAGS)
@@ -552,7 +552,7 @@ src/impl/sdm-sdm_aggregate_hash.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_message_ompi.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_route_binomial.$(OBJEXT): src/impl/$(am__dirstamp) \
+src/impl/sdm-sdm_route_tree.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_set_bitset.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
@@ -594,7 +594,7 @@ mostlyclean-compile:
 	-rm -f src/impl/sdm-sdm.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_aggregate_hash.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_message_ompi.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_route_binomial.$(OBJEXT)
+	-rm -f src/impl/sdm-sdm_route_tree.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 	-rm -f src/mi/libmi_a-CLICommand.$(OBJEXT)
 	-rm -f src/mi/libmi_a-CLIOutput.$(OBJEXT)
@@ -651,7 +651,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_message_ompi.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLICommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLIOutput.Po@am__quote@
@@ -1358,19 +1358,19 @@ src/impl/sdm-sdm_message_ompi.obj: src/impl/sdm_message_ompi.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_ompi.obj `if test -f 'src/impl/sdm_message_ompi.c'; then $(CYGPATH_W) 'src/impl/sdm_message_ompi.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_ompi.c'; fi`
 
-src/impl/sdm-sdm_route_binomial.o: src/impl/sdm_route_binomial.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_binomial.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" -c -o src/impl/sdm-sdm_route_binomial.o `test -f 'src/impl/sdm_route_binomial.c' || echo '$(srcdir)/'`src/impl/sdm_route_binomial.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_binomial.c' object='src/impl/sdm-sdm_route_binomial.o' libtool=no @AMDEPBACKSLASH@
+src/impl/sdm-sdm_route_tree.o: src/impl/sdm_route_tree.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_tree.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo" -c -o src/impl/sdm-sdm_route_tree.o `test -f 'src/impl/sdm_route_tree.c' || echo '$(srcdir)/'`src/impl/sdm_route_tree.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/sdm-sdm_route_tree.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_binomial.o `test -f 'src/impl/sdm_route_binomial.c' || echo '$(srcdir)/'`src/impl/sdm_route_binomial.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_tree.o `test -f 'src/impl/sdm_route_tree.c' || echo '$(srcdir)/'`src/impl/sdm_route_tree.c
 
-src/impl/sdm-sdm_route_binomial.obj: src/impl/sdm_route_binomial.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_binomial.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" -c -o src/impl/sdm-sdm_route_binomial.obj `if test -f 'src/impl/sdm_route_binomial.c'; then $(CYGPATH_W) 'src/impl/sdm_route_binomial.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_binomial.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_route_binomial.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_binomial.c' object='src/impl/sdm-sdm_route_binomial.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/sdm-sdm_route_tree.obj: src/impl/sdm_route_tree.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_tree.obj -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo" -c -o src/impl/sdm-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo" "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po"; else rm -f "src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/sdm-sdm_route_tree.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_binomial.obj `if test -f 'src/impl/sdm_route_binomial.c'; then $(CYGPATH_W) 'src/impl/sdm_route_binomial.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_binomial.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`
 
 src/impl/sdm-sdm_set_bitset.o: src/impl/sdm_set_bitset.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_set_bitset.o -MD -MP -MF "src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Tpo" -c -o src/impl/sdm-sdm_set_bitset.o `test -f 'src/impl/sdm_set_bitset.c' || echo '$(srcdir)/'`src/impl/sdm_set_bitset.c; \
