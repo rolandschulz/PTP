@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005, 2008 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,9 @@ import org.osgi.framework.Bundle;
 public class MpiCHelpBook extends CHelpBookImpl {
 	private static final String TITLE = "MPI C Help Book";
     
+	/**
+	 * builds the list of function summaries by parsing an XML file
+	 */
 	public MpiCHelpBook() {
 		super(MpiPlugin.getPluginId());
 		// populate func map
