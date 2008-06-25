@@ -13,9 +13,7 @@ package org.eclipse.ptp.pldt.upc.editorHelp;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.cdt.ui.FunctionPrototypeSummary;
 import org.eclipse.cdt.ui.IFunctionSummary;
-import org.eclipse.cdt.ui.IFunctionSummary.IFunctionPrototypeSummary;
 import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionPrototypeSummaryImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionSummaryImpl;
@@ -23,6 +21,10 @@ import org.eclipse.ptp.pldt.upc.UPCPlugin;
 
 /**
  * UPC help book - this is the information that is used for the hover help
+ * <p>
+ * <b>Note:</b> This (and F1/dynamic help as well) requires a fix to CDT post-5.0.0 release
+ * to org.eclipse.cdt.internal.core.model.TranslationUnit  - to recognize content-type of UPC to be a deriviative ("kindOf") the C content type.
+ * <p>See https://bugs.eclipse.org/bugs/show_bug.cgi?id=237331  
  * @author Beth Tibbitts
  *
  */
@@ -62,7 +64,8 @@ public class UPCCHelpBook extends CHelpBookImpl {
         desc.put("upc_phaseof", "Returns the phase component of the pointer-to-shared argument.");
         desc.put("upc_resetphase", "Returns a pointer-to-shared which is identical to its input except that it has zero phase");
         desc.put("upc_threadof", "Returns the index of the thread that has affinity to the shared object pointed to by the argument.");
-        desc.put("upc_unlock", "Sets the state of a lock to unlocked.");   
+        desc.put("upc_unlock", "Sets the state of a lock to unlocked."); 
+        desc.put("shared", "this is a shared UPC keyword");
         
         
 		// populate func map
@@ -95,13 +98,14 @@ public class UPCCHelpBook extends CHelpBookImpl {
         funcName2FuncInfo.put("upc_resetphase", fps("upc_resetphase", "", desc, "void", "shared void *ptr"));
         funcName2FuncInfo.put("upc_threadof", fps("upc_threadof", "", desc, "size_t", "shared void *ptr"));
         funcName2FuncInfo.put("upc_unlock", fps("upc_unlock", "", desc, "void", "upc_lock_t *ptr"));
+        funcName2FuncInfo.put("shared", fps("shared", "", desc, "", ""));
         
         // set title
         setTitle(TITLE);
 	}
 	
 	/**
-	 * onvenience function for inputting these FunctionPrototypeSummary and FunctionSummary arguments.
+	 * Convenience function for inputting these FunctionPrototypeSummary and FunctionSummary arguments.
 	 * @param name
 	 * @param namespace
 	 * @param description if empty will do lookup in Map
