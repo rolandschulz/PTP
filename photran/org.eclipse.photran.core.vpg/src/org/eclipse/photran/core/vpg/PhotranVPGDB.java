@@ -29,7 +29,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         {
             this(PhotranVPG.inTestingMode()
                  ? createTempFile()
-                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "vpg");
+                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran40b4vpg");
         }
         
         private PhotranCDTDB(String filename)
