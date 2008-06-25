@@ -349,7 +349,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * @return true if an error was encountered
 	 * @throws InterruptedException
 	 */
-	protected boolean runResource(IProgressMonitor monitor, ICElement ce,
+	public boolean runResource(IProgressMonitor monitor, ICElement ce,
 			int indent, List<String> includes) throws InterruptedException {
 		indent += INDENT_INCR;
 		ScanReturn results;
