@@ -101,40 +101,34 @@ sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg))
 }
 
 /*
- * Start aggregation on a message.
- */
-void
-sdm_aggregate_start(sdm_message msg)
-{
-	sdm_aggregate	a = sdm_message_get_aggregate(msg);
-
-	new_request(sdm_route_get_parent(), msg, a->value);
-}
-
-/*
  * Aggregate a received message
  */
 void
-sdm_aggregate_message(sdm_message msg)
+sdm_aggregate_message(sdm_message msg, unsigned int flags)
 {
-	request *		req;
 	sdm_aggregate	a;
 
 	a = sdm_message_get_aggregate(msg);
 
-	/*
-	 * Find the request this reply is for.
-	 * Check if the request is completed.
-	 */
-	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message compare %s %s\n", sdm_route_get_id(),
-				_set_to_str(req->outstanding),
-				_set_to_str(sdm_message_get_source(msg)));
+	if (flags & SDM_AGGREGATE_UPSTREAM) {
+		request *		req;
 
-		if (sdm_set_compare(req->outstanding, sdm_message_get_source(msg))) {
-			update_reply(req, msg, a->value);
-			break;
+		/*
+		 * Find the request this reply is for.
+		 * Check if the request is completed.
+		 */
+		for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message compare %s %s\n", sdm_route_get_id(),
+					_set_to_str(req->outstanding),
+					_set_to_str(sdm_message_get_source(msg)));
+
+			if (sdm_set_compare(req->outstanding, sdm_message_get_source(msg))) {
+				update_reply(req, msg, a->value);
+				break;
+			}
 		}
+	} else if (flags & SDM_AGGREGATE_DOWNSTREAM) {
+		new_request(sdm_route_get_parent(), msg, a->value);
 	}
 }
 
@@ -170,15 +164,6 @@ sdm_aggregate_finalize(void)
 		sdm_message_progress();
 		sdm_aggregate_progress();
 	}
-}
-
-/*
- * Force aggregation completion.
- */
-void
-sdm_aggregate_finish(const sdm_message msg)
-{
-	//interrupt_all_requests(sdm_message_get_destination(msg));
 }
 
 sdm_aggregate

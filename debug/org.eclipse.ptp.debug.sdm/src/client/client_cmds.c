@@ -130,7 +130,7 @@ send_command(sdm_idset dest, int timeout, char *cmd, void *cbdata)
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
 	sdm_set_union(sdm_message_get_destination(msg), dest);
 
-	sdm_aggregate_start(msg);
+	sdm_aggregate_message(msg, SDM_AGGREGATE_DOWNSTREAM);
 
 	sdm_message_set_send_callback(msg, sdm_message_free);
 	sdm_message_send(msg);
