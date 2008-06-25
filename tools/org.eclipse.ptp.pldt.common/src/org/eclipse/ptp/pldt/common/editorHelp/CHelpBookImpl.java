@@ -62,9 +62,11 @@ public class CHelpBookImpl implements ICHelpBook {
 			String name) {
 		IFunctionSummary fs = funcName2FuncInfo.get(name);
 		if(traceOn){
+			
 			String cn=this.getClass().getSimpleName();
 			String finfo=(fs!=null)?(fs.toString().substring(0,25)):null;
-			System.out.println("CHelpBookImpl "+cn+" getFunctionInfo for "+name+ "= "+finfo);
+			if(finfo!=null)
+				System.out.println("CHelpBookImpl "+cn+" getFunctionInfo for "+name+ "= "+finfo);
 		}
 		return fs;
 	}
