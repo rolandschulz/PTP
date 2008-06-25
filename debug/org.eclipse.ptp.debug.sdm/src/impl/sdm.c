@@ -19,6 +19,9 @@ static int	shutting_down = 0;
 
 static void	recv_callback(sdm_message msg);
 
+/*
+ * Initialize the abstraction layers
+ */
 int
 sdm_init(int argc, char *argv[])
 {
@@ -40,7 +43,7 @@ sdm_init(int argc, char *argv[])
 }
 
 /**
- * Finalize the runtime abstraction.
+ * Finalize the abstraction layers
  */
 void
 sdm_finalize(void)
@@ -52,6 +55,9 @@ sdm_finalize(void)
 	sdm_message_finalize();
 }
 
+/*
+ * Progress messages and the aggregation layer
+ */
 void
 sdm_progress(void)
 {
@@ -80,13 +86,26 @@ recv_callback(sdm_message msg)
 
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got downstream message\n", sdm_route_get_id());
 
+		/*
+		 * Start aggregating messages
+		 */
 		sdm_aggregate_start(msg);
 
+		/*
+		 * If we are the destination, then deliver the payload
+		 */
 		if (sdm_set_contains(sdm_message_get_destination(msg), sdm_route_get_id())) {
 			sdm_message_deliver_payload(msg);
 		}
 
+		/*
+		 * Free the message once it's been forwarded
+		 */
 		sdm_message_set_send_callback(msg, sdm_message_free);
+
+		/*
+		 * Now forward the message
+		 */
 		sdm_message_send(msg);
 	} else {
 		/*
@@ -94,6 +113,10 @@ recv_callback(sdm_message msg)
 		 */
 
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got upstream message #%x\n", sdm_route_get_id());
+
+		/*
+		 * Upstream messages are always aggregated
+		 */
 		sdm_aggregate_message(msg);
 	}
 }
