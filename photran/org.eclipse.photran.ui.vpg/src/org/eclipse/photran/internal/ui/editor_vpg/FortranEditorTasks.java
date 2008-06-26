@@ -167,7 +167,7 @@ public class FortranEditorTasks
         {
             if (updateVPGJob != null || dispatchVPGTasksJob != null) return; // Already running an update
 
-            if (vpgAST == null || vpg.db.isOutOfDate(PhotranVPG.getFilenameForIFile(editor.getIFile())))
+            //if (vpgAST == null || vpg.db.isOutOfDate(PhotranVPG.getFilenameForIFile(editor.getIFile())))
             {
                 vpg.queueJobToEnsureVPGIsUpToDate();
                 
