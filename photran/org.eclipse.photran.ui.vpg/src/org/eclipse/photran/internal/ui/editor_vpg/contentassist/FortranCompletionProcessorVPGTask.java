@@ -25,6 +25,8 @@ final class FortranCompletionProcessorVPGTask implements IFortranEditorVPGTask
     // IFortranEditorVPGTask - Will be run <i>outside</i> the UI thread
     public void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap)
     {
+        if (ast == null) return;
+        
         synchronized (fortranCompletionProcessor)
         {
             try
