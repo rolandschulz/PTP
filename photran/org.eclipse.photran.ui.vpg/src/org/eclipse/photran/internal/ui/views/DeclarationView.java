@@ -307,7 +307,7 @@ public class DeclarationView extends ViewPart
         if (event.getSelection() instanceof TextSelection && tokenList != null && defMap != null)
         {
             String description = defMap.lookup((TextSelection)event.getSelection(), tokenList);
-            update(description == null ? "(Unable to locate declaration)" : description);
+            update(description == null ? "" : description);
         }
         else
         {
