@@ -103,9 +103,6 @@ int
 sdm_message_send(const sdm_message msg)
 {
 	int			len;
-	int			agg_len;
-	int			src_len;
-	int			dest_len;
 	char *		p;
 	char *		buf;
 	sdm_id		dest_id;
@@ -133,18 +130,24 @@ sdm_message_send(const sdm_message msg)
 		/*
 		 * Create a serialized version of the message
 		 */
-		agg_len = sdm_aggregate_serialized_length(msg->aggregate);
-		src_len = sdm_set_serialized_length(msg->src);
-		dest_len = sdm_set_serialized_length(msg->dest);
-		len = agg_len + src_len + dest_len + msg->payload_len;
+
+		len = sdm_aggregate_serialized_length(msg->aggregate)
+			+ sdm_set_serialized_length(msg->src)
+			+ sdm_set_serialized_length(msg->dest)
+			+ msg->payload_len;
+
 		p = buf = (char *)malloc(len);
 
-		sdm_aggregate_serialize(msg->aggregate, p, &p);
-		sdm_set_serialize(msg->src, p, &p);
-		sdm_set_serialize(msg->dest, p, &p);
-		memcpy(p, msg->payload, msg->payload_len);
+		/*
+		 * Note: len was the maximum length of the serialized buffer, we
+		 * now calculate the actual length for the send.
+		 */
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send {%s}\n", sdm_route_get_id(), buf);
+		len = sdm_aggregate_serialize(msg->aggregate, p, &p);
+		len += sdm_set_serialize(msg->src, p, &p);
+		len += sdm_set_serialize(msg->dest, p, &p);
+		memcpy(p, msg->payload, msg->payload_len);
+		len += msg->payload_len;
 
 		/*
 		 * Send the message to each destination. This could be replaced with ISend to parallelize the
@@ -189,9 +192,8 @@ sdm_message_progress(void)
 {
 	int				err;
 	int				avail;
+	int				n;
 	int				len;
-	char *			p;
-	char *			hdr;
 	char *			buf;
 	MPI_Status		stat;
 
@@ -205,7 +207,7 @@ sdm_message_progress(void)
 	if (avail) {
 		MPI_Get_count(&stat, MPI_CHAR, &len);
 
-		buf = (char *)malloc(len * sizeof(char));
+		buf = (char *)malloc(len);
 
 		sdm_message msg = sdm_message_new(buf, len);
 
@@ -218,26 +220,31 @@ sdm_message_progress(void)
 
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n", sdm_route_get_id(), len, stat.MPI_SOURCE);
 
-		hdr = buf;
-		sdm_aggregate_deserialize(msg->aggregate, hdr, &p);
-		len -= (p - hdr);
+		if ((n = sdm_aggregate_deserialize(msg->aggregate, buf, &buf)) < 0) {
+			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
+			return -1;
+		}
+		len -= n;
 
-		hdr = p;
-		sdm_set_deserialize(msg->src, hdr, &p);
-		len -= (p - hdr);
+		if ((n = sdm_set_deserialize(msg->src, buf, &buf)) < 0) {
+			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
+			return -1;
+		}
+		len -= n;
 
-		hdr = p;
-		sdm_set_deserialize(msg->dest, hdr, &p);
-		len -= (p - hdr);
+		if ((n = sdm_set_deserialize(msg->dest, buf, &buf)) < 0) {
+			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
+			return -1;
+		}
+		len -= n;
 
-		msg->payload = p;
+		msg->payload = buf;
 		msg->payload_len = len;
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress <%s>@(%s,%s) {%s}\n", sdm_route_get_id(),
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress agg=%s src=%s dest=%s\n", sdm_route_get_id(),
 				_aggregate_to_str(msg->aggregate),
 				_set_to_str(msg->src),
-				_set_to_str(msg->dest),
-				p);
+				_set_to_str(msg->dest));
 
 		if (sdm_recv_callback  != NULL) {
 			sdm_recv_callback(msg);
@@ -334,6 +341,7 @@ void
 sdm_message_deliver_payload(const sdm_message msg)
 {
 	if (payload_callback != NULL) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_deliver_payload \n", sdm_route_get_id());
 		payload_callback(msg->payload, msg->payload_len);
 	}
 }

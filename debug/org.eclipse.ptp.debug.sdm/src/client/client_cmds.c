@@ -126,7 +126,7 @@ send_command(sdm_idset dest, int timeout, char *cmd, void *cbdata)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send_command %s\n", sdm_route_get_id(), _set_to_str(dest));
 
-	msg = sdm_message_new(cmd, strlen(cmd)+1);
+	msg = sdm_message_new(cmd, strlen(cmd));
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
 	sdm_set_union(sdm_message_get_destination(msg), dest);
 
