@@ -182,25 +182,6 @@ sdm_aggregate_new(void)
 }
 
 void
-sdm_aggregate_get_value(sdm_aggregate a, int type, ...)
-{
-	int	*		value;
-    va_list		ap;
-
-    va_start(ap, type);
-
-    switch (type) {
-    case SDM_AGGREGATE_TIMEOUT:
-    case SDM_AGGREGATE_HASH:
-    	value = va_arg(ap, int *);
-    	*value = a->value;
-    	break;
-    }
-
-    va_end(ap);
-}
-
-void
 sdm_aggregate_set_value(sdm_aggregate a, int type, ...)
 {
 	int		len;
