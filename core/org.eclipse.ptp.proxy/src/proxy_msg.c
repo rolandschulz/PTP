@@ -36,6 +36,8 @@ extern int digittoint(int c);
 #endif /* __linux__ */
 
 #define ARG_SIZE	100
+#define SEP1		':'
+#define SEP2		' '
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -150,24 +152,27 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	 */
 	packet++; /* Skip space */
 	end = packet + MSG_ID_SIZE;
-	*end++ = '\0';
+	*end = '\0';
 	msg_id = strtol(packet, NULL, 16);
+	*end++ = SEP1;
 
 	/*
 	 * transaction ID
 	 */
 	packet = end;
 	end = packet + MSG_TRANS_ID_SIZE;
-	*end++ = '\0';
+	*end = '\0';
 	trans_id = strtol(packet, NULL, 16);
+	*end++ = SEP1;
 
 	/*
 	 * number of args
 	 */
 	packet = end;
 	end = packet + MSG_NARGS_SIZE;
-	*end++ = '\0';
+	*end = '\0';
 	num_args = strtol(packet, NULL, 16);
+	*end++ = SEP2;
 
 	m = new_proxy_msg(msg_id, trans_id);
 
@@ -204,8 +209,9 @@ proxy_msg_decode_string(char *str, char **arg, char **end)
 	}
 
 	ep = str + MSG_ARG_LEN_SIZE;
-	*ep++ = '\0';
+	*ep = '\0';
 	arg_len = strtol(str, NULL, 16);
+	*ep++ = SEP1;
 
 	if (str_len < MSG_ARG_LEN_SIZE + arg_len + 1) {
 		return -1;
