@@ -73,7 +73,9 @@ static void
 recv_callback(sdm_message msg)
 {
 	if (sdm_set_contains(sdm_message_get_source(msg), SDM_MASTER)) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got downstream message\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got downstream message src=%s, dest=%s\n", sdm_route_get_id(),
+				_set_to_str(sdm_message_get_source(msg)),
+				_set_to_str(sdm_message_get_destination(msg)));
 
 		if (shutting_down) {
 			/*
@@ -104,7 +106,9 @@ recv_callback(sdm_message msg)
 		 */
 		sdm_message_send(msg);
 	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got upstream message #%x\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got upstream message src=%s, dest=%s\n", sdm_route_get_id(),
+				_set_to_str(sdm_message_get_source(msg)),
+				_set_to_str(sdm_message_get_destination(msg)));
 
 		/*
 		 * Upstream messages are always aggregated
