@@ -75,10 +75,16 @@ sdm_aggregate_init(int argc, char *argv[])
 	return 0;
 }
 
-void
+int
 sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
 {
-	hex_to_str(buf, end, a->value);
+	char *	e;
+
+	hex_to_str(buf, &e, a->value);
+	if (end != NULL) {
+		*end = e;
+	}
+	return e - buf;
 }
 
 int
@@ -87,10 +93,16 @@ sdm_aggregate_serialized_length(const sdm_aggregate a)
 	return HEX_LEN;
 }
 
-void
+int
 sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
 {
-	a->value = str_to_hex(str, end);
+	char *	e;
+
+	a->value = str_to_hex(str, &e);
+	if (end != NULL) {
+		*end = e;
+	}
+	return e - str;
 }
 
 void
@@ -117,10 +129,6 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 		 * Check if the request is completed.
 		 */
 		for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message compare %s %s\n", sdm_route_get_id(),
-					_set_to_str(req->outstanding),
-					_set_to_str(sdm_message_get_source(msg)));
-
 			if (sdm_set_compare(req->outstanding, sdm_message_get_source(msg))) {
 				update_reply(req, msg, a->value);
 				break;

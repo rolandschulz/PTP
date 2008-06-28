@@ -23,6 +23,7 @@ typedef struct sdm_message *	sdm_message;
 typedef struct sdm_aggregate *	sdm_aggregate;
 
 extern sdm_id	SDM_MASTER;
+
 /*
  * Startup/Initialization
  */
@@ -71,9 +72,9 @@ extern sdm_id sdm_set_max(const sdm_idset set);
 extern sdm_id sdm_set_first(const sdm_idset set);
 extern sdm_id sdm_set_next(const sdm_idset set);
 extern int sdm_set_done(const sdm_idset set);
-extern void sdm_set_serialize(const sdm_idset set, char *buf, char **end);
+extern int sdm_set_serialize(const sdm_idset set, char *buf, char **end);
 extern int sdm_set_serialized_length(const sdm_idset set);
-extern void sdm_set_deserialize(sdm_idset set, char *str, char **end);
+extern int sdm_set_deserialize(sdm_idset set, char *str, char **end);
 extern char *_set_to_str(const sdm_idset set);
 
 /*
@@ -96,9 +97,9 @@ extern int sdm_aggregate_init(int argc, char *argv[]);
 extern void	sdm_aggregate_finalize(void);
 extern sdm_aggregate sdm_aggregate_new(void);
 extern void sdm_aggregate_free(sdm_aggregate a);
-extern void sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end);
+extern int sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end);
 extern int sdm_aggregate_serialized_length(const sdm_aggregate a);
-extern void sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end);
+extern int sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end);
 extern void sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg));
 extern void sdm_aggregate_get_value(const sdm_aggregate a, int type, ...);
 extern void sdm_aggregate_set_value(const sdm_aggregate a, int type, ...);
