@@ -110,6 +110,8 @@ dbg_clnt_cmd_completed(sdm_message msg)
  		 * don't include the bitset, it is only added prior to sending back
  		 * to the client.
  		 */
+ 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] dbg_clnt_cmd_completed src=%s\n", sdm_route_get_id(),
+ 				_set_to_str(sdm_message_get_source(msg)));
 		proxy_msg_insert_bitset(m, idset_to_bitset(sdm_message_get_source(msg)), 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
 	}
@@ -195,8 +197,6 @@ void
 DbgClntFinish(void)
 {
 	proxy_svr_finish(dbg_proxy);
-	sdm_set_free(tmp_idset);
-	bitset_free(tmp_bitset);
 }
 
 int
