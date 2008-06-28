@@ -46,7 +46,7 @@
 #include "sdm.h"
 
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
-extern int	svr_dispatch(dbg_backend *, char *);
+extern int	svr_dispatch(dbg_backend *, char *, int);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_isshutdown(void);
 
@@ -62,9 +62,9 @@ event_callback(dbg_event *e, void *data)
 	if (DbgSerializeEvent(e, &buf) < 0)
 		return;
 
-	len = strlen(buf) + 1;
+	len = strlen(buf);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] server event_callback '%s'\n", sdm_route_get_id(), buf);
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server event_callback '%s'\n", sdm_route_get_id(), buf);
 
 	msg = sdm_message_new(buf, len);
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
@@ -78,7 +78,7 @@ payload_callback(char *cmd, int len)
 {
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "server payload_callback '%s'\n", cmd);
 
-	(void)svr_dispatch(backend, cmd);
+	(void)svr_dispatch(backend, cmd, len);
 }
 
 static int

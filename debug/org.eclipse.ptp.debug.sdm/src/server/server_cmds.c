@@ -142,13 +142,13 @@ svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data)
 }
 
 int
-svr_dispatch(dbg_backend *db, char *cmd_str)
+svr_dispatch(dbg_backend *db, char *cmd_str, int len)
 {
 	int			idx;
 	proxy_msg *	msg;
 	svr_cmd		cmd;
 
-	if (proxy_deserialize_msg(cmd_str, strlen(cmd_str), &msg) < 0) {
+	if (proxy_deserialize_msg(cmd_str, len, &msg) < 0) {
 		svr_res = DBGRES_ERR;
 		DbgSetError(DBGERR_DEBUGGER, "bad debug message format");
 		return 0;
