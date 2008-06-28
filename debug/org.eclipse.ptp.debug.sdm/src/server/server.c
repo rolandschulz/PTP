@@ -131,7 +131,5 @@ server(dbg_backend *dbgr)
 		sdm_progress();
 		svr_progress(dbgr);
 	}
-
-	sdm_finalize();
 }
 
