@@ -155,7 +155,7 @@ public class OpenMpiRMLaunchConfigurationDynamicTab extends
 		}
 		
 		void storeConfig(ILaunchConfigurationWorkingCopy configuration) {
-			configuration.setAttribute(ATTR_NUMPROCS, numProcsDefault);
+			configuration.setAttribute(ATTR_NUMPROCS, numProcs);
 			configuration.setAttribute(ATTR_BYSLOT, bySlot);
 			configuration.setAttribute(ATTR_NOOVERSUBSCRIBE, noOversubscribe);
 			configuration.setAttribute(ATTR_NOLOCAL, noLocal);

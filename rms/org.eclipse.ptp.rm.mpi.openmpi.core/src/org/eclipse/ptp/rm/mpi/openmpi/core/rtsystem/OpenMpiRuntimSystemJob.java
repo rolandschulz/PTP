@@ -74,7 +74,13 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			ipJob.addAttribute(OpenMpiJobAttributes.getMpiJobId().create(map.map_for_job));
 			ipJob.addAttribute(OpenMpiJobAttributes.getVpidStart().create(map.starting_vpid));
 			ipJob.addAttribute(OpenMpiJobAttributes.getVpidRange().create(map.vpid_range));
-			ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(map.vpid_range));
+			if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.bynode) {
+				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_NODE));
+			} else if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.byslot) {
+				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_SLOT));
+			} else {
+				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.UNKNOWN));
+			}
 			ipJob.addAttribute(OpenMpiJobAttributes.getNumMappedNodesDefinition().create(map.mappedNodes.size()));
 		} catch (IllegalValueException e) {
 			// No invalid values can be generated
