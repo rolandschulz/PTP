@@ -40,6 +40,7 @@ import org.eclipse.ptp.rm.core.utils.ILineStreamListener;
 import org.eclipse.ptp.rm.core.utils.TextStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.Activator;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
 
 public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	private TextStreamObserver stderrObserver;
@@ -74,13 +75,13 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			ipJob.addAttribute(OpenMpiJobAttributes.getMpiJobId().create(map.map_for_job));
 			ipJob.addAttribute(OpenMpiJobAttributes.getVpidStart().create(map.starting_vpid));
 			ipJob.addAttribute(OpenMpiJobAttributes.getVpidRange().create(map.vpid_range));
-			if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.bynode) {
-				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_NODE));
-			} else if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.byslot) {
-				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_SLOT));
-			} else {
-				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.UNKNOWN));
-			}
+//			if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.bynode) {
+//				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_NODE));
+//			} else if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.byslot) {
+//				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_SLOT));
+//			} else {
+//				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.UNKNOWN));
+//			}
 			ipJob.addAttribute(OpenMpiJobAttributes.getNumMappedNodesDefinition().create(map.mappedNodes.size()));
 		} catch (IllegalValueException e) {
 			// No invalid values can be generated
@@ -220,15 +221,19 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				String key = var.substring(0, i);
 				keys[p++] = key;
 			}
-			newAttributes.add(OpenMpiJobAttributes.getEnvironmentKeysDefinition().create(keys));
+			newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentKeysDefinition().create(keys));
 		}
+		
+		//${envKeys:-x : -x :::}
+		newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentArgsDefinition().create());
+		
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
 	}
 
 	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
 		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
 		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
-				OpenMpiJobAttributes.getEnvironmentKeysDefinition(),
+				OpenMpiLaunchAttributes.getEnvironmentKeysDefinition(), OpenMpiLaunchAttributes.getEnvironmentArgsDefinition()
 			};
 		IAttributeDefinition<?, ?, ?>[]  allAttributes = new IAttributeDefinition[attributesFromSuper.length+moreAttributes.length];
 	   System.arraycopy(attributesFromSuper, 0, allAttributes, 0, attributesFromSuper.length);
