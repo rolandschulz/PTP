@@ -14,6 +14,8 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -220,7 +222,12 @@ public class OpenMpiRuntimeSystem extends AbstractToolRuntimeSystem {
 							 * If no host information was found in the stream, add default.
 							 */
 							if (hostMap.count() == 0) {
-								hostMap.addDefaultHost();
+								try {
+									InetAddress localhost = InetAddress.getLocalHost();
+									hostMap.addDefaultHost(localhost.getHostName());
+								} catch (UnknownHostException e) {
+									throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Cannot retrive network information for local machine. Check network configuration."));
+								}
 							}
 
 							/*

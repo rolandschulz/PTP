@@ -10,7 +10,12 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -82,14 +87,11 @@ public class OpenMpiHostMap {
 		return hostNameToHost.get(name);
 	}
 
-	public void addDefaultHost() {
-		if (hosts.size() == 0) {
-			OpenMpiHostMap.Host host = new OpenMpiHostMap.Host("localhost.localdomain");
-			host.name = "localhost.localdomain";
-			host.numProcessors = 1;
-			host.maxNumProcessors = 0;
-			addHost(host);
-		}
+	public void addDefaultHost(String name) {
+		OpenMpiHostMap.Host host = new OpenMpiHostMap.Host(name);
+		host.numProcessors = 1;
+		host.maxNumProcessors = 0;
+		addHost(host);
 	}
 
 	public int count() {

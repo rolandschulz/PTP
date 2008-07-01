@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -13,15 +13,26 @@ package org.eclipse.ptp.rm.core.rtsystem;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
+import org.eclipse.ptp.core.attributes.ArrayAttributeDefinition;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.utils.ArgumentParser;
 import org.eclipse.ptp.rm.core.utils.ILineStreamListener;
 import org.eclipse.ptp.rm.core.utils.TextStreamObserver;
@@ -36,37 +47,112 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		super(jobID, name, rtSystem, attrMgr);
 	}
 
-	protected String replaceVariables(String s) {
-		AttributeManager manager = getAttrMgr();
-		IAttribute<?,?,?>[] attributes = manager.getAttributes();
-		for (IAttribute<?, ?, ?> attribute : attributes) {
-			String variable = "${"+attribute.getDefinition().getId()+"}";
-			if (attribute instanceof ArrayAttribute<?>) {
-				ArrayAttribute<?> arrayAttribute = (ArrayAttribute<?>) attribute;
-				List<?> list = arrayAttribute.getValue();
-				String t = null;
-				for (Object o : list) {
-					if (t == null) {
-						t = o.toString();
-					} else {
-						t += " " + o.toString();
+	/*
+	 * Pattern to fined variables according these rules:
+	 * Starts with "${" and ends with "}"
+	 * The content is a name and a set of parameters separated by ":"
+	 * In the parameters, "\" may be used to quote following chars: '\', '}' and ':'
+	 */
+	static final Pattern variablePattern = Pattern.compile(("/$/{(/w+)("+"(?:(?:////)|(?:///})|[^/}])*"+")/}").replace('/','\\'));
+	static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\'));
+
+	/**
+	 * Performs substitution of variables using attributes from the attribute manager as variables.
+	 * @param input the string with variables.
+	 * @param substitutionAttributeManager 
+	 * @return The string after substitution of variables.
+	 */
+	protected String replaceVariables(String input, AttributeManager substitutionAttributeManager) {
+		StringBuffer output = new StringBuffer();
+		Matcher matcher = variablePattern.matcher(input);
+
+		int lastPos = 0;
+		while (matcher.find()) {
+			int startPos = matcher.start();
+			int endPos = matcher.end();
+			String name = matcher.group(1);
+			String parameterList = matcher.group(2);
+			String variable = matcher.group();
+			output.append(input.substring(lastPos, startPos));
+
+			/*
+			 * Resolve variable.
+			 */
+			String resolvedValue = null;
+			IAttribute<?,?,?> attribute = substitutionAttributeManager.getAttribute(name);
+			if (attribute != null) {
+				if (attribute instanceof ArrayAttribute<?>) {
+					/*
+					 * Retrieve parameters or use defaults.
+					 */
+					String optStartStr = "";
+					String optEndStr = "";
+					String startStr = "";
+					String endStr = "";
+					String separatorStr = " ";
+					Matcher paramMatcher = parameterPattern.matcher(parameterList);
+					if (paramMatcher.find()) {
+						startStr = paramMatcher.group(1);
+						if (paramMatcher.find()) {
+							separatorStr = paramMatcher.group(1);
+							if (paramMatcher.find()) {
+								endStr = paramMatcher.group(1);
+								if (paramMatcher.find()) {
+									optStartStr = paramMatcher.group(1);
+									if (paramMatcher.find()) {
+										optEndStr = paramMatcher.group(1);
+									}
+								}
+							}
+						}
 					}
-				}
-				if (t != null) {
-					s = s.replace(variable, t);
+
+					/*
+					 * Build content.
+					 */
+					ArrayAttribute<?> array_attr = (ArrayAttribute<?>) attribute;
+					StringBuffer buffer = new StringBuffer();
+					boolean first = true;
+					List<?> array = array_attr.getValue();
+					if (array.size() > 0) {
+						buffer.append(optStartStr);
+					}
+					buffer.append(startStr);
+					for (Object element : array) {
+						if (first) {
+							first = false;
+						} else {
+							buffer.append(separatorStr);
+						}
+						buffer.append(element);
+					}
+					buffer.append(endStr);
+					if (array.size() > 0) {
+						buffer.append(optEndStr);
+					}
+					resolvedValue = buffer.toString();
 				} else {
-					s = s.replace(variable, "");
+					resolvedValue = attribute.getValueAsString();
 				}
-			} else {
-				String value = attribute.getValueAsString();
-				s = s.replace(variable, value);
 			}
+
+			/*
+			 * If failed to resolve variable, keep it on the string. Else replace by its value.
+			 */
+			if (resolvedValue == null) {
+				output.append(variable);
+			} else {
+				output.append(resolvedValue);
+			}
+			lastPos = endPos;
 		}
-		return s;
+		output.append(input.substring(lastPos));
+		String result = output.toString();
+		return result;
 	}
 
 	@Override
-	protected List<String> doCreateCommand() throws CoreException {
+	protected List<String> doCreateCommand(AttributeManager substitutionAttributeManager) throws CoreException {
 		/*
 		 * Create launch command. If the is not launch command, simply launch the executable.
 		 * If there is a launch command, suppose that the program executable is the last argument, followed
@@ -84,31 +170,67 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			String launchCommand = rtSystem.rmConfiguration.getLaunchCmd();
 			Assert.isNotNull(launchCommand);
 			Assert.isTrue(launchCommand.trim().length() > 0);
-			launchCommand = replaceVariables(launchCommand);
+			launchCommand = replaceVariables(launchCommand, substitutionAttributeManager);
 			ArgumentParser argumentParser = new ArgumentParser(launchCommand);
 			command = argumentParser.getTokenList();
 		}
 		return command;
 	}
+	
+	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
+		return new IAttributeDefinition[]{
+				JobAttributes.getEnvironmentAttributeDefinition(),
+				JobAttributes.getExecutableNameAttributeDefinition(),
+				JobAttributes.getExecutablePathAttributeDefinition(),
+				JobAttributes.getJobIdAttributeDefinition(),
+				JobAttributes.getNumberOfProcessesAttributeDefinition(),
+				JobAttributes.getProgramArgumentsAttributeDefinition(),
+				JobAttributes.getQueueIdAttributeDefinition(),
+				JobAttributes.getSubIdAttributeDefinition(),
+				JobAttributes.getUserIdAttributeDefinition(),
+				JobAttributes.getWorkingDirectoryAttributeDefinition()
+			};
+	}
+		
+	@Override
+	protected Map<String,String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException {
+		HashMap<String, String> environmentMap = new HashMap<String, String>();
+		/*
+		 * Note that environment attribute might not be set if user has not give any environment variables in the launcher configuration.
+		 * If the attribute was set, parse environment variables to create a map of entries as "name=value".
+		 */
+		ArrayAttribute<String> environmentAttribute = getAttrMgr().getAttribute(JobAttributes.getEnvironmentAttributeDefinition());
+		if (environmentAttribute == null) {
+			return environmentMap; // No attribute set.
+		}
+		List<String> environment = environmentAttribute.getValue();
+		for (String entry : environment) {
+			int i = entry.indexOf('=');
+			String key = entry.substring(0, i);
+			String value = entry.substring(i+1);
+			environmentMap.put(key, value);
+		}
+		return environmentMap;
+	}
 
 	@Override
 	protected void doBeforeExecution() throws CoreException {
-		// TODO Auto-generated method stub
+		// Nothing
 	}
 
 	@Override
 	protected void doExecutionFinished() throws CoreException {
-		// TODO Auto-generated method stub
+		// Nothing
 	}
 
 	@Override
 	protected void doExecutionStarted() throws CoreException {
-		// TODO Auto-generated method stub
+		// Nothing
 	}
-	
+
 	@Override
 	protected void doExecutionCleanUp() {
-		// TODO Auto-generated method stub
+		// Nothing
 	}
 
 	/**
@@ -173,5 +295,10 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			stdoutObserver.kill();
 			stdoutObserver = null;
 		}
+	}
+
+	@Override
+	protected IAttribute<?, ?, ?>[] getExtraSubstitutionVariables() throws CoreException {
+		return new IAttribute<?, ?, ?>[0];
 	}
 }
