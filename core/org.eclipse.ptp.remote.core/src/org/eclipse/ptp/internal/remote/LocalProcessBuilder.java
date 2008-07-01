@@ -11,12 +11,14 @@
 package org.eclipse.ptp.internal.remote;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
+import java.util.Map.Entry;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	private ProcessFactory localProcessBuilder;
@@ -35,6 +37,12 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
 	 */
 	public IRemoteProcess start() throws IOException {
-		return new LocalProcess(localProcessBuilder.exec(command().toArray(new String[0])));
+		String commandArray[] = command().toArray(new String[0]);
+		String environmentArray[] = new String[environment().size()];
+		int index = 0;
+		for (Entry<String,String>  entry : environment().entrySet()) {
+			environmentArray[index++] = entry.getKey()+"="+entry.getValue();
+		}
+		return new LocalProcess(localProcessBuilder.exec(commandArray, environmentArray));
 	}
 }
