@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 
 public class OpenMpiPreferenceManager extends AbstractToolsPreferenceManager {
-	private static final String LAUNCH_CMD = "mpirun -display-map ${mpiArgs} ${envKeys::,::-x :} ${execPath}/${execName} ${progArgs}";
+	private static final String LAUNCH_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${execPath}/${execName} ${progArgs}";
 	private static final String DISCOVER_CMD = "ompi_info -a --parseable";
 	private static final String PATH = "";
 	private static final boolean USE_DEFAULTS = true;

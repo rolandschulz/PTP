@@ -23,6 +23,7 @@ import org.eclipse.ptp.core.attributes.ArrayAttributeDefinition;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 
 /**
@@ -42,7 +43,6 @@ public class OpenMpiJobAttributes {
 	private static final String VPID_START_ATTR_ID = "vpidStart";
 	private static final String VPID_RANGE_ATTR_ID = "vpidRange";
 	private static final String MAPPING_MODE_ATTR_ID = "mappingMode";
-	private static final String ENV_KEYS_ATTR_ID = "envKeys";
 
 	private final static IntegerAttributeDefinition numMappedNodesDef =
 		new IntegerAttributeDefinition(NUM_MAPPED_NODES_ATTR_ID, "Mapped nodes",
@@ -68,10 +68,6 @@ public class OpenMpiJobAttributes {
         new EnumeratedAttributeDefinition<MappingMode>(MAPPING_MODE_ATTR_ID, "Mapping mode", "Mapping mode",
                 true, MappingMode.UNKNOWN);
 
-    private final static ArrayAttributeDefinition<String> environmentKetysDefinition =
-    	new ArrayAttributeDefinition<String>(ENV_KEYS_ATTR_ID, "Environment variables",
-    			"Name of environment variables supplied to the executable", false, new String[0]);
-
 	public static IntegerAttributeDefinition getNumMappedNodesDefinition() {
 		return numMappedNodesDef;
 	}
@@ -94,10 +90,6 @@ public class OpenMpiJobAttributes {
 
 	public static EnumeratedAttributeDefinition<MappingMode> getMappingModeDefinition() {
 		return mappingModeDefinition;
-	}
-
-	public static ArrayAttributeDefinition<String> getEnvironmentKeysDefinition() {
-		return environmentKetysDefinition;
 	}
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
