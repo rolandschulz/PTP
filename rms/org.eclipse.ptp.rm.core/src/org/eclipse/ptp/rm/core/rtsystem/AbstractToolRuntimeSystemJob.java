@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.core.rtsystem;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,29 +22,26 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.IRemoteProcess;
 import org.eclipse.ptp.remote.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.Activator;
 
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {
-//	protected String jobSubID;
 	protected String jobID;
-//	protected String name;
-//	protected String user;
 	protected IRemoteProcess process = null;
 	protected AttributeManager attrMgr;
 	protected AbstractToolRuntimeSystem rtSystem;
-	
+
 	public AbstractToolRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem,
 			AttributeManager attrMgr) {
 		super(name);
 		this.attrMgr = attrMgr;
 		this.rtSystem = rtSystem;
-//		this.name = name;
-//		this.user = System.getenv("USER");
 		this.jobID = jobID;
-//		this.jobSubID = jobSubID;
 	}
 
 	@Override
@@ -57,26 +55,10 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	public String getJobID() {
 		return jobID;
 	}
-//
-//	public String getJobSubID() {
-//		return jobSubID;
-//	}
-//
-//	public String getJobName() {
-//		return name;
-//	}
-//	
-//	public String getUser() {
-//		return user;
-//	};
 
 	public AbstractToolRuntimeSystem getRtSystem() {
 		return rtSystem;
 	}
-
-//	public AbstractToolRMConfiguration getRMConfiguration() {
-//		return getRtSystem().rmConfiguration;
-//	}
 
 	public AttributeManager getAttrMgr() {
 		return attrMgr;
@@ -90,14 +72,17 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		changeJobState(JobAttributes.State.STARTED);
-		
+
 		try {
 			/*
-			 * Calculate command.
+			 * Calculate command and environment.
 			 */
 			List<String> command = null;
+			Map<String,String> environment = null;
 			try {
-				command = doCreateCommand();
+				AttributeManager substitutionAttributeManager = createSubstitutionAttributes();
+				environment = doCreateEnvironment(substitutionAttributeManager);
+				command = doCreateCommand(substitutionAttributeManager);
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to caculate command line for launch.", e);
@@ -115,6 +100,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			 */
 			try {
 				IRemoteProcessBuilder processBuilder = rtSystem.createProcessBuilder(command);
+				processBuilder.environment().putAll(environment);
 				process = processBuilder.start();
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -160,29 +146,11 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 			return new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Command successfull, return exit value {0}.", process.exitValue()));
 
-		} finally { 
+		} finally {
 			doExecutionCleanUp();
 		}
-
-//		IToolRuntimeSystemJob job = rtSystem.jobs.get(jobID);
-//		rtSystem.runningJobQueue.remove(job);
-//		rtSystem.jobs.remove(job);
-
-//		state.setValue(JobAttributes.State.RUNNING);
-//		rtSystem.changeJobAttributes(jobID, state, nprocs);
-//		rtSystem.runningJobQueue.add(this);
-
-
-		/*
-		 * Get attributes required to start job. The launch command contains the
-		 * launcher executable and its arguments. The application is specified
-		 * by a place holder.
-		 * TODO: use variable substitution for the place holder.
-		 * TODO: implement program path with place holder.
-		 * TODO: implement program arguments with place holder.
-		 * TODO: append remote installation path to launch command
-		 */
 	}
+
 
 	abstract protected void doExecutionCleanUp();
 
@@ -194,7 +162,36 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 	abstract protected void doBeforeExecution() throws CoreException;
 
-	abstract protected List<String> doCreateCommand() throws CoreException;
+	abstract protected List<String> doCreateCommand(AttributeManager attributeManager) throws CoreException;
+
+	abstract protected Map<String, String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException;
+	
+	protected AttributeManager createSubstitutionAttributes() throws CoreException {
+		AttributeManager newAttributeManager = new AttributeManager(getAttrMgr().getAttributes());
+//		AttributeManager newAttributeManager = new AttributeManager();
+//		for (IAttribute<?, ?, ?> attribute : attributes) {
+//			newAttributeManager.addAttribute(attribute.getDefinition().create(attribute.getValueAsString()));
+//		}
+		IAttribute<?,?,?> extrAttributes[] = getExtraSubstitutionVariables();
+		newAttributeManager.addAttributes(extrAttributes);
+		for (IAttributeDefinition<?, ?, ?> attributeDefinition : getDefaultSubstitutionAttributes()) {
+			IAttribute<?, ?, ?> attribute = newAttributeManager.getAttribute(attributeDefinition.getId()); 
+			if (attribute == null) {
+				// Create one with default value
+				try {
+					newAttributeManager.addAttribute(attributeDefinition.create());
+				} catch (IllegalValueException e) {
+					throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to create default attribute for {0}.", attributeDefinition.getName()), e));
+				}
+			}
+		}
+		return newAttributeManager;
+	}
+	
+	abstract protected IAttribute<?, ?, ?>[] getExtraSubstitutionVariables() throws CoreException;
+
+	abstract protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes();
+	
 
 	/*
 	 * (non-Javadoc)

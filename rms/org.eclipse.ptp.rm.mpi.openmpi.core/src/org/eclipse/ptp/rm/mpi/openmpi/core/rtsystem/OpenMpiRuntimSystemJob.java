@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -13,7 +13,11 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -21,7 +25,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
@@ -60,7 +67,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to parse Open Mpi run command output.", e));
 		}
-		System.out.println(map);
+//		System.out.println(map);
 		OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
 		IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(rtSystem.getQueueID()).getJobById(getJobID());
 		try {
@@ -84,6 +91,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		for (OpenMpiProcessMap.MappedNode node : map.mappedNodes) {
 			String nodename = node.nodename;
 			String nodeID = rtSystem.getNodeIDforName(nodename);
+			
 			Assert.isNotNull(nodeID);
 			for (OpenMpiProcessMap.MappedProc proc : node.procs) {
 				String name = proc.getName();
@@ -118,7 +126,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	protected void doWaitExecution() throws CoreException {
 		OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
 		final IPProcess ipProc = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(rtSystem.getQueueID()).getJobById(getJobID()).getProcessById(rankZeroProcessID);
-		
+
 		stdoutObserver = new TextStreamObserver(
 				inReader,
 				new ILineStreamListener() {
@@ -143,7 +151,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				new ILineStreamListener() {
 					public void newLine(String line) {
 //						System.err.println(line);
-						ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));						
+						ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 					}
 
 					public void streamClosed() {
@@ -184,12 +192,41 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	@Override
 	protected void doExecutionFinished() throws CoreException {
 		for (IPProcess proc : processMap.values()) {
-			proc.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.EXITED));			
+			proc.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.EXITED));
 		}
 	}
-	
+
 	@Override
 	protected void doExecutionCleanUp() {
 	}
 
+	@Override
+	protected IAttribute<?, ?, ?>[] getExtraSubstitutionVariables() throws CoreException {
+		List<IAttribute<?, ?, ?>> newAttributes = new ArrayList<IAttribute<?,?,?>>();
+		ArrayAttribute<String> environmentAttribute = getAttrMgr().getAttribute(JobAttributes.getEnvironmentAttributeDefinition());
+
+		if (environmentAttribute != null) {
+			List<String> environment = environmentAttribute.getValue();
+			int p = 0;
+			String keys[] = new String[environment.size()];
+			for (String var : environment) {
+				int i = var.indexOf('=');
+				String key = var.substring(0, i);
+				keys[p++] = key;
+			}
+			newAttributes.add(OpenMpiJobAttributes.getEnvironmentKeysDefinition().create(keys));
+		}
+		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
+	}
+
+	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
+		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
+		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
+				OpenMpiJobAttributes.getEnvironmentKeysDefinition(),
+			};
+		IAttributeDefinition<?, ?, ?>[]  allAttributes = new IAttributeDefinition[attributesFromSuper.length+moreAttributes.length];
+	   System.arraycopy(attributesFromSuper, 0, allAttributes, 0, attributesFromSuper.length);
+	   System.arraycopy(moreAttributes, 0, allAttributes, attributesFromSuper.length, moreAttributes.length);
+	   return allAttributes;
+	}
 }
