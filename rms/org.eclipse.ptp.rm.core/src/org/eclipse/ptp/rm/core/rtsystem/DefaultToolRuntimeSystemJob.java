@@ -142,6 +142,8 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			if (resolvedValue == null) {
 				output.append(variable);
 			} else {
+				// Recursive macro substitution
+				resolvedValue = replaceVariables(resolvedValue, substitutionAttributeManager);
 				output.append(resolvedValue);
 			}
 			lastPos = endPos;
