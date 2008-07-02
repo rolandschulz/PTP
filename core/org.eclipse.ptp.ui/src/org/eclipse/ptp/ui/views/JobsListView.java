@@ -53,7 +53,6 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobFromListAction;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -109,6 +108,14 @@ public class JobsListView extends ViewPart {
 			for (IPJob job : e.getJobs()) {
 				refresh(job);
 			}
+			
+			// Refresh the terminate job button
+			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					terminateAllAction.updateTerminateJobState();
+				}
+			});
+			
 		}
 		
 		/* (non-Javadoc)
@@ -128,7 +135,6 @@ public class JobsListView extends ViewPart {
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
 			refresh(null);
-			terminateAllAction.updateTerminateJobState();
 		}
 	}
 	
