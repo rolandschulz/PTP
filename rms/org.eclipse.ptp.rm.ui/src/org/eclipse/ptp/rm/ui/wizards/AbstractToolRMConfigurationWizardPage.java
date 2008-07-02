@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -53,35 +53,41 @@ import org.eclipse.swt.widgets.Text;
  */
 public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizardPage {
 
-	private boolean listenerEnabled = false;
+	protected boolean listenerEnabled = false;
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnection connection = null;
-	
-	private Text launchCmdText = null;
-	private Text discoverCmdText = null;
-	private Text continuousMonitorCmdText = null;
-	private Text periodicMonitorCmdText = null;
-	private Spinner periodicMonitorTimeSpinner = null;
-	private Text remoteInstallPathText = null;
-	private Button browseButton = null;
-	private Button defaultButton = null;
-	
-	private WidgetListener listener = new WidgetListener();
-	private DataSource dataSource = new DataSource();
-	
-	private int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
 
-	private class WidgetListener implements ModifyListener, SelectionListener {
-		public void modifyText(ModifyEvent evt) {
+	protected Text launchCmdText = null;
+	protected Text discoverCmdText = null;
+	protected Text continuousMonitorCmdText = null;
+	protected Text periodicMonitorCmdText = null;
+	protected Spinner periodicMonitorTimeSpinner = null;
+	protected Text remoteInstallPathText = null;
+	protected Button browseButton = null;
+	protected Button defaultButton = null;
+
+	protected WizardListener listener = createListener();
+	protected DataSource dataSource = createDataSource();
+
+	protected int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
+
+	protected interface WizardListener extends ModifyListener, SelectionListener {
+	}
+
+	protected class WidgetListener implements WizardListener {
+		final public void modifyText(ModifyEvent evt) {
 			if (! listenerEnabled) return;
+			doModifyText(evt);
+		}
 
+		protected void doModifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(source == launchCmdText || 
-					source == discoverCmdText || 
-					source == periodicMonitorCmdText || 
-					source == continuousMonitorCmdText || 
+			if(source == launchCmdText ||
+					source == discoverCmdText ||
+					source == periodicMonitorCmdText ||
+					source == continuousMonitorCmdText ||
 					source == periodicMonitorTimeSpinner ||
 					source == remoteInstallPathText) {
 				resetErrorStatus();
@@ -90,10 +96,14 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				assert false;
 			}
 		}
-		
-		public void widgetSelected(SelectionEvent e) {
+
+		final public void widgetSelected(SelectionEvent e) {
 			if (! listenerEnabled) return;
-			
+
+			doWidgetSelected(e);
+		}
+
+		protected void doWidgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
 			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
@@ -106,39 +116,86 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			}
 		}
 
-		public void widgetDefaultSelected(SelectionEvent e) {
+		final public void widgetDefaultSelected(SelectionEvent e) {
 			// Empty.
-		}		
+		}
 	}
-		
-	private class DataSource {
-		class ValidationException extends Exception {
+
+	protected WizardListener createListener() {
+		return new WidgetListener();
+	}
+
+	protected DataSource createDataSource() {
+		return new DataSource();
+	}
+
+	protected  class DataSource {
+		protected class ValidationException extends Exception {
+			private static final long serialVersionUID = 1L;
+
 			public ValidationException(String message) {
 				super(message);
 			}
 		}
 
-		AbstractToolRMConfiguration config = null;
+		private AbstractToolRMConfiguration config = null;
 
-		boolean useDefaults = false;
-		String launchCmd = null;
-		String discoverCmd = null;
-		String periodicMonitorCmd = null;
-		int periodicMonitorTime = 0;
-		String continuousMonitorCmd = null;
-		String remoteInstallPath = null;
+		private boolean useDefaults = false;
+		private String launchCmd = null;
+		private String discoverCmd = null;
+		private String periodicMonitorCmd = null;
+		private int periodicMonitorTime = 0;
+		private String continuousMonitorCmd = null;
+		private String remoteInstallPath = null;
 
-		String extractText(Text text) {
+		public void setCommandFields(String launchCmd, String discoverCmd, String periodicMonitorCmd, int periodicMonitorTime, String continuousMonitorCmd, String remoteInstallPath) {
+			this.launchCmd = launchCmd;
+			this.discoverCmd = discoverCmd;
+			this.periodicMonitorCmd = periodicMonitorCmd;
+			this.periodicMonitorTime = periodicMonitorTime;
+			this.continuousMonitorCmd = continuousMonitorCmd;
+			this.remoteInstallPath = remoteInstallPath;
+		}
+
+		public boolean isUseDefaults() {
+			return useDefaults;
+		}
+
+		public String getLaunchCmd() {
+			return launchCmd;
+		}
+
+		public String getDiscoverCmd() {
+			return discoverCmd;
+		}
+
+		public String getPeriodicMonitorCmd() {
+			return periodicMonitorCmd;
+		}
+
+		public int getPeriodicMonitorTime() {
+			return periodicMonitorTime;
+		}
+
+		public String getContinuousMonitorCmd() {
+			return continuousMonitorCmd;
+		}
+
+		public String getRemoteInstallPath() {
+			return remoteInstallPath;
+		}
+
+		protected String extractText(Text text) {
 			String s = text.getText().trim();
 			return (s.length() == 0 ? null : s);
 		}
 
-		void applyText(Text t, String s) {
+		protected void applyText(Text t, String s) {
 			if (s == null) t.setText(EMPTY_STRING);
 			else t.setText(s);
 		}
 
-		void copyFromFields() throws ValidationException {
+		protected void copyFromFields() throws ValidationException {
 			useDefaults = defaultButton.getSelection();
 
 			if (launchCmdText != null)
@@ -155,7 +212,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				remoteInstallPath = extractText(remoteInstallPathText);
 		}
 
-		void validateLocal() throws ValidationException {
+		protected void validateLocal() throws ValidationException {
 			if (! useDefaults) {
 				if (launchCmdText != null && launchCmd == null) {
 					throw new ValidationException("Launch command is missing");
@@ -170,8 +227,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				}
 			}
 		}
-		
-		void storeConfig() {
+
+		protected void storeConfig() {
 			if (launchCmdText != null)
 				config.setLaunchCmd(launchCmd);
 			if (discoverCmdText != null)
@@ -187,7 +244,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			config.setUseDefaults(useDefaults);
 		}
 
-		void loadConfig() {
+		protected void loadConfig() {
 			if (launchCmdText != null)
 				launchCmd = config.getLaunchCmd();
 			if (discoverCmdText != null)
@@ -202,8 +259,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				remoteInstallPath = config.getRemoteInstallPath();
 			useDefaults = config.useDefaults();
 		}
-		
-		void copyToFields() {
+
+		protected void copyToFields() {
 			if (launchCmdText != null)
 				applyText(launchCmdText, launchCmd);
 			if (discoverCmdText != null)
@@ -219,22 +276,42 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			defaultButton.setSelection(useDefaults);
 		}
 
-		void validateGlobal() throws ValidationException {
-			// Nothing yet. Would validate the entire GenericMPIResourceManagerConfiguration. 
+		protected void validateGlobal() throws ValidationException {
+			// Nothing yet. Would validate the entire GenericMPIResourceManagerConfiguration.
+		}
+
+		public void getFromFields() {
+			try {
+				copyFromFields();
+				validateLocal();
+			} catch (ValidationException e) {
+				setErrorMessage(e.getLocalizedMessage());
+				setPageComplete(false);
+			}
+		}
+
+		public void putToFields() {
+			copyToFields();
+			try {
+				validateLocal();
+			} catch (ValidationException e) {
+				setErrorMessage(e.getLocalizedMessage());
+				setPageComplete(false);
+			}
 		}
 
 		public void updateAndStore() {
 			try {
 				copyFromFields();
 				validateLocal();
-				storeConfig();
 				validateGlobal();
+				storeConfig();
 			} catch (ValidationException e) {
 				setErrorMessage(e.getLocalizedMessage());
 				setPageComplete(false);
 			}
 		}
-		
+
 		public void loadAndUpdate() {
 			loadConfig();
 			copyToFields();
@@ -244,18 +321,18 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			} catch (ValidationException e) {
 				setErrorMessage(e.getLocalizedMessage());
 				setPageComplete(false);
-			}			
+			}
 		}
 
 		public void setConfig(IResourceManagerConfiguration configuration) {
 			config = (AbstractToolRMConfiguration) configuration;
 		}
-		
+
 		public AbstractToolRMConfiguration getConfig() {
 			return config;
 		}
 	}
-	
+
 	public AbstractToolRMConfigurationWizardPage(RMConfigurationWizard wizard, int capabilities, String pageName, String title, String description) {
 		super(wizard, pageName);
 		this.capabilities = capabilities;
@@ -263,19 +340,20 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		setDescription(description);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
-	   composite.setLayout(topLayout);
+	    composite.setLayout(topLayout);
 		createContents(composite);
 		setControl(composite);
 	}
-	
+
 	@Override
 	public void setVisible(boolean visible) {
 		if (visible) {
 			resetErrorStatus();
-			
+
 			listenerEnabled = false;
 			dataSource.setConfig(getConfigurationWizard().getConfiguration());
 			dataSource.loadAndUpdate();
@@ -284,17 +362,20 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		}
 		super.setVisible(visible);
 	}
-	
-	private void createContents(Composite parent) {
+
+	protected void createContents(Composite parent) {
+		createOpenMpiContests(parent);
+	}
+
+	protected void createOpenMpiContests(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 4;
 		contents.setLayout(layout);
-		
+
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 4;
 		contents.setLayoutData(gd);
-		
+
 		/*
 		 * Default button
 		 */
@@ -308,19 +389,19 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		if ((capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText("Launch command:");
-	
+
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
 			launchCmdText.addModifyListener(listener);
 		}
-		
+
 		/*
 		 * discover cmd
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText("Discover command:");
-	
+
 			discoverCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
 			discoverCmdText.addModifyListener(listener);
@@ -332,25 +413,25 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		if ((capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText("Monitor command:");
-	
+
 			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 1, 1));
 			periodicMonitorCmdText.addModifyListener(listener);
-	
+
 			label = new Label(contents, SWT.NONE);
 			label.setText("Period:");
 			periodicMonitorTimeSpinner = new Spinner(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false, 1, 1));
 			periodicMonitorTimeSpinner.addModifyListener(listener);
 		}
-		
+
 		/*
 		 * Continuous monitor cmd
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText("Continuous monitor command:");
-	
+
 			continuousMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			continuousMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
 			continuousMonitorCmdText.addModifyListener(listener);
@@ -362,14 +443,14 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		if ((capabilities & AbstractToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText("Path to Open MPI Installation:");
-	
+
 			remoteInstallPathText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 2;
 			gd.widthHint = 60;
 			remoteInstallPathText.setLayoutData(gd);
 			remoteInstallPathText.addModifyListener(listener);
-			
+
 			browseButton = SWTUtil.createPushButton(contents, "Browse", null); //$NON-NLS-1$
 			browseButton.addSelectionListener(listener);
 		}
@@ -381,7 +462,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	 */
 	private void updateControls() {
 		boolean enabled = ! defaultButton.getSelection();
-		
+
 		if (launchCmdText != null)
 			launchCmdText.setEnabled(enabled);
 		if (discoverCmdText != null)
@@ -394,13 +475,13 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			continuousMonitorCmdText.setEnabled(enabled);
 		if (remoteInstallPathText != null)
 			remoteInstallPathText.setEnabled(enabled);
-		if (browseButton != null) 
+		if (browseButton != null)
 			browseButton.setEnabled(enabled);
 	}
 
 	/**
 	 * Convenience method for creating a button widget.
-	 * 
+	 *
 	 * @param parent
 	 * @param label
 	 * @param type
@@ -413,10 +494,10 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		button.setLayoutData(data);
 		return button;
 	}
-	
+
 	/**
 	 * Convenience method for creating a check button widget.
-	 * 
+	 *
 	 * @param parent
 	 * @param label
 	 * @return the check button widget
@@ -430,11 +511,11 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	 */
 	protected void handlePathBrowseButtonSelected() {
 		/*
-		 * Need to do this here because the connection may have been changed 
+		 * Need to do this here because the connection may have been changed
 		 * by the previous wizard page
 		 */
-		
-		AbstractRemoteResourceManagerConfiguration config = (AbstractRemoteResourceManagerConfiguration)dataSource.getConfig(); 
+
+		AbstractRemoteResourceManagerConfiguration config = (AbstractRemoteResourceManagerConfiguration)dataSource.getConfig();
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
 			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
@@ -443,7 +524,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				connection = remoteServices.getConnectionManager().getConnection(conn);
 			}
 		}
-		
+
 		if (connection != null) {
 			if (!connection.isOpen()) {
 				IRunnableWithProgress op = new IRunnableWithProgress() {
@@ -453,17 +534,17 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 						try {
 							connection.open(monitor);
 						} catch (RemoteConnectionException e) {
-							ErrorDialog.openError(getShell(), "Connection Error", 
+							ErrorDialog.openError(getShell(), "Connection Error",
 									"Could not open connection",
 									new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 						}
 					}
-					
+
 				};
 				try {
 					new ProgressMonitorDialog(getShell()).run(true, true, op);
 				} catch (InvocationTargetException e) {
-					ErrorDialog.openError(getShell(), "Connection Error", 
+					ErrorDialog.openError(getShell(), "Connection Error",
 							"Could not open connection",
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				} catch (InterruptedException e) {
@@ -473,7 +554,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				}
 			}
 			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-			
+
 			String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), "Select path to Open MPI installation", initialPath);
 			if (selectedPath != null) {
@@ -481,7 +562,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			}
 		}
 	}
-	
+
 	protected void resetErrorStatus() {
 		setPageComplete(true);
 		setErrorMessage(null);

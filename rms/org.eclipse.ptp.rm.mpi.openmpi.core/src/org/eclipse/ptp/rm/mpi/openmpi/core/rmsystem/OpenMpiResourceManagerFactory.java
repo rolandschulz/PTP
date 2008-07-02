@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -30,21 +30,22 @@ public class OpenMpiResourceManagerFactory extends AbstractResourceManagerFactor
 		return (IResourceManagerConfiguration)configuration.clone();
 	}
 
+	@Override
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) confIn;
-		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
+		PTPCorePlugin plugin = PTPCorePlugin.getDefault();
+		IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new OpenMpiResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
 		OpenMpiResourceManagerConfiguration conf = new OpenMpiResourceManagerConfiguration(this);
 
-		// QUESTION: if configuration constructor with no arguments uses defaults, then there is 
+		// QUESTION: if configuration constructor with no arguments uses defaults, then there is
 		// no need to apply defaults again.
-//		
+//
 //		Preferences preferences = OpenMpiPreferenceManager.getPreferences();
-//		
+//
 //		conf.setLaunchCmd(preferences.getString(OpenMpiPreferenceManager.PREFS_LAUNCH_CMD));
 //		conf.setPath(preferences.getString(OpenMpiPreferenceManager.PREFS_PATH));
 //		conf.setOptions(preferences.getInt(OpenMpiPreferenceManager.PREFS_OPTIONS));
