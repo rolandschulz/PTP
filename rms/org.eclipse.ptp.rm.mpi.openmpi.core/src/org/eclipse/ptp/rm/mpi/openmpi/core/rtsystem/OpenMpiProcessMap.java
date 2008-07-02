@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenMpiProcessMap {
-	
+
 	static public class AppContext {
 		int index;
 		String app = new String();
@@ -24,24 +24,38 @@ public class OpenMpiProcessMap {
 		String workDir = new String();
 		int num_maps;
 	}
-	
-	static public class MappedNode {
-		int cell;
-		int launch_id;
-		String username;
-		String nodename;
-		int num_procs;
-		boolean overSubscribed;
-		String daemon_name;
+
+	/**
+	 * A host that is executing processes from mpirun.
+	 * 
+	 * @author dfferber
+	 */
+	static public class Node {
+		// Information provided only by openmpi 1.2
+		// int cell;
+		// int launch_id;
+		// String username;
+		// int num_procs;
+		// String daemon_name;
+		// 
+		// Information provided by openmpi 1.2 and 1.3
+		String name = null;
+		
+		// Calculated information.
+		boolean overSubscribed = false;
+		int numSlots = 0;
+		int maxSlots = 0;
+		
+		// References to processes.
 		List<MappedProc> procs = new ArrayList<MappedProc>();
 	}
-	
+
 	static public class MappedProc {
 		String name = new String();
 		int rank;
 		int pid;
 		int app_context_index;
-		
+
 		public String getName() {
 			return name;
 		}
@@ -49,7 +63,7 @@ public class OpenMpiProcessMap {
 		public int getPID() {
 			return pid;
 		}
-		
+
 		public int getRank() {
 			return rank;
 		}
@@ -59,7 +73,11 @@ public class OpenMpiProcessMap {
 	String hostname;
 	int map_for_job;
 	int job_id = 0;
-	public enum MappingMode { byslot, bynode, none } 
+
+	public enum MappingMode {
+		byslot, bynode, none
+	}
+
 	MappingMode mapping_mode = MappingMode.none;
 	int starting_vpid = 0;
 	int vpid_range = 0;
@@ -67,7 +85,6 @@ public class OpenMpiProcessMap {
 	List<AppContext> appContexts = new ArrayList<AppContext>();
 
 	int num_nodes;
-	List<MappedNode> mappedNodes = new ArrayList<MappedNode>();
+	List<Node> mappedNodes = new ArrayList<Node>();
 
-	
 }

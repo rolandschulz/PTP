@@ -43,7 +43,9 @@ public class OpenMpiProcessMapParser {
 	}
 
 	private void readMappedNode(BufferedReader reader) throws IOException {
-		OpenMpiProcessMap.MappedNode node = new OpenMpiProcessMap.MappedNode();
+		int num_procs;
+		
+		OpenMpiProcessMap.Node node = new OpenMpiProcessMap.Node();
 		map.mappedNodes.add(node);
 
 		// Mapped node:
@@ -58,13 +60,13 @@ public class OpenMpiProcessMapParser {
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-			node.cell = Integer.parseInt(s);
+//			node.cell = Integer.parseInt(s);
 			s = m.group(2);
-			node.nodename = s;
+			node.name = s;
 			s = m.group(3);
-			node.launch_id = Integer.parseInt(s);
+//			node.launch_id = Integer.parseInt(s);
 			s = m.group(4);
-			node.username = s;
+//			node.username = s;
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
@@ -77,7 +79,7 @@ public class OpenMpiProcessMapParser {
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
 			throw new IOException("Invalid line: " + line);
-		node.daemon_name = m.group(1);
+//		node.daemon_name = m.group(1);
 
 		// Oversubscribed: True Num elements in procs list: 6
 		line = reader.readLine();
@@ -95,7 +97,8 @@ public class OpenMpiProcessMapParser {
 				throw new IOException("Invalid line: " + line);
 			}
 			s = m.group(2);
-			node.num_procs = Integer.parseInt(s);
+//			node.num_procs = Integer.parseInt(s);
+			num_procs = Integer.parseInt(s); 
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
@@ -105,7 +108,8 @@ public class OpenMpiProcessMapParser {
 		// Data type: ORTE_PROCESS_NAME Data Value: [0,1,0]
 		// Proc Rank: 0 Proc PID: 0 App_context index: 0
 		// (empty line)
-		for (int i = 0; i < node.num_procs; i ++) {
+//		for (int i = 0; i < node.num_procs; i ++) {
+		for (int i = 0; i < num_procs; i ++) {
 			OpenMpiProcessMap.MappedProc proc = new OpenMpiProcessMap.MappedProc();
 			node.procs.add(proc);
 

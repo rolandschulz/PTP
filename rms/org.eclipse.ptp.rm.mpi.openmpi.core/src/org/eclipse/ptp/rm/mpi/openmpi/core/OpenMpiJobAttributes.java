@@ -19,11 +19,9 @@ package org.eclipse.ptp.rm.mpi.openmpi.core;
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-import org.eclipse.ptp.core.attributes.ArrayAttributeDefinition;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
-import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 
 /**
@@ -38,7 +36,6 @@ public class OpenMpiJobAttributes {
 	};
 
 	private static final String NUM_MAPPED_NODES_ATTR_ID = "numMappedNodes";
-	private static final String NUM_APP_CONTEXTS_ATTR_ID = "numAppContexts";
 	private static final String MPI_JOB_ID_ATTR_ID = "mpiJobId";
 	private static final String VPID_START_ATTR_ID = "vpidStart";
 	private static final String VPID_RANGE_ATTR_ID = "vpidRange";
@@ -47,10 +44,6 @@ public class OpenMpiJobAttributes {
 	private final static IntegerAttributeDefinition numMappedNodesDef =
 		new IntegerAttributeDefinition(NUM_MAPPED_NODES_ATTR_ID, "Mapped nodes",
 				"Number of mapped nodes", true, 0);
-
-	private final static IntegerAttributeDefinition numAppContexts =
-		new IntegerAttributeDefinition(NUM_APP_CONTEXTS_ATTR_ID, "Application contexts",
-				"Number of application contexts", true, 0);
 
 	private final static IntegerAttributeDefinition mpiJobId =
 		new IntegerAttributeDefinition(MPI_JOB_ID_ATTR_ID, "openmpi job id",
@@ -68,31 +61,47 @@ public class OpenMpiJobAttributes {
         new EnumeratedAttributeDefinition<MappingMode>(MAPPING_MODE_ATTR_ID, "Mapping mode", "Mapping mode",
                 true, MappingMode.UNKNOWN);
 
+ 	/**
+	 * <p>
+	 * openmpi 1.2 and 1.3
+ 	 */
 	public static IntegerAttributeDefinition getNumMappedNodesDefinition() {
 		return numMappedNodesDef;
 	}
 
-	public static IntegerAttributeDefinition getNumAppContextsDefinition() {
-		return numAppContexts;
-	}
-
+	/**
+	 * <p>
+	 * openmpi 1.2 only.
+	 */
 	public static IntegerAttributeDefinition getMpiJobId() {
 		return mpiJobId;
 	}
 
+	/**
+	 * <p>
+	 * openmpi 1.2 only.
+	 */
 	public static IntegerAttributeDefinition getVpidStart() {
 		return vpidStart;
 	}
 
+	/**
+	 * <p>
+	 * openmpi 1.2 only.
+	 */
 	public static IntegerAttributeDefinition getVpidRange() {
 		return vpidRange;
 	}
 
+	/**
+	 * <p>
+	 * openmpi 1.2 and 1.3
+	 */
 	public static EnumeratedAttributeDefinition<MappingMode> getMappingModeDefinition() {
 		return mappingModeDefinition;
 	}
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{numMappedNodesDef,numAppContexts,mpiJobId,vpidStart,vpidRange,mappingModeDefinition};
+		return new IAttributeDefinition[]{numMappedNodesDef,mpiJobId,vpidStart,vpidRange,mappingModeDefinition};
 	}
 }

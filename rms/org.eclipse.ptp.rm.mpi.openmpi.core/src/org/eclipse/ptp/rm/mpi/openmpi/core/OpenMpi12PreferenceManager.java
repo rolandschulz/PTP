@@ -13,11 +13,14 @@ package org.eclipse.ptp.rm.mpi.openmpi.core;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 
-public class OpenMpiPreferenceManager extends AbstractToolsPreferenceManager {
+
+public class OpenMpi12PreferenceManager extends AbstractToolsPreferenceManager {
 	private static final String LAUNCH_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${execPath}/${execName} ${progArgs}";
 	private static final String DISCOVER_CMD = "ompi_info -a --parseable";
 	private static final String PATH = "";
 	private static final boolean USE_DEFAULTS = true;
+
+	public static final String PREFIX = "openmpi-1.2-";
 
 	public static Preferences getPreferences() {
 		return Activator.getDefault().getPluginPreferences();
@@ -30,9 +33,9 @@ public class OpenMpiPreferenceManager extends AbstractToolsPreferenceManager {
 	public static void initializePreferences() {
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		// Initialize only preferences as in OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
-		preferences.setDefault(PREFS_LAUNCH_CMD, LAUNCH_CMD);
-		preferences.setDefault(PREFS_DISCOVER_CMD, DISCOVER_CMD);
-		preferences.setDefault(PREFS_REMOTE_INSTALL_PATH, PATH);
-		preferences.setDefault(PREFS_USE_DEFAULTS, USE_DEFAULTS);
+		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, LAUNCH_CMD);
+		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, DISCOVER_CMD);
+		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, PATH);
+		preferences.setDefault(PREFIX + PREFS_USE_DEFAULTS, USE_DEFAULTS);
 	}
 }

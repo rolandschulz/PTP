@@ -95,8 +95,8 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		int procCount = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
 
 		String procIDs[] = new String[procCount];
-		for (OpenMpiProcessMap.MappedNode node : map.mappedNodes) {
-			String nodename = node.nodename;
+		for (OpenMpiProcessMap.Node node : map.mappedNodes) {
+			String nodename = node.name;
 			String nodeID = rtSystem.getNodeIDforName(nodename);
 			
 			Assert.isNotNull(nodeID);

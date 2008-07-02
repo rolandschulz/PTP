@@ -4,10 +4,22 @@
 <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMpi12PreferencePage"
+            id="org.eclipse.ptp.rm.openmpi.ui.preferences.openmpi12"
+            name="openmpi 1.2">
+      </page>
+      <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMpiPreferencePage"
-            id="org.eclipse.ptp.rm.openmpi.ui.preferences.preferencePage"
-            name="Open MPI (new)">
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.EmptyPage"
+            id="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
+            name="openmpi">
+      </page>
+      <page
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMpi13PreferencePage"
+            id="org.eclipse.ptp.rm.openmpi.ui.preferences.openmpi13"
+            name="openmpi 1.3">
       </page>
    </extension>
    <extension
