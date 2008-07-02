@@ -17,6 +17,8 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.tau.papitest.actions;
 
+import java.io.File;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -67,7 +69,13 @@ public class TestPAPI implements IWorkbenchWindowActionDelegate {
 			
 			System.out.println(papiLoc+" "+papiCountType);
 			
-			if(papiCountType==2)
+			File pdir=new File(papiLoc);
+			if(!pdir.isDirectory()||!pdir.canRead()){
+				return;
+			}
+			File pcxi=new File(papiLoc+File.separator+"papi_xml_event_info");
+			
+			if(pcxi.canRead()&&pcxi.exists())//papiCountType==2)
 			{
 				EventTreeDialog treeD=new EventTreeDialog(window.getShell(),papiLoc);
 				

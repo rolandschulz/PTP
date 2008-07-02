@@ -513,6 +513,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	 * subdirectory and returns a list of all Makefile.tau... files with -pdt
 	 * */
 	private File[] testTAUEnv(String binpath) {
+
 		class makefilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
 				if ((name.indexOf("Makefile.tau") != 0)
@@ -520,10 +521,10 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 					return false;
 				}
 				/*Only include papi makefiles built with multiplecounters*/
-				if (name.indexOf("-multiplecounters") <= 0
-						&& (name.indexOf("-papi") > 0)) {
-					return false;
-				}
+//				if (name.indexOf("-multiplecounters") <= 0
+//						&& (name.indexOf("-papi") > 0)) {
+//					return false;
+//				}
 
 				return true;
 			}
@@ -700,13 +701,13 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				papiSelect
 				.setToolTipText("Set PAPI COUNTER environment variables");
 				papiSelect.addSelectionListener(listener);
-				papiCountRadios = new Button[3];
+				papiCountRadios = new Button[2];
 				papiCountRadios[0] = createRadioButton(papiComp,
 				"Preset Counters");
 				papiCountRadios[1] = createRadioButton(papiComp,
 				"Native Counters");
-				papiCountRadios[2] = createRadioButton(papiComp,
-				"PAPI-C");
+//				papiCountRadios[2] = createRadioButton(papiComp,
+//				"PAPI-C");
 			}
 		}
 		/*
@@ -951,8 +952,10 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 			tauOpts.initializePane(configuration);
 
-			papiCountRadios[configuration.getAttribute(
-					ITAULaunchConfigurationConstants.PAPISELECT, 0)]
+			int pcr=configuration.getAttribute(
+					ITAULaunchConfigurationConstants.PAPISELECT, 0);
+			if(pcr>1)pcr=0;
+			papiCountRadios[pcr]
 					.setSelection(true);
 
 			selmakefile = configuration.getAttribute(
@@ -1096,10 +1099,11 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		} else if (papiCountRadios[1].getSelection()){
 			configuration.setAttribute(ITAULaunchConfigurationConstants.PAPISELECT,
 					1);
-		}else if (papiCountRadios[2].getSelection()){
-			configuration.setAttribute(ITAULaunchConfigurationConstants.PAPISELECT,
-					2);
 		}
+//		else if (papiCountRadios[2].getSelection()){
+//			configuration.setAttribute(ITAULaunchConfigurationConstants.PAPISELECT,
+//					2);
+//		}
 
 		/**
 		 * Selective instrumentation file specification
@@ -1257,8 +1261,15 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		try {
 
 			String papiBin=getPapiLoc();
+			
+			File pdir=new File(papiBin);
+			if(!pdir.isDirectory()||!pdir.canRead()){
+				return;
+			}
+			File pcxi=new File(papiBin+File.separator+"papi_xml_event_info");
+			
 
-			if(papiCountRadios[2].getSelection())
+			if(pcxi.exists())//papiCountRadios[2].getSelection())
 			{
 				//System.out.println(papiBin);
 				final String pTool="papi_xml_event_info";

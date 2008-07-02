@@ -73,7 +73,7 @@ public class PapiCSelect {
 		catch (Exception e) {e.printStackTrace();}
 		return et;
 	}
-	@SuppressWarnings("unchecked")
+
 	public Set<Integer>[] getAvailable(int component,Set<String> checked){
 		Set<Integer>[] index=new HashSet[2];
 		pparser.reset();
@@ -88,6 +88,7 @@ public class PapiCSelect {
 		
 		String[]a=new String[cAl.size()];
 		cAl.toArray(a);
+		printCommand(a);
 		String s;
 		Process p=null;
 		try {
@@ -111,5 +112,14 @@ public class PapiCSelect {
 		index[1]=((EventSet)et.children.get(0).children.get(1)).fullSet;
 		
 		return index;
+	}
+	private static void printCommand(String[] com){
+		String s = "";
+		
+		for(int i=0;i<com.length;i++){
+			s+=com[i]+" ";
+		}
+		
+		System.out.println(s);
 	}
 }
