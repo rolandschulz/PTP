@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.ptp.rdt.ui.views"
+            name="%rdtViewCategory.name">
+      </category>
+      <view
+            category="org.eclipse.cdt.ui.views"
+            class="org.eclipse.ptp.internal.ui.includebrowser.IBViewPart"
+            icon="icons/view16/includeBrowser.gif"
+            id="org.eclipse.cdt.ui.includeBrowser"
+            name="%includeBrowser.name"/>
+      <view
+            category="org.eclipse.ptp.rdt.ui.views"
+            class="org.eclipse.ptp.internal.rdt.ui.callhierarchy.RemoteCHViewPart"
+            icon="icons/view16/call_hierarchy.gif"
+            id="org.eclipse.ptp.rdt.ui.callHierarchy"
+            name="%callHierarchyView.name"/>
+      <view
+            category="org.eclipse.ptp.rdt.ui.views"
+            class="org.eclipse.ptp.internal.rdt.ui.typehierarchy.RemoteTHViewPart"
+            icon="icons/view16/class_hi.gif"
+            id="org.eclipse.ptp.rdt.ui.typeHierarchy"
+            name="%typeHierarchyView.name"/>
+   </extension>
+   <extension
+         point="org.eclipse.search.searchPages">
+      <page
+            canSearchEnclosingProjects="true"
+            class="org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchPage"
+            extensions="c:90,cpp:90, cxx:90, cc:90,C:90, h:90, hh:90, hpp:90, H:90"
+            icon="icons/obj16/csearch_obj.gif"
+            id="org.eclipse.rdt.ui.searchPage"
+            label="%remoteCSearchPage.label"
+            showScopeSection="true"
+            sizeHint="460, 160">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.search.searchResultViewPages">
+      <viewPage
+            class="org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchViewPage"
+            id="org.eclipse.ptp.ui.SearchViewPage"
+            searchResultClass="org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchResult">
+      </viewPage>
+   </extension>
+    <extension
+        point="org.eclipse.cdt.ui.completionProposalComputer"
+        id="remoteParserProposalCategory"
+        name="Remote Proposals">
+        <proposalCategory
+            icon="$nl$/icons/elcl16/codeassist_co.gif"/>
+    </extension>
+   <extension
+         id="LocalCompletionProposalAdapter"
+         point="org.eclipse.cdt.ui.completionProposalComputer">
+      <completionProposalComputer
+            activate="true"
+            categoryId="remoteParserProposalCategory"
+            class="org.eclipse.ptp.internal.rdt.ui.contentassist.LocalCompletionProposalAdapter">
+         <partition type="__dftl_partition_content_type" />
+         <partition type="__c_preprocessor" />
+      </completionProposalComputer>
+   </extension>
+   <extension
+         id="org.eclipse.ptp.rdt.ui.remoteceditor"
+         point="org.eclipse.ui.editors">
+      <editor
+            default="true"
+            name="%remoteEditor.name"
+            icon="icons/obj16/c_file_obj.gif"
+            class="org.eclipse.ptp.internal.rdt.ui.editor.CEditor"
+            contributorClass="org.eclipse.ptp.internal.rdt.ui.editor.CEditorActionContributor"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
+            id="org.eclipse.pdt.rdt.ui.editor.CEditor">
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxSource"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxHeader"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cHeader"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
+      </editor>
+   </extension>
+   <extension
+         id="org.eclipse.ptp.rdt.ui.RemoteCIndexSubsystemConfiguration"
+         name="Remote C/C++ Indexing Subsystem"
+         point="org.eclipse.rse.core.subsystemConfigurations">
+      <configuration
+            class="org.eclipse.ptp.rdt.ui.subsystems.RemoteCIndexSubsystemConfiguration"
+            description="%configuration.description.0"
+            id="org.eclipse.ptp.rdt.ui.RemoteCIndexSubsystemConfiguration"
+            name="%configuration.name.0"
+            systemTypeIds="*"
+            vendor="%configuration.vendor.0">
+      </configuration>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
+      <wizardPage
+            ID="org.eclipse.ptp.rdt.ui.serviceModelWizardPage"
+            operationClass="org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPageOperation"
+            pageClass="org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPage">
+         <nature
+               natureID="org.eclipse.ptp.rdt.core.remoteNature">
+         </nature>
+      </wizardPage>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+            name="%category.name.0">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+            class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteCppProjectWizard"
+            hasPages="true"
+            id="org.eclipse.ptp.rdt.ui.newRemoteProjectWizard"
+            name="%wizard.name.0"
+            project="true">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.ui.IndexerPage">
+      <indexerUI
+            class="org.eclipse.ptp.internal.rdt.ui.preferences.RemoteFastIndexerBlock"
+            id="org.eclipse.ptp.rdt.ui.indexerUI"
+            indexerID="org.eclipse.ptp.rdt.core.RemoteFastIndexer"
+            name="RDT Remote Fast Indexer">
+      </indexerUI>
+      
+   </extension>
+      <extension
+         id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
+         name="RDT Remote C/C++ Indexing Service"
+         point="org.eclipse.ptp.rdt.services.providers">
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
+            configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
+            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
+            name="RDT Remote C/C++ Indexing Service"
+            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
+      </provider>
+   </extension>
+   <extension
+         id="org.eclipse.ptp.rdt.core.remoteNature"
+         name="RDT Remote Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.ptp.rdt.core.resources.RemoteNature">
+         </run>
+      </runtime>
+   </extension>
+   
+</plugin>
