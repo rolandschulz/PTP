@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="org.eclipse.ptp.rdt.core.RemoteFastIndexer"
+         name="%remoteIndexer.name"
+         point="org.eclipse.cdt.core.CIndexer">
+      <run
+            class="org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer">
+      </run>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rdt.services.services">
+      <service
+            id="org.eclipse.ptp.rdt.core.CIndexingService"
+            name="%CIndexingService.name">
+         <nature
+               id="org.eclipse.cdt.core.cnature">
+         </nature>
+         <nature
+               id="org.eclipse.cdt.core.ccnature">
+         </nature>
+      </service>
+   </extension>
+</plugin>
