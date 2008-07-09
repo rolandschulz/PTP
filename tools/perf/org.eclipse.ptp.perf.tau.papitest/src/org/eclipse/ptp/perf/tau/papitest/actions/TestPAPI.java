@@ -67,7 +67,7 @@ public class TestPAPI implements IWorkbenchWindowActionDelegate {
 			int papiCountType = Activator.getDefault().getPreferenceStore().getInt(papiCounterTypeVar);
 			String papiLoc=Activator.getDefault().getPreferenceStore().getString(papiLocationSelectionVar);
 			
-			System.out.println(papiLoc+" "+papiCountType);
+			//System.out.println(papiLoc+" "+papiCountType);
 			
 			File pdir=new File(papiLoc);
 			if(!pdir.isDirectory()||!pdir.canRead()){

@@ -151,7 +151,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			public void widgetSelected(SelectionEvent e) {
 				Object[] masterlist = contentProvider.getElements(inputElement);
 				for (int i = 0; i < masterlist.length; i++) {
-					System.out.println(masterlist[i]);
+					//System.out.println(masterlist[i]);
 					listViewer.setChecked(masterlist[i], true);
 					updateGrey(masterlist[i]);
 				}

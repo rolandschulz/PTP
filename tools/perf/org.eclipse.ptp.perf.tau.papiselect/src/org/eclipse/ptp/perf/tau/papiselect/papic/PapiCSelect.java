@@ -1,6 +1,7 @@
 package org.eclipse.ptp.perf.tau.papiselect.papic;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,12 +54,12 @@ public class PapiCSelect {
 		//InputStream is=null;
 		EventTree et=null;
 		try {
-			Process p = Runtime.getRuntime().exec(toolPath, null, null);
+			//Process p = Runtime.getRuntime().exec(toolPath, null, null);
 
 			//BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			//is=p.getInputStream();
 			pparser.reset();
-			et=parseETree(p.getInputStream());//  new FileInputStream(new File(toolPath)));//
+			et=findET(new String[]{toolPath});//parseETree(execItem(new String[]{toolPath}));//p.getInputStream());//  new FileInputStream(new File(toolPath)));//
 			
 			//BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -68,16 +69,114 @@ public class PapiCSelect {
 //			fault=true;
 //			}
 
-			p.destroy();
+			//p.destroy();
 		}
 		catch (Exception e) {e.printStackTrace();}
 		return et;
 	}
 
+	public class OutReader extends Thread{
+		StringBuffer str;
+		BufferedReader out;
+		
+		OutReader(InputStream is){
+			str=new StringBuffer();
+			out=new BufferedReader(new InputStreamReader(is));
+		}
+		
+		public void run(){
+			String s;
+			try {
+				
+				while ((s = out.readLine()) != null) 
+				{
+				//fault=true;
+				//System.out.println(s);
+					str.append(s);
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+//	public class ETReader extends Thread{
+//		EventTree et;
+//		InputStream is;
+//		
+//		ETReader(InputStream is){
+//			//str=new StringBuffer();
+//			//out=new BufferedReader(new InputStreamReader(is));
+//			this.is = is;
+//		}
+//		
+//		public void run(){
+//			et=parseETree(is);
+//		}
+////			String s;
+////			try {
+////				
+////				while ((s = out.readLine()) != null) 
+////				{
+////				//fault=true;
+////				//System.out.println(s);
+////					str.append(s);
+////				}
+////				
+////			} catch (IOException e) {
+////				e.printStackTrace();
+////			}
+////		}
+//	}
+	
+	public EventTree findET(String[] commands){
+		EventTree et =null;
+		try {
+			Process p = Runtime.getRuntime().exec(commands);
+			
+			//BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			//boolean fault=false;
+			
+			OutReader errThd=new OutReader(p.getErrorStream());
+			OutReader stdThd=new OutReader(p.getInputStream());
+			stdThd.start();
+			errThd.start();
+			
+			int result=p.waitFor();
+			
+			stdThd.join();
+			errThd.join();
+			
+			p.destroy();
+			
+			if(result==0){
+				//s=stdThd.str.toString();
+				byte[] xbytes=stdThd.str.toString().getBytes();
+				ByteArrayInputStream stringIS = new ByteArrayInputStream(xbytes);
+
+				et=parseETree(stringIS);//stdThd.et;
+			}
+//			while ((s = stdErr.readLine()) != null) 
+//			{
+//			//fault=true;
+//			System.out.println(s);
+//			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return et;
+	}
+	
 	public Set<Integer>[] getAvailable(int component,Set<String> checked){
 		Set<Integer>[] index=new HashSet[2];
 		pparser.reset();
-		EventTree et;
+		
 		
 		ArrayList<String> cAl = new ArrayList(checked);
 		
@@ -88,38 +187,59 @@ public class PapiCSelect {
 		
 		String[]a=new String[cAl.size()];
 		cAl.toArray(a);
-		printCommand(a);
-		String s;
-		Process p=null;
-		try {
-			p = Runtime.getRuntime().exec(a);
-			
-			BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			//boolean fault=false;
-			while ((s = stdErr.readLine()) != null) 
-			{
-			//fault=true;
-			System.out.println(s);
-			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		et=parseETree(p.getInputStream());
-		p.destroy();
+		//printCommand(a);
 		
+		EventTree et=findET(a);//parseETree(execItem(a));
+		//String s;
+//		Process p=null;
+//		try {
+//			p = Runtime.getRuntime().exec(a);
+//			
+//			//BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+//			//boolean fault=false;
+//			
+//			OutputReader errThd=new OutputReader(p.getErrorStream());
+//			OutputReader stdThd=new OutputReader(p.getInputStream());
+//			stdThd.start();
+//			errThd.start();
+//			
+//			int result=p.waitFor();
+//			
+//			stdThd.join();
+//			errThd.join();
+//			
+//			et=parseETree(stdThd.str.toString());
+//			p.destroy();
+////			while ((s = stdErr.readLine()) != null) 
+////			{
+////			//fault=true;
+////			System.out.println(s);
+////			}
+//			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		
+		if(et==null)
+		{
+			return null;
+		}
 		index[0]=((EventSet)et.children.get(0).children.get(0)).fullSet;
 		index[1]=((EventSet)et.children.get(0).children.get(1)).fullSet;
 		
 		return index;
 	}
-	private static void printCommand(String[] com){
-		String s = "";
-		
-		for(int i=0;i<com.length;i++){
-			s+=com[i]+" ";
-		}
-		
-		System.out.println(s);
-	}
+//	private static void printCommand(String[] com){
+//		String s = "";
+//		
+//		for(int i=0;i<com.length;i++){
+//			s+=com[i]+" ";
+//		}
+//		
+//		System.out.println(s);
+//	}
 }

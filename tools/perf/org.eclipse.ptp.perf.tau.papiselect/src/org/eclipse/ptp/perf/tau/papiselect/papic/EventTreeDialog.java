@@ -226,7 +226,9 @@ public class EventTreeDialog extends Dialog{
 						
 						Set<Integer>[]av=cSelect.getAvailable(c.index, c.eNames);
 						
-						
+						if(av==null){
+							return;
+						}
 						
 						Set<Integer> grey = new HashSet<Integer>(((EventSet)c.children.get(0)).fullSet);
 						
