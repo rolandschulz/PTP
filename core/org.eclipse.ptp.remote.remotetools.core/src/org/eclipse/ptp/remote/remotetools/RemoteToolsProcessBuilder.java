@@ -11,8 +11,10 @@
 package org.eclipse.ptp.remote.remotetools;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
@@ -24,24 +26,26 @@ import org.eclipse.ptp.remotetools.core.RemoteProcess;
 
 public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private RemoteToolsConnection connection;
+	private Map<String, String> remoteEnv = new HashMap<String, String>();
 
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, List<String> command) {
 		super(conn, command);
+		remoteEnv.putAll(System.getenv());
 		this.connection = conn;
 	}
 	
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, String... command) {
-		super(conn, command);
-		this.connection = conn;
+		this(conn, Arrays.asList(command));
 	}
-	
 
-	private String spaceEscapify(String inputString) {
-		if(inputString == null)
-			return null;
-		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
+	 */
+	@Override
+	public Map<String, String> environment() {
+		return remoteEnv;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
 	 */
@@ -77,5 +81,11 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		}
+	}
+	
+	private String spaceEscapify(String inputString) {
+		if(inputString == null)
+			return null;
+		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
