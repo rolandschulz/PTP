@@ -11,26 +11,37 @@
 package org.eclipse.ptp.internal.remote;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
-import java.util.Map.Entry;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	private ProcessFactory localProcessBuilder;
+	private Map<String, String> remoteEnv = new HashMap<String, String>();
 
 	public LocalProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
-		localProcessBuilder = ProcessFactory.getFactory();;
+		remoteEnv.putAll(System.getenv());
+		localProcessBuilder = ProcessFactory.getFactory();
 	}
 	
 	public LocalProcessBuilder(IRemoteConnection conn, String... command) {
-		super(conn, command);
-		localProcessBuilder = ProcessFactory.getFactory();;
+		this(conn, Arrays.asList(command));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
+	 */
+	@Override
+	public Map<String, String> environment() {
+		return remoteEnv;
 	}
 	
 	/* (non-Javadoc)

@@ -12,7 +12,6 @@ package org.eclipse.ptp.remote;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,15 +21,12 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	private List<String> commandArgs;
 	private IRemoteConnection remoteConnection;
 	private IFileStore remoteDir;
-	private Map<String, String> remoteEnv;
 	private boolean redirectErrorStream;
 	
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, List<String> command) {
 		remoteConnection = conn;
 		commandArgs = command;
 		remoteDir = null;
-		remoteEnv = new HashMap<String, String>();
-		remoteEnv.putAll(System.getenv());
 		redirectErrorStream = false;
 	}
 	
@@ -94,9 +90,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#environment()
 	 */
-	public Map<String, String> environment() {
-		return remoteEnv;
-	}
+	public abstract Map<String, String> environment();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#redirectErrorStream()

@@ -11,39 +11,41 @@
 package org.eclipse.ptp.remote.rse;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
-import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
-import org.eclipse.rse.services.shells.HostShellProcessAdapter;
-import org.eclipse.rse.services.shells.IHostShell;
-import org.eclipse.rse.services.shells.IShellService;
 
 public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final static 	String EXIT_CMD = "exit"; //$NON-NLS-1$
 	private final static 	String CMD_DELIMITER = ";"; //$NON-NLS-1$
 	
 	private RSEConnection connection;
+	private Map<String, String> remoteEnv = new HashMap<String, String>();
 
 	public RSEProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
+		remoteEnv.putAll(System.getenv());
 		this.connection = (RSEConnection)conn;
 	}
-	
-	public RSEProcessBuilder(IRemoteConnection conn, String... command) {
-		super(conn, command);
-	}
-	
 
-	private String spaceEscapify(String inputString) {
-		if(inputString == null)
-			return null;
-		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
+	public RSEProcessBuilder(IRemoteConnection conn, String... command) {
+		this(conn, Arrays.asList(command));
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
+	 */
+	@Override
+	public Map<String, String> environment() {
+		return remoteEnv;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
 	 */
@@ -86,6 +88,12 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		Process p = new HostShellProcessAdapter(hostShell);
 		return new RSEProcess(p);
+	}
+	
+	private String spaceEscapify(String inputString) {
+		if(inputString == null)
+			return null;
+		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }
