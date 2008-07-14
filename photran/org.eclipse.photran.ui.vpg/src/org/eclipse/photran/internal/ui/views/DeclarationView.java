@@ -288,9 +288,12 @@ public class DeclarationView extends ViewPart
      */
     public synchronized boolean handle(ASTExecutableProgramNode ast, TokenList tokenList, DefinitionMap<Definition> defMap)
     {
-        String path = activeEditor.getIFile().getFullPath().toPortableString();
-        activeAST.put(path, ast);
-        activeTokenList.put(path, tokenList);
+        if (activeEditor != null)
+        {
+            String path = activeEditor.getIFile().getFullPath().toPortableString();
+            activeAST.put(path, ast);
+            activeTokenList.put(path, tokenList);
+        }
         return true;
     }
 
