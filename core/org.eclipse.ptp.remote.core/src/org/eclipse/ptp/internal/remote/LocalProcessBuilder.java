@@ -18,24 +18,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	private ProcessFactory localProcessBuilder;
-	private Map<String, String> remoteEnv = new HashMap<String, String>();
 
+	private Map<String, String> remoteEnv = new HashMap<String, String>();
 	public LocalProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
 		remoteEnv.putAll(System.getenv());
 		localProcessBuilder = ProcessFactory.getFactory();
 	}
-	
+
 	public LocalProcessBuilder(IRemoteConnection conn, String... command) {
 		this(conn, Arrays.asList(command));
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
 	 */
@@ -54,6 +57,17 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		for (Entry<String,String>  entry : environment().entrySet()) {
 			environmentArray[index++] = entry.getKey()+"="+entry.getValue();
 		}
-		return new LocalProcess(localProcessBuilder.exec(commandArray, environmentArray));
+		Process localProc;
+		if (directory() != null) {
+			try {
+				localProc = localProcessBuilder.exec(commandArray, environmentArray, 
+						directory().toLocalFile(EFS.NONE, new NullProgressMonitor()));
+			} catch (CoreException e) {
+				throw new IOException(e.getMessage());
+			}
+		} else {
+			localProc = localProcessBuilder.exec(commandArray, environmentArray);
+		}
+		return new LocalProcess(localProc);
 	}
 }
