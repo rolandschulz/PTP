@@ -20,6 +20,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteProcess;
+import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
+import org.eclipse.rse.services.shells.HostShellProcessAdapter;
+import org.eclipse.rse.services.shells.IHostShell;
+import org.eclipse.rse.services.shells.IShellService;
 
 public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final static 	String EXIT_CMD = "exit"; //$NON-NLS-1$
@@ -30,8 +34,35 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 
 	public RSEProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
-		remoteEnv.putAll(System.getenv());
 		this.connection = (RSEConnection)conn;
+		
+		IShellService shellService = connection.getRemoteShellService();
+		
+		try {
+			String[] env = shellService.getHostEnvironment();
+			populateEnvironmentMap(env, remoteEnv);
+			
+		} catch (SystemMessageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+
+	private void populateEnvironmentMap(String[] env, Map<String, String> envMap) {
+		// env is of the form "var=value"
+		
+		for(int k = 0; k < env.length; k++) {
+			
+			// get the index of the "="
+			int pos = env[k].indexOf("="); //$NON-NLS-1$
+			assert(pos != -1);
+			
+			
+			envMap.put(env[k].substring(0, pos - 1), env[k].substring(pos + 1));
+		}
+		
 	}
 
 	public RSEProcessBuilder(IRemoteConnection conn, String... command) {
