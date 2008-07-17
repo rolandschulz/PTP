@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 
 import org.eclipse.core.runtime.Preferences;
-
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpi12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpi13PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
@@ -46,6 +45,7 @@ public class OpenMpiToolConfigurationWizardPage extends
 			Object source = e.getSource();
 			if (source == versionCombo) {
 				handleVersionSelected();
+				updateControls();
 			} else {
 				super.doWidgetSelected(e);
 			}
@@ -172,6 +172,7 @@ public class OpenMpiToolConfigurationWizardPage extends
 		} else {
 			assert false;
 		}
+		resetErrorStatus();
 		dataSource.setCommandFields(launchCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
 		dataSource.putToFields();
 		listenerEnabled = true;

@@ -11,18 +11,46 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.ptp.core.attributes.AttributeManager;
 
 public class OpenMpiProcessMap {
 
-	static public class AppContext {
-		int index;
-		String app = new String();
-		int num_procs;
-		List<String> argv = new ArrayList<String>();
-		List<String> env = new ArrayList<String>();
-		String workDir = new String();
-		int num_maps;
+	/**
+	 * An application launched by mpirun.
+	 * 
+	 * @author dfferber
+	 */
+	static public class Application {
+		private int index;
+		private String name = new String();
+		final private AttributeManager attributeManager = new AttributeManager();
+		private int numberOfProcessors;
+		
+		public Application(int index, String applicationName, int numberOfProcessors) {
+			super();
+			this.index = index;
+			this.name = applicationName;
+			this.numberOfProcessors = numberOfProcessors;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public int getNumberOfProcessors() {
+			return numberOfProcessors;
+		}
+		
+		public AttributeManager getAttributeManager() {
+			return attributeManager;
+		}
 	}
 
 	/**
@@ -32,59 +60,119 @@ public class OpenMpiProcessMap {
 	 */
 	static public class Node {
 		// Information provided only by openmpi 1.2
-		// int cell;
-		// int launch_id;
-		// String username;
-		// int num_procs;
-		// String daemon_name;
-		// 
+		 int index;
+
 		// Information provided by openmpi 1.2 and 1.3
-		String name = null;
-		
-		// Calculated information.
-		boolean overSubscribed = false;
-		int numSlots = 0;
-		int maxSlots = 0;
+		private String name = null;
+		 
+		final private AttributeManager attributeManager = new AttributeManager();
 		
 		// References to processes.
-		List<MappedProc> procs = new ArrayList<MappedProc>();
+		private List<Process> processes = new ArrayList<Process>();
+
+		public Node(int index, String name) {
+			super();
+			this.index = index;
+			this.name = name;
+		}
+		
+		public int getIndex() {
+			return index;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public AttributeManager getAttributeManager() {
+			return attributeManager;
+		}
+		
+//		public void addProcessor(Process process) {
+//			processes.add(process);
+//		}
+		
+		public List<Process> getProcesses() {
+			return Collections.unmodifiableList(processes);
+		}
+
 	}
 
-	static public class MappedProc {
-		String name = new String();
-		int rank;
-		int pid;
-		int app_context_index;
+	/**
+	 * A process spawned by mpirun for a certain application on a certain node.
+	 */
+	static public class Process {
+		private String name;
+		private int index;
+		private int applicationIndex;
+		private Node node;
+		
+		final private AttributeManager attributeManager = new AttributeManager();
+		
+		public Process(Node node, int index, String name, int applicationIndex) {
+			super();
+			this.node = node;
+			this.name = name;
+			this.index = index;
+			this.applicationIndex = applicationIndex;
+		}
 
 		public String getName() {
 			return name;
 		}
-
-		public int getPID() {
-			return pid;
+		
+		public int getIndex() {
+			return index;
+		}
+		
+		public int getApplicationIndex() {
+			return applicationIndex;
 		}
 
-		public int getRank() {
-			return rank;
+		public AttributeManager getAttributeManager() {
+			return attributeManager;
+		}
+		
+		public Node getNode() {
+			return node;
 		}
 	}
 
-	int pid;
-	String hostname;
-	int map_for_job;
-	int job_id = 0;
-
-	public enum MappingMode {
-		byslot, bynode, none
+	final private AttributeManager attributeManager = new AttributeManager();
+	final private List<Application> applications = new ArrayList<Application>();
+	final private List<Node> nodes = new ArrayList<Node>();
+	final private List<Process> processes = new ArrayList<Process>();
+	
+	public OpenMpiProcessMap() {
+		// Nothing.
 	}
-
-	MappingMode mapping_mode = MappingMode.none;
-	int starting_vpid = 0;
-	int vpid_range = 0;
-	int num_app_contexts = 0;
-	List<AppContext> appContexts = new ArrayList<AppContext>();
-
-	int num_nodes;
-	List<Node> mappedNodes = new ArrayList<Node>();
-
+	
+	public List<Process> getProcesses() {
+		return Collections.unmodifiableList(processes);
+	}
+	
+	public List<Node> getNodes() {
+		return Collections.unmodifiableList(nodes);
+	}
+	
+	public List<Application> getAppContexts() {
+		return Collections.unmodifiableList(applications);
+	}
+	
+	public AttributeManager getAttributeManager() {
+		return attributeManager;
+	}
+	
+	void addApplication(Application application) {
+		this.applications.add(application);
+	}
+	
+	void addNode(Node node) {
+		nodes.add(node);
+	}
+	
+	void addProcess(Process process) {
+		processes.add(process);
+		process.node.processes.add(process);
+	}
 }

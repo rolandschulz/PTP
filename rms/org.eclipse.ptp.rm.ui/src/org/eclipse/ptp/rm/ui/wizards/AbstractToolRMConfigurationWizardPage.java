@@ -460,7 +460,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	 * Update wizard UI selections from settings. This should be called whenever any
 	 * settings are changed.
 	 */
-	private void updateControls() {
+	protected void updateControls() {
 		boolean enabled = ! defaultButton.getSelection();
 
 		if (launchCmdText != null)

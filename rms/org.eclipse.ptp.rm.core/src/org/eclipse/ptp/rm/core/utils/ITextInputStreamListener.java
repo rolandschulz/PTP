@@ -17,7 +17,7 @@ package org.eclipse.ptp.rm.core.utils;
  * @author Daniel Felix Ferber
  * @since 1.0
  */
-public interface ILineStreamListener {
+public interface ITextInputStreamListener {
 	void newLine(String line);
 	void streamClosed();
 	void streamError(Exception e);

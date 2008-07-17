@@ -18,7 +18,7 @@ package org.eclipse.ptp.rm.core.utils;
  * @author Daniel Felix Ferber
  * @since 1.0
  */
-public interface IStreamListener {
+public interface IInputStreamListener {
 	void newBytes(byte bytes[], int length);
 	void streamClosed();
 	void streamError(Exception e);

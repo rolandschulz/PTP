@@ -27,7 +27,7 @@ import java.io.IOException;
  * @since 1.0
  *
  */
-public class TextStreamObserver extends Thread {
+public class TextInputStreamObserver extends Thread {
 	/**
 	 * Stream that is been observed and read.
 	 */
@@ -41,16 +41,16 @@ public class TextStreamObserver extends Thread {
 	/**
 	 * Listener that is called when data is received.
 	 */
-	private ILineStreamListener listener;
+	private ITextInputStreamListener listener;
 
-	public TextStreamObserver(BufferedReader input, ILineStreamListener listener,
+	public TextInputStreamObserver(BufferedReader input, ITextInputStreamListener listener,
 			String name) {
 		this.reader = input;
 		this.listener = listener;
 		setName(name);
 	}
 
-	public TextStreamObserver(BufferedReader input, ILineStreamListener listener) {
+	public TextInputStreamObserver(BufferedReader input, ITextInputStreamListener listener) {
 		this.reader = input;
 		this.listener = listener;
 		setName(this.getClass().getName());

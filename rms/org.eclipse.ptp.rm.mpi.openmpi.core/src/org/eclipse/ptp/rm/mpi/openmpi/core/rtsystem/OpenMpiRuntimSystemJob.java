@@ -13,14 +13,11 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -29,149 +26,255 @@ import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.DefaultToolRuntimeSystemJob;
-import org.eclipse.ptp.rm.core.utils.ILineStreamListener;
-import org.eclipse.ptp.rm.core.utils.TextStreamObserver;
-import org.eclipse.ptp.rm.mpi.openmpi.core.Activator;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes;
+import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
+import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.Process;
 
 public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
-	private TextStreamObserver stderrObserver;
-	private TextStreamObserver stdoutObserver;
-	private BufferedReader inReader;
-	private BufferedReader errReader;
+	Object lock1 = new Object();
+
+	private InputStreamObserver stderrObserver;
+	private InputStreamObserver stdoutObserver;
+
 	/** Information parsed from launch command. */
 	OpenMpiProcessMap map;
+
 	/** Mapping of processes created by this job. */
-	private Map<String,IPProcess> processMap = new HashMap<String, IPProcess>();
+//	private Map<String,String> processMap = new HashMap<String, String>();
+
 	/** Process with rank 0 (zero) that prints all output. */
-	private String rankZeroProcessID;
+//	private String rankZeroProcessID;
+
+	/**
+	 * Process IDs created by this job. The first process (zero index) is special,
+	 * because it is always created.
+	 */
+	String processIDs[];
+
+	/** Exception raised while parsing mpi map information. */
+	IOException parserException = null;
 
 	public OpenMpiRuntimSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, name, rtSystem, attrMgr);
 	}
 
-
 	@Override
 	protected void doExecutionStarted() throws CoreException {
-		inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		try {
-			map = OpenMpiProcessMapParser.parse(errReader);
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to parse Open Mpi run command output.", e));
-		}
-//		System.out.println(map);
-		OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
-		IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(rtSystem.getQueueID()).getJobById(getJobID());
-		try {
-			ipJob.addAttribute(OpenMpiJobAttributes.getMpiJobId().create(map.map_for_job));
-			ipJob.addAttribute(OpenMpiJobAttributes.getVpidStart().create(map.starting_vpid));
-			ipJob.addAttribute(OpenMpiJobAttributes.getVpidRange().create(map.vpid_range));
-//			if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.bynode) {
-//				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_NODE));
-//			} else if (map.mapping_mode == org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode.byslot) {
-//				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.BY_SLOT));
-//			} else {
-//				ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode.UNKNOWN));
-//			}
-			ipJob.addAttribute(OpenMpiJobAttributes.getNumMappedNodesDefinition().create(map.mappedNodes.size()));
-		} catch (IllegalValueException e) {
-			// No invalid values can be generated
-			Assert.isTrue(false);
-		}
-		if (map.mapping_mode == OpenMpiProcessMap.MappingMode.bynode) {
-			ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(OpenMpiJobAttributes.MappingMode.BY_NODE));
-		} else if (map.mapping_mode == OpenMpiProcessMap.MappingMode.byslot) {
-			ipJob.addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(OpenMpiJobAttributes.MappingMode.BY_SLOT));
-		}
-		int procCount = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
+		/*
+		 * Create a zero index job.
+		 */
+		final OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
+		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(rtSystem.getQueueID()).getJobById(getJobID());
+		final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), "Open MPI run", 0);
+		processIDs = new String[] { zeroIndexProcessID } ;
 
-		String procIDs[] = new String[procCount];
-		for (OpenMpiProcessMap.Node node : map.mappedNodes) {
-			String nodename = node.name;
-			String nodeID = rtSystem.getNodeIDforName(nodename);
-			
-			Assert.isNotNull(nodeID);
-			for (OpenMpiProcessMap.MappedProc proc : node.procs) {
-				String name = proc.getName();
-				int index = proc.getRank();
-				procIDs[index] = rtSystem.createProcess(getJobID(), name, index);
-				IPProcess ipProc = ipJob.getProcessById(procIDs[index]);
-				processMap.put(procIDs[index], ipProc);
-				if (index == 0) {
-					/*
-					 * Exactly one process must have rank 0.
-					 */
-					Assert.isTrue(rankZeroProcessID == null);
-					rankZeroProcessID = procIDs[index];
-				}
+		/*
+		 * Listener that saves stdout.
+		 */
+		final PipedOutputStream stdoutOutputStream = new PipedOutputStream();
+		final PipedInputStream stdoutInputStream = new PipedInputStream();
+		try {
+			stdoutInputStream.connect(stdoutOutputStream);
+		} catch (IOException e) {
+			assert false; // This exception is not possible
+		}
+		final InputStreamListenerToOutputStream stdoutPipedStreamListener = new InputStreamListenerToOutputStream(stdoutOutputStream);
+		final BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
+		Thread stdoutThread = new Thread() {
+			@Override
+			public void run() {
+				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
-					ipProc.addAttribute(ProcessAttributes.getPIDAttributeDefinition().create(proc.getPID()));
-					ipProc.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
-				} catch (IllegalValueException e) {
-					// No invalid values can be generated
-					Assert.isTrue(false);
+					String line = stdoutBufferedReader.readLine();
+					while (line != null) {
+						synchronized (lock1) {
+							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+//							System.out.println(line);
+						}
+						line = stdoutBufferedReader.readLine();
+					}
+				} catch (IOException e) {
+					PTPCorePlugin.log(e);
+				} finally {
+					if (stdoutObserver != null) {
+						stdoutObserver.removeListener(stdoutPipedStreamListener);
+					}
+					try {
+						stdoutOutputStream.close();
+					} catch (IOException e) {
+						PTPCorePlugin.log(e);
+					}
+					try {
+						stdoutInputStream.close();
+					} catch (IOException e) {
+						PTPCorePlugin.log(e);
+					}
 				}
 			}
-			/*
-			 * Exactly one process must have rank 0.
-			 */
-			Assert.isNotNull(rankZeroProcessID);
+		};
+		stdoutThread.start();
+
+		/*
+		 * Listener that saves stderr.
+		 */
+		final PipedOutputStream stderrOutputStream = new PipedOutputStream();
+		final PipedInputStream stderrInputStream = new PipedInputStream();
+		try {
+			stderrInputStream.connect(stderrOutputStream);
+		} catch (IOException e) {
+			assert false; // This exception is not possible
+		}
+		final InputStreamListenerToOutputStream stderrPipedStreamListener = new InputStreamListenerToOutputStream(stderrOutputStream);
+		final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
+		Thread stderrThread = new Thread() {
+			@Override
+			public void run() {
+				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
+				try {
+					String line = stderrBufferedReader.readLine();
+					while (line != null) {
+						synchronized (lock1) {
+							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
+//							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							System.err.println(line);
+						}
+						line = stderrBufferedReader.readLine();
+					}
+				} catch (IOException e) {
+					PTPCorePlugin.log(e);
+				} finally {
+					if (stderrObserver != null) {
+						stderrObserver.removeListener(stderrPipedStreamListener);
+					}
+					try {
+						stderrOutputStream.close();
+					} catch (IOException e) {
+						PTPCorePlugin.log(e);
+					}
+					try {
+						stderrInputStream.close();
+					} catch (IOException e) {
+						PTPCorePlugin.log(e);
+					}
+				}
+			}
+		};
+//		stderrThread.start();
+
+		/*
+		 * Thread that parses map information.
+		 */
+		final PipedOutputStream parserOutputStream = new PipedOutputStream();
+		final PipedInputStream parserInputStream = new PipedInputStream();
+		try {
+			parserInputStream.connect(parserOutputStream);
+		} catch (IOException e) {
+			assert false; // This exception is not possible
+		}
+		final InputStreamListenerToOutputStream parserPipedStreamListener = new InputStreamListenerToOutputStream(parserOutputStream);
+		Thread parserThread = new Thread() {
+			@Override
+			public void run() {
+				OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
+				try {
+					if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+						map = OpenMpiProcessMapText12Parser.parse(parserInputStream);
+					} else {
+						map = OpenMpiProcessMapXml13Parser.parse(parserInputStream);
+					}
+				} catch (IOException e) {
+					parserException = e;
+					process.destroy();
+				} finally {
+					if (stderrObserver != null) {
+						stderrObserver.removeListener(parserPipedStreamListener);
+					}
+					try {
+						parserOutputStream.close();
+					} catch (IOException e) {
+						PTPCorePlugin.log(e);
+					}
+					try {
+						parserInputStream.close();
+					} catch (IOException e) {
+						PTPCorePlugin.log(e);
+					}
+				}
+			}
+		};
+
+		/*
+		 * Create and start listeners.
+		 */
+//		stderrObserver = new InputStreamObserver(process.getErrorStream());
+//		stderrObserver.addListener(stderrPipedStreamListener);
+//		stderrObserver.start();
+
+		stdoutObserver = new InputStreamObserver(process.getInputStream());
+		stdoutObserver.addListener(parserPipedStreamListener);
+		stdoutObserver.addListener(stdoutPipedStreamListener);
+		stdoutObserver.start();
+
+		try {
+			parserThread.start();
+			parserThread.join();
+		} catch (InterruptedException e) {
+			// Do nothing.
 		}
 
+		if (parserException != null) {
+			process.destroy();
+			throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to parse Open Mpi run command output.", parserException));
+		}
+
+		/*
+		 * Copy job attributes from map.
+		 */
+		rtSystem.changeJob(getJobID(), map.getAttributeManager());
+
+		/*
+		 * Copy process attributes from map.
+		 */
+		List<Process> newProcesses = map.getProcesses();
+		processIDs = new String[newProcesses.size()];
+		for (Process newProcess : newProcesses) {
+			String nodename = newProcess.getNode().getName();
+			String nodeID = rtSystem.getNodeIDforName(nodename);
+			if (nodeID == null) {
+				process.destroy();
+				throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Hostnames from Open MPI output do not match expected hostname.", parserException));
+			}
+
+			String processName = newProcess.getName();
+			int processIndex = newProcess.getIndex();
+			String processID = null;
+			if (processIndex == 0) {
+				processID = zeroIndexProcessID;
+			} else {
+				processID = rtSystem.createProcess(getJobID(), processName, processIndex);
+			}
+			processIDs[processIndex] = processID;
+
+			AttributeManager attrMgr = new AttributeManager();
+			attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(processName));
+			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
+			attrMgr.addAttributes(newProcess.getAttributeManager().getAttributes());
+			rtSystem.changeProcess(processID, attrMgr);
+		}
 	}
 
 	@Override
 	protected void doWaitExecution() throws CoreException {
-		OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
-		final IPProcess ipProc = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(rtSystem.getQueueID()).getJobById(getJobID()).getProcessById(rankZeroProcessID);
-
-		stdoutObserver = new TextStreamObserver(
-				inReader,
-				new ILineStreamListener() {
-					public void newLine(String line) {
-//						System.out.println(line);
-						ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-					}
-
-					public void streamClosed() {
-						System.out.println("stdout closed");
-					}
-
-					public void streamError(Exception e) {
-						System.out.println("sdtout "+e.getLocalizedMessage());
-					}
-				}
-		);
-		stdoutObserver.start();
-
-		stderrObserver = new TextStreamObserver(
-				errReader,
-				new ILineStreamListener() {
-					public void newLine(String line) {
-//						System.err.println(line);
-						ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
-					}
-
-					public void streamClosed() {
-						System.err.println("stderr closed");
-					}
-
-					public void streamError(Exception e) {
-						System.err.println("stderr "+e.getLocalizedMessage());
-					}
-				}
-		);
-		stderrObserver.start();
-
 		try {
 			stderrObserver.join();
 		} catch (InterruptedException e1) {
@@ -198,13 +301,27 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionFinished() throws CoreException {
-		for (IPProcess proc : processMap.values()) {
-			proc.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.EXITED));
+		AttributeManager attrMrg = new AttributeManager();
+		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.EXITED));
+
+		for (String processId : processIDs) {
+			rtSystem.changeProcess(processId, attrMrg);
 		}
 	}
 
 	@Override
 	protected void doExecutionCleanUp() {
+		if (process != null) {
+			process.destroy();
+		}
+		if (stderrObserver != null) {
+			stderrObserver.kill();
+			stderrObserver = null;
+		}
+		if (stdoutObserver != null) {
+			stdoutObserver.kill();
+			stdoutObserver = null;
+		}
 	}
 
 	@Override
@@ -223,13 +340,14 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			}
 			newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentKeysDefinition().create(keys));
 		}
-		
+
 		//${envKeys:-x : -x :::}
 		newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentArgsDefinition().create());
-		
+
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
 	}
 
+	@Override
 	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
 		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
 		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
