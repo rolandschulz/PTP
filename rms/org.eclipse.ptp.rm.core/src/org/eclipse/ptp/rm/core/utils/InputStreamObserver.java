@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -14,18 +14,21 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.PTPCorePlugin;
+
 /**
- * Connects an inputstream to a stream listener.
+ * A thread that forwards data from an inputstream to a {@link IInputStreamListener}.
  * <p>
  * This is a general facility that allows to forward data received from an
- * inputstream to a listener object. Note that only one listener is connected
- * to the observer.
+ * inputstream to a listener object.
  *
- * Copied and adapted from remote tools.
+ * Copied and adapted from remote tools. Multiple listeners are now supported.
  *
  * @author Daniel Felix Ferber
  */
-public class StreamObserver extends Thread {
+public class InputStreamObserver extends Thread {
+	boolean closed = false;
 	/*
 	 * TODO: Open issues
 	 * - Does access to 'killed' attribute need synchronized access?
@@ -39,26 +42,36 @@ public class StreamObserver extends Thread {
 	private InputStream input;
 
 	/**
-	 * Signals that bridge should stop.
+	 * Signals that observer should stop running.
 	 */
 	private boolean killed;
 
 	/**
-	 * Listener that is called when data is received.
+	 * Listeners that are called when data is received.
 	 */
-	private IStreamListener listener;
+	ListenerList listeners = new ListenerList();
 
 	private static final int BUFFER_SIZE = 100;
 
-	public StreamObserver(InputStream input, IStreamListener listener, String name) {
+	public InputStreamObserver(InputStream input) {
 		this.input = input;
-		this.listener = listener;
+		setName(this.getClass().getName());
+	}
+
+	public InputStreamObserver(InputStream input, String name) {
+		this.input = input;
 		setName(name);
 	}
 
-	public StreamObserver(InputStream input, IStreamListener listener) {
+	public InputStreamObserver(InputStream input, IInputStreamListener listener, String name) {
 		this.input = input;
-		this.listener = listener;
+		this.listeners.add(listener);
+		setName(name);
+	}
+
+	public InputStreamObserver(InputStream input, IInputStreamListener listener) {
+		this.input = input;
+		this.listeners.add(listener);
 		setName(this.getClass().getName());
 	}
 
@@ -71,27 +84,53 @@ public class StreamObserver extends Thread {
 		interrupt();
 	}
 
-	void log(String s) {
-//		System.err.println(name + ": " + s);
+	protected void log(String s) {
+//		PTPCorePlugin.log(s);
+	}
+
+	protected void log(Throwable e) {
+		PTPCorePlugin.log(e);
 	}
 
 	void streamClosed() {
 		log("Stream closed");
-		listener.streamClosed();
+		closed = true;
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IInputStreamListener)listener).streamClosed();
+			} catch (Exception e) {
+				log(e);
+				listeners.remove(listener);
+			}
+		}
 	}
 
 	void streamError(Exception e) {
 		log("Recovered from exception: " + e.getMessage());
-		listener.streamError(e);
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IInputStreamListener)listener).streamError(e);
+			} catch (Exception ee) {
+				log(ee);
+				listeners.remove(listener);
+			}
+		}
 	}
 
 	void newBytes(byte buffer[], int length) {
 		log("Received: " + Integer.toString(length) + " bytes");
-		listener.newBytes(buffer, length);
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IInputStreamListener)listener).newBytes(buffer, length);
+			} catch (Exception e) {
+				log(e);
+				listeners.remove(listener);
+			}
+		}
 	}
 
 	/**
-	 * Run in background.
+	 * Run stream observer.
 	 */
 	@Override
 	public void run() {
@@ -134,4 +173,13 @@ public class StreamObserver extends Thread {
 		}
 		log("Finished observing");
 	}
+
+	public void addListener(IInputStreamListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(IInputStreamListener listener) {
+		listeners.remove(listener);
+	}
+
 }

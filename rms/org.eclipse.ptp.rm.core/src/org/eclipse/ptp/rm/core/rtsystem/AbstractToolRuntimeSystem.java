@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -47,6 +47,8 @@ import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory;
+import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeEventFactory;
 
 /*
@@ -403,7 +405,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		AttributeManager jobAttrMgr = new AttributeManager();
 
 		/*
-		 * Add generated attributes. 
+		 * Add generated attributes.
 		 */
 		String jobID = generateID().toString();
 		jobAttrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobID));
@@ -420,7 +422,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String execPath = attrMgr.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValue();
 		Integer numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
 //		List<String> progArgs = attrMgr.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
-		
+
 		/*
 		 * Copy these relevant attributes to IPJob.
 		 */
@@ -434,13 +436,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 		// TODO: Why does this not compile?
 //		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgsAttr));
-		
+
 		/*
 		 * Notify RM.
 		 */
 		mgr.setAttributeManager(new RangeSet(jobID), jobAttrMgr);
 		fireRuntimeNewJobEvent(eventFactory.newRuntimeNewJobEvent(parentID, mgr));
-		
+
 		return jobID;
 	}
 
@@ -489,7 +491,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @param name the name of the queue
 	 * @return the id of the new queue
 	 */
-	protected String createQueue(String name) {
+	public String createQueue(String name) {
 		String id = generateID();
 		ElementAttributeManager mgr = new ElementAttributeManager();
 		AttributeManager attrMgr = new AttributeManager();
@@ -499,7 +501,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(rmID, mgr));
 		return id;
 	}
-	
+
 	/**
 	 * Notify RM to create a new process.
 	 *
@@ -512,7 +514,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String id = generateID();
 		ElementAttributeManager mgr = new ElementAttributeManager();
 		AttributeManager attrMgr = new AttributeManager();
-		
+
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.STARTING));
 		try {
 			attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(index));
@@ -527,7 +529,23 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return id;
 	}
 
+	public void changeProcess(String processID, AttributeManager changedAttrMgr) {
+		AttributeManager attrMgr = new AttributeManager();
+		attrMgr.addAttributes(changedAttrMgr.getAttributes());
+		ElementAttributeManager elementAttrs = new ElementAttributeManager();
+		elementAttrs.setAttributeManager(new RangeSet(processID), attrMgr);
+		IRuntimeProcessChangeEvent event = eventFactory.newRuntimeProcessChangeEvent(elementAttrs);
+		fireRuntimeProcessChangeEvent(event);
+	}
 
+	public void changeJob(String jobID, AttributeManager changedAttrMgr) {
+		AttributeManager attrMgr = new AttributeManager();
+		attrMgr.addAttributes(changedAttrMgr.getAttributes());
+		ElementAttributeManager elementAttrs = new ElementAttributeManager();
+		elementAttrs.setAttributeManager(new RangeSet(jobID), attrMgr);
+		IRuntimeJobChangeEvent event = eventFactory.newRuntimeJobChangeEvent(elementAttrs);
+		fireRuntimeJobChangeEvent(event);
+	}
 	/**
 	 * Generate a new element ID
 	 *
@@ -552,12 +570,20 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	public IRemoteProcessBuilder createProcessBuilder(List<String> command) {
 		return remoteServices.getProcessBuilder(connection, command);
 	}
-	
+
 	public String getRmID() {
 		return rmID;
 	}
 
 	public AbstractToolRMConfiguration getRmConfiguration() {
 		return rmConfiguration;
+	}
+
+	public IRemoteConnection getConnection() {
+		return connection;
+	}
+
+	public IRemoteServices getRemoteServices() {
+		return remoteServices;
 	}
 }

@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rmsystem;
 
+import java.io.OutputStream;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -20,6 +23,10 @@ import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
@@ -161,6 +168,17 @@ public abstract class AbstractToolResourceManager extends
 	@Override
 	protected boolean doUpdateQueues(Collection<IPQueueControl> queues, AttributeManager attrs) {
 		return updateQueues(queues, attrs);
+	}
+	
+	protected void createHostList(OutputStream os, String queueID, String jobID) throws CoreException {
+		String rmID = getConfiguration().getResourceManagerId();
+		IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rmID);
+		IPQueue queue = rm.getQueueById(queueID);
+		IPJob job = queue.getJobById(jobID);
+		IPProcess processes [] = job.getProcesses();
+		processes[0].getNode();
+		
+		
 	}
 
 }

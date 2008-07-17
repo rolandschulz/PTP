@@ -21,26 +21,20 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
-import org.eclipse.ptp.core.attributes.ArrayAttributeDefinition;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.utils.ArgumentParser;
-import org.eclipse.ptp.rm.core.utils.ILineStreamListener;
-import org.eclipse.ptp.rm.core.utils.TextStreamObserver;
+import org.eclipse.ptp.rm.core.utils.ITextInputStreamListener;
+import org.eclipse.ptp.rm.core.utils.TextInputStreamObserver;
 
 public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
-	private TextStreamObserver stderrObserver;
-	private TextStreamObserver stdoutObserver;
+	private TextInputStreamObserver stderrObserver;
+	private TextInputStreamObserver stdoutObserver;
 
 	public DefaultToolRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem,
 			AttributeManager attrMgr) {
@@ -59,7 +53,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/**
 	 * Performs substitution of variables using attributes from the attribute manager as variables.
 	 * @param input the string with variables.
-	 * @param substitutionAttributeManager 
+	 * @param substitutionAttributeManager
 	 * @return The string after substitution of variables.
 	 */
 	protected String replaceVariables(String input, AttributeManager substitutionAttributeManager) {
@@ -124,6 +118,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 						} else {
 							buffer.append(separatorStr);
 						}
+						assert element != null;
 						buffer.append(element);
 					}
 					buffer.append(endStr);
@@ -178,7 +173,8 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 		return command;
 	}
-	
+
+	@Override
 	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
 		return new IAttributeDefinition[]{
 				JobAttributes.getEnvironmentAttributeDefinition(),
@@ -193,7 +189,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				JobAttributes.getWorkingDirectoryAttributeDefinition()
 			};
 	}
-		
+
 	@Override
 	protected Map<String,String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException {
 		HashMap<String, String> environmentMap = new HashMap<String, String>();
@@ -243,9 +239,9 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		BufferedReader errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-		stdoutObserver = new TextStreamObserver(
+		stdoutObserver = new TextInputStreamObserver(
 				inReader,
-				new ILineStreamListener() {
+				new ITextInputStreamListener() {
 					public void newLine(String line) {
 						System.out.println(line);
 					}
@@ -259,9 +255,9 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		);
 		stdoutObserver.start();
 
-		stderrObserver = new TextStreamObserver(
+		stderrObserver = new TextInputStreamObserver(
 				errReader,
-				new ILineStreamListener() {
+				new ITextInputStreamListener() {
 					public void newLine(String line) {
 						System.err.println(line);
 					}

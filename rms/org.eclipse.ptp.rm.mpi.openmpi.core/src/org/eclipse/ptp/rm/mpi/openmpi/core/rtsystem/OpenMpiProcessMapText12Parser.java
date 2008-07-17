@@ -13,29 +13,40 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.MappingMode;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIApplicationAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiNodeAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode;
 
-public class OpenMpiProcessMapParser {
-	private OpenMpiProcessMapParser() {
+public class OpenMpiProcessMapText12Parser {
+	private OpenMpiProcessMapText12Parser() {
 		// Do not allow instances.
 	}
 
 	OpenMpiProcessMap map = new OpenMpiProcessMap();
+	int numApplications;
+	int numNodes;
 
-	public static OpenMpiProcessMap parse(BufferedReader reader) throws IOException {
-		OpenMpiProcessMapParser parser = new OpenMpiProcessMapParser();
+	public static OpenMpiProcessMap parse(InputStream is) throws IOException {
+		OpenMpiProcessMapText12Parser parser = new OpenMpiProcessMapText12Parser();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
 		parser.readLine1(reader);
 		parser.readLine2(reader);
-		for (int i = 0; i < parser.map.num_app_contexts; i++) {
+		for (int i = 0; i < parser.numApplications; i++) {
 			parser.readAppContext(reader);
 		}
 		parser.readLine3(reader);
-		for (int i = 0; i < parser.map.num_nodes; i++) {
+		for (int i = 0; i < parser.numNodes; i++) {
 			parser.readMappedNode(reader);
 		}
 
@@ -43,11 +54,6 @@ public class OpenMpiProcessMapParser {
 	}
 
 	private void readMappedNode(BufferedReader reader) throws IOException {
-		int num_procs;
-		
-		OpenMpiProcessMap.Node node = new OpenMpiProcessMap.Node();
-		map.mappedNodes.add(node);
-
 		// Mapped node:
 		// ignore
 		String line = reader.readLine();
@@ -56,20 +62,24 @@ public class OpenMpiProcessMapParser {
 		line = reader.readLine();
 		Pattern p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*");
 		Matcher m = p.matcher(line);
+		int nodeIndex;
+		String nodeName;
 		if (!m.matches() || m.groupCount() != 4)
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-//			node.cell = Integer.parseInt(s);
+			nodeIndex = Integer.parseInt(s);
 			s = m.group(2);
-			node.name = s;
+			nodeName = s;
+			// Ignore username and launch id.
 			s = m.group(3);
-//			node.launch_id = Integer.parseInt(s);
 			s = m.group(4);
-//			node.username = s;
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
+
+		OpenMpiProcessMap.Node node = new OpenMpiProcessMap.Node(nodeIndex, nodeName);
+		map.addNode(node);
 
 		// Daemon name:
 		// Data type: ORTE_PROCESS_NAME Data Value: NULL
@@ -79,26 +89,26 @@ public class OpenMpiProcessMapParser {
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
 			throw new IOException("Invalid line: " + line);
-//		node.daemon_name = m.group(1);
+		// Ignore deamon name
 
 		// Oversubscribed: True Num elements in procs list: 6
 		line = reader.readLine();
 		p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*");
 		m = p.matcher(line);
+		int numProcesses;
 		if (!m.matches() || m.groupCount() != 2)
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
 			if (s.equalsIgnoreCase("true")) {
-				node.overSubscribed = true;
+				node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getOversubscribedDefinition().create(true));
 			} else if (s.equalsIgnoreCase("false")) {
-				node.overSubscribed = false;
+				node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getOversubscribedDefinition().create(false));
 			} else {
 				throw new IOException("Invalid line: " + line);
 			}
 			s = m.group(2);
-//			node.num_procs = Integer.parseInt(s);
-			num_procs = Integer.parseInt(s); 
+			numProcesses = Integer.parseInt(s); 
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
@@ -109,10 +119,12 @@ public class OpenMpiProcessMapParser {
 		// Proc Rank: 0 Proc PID: 0 App_context index: 0
 		// (empty line)
 //		for (int i = 0; i < node.num_procs; i ++) {
-		for (int i = 0; i < num_procs; i ++) {
-			OpenMpiProcessMap.MappedProc proc = new OpenMpiProcessMap.MappedProc();
-			node.procs.add(proc);
-
+		for (int i = 0; i < numProcesses; i ++) {
+			String processName;
+			int processIndex;
+			int processPid;
+			int applicationIndex;
+			
 			line = reader.readLine();
 			line = reader.readLine();
 			line = reader.readLine();
@@ -120,7 +132,7 @@ public class OpenMpiProcessMapParser {
 			m = p.matcher(line);
 			if (!m.matches() || m.groupCount() != 1)
 				throw new IOException("Invalid line: " + line);
-			proc.name = m.group(1);
+			processName = m.group(1);
 
 			line = reader.readLine();
 			p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*");
@@ -129,15 +141,25 @@ public class OpenMpiProcessMapParser {
 				throw new IOException("Invalid line: " + line);
 			try {
 				String s = m.group(1);
-				proc.rank = Integer.parseInt(s);
+				processIndex = Integer.parseInt(s);
 				s = m.group(2);
-				proc.pid = Integer.parseInt(s);
+				processPid = Integer.parseInt(s);
 				s = m.group(3);
-				proc.app_context_index = Integer.parseInt(s);
+				applicationIndex = Integer.parseInt(s);
 			} catch (NumberFormatException e) {
 				throw new IOException("Invalid line: " + line);
 			}
 			line = reader.readLine();
+			
+			OpenMpiProcessMap.Process proc = new OpenMpiProcessMap.Process(node, processIndex, processName, applicationIndex);
+			map.addProcess(proc);
+			try {
+				proc.getAttributeManager().addAttribute(ProcessAttributes.getPIDAttributeDefinition().create(processPid));
+			} catch (IllegalValueException e) {
+				// This is not possible.
+				assert false;
+			}
+
 		}
 	}
 
@@ -150,27 +172,29 @@ public class OpenMpiProcessMapParser {
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-			map.num_nodes = Integer.parseInt(s);
+			numNodes = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
 	}
 
 	private void readAppContext(BufferedReader reader) throws IOException {
-		OpenMpiProcessMap.AppContext context = new OpenMpiProcessMap.AppContext();
-		map.appContexts.add(context);
-
 		// Data for app_context: index 0 app: hellio
 		String line = reader.readLine();
 		Pattern p = Pattern.compile("[^:]*:\\s*\\w*\\s*(\\d*)[^:]*:\\s*(\\w*).*");
 		Matcher m = p.matcher(line);
+		
+		int applicationIndex;
+		String applicationName;
+		int numberOfProcessors;
+		
 		if (!m.matches() || m.groupCount() != 2)
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-			context.index = Integer.parseInt(s);
+			applicationIndex = Integer.parseInt(s);
 			s = m.group(2);
-			context.app = s;
+			applicationName = s;
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
@@ -183,30 +207,37 @@ public class OpenMpiProcessMapParser {
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-			context.num_procs = Integer.parseInt(s);
+			numberOfProcessors = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
+
+		OpenMpiProcessMap.Application application = new OpenMpiProcessMap.Application(applicationIndex, applicationName, numberOfProcessors);
+		map.addApplication(application);
 
 		// Argv[0]: hellio
 		line = reader.readLine();
 		p = Pattern.compile("\\s*Argv\\[\\d*\\]\\s*:\\s*(.*)");
 		m = p.matcher(line);
+		List<String> arguments = new ArrayList<String>();
 		while (m.matches()) {
-			context.argv.add(m.group(1));
+			arguments.add(m.group(1));
 			line = reader.readLine();
 			m = p.matcher(line);
 		}
+		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIProgArgsAttrDef().create(arguments.toArray(new String[arguments.size()])));
 
 		// Env[0]: OMPI_MCA_rmaps_base_display_map=1
 		line = reader.readLine();
 		p = Pattern.compile("\\s*Env\\[\\d*\\]\\s*:\\s*(.*)");
 		m = p.matcher(line);
+		List<String> environment = new ArrayList<String>();
 		while (m.matches()) {
-			context.env.add(m.group(1));
+			environment.add(m.group(1));
 			line = reader.readLine();
 			m = p.matcher(line);
 		}
+		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIEnvAttrDef().create(environment.toArray(new String[environment.size()])));
 
 		// Working dir: /home/dfferber/EclipseWorkspaces/runtime-New_configuration/hellio/Debug (user: 0)
 		// NO line = reader.readLine();
@@ -216,8 +247,8 @@ public class OpenMpiProcessMapParser {
 		if (!m.matches() || m.groupCount() != 1)
 			throw new IOException("Invalid line: " + line);
 		{
-			String s = m.group(1);
-			context.workDir = s.trim();
+			String s = m.group(1).trim();
+			application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIWorkingDirAttrDef().create(s));
 		}
 
 		// Num maps: 1
@@ -229,8 +260,9 @@ public class OpenMpiProcessMapParser {
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-			context.num_maps = Integer.parseInt(s);
-			for (int i = 0; i < context.num_maps; i++) {
+			// Ignore this information.
+			int num_maps = Integer.parseInt(s);
+			for (int i = 0; i < num_maps; i++) {
 				line = reader.readLine();
 			}
 		} catch (NumberFormatException e) {
@@ -248,11 +280,21 @@ public class OpenMpiProcessMapParser {
 			throw new IOException("Invalid line: " + line);
 		try {
 			String s = m.group(1);
-			map.starting_vpid = Integer.parseInt(s);
+			try {
+				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getVpidStart().create(Integer.parseInt(s)));
+			} catch (IllegalValueException e) {
+			// This is not possible.
+				assert false;
+			}
 			s = m.group(2);
-			map.vpid_range = Integer.parseInt(s);
+			try {
+				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getVpidRange().create(Integer.parseInt(s)));
+			} catch (IllegalValueException e) {
+			// This is not possible.
+				assert false;
+			}
 			s = m.group(3);
-			map.num_app_contexts = Integer.parseInt(s);
+			numApplications = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
@@ -266,16 +308,18 @@ public class OpenMpiProcessMapParser {
 		if (!m.matches() || m.groupCount() != 4)
 			throw new IOException("Invalid line: " + line);
 		try {
-			map.hostname = m.group(1);
-			String s = m.group(2);
-			map.job_id = Integer.parseInt(s);
-			s = m.group(3);
-			map.map_for_job = Integer.parseInt(s);
+			map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getHostname().create(m.group(1)));
+			try {
+				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getMpiJobId().create(Integer.parseInt(m.group(3))));
+			} catch (IllegalValueException e) {
+				// This is not possible.
+				assert false;
+			}
 			String mode = m.group(4);
 			if (mode.equalsIgnoreCase("bynode")) {
-				map.mapping_mode = MappingMode.bynode;
+				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(MappingMode.BY_NODE));
 			} else if (mode.equalsIgnoreCase("byslot")) {
-				map.mapping_mode = MappingMode.byslot;
+				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(MappingMode.BY_SLOT));
 			} else {
 				throw new IOException("Invalid line: " + line);
 			}
@@ -287,9 +331,7 @@ public class OpenMpiProcessMapParser {
 	public static void main(String[] args) {
 		try {
 			FileInputStream is = new FileInputStream("test.txt");
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			OpenMpiProcessMapParser p = new OpenMpiProcessMapParser();
-			p.parse(br);
+			OpenMpiProcessMapText12Parser.parse(is);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

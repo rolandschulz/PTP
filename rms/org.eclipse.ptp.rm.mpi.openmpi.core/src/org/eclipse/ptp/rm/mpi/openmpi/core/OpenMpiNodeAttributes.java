@@ -19,6 +19,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.core;
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
+import org.eclipse.ptp.core.attributes.BooleanAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
@@ -32,6 +33,7 @@ public class OpenMpiNodeAttributes {
 	private static final String NUM_NODES_ID = "numNodes";
 	private static final String MAX_NUM_NODES_ID = "maxNumNodes";
 	private static final String STATUS_MESSAGE = "statusMessage";
+	private static final String OVERSUBSCRIBED = "oversubscribed";
 
 	private final static IntegerAttributeDefinition numNodesDef =
 		new IntegerAttributeDefinition(NUM_NODES_ID, "Number of nodes",
@@ -44,6 +46,10 @@ public class OpenMpiNodeAttributes {
 	private final static StringAttributeDefinition statusMessageDef =
 		new StringAttributeDefinition(STATUS_MESSAGE, "Status message",
 				"Status message", true, "");
+	
+	private final static BooleanAttributeDefinition oversubscribedDefinition =
+		new BooleanAttributeDefinition(OVERSUBSCRIBED, "Oversubscribed",
+		"Oversubscribed node (more processes than available)", true, false); 
 
 	/**
 	 * Number of slots suggested on the node.
@@ -70,6 +76,15 @@ public class OpenMpiNodeAttributes {
 	 */
 	public static StringAttributeDefinition getStatusMessageDefinition() {
 		return statusMessageDef;
+	}
+	
+	/**
+	 * If node is oversubscribed.
+	 * <p>
+	 * Note: openmpi 1.2 and 1.3
+	 */
+	public static BooleanAttributeDefinition getOversubscribedDefinition() {
+		return oversubscribedDefinition;
 	}
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
