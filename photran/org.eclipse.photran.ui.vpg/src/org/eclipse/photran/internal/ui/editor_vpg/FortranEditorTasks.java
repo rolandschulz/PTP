@@ -109,8 +109,9 @@ public class FortranEditorTasks
         {
             if (editor == null) return;
             
-            if (SearchPathProperties.getProperty(editor.getIFile().getProject(),
-                                                 SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"))
+            String vpgEnabledProperty = SearchPathProperties.getProperty(editor.getIFile().getProject(),
+                                                 SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
+            if (vpgEnabledProperty != null && vpgEnabledProperty.equals("true"))
             {
                 runASTTasks();
                 if (runVPGTasks) runVPGTasks();

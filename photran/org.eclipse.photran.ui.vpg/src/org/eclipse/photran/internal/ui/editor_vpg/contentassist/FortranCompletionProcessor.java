@@ -35,8 +35,10 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
     
     public IContentAssistant setup(AbstractFortranEditor editor)
     {
-        if (SearchPathProperties.getProperty(editor.getIFile().getProject(),
-                                             SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME).equals("true"))
+        String contentAssistEnabledProperty = SearchPathProperties.getProperty(
+            editor.getIFile().getProject(),
+            SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
+        if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true"))
         {
             final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
             

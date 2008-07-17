@@ -173,8 +173,10 @@ public class DeclarationView extends ViewPart
     {
         if (editor != null)
         {
-            if (SearchPathProperties.getProperty(editor.getIFile().getProject(),
-                                                 SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME).equals("true"))
+            String contentAssistEnabledProperty = SearchPathProperties.getProperty(
+                editor.getIFile().getProject(),
+                SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
+            if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true"))
             {
                 addCaretMovementListenerTo(editor);
                 FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
