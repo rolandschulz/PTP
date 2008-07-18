@@ -46,6 +46,7 @@ public class OpenMpiToolConfigurationWizardPage extends
 			if (source == versionCombo) {
 				handleVersionSelected();
 				updateControls();
+				dataSource.updateAndStore();
 			} else {
 				super.doWidgetSelected(e);
 			}
