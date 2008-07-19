@@ -2,9 +2,8 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
@@ -26,12 +25,15 @@ import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteProcess;
+import org.eclipse.ptp.remote.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.mpi.openmpi.core.Activator;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiMachineAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiNodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiHostMap.Host;
 
 public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
@@ -57,6 +59,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 		Parameters params = rts.getParameters();
 		Map<String, String> hostToElementMap = rts.getHostToElementMap();
+		OpenMpiResourceManagerConfiguration rmConfiguration = (OpenMpiResourceManagerConfiguration) rts.getRmConfiguration();
 		assert connection != null;
 		assert remoteServices != null;
 		assert fileMgr != null;
@@ -81,44 +84,12 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		 * Then, the exception is re-thrown.
 		 */
 		try {
-
 			/*
 			 * STEP 1:
 			 * Parse output of command.
 			 * TODO: validate lines and write to log if invalid lines were found.
 			 */
-			try {
-				String line;
-				while ((line = output.readLine()) != null) {
-					int nameStart = line.indexOf(":param:");
-					if (nameStart >= 0) {
-						nameStart += 7;
-						int pos = line.indexOf(":", nameStart);
-						if (pos >= 0) {
-							/*
-							 * If parameter is already in list, then update, otherwise add.
-							 */
-							String name = line.substring(nameStart, pos);
-							Parameters.Parameter param = params.getParameter(name);
-							if (param == null) {
-								param = params.addParameter(name);
-							}
-							int pos2;
-							if ((pos2 = line.indexOf(":value:", pos)) >= 0) {
-								param.setValue(line.substring(pos2 + 7));
-							} else if ((pos2 = line.indexOf(":status:", pos)) >= 0) {
-								if (line.substring(pos2 + 8).equals("read-only")) {
-									param.setReadOnly(true);
-								}
-							} else if ((pos2 = line.indexOf(":help:", pos)) >= 0) {
-								param.setHelp(line.substring(pos2 + 6));
-							}
-						}
-					}
-				}
-			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to parse output of discover command.", e));
-			}
+			parseParameters(output, params);
 
 			/*
 			 * STEP 2:
@@ -129,64 +100,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			 * But the RDS was dropped by version 1.3.
 			 * Then the orte_default_hostfile parameter might be used instead, as long as it was defined in the system wide MCA parameters.
 			 */
-			OpenMpiHostMap hostMap = null;
-			String hostFilePath = null;
-
-			Parameters.Parameter rds_param = params.getParameter("rds_hostfile_path");
-			Parameters.Parameter orte_param = params.getParameter("orte_default_hostfile");
-
-			if (rds_param != null) {
-				hostFilePath = rds_param.getValue();
-				if (hostFilePath.trim().length() == 0) {
-					hostFilePath = null;
-				}
-			}
-			if (hostFilePath == null) {
-				if (orte_param != null) {
-					hostFilePath = orte_param.getValue();
-					if (hostFilePath.trim().length() == 0) {
-						hostFilePath = null;
-					}
-				}
-			}
-
-			// Validate.
-			if (hostFilePath == null) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Discover command did not inform path to default hostfile. If necessary, set MCA parameters to define default hostfile path."));
-			}
-			IPath path = new Path(hostFilePath);
-			if (! path.isAbsolute()) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Discover command informed a path to hostfile that is not an absolute path ({0}).", hostFilePath)));
-			}
-
-			// Try to read.
-			assert hostFilePath != null;
-			IProgressMonitor monitor = new NullProgressMonitor();
-			IFileStore hostfile;
-			try {
-				hostfile = fileMgr.getResource(new Path(hostFilePath), monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Failed find hostfile ({0}).", hostFilePath), e));
-			}
-
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(hostfile.openInputStream(EFS.NONE, monitor)));
-				hostMap = OpenMpiHostMapParser.parse(reader);
-			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Failed to parse hostfile ({0}).", hostfile), e));
-			}
-
-			/*
-			 * If no host information was found in the hostfile, add default.
-			 */
-			if (hostMap.count() == 0) {
-				try {
-					InetAddress localhost = InetAddress.getLocalHost();
-					hostMap.addDefaultHost(localhost.getHostName());
-				} catch (UnknownHostException e) {
-					throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Cannot retrive network information for local machine. Check network configuration."));
-				}
-			}
+			OpenMpiHostMap hostMap = readHostFile(connection, remoteServices, fileMgr, params, rmConfiguration);
 
 			/*
 			 * Create model according to data from discover.
@@ -254,6 +168,166 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			 */
 			machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 			machine.addAttribute(OpenMpiMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Internal error while running discover command: ", e.getMessage())));
+		}
+	}
+
+	private OpenMpiHostMap readHostFile(IRemoteConnection connection,
+			IRemoteServices remoteServices, IRemoteFileManager fileMgr,
+			Parameters params,
+			OpenMpiResourceManagerConfiguration rmConfiguration)
+			throws CoreException, IOException {
+
+		/*
+		 * OpenMpi 1.2 uses rds_hostfile_path. Open 1.3 uses orte_default_hostfile.
+		 * For 1.2, path must not be empty. For 1.3 it may be empty and default host is assumed.
+		 */
+		OpenMpiHostMap hostMap = null;
+		String hostFilePath = null;
+
+		Parameters.Parameter rds_param = params.getParameter("rds_hostfile_path");
+		Parameters.Parameter orte_param = params.getParameter("orte_default_hostfile");
+
+		if (rds_param != null) {
+			hostFilePath = rds_param.getValue();
+			if (hostFilePath.trim().length() == 0) {
+				hostFilePath = null;
+			}
+		}
+		if (hostFilePath == null) {
+			if (orte_param != null) {
+				hostFilePath = orte_param.getValue();
+				if (hostFilePath.trim().length() == 0) {
+					hostFilePath = null;
+				}
+			}
+		}
+
+		// Validate.
+		if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+			if (hostFilePath == null) {
+				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Discover command did not inform path to default hostfile. If necessary, set MCA parameters to define default hostfile path."));
+			}
+		} else if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
+			hostMap = new OpenMpiHostMap();
+			String hostname = getRemoteHostname(connection, remoteServices);
+			hostMap.addDefaultHost(hostname);
+			return hostMap;
+		} else {
+			assert false;
+		}
+
+		IPath path = new Path(hostFilePath);
+		if (! path.isAbsolute()) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Discover command informed a path to hostfile that is not an absolute path ({0}).", hostFilePath)));
+		}
+
+		// Try to read.
+		assert hostFilePath != null;
+		IProgressMonitor monitor = new NullProgressMonitor();
+		IFileStore hostfile;
+		try {
+			hostfile = fileMgr.getResource(new Path(hostFilePath), monitor);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Failed find hostfile ({0}).", hostFilePath), e));
+		}
+
+		InputStream is = null;
+		try {
+			is = hostfile.openInputStream(EFS.NONE, monitor);
+		} catch (CoreException e) {
+			Status s = new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Failed read hostfile ({0}).", hostfile), e);
+			throw new CoreException(s);
+		}
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			hostMap = OpenMpiHostMapParser.parse(reader);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Failed to parse hostfile ({0}).", hostfile), e));
+		}
+
+		/*
+		 * If no host information was found in the hostfile, add default.
+		 * Only for Open MPI 1.2. On 1.3, there is no default host file assumed.
+		 */
+		if (hostMap.count() == 0) {
+			if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+				// This was not correct for remote hosts. Worked only for local hosts.
+//					try {
+//						InetAddress localhost = InetAddress.getLocalHost();
+//						hostMap.addDefaultHost(localhost.getHostName());
+//					} catch (UnknownHostException e) {
+//						throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Cannot retrive network information for local machine. Check network configuration."));
+//					}
+				String hostname = getRemoteHostname(connection, remoteServices);
+				hostMap.addDefaultHost(hostname);
+			} else if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Empty hostfile is not allowed ({0}).", hostfile)));
+			} else {
+				assert false;
+			}
+		}
+		return hostMap;
+	}
+
+	private String getRemoteHostname(IRemoteConnection connection,
+			IRemoteServices remoteServices) throws CoreException, IOException {
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, "hostname");
+		IRemoteProcess process = null;
+		try {
+			process = processBuilder.start();
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Failed to run command to get hostname.", e));
+		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			// Ignore
+		}
+		if (process.exitValue() != 0) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Command to get hostname failed with exit code {0}", process.exitValue())));
+		}
+		String hostname = br.readLine();
+		if (hostname == null) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Failed to parse command for hostname."));
+		}
+		return hostname;
+	}
+
+	private void parseParameters(BufferedReader output, Parameters params)
+			throws CoreException {
+
+		try {
+			String line;
+			while ((line = output.readLine()) != null) {
+				int nameStart = line.indexOf(":param:");
+				if (nameStart >= 0) {
+					nameStart += 7;
+					int pos = line.indexOf(":", nameStart);
+					if (pos >= 0) {
+						/*
+						 * If parameter is already in list, then update, otherwise add.
+						 */
+						String name = line.substring(nameStart, pos);
+						Parameters.Parameter param = params.getParameter(name);
+						if (param == null) {
+							param = params.addParameter(name);
+						}
+						int pos2;
+						if ((pos2 = line.indexOf(":value:", pos)) >= 0) {
+							param.setValue(line.substring(pos2 + 7));
+						} else if ((pos2 = line.indexOf(":status:", pos)) >= 0) {
+							if (line.substring(pos2 + 8).equals("read-only")) {
+								param.setReadOnly(true);
+							}
+						} else if ((pos2 = line.indexOf(":help:", pos)) >= 0) {
+							param.setHelp(line.substring(pos2 + 6));
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to parse output of discover command.", e));
 		}
 	}
 }
