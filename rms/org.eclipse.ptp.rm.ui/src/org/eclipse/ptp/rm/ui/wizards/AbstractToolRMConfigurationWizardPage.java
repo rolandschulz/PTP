@@ -257,7 +257,9 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				continuousMonitorCmd = config.getContinuousMonitorCmd();
 			if (remoteInstallPathText != null)
 				remoteInstallPath = config.getRemoteInstallPath();
-			useDefaults = config.useDefaults();
+			// Hack, since "Use default" is not yet implement, always assign true
+			// useDefaults = config.useDefaults();
+			useDefaults = true;
 		}
 
 		protected void copyToFields() {
@@ -461,6 +463,9 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	 * settings are changed.
 	 */
 	protected void updateControls() {
+		// Hack, since "Use default" is not yet implement, always leave it disabled.
+		defaultButton.setEnabled(false);
+
 		boolean enabled = ! defaultButton.getSelection();
 
 		if (launchCmdText != null)
