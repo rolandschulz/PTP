@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -117,9 +118,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				hostToElementMap.put(host.getName(), nodeId);
 
 				// Add processor information to node.
+				AttributeManager attrManager = new AttributeManager();
 				if (host.getNumProcessors() != 0) {
 					try {
-						node.addAttribute(OpenMpiNodeAttributes.getNumberOfNodesAttributeDefinition().create(host.getNumProcessors()));
+						attrManager.addAttribute(OpenMpiNodeAttributes.getNumberOfNodesAttributeDefinition().create(host.getNumProcessors()));
 					} catch (IllegalValueException e) {
 						// This situation is not possible since host.getNumProcessors() is always valid.
 						assert false;
@@ -127,7 +129,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				}
 				if (host.getMaxNumProcessors() != 0) {
 					try {
-						node.addAttribute(OpenMpiNodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(host.getMaxNumProcessors()));
+						attrManager.addAttribute(OpenMpiNodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(host.getMaxNumProcessors()));
 					} catch (IllegalValueException e) {
 						// This situation is not possible since host.getMaxNumProcessors() is always valid.
 						assert false;
@@ -135,15 +137,16 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				}
 				if (host.getErrors() != 0) {
 					if ((host.getErrors() & Host.ERR_MAX_NUM_SLOTS) != 0) {
-						node.addAttribute(OpenMpiNodeAttributes.getStatusMessageDefinition().create("Invalid 'max-slots' parameter was ignored for this host."));
+						attrManager.addAttribute(OpenMpiNodeAttributes.getStatusMessageDefinition().create("Invalid 'max-slots' parameter was ignored for this host."));
 					} else if ((host.getErrors() & Host.ERR_NUM_SLOTS) != 0) {
-						node.addAttribute(OpenMpiNodeAttributes.getStatusMessageDefinition().create("Invalid 'slots/cpus/count' parameter was ignored for this host."));
+						attrManager.addAttribute(OpenMpiNodeAttributes.getStatusMessageDefinition().create("Invalid 'slots/cpus/count' parameter was ignored for this host."));
 					} else if ((host.getErrors() & Host.ERR_UNKNOWN_ATTR) != 0) {
-						node.addAttribute(OpenMpiNodeAttributes.getStatusMessageDefinition().create("Invalid parameter was ignored for this host."));
+						attrManager.addAttribute(OpenMpiNodeAttributes.getStatusMessageDefinition().create("Invalid parameter was ignored for this host."));
 					}
-					node.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
+					attrManager.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
 					hasSomeError = true;
 				}
+				rts.changeNode(nodeId, attrManager);
 			}
 			if (hostMap.hasErrors) {
 				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
@@ -158,16 +161,20 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			 * Show message of core exception and change machine status to error.
 			 */
 			if (e.getStatus().getSeverity() == IStatus.ERROR) {
-				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				machine.addAttribute(OpenMpiMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Error while running discover command: ", e.getMessage())));
+				AttributeManager attrManager = new AttributeManager();
+				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
+				attrManager.addAttribute(OpenMpiMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Error while running discover command: {0}.", e.getMessage())));
+				rts.changeMachine(machineID, attrManager);
 			}
 			throw e;
 		} catch (Exception e) {
 			/*
 			 * Show message of all other exceptions and change machine status to error.
 			 */
-			machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			machine.addAttribute(OpenMpiMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Internal error while running discover command: ", e.getMessage())));
+			AttributeManager attrManager = new AttributeManager();
+			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
+			attrManager.addAttribute(OpenMpiMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Internal error while running discover command: {0}", e.getMessage())));
+			rts.changeMachine(machineID, attrManager);
 		}
 	}
 

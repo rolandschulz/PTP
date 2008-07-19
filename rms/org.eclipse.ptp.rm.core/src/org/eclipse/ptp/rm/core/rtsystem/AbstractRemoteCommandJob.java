@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -129,7 +129,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 				parseStatus = e.getStatus();
 				if (parseStatus.getSeverity() == IStatus.ERROR) {
 //				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, parsingErrorMessage, e));
-					throw new CoreException(parseStatus);
+					throw e;
 				}
 			}
 
@@ -147,7 +147,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 
 			return parseStatus;
 		} catch (CoreException e) {
-			return e.getStatus();
+			return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Command failed.", e);
 		} catch (Exception e) {
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Internal error", e);
 		} finally {

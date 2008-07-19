@@ -48,6 +48,8 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeEventFactory;
 
@@ -546,6 +548,25 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		IRuntimeJobChangeEvent event = eventFactory.newRuntimeJobChangeEvent(elementAttrs);
 		fireRuntimeJobChangeEvent(event);
 	}
+
+	public void changeNode(String nodeID, AttributeManager changedAttrMgr) {
+		AttributeManager attrMgr = new AttributeManager();
+		attrMgr.addAttributes(changedAttrMgr.getAttributes());
+		ElementAttributeManager elementAttrs = new ElementAttributeManager();
+		elementAttrs.setAttributeManager(new RangeSet(nodeID), attrMgr);
+		IRuntimeNodeChangeEvent event = eventFactory.newRuntimeNodeChangeEvent(elementAttrs);
+		fireRuntimeNodeChangeEvent(event);
+	}
+
+	public void changeMachine(String machineID, AttributeManager changedAttrMgr) {
+		AttributeManager attrMgr = new AttributeManager();
+		attrMgr.addAttributes(changedAttrMgr.getAttributes());
+		ElementAttributeManager elementAttrs = new ElementAttributeManager();
+		elementAttrs.setAttributeManager(new RangeSet(machineID), attrMgr);
+		IRuntimeMachineChangeEvent event = eventFactory.newRuntimeMachineChangeEvent(elementAttrs);
+		fireRuntimeMachineChangeEvent(event);
+	}
+
 	/**
 	 * Generate a new element ID
 	 *
