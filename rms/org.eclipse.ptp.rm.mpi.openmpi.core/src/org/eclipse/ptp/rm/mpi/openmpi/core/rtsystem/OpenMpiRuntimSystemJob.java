@@ -189,8 +189,10 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				try {
 					if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
 						map = OpenMpiProcessMapText12Parser.parse(parserInputStream);
-					} else {
+					} else if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
 						map = OpenMpiProcessMapXml13Parser.parse(parserInputStream);
+					} else {
+						assert false;
 					}
 				} catch (IOException e) {
 					parserException = e;
