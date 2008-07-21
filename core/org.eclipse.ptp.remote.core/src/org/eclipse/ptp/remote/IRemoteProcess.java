@@ -35,18 +35,18 @@ public interface IRemoteProcess {
 	public InputStream getErrorStream();
 
 	/**
-	 * Gets the standard input stream to the process
+	 * Gets an InputStream which can be used to read the standard output stream of the process
 	 * 
 	 * @return the input stream connected to the standard
-	 * input of the process
+	 * output of the process
 	 */
 	public InputStream getInputStream();
 
 	/**
-	 * Gets the standard output stream of the process
+	 * Gets an output stream which can be used to write to the standard input stream of the process
 	 * 
 	 * @return the output stream connected to the standard
-	 * output of the process
+	 * input of the process
 	 */
 	public OutputStream getOutputStream();
 
