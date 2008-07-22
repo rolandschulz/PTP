@@ -353,13 +353,13 @@ public class BitList {
 
 	public static String showBitList(BitList tasks) {
 		if (tasks == null) {
-			return "";
+			return "{null}";
 		}
 		int[] array = tasks.toArray();
 		if (array.length == 0)
-			return "";
+			return "{}";
 		
-		String msg = "";
+		String msg = "{";
 		int preTask = array[0];
 		msg += preTask;
 		boolean isContinue = false;
@@ -379,6 +379,6 @@ public class BitList {
 			isContinue = false;
 			preTask = array[i];
 		}
-		return msg;
+		return msg + "}";
 	}
 }
