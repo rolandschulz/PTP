@@ -60,7 +60,7 @@
 		</complex-array>
 	</process>
 	
-	<process type="org.eclipse.ptp.pldt.wizards.mpiProjectProcess">
+	<process type="org.eclipse.ptp.pldt.wizards.mpiProjectProcessCPP">
 		<!-- no arguments as we go straight to the store (not recommended usage of template engine..) -->
 	</process>
 
