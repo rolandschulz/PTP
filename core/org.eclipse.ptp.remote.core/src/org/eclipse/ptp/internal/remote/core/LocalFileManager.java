@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote;
+package org.eclipse.ptp.internal.remote.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +20,8 @@ import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
@@ -32,10 +32,10 @@ public class LocalFileManager implements IRemoteFileManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		DirectoryDialog dialog = new DirectoryDialog(PTPRemotePlugin.getShell());
+		DirectoryDialog dialog = new DirectoryDialog(PTPRemoteCorePlugin.getShell());
 		dialog.setText(message);
 		if (filterPath != null) {
 			File path = new File(filterPath);
@@ -54,10 +54,10 @@ public class LocalFileManager implements IRemoteFileManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseFile(Shell shell, String message, String filterPath) {
-		FileDialog dialog = new FileDialog(PTPRemotePlugin.getShell(), SWT.MULTI);
+		FileDialog dialog = new FileDialog(PTPRemoteCorePlugin.getShell(), SWT.MULTI);
 		dialog.setText(message);
 		if (filterPath != null) {
 			File path = new File(filterPath);
@@ -75,7 +75,7 @@ public class LocalFileManager implements IRemoteFileManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
 		try {
@@ -86,21 +86,21 @@ public class LocalFileManager implements IRemoteFileManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IPath getWorkingDirectory() {
 		return new Path(System.getProperty("user.dir"));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toPath(java.net.URI)
 	 */
 	public IPath toPath(URI uri) {
 		return URIUtil.toPath(uri);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
 		return URIUtil.toURI(path);

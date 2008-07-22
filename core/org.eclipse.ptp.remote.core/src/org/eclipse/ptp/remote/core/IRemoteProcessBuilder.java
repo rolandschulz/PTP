@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 import java.io.IOException;
 import java.util.List;

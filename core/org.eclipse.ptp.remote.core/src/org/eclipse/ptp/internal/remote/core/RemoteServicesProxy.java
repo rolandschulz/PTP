@@ -8,19 +8,19 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote;
+package org.eclipse.ptp.internal.remote.core;
 
 import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.ptp.remote.IRemoteServicesFactory;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.IRemoteServicesDelegate;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 
 public class RemoteServicesProxy implements IRemoteServices {
@@ -58,7 +58,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#getConnectionManager()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getConnectionManager()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		loadServices();
@@ -77,7 +77,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 		try {
 			factory = (IRemoteServicesFactory)configElement.createExecutableExtension(ATTR_CLASS);
 		} catch (Exception e) {
-			PTPRemotePlugin.log(
+			PTPRemoteCorePlugin.log(
 					"Failed to instatiate factory: "
 					+ configElement.getAttribute(ATTR_CLASS)
 					+ " in type: "
@@ -89,7 +89,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
 		loadServices();
@@ -97,21 +97,21 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#getId()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getId()
 	 */
 	public String getId() {
 		return id;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#getName()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn,
 			List<String> command) {
@@ -120,7 +120,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn,
 			String... command) {
@@ -129,7 +129,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#initialize()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize()
 	 */
 	public boolean initialize() {
 		loadServices();
@@ -137,7 +137,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#isInitialized()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#isInitialized()
 	 */
 	public boolean isInitialized() {
 		return initialized;

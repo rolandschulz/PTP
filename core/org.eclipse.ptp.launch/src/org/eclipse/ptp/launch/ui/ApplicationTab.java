@@ -45,11 +45,13 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -455,11 +457,12 @@ public class ApplicationTab extends LaunchConfigurationTab {
     	}
        	IResourceManager rm = getResourceManager(getLaunchConfiguration());
     	AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)rm).getConfiguration();
-    	IRemoteServices remServices = PTPRemotePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
-    	if (remServices != null) {
+    	IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
+    	IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remServices);
+    	if (remServices != null && remUIServices != null) {
     		IRemoteConnection remCon = remServices.getConnectionManager().getConnection(rmConf.getConnectionName());
     		if (remCon != null) {
-    			IRemoteFileManager fileMgr = remServices.getFileManager(remCon);
+    			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager(remCon);
     			if (fileMgr != null) {
     				IPath path = fileMgr.browseFile(getShell(), "Select application to execute", initPath);
     				if (path != null) {
@@ -507,13 +510,13 @@ public class ApplicationTab extends LaunchConfigurationTab {
     	    }
     	    initPath = getProject().getLocationURI().getPath();
     	}
-    	IRemoteServices localServices = PTPRemotePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");// .getDefaultServices();
-    	if(localServices != null) {
+    	IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.core.LocalServices");
+    	IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
+    	if(localServices != null && localUIServices != null) {
     		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 			IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
-			IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
-			
-			IPath path = localFileManager.browseFile(getShell(), "Select the executable file to be copied", initPath);
+			IRemoteUIFileManager localUIFileManger = localUIServices.getUIFileManager(lconn); 
+			IPath path = localUIFileManger.browseFile(getShell(), "Select the executable file to be copied", initPath);
 			if (path != null) {
 				localAppText.setText(path.toString());
 			}
@@ -521,7 +524,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
     	
        	/*IResourceManager rm = getResourceManager(getLaunchConfiguration());
     	AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)rm).getConfiguration();
-    	IRemoteServices remServices = PTPRemotePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
+    	IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
     	if (remServices != null) {
     		IRemoteConnection remCon = remServices.getConnectionManager().getConnection(rmConf.getConnectionName());
     		if (remCon != null) {

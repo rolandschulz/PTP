@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,35 +16,8 @@ import java.net.URI;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.swt.widgets.Shell;
 
 public interface IRemoteFileManager {
-	/**
-	 * Browse for a remote directory. The return value is the path of the directory
-	 * <i>on the remote system</i>.
-	 * 
-	 * Equivalent to {@link org.eclipse.swt.widgets.DirectoryDialog}.
-	 * 
-	 * @param shell workbench shell
-	 * @param message message to display in dialog
-	 * @param initialPath initial path to use when displaying files
-	 * @return the path to the directory relative to the remote system or null if the browser was cancelled
-	 */
-	public IPath browseDirectory(Shell shell, String message, String initialPath);
-
-	/**
-	 * Browse for a remote file. The return value is the path of the file
-	 * <i>on the remote system</i>. 
-	 * 
-	 * Equivalent to {@link org.eclipse.swt.widgets.FileDialog}.
-	 * 
-	 * @param shell workbench shell
-	 * @param message message to display in dialog
-	 * @param initialPath initial path to use when displaying files
-	 * @return the path to the file relative to the remote system or null if the browser was cancelled
-	 */
-	public IPath browseFile(Shell shell, String message, String initialPath);
-
 	/**
 	 * Get the resource associated with path. IFileStore can then
 	 * be used to perform operations on the file.

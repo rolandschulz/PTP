@@ -8,10 +8,10 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote;
+package org.eclipse.ptp.internal.remote.core;
 
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.swt.widgets.Shell;
 
 
@@ -19,27 +19,27 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	private IRemoteConnection localConnection = new LocalConnection();
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
 		return localConnection;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		return new IRemoteConnection[]{localConnection};
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
 	 */
 	public void newConnection(Shell shell) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#supportsNewConnections()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#supportsNewConnections()
 	 */
 	public boolean supportsNewConnections() {
 		return false;

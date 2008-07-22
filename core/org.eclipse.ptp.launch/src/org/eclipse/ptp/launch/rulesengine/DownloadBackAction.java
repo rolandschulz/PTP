@@ -29,8 +29,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
 import org.eclipse.ptp.launch.internal.LinuxPath;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 
 public class DownloadBackAction implements IRuleAction {

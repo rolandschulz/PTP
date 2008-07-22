@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote;
+package org.eclipse.ptp.internal.remote.core;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,9 +21,9 @@ import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteProcess;
+import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	private ProcessFactory localProcessBuilder;
@@ -40,7 +40,7 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
 	 */
 	@Override
 	public Map<String, String> environment() {
@@ -48,7 +48,7 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
 	public IRemoteProcess start() throws IOException {
 		String commandArray[] = command().toArray(new String[0]);

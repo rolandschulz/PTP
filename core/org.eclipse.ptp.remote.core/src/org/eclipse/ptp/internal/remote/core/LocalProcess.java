@@ -8,12 +8,12 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote;
+package org.eclipse.ptp.internal.remote.core;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.eclipse.ptp.remote.AbstractRemoteProcess;
+import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 
 public class LocalProcess extends AbstractRemoteProcess {
 	private Process localProcess;
@@ -71,7 +71,7 @@ public class LocalProcess extends AbstractRemoteProcess {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteProcess#isCompleted()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcess#isCompleted()
 	 */
 	public boolean isCompleted() {
 		try {

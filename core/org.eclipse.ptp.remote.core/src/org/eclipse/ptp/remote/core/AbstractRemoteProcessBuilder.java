@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,14 +35,14 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#connection()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection()
 	 */
 	public IRemoteConnection connection() {
 		return remoteConnection;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#connection(org.eclipse.ptp.remote.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteProcessBuilder connection(IRemoteConnection conn) {
 		remoteConnection = conn;
@@ -50,14 +50,14 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#command()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command()
 	 */
 	public List<String> command() {
 		return commandArgs;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#command(java.util.List)
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.util.List)
 	 */
 	public IRemoteProcessBuilder command(List<String> command) {
 		commandArgs = command;
@@ -65,7 +65,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#command(java.lang.String)
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.lang.String)
 	 */
 	public IRemoteProcessBuilder command(String... command) {
 		commandArgs = Arrays.asList(command);
@@ -73,14 +73,14 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#directory()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory()
 	 */
 	public IFileStore directory() {
 		return remoteDir;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#directory(org.eclipse.core.filesystem.IFileStore)
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory(org.eclipse.core.filesystem.IFileStore)
 	 */
 	public IRemoteProcessBuilder directory(IFileStore directory) {
 		remoteDir = directory;
@@ -88,19 +88,19 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#environment()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#environment()
 	 */
 	public abstract Map<String, String> environment();
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#redirectErrorStream()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream()
 	 */
 	public boolean redirectErrorStream() {
 		return redirectErrorStream;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#redirectErrorStream(boolean)
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream(boolean)
 	 */
 	public IRemoteProcessBuilder redirectErrorStream(boolean redirectErrorStream) {
 		this.redirectErrorStream = redirectErrorStream;
@@ -108,7 +108,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
 	public abstract IRemoteProcess start() throws IOException;
 }

@@ -9,30 +9,30 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.remote.exception;
+package org.eclipse.ptp.remote.core.exception;
 
-public class AddressInUseException extends RemoteConnectionException {
-	private static final long serialVersionUID = 1771839754428411610L;
+public class PrivilegedPortException extends RemoteConnectionException {
+	private static final long serialVersionUID = -7794871221470179956L;
 
 	/**
 	 * @param message
 	 * @param cause
 	 */
-	public AddressInUseException(String message, Throwable cause) {
+	public PrivilegedPortException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
 	/**
 	 * @param message
 	 */
-	public AddressInUseException(String message) {
+	public PrivilegedPortException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public AddressInUseException(Throwable cause) {
+	public PrivilegedPortException(Throwable cause) {
 		super(cause);
 	}
 

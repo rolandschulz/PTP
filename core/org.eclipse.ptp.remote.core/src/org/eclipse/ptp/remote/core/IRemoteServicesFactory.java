@@ -8,21 +8,12 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote;
+package org.eclipse.ptp.remote.core;
 
-import org.eclipse.ptp.remote.IRemoteServicesDelegate;
-import org.eclipse.ptp.remote.IRemoteServicesFactory;
-
-public class LocalServicesFactory implements IRemoteServicesFactory {
-	private static LocalServices services = null;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesFactory#getServices()
+public interface IRemoteServicesFactory {
+	/**
+	 * @param rm
+	 * @return
 	 */
-	public IRemoteServicesDelegate getServices() {
-		if (services == null) {
-			services = new LocalServices();
-		}
-		return services;
-	}
+	public IRemoteServicesDelegate getServices();
 }

@@ -9,33 +9,30 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.remote.exception;
+package org.eclipse.ptp.remote.core.exception;
 
-public class UnableToForwardPortException extends RemoteConnectionException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5814772755700213717L;
+public class RemoteConnectionException extends Exception {
+	private static final long serialVersionUID = -7794871221470179956L;
 
 	/**
 	 * @param message
 	 * @param cause
 	 */
-	public UnableToForwardPortException(String message, Throwable cause) {
+	public RemoteConnectionException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
 	/**
 	 * @param message
 	 */
-	public UnableToForwardPortException(String message) {
+	public RemoteConnectionException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public UnableToForwardPortException(Throwable cause) {
+	public RemoteConnectionException(Throwable cause) {
 		super(cause);
 	}
 
