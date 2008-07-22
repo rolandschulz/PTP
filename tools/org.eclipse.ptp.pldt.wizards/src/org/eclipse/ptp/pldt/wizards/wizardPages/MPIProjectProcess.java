@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006,2007 IBM Corp. 
+ * Copyright (c) 2006,2008 IBM Corp. 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,23 +37,22 @@ import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
 /**
  * 
  * After the MPIProjectWizardPage runs, and we get MPI include path from the user,
- * we have this opportunity to use that information to modify the include paths etc.
+ * we have this opportunity to use that information to modify the include paths, build cmd,  etc.
  * in the project
  * 
- * <p>Note: not sure we handle C++ projects correctly yet.
+ * <p>This handles plain C projects; MPIProjectProcessCPP extends this to handle C++ projects
  * 
  * @author Beth Tibbitts
  *
  */
 public class MPIProjectProcess extends ProcessRunner {
-	private static final boolean traceOn=false;
+	private static final boolean traceOn=true;
 	private boolean wizTraceOn=MPIProjectWizardPage.wizardTraceOn;
 	//private static final templateID=
 
-	private Map<String,String> valueStore;
+	protected Map<String,String> valueStore;
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void process(TemplateCore template, ProcessArgument[] args,
 			String processId, IProgressMonitor monitor)
 			throws ProcessFailureException {
@@ -72,8 +71,6 @@ public class MPIProjectProcess extends ProcessRunner {
 				System.out.println("Do not save MPI info in this project.");
 			return;
 		}
-
- 		//CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
 
  		// this process must be executed after a separate process which creates the project
 		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName"));
@@ -116,7 +113,7 @@ public class MPIProjectProcess extends ProcessRunner {
 		IManagedProject mProj = info.getManagedProject();
 		if(traceOn)showOptions(mProj);
 		
-		// add the include path & linker values to all the configurations
+		// add the include path, linker, build cmd, etc.  values to all the configurations
 		IConfiguration[] configs = mProj.getConfigurations();
 		for (int i = 0; i < configs.length; i++) {
 			IConfiguration cf = configs[i];
@@ -155,7 +152,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * or if we haven't gotten around to LETTING the user select anything yet.
 	 * @return
 	 */
-	private String getNewPropValue(String pageID, String propID, String defaultVal) {
+	protected String getNewPropValue(String pageID, String propID, String defaultVal) {
 		Object obj = valueStore.get(pageID+MPIProjectWizardPage.DOT+propID);
 		// if selection made on page, obj is non-null.
 		String newValue = defaultVal;
@@ -181,11 +178,10 @@ public class MPIProjectProcess extends ProcessRunner {
 	 *            include path(s) to add.  If more than one, separate by
 	 *            java.io.File.pathSeparator, which is semicolon for Windows, colon for Mac/Linux
 	 */
-	private void addIncludePath(IConfiguration cf, String newIncludePath) {
+	protected void addIncludePath(IConfiguration cf, String newIncludePath) {
 		// note: could be > 1 path in 'newIncludePath'
 		String ext = "c";
 		ITool cfTool = cf.getToolFromInputExtension(ext);
-		// do we need to also handle c++ case as well?
 
 		//String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
 		String name = cfTool.getName();// "XL C Compiler"
@@ -223,7 +219,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param libPath the library search path name (e.g. "c:/mypath/lib")
 	 * 
 	 */
-	private void addLinkerOpt(IConfiguration cf, String libName, String libPath) {
+	protected void addLinkerOpt(IConfiguration cf, String libName, String libPath) {
 		String ext = "o";
 		ITool cfTool = cf.getToolFromInputExtension(ext);
 
@@ -235,13 +231,13 @@ public class MPIProjectProcess extends ProcessRunner {
 	}                                                                                                                     
 
 	
-	private void setCompileCommand(IConfiguration cf, String buildCmd) {
+	protected void setCompileCommand(IConfiguration cf, String buildCmd) {
 		if(traceOn)System.out.println("compile cmd: "+buildCmd);
 		ITool compiler = cf.getToolFromInputExtension("c");
 		compiler.setToolCommand(buildCmd);
-		
 	}
-	private void setLinkCommand(IConfiguration cf, String buildCmd) {
+	
+	protected void setLinkCommand(IConfiguration cf, String buildCmd) {
 		if(traceOn)System.out.println("link cmd: "+buildCmd);
 		ITool linker=cf.getToolFromInputExtension("o");
 		linker.setToolCommand(buildCmd);
@@ -256,7 +252,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param option the option to update 
 	 * @param value the new value to add to the list of existing values in the option
 	 */
-	private void addOptionValue(IConfiguration cf, ITool tool, IOption option, String value) {
+	protected void addOptionValue(IConfiguration cf, ITool tool, IOption option, String value) {
 		try {
 			int type = option.getValueType();
 			String[] valueList = null;
@@ -303,7 +299,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * 
 	 * @param proj the (managed) project for which print all this stuff.
 	 */
-	private void showOptions(IManagedProject proj) {
+	protected void showOptions(IManagedProject proj) {
 		if(traceOn)System.out.println("Managed Project: "+proj.getName());
 		if(traceOn)System.out.println("Path.SEPARATOR="+Path.SEPARATOR);
 		if(traceOn)System.out.println("Path.DEVICE_SEPARATOR="+Path.DEVICE_SEPARATOR);
@@ -362,7 +358,7 @@ public class MPIProjectProcess extends ProcessRunner {
 		}
 
 	}
-	private String showType(int type){
+	protected String showType(int type){
 		if(type==IOption.INCLUDE_PATH) return type+" (IOption.INCLUDE_PATH)";
 		if(type==IOption.LIBRARY_PATHS) return type+" (IOption.LIBRARY_PATHS)";
 		if(type==IOption.LIBRARIES)     return type+" (IOption.LIBRARIES)";
@@ -375,7 +371,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param opt
 	 * @throws BuildException
 	 */
-	private void showIncludePaths(IOption opt) throws BuildException {
+	protected void showIncludePaths(IOption opt) throws BuildException {
 		assert opt.getValueType() == IOption.INCLUDE_PATH ;
 		// if the option is a list of include paths, display them.
 		String[] includePaths = opt.getIncludePaths();
@@ -394,7 +390,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * (usually semicolon or colon)
 	 * @return the merged list
 	 */
-	private String[] add(String[] existingPaths, String newPath) {
+	protected String[] add(String[] existingPaths, String newPath) {
 		String pathSep=java.io.File.pathSeparator;  // semicolon for windows, colon for Mac/Linux
 		List<String> newPathList = new ArrayList<String>();
 		String path;
@@ -410,10 +406,6 @@ public class MPIProjectProcess extends ProcessRunner {
 		
 		String[] newArray=(String[])newPathList.toArray(new String[0]);
 		return newArray;
-		
-		/*
-
-		*/
 	}
 
 	/**
@@ -422,7 +414,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param newStr
 	 * @return
 	 */
-	private String[] addNotPath(String[] strList, String newStr) {
+	protected String[] addNotPath(String[] strList, String newStr) {
 		int len = strList.length;
 		String newList[] = new String[len + 1];
 		System.arraycopy(strList, 0, newList, 0, len);
@@ -434,7 +426,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param list
 	 * @return
 	 */
-	private String unroll (String[] list){
+	protected String unroll (String[] list){
 		StringBuffer result=new StringBuffer();
 		//list = new String[]{"one","two"};
 		//System.out.println(list);
@@ -442,8 +434,6 @@ public class MPIProjectProcess extends ProcessRunner {
 			String string = list[i];
 			result.append(string);
 			result.append(", ");
-			
-			
 		}
 		if (result.length() > 2) {
 			result.delete(result.length() - 2, result.length() - 1);
@@ -463,7 +453,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 *            the option type we are looking for, e.g. IOption.SOMETHING
 	 * @return
 	 */
-	private List<IOption> getOptionsByType(IConfiguration cf, ITool cfTool, int optionType) {
+	protected List<IOption> getOptionsByType(IConfiguration cf, ITool cfTool, int optionType) {
 
 		// run thru ALL options and check type for each, returning the ones that match
 		IOption[] allOptions = cfTool.getOptions();
@@ -495,7 +485,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param optionType
 	 * @return
 	 */
-	private IOption getFirstOptionByType(IConfiguration cf, ITool cfTool, int optionType){
+	protected IOption getFirstOptionByType(IConfiguration cf, ITool cfTool, int optionType){
 		List<IOption> allOptions=getOptionsByType(cf,cfTool,optionType);
 		if(allOptions.size()>0){
 			return allOptions.get(0);
