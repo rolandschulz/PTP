@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP RSE UI Adapter Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.remote.rse.ui;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.remote.rse.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.remote.rse.core;bundle-version="2.0.0",
+ org.eclipse.ptp.remote.core;bundle-version="2.0.1",
+ org.eclipse.ptp.remote.ui;bundle-version="2.0.0",
+ org.eclipse.rse.core;bundle-version="3.0.0",
+ org.eclipse.rse.files.ui;bundle-version="3.0.0",
+ org.eclipse.rse.subsystems.files.core;bundle-version="3.0.0",
+ org.eclipse.rse.ui;bundle-version="3.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

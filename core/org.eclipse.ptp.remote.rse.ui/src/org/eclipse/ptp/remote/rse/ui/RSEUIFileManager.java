@@ -8,11 +8,12 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.rse;
+package org.eclipse.ptp.remote.rse.ui;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.remote.rse.core.RSEConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
