@@ -165,6 +165,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * <br>
 	 */
 	private static boolean alreadyShown;
+	@SuppressWarnings("unused")
 	private static void showNoPrefs1() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();

@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.swt.SWT;
@@ -156,6 +155,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * TODO: do we need a "do not show this message again" setting? (af - yes please! ;)
 	 */
 	private static boolean alreadyShown;
+	@SuppressWarnings("unused")
 	private static void showNoPrefs1() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
