@@ -37,10 +37,10 @@ import org.eclipse.ptp.launch.data.ExecutionConfiguration;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
 import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.ptp.launch.internal.LinuxPath;
-//import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+//import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 //import org.eclipse.ptp.remotetools.utils.file.FileRecursiveEnumeration;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 
 public class UploadRuleAction implements IRuleAction {

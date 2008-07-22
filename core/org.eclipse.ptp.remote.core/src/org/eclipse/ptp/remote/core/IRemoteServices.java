@@ -8,32 +8,29 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
+package org.eclipse.ptp.remote.core;
 
-package org.eclipse.ptp.remote.exception;
 
-public class RemoteConnectionException extends Exception {
-	private static final long serialVersionUID = -7794871221470179956L;
 
+public interface IRemoteServices extends IRemoteServicesDelegate {
 	/**
-	 * @param message
-	 * @param cause
+	 * Get unique ID of this service. Can be used as a lookup key.
+	 * 
+	 * @return unique ID
 	 */
-	public RemoteConnectionException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
+	public String getId();
+	
 	/**
-	 * @param message
+	 * Get display name of this service.
+	 * 
+	 * @return display name
 	 */
-	public RemoteConnectionException(String message) {
-		super(message);
-	}
-
+	public String getName();
+	
 	/**
-	 * @param cause
+	 * Get state of this service
+	 * 
+	 * @return true if initialized successfully
 	 */
-	public RemoteConnectionException(Throwable cause) {
-		super(cause);
-	}
-
+	public boolean isInitialized();
 }

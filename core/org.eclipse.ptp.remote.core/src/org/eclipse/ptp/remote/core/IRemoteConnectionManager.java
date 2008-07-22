@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 import org.eclipse.swt.widgets.Shell;
 

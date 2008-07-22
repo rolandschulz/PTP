@@ -8,29 +8,21 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.internal.remote.core;
 
+import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
 
-
-public interface IRemoteServices extends IRemoteServicesDelegate {
-	/**
-	 * Get unique ID of this service. Can be used as a lookup key.
-	 * 
-	 * @return unique ID
-	 */
-	public String getId();
+public class LocalServicesFactory implements IRemoteServicesFactory {
+	private static LocalServices services = null;
 	
-	/**
-	 * Get display name of this service.
-	 * 
-	 * @return display name
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesFactory#getServices()
 	 */
-	public String getName();
-	
-	/**
-	 * Get state of this service
-	 * 
-	 * @return true if initialized successfully
-	 */
-	public boolean isInitialized();
+	public IRemoteServicesDelegate getServices() {
+		if (services == null) {
+			services = new LocalServices();
+		}
+		return services;
+	}
 }

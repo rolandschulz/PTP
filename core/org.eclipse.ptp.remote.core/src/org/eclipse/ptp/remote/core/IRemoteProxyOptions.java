@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 /**
  * Options governing how remote proxy communication should work. The STDIO and 

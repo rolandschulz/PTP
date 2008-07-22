@@ -8,10 +8,10 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public interface IRemoteConnection {
 	/**

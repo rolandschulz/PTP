@@ -8,12 +8,32 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
 
-public interface IRemoteServicesFactory {
+package org.eclipse.ptp.remote.core.exception;
+
+public class AddressInUseException extends RemoteConnectionException {
+	private static final long serialVersionUID = 1771839754428411610L;
+
 	/**
-	 * @param rm
-	 * @return
+	 * @param message
+	 * @param cause
 	 */
-	public IRemoteServicesDelegate getServices();
+	public AddressInUseException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * @param message
+	 */
+	public AddressInUseException(String message) {
+		super(message);
+	}
+
+	/**
+	 * @param cause
+	 */
+	public AddressInUseException(Throwable cause) {
+		super(cause);
+	}
+
 }

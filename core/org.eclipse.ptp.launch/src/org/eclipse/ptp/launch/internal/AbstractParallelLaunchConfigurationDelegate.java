@@ -104,11 +104,11 @@ import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
@@ -1011,7 +1011,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
 				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
 				if (remoteServices != null) {
 					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 					IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
@@ -1076,8 +1076,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
 				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
 				
-				IRemoteServices localServices = PTPRemotePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
-				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.core.LocalServices");
+				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
 				if (remoteServices != null && localServices != null) {
 					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed*/
@@ -1251,7 +1251,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
 				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
 
-				IRemoteServices localServices = PTPRemotePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
+				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.core.LocalServices");
 				if (localServices != null) {
 					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
@@ -1272,7 +1272,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
 				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
 
-				IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
 				if (remoteServices != null) {
 
 					IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();

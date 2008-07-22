@@ -14,7 +14,7 @@ package org.eclipse.ptp.launch.rulesengine;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
-import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 
 

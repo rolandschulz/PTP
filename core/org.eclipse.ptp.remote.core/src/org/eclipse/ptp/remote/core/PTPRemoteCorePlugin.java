@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
+package org.eclipse.ptp.remote.core;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.remote.LocalServices;
-import org.eclipse.ptp.internal.remote.RemoteServicesProxy;
+import org.eclipse.ptp.internal.remote.core.LocalServices;
+import org.eclipse.ptp.internal.remote.core.RemoteServicesProxy;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -35,7 +35,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class PTPRemotePlugin extends AbstractUIPlugin {
+public class PTPRemoteCorePlugin extends AbstractUIPlugin {
 
 	private class RemoteServicesSorter implements Comparator<IRemoteServices> {
 		public int compare(IRemoteServices o1, IRemoteServices o2) {
@@ -43,11 +43,11 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		}
 	}
 
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remote"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core"; //$NON-NLS-1$
 	public static final String EXTENSION_POINT_ID = "remoteServices"; //$NON-NLS-1$
 	
 	// The shared instance
-	private static PTPRemotePlugin plugin;
+	private static PTPRemoteCorePlugin plugin;
 	
 	/**
 	 * @return
@@ -123,7 +123,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static PTPRemotePlugin getDefault() {
+	public static PTPRemoteCorePlugin getDefault() {
 		return plugin;
 	}
 	
@@ -193,7 +193,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	/**
 	 * The constructor
 	 */
-	public PTPRemotePlugin() {
+	public PTPRemoteCorePlugin() {
 	}
 	
 	/**
