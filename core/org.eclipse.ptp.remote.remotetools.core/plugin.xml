@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
-            class="org.eclipse.ptp.remote.remotetools.RemoteToolsServicesFactory"
+            class="org.eclipse.ptp.remote.remotetools.core.RemoteToolsServicesFactory"
             id="org.eclipse.ptp.remote.RemoteTools"
             name="Remote Tools">
       </remoteServices>
@@ -15,35 +15,8 @@
       <filesystem
             scheme="remotetools">
          <run
-               class="org.eclipse.ptp.remote.remotetools.RemoteToolsFileSystem">
+               class="org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileSystem">
          </run>
       </filesystem>
    </extension>
-  <extension
-         point="org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate">
-      <control
-            class="org.eclipse.ptp.remote.remotetools.environment.core.Environment"
-            name="Remote Host"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
-            class="org.eclipse.ptp.remote.remotetools.environment.preferences.ui.PreferencePage"
-            id="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
-            name="Remote Host"/>      
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.ptp.remote.remotetools.environment.preferences.ui.PreferenceInitializer"/>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.remote.ui.remoteUIServices">
-      <remoteUIServices
-            class="org.eclipse.ptp.remote.remotetools.RemoteToolsUIServicesFactory"
-            id="org.eclipse.ptp.remote.RemoteTools"
-            name="Remote Tools">
-      </remoteUIServices>
-   </extension>
-
 </plugin>
