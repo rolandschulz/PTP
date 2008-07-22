@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -37,19 +38,25 @@ public class OpenMpiProcessMapXml13Parser {
 		@Override
 		public void startDocument() throws SAXException {
 			super.startDocument();
-			System.out.println("Start document");
+			// Notify listeners that parsing has started
+			for (Object listener : listeners.getListeners()) {
+				try {
+					((IOpenMpiProcessMapXml13ParserListener ) listener).startDocument();
+				} catch (Exception e) {
+					PTPCorePlugin.log(e);
+				}
+			}
 		}
 
 		@Override
 		public void endDocument() throws SAXException {
 			super.endDocument();
-			System.out.println("End document");
 		}
 
 		@Override
 		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 			super.startElement(uri, localName, name, attributes);
-			System.out.println("Start element: "+name);
+//			System.out.println("Start element: "+name);
 			ContextHandler handler = handlers.peek();
 			ContextHandler childHandler = null;
 			if (handler != null) {
@@ -70,7 +77,7 @@ public class OpenMpiProcessMapXml13Parser {
 		@Override
 		public void endElement(String uri, String localName, String name) throws SAXException {
 			super.endElement(uri, localName, name);
-			System.out.println("End element: "+name);
+//			System.out.println("End element: "+name);
 			ContextHandler handler = handlers.pop();
 			if (handler != null) {
 				handler.finish();
@@ -86,7 +93,7 @@ public class OpenMpiProcessMapXml13Parser {
 		@Override
 		public void fatalError(SAXParseException e) throws SAXException {
 			// TODO Auto-generated method stub
-			System.out.println(e.getClass());
+//			System.out.println(e.getClass());
 			
 			super.fatalError(e);
 		}
@@ -94,6 +101,12 @@ public class OpenMpiProcessMapXml13Parser {
 
 	protected final OpenMpiProcessMap map = new OpenMpiProcessMap();
 	protected final StackContextHandler handler = new StackContextHandler(new DocumentHandler());
+	protected final ListenerList listeners = new ListenerList();
+	
+	public static interface IOpenMpiProcessMapXml13ParserListener {
+		void startDocument();
+		void endDocument();
+	}
 
 	private class UnknownElementException extends SAXException {
 		private static final long serialVersionUID = 1L;
@@ -163,7 +176,7 @@ public class OpenMpiProcessMapXml13Parser {
 			} else {
 				return super.newElement(name);
 			}
-		}
+		}		
 	}
 
 	public class MapHandler extends ContextHandler {
@@ -175,13 +188,24 @@ public class OpenMpiProcessMapXml13Parser {
 				return super.newElement(name);
 			}
 		}
-
+		
 		@Override
 		public void finish() throws SAXException {
+			super.finish();
+			// Notify listeners that end has been reached.
+			for (Object listener : listeners.getListeners()) {
+				try {
+					((IOpenMpiProcessMapXml13ParserListener ) listener).endDocument();
+				} catch (Exception e) {
+					PTPCorePlugin.log(e);
+				}
+			}
+			
 			// Throw exception to force stop parsing.
 			// Or else, the parser would complain about content not allows after in trailing section.
 			throw new ParseInterruptedException();
 		}
+
 	}
 
 	public class HostHandler extends ContextHandler {
@@ -309,7 +333,14 @@ public class OpenMpiProcessMapXml13Parser {
 	}
 
 	public static OpenMpiProcessMap parse(InputStream is) throws IOException {
+		return parse(is, null);
+	}
+
+	public static OpenMpiProcessMap parse(InputStream is, IOpenMpiProcessMapXml13ParserListener listener) throws IOException {
 		OpenMpiProcessMapXml13Parser parser = new OpenMpiProcessMapXml13Parser();
+		if (listener != null) {
+			parser.addListener(listener);
+		}
 		try {
 			BufferedInputStream bis = new BufferedInputStream(is);
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -323,6 +354,14 @@ public class OpenMpiProcessMapXml13Parser {
 			throw new RuntimeException(e);
 		}
 		return parser.map;
+	}
+
+	public void addListener(IOpenMpiProcessMapXml13ParserListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(IOpenMpiProcessMapXml13ParserListener listener) {
+		listeners.remove(listener);
 	}
 
 	public static void main(String[] args) {
