@@ -2,7 +2,6 @@ package org.eclipse.ptp.rm.core.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 
@@ -21,16 +20,16 @@ public class InputStreamListenerToOutputStream implements IInputStreamListener {
 
 	public void newBytes(byte[] bytes, int length) {
 		try {
-			if (enabled) outputStream.write(bytes, 0, length);
+			if (isEnabled()) outputStream.write(bytes, 0, length);
 		} catch (IOException e) {
-			enabled = false;
+			disable();
 			log(e);
 		}
 	}
 
 	public void streamClosed() {
 		try {
-			enabled = false;
+			disable();
 			outputStream.close();
 		} catch (IOException e) {
 			log(e);
@@ -38,16 +37,19 @@ public class InputStreamListenerToOutputStream implements IInputStreamListener {
 	}
 
 	public void streamError(Exception e) {
-		try {
-			enabled = false;
-			outputStream.close();
-		} catch (IOException ee) {
-			log(ee);
-		}
+		disable();
 		log(e);
 	}
 
 	protected void log(Exception e) {
 		PTPCorePlugin.log(e);
+	}
+	
+	public synchronized void disable() {
+		enabled = false;
+	}
+	
+	public synchronized boolean isEnabled() {
+		return enabled;
 	}
 }

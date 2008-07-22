@@ -39,6 +39,7 @@ import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.Process;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
 
 public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	Object lock1 = new Object();
@@ -107,19 +108,20 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				} catch (IOException e) {
 					PTPCorePlugin.log(e);
 				} finally {
-					if (stdoutObserver != null) {
-						stdoutObserver.removeListener(stdoutPipedStreamListener);
-					}
-					try {
-						stdoutOutputStream.close();
-					} catch (IOException e) {
-						PTPCorePlugin.log(e);
-					}
-					try {
-						stdoutInputStream.close();
-					} catch (IOException e) {
-						PTPCorePlugin.log(e);
-					}
+					stdoutPipedStreamListener.disable();
+//					if (stdoutObserver != null) {
+//						stdoutObserver.removeListener(stdoutPipedStreamListener);
+//					}
+//					try {
+//						stdoutOutputStream.close();
+//					} catch (IOException e) {
+//						PTPCorePlugin.log(e);
+//					}
+//					try {
+//						stdoutInputStream.close();
+//					} catch (IOException e) {
+//						PTPCorePlugin.log(e);
+//					}
 				}
 			}
 		};
@@ -153,19 +155,20 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				} catch (IOException e) {
 					PTPCorePlugin.log(e);
 				} finally {
-					if (stderrObserver != null) {
-						stderrObserver.removeListener(stderrPipedStreamListener);
-					}
-					try {
-						stderrOutputStream.close();
-					} catch (IOException e) {
-						PTPCorePlugin.log(e);
-					}
-					try {
-						stderrInputStream.close();
-					} catch (IOException e) {
-						PTPCorePlugin.log(e);
-					}
+					stderrPipedStreamListener.disable();
+//					if (stderrObserver != null) {
+//						stderrObserver.removeListener(stderrPipedStreamListener);
+//					}
+//					try {
+//						stderrOutputStream.close();
+//					} catch (IOException e) {
+//						PTPCorePlugin.log(e);
+//					}
+//					try {
+//						stderrInputStream.close();
+//					} catch (IOException e) {
+//						PTPCorePlugin.log(e);
+//					}
 				}
 			}
 		};
@@ -190,7 +193,22 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 					if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
 						map = OpenMpiProcessMapText12Parser.parse(parserInputStream);
 					} else if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
-						map = OpenMpiProcessMapXml13Parser.parse(parserInputStream);
+						map = OpenMpiProcessMapXml13Parser.parse(parserInputStream, new IOpenMpiProcessMapXml13ParserListener() {
+							public void startDocument() {
+								// Empty
+							}
+							public void endDocument() {
+								/*
+								 * Turn of listener that generates input for parser when parsing finishes.
+								 * If not done, the parser will close the piped inputstream, making the listener
+								 * get IOExceptions for closed stream.
+								 */
+								if (stderrObserver != null) {
+									parserPipedStreamListener.disable();
+									stderrObserver.removeListener(parserPipedStreamListener);
+								}
+							}
+						});
 					} else {
 						assert false;
 					}
@@ -201,18 +219,9 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 					parserException = e;
 					process.destroy();
 				} finally {
+					parserPipedStreamListener.disable();
 					if (stderrObserver != null) {
 						stderrObserver.removeListener(parserPipedStreamListener);
-					}
-					try {
-						parserOutputStream.close();
-					} catch (IOException e) {
-						PTPCorePlugin.log(e);
-					}
-					try {
-						parserInputStream.close();
-					} catch (IOException e) {
-						PTPCorePlugin.log(e);
 					}
 				}
 			}
@@ -228,8 +237,8 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		stderrObserver = new InputStreamObserver(process.getErrorStream());
 		stdoutObserver = new InputStreamObserver(process.getInputStream());
 
-		stdoutObserver.addListener(stdoutPipedStreamListener);
-		stderrObserver.addListener(stderrPipedStreamListener);
+//		stdoutObserver.addListener(stdoutPipedStreamListener);
+//		stderrObserver.addListener(stderrPipedStreamListener);
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 		OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
@@ -245,7 +254,6 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		stdoutObserver.start();
 
 		try {
-//			parserThread.start();
 			parserThread.join();
 		} catch (InterruptedException e) {
 			// Do nothing.
@@ -294,28 +302,42 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 
 	@Override
 	protected void doWaitExecution() throws CoreException {
+		/*
+		 * Wait until both stdout and stderr stop because stream are closed.
+		 * This means that the process has finished.
+		 */
 		try {
 			stderrObserver.join();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
+//		System.err.println("stderr finished");
 		try {
 			stdoutObserver.join();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
+//		System.err.println("stdout finished");
+		/*
+		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
+		 */
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			// Ignore
+		}
 	}
 
 	@Override
 	protected void doTerminateJob() {
-		if (stderrObserver != null) {
-			stderrObserver.kill();
-			stderrObserver = null;
-		}
-		if (stdoutObserver != null) {
-			stdoutObserver.kill();
-			stdoutObserver = null;
-		}
+//		if (stderrObserver != null) {
+//			stderrObserver.kill();
+//			stderrObserver = null;
+//		}
+//		if (stdoutObserver != null) {
+//			stdoutObserver.kill();
+//			stdoutObserver = null;
+//		}
 	}
 
 	@Override
