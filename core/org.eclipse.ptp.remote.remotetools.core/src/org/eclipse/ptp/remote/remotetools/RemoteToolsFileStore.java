@@ -27,8 +27,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
@@ -152,7 +152,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#getName()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#getName()
 	 */
 	@Override
 	public String getName() {
@@ -164,7 +164,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#getParent()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#getParent()
 	 * 
 	 * FIXME: should take a progress monitor as argument
 	 * FIXME: should throw a core exception
@@ -185,7 +185,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#mkdir(int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#mkdir(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public IFileStore mkdir(int options, IProgressMonitor monitor)
@@ -202,7 +202,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#openInputStream(int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openInputStream(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor)
@@ -222,7 +222,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#openOutputStream(int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openOutputStream(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor)
@@ -243,7 +243,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#putInfo(org.eclipse.ptp.remote.IRemoteResourceInfo, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#putInfo(org.eclipse.ptp.remote.core.IRemoteResourceInfo, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void putInfo(IFileInfo info, int options,
@@ -278,7 +278,7 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteResource#toURI()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#toURI()
 	 */
 	@Override
 	public URI toURI() {

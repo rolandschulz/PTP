@@ -13,11 +13,11 @@ package org.eclipse.ptp.remote.rse;
 import java.util.List;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.rse.ui.RSEUIPlugin;

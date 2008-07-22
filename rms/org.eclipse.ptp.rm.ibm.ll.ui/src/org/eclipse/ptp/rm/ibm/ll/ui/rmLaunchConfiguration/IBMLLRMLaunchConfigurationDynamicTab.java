@@ -22,16 +22,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.attributes.BigIntegerAttribute;
@@ -49,6 +53,17 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
+import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.ibm.ll.ui.preferences.IBMLLPreferenceConstants;
+import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -58,27 +73,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.core.filesystem.*;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
-import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
-import org.eclipse.ptp.rm.ibm.ll.ui.preferences.IBMLLPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration.IBMLLRMLaunchConfigurationDynamicTab.ValidationException;
-import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 public class IBMLLRMLaunchConfigurationDynamicTab extends
@@ -160,6 +158,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private Vector<Object> activeWidgets;
 	private IRemoteConnection remoteConnection;
 	private IRemoteServices remoteService;
+	private IRemoteUIServices remoteUIService;
 	private Shell parentShell;
 
 	private Composite generalTabPane = null;
@@ -464,12 +463,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	protected void getInputFile(FileSelectorRowWidget selector, String titleID,
 			String pathAttrID) {
-		String selectedFile;
+		String selectedFile = null;
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":getInputFile entered.");
-		selectedFile = remoteService.getFileManager(remoteConnection)
-				.browseFile(parentShell, Messages.getString(titleID),
-						getFileDialogPath(pathAttrID)).toString();
+		if (remoteUIService != null) {
+			selectedFile = remoteUIService.getUIFileManager(remoteConnection)
+					.browseFile(parentShell, Messages.getString(titleID),
+							getFileDialogPath(pathAttrID)).toString();
+		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
 			selector.setPath(selectedFile);
@@ -493,13 +494,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	protected void getOutputFile(FileSelectorRowWidget selector,
 			String titleID, String pathAttrID) {
-		String selectedFile;
+		String selectedFile = null;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":getOutputFile entered.");
-		selectedFile = remoteService.getFileManager(remoteConnection)
-				.browseFile(parentShell, Messages.getString(titleID),
-						getFileDialogPath(pathAttrID)).toString();
+		if (remoteUIService != null) {
+			selectedFile = remoteUIService.getUIFileManager(remoteConnection)
+					.browseFile(parentShell, Messages.getString(titleID),
+							getFileDialogPath(pathAttrID)).toString();
+		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
 			selector.setPath(selectedFile);
@@ -523,13 +526,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	protected void getDirectory(FileSelectorRowWidget selector, String titleID,
 			String pathAttrID) {
-		String selectedFile;
+		String selectedFile = null;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":getDirectory entered.");
-		selectedFile = remoteService.getFileManager(remoteConnection)
-				.browseDirectory(parentShell, Messages.getString(titleID),
-						getFileDialogPath(pathAttrID)).toString();
+		if (remoteUIService != null) {
+			selectedFile = remoteUIService.getUIFileManager(remoteConnection)
+					.browseDirectory(parentShell, Messages.getString(titleID),
+							getFileDialogPath(pathAttrID)).toString();
+		}
 		if (selectedFile != null) {
 			String parentDir;
 
@@ -1311,8 +1316,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 		config = (IBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm)
 				.getConfiguration();
-		remoteService = PTPRemotePlugin.getDefault().getRemoteServices(
+		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 				config.getRemoteServicesId());
+		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
 		connMgr = remoteService.getConnectionManager();
 		remoteConnection = connMgr.getConnection(config.getConnectionName());
 		parentShell = parent.getShell();

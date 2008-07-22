@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.remote.remoteServices">
+         point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
             class="org.eclipse.ptp.remote.remotetools.RemoteToolsServicesFactory"
             id="org.eclipse.ptp.remote.RemoteTools"
@@ -36,6 +36,14 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.ptp.remote.remotetools.environment.preferences.ui.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.remote.ui.remoteUIServices">
+      <remoteUIServices
+            class="org.eclipse.ptp.remote.remotetools.RemoteToolsUIServicesFactory"
+            id="org.eclipse.ptp.remote.RemoteTools"
+            name="Remote Tools">
+      </remoteUIServices>
    </extension>
 
 </plugin>

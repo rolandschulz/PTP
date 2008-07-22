@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.ArgumentParser;
-import org.eclipse.ptp.remote.IRemoteProcess;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.Activator;
 
 /**

@@ -27,7 +27,7 @@ package org.eclipse.ptp.rm.ibm.ll.ui.preferences;
 import java.io.File;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;

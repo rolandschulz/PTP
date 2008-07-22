@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;

@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse;
 
-import org.eclipse.ptp.remote.IRemoteServicesDelegate;
-import org.eclipse.ptp.remote.IRemoteServicesFactory;
+import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
 
 public class RSEServicesFactory implements IRemoteServicesFactory {
 	private static RSEServices services = null;

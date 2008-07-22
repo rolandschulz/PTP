@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.ptp.remote.AbstractRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteProcess;
+import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteScript;
@@ -39,7 +39,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
 	 */
 	@Override
 	public Map<String, String> environment() {
@@ -47,7 +47,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
 	public IRemoteProcess start() throws IOException {
 		// The exit command is called to force the remote shell to close after our command 

@@ -12,11 +12,11 @@ package org.eclipse.ptp.remote.remotetools;
 
 import java.util.List;
 
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
@@ -35,14 +35,14 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getConnectionManager()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		return connMgr;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
 		if (!(conn instanceof RemoteToolsConnection)) {
@@ -59,21 +59,21 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
 		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
 		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#initialize()
 	 */
 	public boolean initialize() {
 		if (connMgr == null) {

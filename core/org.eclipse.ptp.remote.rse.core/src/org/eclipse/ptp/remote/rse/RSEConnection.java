@@ -10,16 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.eclipse.core.filesystem.IFileSystem;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.shells.IShellService;

@@ -13,7 +13,7 @@ package org.eclipse.ptp.remote.rse;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.eclipse.ptp.remote.AbstractRemoteProcess;
+import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 
 public class RSEProcess extends AbstractRemoteProcess {
 	private Process rseProcess;

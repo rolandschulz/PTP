@@ -17,16 +17,16 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -83,6 +83,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
     private PEResourceManagerConfiguration config;
     private RMConfigurationWizard confWizard;
     private IRemoteServices remoteService;
+    private IRemoteUIServices remoteUIService;
     private IRemoteConnection remoteConnection;
     private IRemoteConnectionManager connMgr;
 
@@ -108,10 +109,12 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 		}
 	    }
 	    if (e.getSource() == libOverrideBrowse) {
-		String selectedFile;
+		String selectedFile = null;
 
-		selectedFile = remoteService.getFileManager(remoteConnection).browseDirectory(PEResourceManagerOptionDialog.this.parentShell,
-			Messages.getString("PEDialogs.librarySelectorTitle"), "/").toString();
+		if (remoteUIService != null) {
+			selectedFile = remoteUIService.getUIFileManager(remoteConnection).browseDirectory(PEResourceManagerOptionDialog.this.parentShell,
+					Messages.getString("PEDialogs.librarySelectorTitle"), "/").toString();
+		}
 		if (selectedFile != null) {
 		    libOverridePath.setText(selectedFile);
 		}
@@ -407,7 +410,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 		IFileInfo fileInfo;
 		IPath testPath;
 
-		remoteService = PTPRemotePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
 		connMgr = remoteService.getConnectionManager();
 		remoteConnection = connMgr.getConnection(config.getConnectionName());
 		testPath = new Path(widgetValue);

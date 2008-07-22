@@ -8,11 +8,12 @@ Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
  org.eclipse.ui,
- org.eclipse.ptp.remote,
+ org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ptp.remotetools.utils,
  org.eclipse.ptp.remotetools.preferences,
- org.eclipse.ptp.ui
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.remote.ui;bundle-version="2.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.remote.remotetools

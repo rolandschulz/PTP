@@ -58,10 +58,12 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.BooleanRowWidget;
@@ -392,6 +394,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     private Vector<Object> activeWidgets;
     private IRemoteConnection remoteConnection;
     private IRemoteServices remoteService;
+    private IRemoteUIServices remoteUIService;
     private Shell parentShell;
 //    private RSEFileManager remoteFileManager;
     /*
@@ -751,10 +754,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      */
     protected void getInputFile(FileSelectorRowWidget selector, String titleID, String pathAttrID)
     {
-	String selectedFile;
+	String selectedFile = null;
 
-	selectedFile = remoteService.getFileManager(remoteConnection).browseFile(parentShell, Messages.getString(titleID),
+	if (remoteUIService != null) {
+		selectedFile = remoteUIService.getUIFileManager(remoteConnection).browseFile(parentShell, Messages.getString(titleID),
 										 getFileDialogPath(pathAttrID)).toString();
+	}
 	if (selectedFile != null) {
 	    saveFileDialogPath(pathAttrID, selectedFile);
 	    selector.setPath(selectedFile);
@@ -772,10 +777,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      */
     protected void getOutputFile(FileSelectorRowWidget selector, String titleID, String pathAttrID)
     {
-	String selectedFile;
+	String selectedFile = null;
 
-	selectedFile = remoteService.getFileManager(remoteConnection).browseFile(parentShell, Messages.getString(titleID),
+	if (remoteUIService != null) {
+		selectedFile = remoteUIService.getUIFileManager(remoteConnection).browseFile(parentShell, Messages.getString(titleID),
 										 getFileDialogPath(pathAttrID)).toString();
+	}
 	if (selectedFile != null) {
 	    saveFileDialogPath(pathAttrID, selectedFile);
 	    selector.setPath(selectedFile);
@@ -793,10 +800,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      */
     protected void getDirectory(FileSelectorRowWidget selector, String titleID, String pathAttrID)
     {
-	String selectedFile;
+	String selectedFile = null;
 
-	selectedFile = remoteService.getFileManager(remoteConnection).browseDirectory(parentShell, Messages.getString(titleID),
+	if (remoteUIService != null) {
+		selectedFile = remoteUIService.getUIFileManager(remoteConnection).browseDirectory(parentShell, Messages.getString(titleID),
 										 getFileDialogPath(pathAttrID)).toString();
+	}
 	if (selectedFile != null) {
 	    String parentDir;
 	    
@@ -1693,7 +1702,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	IRemoteConnectionManager connMgr;
 
 	config = (PEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
-	remoteService = PTPRemotePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+	remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+	remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
 	connMgr = remoteService.getConnectionManager();
 	remoteConnection = connMgr.getConnection(config.getConnectionName());
 	parentShell = parent.getShell();
