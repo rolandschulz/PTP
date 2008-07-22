@@ -51,7 +51,6 @@ public class OpenMPProjectProcess extends ProcessRunner {
 	private Map<String,String> valueStore;
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void process(TemplateCore template, ProcessArgument[] args,
 			String processId, IProgressMonitor monitor)
 			throws ProcessFailureException {
