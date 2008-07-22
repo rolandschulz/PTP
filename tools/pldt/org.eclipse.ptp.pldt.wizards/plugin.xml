@@ -53,6 +53,10 @@
                name="openMPProjectProcess"
                processRunner="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectProcess">
          </processType>
+         <processType
+               name="mpiProjectProcessCPP"
+               processRunner="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectProcessCPP">
+         </processType>
       </extension>
 
 </plugin>
