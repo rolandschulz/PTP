@@ -215,10 +215,12 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Discover command did not inform path to default hostfile. If necessary, set MCA parameters to define default hostfile path."));
 			}
 		} else if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
-			hostMap = new OpenMpiHostMap();
-			String hostname = getRemoteHostname(connection, remoteServices);
-			hostMap.addDefaultHost(hostname);
-			return hostMap;
+			if (hostFilePath == null) {
+				hostMap = new OpenMpiHostMap();
+				String hostname = getRemoteHostname(connection, remoteServices);
+				hostMap.addDefaultHost(hostname);
+				return hostMap;
+			}
 		} else {
 			assert false;
 		}
