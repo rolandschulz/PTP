@@ -278,6 +278,22 @@ class SpecificationCollector extends BindingCollector
         
         IASTListNode<ASTNamedConstantDefNode> list = node.getNamedConstantDefList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.get(i).getNamedConstant());
+        {
+            List<PhotranTokenRef> bindings = bind(list.get(i).getNamedConstant());
+
+            try
+            {
+                for (PhotranTokenRef tr : bindings)
+                {
+                    Definition def = vpg.getDefinitionFor(tr);
+                    def.setParameter();
+                    vpg.setDefinitionFor(tr, def);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Error(e);
+            }
+        }
     }
 }

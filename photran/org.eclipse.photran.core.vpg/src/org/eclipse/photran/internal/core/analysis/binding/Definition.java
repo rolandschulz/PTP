@@ -106,6 +106,7 @@ public class Definition implements Serializable, Comparable<Definition>
     protected ArraySpec arraySpec;
     
     private boolean subprogramArgument = false;
+    private boolean parameter = false;
 
     protected Definition() {}
     
@@ -342,6 +343,8 @@ public class Definition implements Serializable, Comparable<Definition>
             setArraySpec(arraySpec);
         else if (accessSpec != null)
             setVisibility(accessSpec);
+        else if (attrSpec.isParameter())
+            setParameter();
 
         // TODO: Intent, etc.
     }
@@ -357,6 +360,17 @@ public class Definition implements Serializable, Comparable<Definition>
             this.visibility = Visibility.PUBLIC;
         else if (accessSpec.isPrivate())
             this.visibility = Visibility.PRIVATE;
+    }
+    
+    void setParameter()
+    {
+        this.parameter = true;
+    }
+    
+    /** @return true iff this entity was declared as a PARAMETER (i.e., it a constant variable) */
+    public boolean isParameter()
+    {
+        return parameter;
     }
     
     boolean isPublic()
