@@ -93,6 +93,7 @@ public class InputStreamObserver extends Thread {
 	}
 
 	void streamClosed() {
+		if (closed) return;
 		log("Stream closed");
 		closed = true;
 		for (Object listener : listeners.getListeners()) {
@@ -106,6 +107,7 @@ public class InputStreamObserver extends Thread {
 	}
 
 	void streamError(Exception e) {
+		if (closed) return;
 		log("Recovered from exception: " + e.getMessage());
 		for (Object listener : listeners.getListeners()) {
 			try {
@@ -118,6 +120,7 @@ public class InputStreamObserver extends Thread {
 	}
 
 	void newBytes(byte buffer[], int length) {
+		if (closed) return;
 		log("Received: " + Integer.toString(length) + " bytes");
 		for (Object listener : listeners.getListeners()) {
 			try {

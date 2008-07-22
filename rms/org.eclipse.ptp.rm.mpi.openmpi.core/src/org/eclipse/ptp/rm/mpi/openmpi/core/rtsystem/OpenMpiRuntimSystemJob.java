@@ -34,8 +34,8 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.DefaultToolRuntimeSystemJob;
-import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
+import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.Process;
@@ -89,10 +89,11 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			assert false; // This exception is not possible
 		}
 		final InputStreamListenerToOutputStream stdoutPipedStreamListener = new InputStreamListenerToOutputStream(stdoutOutputStream);
-		final BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
+		
 		Thread stdoutThread = new Thread() {
 			@Override
 			public void run() {
+				BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
 				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
 					String line = stdoutBufferedReader.readLine();
@@ -122,7 +123,6 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				}
 			}
 		};
-		stdoutThread.start();
 
 		/*
 		 * Listener that saves stderr.
@@ -135,10 +135,10 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			assert false; // This exception is not possible
 		}
 		final InputStreamListenerToOutputStream stderrPipedStreamListener = new InputStreamListenerToOutputStream(stderrOutputStream);
-		final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
 		Thread stderrThread = new Thread() {
 			@Override
 			public void run() {
+				final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
 				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
 					String line = stderrBufferedReader.readLine();
@@ -146,7 +146,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 //							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-							System.err.println(line);
+//							System.err.println(line);
 						}
 						line = stderrBufferedReader.readLine();
 					}
@@ -169,7 +169,6 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				}
 			}
 		};
-//		stderrThread.start();
 
 		/*
 		 * Thread that parses map information.
@@ -187,6 +186,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			public void run() {
 				OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 				try {
+					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 					if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
 						map = OpenMpiProcessMapText12Parser.parse(parserInputStream);
 					} else if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
@@ -195,6 +195,9 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 						assert false;
 					}
 				} catch (IOException e) {
+					/*
+					 * If output could not be parsed, the kill the mpi process.
+					 */
 					parserException = e;
 					process.destroy();
 				} finally {
@@ -218,17 +221,31 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		/*
 		 * Create and start listeners.
 		 */
-//		stderrObserver = new InputStreamObserver(process.getErrorStream());
-//		stderrObserver.addListener(stderrPipedStreamListener);
-//		stderrObserver.start();
+		stdoutThread.start();
+		stderrThread.start();
+		parserThread.start();
 
+		stderrObserver = new InputStreamObserver(process.getErrorStream());
 		stdoutObserver = new InputStreamObserver(process.getInputStream());
-		stdoutObserver.addListener(parserPipedStreamListener);
+
 		stdoutObserver.addListener(stdoutPipedStreamListener);
+		stderrObserver.addListener(stderrPipedStreamListener);
+
+		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
+		OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
+		if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+			stderrObserver.addListener(parserPipedStreamListener);
+		} else if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
+			stdoutObserver.addListener(parserPipedStreamListener);
+		} else {
+			assert false;
+		}
+
+		stderrObserver.start();
 		stdoutObserver.start();
 
 		try {
-			parserThread.start();
+//			parserThread.start();
 			parserThread.join();
 		} catch (InterruptedException e) {
 			// Do nothing.
