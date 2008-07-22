@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate">
+      <control
+            class="org.eclipse.ptp.remote.remotetools.ui.environment.Environment"
+            name="Remote Host">
+      </control>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
+            class="org.eclipse.ptp.remote.remotetools.ui.environment.preferences.PreferencePage"
+            id="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage.EnvironmentPreferencePage"
+            name="Remote Host"/>      
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.remote.remotetools.ui.environment.preferences.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.remote.ui.remoteUIServices">
+      <remoteUIServices
+            class="org.eclipse.ptp.remote.remotetools.ui.RemoteToolsUIServicesFactory"
+            id="org.eclipse.ptp.remote.RemoteTools"
+            name="Remote Tools">
+      </remoteUIServices>
+   </extension>
+</plugin>
