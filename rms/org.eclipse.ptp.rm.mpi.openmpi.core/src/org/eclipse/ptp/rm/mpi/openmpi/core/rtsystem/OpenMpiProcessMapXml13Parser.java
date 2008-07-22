@@ -19,6 +19,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiNodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class OpenMpiProcessMapXml13Parser {
@@ -48,6 +49,7 @@ public class OpenMpiProcessMapXml13Parser {
 		@Override
 		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 			super.startElement(uri, localName, name, attributes);
+			System.out.println("Start element: "+name);
 			ContextHandler handler = handlers.peek();
 			ContextHandler childHandler = null;
 			if (handler != null) {
@@ -68,10 +70,25 @@ public class OpenMpiProcessMapXml13Parser {
 		@Override
 		public void endElement(String uri, String localName, String name) throws SAXException {
 			super.endElement(uri, localName, name);
+			System.out.println("End element: "+name);
 			ContextHandler handler = handlers.pop();
 			if (handler != null) {
 				handler.finish();
 			}
+		}
+		
+		@Override
+		public void error(SAXParseException e) throws SAXException {
+			// TODO Auto-generated method stub
+			super.error(e);
+		}
+		
+		@Override
+		public void fatalError(SAXParseException e) throws SAXException {
+			// TODO Auto-generated method stub
+			System.out.println(e.getClass());
+			
+			super.fatalError(e);
 		}
 	}
 
@@ -110,6 +127,10 @@ public class OpenMpiProcessMapXml13Parser {
 		}
 	}
 
+	private class ParseInterruptedException extends SAXException {
+		private static final long serialVersionUID = 1L;		
+	}
+	
 	private abstract class ContextHandler {
 		public ContextHandler newElement(String name) throws SAXException {
 			throw new UnknownElementException(name);
@@ -155,6 +176,12 @@ public class OpenMpiProcessMapXml13Parser {
 			}
 		}
 
+		@Override
+		public void finish() throws SAXException {
+			// Throw exception to force stop parsing.
+			// Or else, the parser would complain about content not allows after in trailing section.
+			throw new ParseInterruptedException();
+		}
 	}
 
 	public class HostHandler extends ContextHandler {
@@ -276,6 +303,7 @@ public class OpenMpiProcessMapXml13Parser {
 		@Override
 		public void finish() throws SAXException {
 			OpenMpiProcessMap.Process process = new OpenMpiProcessMap.Process(node, rank, Integer.toString(rank), 1);
+			map.addProcess(process);
 			super.finish();
 		}
 	}
@@ -287,12 +315,14 @@ public class OpenMpiProcessMapXml13Parser {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
 			saxParser.parse(bis, parser.handler);
-			return parser.map;
+		} catch (ParseInterruptedException e) {
+			// this is ok and expected
 		} catch (SAXException e) {
 			throw new IOException(e.getMessage());
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
+		return parser.map;
 	}
 
 	public static void main(String[] args) {
