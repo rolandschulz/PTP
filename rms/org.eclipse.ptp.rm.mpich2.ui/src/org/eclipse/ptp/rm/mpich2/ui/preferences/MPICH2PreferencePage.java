@@ -24,14 +24,14 @@ import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class MPICH2PreferencePage extends AbstractRemotePreferencePage {
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#getPreferences()
+	 * @see org.eclipse.ptp.remote.core.ui.preferences.AbstractRemotePreferencePage#getPreferences()
 	 */
 	public Preferences getPreferences() {
 		return MPICH2PreferenceManager.getPreferences();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#savePreferences()
+	 * @see org.eclipse.ptp.remote.core.ui.preferences.AbstractRemotePreferencePage#savePreferences()
 	 */
 	public void savePreferences() {
 		MPICH2PreferenceManager.savePreferences();

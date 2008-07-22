@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.remotetools.environment.core.PTPTargetControl;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
@@ -72,7 +72,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
 		refreshConnections();
@@ -80,7 +80,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
@@ -88,7 +88,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
 	 */
 	public void newConnection(Shell shell) {
 		if (remoteHost != null) {
@@ -103,7 +103,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#supportsNewConnections()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#supportsNewConnections()
 	 */
 	public boolean supportsNewConnections() {
 		return remoteHost != null;

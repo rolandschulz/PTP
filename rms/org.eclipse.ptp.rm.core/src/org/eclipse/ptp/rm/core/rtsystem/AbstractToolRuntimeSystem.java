@@ -37,12 +37,12 @@ import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
@@ -136,7 +136,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
-		remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
+		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
 		if (remoteServices == null) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not find remote services for resource manager"));
 		}

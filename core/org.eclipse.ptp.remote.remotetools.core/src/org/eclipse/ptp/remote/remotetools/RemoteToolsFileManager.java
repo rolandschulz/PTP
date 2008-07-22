@@ -20,9 +20,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.ui.RemoteResourceBrowser;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
@@ -30,7 +28,6 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
-import org.eclipse.swt.widgets.Shell;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
 	private IRemoteExecutionManager exeMgr;
@@ -42,40 +39,6 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		this.exeMgr = exeMgr;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
-	 */
-	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, shell);
-		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
-		browser.setInitialPath(filterPath);
-		if (browser.open() == Window.CANCEL) {
-			return null;
-		}
-		IPath path = browser.getPath();
-		if (path == null) {
-			return null;
-		}
-		return path;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
-	 */
-	public IPath browseFile(Shell shell, String message, String filterPath) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(this, shell);
-		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
-		browser.setInitialPath(filterPath);
-		if (browser.open() == Window.CANCEL) {
-			return null;
-		}
-		IPath path = browser.getPath();
-		if (path == null) {
-			return null;
-		}
-		return path;
-	}
-
 	/**
 	 * Store an IRemoteResource in the cache
 	 * 
@@ -97,7 +60,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
 		IFileStore res = lookup(path);
@@ -151,14 +114,14 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toPath(java.net.URI)
 	 */
 	public IPath toPath(URI uri) {
 		return new Path(uri.getPath());
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
 		try {

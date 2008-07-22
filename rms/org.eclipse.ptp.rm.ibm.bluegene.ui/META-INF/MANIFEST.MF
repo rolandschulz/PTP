@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rm.ibm.bluegene.core,
  org.eclipse.ptp.launch,
  org.eclipse.debug.core,
- org.eclipse.ptp.remote,
+ org.eclipse.ptp.remote.core,
  org.eclipse.ptp.rm.remote
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.ibm.bluegene.ui,

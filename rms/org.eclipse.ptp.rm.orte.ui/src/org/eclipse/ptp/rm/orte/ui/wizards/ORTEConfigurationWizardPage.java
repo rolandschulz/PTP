@@ -30,11 +30,13 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.orte.core.rmsystem.ORTEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.orte.ui.Activator;
 import org.eclipse.ptp.rm.orte.ui.internal.ui.Messages;
@@ -363,16 +365,18 @@ public class ORTEConfigurationWizardPage extends RMConfigurationWizardPage {
 		 * Need to do this here because the connection may have been changed 
 		 * by the previous wizard page
 		 */
+		IRemoteUIServices remUIServices = null;
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
 			}
+			remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 		}
 		
-		if (connection != null) {
+		if (remUIServices != null && connection != null) {
 			if (!connection.isOpen()) {
 				IRunnableWithProgress op = new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor)
@@ -400,7 +404,7 @@ public class ORTEConfigurationWizardPage extends RMConfigurationWizardPage {
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
 			}
-			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
+			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager(connection);
 			
 			String initialPath = "//"; // Start at root since ORTED is probably installed in the system somewhere
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("ORTEConfigurationWizardPage.select"), initialPath); //$NON-NLS-1$

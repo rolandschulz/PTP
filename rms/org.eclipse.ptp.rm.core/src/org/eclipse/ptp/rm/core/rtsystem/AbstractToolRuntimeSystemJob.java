@@ -26,8 +26,8 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.remote.IRemoteProcess;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.Activator;
 
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {

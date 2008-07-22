@@ -13,7 +13,7 @@ package org.eclipse.ptp.remote.remotetools;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.eclipse.ptp.remote.AbstractRemoteProcess;
+import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 
 public class RemoteToolsProcess extends AbstractRemoteProcess {
 	private Process remoteProcess;
@@ -71,7 +71,7 @@ public class RemoteToolsProcess extends AbstractRemoteProcess {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.AbstractRemoteProcess#isCompleted()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcess#isCompleted()
 	 */
 	public boolean isCompleted() {
 		try {

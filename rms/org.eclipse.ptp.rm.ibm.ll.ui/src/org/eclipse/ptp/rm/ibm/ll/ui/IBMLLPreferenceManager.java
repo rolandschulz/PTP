@@ -27,7 +27,7 @@ package org.eclipse.ptp.rm.ibm.ll.ui;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 
 public class IBMLLPreferenceManager {

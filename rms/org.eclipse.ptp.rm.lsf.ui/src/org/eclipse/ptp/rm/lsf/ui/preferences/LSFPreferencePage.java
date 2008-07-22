@@ -24,14 +24,14 @@ import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class LSFPreferencePage extends AbstractRemotePreferencePage {
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#getPreferences()
+	 * @see org.eclipse.ptp.remote.core.ui.preferences.AbstractRemotePreferencePage#getPreferences()
 	 */
 	public Preferences getPreferences() {
 		return LSFPreferenceManager.getPreferences();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#savePreferences()
+	 * @see org.eclipse.ptp.remote.core.ui.preferences.AbstractRemotePreferencePage#savePreferences()
 	 */
 	public void savePreferences() {
 		LSFPreferenceManager.savePreferences();
