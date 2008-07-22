@@ -22,11 +22,13 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
@@ -50,6 +52,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	private IResourceManagerControl resourceManager = null;
 	private IRemoteServices remoteServices = null;
+	private IRemoteUIServices remoteUIServices = null;
 	private IRemoteConnection connection = null;
 	
 	private String errMsg = null;
@@ -213,8 +216,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return path to file selected in browser
 	 */
 	private String browseFile() {
-		if (remoteServices != null) {
-			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+		if (remoteUIServices != null) {
+			IRemoteUIFileManager fileManager = remoteUIServices.getUIFileManager(connection);
 			if (fileManager != null) {
 				IPath path = fileManager.browseFile(getShell(), 
 						Messages.getString("SDMDebuggerPage.selectDebuggerExe"), 
@@ -271,7 +274,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				resourceManager = rm;
 				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
 					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
-					remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
+					remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
 					if (remoteServices != null) {
 						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
 						if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
@@ -279,6 +282,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 						} else {
 							address = remConfig.getLocalAddress();
 						}
+						remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 					}
 				} else {
 					address = "localhost"; //$NON-NLS-1$

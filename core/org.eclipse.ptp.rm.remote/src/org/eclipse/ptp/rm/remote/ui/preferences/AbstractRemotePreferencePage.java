@@ -25,7 +25,7 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.remote.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;

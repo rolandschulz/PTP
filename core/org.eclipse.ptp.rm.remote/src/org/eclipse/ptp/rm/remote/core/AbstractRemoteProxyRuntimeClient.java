@@ -28,15 +28,15 @@ import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.util.DebugOptions;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteProcess;
-import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
@@ -97,7 +97,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			 * This can fail if we are restarting the RM from saved information and the saved remote
 			 * services provider is no longer available...
 			 */
-			IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
 			if (remoteServices == null) {
 				throw new IOException("Could not find remote services ID " + config.getRemoteServicesId());  //$NON-NLS-1$
 			}

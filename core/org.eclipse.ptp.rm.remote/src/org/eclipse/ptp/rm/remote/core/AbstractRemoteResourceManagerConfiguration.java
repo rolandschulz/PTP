@@ -21,7 +21,7 @@ package org.eclipse.ptp.rm.remote.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;

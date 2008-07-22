@@ -10,26 +10,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.swt.widgets.Shell;
 
-public class RSEFileManager implements IRemoteFileManager {
+public class RSEUIFileManager implements IRemoteUIFileManager {
 	private RSEConnection connection;
 
-	public RSEFileManager(RSEConnection conn) {
+	public RSEUIFileManager(RSEConnection conn) {
 		this.connection = conn;
 	}
 	
@@ -65,37 +59,5 @@ public class RSEFileManager implements IRemoteFileManager {
 			}
 		}
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
-	 */
-	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
-		return connection.getFileSystem().getStore(toURI(path));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public IPath getWorkingDirectory() {
-		return new Path("/"); // TODO: RSE doesn't provide any way to get this
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
-	 */
-	public IPath toPath(URI uri) {
-		return new Path(uri.getPath());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
-	 */
-	public URI toURI(IPath path) {
-		try {
-			return new URI("rse", connection.getHost().getHostName(), path.toPortableString(), null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			return null;
-		}
 	}
 }

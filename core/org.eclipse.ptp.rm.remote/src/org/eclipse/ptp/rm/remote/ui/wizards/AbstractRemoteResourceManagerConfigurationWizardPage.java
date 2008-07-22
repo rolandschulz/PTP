@@ -22,11 +22,11 @@ import java.util.TreeSet;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
@@ -320,7 +320,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
@@ -542,7 +542,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * handler for the connection combo.
 	 */
 	protected void handleRemoteServiceSelected() {
-		IRemoteServices[] allRemoteServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
 		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
 			remoteServices = allRemoteServices[selectionIndex];
@@ -587,12 +587,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * routine when the default index is selected.
 	 */
 	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] allServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] allServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		IRemoteServices defServices;
 		if (remoteServices != null) {
 			defServices = remoteServices;
 		} else {
-			defServices = PTPRemotePlugin.getDefault().getDefaultServices();
+			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		}
 		int defIndex = allServices.length - 1; 
 		remoteCombo.removeAll();

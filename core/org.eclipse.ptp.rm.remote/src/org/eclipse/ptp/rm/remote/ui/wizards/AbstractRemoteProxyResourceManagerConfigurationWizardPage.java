@@ -39,13 +39,15 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.remote.IRemoteConnection;
-import org.eclipse.ptp.remote.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.IRemoteFileManager;
-import org.eclipse.ptp.remote.IRemoteProxyOptions;
-import org.eclipse.ptp.remote.IRemoteServices;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.Activator;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.ui.Messages;
@@ -407,7 +409,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
@@ -703,11 +705,16 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 				}
 			}
 			if (connection.isOpen()) {
-				IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-				String correctPath = serverText.getText();
-				IPath selectedPath = fileMgr.browseFile(getShell(), Messages.getString("RemoteProxyConfigurationWizard.select"), correctPath); //$NON-NLS-1$
-				if (selectedPath != null) {
-					serverText.setText(selectedPath.toString());
+				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+				if (remoteUIServices != null) {
+					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager(connection);
+					if (fileMgr != null) {
+						String correctPath = serverText.getText();
+						IPath selectedPath = fileMgr.browseFile(getShell(), Messages.getString("RemoteProxyConfigurationWizard.select"), correctPath); //$NON-NLS-1$
+						if (selectedPath != null) {
+							serverText.setText(selectedPath.toString());
+						}
+					}
 				}
 			}
 		}
@@ -721,7 +728,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * handler for the connection combo.
 	 */
 	protected void handleRemoteServiceSelected() {
-		IRemoteServices[] allRemoteServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
 		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
 			remoteServices = allRemoteServices[selectionIndex];
@@ -766,12 +773,12 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * routine when the default index is selected.
 	 */
 	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] allServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] allServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		IRemoteServices defServices;
 		if (remoteServices != null) {
 			defServices = remoteServices;
 		} else {
-			defServices = PTPRemotePlugin.getDefault().getDefaultServices();
+			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		}
 		int defIndex = allServices.length - 1; 
 		remoteCombo.removeAll();
