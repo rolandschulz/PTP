@@ -140,11 +140,7 @@ public class FortranLanguage extends AbstractLanguage
 
 	public int getLinkageID()
 	{
-	    // AbstractIndexerTask#runTask does not process FORTRAN_LINKAGE_ID
-	    // (and neither does the C/C++ Index view), so we'll pretend to be C
-	    
-		//return ILinkage.FORTRAN_LINKAGE_ID;
-	    
-	    return ILinkage.C_LINKAGE_ID;
+	    // FYI AbstractIndexerTask#runTask does not currently process FORTRAN_LINKAGE_ID
+		return ILinkage.FORTRAN_LINKAGE_ID;
 	}
 }
