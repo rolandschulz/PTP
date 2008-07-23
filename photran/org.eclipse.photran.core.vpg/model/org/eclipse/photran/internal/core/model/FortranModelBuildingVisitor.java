@@ -19,9 +19,9 @@ import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * This parse tree visitor is used by the <code>FortranModelBuilder</code> to create the model you
@@ -31,6 +31,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  * 
  * @author joverbey
  */
+@SuppressWarnings("restriction")
 public final class FortranModelBuildingVisitor extends GenericASTVisitor
 {
     // --INFRASTRUCTURE--------------------------------------------------
@@ -50,9 +51,9 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         this.elementMappingVisitor = new ElementMappingVisitor();
     }
 
-    private LinkedList/* <ParseTreeNode> */parentParseTreeNodeStack = new LinkedList();
+    private LinkedList<IASTNode> parentParseTreeNodeStack = new LinkedList<IASTNode>();
 
-    private LinkedList/* <F90Elements.F90Element> */parentElementStack = new LinkedList();
+    private LinkedList<FortranElement> parentElementStack = new LinkedList<FortranElement>();
 
     private Parent getCurrentParent()
     {

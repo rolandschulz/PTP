@@ -7,8 +7,6 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
@@ -21,6 +19,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
  * 
  * @author joverbey
  */
+@SuppressWarnings("restriction")
 public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisitor
 {
     // --INFRASTRUCTURE--------------------------------------------------
@@ -37,9 +36,9 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
         this.modelBuilder = modelBuilder;
     }
 
-    private LinkedList/* <ParseTreeNode> */parentParseTreeNodeStack = new LinkedList();
+    private LinkedList<IASTNode> parentParseTreeNodeStack = new LinkedList<IASTNode>();
 
-    private LinkedList/* <F90Elements.F90Element> */parentElementStack = new LinkedList();
+    private LinkedList<FortranElement> parentElementStack = new LinkedList<FortranElement>();
 
     private Parent getCurrentParent()
     {

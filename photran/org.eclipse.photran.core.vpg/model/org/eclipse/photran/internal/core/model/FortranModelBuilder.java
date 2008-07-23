@@ -2,7 +2,6 @@ package org.eclipse.photran.internal.core.model;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.cdt.core.model.CModelException;
@@ -14,7 +13,6 @@ import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.Activator;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
@@ -34,15 +32,16 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  * 
  * @author joverbey
  */
+@SuppressWarnings("restriction")
 public class FortranModelBuilder implements IFortranModelBuilder
 {
     private TranslationUnit translationUnit;
-    private Map newElements;
+    private Map<ICElement, Object /*CElementInfo*/> newElements;
     private boolean isFixedForm;
 
     public void setTranslationUnit(ITranslationUnit tu)
     {
-        if (!(tu instanceof ITranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit");
+        if (!(tu instanceof TranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit");
         
         this.translationUnit = (TranslationUnit)tu;
     }
@@ -55,7 +54,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
     public void parse(boolean quickParseMode) throws Exception
     {
-        this.newElements = new HashMap();
+        this.newElements = new HashMap<ICElement, Object /*CElementInfo*/>();
         boolean wasSuccessful = true;
 
         IAccumulatingLexer lexer = null;
@@ -192,26 +191,5 @@ public class FortranModelBuilder implements IFortranModelBuilder
         this.newElements.put(element, element.getElementInfo());
 
         return element;
-    }
-
-    private void addF90Elements(Map elts) throws CModelException
-    {
-        // Add all top-level elements (those with no parent) and recurse
-        addF90ElementsFor(null, elts);
-    }
-
-    private void addF90ElementsFor(Parent parent, Map elts) throws CModelException
-    {
-        Iterator it = elts.keySet().iterator();
-        while (it.hasNext())
-        {
-            FortranElement e = (FortranElement)it.next();
-            if (e.getParent() == parent)
-            {
-                addF90Element(e);
-                e.setIdentifier(e.getIdentifier()); // It seems to forget position info
-                addF90ElementsFor(e, elts);
-            }
-        }
     }
 }
