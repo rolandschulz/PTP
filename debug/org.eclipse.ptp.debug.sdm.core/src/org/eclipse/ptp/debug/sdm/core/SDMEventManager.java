@@ -23,6 +23,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.PDILocationFactory;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
 import org.eclipse.ptp.debug.core.pdi.manager.AbstractEventManager;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIBreakpointRequest;
@@ -33,8 +34,15 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteVariableRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDisableBreakpointRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEnableBreakpointRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIGoRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDISetCurrentStackFrameRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStartDebuggerRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIStepFinishRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIStepIntoInstructionRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIStepIntoRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverInstructionRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIStepRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDITerminateRequest;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
@@ -101,6 +109,8 @@ public class SDMEventManager extends AbstractEventManager {
 	 */
 	private synchronized void fireEvent(IPDIEventRequest request, IProxyDebugEvent event) {
 		BitList eTasks = ProxyDebugClient.decodeBitSet(event.getBitSet());
+
+		PDebugUtils.println("Msg: SDMEventManager - fireEvent(): event " + event);
 		
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>() {
 			private static final long serialVersionUID = 1L;
@@ -111,7 +121,31 @@ public class SDMEventManager extends AbstractEventManager {
 		};
 		if (event instanceof IProxyDebugOKEvent) {
 			if (request != null) {
-				if (request instanceof IPDIEnableBreakpointRequest) {
+				if (request instanceof IPDIGoRequest) {
+					session.getTaskManager().setSuspendTasks(false, eTasks);
+					session.processRunningEvent(eTasks.copy());
+					eventList.add(session.getEventFactory().newResumedEvent(session, eTasks, IPDIResumedEvent.CONTINUE));
+				}
+				else if (request instanceof IPDIStepRequest) {
+					int details;
+					if (request instanceof IPDIStepIntoRequest)
+						details = IPDIResumedEvent.STEP_INTO;
+					else if (request instanceof IPDIStepOverRequest)
+						details = IPDIResumedEvent.STEP_OVER;
+					else if (request instanceof IPDIStepFinishRequest)
+						details = IPDIResumedEvent.STEP_RETURN;
+					else if (request instanceof IPDIStepIntoInstructionRequest)
+						details = IPDIResumedEvent.STEP_INTO_INSTRUCTION;
+					else if (request instanceof IPDIStepOverInstructionRequest)
+						details = IPDIResumedEvent.STEP_OVER_INSTRUCTION;
+					else {
+						details = IPDIResumedEvent.CONTINUE;
+					}
+					session.getTaskManager().setSuspendTasks(false, eTasks);
+					session.processRunningEvent(eTasks.copy());
+					eventList.add(session.getEventFactory().newResumedEvent(session, eTasks, details));
+				}
+				else if (request instanceof IPDIEnableBreakpointRequest) {
 				}
 				else if (request instanceof IPDIDisableBreakpointRequest) {
 				}
@@ -237,28 +271,22 @@ public class SDMEventManager extends AbstractEventManager {
 			}
 		}
 		else if (event instanceof IProxyDebugSignalEvent) {
-			if (request == null || request.sendEvent()) {
-				IProxyDebugSignalEvent e = (IProxyDebugSignalEvent)event;
-				ProxyDebugLocator loc = e.getFrame().getLocator();
-				IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
-				eventList.add(createSuspendedEvent(session.getEventFactory().newSignalInfo(session, eTasks, e.getSignalName(), e.getSignalMeaning(), null, locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
-			}
+			IProxyDebugSignalEvent e = (IProxyDebugSignalEvent)event;
+			ProxyDebugLocator loc = e.getFrame().getLocator();
+			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
+			eventList.add(createSuspendedEvent(session.getEventFactory().newSignalInfo(session, eTasks, e.getSignalName(), e.getSignalMeaning(), null, locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
 		}
 		else if (event instanceof IProxyDebugStepEvent) {
-			if (request == null || request.sendEvent()) {
-				IProxyDebugStepEvent e = (IProxyDebugStepEvent)event;
-				ProxyDebugLocator loc = e.getFrame().getLocator();
-				IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
-				eventList.add(createSuspendedEvent(session.getEventFactory().newEndSteppingRangeInfo(session, eTasks,  locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
-			}
+			IProxyDebugStepEvent e = (IProxyDebugStepEvent)event;
+			ProxyDebugLocator loc = e.getFrame().getLocator();
+			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
+			eventList.add(createSuspendedEvent(session.getEventFactory().newEndSteppingRangeInfo(session, eTasks,  locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
 		}
 		else if (event instanceof IProxyDebugSuspendEvent) {
-			if (request == null || request.sendEvent()) {
-				IProxyDebugSuspendEvent e = (IProxyDebugSuspendEvent)event;
-				ProxyDebugLocator loc = e.getFrame().getLocator();
-				IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
-				eventList.add(createSuspendedEvent(session.getEventFactory().newLocationReachedInfo(session, eTasks, locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
-			}
+			IProxyDebugSuspendEvent e = (IProxyDebugSuspendEvent)event;
+			ProxyDebugLocator loc = e.getFrame().getLocator();
+			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
+			eventList.add(createSuspendedEvent(session.getEventFactory().newLocationReachedInfo(session, eTasks, locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
 		}
 		else if (event instanceof IProxyDebugTypeEvent) {
 		}

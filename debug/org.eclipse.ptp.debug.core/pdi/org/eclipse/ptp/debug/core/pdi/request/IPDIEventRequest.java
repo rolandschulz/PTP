@@ -103,10 +103,4 @@ public interface IPDIEventRequest extends IPDISet {
      * @return action type
      */
     int getResponseAction();
-    
-    /**
-     * Returns whether send event for this request
-     * @return true if send event
-     */
-    boolean sendEvent();
 }

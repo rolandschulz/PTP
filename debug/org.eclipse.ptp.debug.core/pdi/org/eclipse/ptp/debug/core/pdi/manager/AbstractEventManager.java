@@ -32,15 +32,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
-import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIGoRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIStepFinishRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIStepIntoInstructionRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIStepIntoRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverInstructionRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIStepRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStopDebuggerRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.manager.AbstractPDIManager;
 
@@ -175,31 +167,7 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	 */
 	public void registerEventRequest(IPDIEventRequest request) {
 		synchronized (requestList) {
-			if (request instanceof IPDIGoRequest || request instanceof IPDIStepRequest) {
-				int details;
-				if (request instanceof IPDIStepIntoRequest)
-					details = IPDIResumedEvent.STEP_INTO;
-				else if (request instanceof IPDIStepOverRequest)
-					details = IPDIResumedEvent.STEP_OVER;
-				else if (request instanceof IPDIStepFinishRequest)
-					details = IPDIResumedEvent.STEP_RETURN;
-				else if (request instanceof IPDIStepIntoInstructionRequest)
-					details = IPDIResumedEvent.STEP_INTO_INSTRUCTION;
-				else if (request instanceof IPDIStepOverInstructionRequest)
-					details = IPDIResumedEvent.STEP_OVER_INSTRUCTION;
-				else {
-					details = IPDIResumedEvent.CONTINUE;
-				}
-				//Resume and step requests are special request because there is no event back from sdm
-				//so it needs to notify manually
-				request.done();
-				notifyEventRequest(request);
-
-				session.getTaskManager().setSuspendTasks(false, request.getTasks());
-				session.processRunningEvent(request.getTasks().copy());
-				fireEvents(new IPDIEvent[] { session.getEventFactory().newResumedEvent(session, request.getTasks(), details) });
-			}
-			else if (request instanceof IPDIStopDebuggerRequest) {
+			if (request instanceof IPDIStopDebuggerRequest) {
 				request.done();
 				notifyEventRequest(request);
 				session.setStatus(IPDISession.EXITED);
