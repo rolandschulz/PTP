@@ -21,6 +21,12 @@
             id="org.eclipse.ptp.rm.openmpi.ui.preferences.openmpi13"
             name="openmpi 1.3">
       </page>
+      <page
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.SDMPreferencePage"
+            id="org.eclipse.ptp.rm.openmpi.ui.preferences.sdm"
+            name="SDM">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.rmConfigurations">

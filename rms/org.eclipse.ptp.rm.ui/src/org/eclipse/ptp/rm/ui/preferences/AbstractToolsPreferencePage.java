@@ -38,14 +38,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public abstract class AbstractToolsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private class WidgetListener implements ModifyListener {
-		private boolean listenerEnabled = true;
+	private class WidgetListener extends  PreferenceWidgetListener implements ModifyListener {
 
-		public void enable() { listenerEnabled = true; }
-		public void disnable() { listenerEnabled = false; }
 
 		public void modifyText(ModifyEvent evt) {
-			if (! listenerEnabled) return;
+			if (! isEnabled()) return;
 
 			Object source = evt.getSource();
 			if(source == launchCmdText ||
@@ -66,14 +63,10 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 		}
 	}
 
-	private class DataSource {
-		class ValidationException extends Exception {
-			public ValidationException(String message) {
-				super(message);
-			}
+	private class DataSource extends PreferenceDataSource {
+		DataSource(PreferencePage page) {
+			super(page);
 		}
-
-//		Preferences config = null;
 
 		String launchCmd = null;
 		String discoverCmd = null;
@@ -82,25 +75,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 		String continuousMonitorCmd = null;
 		String remoteInstallPath = null;
 
-		String extractText(Text text) {
-			String s = text.getText().trim();
-			return (s.length() == 0 ? null : s);
-		}
-
-		String toPreference(String s) {
-			return (s == null ? "" : s);
-		}
-
-		String fromPreference(String s) {
-			return (s.equals(EMPTY_STRING) ? null : s);
-		}
-
-		void applyText(Text t, String s) {
-			if (s == null) t.setText(EMPTY_STRING);
-			else t.setText(s);
-		}
-
-		void copyFromFields() throws ValidationException {
+		protected void copyFromFields() throws ValidationException {
 			if (launchCmdText != null)
 				launchCmd = extractText(launchCmdText);
 			if (discoverCmdText != null)
@@ -115,7 +90,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 				remoteInstallPath = extractText(remoteInstallPathText);
 		}
 
-		void validateLocal() throws ValidationException {
+		protected void validateLocal() throws ValidationException {
 			if (launchCmdText != null && launchCmd == null) {
 				throw new ValidationException("Launch command is missing");
 			}
@@ -129,7 +104,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 			}
 		}
 
-		void storeConfig() {
+		protected void storeConfig() {
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
@@ -146,7 +121,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 			savePreferences();
 		}
 
-		void loadConfig() {
+		protected void loadConfig() {
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				launchCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
@@ -162,7 +137,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 				remoteInstallPath = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		}
 
-		private void loadDefaultConfig() {
+		protected void loadDefaultConfig() {
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				launchCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
@@ -178,7 +153,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 				remoteInstallPath = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		}
 
-		void copyToFields() {
+		protected void copyToFields() {
 			if (launchCmdText != null)
 				applyText(launchCmdText, launchCmd);
 			if (discoverCmdText != null)
@@ -192,59 +167,6 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 			if (remoteInstallPathText != null)
 				applyText(remoteInstallPathText, remoteInstallPath);
 		}
-
-		void validateGlobal() throws ValidationException {
-			// Nothing yet.
-		}
-
-		public void updateAndValidate() {
-			try {
-				copyFromFields();
-				validateLocal();
-				validateGlobal();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setValid(false);
-			}
-		}
-
-		public void loadAndUpdate() {
-			loadConfig();
-			copyToFields();
-			try {
-				validateLocal();
-				validateGlobal();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setValid(false);
-			}
-		}
-
-		public boolean storeAndUpdate() {
-			try {
-				copyFromFields();
-				validateLocal();
-				validateGlobal();
-				storeConfig();
-				return true;
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				//setValid(false);
-				return false;
-			}
-		}
-
-		public void loadDefaultsAndUpdate() {
-			loadDefaultConfig();
-			copyToFields();
-			try {
-				validateLocal();
-				validateGlobal();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setValid(false);
-			}
-		}
 	}
 
 	public static final String EMPTY_STRING = "";  //$NON-NLS-1$
@@ -256,7 +178,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 	private Text remoteInstallPathText = null;
 
 	private WidgetListener listener = new WidgetListener();
-	private DataSource dataSource = new DataSource();
+	private DataSource dataSource = new DataSource(this);
 
 	private int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
 	private String prefix; // to get preferences
@@ -363,7 +285,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 			remoteInstallPathText.addModifyListener(listener);
 		}
 		resetErrorMessages();
-		listener.disnable();
+		listener.disable();
 		dataSource.loadAndUpdate();
 		listener.enable();
 		return contents;
@@ -380,7 +302,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 	@Override
 	protected void performDefaults() {
 		resetErrorMessages();
-		listener.disnable();
+		listener.disable();
 		dataSource.loadDefaultsAndUpdate();
 		listener.enable();
 //		super.performDefaults();
