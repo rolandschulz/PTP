@@ -35,7 +35,6 @@
 
 #include "config.h"
 
-#include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,19 +44,22 @@
 #include "proxy_tcp.h"
 #include "sdm.h"
 
-extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
-extern int	svr_dispatch(dbg_backend *, char *, int);
+extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *));
+extern int	svr_dispatch(dbg_backend *, char *, int, void *);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_isshutdown(void);
 
 static dbg_backend *	backend;
 
+/*
+ * Aggregate debugger response.
+ */
 static void
 event_callback(dbg_event *e, void *data)
 {
 	int			len;
 	char *		buf;
-	sdm_message msg;
+	sdm_message	msg;
 
 	if (DbgSerializeEvent(e, &buf) < 0)
 		return;
@@ -67,20 +69,27 @@ event_callback(dbg_event *e, void *data)
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server event_callback '%s'\n", sdm_route_get_id(), buf);
 
 	msg = sdm_message_new(buf, len);
-	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
 	sdm_set_add_element(sdm_message_get_destination(msg), SDM_MASTER);
 
-	sdm_aggregate_message(msg, SDM_AGGREGATE_UPSTREAM);
+	//sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
+
+	sdm_aggregate_message(msg, SDM_AGGREGATE_UPSTREAM | SDM_AGGREGATE_INIT);
 }
 
+/*
+ * Dispatch payload to debugger.
+ */
 static void
-payload_callback(char *cmd, int len)
+payload_callback(char *buf, int len)
 {
-	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "server payload_callback '%s'\n", cmd);
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server payload_callback\n", sdm_route_get_id());
 
-	(void)svr_dispatch(backend, cmd, len);
+	(void)svr_dispatch(backend, buf, len, NULL);
 }
 
+/*
+ * Just forward aggregated message to parent.
+ */
 static int
 aggregate_callback(sdm_message msg) {
 	sdm_message_set_send_callback(msg, sdm_message_free);
@@ -125,7 +134,7 @@ server(dbg_backend *dbgr)
 	sdm_message_set_payload_callback(payload_callback);
 	sdm_aggregate_set_completion_callback(aggregate_callback);
 
-	svr_init(dbgr, event_callback, NULL);
+	svr_init(dbgr, event_callback);
 
 	while (!svr_isshutdown()) {
 		sdm_progress();
