@@ -1,17 +1,21 @@
-/*
- * sdm.h
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- *  Created on: May 23, 2008
- *      Author: greg
- */
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 
 #ifndef SDM_H_
 #define SDM_H_
 
 #define SDM_AGGREGATE_UPSTREAM		0x00000001
 #define SDM_AGGREGATE_DOWNSTREAM	0x00000002
-#define SDM_AGGREGATE_TIMEOUT		0x00000004
-#define SDM_AGGREGATE_HASH			0x00000008
+#define SDM_AGGREGATE_INIT			0x00000004
+#define SDM_AGGREGATE_TIMEOUT		0x00000008
 
 struct sdm_idset;
 struct sdm_message;
@@ -39,6 +43,8 @@ extern int sdm_message_init(int argc, char *argv[]);
 extern void sdm_message_finalize(void);
 extern sdm_message sdm_message_new(char *buf, int len);
 extern void sdm_message_free(sdm_message msg);
+extern unsigned int sdm_message_get_id(const sdm_message msg);
+extern void sdm_message_set_id(const sdm_message msg, const unsigned int id);
 extern sdm_idset sdm_message_get_destination(const sdm_message msg);
 extern sdm_aggregate sdm_message_get_aggregate(const sdm_message msg);
 extern sdm_idset sdm_message_get_source(const sdm_message msg);

@@ -131,10 +131,9 @@ svr_isshutdown(void)
 }
 
 int
-svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data)
+svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *))
 {
 	event_callback = cb;
-	event_data = data;
 	svr_env = NULL;
 	svr_last_tid = 0;
 	svr_state = SVR_RUNNING;
@@ -142,11 +141,13 @@ svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data)
 }
 
 int
-svr_dispatch(dbg_backend *db, char *cmd_str, int len)
+svr_dispatch(dbg_backend *db, char *cmd_str, int len, void *data)
 {
 	int			idx;
 	proxy_msg *	msg;
 	svr_cmd		cmd;
+
+	event_data = data;
 
 	if (proxy_deserialize_msg(cmd_str, len, &msg) < 0) {
 		svr_res = DBGRES_ERR;

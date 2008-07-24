@@ -9,10 +9,10 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-#include <mpi.h>
+#include "config.h"
+
 #include <stdlib.h>
 
-#include "compat.h"
 #include "sdm.h"
 
 static int	shutting_down = 0;
