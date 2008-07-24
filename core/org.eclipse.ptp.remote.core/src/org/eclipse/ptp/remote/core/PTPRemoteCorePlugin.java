@@ -24,18 +24,16 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.remote.core.LocalServices;
-import org.eclipse.ptp.internal.remote.core.RemoteServicesProxy;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ptp.remote.internal.core.LocalServices;
+import org.eclipse.ptp.remote.internal.core.RemoteServicesProxy;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class PTPRemoteCorePlugin extends AbstractUIPlugin {
+public class PTPRemoteCorePlugin extends Plugin {
 
 	private class RemoteServicesSorter implements Comparator<IRemoteServices> {
 		public int compare(IRemoteServices o1, IRemoteServices o2) {
@@ -48,24 +46,6 @@ public class PTPRemoteCorePlugin extends AbstractUIPlugin {
 	
 	// The shared instance
 	private static PTPRemoteCorePlugin plugin;
-	
-	/**
-	 * @return
-	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-	
-	/**
-	 * @return
-	 */
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
 
 	/**
      * If it is possible to adapt the given object to the given type, this
@@ -125,18 +105,6 @@ public class PTPRemoteCorePlugin extends AbstractUIPlugin {
 	 */
 	public static PTPRemoteCorePlugin getDefault() {
 		return plugin;
-	}
-	
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getShell() {
-		if (getActiveWorkbenchWindow() != null) {
-			return getActiveWorkbenchWindow().getShell();
-		}
-		return null;
 	}
 	
 	/**

@@ -20,7 +20,6 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
-import org.eclipse.rse.ui.RSEUIPlugin;
 
 
 public class RSEServices implements IRemoteServicesDelegate {
@@ -62,11 +61,7 @@ public class RSEServices implements IRemoteServicesDelegate {
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
 	public boolean initialize() {
-		if (!RSEUIPlugin.isTheSystemRegistryActive()) {
-			return false;
-		}
-		
-		registry = RSECorePlugin.getDefault().getSystemRegistry();
+		registry = RSECorePlugin.getTheSystemRegistry();
 		if (registry == null) {
 			return false;
 		}

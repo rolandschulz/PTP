@@ -19,7 +19,6 @@ import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShellServiceSubSystem;
-import org.eclipse.swt.widgets.Display;
 
 public class RSEConnection implements IRemoteConnection {
 	private IHost rseHost;
@@ -147,17 +146,11 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		
 		if (!subSystem.isConnected()) {
-			// Need to run this in the UI thread
-			Display.getDefault().syncExec(new Runnable()
-			{
-				public void run()
-				{	try {
-						subSystem.connect(monitor, false);
-					} catch (Exception e) {
-						// Ignore
-					}
-				}
-			});
+			try {
+				subSystem.connect(monitor, false);
+			} catch (Exception e) {
+				// Ignore
+			}
 			
 			if(!subSystem.isConnected()) {
 				throw new RemoteConnectionException("Could not connect shell service");

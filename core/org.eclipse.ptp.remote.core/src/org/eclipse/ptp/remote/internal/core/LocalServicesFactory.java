@@ -8,23 +8,21 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.core;
+package org.eclipse.ptp.remote.internal.core;
 
+import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
 
-
-public interface IRemoteConnectionManager {	
-	/**
-	 * Find a remote connection given its name
-	 * 
-	 * @param name
-	 * @return remote connection
-	 */
-	public IRemoteConnection getConnection(String name);
+public class LocalServicesFactory implements IRemoteServicesFactory {
+	private static LocalServices services = null;
 	
-	/**
-	 * Get known connections
-	 * 
-	 * @return connections that we know about
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesFactory#getServices()
 	 */
-	public IRemoteConnection[] getConnections();
+	public IRemoteServicesDelegate getServices() {
+		if (services == null) {
+			services = new LocalServices();
+		}
+		return services;
+	}
 }

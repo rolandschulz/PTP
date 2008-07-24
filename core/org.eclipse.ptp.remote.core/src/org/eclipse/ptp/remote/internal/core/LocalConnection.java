@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote.core;
+package org.eclipse.ptp.remote.internal.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;

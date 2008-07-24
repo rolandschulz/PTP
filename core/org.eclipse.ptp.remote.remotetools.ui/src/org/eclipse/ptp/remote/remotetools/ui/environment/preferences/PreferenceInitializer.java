@@ -11,8 +11,9 @@
  */
 package org.eclipse.ptp.remote.remotetools.ui.environment.preferences;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.remote.remotetools.core.Activator;
 import org.eclipse.ptp.remote.remotetools.core.environment.ConfigFactory;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.DefaultValues;
 
@@ -31,8 +32,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		IPreferenceStore store = org.eclipse.ptp.remote.remotetools.core.Activator.getDefault()//PreferencesPlugin.getDefault()
-				.getPreferenceStore();
+		Preferences store = Activator.getDefault().getPluginPreferences();
 		store.setDefault(ConfigFactory.ATTR_LOGIN_USERNAME, DefaultValues.LOGIN_USERNAME);
 		store.setDefault(ConfigFactory.ATTR_CONNECTION_ADDRESS, DefaultValues.CONNECTION_ADDRESS);
 		store.setDefault(ConfigFactory.ATTR_CONNECTION_PORT, DefaultValues.CONNECTION_PORT);

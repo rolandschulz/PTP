@@ -8,23 +8,15 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.core;
+package org.eclipse.ptp.remote.ui;
+
+import org.eclipse.swt.widgets.Shell;
 
 
-
-public interface IRemoteConnectionManager {	
+public interface IRemoteUIConnectionManager {	
 	/**
-	 * Find a remote connection given its name
-	 * 
-	 * @param name
-	 * @return remote connection
+	 * Create a new connection. The implementation can chose to do this in any way,
+	 * but typically will use a dialog or wizard.
 	 */
-	public IRemoteConnection getConnection(String name);
-	
-	/**
-	 * Get known connections
-	 * 
-	 * @return connections that we know about
-	 */
-	public IRemoteConnection[] getConnections();
+	public void newConnection(Shell shell);
 }

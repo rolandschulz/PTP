@@ -8,21 +8,16 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote.core;
+package org.eclipse.ptp.remote.internal.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
-import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.swt.widgets.Shell;
 
-public class LocalServicesFactory implements IRemoteServicesFactory {
-	private static LocalServices services = null;
-	
+
+public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesFactory#getServices()
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
 	 */
-	public IRemoteServicesDelegate getServices() {
-		if (services == null) {
-			services = new LocalServices();
-		}
-		return services;
+	public void newConnection(Shell shell) {
 	}
 }

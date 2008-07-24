@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -25,30 +27,22 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static PTPRemoteUIPlugin plugin;
 	
-	private Map<String, RemoteUIServicesProxy> remoteUIServices = null;
+	/**
+	 * @return
+	 */
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getShell();
+		}
+		return null;
+	}
 	
 	/**
-	 * The constructor
+	 * @return
 	 */
-	public PTPRemoteUIPlugin() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 
 	/**
@@ -60,6 +54,26 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 	
+	/**
+	 * Returns the active workbench shell or <code>null</code> if none
+	 * 
+	 * @return the active workbench shell or <code>null</code> if none
+	 */
+	public static Shell getShell() {
+		if (getActiveWorkbenchWindow() != null) {
+			return getActiveWorkbenchWindow().getShell();
+		}
+		return null;
+	}
+	
+	private Map<String, RemoteUIServicesProxy> remoteUIServices = null;
+	
+	/**
+	 * The constructor
+	 */
+	public PTPRemoteUIPlugin() {
+	}
+
 	/**
 	 * Helper method to find UI services that correspond to a particular remote services
 	 * implementation
@@ -81,6 +95,24 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		}
 		proxy.setServices(services);
 		return proxy;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
 	}
 
 	/**
