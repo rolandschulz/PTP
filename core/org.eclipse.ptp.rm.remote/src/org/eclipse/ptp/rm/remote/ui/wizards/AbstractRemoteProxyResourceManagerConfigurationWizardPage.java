@@ -45,6 +45,7 @@ import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -116,6 +117,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnectionManager connectionManager = null;
+	private IRemoteUIConnectionManager uiConnectionManager = null;
 	private IRemoteConnection connection = null;
 	private boolean loading = true;
 	private boolean isValid;
@@ -664,8 +666,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected void handleNewRemoteConnectionSelected() 
 	{
-		if (connectionManager != null) {
-			connectionManager.newConnection(getShell());
+		if (uiConnectionManager != null) {
+			uiConnectionManager.newConnection(getShell());
 			handleRemoteServiceSelected();
 		}
 	}
@@ -733,6 +735,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
 			remoteServices = allRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
+			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+			if (remUIServices != null) {
+				uiConnectionManager = remUIServices.getUIConnectionManager(connectionManager);
+			}
 			IRemoteConnection[] connections = connectionManager.getConnections();
 			connectionCombo.removeAll();
 			int selected = connections.length - 1;
@@ -762,7 +768,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			/*
 			 * Enable 'new' button if new connections are supported
 			 */
-			newConnectionButton.setEnabled(connectionManager.supportsNewConnections());
+			newConnectionButton.setEnabled(uiConnectionManager != null);
 		}
 	}
 

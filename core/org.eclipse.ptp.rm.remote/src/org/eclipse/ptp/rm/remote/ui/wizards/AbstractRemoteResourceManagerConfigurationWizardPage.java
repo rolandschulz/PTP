@@ -27,6 +27,9 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
@@ -72,6 +75,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnectionManager connectionManager = null;
+	private IRemoteUIConnectionManager uiConnectionManager = null;
 	private IRemoteConnection connection = null;
 	private boolean loading = true;
 	private boolean isValid;
@@ -528,8 +532,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 */
 	protected void handleNewRemoteConnectionSelected() 
 	{
-		if (connectionManager != null) {
-			connectionManager.newConnection(getShell());
+		if (uiConnectionManager != null) {
+			uiConnectionManager.newConnection(getShell());
 			handleRemoteServiceSelected();
 		}
 	}
@@ -547,6 +551,10 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
 			remoteServices = allRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
+			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+			if (remUIServices != null) {
+				uiConnectionManager = remUIServices.getUIConnectionManager(connectionManager);
+			}
 			IRemoteConnection[] connections = connectionManager.getConnections();
 			connectionCombo.removeAll();
 			int selected = connections.length - 1;
@@ -576,7 +584,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			/*
 			 * Enable 'new' button if new connections are supported
 			 */
-			newConnectionButton.setEnabled(connectionManager.supportsNewConnections());
+			newConnectionButton.setEnabled(uiConnectionManager != null);
 		}
 	}
 
