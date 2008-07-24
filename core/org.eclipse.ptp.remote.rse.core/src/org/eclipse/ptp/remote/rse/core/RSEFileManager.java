@@ -18,13 +18,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
-import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
-import org.eclipse.swt.widgets.Shell;
 
 public class RSEFileManager implements IRemoteFileManager {
 	private RSEConnection connection;
@@ -33,40 +27,6 @@ public class RSEFileManager implements IRemoteFileManager {
 		this.connection = conn;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
-	 */
-	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		IHost host = connection.getHost();
-		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell, message, host);
-		dlg.setBlockOnOpen(true);
-		if(dlg.open() == Window.OK) {
-			Object retObj = dlg.getSelectedObject();
-			if(retObj instanceof IRemoteFile) {
-				IRemoteFile selectedFile = (IRemoteFile) retObj;
-				return new Path(selectedFile.getAbsolutePath());
-			}
-		}
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
-	 */
-	public IPath browseFile(Shell shell, String message, String filterPath) {
-		IHost host = connection.getHost();
-		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, host);
-		dlg.setBlockOnOpen(true);
-		if(dlg.open() == Window.OK) {
-			Object retObj = dlg.getSelectedObject();
-			if(retObj instanceof IRemoteFile) {
-				IRemoteFile selectedFile = (IRemoteFile) retObj;
-				return new Path(selectedFile.getAbsolutePath());
-			}
-		}
-		return null;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
 	 */

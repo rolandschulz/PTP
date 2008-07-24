@@ -5,7 +5,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
-            class="org.eclipse.ptp.internal.remote.core.LocalServicesFactory"
+            class="org.eclipse.ptp.remote.internal.core.LocalServicesFactory"
             id="org.eclipse.ptp.remote.LocalServices"
             name="Local">
       </remoteServices>

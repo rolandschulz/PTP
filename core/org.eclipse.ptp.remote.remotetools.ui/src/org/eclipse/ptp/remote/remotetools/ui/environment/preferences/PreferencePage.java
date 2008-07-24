@@ -11,7 +11,7 @@
  */
 package org.eclipse.ptp.remote.remotetools.ui.environment.preferences;
 
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ptp.remote.remotetools.core.Activator;
@@ -20,6 +20,7 @@ import org.eclipse.ptp.remotetools.preferences.ui.AbstractBaseFieldEditorPrefere
 import org.eclipse.ptp.remotetools.preferences.ui.LabelFieldEditor;
 import org.eclipse.ptp.remotetools.preferences.ui.SpacerFieldEditor;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 
 /**
@@ -32,7 +33,7 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 	public PreferencePage() {
 		super(GRID);
 
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), Activator.PLUGIN_ID);
 		setPreferenceStore(store);
 		
 		// setDescription must be called here or it wont work

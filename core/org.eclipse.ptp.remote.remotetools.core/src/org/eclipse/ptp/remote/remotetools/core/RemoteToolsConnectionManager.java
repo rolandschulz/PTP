@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.remotetools.core.environment.PTPTargetControl;
@@ -23,8 +22,6 @@ import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
-import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
-import org.eclipse.swt.widgets.Shell;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
@@ -85,27 +82,5 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
 		return connections.values().toArray(new IRemoteConnection[connections.size()]);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
-	 */
-	public void newConnection(Shell shell) {
-		if (remoteHost != null) {
-			EnvironmentWizard wizard = new EnvironmentWizard(remoteHost);
-			WizardDialog dialog = new WizardDialog(shell, wizard);
-			dialog.create();
-			dialog.setBlockOnOpen(true);
-			if (dialog.open() == WizardDialog.OK) {
-				refreshConnections();
-			}
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#supportsNewConnections()
-	 */
-	public boolean supportsNewConnections() {
-		return remoteHost != null;
 	}
 }

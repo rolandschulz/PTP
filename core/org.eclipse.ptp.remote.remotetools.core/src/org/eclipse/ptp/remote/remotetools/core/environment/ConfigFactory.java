@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.remote.remotetools.core.Activator;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.AttributeNames;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.DefaultValues;
@@ -96,7 +96,7 @@ public class ConfigFactory {
 	
 	private void createCurrentMapFromPreferences() {
 		currentMap = new HashMap<String, String>();
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		Preferences store = Activator.getDefault().getPluginPreferences();
 		currentMap.put(ATTR_LOGIN_USERNAME, store.getString(ATTR_LOGIN_USERNAME));
 		currentMap.put(ATTR_CONNECTION_ADDRESS, store.getString(ATTR_CONNECTION_ADDRESS));
 		currentMap.put(ATTR_CONNECTION_PORT, store.getString(ATTR_CONNECTION_PORT));

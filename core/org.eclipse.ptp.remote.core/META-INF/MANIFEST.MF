@@ -5,11 +5,8 @@ Bundle-SymbolicName: org.eclipse.ptp.remote.core;singleton:=true
 Bundle-Version: 2.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.remote.core.PTPRemoteCorePlugin
 Bundle-Vendor: Eclipse.org
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
- org.eclipse.ui.ide,
- com.ibm.icu,
  org.eclipse.core.resources,
  org.eclipse.cdt.core
 Eclipse-LazyStart: true

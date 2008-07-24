@@ -18,19 +18,14 @@ import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.rse.core.IRSESystemType;
-import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
-import org.eclipse.rse.ui.actions.SystemNewConnectionAction;
-import org.eclipse.swt.widgets.Shell;
 
 
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private IFileSystem fileSystem = null;
 	private ISystemRegistry registry;
-	private SystemNewConnectionAction action;
-	private Map<IHost, IRemoteConnection> connections = null;
+	private Map<IHost, IRemoteConnection> connections = new HashMap<IHost,IRemoteConnection>();
 	
 	public RSEConnectionManager(ISystemRegistry registry) {
 		this.registry = registry;
@@ -58,40 +53,15 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
-		if (connections == null && fileSystem != null) {
-			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
-			connections = new HashMap<IHost,IRemoteConnection>();
-			for (IHost host : hosts) {
-				connections.put(host, new RSEConnection(host, fileSystem));
-			}
-		}
+		refreshConnections();
 		return connections.values().toArray(new IRemoteConnection[connections.size()]);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
+	/**
+	 * Check for new connections
 	 */
-	public void newConnection(Shell shell) {
-		if (action == null) {
- 			action = new SystemNewConnectionAction(shell, false, false, null);
- 	   		IRSESystemType systemType = RSECorePlugin.getTheCoreRegistry().getSystemTypeById(IRSESystemType.SYSTEMTYPE_SSH_ONLY_ID);
-			if (systemType != null) {
- 	   			action.restrictSystemTypes(new IRSESystemType[] { systemType });
-			}
-		}
-    		
-		try 
-		{
-			action.run();
-		} catch (Exception e)
-		{
-			// Ignore
-		}
-		
-		/*
-		 * Check for new connections
-		 */
-		if (connections != null && fileSystem != null) {
+	public void refreshConnections() {
+		if (fileSystem != null) {
 			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
 			for (IHost host : hosts) {
 				if (!connections.containsKey(host)) {
@@ -99,12 +69,5 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 				}
 			}
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#supportsNewConnections()
-	 */
-	public boolean supportsNewConnections() {
-		return true;
 	}
 }
