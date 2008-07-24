@@ -14,6 +14,8 @@
  * SDM messages using MPI.
  */
 
+#include "config.h"
+
 #include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,11 +23,13 @@
 
 #include "compat.h"
 #include "list.h"
+#include "serdes.h"
 #include "sdm.h"
 
 struct sdm_message {
+	unsigned int	id;				/* ID of the message */
 	sdm_idset		dest; 			/* Destinations of the message */
-	sdm_idset		src; 			/* Source of the message */
+	sdm_idset		src; 			/* Sources of the message */
 	sdm_aggregate	aggregate;		/* Message aggregation */
 	char *			payload;		/* Payload */
 	int				payload_len;	/* Payload length */
@@ -131,7 +135,8 @@ sdm_message_send(const sdm_message msg)
 		 * Create a serialized version of the message
 		 */
 
-		len = sdm_aggregate_serialized_length(msg->aggregate)
+		len = HEX_LEN
+			+ sdm_aggregate_serialized_length(msg->aggregate)
 			+ sdm_set_serialized_length(msg->src)
 			+ sdm_set_serialized_length(msg->dest)
 			+ msg->payload_len;
@@ -143,7 +148,9 @@ sdm_message_send(const sdm_message msg)
 		 * now calculate the actual length for the send.
 		 */
 
-		len = sdm_aggregate_serialize(msg->aggregate, p, &p);
+		len = HEX_LEN;
+		int_to_hex_str(msg->id, p, &p);
+		len += sdm_aggregate_serialize(msg->aggregate, p, &p);
 		len += sdm_set_serialize(msg->src, p, &p);
 		len += sdm_set_serialize(msg->dest, p, &p);
 		memcpy(p, msg->payload, msg->payload_len);
@@ -220,6 +227,9 @@ sdm_message_progress(void)
 
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n", sdm_route_get_id(), len, stat.MPI_SOURCE);
 
+		msg->id = hex_str_to_int(buf, &buf);
+		len -= HEX_LEN;
+
 		if ((n = sdm_aggregate_deserialize(msg->aggregate, buf, &buf)) < 0) {
 			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
 			return -1;
@@ -271,6 +281,7 @@ sdm_message_new(char *buf, int len)
 {
 	sdm_message	msg = (sdm_message)malloc(sizeof(struct sdm_message));
 
+	msg->id = 0;
 	msg->dest = sdm_set_new();
 	msg->src = sdm_set_new();
 	sdm_set_add_element(msg->src, sdm_route_get_id());
@@ -292,6 +303,18 @@ sdm_message_free(sdm_message msg)
 	sdm_set_free(msg->dest);
 	sdm_aggregate_free(msg->aggregate);
 	free(msg);
+}
+
+unsigned int
+sdm_message_get_id(const sdm_message msg)
+{
+	return msg->id;
+}
+
+void
+sdm_message_set_id(const sdm_message msg, unsigned int id)
+{
+	msg->id = id;
 }
 
 void
@@ -329,6 +352,12 @@ sdm_aggregate
 sdm_message_get_aggregate(const sdm_message msg)
 {
 	return msg->aggregate;
+}
+
+void
+sdm_message_set_aggregate(const sdm_message msg, const sdm_aggregate a)
+{
+	sdm_aggregate_copy(msg->aggregate, a);
 }
 
 void
