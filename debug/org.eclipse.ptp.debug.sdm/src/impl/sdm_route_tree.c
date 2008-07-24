@@ -14,6 +14,8 @@
  * be either binomial or balanced.
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 
 #include "compat.h"
@@ -135,7 +137,8 @@ sdm_route_get_route(const sdm_idset dest)
 
 /*
  * Given a destination set, compute the set of all destinations
- * reachable from the current location.
+ * reachable from the current location. If the destination is empty,
+ * the result is all possible destinations.
  */
 sdm_idset
 sdm_route_reachable(const sdm_idset dest)
