@@ -24,10 +24,13 @@
 #include "compat.h"
 #include "list.h"
 #include "hash.h"
+#include "serdes.h"
 #include "sdm.h"
 
+#define SDM_EVENT_WAIT_TIME 100000
+
 struct sdm_aggregate {
-	unsigned int	value;
+	unsigned int	value;	/* Timeout or hash value */
 };
 
 /*
@@ -36,7 +39,7 @@ struct sdm_aggregate {
  * for a particular request.
  */
 struct request {
-	int				id;				/* this request id */
+	int				id;				/* request ID */
 	sdm_idset		outstanding;	/* controllers remaining to send replies */
 	int				timeout;		/* wait timeout for this request (microseconds) */
 	Hash *			replys;			/* hash of replies we've received */
@@ -47,19 +50,16 @@ typedef struct request	request;
 
 static List *			all_requests;
 static struct request *	current_request;
+static sdm_idset		empty_set;
 
-static void			new_request(sdm_idset dest, int timeout);
+static request *	new_request(sdm_idset dest, int timeout);
 static void			free_request(request *);
 static void			update_reply(request *req, sdm_message msg, int hash);
-static unsigned int	str_to_hex(char *str, char **end);
-static void			hex_to_str(char *str, char **end, unsigned int val);
 static void			start_timer(request *r);
 static int			check_timer(request *r);
 static void			disable_timer(request *r);
 static void			request_completed(request *req);
 static int	 		(*completion_callback)(const sdm_message msg);
-
-#define HEX_LEN	8
 
 #define ELAPSED_TIME(t1, t2)	(((t1.tv_sec - t2.tv_sec) * 1000000) + (t1.tv_usec - t2.tv_usec))
 #define TIMER_RUNNING			0
@@ -72,6 +72,7 @@ sdm_aggregate_init(int argc, char *argv[])
 	all_requests = NewList();
 	current_request = NULL;
 	completion_callback = NULL;
+	empty_set = sdm_set_new();
 	return 0;
 }
 
@@ -80,7 +81,7 @@ sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
 {
 	char *	e;
 
-	hex_to_str(buf, &e, a->value);
+	int_to_hex_str(a->value, buf, &e);
 	if (end != NULL) {
 		*end = e;
 	}
@@ -98,7 +99,7 @@ sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
 {
 	char *	e;
 
-	a->value = str_to_hex(str, &e);
+	a->value = hex_str_to_int(str, &e);
 	if (end != NULL) {
 		*end = e;
 	}
@@ -124,6 +125,17 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 	if (flags & SDM_AGGREGATE_UPSTREAM) {
 		request *		req;
 
+		if (flags & SDM_AGGREGATE_INIT) {
+			int		len;
+			char *	buf;
+
+			sdm_message_get_payload(msg, &buf, &len);
+			a->value = HashCompute(buf, len);
+		}
+
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: upstream message from %s\n",
+				sdm_route_get_id(), _set_to_str(sdm_message_get_source(msg)));
+
 		/*
 		 * Find the request this reply is for.
 		 * Check if the request is completed.
@@ -134,7 +146,24 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 				break;
 			}
 		}
+
+		if (req == NULL) {
+			/*
+			 * This must be an unsolicited event. Create a new fake request that will just wait
+			 * for a pre-determined timeout, then forward whatever it has.
+			 *
+			 * An alternative to this would be to peek into the payload to see what the command
+			 * is, then make a decision about expected replies.
+			 */
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: message is unsolicited\n", sdm_route_get_id());
+
+			req = new_request(sdm_route_reachable(empty_set), SDM_EVENT_WAIT_TIME);
+			update_reply(req, msg, a->value);
+		}
 	} else if (flags & SDM_AGGREGATE_DOWNSTREAM) {
+		if (sdm_route_get_id() == SDM_MASTER) {
+		}
+
 		new_request(sdm_message_get_destination(msg), a->value);
 	}
 }
@@ -148,15 +177,15 @@ sdm_aggregate_progress(void)
 	request *	req;
 
 	/*
-	 * Process command requests
+	 * Process command requests. Only process requests in the order that they were
+	 * received. This is to preserve the order of replies. Note: this could cause
+	 * a backlog of requests.
 	 */
-	for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
-		if (sdm_set_is_empty(req->outstanding)) {
+	if ((req = (request *)GetFirstElement(all_requests)) != NULL) {
+		if (sdm_set_is_empty(req->outstanding) ||
+				(req->timeout > 0 && check_timer(req) == TIMER_EXPIRED)) {
 			request_completed(req);
 			free_request(req);
-		} else if (req->timeout > 0 && check_timer(req) == TIMER_EXPIRED) {
-			request_completed(req);
-			disable_timer(req);
 		}
 	}
 }
@@ -177,15 +206,15 @@ sdm_aggregate
 sdm_aggregate_new(void)
 {
 	sdm_aggregate	a = (sdm_aggregate)malloc(sizeof(struct sdm_aggregate));
+
 	a->value = 0;
+
 	return a;
 }
 
 void
 sdm_aggregate_set_value(sdm_aggregate a, int type, ...)
 {
-	int		len;
-	char *	buf;
     va_list	ap;
 
     va_start(ap, type);
@@ -193,12 +222,6 @@ sdm_aggregate_set_value(sdm_aggregate a, int type, ...)
     switch (type) {
     case SDM_AGGREGATE_TIMEOUT:
     	a->value = va_arg(ap, int);
-    	break;
-
-    case SDM_AGGREGATE_HASH:
-    	buf = va_arg(ap, char *);
-    	len = va_arg(ap, int);
-    	a->value = HashCompute(buf, len);
     	break;
     }
 
@@ -209,6 +232,12 @@ void
 sdm_aggregate_free(const sdm_aggregate a)
 {
 	free(a);
+}
+
+void
+sdm_aggregate_copy(const sdm_aggregate a1, const sdm_aggregate a2)
+{
+	a1->value = a2->value;
 }
 
 /********************************************/
@@ -223,8 +252,8 @@ _aggregate_to_str(sdm_aggregate a)
 		free(res);
 	}
 
-	res = (char *)malloc(sizeof(int)*2+1);
-	hex_to_str(res, NULL, a->value);
+	res = (char *)malloc(sizeof(int)+1);
+	int_to_hex_str(a->value, res, NULL);
 	return res;
 }
 
@@ -237,14 +266,14 @@ _aggregate_to_str(sdm_aggregate a)
  * The outstanding set is all controllers that will respond to this request and once
  * we have received replies from all controllers in this set, the request is complete.
  */
-static void
+static request *
 new_request(sdm_idset dest, int timeout)
 {
 	request *	r;
-	static int	id = 0;
+	static int	ids = 0;
 
 	r = (request *)malloc(sizeof(request));
-	r->id = id++;
+	r->id = ids++;
 	r->timeout = timeout;
 	r->timer_state = TIMER_DISABLED;
 	r->replys = HashCreate(sdm_route_get_size());
@@ -255,6 +284,8 @@ new_request(sdm_idset dest, int timeout)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d expected replies %s\n",
 			sdm_route_get_id(), r->id, _set_to_str(r->outstanding));
+
+	return r;
 }
 
 /*
@@ -268,40 +299,6 @@ free_request(request *r)
 	HashDestroy(r->replys, NULL);
 	free(r);
 }
-
-/*
- * Convert a hexadecimal string into an integer.
- */
-static unsigned int
-str_to_hex(char *str, char **end)
-{
-	int				n;
-	unsigned int	val = 0;
-
-	for (n = 0; n < HEX_LEN && *str != '\0' && isxdigit(*str); n++, str++) {
-		val <<= 4;
-		val += digittoint(*str);
-	}
-
-	if (end != NULL) {
-		*end = str;
-	}
-
-	return val;
-}
-
-/*
- * Convert an integer to a hexadecimal string.
- */
-static void
-hex_to_str(char *str, char **end, unsigned int val)
-{
-	sprintf(str, "%08x", val & 0xffffffff);
-	if (end != NULL) {
-		*end = str + HEX_LEN;
-	}
-}
-
 
 /*
  * Callback when a request is completed.
