@@ -137,7 +137,15 @@ sdm_set_union(const sdm_idset set1, const sdm_idset set2)
 sdm_idset
 sdm_set_intersect(const sdm_idset set1, const sdm_idset set2)
 {
-	bitset_andeq(set1->set, set2->set);
+	/*
+	 * If either set is empty, the result is U (the universe)
+	 */
+	if (bitset_isempty(set1->set) || bitset_isempty(set2->set)) {
+		bitset_clear(set1->set);
+		bitset_invert(set1->set);
+	} else {
+		bitset_andeq(set1->set, set2->set);
+	}
 	return set1;
 }
 
