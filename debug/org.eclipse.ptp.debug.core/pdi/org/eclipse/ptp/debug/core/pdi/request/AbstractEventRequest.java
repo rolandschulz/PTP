@@ -122,13 +122,6 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 	}
 	
 	/* (non-Javadoc)
-     * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#sendEvent()
-     */
-    public boolean sendEvent() {
-    	return true;
-    }
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#setStatus(int)
 	 */
 	public void setStatus(int status) {
@@ -139,7 +132,27 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return getName() + " in status [" + status + "] for " + BitList.showBitList(getTasks()) + ".";
+		String res = getName() + " in status [";
+		
+		switch (status) {
+		case ERROR:
+			res += "ERROR";
+			break;
+		case RUNNING:
+			res += "RUNNING";
+			break;
+		case DONE:
+			res += "DONE";
+			break;
+		case CANCELLED:
+			res += "CANCELLED";
+			break;
+		default:
+			res += "UNKNOWN";
+			break;
+		}
+		
+		return res + "] for " + BitList.showBitList(getTasks()) + ".";
 	}
 	
     /**
