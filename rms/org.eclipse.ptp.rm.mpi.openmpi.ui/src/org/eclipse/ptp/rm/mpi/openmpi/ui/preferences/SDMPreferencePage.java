@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rm.mpi.openmpi.ui.preferences;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rm.mpi.openmpi.core.SDMPreferenceManager;
@@ -26,17 +27,15 @@ public class SDMPreferencePage extends PreferencePage implements IWorkbenchPrefe
 			if (! isEnabled()) return;
 
 			Object source = evt.getSource();
-//			if(source == launchCmdText ||
-//					source == discoverCmdText ||
-//					source == periodicMonitorCmdText ||
-//					source == continuousMonitorCmdText ||
-//					source == periodicMonitorTimeSpinner ||
-//					source == remoteInstallPathText) {
-//				resetErrorMessages();
-//				dataSource.updateAndValidate();
-//			} else {
-//				assert false;
-//			}
+			if(source == sdmExecText ||
+					source == sdmHostText ||
+					source == sdmDebuggerText ||
+					source == sdmPortSpinner) {
+				resetErrorMessages();
+				dataSource.updateAndValidate();
+			} else {
+				assert false;
+			}
 		}
 
 		public void widgetDefaultSelected(SelectionEvent e) {
@@ -55,97 +54,64 @@ public class SDMPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		protected void copyFromFields() throws ValidationException {
-			
-//			if (launchCmdText != null)
-//				launchCmd = extractText(launchCmdText);
-//			if (discoverCmdText != null)
-//				discoverCmd = extractText(discoverCmdText);
-//			if (periodicMonitorCmdText != null)
-//				periodicMonitorCmd = extractText(periodicMonitorCmdText);
-//			if (periodicMonitorTimeSpinner != null)
-//				periodicMonitorTime = periodicMonitorTimeSpinner.getSelection();
-//			if (continuousMonitorCmdText != null)
-//				continuousMonitorCmd = extractText(continuousMonitorCmdText);
-//			if (remoteInstallPathText != null)
-//				remoteInstallPath = extractText(remoteInstallPathText);
+			sdmExec = extractText(sdmExecText);
+			sdmHost= extractText(sdmHostText);
+			sdmDebugger = extractText(sdmDebuggerText);
+			sdmPort = sdmPortSpinner.getSelection();
 		}
 
 		protected void validateLocal() throws ValidationException {
-//			if (launchCmdText != null && launchCmd == null) {
-//				throw new ValidationException("Launch command is missing");
-//			}
-//			if (discoverCmdText != null) {
-//				if (discoverCmd == null) {
-//					throw new ValidationException("Discover command is missing");
-//				}
-//				if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
-//					throw new ValidationException("Time period must be an integer greater than 0");
-//				}
-//			}
+			if (sdmExec == null) {
+				throw new ValidationException("Executable path is missing.");
+			} else {
+				Path path = new Path(sdmExec);
+				if (path.isAbsolute()) {
+					throw new ValidationException("Executable path must be absolute.");
+				}
+			}
+			if (sdmHost == null) {
+				throw new ValidationException("Hostname is missing.");
+			}
+			if (sdmDebugger == null) {
+				throw new ValidationException("Debugger name is missing.");
+			}
+			if (sdmPort < 1) {
+				throw new ValidationException("Port number is missing.");
+			} else if (sdmPort > 65535) {
+				throw new ValidationException("Port number out of range.");
+			}
 		}
 
 		protected void storeConfig() {
-//			Preferences config = getPreferences();
-//			if (launchCmdText != null)
-//				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
-//			if (discoverCmdText != null)
-//				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD, toPreference(discoverCmd));
-//			if (periodicMonitorCmdText != null)
-//				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD, toPreference(periodicMonitorCmd));
-//			if (periodicMonitorTimeSpinner != null)
-//				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME, periodicMonitorTime);
-//			if (continuousMonitorCmdText != null)
-//				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD, toPreference(continuousMonitorCmd));
-//			if (remoteInstallPathText != null)
-//				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH, toPreference(remoteInstallPath));
+			Preferences config = getPreferences();
+			config.setValue(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_EXEC, toPreference(sdmExec));
+			config.setValue(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_HOST, toPreference(sdmHost));
+			config.setValue(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_DEBUGGER, toPreference(sdmDebugger));
+			config.setValue(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_PORT, sdmPort);
 			savePreferences();
 		}
 
 		protected void loadConfig() {
 			Preferences config = getPreferences();
-//			if (launchCmdText != null)
-//				launchCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
-//			if (discoverCmdText != null)
-//				discoverCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
-//			if (periodicMonitorCmdText != null)
-//				periodicMonitorCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-//			if (periodicMonitorTimeSpinner != null)
-//				periodicMonitorTime = config.getInt(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
-//			if (continuousMonitorCmdText != null)
-//				continuousMonitorCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
-//			if (remoteInstallPathText != null)
-//				remoteInstallPath = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+			sdmExec = fromPreference(config.getString(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_EXEC));
+			sdmHost = fromPreference(config.getString(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_HOST));
+			sdmDebugger = fromPreference(config.getString(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_DEBUGGER));
+			sdmPort = config.getInt(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_PORT);
 		}
 
 		protected void loadDefaultConfig() {
 			Preferences config = getPreferences();
-//			if (launchCmdText != null)
-//				launchCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
-//			if (discoverCmdText != null)
-//				discoverCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
-//			if (periodicMonitorCmdText != null)
-//				periodicMonitorCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-//			if (periodicMonitorTimeSpinner != null)
-//				periodicMonitorTime = config.getDefaultInt(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
-//			if (continuousMonitorCmdText != null)
-//				continuousMonitorCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
-//			if (remoteInstallPathText != null)
-//				remoteInstallPath = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+			sdmExec = fromPreference(config.getDefaultString(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_EXEC));
+			sdmHost = fromPreference(config.getDefaultString(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_HOST));
+			sdmDebugger = fromPreference(config.getDefaultString(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_DEBUGGER));
+			sdmPort = config.getDefaultInt(SDMPreferenceManager.PREFIX + SDMPreferenceManager.PREF_SDM_PORT);
 		}
 
 		protected void copyToFields() {
-//			if (launchCmdText != null)
-//				applyText(launchCmdText, launchCmd);
-//			if (discoverCmdText != null)
-//				applyText(discoverCmdText, discoverCmd);
-//			if (periodicMonitorCmdText != null)
-//				applyText(periodicMonitorCmdText, periodicMonitorCmd);
-//			if (periodicMonitorTimeSpinner != null)
-//				periodicMonitorTimeSpinner.setSelection(periodicMonitorTime);
-//			if (continuousMonitorCmdText != null)
-//				applyText(continuousMonitorCmdText, continuousMonitorCmd);
-//			if (remoteInstallPathText != null)
-//				applyText(remoteInstallPathText, remoteInstallPath);
+			applyText(sdmExecText, sdmExec);
+			applyText(sdmHostText, sdmHost);
+			applyText(sdmDebuggerText, sdmDebugger);
+			sdmPortSpinner.setSelection(sdmPort);
 		}
 	}
 

@@ -20,20 +20,20 @@ public abstract class PreferenceDataSource {
 		this.page = page;
 	}
 
-	String extractText(Text text) {
+	protected String extractText(Text text) {
 		String s = text.getText().trim();
 		return (s.length() == 0 ? null : s);
 	}
 
-	String toPreference(String s) {
+	protected String toPreference(String s) {
 		return (s == null ? "" : s);
 	}
 
-	String fromPreference(String s) {
+	protected String fromPreference(String s) {
 		return (s.equals(EMPTY_STRING) ? null : s);
 	}
 
-	void applyText(Text t, String s) {
+	protected void applyText(Text t, String s) {
 		if (s == null)
 			t.setText(EMPTY_STRING);
 		else
