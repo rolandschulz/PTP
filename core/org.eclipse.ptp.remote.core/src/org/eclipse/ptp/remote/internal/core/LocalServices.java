@@ -19,7 +19,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
 
 public class LocalServices implements IRemoteServicesDelegate {
-	public static final String LocalServicesId = "org.eclipse.ptp.remote.core.LocalServices";
+	public static final String LocalServicesId = "org.eclipse.ptp.remote.LocalServices";
 	
 	private IRemoteConnectionManager connMgr;
 	
