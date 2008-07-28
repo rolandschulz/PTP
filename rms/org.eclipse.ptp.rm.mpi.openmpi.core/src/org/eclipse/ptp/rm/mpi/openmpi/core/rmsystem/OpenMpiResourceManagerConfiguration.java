@@ -93,10 +93,11 @@ public class OpenMpiResourceManagerConfiguration extends
 		 * By default, assume openmpi 1.3 configuration.
 		 */
 		Preferences prefs = OpenMpi13PreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getDefaultString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_LAUNCH_CMD));
-		setDiscoverCmd(prefs.getDefaultString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DISCOVER_CMD));
-		setRemoteInstallPath(prefs.getDefaultString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-		setUseDefaults(prefs.getDefaultBoolean(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_USE_DEFAULTS));
+		setLaunchCmd(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DEBUG_CMD));
+		setDiscoverCmd(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DISCOVER_CMD));
+		setRemoteInstallPath(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+		setUseDefaults(prefs.getBoolean(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_USE_DEFAULTS));
 		setVersionId(VERSION_13);
 	}
 
@@ -120,6 +121,7 @@ public class OpenMpiResourceManagerConfiguration extends
 		ToolsConfig toolsConfig = new ToolsConfig(
 				remoteConf,
 				getLaunchCmd(),
+				getDebugCmd(),
 				getDiscoverCmd(),
 				getPeriodicMonitorCmd(),
 				getPeriodicMonitorTime(),

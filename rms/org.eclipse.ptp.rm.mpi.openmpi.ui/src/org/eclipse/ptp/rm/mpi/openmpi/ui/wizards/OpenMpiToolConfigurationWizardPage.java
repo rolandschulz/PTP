@@ -161,20 +161,23 @@ public class OpenMpiToolConfigurationWizardPage extends
 		DataSource dataSource = (DataSource) this.dataSource;
 		dataSource.getFromFields();
 		String launchCmd = null;
+		String debugCmd = null;
 		String discoverCmd = null;
 		if (dataSource.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
 			Preferences preferences = OpenMpi12PreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMpi12PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = preferences.getString(OpenMpi12PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMpi12PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_DISCOVER_CMD);
 		} else if (dataSource.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
 			Preferences preferences = OpenMpi13PreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = preferences.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DISCOVER_CMD);
 		} else {
 			assert false;
 		}
 		resetErrorStatus();
-		dataSource.setCommandFields(launchCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
+		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
 		dataSource.putToFields();
 		listenerEnabled = true;
 	}

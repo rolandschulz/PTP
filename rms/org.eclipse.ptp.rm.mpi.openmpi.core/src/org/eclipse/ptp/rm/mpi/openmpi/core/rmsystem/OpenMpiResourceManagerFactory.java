@@ -41,15 +41,6 @@ public class OpenMpiResourceManagerFactory extends AbstractResourceManagerFactor
 	public IResourceManagerConfiguration createConfiguration() {
 		OpenMpiResourceManagerConfiguration conf = new OpenMpiResourceManagerConfiguration(this);
 
-		// QUESTION: if configuration constructor with no arguments uses defaults, then there is
-		// no need to apply defaults again.
-//
-//		Preferences preferences = OpenMpiPreferenceManager.getPreferences();
-//
-//		conf.setLaunchCmd(preferences.getString(OpenMpiPreferenceManager.PREFS_LAUNCH_CMD));
-//		conf.setPath(preferences.getString(OpenMpiPreferenceManager.PREFS_PATH));
-//		conf.setOptions(preferences.getInt(OpenMpiPreferenceManager.PREFS_OPTIONS));
-
 		return conf;
 	}
 

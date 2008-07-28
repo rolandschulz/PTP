@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -82,7 +83,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			try {
 				AttributeManager substitutionAttributeManager = createSubstitutionAttributes();
 				environment = doCreateEnvironment(substitutionAttributeManager);
-				command = doCreateCommand(substitutionAttributeManager);
+				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition()); 
+				if (debugAttr != null && debugAttr.getValue()) {
+					command = doCreateDebugCommand(substitutionAttributeManager);
+				} else {
+					command = doCreateLaunchCommand(substitutionAttributeManager);
+				}
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to caculate command line for launch.", e);
@@ -162,7 +168,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 	abstract protected void doBeforeExecution() throws CoreException;
 
-	abstract protected List<String> doCreateCommand(AttributeManager attributeManager) throws CoreException;
+	abstract protected List<String> doCreateLaunchCommand(AttributeManager attributeManager) throws CoreException;
+
+	abstract protected List<String> doCreateDebugCommand(AttributeManager attributeManager) throws CoreException;
 
 	abstract protected Map<String, String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException;
 	

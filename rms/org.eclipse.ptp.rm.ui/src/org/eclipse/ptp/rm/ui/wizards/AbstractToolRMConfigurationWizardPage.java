@@ -62,6 +62,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	private IRemoteConnection connection = null;
 
 	protected Text launchCmdText = null;
+	protected Text debugCmdText = null;
 	protected Text discoverCmdText = null;
 	protected Text continuousMonitorCmdText = null;
 	protected Text periodicMonitorCmdText = null;
@@ -87,6 +88,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		protected void doModifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
 			if(source == launchCmdText ||
+					source == debugCmdText ||
 					source == discoverCmdText ||
 					source == periodicMonitorCmdText ||
 					source == continuousMonitorCmdText ||
@@ -144,14 +146,16 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 
 		private boolean useDefaults = false;
 		private String launchCmd = null;
+		private String debugCmd = null;
 		private String discoverCmd = null;
 		private String periodicMonitorCmd = null;
 		private int periodicMonitorTime = 0;
 		private String continuousMonitorCmd = null;
 		private String remoteInstallPath = null;
 
-		public void setCommandFields(String launchCmd, String discoverCmd, String periodicMonitorCmd, int periodicMonitorTime, String continuousMonitorCmd, String remoteInstallPath) {
+		public void setCommandFields(String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd, int periodicMonitorTime, String continuousMonitorCmd, String remoteInstallPath) {
 			this.launchCmd = launchCmd;
+			this.debugCmd = debugCmd;
 			this.discoverCmd = discoverCmd;
 			this.periodicMonitorCmd = periodicMonitorCmd;
 			this.periodicMonitorTime = periodicMonitorTime;
@@ -165,6 +169,10 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 
 		public String getLaunchCmd() {
 			return launchCmd;
+		}
+		
+		public String getDebugCmd() {
+			return debugCmd;
 		}
 
 		public String getDiscoverCmd() {
@@ -202,6 +210,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 
 			if (launchCmdText != null)
 				launchCmd = extractText(launchCmdText);
+			if (debugCmdText != null)
+				debugCmd = extractText(debugCmdText);
 			if (discoverCmdText != null)
 				discoverCmd = extractText(discoverCmdText);
 			if (periodicMonitorCmdText != null)
@@ -219,6 +229,9 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				if (launchCmdText != null && launchCmd == null) {
 					throw new ValidationException("Launch command is missing");
 				}
+				if (debugCmdText != null && debugCmd == null) {
+					throw new ValidationException("Debug command is missing");
+				}
 				if (discoverCmdText != null) {
 					if (discoverCmd == null) {
 						throw new ValidationException("Discover command is missing");
@@ -233,6 +246,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		protected void storeConfig() {
 			if (launchCmdText != null)
 				config.setLaunchCmd(launchCmd);
+			if (debugCmdText != null)
+				config.setDebugCmd(debugCmd);
 			if (discoverCmdText != null)
 				config.setDiscoverCmd(discoverCmd);
 			if (periodicMonitorCmdText != null)
@@ -249,6 +264,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		protected void loadConfig() {
 			if (launchCmdText != null)
 				launchCmd = config.getLaunchCmd();
+			if (debugCmdText != null)
+				debugCmd = config.getDebugCmd();
 			if (discoverCmdText != null)
 				discoverCmd = config.getDiscoverCmd();
 			if (periodicMonitorCmdText != null)
@@ -267,6 +284,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		protected void copyToFields() {
 			if (launchCmdText != null)
 				applyText(launchCmdText, launchCmd);
+			if (debugCmdText != null)
+				applyText(debugCmdText, debugCmd);
 			if (discoverCmdText != null)
 				applyText(discoverCmdText, discoverCmd);
 			if (periodicMonitorCmdText != null)
@@ -397,6 +416,13 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
 			launchCmdText.addModifyListener(listener);
+
+			label = new Label(contents, SWT.NONE);
+			label.setText("Debug command:");
+
+			debugCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
+			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			debugCmdText.addModifyListener(listener);
 		}
 
 		/*
@@ -472,6 +498,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 
 		if (launchCmdText != null)
 			launchCmdText.setEnabled(enabled);
+		if (debugCmdText != null)
+			debugCmdText.setEnabled(enabled);
 		if (discoverCmdText != null)
 			discoverCmdText.setEnabled(enabled);
 		if (periodicMonitorCmdText != null)
