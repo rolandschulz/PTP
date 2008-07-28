@@ -22,7 +22,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -36,9 +35,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * - Make data source extensible
  * - Make createContents extensible
  */
-public abstract class AbstractToolsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage implements IWorkbenchPreferencePage {
 
-	private class WidgetListener extends  PreferenceWidgetListener implements ModifyListener {
+	class WidgetListener extends PreferenceWidgetListener implements ModifyListener {
 
 
 		public void modifyText(ModifyEvent evt) {
@@ -52,7 +51,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 					source == periodicMonitorTimeSpinner ||
 					source == remoteInstallPathText) {
 				resetErrorMessages();
-				dataSource.updateAndValidate();
+				dataSource.validate();
 			} else {
 				assert false;
 			}
@@ -63,7 +62,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 		}
 	}
 
-	private class DataSource extends PreferenceDataSource {
+	class DataSource extends PreferenceDataSource {
 		DataSource(PreferencePage page) {
 			super(page);
 		}
@@ -177,13 +176,10 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 	private Spinner periodicMonitorTimeSpinner = null;
 	private Text remoteInstallPathText = null;
 
-	private WidgetListener listener = new WidgetListener();
-	private DataSource dataSource = new DataSource(this);
-
 	private int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
 	private String prefix; // to get preferences
 
-    public AbstractToolsPreferencePage(String prefix, int capabilities) {
+   public AbstractToolsPreferencePage(String prefix, int capabilities) {
 		super();
     	this.capabilities = capabilities;
     	this.prefix = prefix;
@@ -201,16 +197,29 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
     	this.prefix = prefix;
 	}
 
+	@Override
+	protected PreferenceDataSource createDataSource() {
+		return new DataSource(this);
+	}
+	
+	@Override
+	protected PreferenceWidgetListener createListener() {
+		return new WidgetListener();
+	}
+	
+	private DataSource getDataSource() {
+		return (DataSource) this.dataSource;
+	}
+
+	private WidgetListener getListener() {
+		return (WidgetListener) this.listener;
+	}
+
 	public void init(IWorkbench workbench) {
 		// Nothing to do.
 	}
 
-	abstract public Preferences getPreferences();
-
-	abstract public void savePreferences();
-
-	@Override
-	protected Control createContents(Composite parent) {
+	protected Composite doCreateContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 4;
@@ -225,7 +234,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			launchCmdText.addModifyListener(listener);
+			launchCmdText.addModifyListener(getListener() );
 		}
 
 		/*
@@ -237,7 +246,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 
 			discoverCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			discoverCmdText.addModifyListener(listener);
+			discoverCmdText.addModifyListener(getListener());
 		}
 
 		/*
@@ -249,13 +258,13 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 
 			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 1, 1));
-			periodicMonitorCmdText.addModifyListener(listener);
+			periodicMonitorCmdText.addModifyListener(getListener() );
 
 			label = new Label(contents, SWT.NONE);
 			label.setText("Period:");
 			periodicMonitorTimeSpinner = new Spinner(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false, 1, 1));
-			periodicMonitorTimeSpinner.addModifyListener(listener);
+			periodicMonitorTimeSpinner.addModifyListener(getListener());
 		}
 
 		/*
@@ -267,7 +276,7 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 
 			continuousMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			continuousMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			continuousMonitorCmdText.addModifyListener(listener);
+			continuousMonitorCmdText.addModifyListener(getListener());
 		}
 
 		/*
@@ -282,42 +291,8 @@ public abstract class AbstractToolsPreferencePage extends PreferencePage impleme
 			gd.horizontalSpan = 3;
 			gd.widthHint = 60;
 			remoteInstallPathText.setLayoutData(gd);
-			remoteInstallPathText.addModifyListener(listener);
+			remoteInstallPathText.addModifyListener(getListener());
 		}
-		resetErrorMessages();
-		listener.disable();
-		dataSource.loadAndUpdate();
-		listener.enable();
 		return contents;
-	}
-
-	@Override
-	public boolean performOk() {
-		resetErrorMessages();
-		dataSource.storeAndUpdate();
-		return true;
-//		return super.performOk();
-	}
-
-	@Override
-	protected void performDefaults() {
-		resetErrorMessages();
-		listener.disable();
-		dataSource.loadDefaultsAndUpdate();
-		listener.enable();
-//		super.performDefaults();
-	}
-
-	@Override
-	protected void performApply() {
-		resetErrorMessages();
-		dataSource.storeAndUpdate();
-//		super.performApply();
-	}
-
-	protected void resetErrorMessages() {
-		setErrorMessage(null);
-		setMessage(null);
-		setValid(true);
 	}
 }
