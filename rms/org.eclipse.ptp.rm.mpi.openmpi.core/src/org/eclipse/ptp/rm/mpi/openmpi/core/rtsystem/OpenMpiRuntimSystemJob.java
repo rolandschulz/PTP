@@ -237,8 +237,8 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		stderrObserver = new InputStreamObserver(process.getErrorStream());
 		stdoutObserver = new InputStreamObserver(process.getInputStream());
 
-//		stdoutObserver.addListener(stdoutPipedStreamListener);
-//		stderrObserver.addListener(stderrPipedStreamListener);
+		stdoutObserver.addListener(stdoutPipedStreamListener);
+		stderrObserver.addListener(stderrPipedStreamListener);
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 		OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
