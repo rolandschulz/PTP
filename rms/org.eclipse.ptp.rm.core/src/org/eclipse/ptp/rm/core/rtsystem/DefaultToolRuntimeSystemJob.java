@@ -149,11 +149,9 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected List<String> doCreateCommand(AttributeManager substitutionAttributeManager) throws CoreException {
+	protected List<String> doCreateLaunchCommand(AttributeManager substitutionAttributeManager) throws CoreException {
 		/*
-		 * Create launch command. If the is not launch command, simply launch the executable.
-		 * If there is a launch command, suppose that the program executable is the last argument, followed
-		 * by program arguments.
+		 * Create launch command. If there is no launch command, simply launch the executable.
 		 */
 		List<String> command = new ArrayList<String>();
 		if (! rtSystem.rmConfiguration.hasLaunchCmd()) {
@@ -169,6 +167,29 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			Assert.isTrue(launchCommand.trim().length() > 0);
 			launchCommand = replaceVariables(launchCommand, substitutionAttributeManager);
 			ArgumentParser argumentParser = new ArgumentParser(launchCommand);
+			command = argumentParser.getTokenList();
+		}
+		return command;
+	}
+
+	protected List<String> doCreateDebugCommand(AttributeManager substitutionAttributeManager) throws CoreException {
+		/*
+		 * Create debug command. If there is no debug command, simply launch the executable.
+		 */
+		List<String> command = new ArrayList<String>();
+		if (! rtSystem.rmConfiguration.hasDebugCmd()) {
+			// Fall back to calling the executable.
+			StringAttribute execPath = getAttrMgr().getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
+			ArrayAttribute<String> arguments = getAttrMgr().getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition());
+			command.add(execPath.getValue());
+			command.addAll(arguments.getValue());
+		} else {
+			// Use the tool to launch executable
+			String debugCommand = rtSystem.rmConfiguration.getDebugCmd();
+			Assert.isNotNull(debugCommand);
+			Assert.isTrue(debugCommand.trim().length() > 0);
+			debugCommand = replaceVariables(debugCommand, substitutionAttributeManager);
+			ArgumentParser argumentParser = new ArgumentParser(debugCommand);
 			command = argumentParser.getTokenList();
 		}
 		return command;

@@ -40,7 +40,6 @@ public class Activator extends Plugin {
 		plugin = this;
 		OpenMpi12PreferenceManager.initializePreferences();
 		OpenMpi13PreferenceManager.initializePreferences();
-		SDMPreferenceManager.initializePreferences();
 	}
 
 	/*

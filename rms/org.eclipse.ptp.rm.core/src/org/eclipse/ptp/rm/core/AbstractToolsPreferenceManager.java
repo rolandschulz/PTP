@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.core;
 
 public class AbstractToolsPreferenceManager {
 	public static final String PREFS_LAUNCH_CMD = "launchCmd";
+	public static final String PREFS_DEBUG_CMD = "debugCmd";
 	public static final String PREFS_DISCOVER_CMD = "discoverCmd";
 	public static final String PREFS_PERIODIC_MONITOR_CMD = "periodicMonitorCmd";
 	public static final String PREFS_PERIODIC_MONITOR_TIME = "periodicMonitorTime";

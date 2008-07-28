@@ -45,6 +45,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 
 			Object source = evt.getSource();
 			if(source == launchCmdText ||
+					source == debugCmdText ||
 					source == discoverCmdText ||
 					source == periodicMonitorCmdText ||
 					source == continuousMonitorCmdText ||
@@ -68,6 +69,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		}
 
 		String launchCmd = null;
+		String debugCmd = null;
 		String discoverCmd = null;
 		String periodicMonitorCmd = null;
 		int periodicMonitorTime = 0;
@@ -77,6 +79,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		protected void copyFromFields() throws ValidationException {
 			if (launchCmdText != null)
 				launchCmd = extractText(launchCmdText);
+			if (debugCmdText != null)
+				debugCmd = extractText(debugCmdText);
 			if (discoverCmdText != null)
 				discoverCmd = extractText(discoverCmdText);
 			if (periodicMonitorCmdText != null)
@@ -93,10 +97,18 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			if (launchCmdText != null && launchCmd == null) {
 				throw new ValidationException("Launch command is missing");
 			}
+			if (debugCmdText != null && debugCmd == null) {
+				throw new ValidationException("Debug command is missing");
+			}
 			if (discoverCmdText != null) {
 				if (discoverCmd == null) {
 					throw new ValidationException("Discover command is missing");
 				}
+			}
+			if (periodicMonitorCmdText != null) {
+//				if (periodicMonitorCmd == null) {
+//					throw new ValidationException("Periodic monitor command is missing");
+//				}
 				if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
 					throw new ValidationException("Time period must be an integer greater than 0");
 				}
@@ -107,6 +119,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
+			if (debugCmdText != null)
+				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD, toPreference(debugCmd));
 			if (discoverCmdText != null)
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD, toPreference(discoverCmd));
 			if (periodicMonitorCmdText != null)
@@ -124,6 +138,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				launchCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
+			if (debugCmdText != null)
+				debugCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
 			if (discoverCmdText != null)
 				discoverCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
 			if (periodicMonitorCmdText != null)
@@ -140,6 +156,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				launchCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
+			if (debugCmdText != null)
+				debugCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
 			if (discoverCmdText != null)
 				discoverCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
 			if (periodicMonitorCmdText != null)
@@ -155,6 +173,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		protected void copyToFields() {
 			if (launchCmdText != null)
 				applyText(launchCmdText, launchCmd);
+			if (debugCmdText != null)
+				applyText(debugCmdText, debugCmd);
 			if (discoverCmdText != null)
 				applyText(discoverCmdText, discoverCmd);
 			if (periodicMonitorCmdText != null)
@@ -170,6 +190,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 
 	public static final String EMPTY_STRING = "";  //$NON-NLS-1$
 	private Text launchCmdText = null;
+	private Text debugCmdText = null;
 	private Text discoverCmdText = null;
 	private Text continuousMonitorCmdText = null;
 	private Text periodicMonitorCmdText = null;
@@ -235,6 +256,13 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
 			launchCmdText.addModifyListener(getListener() );
+
+			label = new Label(contents, SWT.NONE);
+			label.setText("Debug command:");
+
+			debugCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
+			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			debugCmdText.addModifyListener(getListener() );
 		}
 
 		/*

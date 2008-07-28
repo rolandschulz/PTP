@@ -28,6 +28,7 @@ public abstract class AbstractToolRMConfiguration extends
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private static final String TAG_LAUNCH_CMD = "launchCmd"; //$NON-NLS-1$
+	private static final String TAG_DEBUG_CMD = "debugCmd"; //$NON-NLS-1$
 	private static final String TAG_DISCOVER_CMD = "discoverCmd"; //$NON-NLS-1$
 	private static final String TAG_PERIODIC_MONITOR_CMD = "periodicMonitorCmd"; //$NON-NLS-1$
 	private static final String TAG_PERIODIC_MONITOR_TIME = "periodicMonitorTime"; //$NON-NLS-1$
@@ -51,6 +52,7 @@ public abstract class AbstractToolRMConfiguration extends
 	static public class ToolsConfig {
 		private RemoteConfig remoteConfig;
 		private String launchCmd;
+		private String debugCmd;
 		private String discoverCmd;
 		private String periodicMonitorCmd;
 		private int periodicMonitorTime;
@@ -59,16 +61,17 @@ public abstract class AbstractToolRMConfiguration extends
 		private boolean useDefaults;
 
 		public ToolsConfig() {
-			this(new RemoteConfig(), null, null, null, 0, null, null, true);
+			this(new RemoteConfig(), null, null, null, null, 0, null, null, true);
 		}
 
-		public ToolsConfig(RemoteConfig remoteConfig, String launchCmd,
+		public ToolsConfig(RemoteConfig remoteConfig, String launchCmd, String debugCmd,
 				String discoverCmd, String periodicMonitorCmd,
 				int periodicMonitorTime, String continuousMonitorCmd,
 				String remoteInstallPath, boolean useDefaults) {
 			super();
 			this.remoteConfig = remoteConfig;
 			this.launchCmd = launchCmd;
+			this.debugCmd = debugCmd;
 			this.discoverCmd = discoverCmd;
 			this.periodicMonitorCmd = periodicMonitorCmd;
 			this.periodicMonitorTime = periodicMonitorTime;
@@ -88,9 +91,17 @@ public abstract class AbstractToolRMConfiguration extends
 		public String getLaunchCmd() {
 			return launchCmd;
 		}
-
+		
 		public void setLaunchCmd(String launchCmd) {
 			this.launchCmd = launchCmd;
+		}
+
+		public String getDebugCmd() {
+			return debugCmd;
+		}
+		
+		public void setDebugCmd(String debugCmd) {
+			this.debugCmd = debugCmd;
 		}
 
 		public String getDiscoverCmd() {
@@ -143,6 +154,7 @@ public abstract class AbstractToolRMConfiguration extends
 	}
 
 	private String launchCmd;
+	private String debugCmd;
 	private String discoverCmd;
 	private String periodicMonitorCmd;
 	private int periodicMonitorTime;
@@ -156,6 +168,7 @@ public abstract class AbstractToolRMConfiguration extends
 		RemoteConfig remoteConfig = loadRemote(factory, memento);
 
 		String launchCmd = memento.getString(TAG_LAUNCH_CMD);
+		String debugCmd = memento.getString(TAG_DEBUG_CMD);
 		String discoverCmd = memento.getString(TAG_DISCOVER_CMD);
 		String periodicMonitorCmd = memento.getString(TAG_PERIODIC_MONITOR_CMD);
 		Integer periodicMonitorTime = memento
@@ -166,7 +179,7 @@ public abstract class AbstractToolRMConfiguration extends
 		boolean useDefaults = Boolean.parseBoolean(memento
 				.getString(TAG_USE_DEFAULTS));
 
-		ToolsConfig config = new ToolsConfig(remoteConfig, launchCmd,
+		ToolsConfig config = new ToolsConfig(remoteConfig, launchCmd, debugCmd,
 				discoverCmd, periodicMonitorCmd, periodicMonitorTime,
 				continuousMonitorCmd, remoteInstallPath, useDefaults);
 		return config;
@@ -177,6 +190,7 @@ public abstract class AbstractToolRMConfiguration extends
 		super(toolsConfig.getRemoteConfig(), factory);
 		this.capabilities = capabilities;
 		this.launchCmd = toolsConfig.getLaunchCmd();
+		this.debugCmd = toolsConfig.getDebugCmd();
 		this.discoverCmd = toolsConfig.getDiscoverCmd();
 		this.periodicMonitorCmd = toolsConfig.getPeriodicMonitorCmd();
 		this.periodicMonitorTime = toolsConfig.getPeriodicMonitorTime();
@@ -187,12 +201,13 @@ public abstract class AbstractToolRMConfiguration extends
 
 	public AbstractToolRMConfiguration(int capabilities,
 			AbstractToolRMFactory factory, RemoteConfig config, String toolId,
-			String launchCmd, String discoverCmd, String periodicMonitorCmd,
+			String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd,
 			int periodicMonitorTime, String continuousMonitorCmd,
 			String remoteInstallPath, boolean useDefaults) {
 		super(config, factory);
 		this.capabilities = capabilities;
 		setLaunchCmd(launchCmd);
+		setDebugCmd(debugCmd);
 		setDiscoverCmd(discoverCmd);
 		setPeriodicMonitorCmd(periodicMonitorCmd);
 		setPeriodicMonitorTime(periodicMonitorTime);
@@ -208,6 +223,7 @@ public abstract class AbstractToolRMConfiguration extends
 	public void save(IMemento memento) {
 		super.save(memento);
 		memento.putString(TAG_LAUNCH_CMD, launchCmd);
+		memento.putString(TAG_DEBUG_CMD, debugCmd);
 		memento.putString(TAG_DISCOVER_CMD, discoverCmd);
 		memento.putString(TAG_PERIODIC_MONITOR_CMD, periodicMonitorCmd);
 		memento.putInteger(TAG_PERIODIC_MONITOR_TIME, periodicMonitorTime);
@@ -224,6 +240,14 @@ public abstract class AbstractToolRMConfiguration extends
 
 	public void setLaunchCmd(String launchCmd) {
 		this.launchCmd = launchCmd;
+	}
+	
+	public String getDebugCmd() {
+		return debugCmd;
+	}
+	
+	public void setDebugCmd(String debugCmd) {
+		this.debugCmd = debugCmd;
 	}
 
 	public String getDiscoverCmd() {
@@ -282,6 +306,11 @@ public abstract class AbstractToolRMConfiguration extends
 	public boolean hasLaunchCmd() {
 		return (capabilities & CAP_LAUNCH) != 0 && launchCmd != null
 				&& !launchCmd.trim().equals(EMPTY_STRING);
+	}
+
+	public boolean hasDebugCmd() {
+		return (capabilities & CAP_LAUNCH) != 0 && debugCmd != null
+				&& !debugCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasContinuousMonitorCmd() {
