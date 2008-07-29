@@ -93,7 +93,7 @@ recv_callback(sdm_message msg)
 		 * If we are the destination, then deliver the payload
 		 */
 		if (sdm_set_contains(sdm_message_get_destination(msg), sdm_route_get_id())) {
-			sdm_message_deliver_payload(msg);
+			sdm_message_deliver(msg);
 		}
 
 		/*

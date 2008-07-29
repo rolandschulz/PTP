@@ -38,8 +38,8 @@ struct sdm_message {
 	void 			(*send_complete)(sdm_message msg);
 };
 
-static void (*sdm_recv_callback)(sdm_message msg) = NULL;
-static void	(*payload_callback)(char *buf, int len) = NULL;
+static void (*sdm_recv_callback)(const sdm_message msg) = NULL;
+static void	(*deliver_callback)(const sdm_message msg) = NULL;
 
 static void	setenviron(char *str, int val);
 
@@ -135,7 +135,7 @@ sdm_message_send(const sdm_message msg)
 		 * Create a serialized version of the message
 		 */
 
-		len = HEX_LEN
+		len = HEX_LEN /* sizeof(id) */
 			+ sdm_aggregate_serialized_length(msg->aggregate)
 			+ sdm_set_serialized_length(msg->src)
 			+ sdm_set_serialized_length(msg->dest)
@@ -279,9 +279,10 @@ sdm_message_set_recv_callback(void (*callback)(sdm_message msg))
 sdm_message
 sdm_message_new(char *buf, int len)
 {
+	static unsigned int ids = 0;
 	sdm_message	msg = (sdm_message)malloc(sizeof(struct sdm_message));
 
-	msg->id = 0;
+	msg->id = ids++;
 	msg->dest = sdm_set_new();
 	msg->src = sdm_set_new();
 	sdm_set_add_element(msg->src, sdm_route_get_id());
@@ -361,17 +362,17 @@ sdm_message_set_aggregate(const sdm_message msg, const sdm_aggregate a)
 }
 
 void
-sdm_message_set_payload_callback(void (*callback)(char *buf, int len))
+sdm_message_set_deliver_callback(void (*callback)(const sdm_message msg))
 {
-	payload_callback = callback;
+	deliver_callback = callback;
 }
 
 void
-sdm_message_deliver_payload(const sdm_message msg)
+sdm_message_deliver(const sdm_message msg)
 {
-	if (payload_callback != NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_deliver_payload \n", sdm_route_get_id());
-		payload_callback(msg->payload, msg->payload_len);
+	if (deliver_callback != NULL) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_deliver \n", sdm_route_get_id());
+		deliver_callback(msg);
 	}
 }
 
