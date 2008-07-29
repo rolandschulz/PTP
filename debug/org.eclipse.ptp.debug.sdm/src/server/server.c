@@ -44,8 +44,8 @@
 #include "proxy_tcp.h"
 #include "sdm.h"
 
-extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *));
-extern int	svr_dispatch(dbg_backend *, char *, int, void *);
+extern int	svr_init(dbg_backend *, void (*)(dbg_event *, int));
+extern int	svr_dispatch(dbg_backend *, char *, int, int);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_isshutdown(void);
 
@@ -55,7 +55,7 @@ static dbg_backend *	backend;
  * Aggregate debugger response.
  */
 static void
-event_callback(dbg_event *e, void *data)
+event_callback(dbg_event *e, int data)
 {
 	int			len;
 	char *		buf;
@@ -69,6 +69,7 @@ event_callback(dbg_event *e, void *data)
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server event_callback '%s'\n", sdm_route_get_id(), buf);
 
 	msg = sdm_message_new(buf, len);
+	sdm_message_set_id(msg, data);
 	sdm_set_add_element(sdm_message_get_destination(msg), SDM_MASTER);
 
 	//sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
@@ -80,11 +81,17 @@ event_callback(dbg_event *e, void *data)
  * Dispatch payload to debugger.
  */
 static void
-payload_callback(char *buf, int len)
+deliver_callback(const sdm_message msg)
 {
-	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server payload_callback\n", sdm_route_get_id());
+	int		id;
+	int		len;
+	char *	buf;
 
-	(void)svr_dispatch(backend, buf, len, NULL);
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server deliver_callback\n", sdm_route_get_id());
+
+	sdm_message_get_payload(msg, &buf, &len);
+	id = sdm_message_get_id(msg);
+	(void)svr_dispatch(backend, buf, len, id);
 }
 
 /*
@@ -131,7 +138,7 @@ server(dbg_backend *dbgr)
 
 	backend = dbgr;
 
-	sdm_message_set_payload_callback(payload_callback);
+	sdm_message_set_deliver_callback(deliver_callback);
 	sdm_aggregate_set_completion_callback(aggregate_callback);
 
 	svr_init(dbgr, event_callback);
