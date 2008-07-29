@@ -106,8 +106,8 @@ static svr_cmd svr_cmd_tab[] =
 };
 
 static int			svr_res;
-static void			(*event_callback)(dbg_event *, void *);
-static void *		event_data;
+static void			(*event_callback)(dbg_event *, int);
+static int			event_data;
 static char **		svr_env;
 static int			svr_last_tid;
 static int			svr_state;
@@ -131,7 +131,7 @@ svr_isshutdown(void)
 }
 
 int
-svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *))
+svr_init(dbg_backend *db, void (*cb)(dbg_event *, int))
 {
 	event_callback = cb;
 	svr_env = NULL;
@@ -141,7 +141,7 @@ svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *))
 }
 
 int
-svr_dispatch(dbg_backend *db, char *cmd_str, int len, void *data)
+svr_dispatch(dbg_backend *db, char *cmd_str, int len, int data)
 {
 	int			idx;
 	proxy_msg *	msg;
