@@ -52,10 +52,10 @@ extern void sdm_message_set_source(const sdm_message msg, const sdm_idset src);
 extern void sdm_message_get_payload(const sdm_message msg, char **buf, int *len);
 extern int sdm_message_send(const sdm_message msg);
 extern void sdm_message_set_send_callback(const sdm_message msg, void (*callback)(const sdm_message msg));
-extern void sdm_message_set_recv_callback(void (*callback)(sdm_message msg));
-extern void sdm_message_set_payload_callback(void (*callback)(char *buf, int len));
+extern void sdm_message_set_recv_callback(void (*callback)(const sdm_message msg));
+extern void sdm_message_set_deliver_callback(void (*callback)(const sdm_message msg));
 extern int sdm_message_progress(void);
-extern void	sdm_message_deliver_payload(const sdm_message msg);
+extern void	sdm_message_deliver(const sdm_message msg);
 
 /*
  * Set operations
@@ -106,6 +106,7 @@ extern void sdm_aggregate_free(sdm_aggregate a);
 extern int sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end);
 extern int sdm_aggregate_serialized_length(const sdm_aggregate a);
 extern int sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end);
+extern void sdm_aggregate_copy(const sdm_aggregate a1, const sdm_aggregate a2);
 extern void sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg));
 extern void sdm_aggregate_set_value(const sdm_aggregate a, int type, ...);
 extern void sdm_aggregate_message(const sdm_message msg, unsigned int flags);
