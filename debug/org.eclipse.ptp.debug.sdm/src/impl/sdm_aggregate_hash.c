@@ -39,7 +39,7 @@ struct sdm_aggregate {
  * for a particular request.
  */
 struct request {
-	int				id;				/* request ID */
+	int				id;				/* request ID (same as message ID) */
 	sdm_idset		outstanding;	/* controllers remaining to send replies */
 	int				timeout;		/* wait timeout for this request (microseconds) */
 	Hash *			replys;			/* hash of replies we've received */
@@ -52,7 +52,7 @@ static List *			all_requests;
 static struct request *	current_request;
 static sdm_idset		empty_set;
 
-static request *	new_request(sdm_idset dest, int timeout);
+static request *	new_request(sdm_idset dest, int id, int timeout);
 static void			free_request(request *);
 static void			update_reply(request *req, sdm_message msg, int hash);
 static void			start_timer(request *r);
@@ -118,6 +118,7 @@ sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg))
 void
 sdm_aggregate_message(sdm_message msg, unsigned int flags)
 {
+	int 			id;
 	sdm_aggregate	a;
 
 	a = sdm_message_get_aggregate(msg);
@@ -133,38 +134,45 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 			a->value = HashCompute(buf, len);
 		}
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: upstream message from %s\n",
-				sdm_route_get_id(), _set_to_str(sdm_message_get_source(msg)));
+		id = sdm_message_get_id(msg);
+
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: upstream message #%d from %s\n",
+				sdm_route_get_id(), id, _set_to_str(sdm_message_get_source(msg)));
 
 		/*
 		 * Find the request this reply is for.
 		 * Check if the request is completed.
 		 */
 		for (SetList(all_requests); (req = (request *)GetListElement(all_requests)) != NULL; ) {
-			if (sdm_set_compare(req->outstanding, sdm_message_get_source(msg))) {
-				update_reply(req, msg, a->value);
+			if (req->id == id) {
 				break;
 			}
 		}
 
-		if (req == NULL) {
+		if (req != NULL && sdm_set_compare(req->outstanding, sdm_message_get_source(msg))) {
+			update_reply(req, msg, a->value);
+		} else {
 			/*
-			 * This must be an unsolicited event. Create a new fake request that will just wait
-			 * for a pre-determined timeout, then forward whatever it has.
+			 * This must be an unsolicited event. Create a new fake request that will just
+			 * wait for a pre-determined timeout, then forward whatever it has. An
+			 * alternative to this would be to peek into the payload to see what the
+			 * command is, then make a decision about expected replies.
 			 *
-			 * An alternative to this would be to peek into the payload to see what the command
-			 * is, then make a decision about expected replies.
+			 * This request can have the same ID as the original request, since we're
+			 * guaranteed to receive events in order from a particular source.
+			 *
+			 * It also depends on only processing requests in order, since it's possible
+			 * for this event to be received before we have aggregated replies for
+			 * the original request.
+			 *
 			 */
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: message is unsolicited\n", sdm_route_get_id());
 
-			req = new_request(sdm_route_reachable(empty_set), SDM_EVENT_WAIT_TIME);
+			req = new_request(sdm_route_reachable(empty_set), id, SDM_EVENT_WAIT_TIME);
 			update_reply(req, msg, a->value);
 		}
 	} else if (flags & SDM_AGGREGATE_DOWNSTREAM) {
-		if (sdm_route_get_id() == SDM_MASTER) {
-		}
-
-		new_request(sdm_message_get_destination(msg), a->value);
+		new_request(sdm_message_get_destination(msg), sdm_message_get_id(msg), a->value);
 	}
 }
 
@@ -267,13 +275,12 @@ _aggregate_to_str(sdm_aggregate a)
  * we have received replies from all controllers in this set, the request is complete.
  */
 static request *
-new_request(sdm_idset dest, int timeout)
+new_request(sdm_idset dest, int id, int timeout)
 {
 	request *	r;
-	static int	ids = 0;
 
 	r = (request *)malloc(sizeof(request));
-	r->id = ids++;
+	r->id = id;
 	r->timeout = timeout;
 	r->timer_state = TIMER_DISABLED;
 	r->replys = HashCreate(sdm_route_get_size());
@@ -384,13 +391,15 @@ update_reply(request *req, sdm_message msg, int hash)
 	 * Save reply if it is new, otherwise just update the reply set
 	 */
 	if ((reply_msg = (sdm_message)HashSearch(req->replys, na->value)) == NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply #%x\n", sdm_route_get_id(), na->value);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply #%x for request %d\n",
+				sdm_route_get_id(), na->value, req->id);
 		HashInsert(req->replys, na->value, (void *)msg);
 	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x with src %s\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x with src %s for request %d\n",
 				sdm_route_get_id(),
 				na->value,
-				_set_to_str(sdm_message_get_source(msg)));
+				_set_to_str(sdm_message_get_source(msg)),
+				req->id);
 		sdm_set_union(sdm_message_get_source(reply_msg), sdm_message_get_source(msg));
 		sdm_message_free(msg);
 	}
