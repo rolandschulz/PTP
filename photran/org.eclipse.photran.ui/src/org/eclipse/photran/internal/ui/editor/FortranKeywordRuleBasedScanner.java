@@ -26,7 +26,6 @@ import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
@@ -68,51 +67,51 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         }
     }
 
-    /**
-     * Rule which detects identifiers between columns 7 and 72 
-     * 
-     * @see org.eclipse.jface.text.rules.WordRule
-     */
-    private static final class FixedFormIdentifierWordRule extends WordRule
-    {
-        private StringBuffer fBuffer = new StringBuffer();
-
-        private FixedFormIdentifierWordRule(IWordDetector detector, IToken token)
-        {
-            super(detector, token);
-        }
-
-        public IToken evaluate(ICharacterScanner scanner)
-        {
-            // int c= scanner.read();
-            // boolean canStart = fDetector.isWordStart((char)c) && scanner.getColumn() >= 7;
-            // scanner.unread();
-            // return canStart ? super.evaluate(scanner) : Token.UNDEFINED;
-
-            int c = scanner.read();
-            if (fDetector.isWordStart((char)c) && scanner.getColumn() >= 7)
-            {
-                fBuffer.setLength(0);
-                do
-                {
-                    fBuffer.append((char)c);
-                    c = scanner.read();
-                }
-                while (c != ICharacterScanner.EOF && fDetector.isWordPart((char)c) && scanner.getColumn() <= 72);
-                scanner.unread();
-
-                IToken token = (IToken)fWords.get(fBuffer.toString());
-                if (token != null) return token;
-
-                if (fDefaultToken.isUndefined()) unreadBuffer(scanner);
-
-                return fDefaultToken;
-            }
-
-            scanner.unread();
-            return Token.UNDEFINED;
-        }
-    }
+//    /**
+//     * Rule which detects identifiers between columns 7 and 72 
+//     * 
+//     * @see org.eclipse.jface.text.rules.WordRule
+//     */
+//    private static final class FixedFormIdentifierWordRule extends WordRule
+//    {
+//        private StringBuffer fBuffer = new StringBuffer();
+//
+//        private FixedFormIdentifierWordRule(IWordDetector detector, IToken token)
+//        {
+//            super(detector, token);
+//        }
+//
+//        public IToken evaluate(ICharacterScanner scanner)
+//        {
+//            // int c= scanner.read();
+//            // boolean canStart = fDetector.isWordStart((char)c) && scanner.getColumn() >= 7;
+//            // scanner.unread();
+//            // return canStart ? super.evaluate(scanner) : Token.UNDEFINED;
+//
+//            int c = scanner.read();
+//            if (fDetector.isWordStart((char)c) && scanner.getColumn() >= 7)
+//            {
+//                fBuffer.setLength(0);
+//                do
+//                {
+//                    fBuffer.append((char)c);
+//                    c = scanner.read();
+//                }
+//                while (c != ICharacterScanner.EOF && fDetector.isWordPart((char)c) && scanner.getColumn() <= 72);
+//                scanner.unread();
+//
+//                IToken token = (IToken)fWords.get(fBuffer.toString());
+//                if (token != null) return token;
+//
+//                if (fDefaultToken.isUndefined()) unreadBuffer(scanner);
+//
+//                return fDefaultToken;
+//            }
+//
+//            scanner.unread();
+//            return Token.UNDEFINED;
+//        }
+//    }
 
     /**
      * Word detector for Fortran identifiers and generic operators
