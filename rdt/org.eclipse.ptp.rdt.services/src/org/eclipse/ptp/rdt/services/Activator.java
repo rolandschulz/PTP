@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rdt.services;
 
+import java.io.File;
+
 import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -40,11 +42,14 @@ public class Activator extends AbstractUIPlugin {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		ISavedState savedState = workspace.addSaveParticipant(this, new ServiceModelSaveParticipant());
 		
-//		if (savedState != null) {
-//			IPath statePath = savedState.lookup(getServiceModelStateFilePath());
-//			ServiceModelManager manager = ServiceModelManager.getInstance();
-//			manager.loadModelConfiguration(statePath.toFile());
-//		}
+		if (savedState != null) {
+			IPath statePath = savedState.lookup(getServiceModelStateFilePath());
+			File file = statePath.toFile();
+			if (file.exists()) {
+				ServiceModelManager manager = ServiceModelManager.getInstance();
+				manager.loadModelConfiguration(file);
+			}
+		}
 	}
 
 	@Override
