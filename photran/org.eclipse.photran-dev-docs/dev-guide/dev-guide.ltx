@@ -4,8 +4,21 @@
 %\usepackage{anysize}
 %\marginsize{0.5in}{0.5in}{0.5in}{0.5in}
 \usepackage{fullpage}
-
 \usepackage{graphicx}
+
+\usepackage{listings}
+\lstset{numbers=left, numberstyle=\tiny, numbersep=5pt, captionpos=b, basicstyle=\footnotesize} 
+
+\usepackage[pdftex]{hyperref}
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=blue
+}
+
+
 
 \hyphenpenalty=5000
 \tolerance=1000
@@ -18,7 +31,7 @@
 
 \title{Photran 4.0 Developer's Guide}
 \author{
-\input{authors}
+\input{authors.ltx}
 }
 \date{}
 
@@ -29,29 +42,35 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Introduction}
-\input{01-intro.ltx-inc}
+\input{intro.ltx-inc}
+
+\chapter{Interactions with the CDT}
+\input{cdt.ltx-inc}
 
 \chapter{Plug-in Decomposition}
-\input{02-plugins.ltx-inc}
+\input{plugins.ltx-inc}
 
 \chapter{Parsing and Program Analysis}
-\input{03-parsing.ltx-inc}
+\input{parsing.ltx-inc}
 
 \chapter{Refactoring}
-\input{04-refactoring.ltx-inc}
+\input{refactoring.ltx-inc}
+
+\chapter{Photran Editor}
+\input{editor.ltx-inc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 
 \chapter{Getting the Photran 4.0 Sources from CVS}
 \vspace{0.5em}
-\input{a1-cvs.ltx-inc}
+\input{app-cvs.ltx-inc}
 
 \chapter{Creating an Error Parser}
-\input{a2-error-parsers.ltx-inc}
+\input{app-error-parsers.ltx-inc}
 
 \chapter{Creating Tests for the Rename Refactoring}
-\input{a3-rename-tests.ltx-inc}
+\input{app-rename-tests.ltx-inc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}

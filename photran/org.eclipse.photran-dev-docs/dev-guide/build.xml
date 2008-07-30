@@ -28,7 +28,7 @@
 			failifexecutionfails="true">
 			<arg value="cvs-instructions.ltx" />
 		</exec>
-	  	<delete><fileset dir="." includes="*.aux *.log *.toc *.dvi *.ps" /></delete>
+	  	<delete><fileset dir="." includes="*.aux *.log *.toc *.dvi *.ps *.out" /></delete>
 	  	<exec executable="bash"><arg value="-c" /><arg value="if [ &quot;$$LOGNAME&quot; == &quot;joverbey&quot; ]; then xpdf -paper letter dev-guide.pdf; fi" /></exec>
 	</target>
 

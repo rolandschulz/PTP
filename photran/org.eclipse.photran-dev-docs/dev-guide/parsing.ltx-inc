@@ -46,7 +46,9 @@ until the AST is released (permanent) or garbage collected (transient).
 
 The \texttt{acquireTransient/PermanentAST} methods return an object implementing \texttt{IFortranAST}.
 
-{\footnotesize\begin{verbatim}
+\lstset{language=Java}
+
+\begin{lstlisting}
 public interface IFortranAST extends Iterable<Token>
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -69,7 +71,7 @@ public interface IFortranAST extends Iterable<Token>
     public Token findFirstTokenOnLine(int line);
     public Token findTokenByFileOffsetLength(IFile file, int offset, int length);
 }
-\end{verbatim}}
+\end{lstlisting}
 
 The \texttt{getRoot} method returns the root of the AST, while the \texttt{find...}
 methods provide an efficient means to search for tokens based on their lexical
@@ -100,7 +102,7 @@ For example, \texttt{fortran95.bnf} defines a \textit{$<$ProgramUnit$>$} as foll
 
 An \texttt{ASTProgramUnitNode} object, then, provides the following interface.
 
-{\footnotesize\begin{verbatim}
+\begin{lstlisting}
 public class ASTProgramUnitNode extends ParseTreeNode
 {
     public ASTMainProgramNode getASTMainProgram() { ... }
@@ -109,7 +111,7 @@ public class ASTProgramUnitNode extends ParseTreeNode
     public ASTModuleNode getASTModule() { ... }
     public ASTBlockDataSubprogramNode getASTBlockDataSubprogram() { ... }
 }
-\end{verbatim}}
+\end{lstlisting}
 
 \subsubsection{List Nodes (Recursive Productions)}
 
@@ -169,12 +171,12 @@ The solution is to label the MainRange nonterminal with a caret (\^), indicating
 This means that accessor methods that would otherwise be in a separate MainRange object will be placed in the
 MainProgram object instead.  This means that an \texttt{ASTMainProgramNode} object has the following interface.
 
-{\footnotesize\begin{verbatim}
+\begin{lstlisting}[numbers=none]
     public ASTProgramStmtNode getProgramStmt();
     public ASTBodyNode getBody();
     public ASTBodyPlusInternalsNode getBodyPlusInternals();
     public ASTEndProgramStmtNode getEndProgramStmt();
-\end{verbatim}}
+\end{lstlisting}
 
 \subsubsection{Tokens}
 
