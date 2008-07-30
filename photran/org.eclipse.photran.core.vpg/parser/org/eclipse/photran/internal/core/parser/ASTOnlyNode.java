@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTOnlyNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token newName; // in ASTOnlyNode
+    ASTGenericSpecNode genericSpec; // in ASTOnlyNode
     org.eclipse.photran.internal.core.lexer.Token isRenamed; // in ASTOnlyNode
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTOnlyNode
-    ASTGenericSpecNode genericSpec; // in ASTOnlyNode
 
     public org.eclipse.photran.internal.core.lexer.Token getNewName()
     {
@@ -39,6 +39,17 @@ public class ASTOnlyNode extends ASTNode
     public void setNewName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.newName = newValue;
+    }
+
+
+    public ASTGenericSpecNode getGenericSpec()
+    {
+        return this.genericSpec;
+    }
+
+    public void setGenericSpec(ASTGenericSpecNode newValue)
+    {
+        this.genericSpec = newValue;
     }
 
 
@@ -64,17 +75,6 @@ public class ASTOnlyNode extends ASTNode
     }
 
 
-    public ASTGenericSpecNode getGenericSpec()
-    {
-        return this.genericSpec;
-    }
-
-    public void setGenericSpec(ASTGenericSpecNode newValue)
-    {
-        this.genericSpec = newValue;
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTOnlyNode(this);
@@ -91,9 +91,9 @@ public class ASTOnlyNode extends ASTNode
         switch (index)
         {
         case 0:  return this.newName;
-        case 1:  return this.isRenamed;
-        case 2:  return this.name;
-        case 3:  return this.genericSpec;
+        case 1:  return this.genericSpec;
+        case 2:  return this.isRenamed;
+        case 3:  return this.name;
         default: return null;
         }
     }
@@ -103,9 +103,9 @@ public class ASTOnlyNode extends ASTNode
         switch (index)
         {
         case 0:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.isRenamed = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.genericSpec = (ASTGenericSpecNode)value;
+        case 1:  this.genericSpec = (ASTGenericSpecNode)value;
+        case 2:  this.isRenamed = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

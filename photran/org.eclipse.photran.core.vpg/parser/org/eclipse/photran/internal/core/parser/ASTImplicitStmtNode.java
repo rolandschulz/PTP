@@ -28,8 +28,8 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTImplicitStmtNode
     org.eclipse.photran.internal.core.lexer.Token implicitToken; // in ASTImplicitStmtNode
-    IASTListNode<ASTImplicitSpecNode> implicitSpecList; // in ASTImplicitStmtNode
     org.eclipse.photran.internal.core.lexer.Token isImplicitNone; // in ASTImplicitStmtNode
+    IASTListNode<ASTImplicitSpecNode> implicitSpecList; // in ASTImplicitStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTImplicitStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -54,17 +54,6 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     }
 
 
-    public IASTListNode<ASTImplicitSpecNode> getImplicitSpecList()
-    {
-        return this.implicitSpecList;
-    }
-
-    public void setImplicitSpecList(IASTListNode<ASTImplicitSpecNode> newValue)
-    {
-        this.implicitSpecList = newValue;
-    }
-
-
     public boolean isImplicitNone()
     {
         return this.isImplicitNone != null;
@@ -73,6 +62,17 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     public void setIsImplicitNone(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isImplicitNone = newValue;
+    }
+
+
+    public IASTListNode<ASTImplicitSpecNode> getImplicitSpecList()
+    {
+        return this.implicitSpecList;
+    }
+
+    public void setImplicitSpecList(IASTListNode<ASTImplicitSpecNode> newValue)
+    {
+        this.implicitSpecList = newValue;
     }
 
 
@@ -94,8 +94,8 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
         {
         case 0:  return this.label;
         case 1:  return this.implicitToken;
-        case 2:  return this.implicitSpecList;
-        case 3:  return this.isImplicitNone;
+        case 2:  return this.isImplicitNone;
+        case 3:  return this.implicitSpecList;
         case 4:  return this.hiddenTEos;
         default: return null;
         }
@@ -107,8 +107,8 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 1:  this.implicitToken = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.implicitSpecList = (IASTListNode<ASTImplicitSpecNode>)value;
-        case 3:  this.isImplicitNone = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.isImplicitNone = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.implicitSpecList = (IASTListNode<ASTImplicitSpecNode>)value;
         case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }

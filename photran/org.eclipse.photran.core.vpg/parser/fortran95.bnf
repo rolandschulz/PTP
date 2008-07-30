@@ -219,6 +219,11 @@
   | <PointerStmt>
   | <SaveStmt>
   | <TargetStmt>
+  | <UnprocessedIncludeStmt>
+
+#JO
+<UnprocessedIncludeStmt> ::=
+  (inline):<LblDef> T_IDENT T_SCON T_EOS
 
 # R215
 (superclass):<ExecutableConstruct> ::=

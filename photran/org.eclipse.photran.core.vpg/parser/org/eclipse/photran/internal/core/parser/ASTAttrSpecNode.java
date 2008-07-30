@@ -26,30 +26,41 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isDimension; // in ASTAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isParameter; // in ASTAttrSpecNode
     ASTAccessSpecNode accessSpec; // in ASTAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isSave; // in ASTAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isPointer; // in ASTAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isExternal; // in ASTAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isOptional; // in ASTAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isAllocatable; // in ASTAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isTarget; // in ASTAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isExternal; // in ASTAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isIntent; // in ASTAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isParameter; // in ASTAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isSave; // in ASTAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isDimension; // in ASTAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTAttrSpecNode
     ASTArraySpecNode arraySpec; // in ASTAttrSpecNode
     ASTIntentSpecNode intentSpec; // in ASTAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isTarget; // in ASTAttrSpecNode
 
-    public boolean isIntrinsic()
+    public boolean isDimension()
     {
-        return this.isIntrinsic != null;
+        return this.isDimension != null;
     }
 
-    public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsDimension(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isIntrinsic = newValue;
+        this.isDimension = newValue;
+    }
+
+
+    public boolean isParameter()
+    {
+        return this.isParameter != null;
+    }
+
+    public void setIsParameter(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isParameter = newValue;
     }
 
 
@@ -64,6 +75,28 @@ public class ASTAttrSpecNode extends ASTNode
     }
 
 
+    public boolean isIntrinsic()
+    {
+        return this.isIntrinsic != null;
+    }
+
+    public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntrinsic = newValue;
+    }
+
+
+    public boolean isSave()
+    {
+        return this.isSave != null;
+    }
+
+    public void setIsSave(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isSave = newValue;
+    }
+
+
     public boolean isPointer()
     {
         return this.isPointer != null;
@@ -72,6 +105,17 @@ public class ASTAttrSpecNode extends ASTNode
     public void setIsPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isPointer = newValue;
+    }
+
+
+    public boolean isExternal()
+    {
+        return this.isExternal != null;
+    }
+
+    public void setIsExternal(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isExternal = newValue;
     }
 
 
@@ -97,28 +141,6 @@ public class ASTAttrSpecNode extends ASTNode
     }
 
 
-    public boolean isTarget()
-    {
-        return this.isTarget != null;
-    }
-
-    public void setIsTarget(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isTarget = newValue;
-    }
-
-
-    public boolean isExternal()
-    {
-        return this.isExternal != null;
-    }
-
-    public void setIsExternal(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isExternal = newValue;
-    }
-
-
     public boolean isIntent()
     {
         return this.isIntent != null;
@@ -127,39 +149,6 @@ public class ASTAttrSpecNode extends ASTNode
     public void setIsIntent(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isIntent = newValue;
-    }
-
-
-    public boolean isParameter()
-    {
-        return this.isParameter != null;
-    }
-
-    public void setIsParameter(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isParameter = newValue;
-    }
-
-
-    public boolean isSave()
-    {
-        return this.isSave != null;
-    }
-
-    public void setIsSave(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isSave = newValue;
-    }
-
-
-    public boolean isDimension()
-    {
-        return this.isDimension != null;
-    }
-
-    public void setIsDimension(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isDimension = newValue;
     }
 
 
@@ -185,6 +174,17 @@ public class ASTAttrSpecNode extends ASTNode
     }
 
 
+    public boolean isTarget()
+    {
+        return this.isTarget != null;
+    }
+
+    public void setIsTarget(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isTarget = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAttrSpecNode(this);
@@ -200,21 +200,21 @@ public class ASTAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isIntrinsic;
-        case 1:  return this.accessSpec;
-        case 2:  return this.isPointer;
-        case 3:  return this.isOptional;
-        case 4:  return this.isAllocatable;
-        case 5:  return this.isTarget;
+        case 0:  return this.isDimension;
+        case 1:  return this.isParameter;
+        case 2:  return this.accessSpec;
+        case 3:  return this.isIntrinsic;
+        case 4:  return this.isSave;
+        case 5:  return this.isPointer;
         case 6:  return this.isExternal;
-        case 7:  return this.isIntent;
-        case 8:  return this.isParameter;
-        case 9:  return this.isSave;
-        case 10: return this.isDimension;
-        case 11: return this.hiddenTLparen;
-        case 12: return this.arraySpec;
-        case 13: return this.intentSpec;
-        case 14: return this.hiddenTRparen;
+        case 7:  return this.isOptional;
+        case 8:  return this.isAllocatable;
+        case 9:  return this.isIntent;
+        case 10: return this.hiddenTLparen;
+        case 11: return this.arraySpec;
+        case 12: return this.intentSpec;
+        case 13: return this.hiddenTRparen;
+        case 14: return this.isTarget;
         default: return null;
         }
     }
@@ -223,21 +223,21 @@ public class ASTAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.accessSpec = (ASTAccessSpecNode)value;
-        case 2:  this.isPointer = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.isOptional = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.isAllocatable = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.isTarget = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.isDimension = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isParameter = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.accessSpec = (ASTAccessSpecNode)value;
+        case 3:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.isSave = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 5:  this.isPointer = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 6:  this.isExternal = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.isIntent = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 8:  this.isParameter = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.isSave = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 10: this.isDimension = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 11: this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 12: this.arraySpec = (ASTArraySpecNode)value;
-        case 13: this.intentSpec = (ASTIntentSpecNode)value;
-        case 14: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.isOptional = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.isAllocatable = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 9:  this.isIntent = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 10: this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 11: this.arraySpec = (ASTArraySpecNode)value;
+        case 12: this.intentSpec = (ASTIntentSpecNode)value;
+        case 13: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 14: this.isTarget = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

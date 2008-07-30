@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTSubroutineParNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTSubroutineParNode
     org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSubroutineParNode
-
-    public boolean isAsterisk()
-    {
-        return this.isAsterisk != null;
-    }
-
-    public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAsterisk = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTSubroutineParNode
 
     public org.eclipse.photran.internal.core.lexer.Token getVariableName()
     {
@@ -48,6 +37,17 @@ public class ASTSubroutineParNode extends ASTNode
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+    }
+
+
+    public boolean isAsterisk()
+    {
+        return this.isAsterisk != null;
+    }
+
+    public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAsterisk = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isAsterisk;
-        case 1:  return this.variableName;
+        case 0:  return this.variableName;
+        case 1:  return this.isAsterisk;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
