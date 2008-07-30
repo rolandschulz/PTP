@@ -323,6 +323,12 @@ public class ServiceModelManager implements IServiceModelManager {
 		try {
 			for (Entry<IProject, Set<IServiceConfiguration>> entry  : model.entrySet()) {
 				IProject project = entry.getKey();
+				
+				// Skip over projects that've been deleted.
+				if (!project.exists()) {
+					continue;
+				}
+				
 				String projectName = project.getName();
 				
 				IMemento projectMemento = rootMemento.createChild(PROJECT_ELEMENT_NAME);
@@ -378,6 +384,11 @@ public class ServiceModelManager implements IServiceModelManager {
 			for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
 				String projectName = projectMemento.getString(ATTR_NAME);
 				IProject project = root.getProject(projectName);
+				
+				// Skip over projects that aren't in the workspace.
+				if (!project.exists()) {
+					continue;
+				}
 				
 				for (IMemento configMemento : projectMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
 					String configName = configMemento.getString(ATTR_NAME);
