@@ -28,8 +28,8 @@ public class ASTCharLengthNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharLengthNode
-    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
     ASTExprNode lengthExpr; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCharLengthNode
 
     public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
@@ -43,17 +43,6 @@ public class ASTCharLengthNode extends ASTNode
     }
 
 
-    public boolean isAssumedLength()
-    {
-        return this.isAssumedLength != null;
-    }
-
-    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAssumedLength = newValue;
-    }
-
-
     public ASTExprNode getLengthExpr()
     {
         return this.lengthExpr;
@@ -62,6 +51,17 @@ public class ASTCharLengthNode extends ASTNode
     public void setLengthExpr(ASTExprNode newValue)
     {
         this.lengthExpr = newValue;
+    }
+
+
+    public boolean isAssumedLength()
+    {
+        return this.isAssumedLength != null;
+    }
+
+    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAssumedLength = newValue;
     }
 
 
@@ -82,8 +82,8 @@ public class ASTCharLengthNode extends ASTNode
         {
         case 0:  return this.constIntLength;
         case 1:  return this.hiddenTLparen;
-        case 2:  return this.isAssumedLength;
-        case 3:  return this.lengthExpr;
+        case 2:  return this.lengthExpr;
+        case 3:  return this.isAssumedLength;
         case 4:  return this.hiddenTRparen;
         default: return null;
         }
@@ -95,8 +95,8 @@ public class ASTCharLengthNode extends ASTNode
         {
         case 0:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.lengthExpr = (ASTExprNode)value;
+        case 2:  this.lengthExpr = (ASTExprNode)value;
+        case 3:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }

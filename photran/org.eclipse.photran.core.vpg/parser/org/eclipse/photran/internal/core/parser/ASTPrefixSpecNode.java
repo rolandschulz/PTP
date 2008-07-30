@@ -26,10 +26,21 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTPrefixSpecNode extends ASTNode
 {
+    org.eclipse.photran.internal.core.lexer.Token isPure; // in ASTPrefixSpecNode
     org.eclipse.photran.internal.core.lexer.Token isElemental; // in ASTPrefixSpecNode
     ASTTypeSpecNode typeSpec; // in ASTPrefixSpecNode
     org.eclipse.photran.internal.core.lexer.Token isRecursive; // in ASTPrefixSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isPure; // in ASTPrefixSpecNode
+
+    public boolean isPure()
+    {
+        return this.isPure != null;
+    }
+
+    public void setIsPure(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isPure = newValue;
+    }
+
 
     public boolean isElemental()
     {
@@ -64,17 +75,6 @@ public class ASTPrefixSpecNode extends ASTNode
     }
 
 
-    public boolean isPure()
-    {
-        return this.isPure != null;
-    }
-
-    public void setIsPure(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPure = newValue;
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPrefixSpecNode(this);
@@ -90,10 +90,10 @@ public class ASTPrefixSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isElemental;
-        case 1:  return this.typeSpec;
-        case 2:  return this.isRecursive;
-        case 3:  return this.isPure;
+        case 0:  return this.isPure;
+        case 1:  return this.isElemental;
+        case 2:  return this.typeSpec;
+        case 3:  return this.isRecursive;
         default: return null;
         }
     }
@@ -102,10 +102,10 @@ public class ASTPrefixSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isElemental = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.typeSpec = (ASTTypeSpecNode)value;
-        case 2:  this.isRecursive = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.isPure = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.isPure = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isElemental = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 2:  this.typeSpec = (ASTTypeSpecNode)value;
+        case 3:  this.isRecursive = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTUnitIdentifierNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hasAsterisk; // in ASTUnitIdentifierNode
     ASTUFExprNode expression; // in ASTUnitIdentifierNode
-
-    public boolean hasAsterisk()
-    {
-        return this.hasAsterisk != null;
-    }
-
-    public void setHasAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasAsterisk = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token hasAsterisk; // in ASTUnitIdentifierNode
 
     public ASTUFExprNode getExpression()
     {
@@ -48,6 +37,17 @@ public class ASTUnitIdentifierNode extends ASTNode
     public void setExpression(ASTUFExprNode newValue)
     {
         this.expression = newValue;
+    }
+
+
+    public boolean hasAsterisk()
+    {
+        return this.hasAsterisk != null;
+    }
+
+    public void setHasAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasAsterisk = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTUnitIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.hasAsterisk;
-        case 1:  return this.expression;
+        case 0:  return this.expression;
+        case 1:  return this.hasAsterisk;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTUnitIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.expression = (ASTUFExprNode)value;
+        case 0:  this.expression = (ASTUFExprNode)value;
+        case 1:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

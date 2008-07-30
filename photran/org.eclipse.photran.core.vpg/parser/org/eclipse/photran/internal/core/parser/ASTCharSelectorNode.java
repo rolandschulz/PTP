@@ -30,8 +30,8 @@ public class ASTCharSelectorNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLeneq; // in ASTCharSelectorNode
-    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharSelectorNode
     ASTExprNode lengthExpr; // in ASTCharSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTKindeq; // in ASTCharSelectorNode
     ASTExprNode kindExpr; // in ASTCharSelectorNode
@@ -48,17 +48,6 @@ public class ASTCharSelectorNode extends ASTNode
     }
 
 
-    public boolean isAssumedLength()
-    {
-        return this.isAssumedLength != null;
-    }
-
-    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAssumedLength = newValue;
-    }
-
-
     public ASTExprNode getLengthExpr()
     {
         return this.lengthExpr;
@@ -67,6 +56,17 @@ public class ASTCharSelectorNode extends ASTNode
     public void setLengthExpr(ASTExprNode newValue)
     {
         this.lengthExpr = newValue;
+    }
+
+
+    public boolean isAssumedLength()
+    {
+        return this.isAssumedLength != null;
+    }
+
+    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAssumedLength = newValue;
     }
 
 
@@ -100,8 +100,8 @@ public class ASTCharSelectorNode extends ASTNode
         case 1:  return this.constIntLength;
         case 2:  return this.hiddenTLparen;
         case 3:  return this.hiddenTLeneq;
-        case 4:  return this.isAssumedLength;
-        case 5:  return this.lengthExpr;
+        case 4:  return this.lengthExpr;
+        case 5:  return this.isAssumedLength;
         case 6:  return this.hiddenTComma;
         case 7:  return this.hiddenTKindeq;
         case 8:  return this.kindExpr;
@@ -118,8 +118,8 @@ public class ASTCharSelectorNode extends ASTNode
         case 1:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 3:  this.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.lengthExpr = (ASTExprNode)value;
+        case 4:  this.lengthExpr = (ASTExprNode)value;
+        case 5:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 7:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 8:  this.kindExpr = (ASTExprNode)value;

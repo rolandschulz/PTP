@@ -26,29 +26,18 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTConstantNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hasPlus; // in ASTConstantNode
     ASTNamedConstantUseNode namedConstantKind; // in ASTConstantNode
     ASTStructureConstructorNode structureConstructor; // in ASTConstantNode
-    org.eclipse.photran.internal.core.lexer.Token hasMinus; // in ASTConstantNode
-    ASTUnsignedArithmeticConstantNode unsignedArithmeticConstant; // in ASTConstantNode
-    ASTBozLiteralConstantNode bozLiteralConstant; // in ASTConstantNode
-    org.eclipse.photran.internal.core.lexer.Token hollerithConst; // in ASTConstantNode
-    ASTLogicalConstantNode logicalConst; // in ASTConstantNode
     org.eclipse.photran.internal.core.lexer.Token hasIntKind; // in ASTConstantNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTConstantNode
     org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTConstantNode
+    ASTBozLiteralConstantNode bozLiteralConstant; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hollerithConst; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hasMinus; // in ASTConstantNode
+    ASTLogicalConstantNode logicalConst; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hasPlus; // in ASTConstantNode
+    ASTUnsignedArithmeticConstantNode unsignedArithmeticConstant; // in ASTConstantNode
     ASTNamedConstantUseNode name; // in ASTConstantNode
-
-    public boolean hasPlus()
-    {
-        return this.hasPlus != null;
-    }
-
-    public void setHasPlus(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasPlus = newValue;
-    }
-
 
     public ASTNamedConstantUseNode getNamedConstantKind()
     {
@@ -72,25 +61,25 @@ public class ASTConstantNode extends ASTNode
     }
 
 
-    public boolean hasMinus()
+    public boolean hasIntKind()
     {
-        return this.hasMinus != null;
+        return this.hasIntKind != null;
     }
 
-    public void setHasMinus(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasMinus = newValue;
+        this.hasIntKind = newValue;
     }
 
 
-    public ASTUnsignedArithmeticConstantNode getUnsignedArithmeticConstant()
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
     {
-        return this.unsignedArithmeticConstant;
+        return this.stringConst;
     }
 
-    public void setUnsignedArithmeticConstant(ASTUnsignedArithmeticConstantNode newValue)
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.unsignedArithmeticConstant = newValue;
+        this.stringConst = newValue;
     }
 
 
@@ -116,6 +105,17 @@ public class ASTConstantNode extends ASTNode
     }
 
 
+    public boolean hasMinus()
+    {
+        return this.hasMinus != null;
+    }
+
+    public void setHasMinus(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasMinus = newValue;
+    }
+
+
     public ASTLogicalConstantNode getLogicalConst()
     {
         return this.logicalConst;
@@ -127,25 +127,25 @@ public class ASTConstantNode extends ASTNode
     }
 
 
-    public boolean hasIntKind()
+    public boolean hasPlus()
     {
-        return this.hasIntKind != null;
+        return this.hasPlus != null;
     }
 
-    public void setHasIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setHasPlus(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.hasIntKind = newValue;
+        this.hasPlus = newValue;
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
+    public ASTUnsignedArithmeticConstantNode getUnsignedArithmeticConstant()
     {
-        return this.stringConst;
+        return this.unsignedArithmeticConstant;
     }
 
-    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setUnsignedArithmeticConstant(ASTUnsignedArithmeticConstantNode newValue)
     {
-        this.stringConst = newValue;
+        this.unsignedArithmeticConstant = newValue;
     }
 
 
@@ -175,17 +175,17 @@ public class ASTConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.hasPlus;
-        case 1:  return this.namedConstantKind;
-        case 2:  return this.structureConstructor;
-        case 3:  return this.hasMinus;
-        case 4:  return this.unsignedArithmeticConstant;
+        case 0:  return this.namedConstantKind;
+        case 1:  return this.structureConstructor;
+        case 2:  return this.hasIntKind;
+        case 3:  return this.hiddenTUnderscore;
+        case 4:  return this.stringConst;
         case 5:  return this.bozLiteralConstant;
         case 6:  return this.hollerithConst;
-        case 7:  return this.logicalConst;
-        case 8:  return this.hasIntKind;
-        case 9:  return this.hiddenTUnderscore;
-        case 10: return this.stringConst;
+        case 7:  return this.hasMinus;
+        case 8:  return this.logicalConst;
+        case 9:  return this.hasPlus;
+        case 10: return this.unsignedArithmeticConstant;
         case 11: return this.name;
         default: return null;
         }
@@ -195,17 +195,17 @@ public class ASTConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasPlus = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.namedConstantKind = (ASTNamedConstantUseNode)value;
-        case 2:  this.structureConstructor = (ASTStructureConstructorNode)value;
-        case 3:  this.hasMinus = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.unsignedArithmeticConstant = (ASTUnsignedArithmeticConstantNode)value;
+        case 0:  this.namedConstantKind = (ASTNamedConstantUseNode)value;
+        case 1:  this.structureConstructor = (ASTStructureConstructorNode)value;
+        case 2:  this.hasIntKind = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 3:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 4:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 5:  this.bozLiteralConstant = (ASTBozLiteralConstantNode)value;
         case 6:  this.hollerithConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.logicalConst = (ASTLogicalConstantNode)value;
-        case 8:  this.hasIntKind = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 10: this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 7:  this.hasMinus = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 8:  this.logicalConst = (ASTLogicalConstantNode)value;
+        case 9:  this.hasPlus = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 10: this.unsignedArithmeticConstant = (ASTUnsignedArithmeticConstantNode)value;
         case 11: this.name = (ASTNamedConstantUseNode)value;
         default: throw new IllegalArgumentException("Invalid index");
         }

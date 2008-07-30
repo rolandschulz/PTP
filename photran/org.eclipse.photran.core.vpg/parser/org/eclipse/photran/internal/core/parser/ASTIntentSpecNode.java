@@ -26,21 +26,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTIntentSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isIntentIn; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token isIntentOut; // in ASTIntentSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isIntentIn; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token isIntentInOut; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTOut; // in ASTIntentSpecNode
-
-    public boolean isIntentIn()
-    {
-        return this.isIntentIn != null;
-    }
-
-    public void setIsIntentIn(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isIntentIn = newValue;
-    }
-
 
     public boolean isIntentOut()
     {
@@ -50,6 +39,17 @@ public class ASTIntentSpecNode extends ASTNode
     public void setIsIntentOut(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isIntentOut = newValue;
+    }
+
+
+    public boolean isIntentIn()
+    {
+        return this.isIntentIn != null;
+    }
+
+    public void setIsIntentIn(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntentIn = newValue;
     }
 
 
@@ -79,8 +79,8 @@ public class ASTIntentSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isIntentIn;
-        case 1:  return this.isIntentOut;
+        case 0:  return this.isIntentOut;
+        case 1:  return this.isIntentIn;
         case 2:  return this.isIntentInOut;
         case 3:  return this.hiddenTOut;
         default: return null;
@@ -91,8 +91,8 @@ public class ASTIntentSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 1:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 2:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value;
         case 3:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value;
         default: throw new IllegalArgumentException("Invalid index");
