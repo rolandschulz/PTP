@@ -18,25 +18,40 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -50,6 +65,15 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
 import org.eclipse.ptp.debug.sdm.core.pdi.PDIDebugger;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  * @author clement
@@ -62,6 +86,10 @@ public class SDMDebugger implements IPDebugger {
 	private IPDIEventFactory eventFactory = null;
 	private IPDIRequestFactory requestFactory = null;
 	
+	IFileStore routingFileStore = null;
+	private List<String> dbgArgs;
+	private IRemoteProcess process;
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath)
 	 */
@@ -78,6 +106,9 @@ public class SDMDebugger implements IPDebugger {
 		if (requestFactory == null) {
 			requestFactory = new SDMRequestFactory();
 		}
+
+		writeRoutingFile(launch);
+
 		return createSession(timeout, launch, corefile);
 	}
 	
@@ -99,6 +130,8 @@ public class SDMDebugger implements IPDebugger {
 		} catch (PDIException e) {
 			throw newCoreException(e);
 		}
+
+		prepareRoutingFile(configuration, attrMgr, monitor);
 	}
 		
 	/* (non-Javadoc)
@@ -112,7 +145,7 @@ public class SDMDebugger implements IPDebugger {
 			attrMgr.addAttribute(dbgArgsAttr);
 		}
 		
-		List<String> dbgArgs = dbgArgsAttr.getValue();
+		dbgArgs = dbgArgsAttr.getValue();
 
 		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
 		
@@ -131,6 +164,11 @@ public class SDMDebugger implements IPDebugger {
 			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
 		}
 	
+		int numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
+		dbgArgs.add("--numnodes=" + numProcs); //$NON-NLS-1$
+
+
+
 		// remote setting
 		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);;
 		if (dbgExePath == null) {
@@ -155,6 +193,41 @@ public class SDMDebugger implements IPDebugger {
 		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 	}
 	
+	public void cleanup(ILaunchConfiguration configuration,
+			AttributeManager attrMgr, IPLaunch launch) {
+		if (process != null) {
+			process.destroy();
+			process = null;
+		}
+	}
+
+	public void prepare(ILaunchConfiguration configuration,	AttributeManager attrMgr) {
+		IResourceManagerControl rm = null;
+
+		List<String> cmd = new ArrayList<String>();
+		cmd.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue());
+		cmd.addAll(dbgArgs);
+
+		try {
+			rm = (IResourceManagerControl) getResourceManager(configuration);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		IResourceManagerConfiguration conf = rm.getConfiguration();
+		AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+		IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
+		IRemoteConnection connection = connectionManager.getConnection(remConf.getConnectionName());
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, cmd);
+		process = null;
+		try {
+			process = processBuilder.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Get the PDI debugger implementation. Creates the class if necessary.
 	 * 
@@ -212,6 +285,80 @@ public class SDMDebugger implements IPDebugger {
 					launch.getLaunchConfiguration(), timeout, getDebugger(), job.getID(), job_size);
 		}
 		catch (PDIException e) {
+			throw newCoreException(e);
+		}
+	}
+
+	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager[] rms = universe.getResourceManagers();
+		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+		for (IResourceManager rm : rms) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
+					rm.getUniqueName().equals(rmUniqueName)) {
+				return rm;
+			}
+		}
+		return null;
+	}
+
+	private void prepareRoutingFile(ILaunchConfiguration configuration,
+			AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException {
+		IPath routingFilePath = new Path(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
+		routingFilePath = routingFilePath.append("routing_file");
+
+		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
+		IResourceManagerConfiguration conf = rm.getConfiguration();
+		AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+		IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
+		IRemoteConnection rconn = rconnMgr.getConnection(remConf.getConnectionName());
+		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
+
+		try {
+			this.routingFileStore = remoteFileManager.getResource(routingFilePath, monitor);
+		} catch (IOException e) {
+			throw newCoreException(e);
+		}
+
+		IFileInfo info = routingFileStore.fetchInfo();
+		if (info.exists()) {
+			try {
+				routingFileStore.delete(0, monitor);
+			} catch (CoreException e) {
+				throw newCoreException(e);
+			}
+			routingFileStore.fetchInfo();
+		}
+	}
+
+	private void writeRoutingFile(IPLaunch launch) throws CoreException {
+		System.out.println("Write");
+		IProgressMonitor monitor = new NullProgressMonitor();
+		OutputStream os = null;
+		try {
+			os = routingFileStore.openOutputStream(0, monitor);
+		} catch (CoreException e) {
+			throw newCoreException(e);
+		}
+		PrintWriter pw = new PrintWriter(os);
+		IPProcess processes[] = launch.getPJob().getProcesses();
+		pw.format("%d\n", processes.length);
+		int base = 10000;
+		int range = 10000;
+		Random random = new Random();
+		for (IPProcess process : processes) {
+			String index = process.getProcessIndex();
+			IPNode node = process.getNode();
+			String nodeName = node.getName();
+			int portNumber = base + random.nextInt(range);
+			pw.format("%s %s %d\n", index, nodeName, portNumber);
+		}
+		pw.close();
+		try {
+			os.close();
+		} catch (IOException e) {
 			throw newCoreException(e);
 		}
 	}

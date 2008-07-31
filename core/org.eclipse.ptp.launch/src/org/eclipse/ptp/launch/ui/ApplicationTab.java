@@ -84,6 +84,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	    public void modifyText(ModifyEvent e) {
             updateLaunchConfigurationDialog();
         }
+        @Override
         public void widgetSelected(SelectionEvent e) {
 	        Object source = e.getSource();
 			if (source == projButton) {
@@ -174,6 +175,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/* (non-Javadoc)
      * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
      */
+    @Override
     public Image getImage() {
         return LaunchImages.getImage(LaunchImages.IMG_MAIN_TAB);
     }
@@ -188,6 +190,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/* (non-Javadoc)
      * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
      */
+    @Override
     public void initializeFrom(ILaunchConfiguration configuration) {
     	super.initializeFrom(configuration);
     	
@@ -206,6 +209,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
     /* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public boolean isValid(ILaunchConfiguration config) {
 		setErrorMessage(null);
 		setMessage(null);
@@ -303,6 +307,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
     /* (non-Javadoc)
      * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.ILaunchConfigurationDialog)
      */
+    @Override
     public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
         super.setLaunchConfigurationDialog(dialog);
     }
@@ -488,6 +493,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/* (non-Javadoc)
      * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#updateLaunchConfigurationDialog()
      */
+    @Override
     protected void updateLaunchConfigurationDialog() {
         super.updateLaunchConfigurationDialog();
     }	
@@ -510,7 +516,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
     	    }
     	    initPath = getProject().getLocationURI().getPath();
     	}
-    	IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.core.LocalServices");
+    	IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
     	IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
     	if(localServices != null && localUIServices != null) {
     		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();

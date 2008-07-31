@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
@@ -300,9 +301,14 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(processName));
 			attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
 			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
+			try {
+				attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(newProcess.getIndex()));
+			} catch (IllegalValueException e) {
+				// Is always valid.
+				assert false;
+			}
 			attrMgr.addAttributes(newProcess.getAttributeManager().getAttributes());
 			rtSystem.changeProcess(processID, attrMgr);
-
 
 			IPProcessControl control = (IPProcessControl) ipJob.getProcessById(processID);
 			IPNode node = ipMachine.getNodeById(nodeID);
