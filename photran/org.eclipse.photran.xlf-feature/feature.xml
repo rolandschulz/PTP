@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.photran.xlf_feature"
-      label="IBM XLF Compiler Support"
+      label="IBM XLF Compiler Support (Eclipse Technology Incubation)"
       version="4.0.4"
       provider-name="Los Alamos National Laboratory">
 
