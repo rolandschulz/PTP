@@ -11,10 +11,9 @@
 package org.eclipse.photran.internal.ui.properties;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,6 +35,7 @@ public class SearchPathsPropertyPage extends PropertyPage
 {
     private BooleanFieldEditor enableVPG, enableDeclView, enableContentAssist;
     private WorkspacePathEditor modulePathEditor, includePathEditor;
+    private boolean showMessage = false;
     
     /**
      * @see PreferencePage#createContents(Composite)
@@ -61,18 +61,31 @@ public class SearchPathsPropertyPage extends PropertyPage
             {
                 enableDeclView.setEnabled(newValue, composite);
                 enableContentAssist.setEnabled(newValue, composite);
+                showMessage = (oldValue != newValue);
             }
         };
         enableVPG.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
                                                                            SearchPathProperties.ENABLE_VPG_PROPERTY_NAME));
         enableVPG.load();
 
-        enableDeclView = new BooleanFieldEditor("IgnoreThis", "Enable Fortran Declaration view", composite);
+        enableDeclView = new BooleanFieldEditor("IgnoreThis", "Enable Fortran Declaration view", composite)
+        {
+            @Override protected void valueChanged(boolean oldValue, boolean newValue)
+            {
+                showMessage = (oldValue != newValue);
+            }
+        };
         enableDeclView.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
                                                                                 SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME));
         enableDeclView.load();
 
-        enableContentAssist = new BooleanFieldEditor("IgnoreThis", "Enable Fortran content assist (Ctrl+Space)", composite);
+        enableContentAssist = new BooleanFieldEditor("IgnoreThis", "Enable Fortran content assist (Ctrl+Space)", composite)
+        {
+            @Override protected void valueChanged(boolean oldValue, boolean newValue)
+            {
+                showMessage = (oldValue != newValue);
+            }
+        };
         enableContentAssist.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
                                                                                      SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME));
         enableContentAssist.load();
@@ -128,6 +141,11 @@ public class SearchPathsPropertyPage extends PropertyPage
         enableContentAssist.store();
         modulePathEditor.store();
         includePathEditor.store();
+        
+        MessageDialog.openInformation(getShell(), "Preferences Changed", "You may need to close and re-open any " +
+            "Fortran editors for the new settings to take effect.");
+        showMessage = false;
+        
         return true;
     }
 }
