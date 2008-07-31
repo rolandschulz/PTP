@@ -41,6 +41,7 @@ static struct option longopts[] = {
 	{"port",			required_argument,	NULL, 	'p'},
 	{"host",			required_argument,	NULL, 	'h'},
 	{"jobid",			required_argument,	NULL, 	'j'},
+	{"numnodes",		required_argument, 	NULL,	'n'},
 #ifdef DEBUG
 	{"debug",			optional_argument,	NULL, 	'd'},
 #endif /* DEBUG */
@@ -48,9 +49,9 @@ static struct option longopts[] = {
 };
 
 #ifdef DEBUG
-static char * shortopts = "b:e:P:p:h:j:d::";
+static char * shortopts = "b:e:P:p:h:j:d:n::";
 #else /* DEBUG */
-static char * shortopts = "b:e:P:p:h:j:";
+static char * shortopts = "b:e:P:p:h:j:n:";
 #endif /* DEBUG */
 
 static int	fatal_error = 0;
@@ -132,6 +133,7 @@ main(int argc, char *argv[])
 				"    [--proxy=proxy]\n"
 				"    [--host=host_name] [--port=port]\n"
 				"    [--jobid=jobid]\n"
+				"	 [--numnodes=numnodes]\n"
 	#ifdef DEBUG
 				"    [--debug[=level]]\n"
 	#endif /* DEBUG */
