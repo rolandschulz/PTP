@@ -155,8 +155,7 @@ Inc. in the United States, other countries, or both.
          id="org.eclipse.photran.core.vpg"
          download-size="0"
          install-size="0"
-         version="4.0.4"
-         unpack="false"/>
+         version="4.0.4"/>
 
    <plugin
          id="org.eclipse.photran.ui.vpg"
