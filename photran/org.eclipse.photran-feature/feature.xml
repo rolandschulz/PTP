@@ -121,12 +121,6 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <update label="Photran" url="http://www.eclipse.org/photran/updates"/>
    </url>
 
-   <includes
-         id="org.eclipse.photran.vpg_feature"
-         version="4.0.4"
-         name="Photran Advanced Features (Content Assist, Declaration View, Refactoring)"
-         optional="true"/>
-
    <requires>
       <import feature="org.eclipse.cdt" version="5.0.0" match="compatible"/>
    </requires>
@@ -163,13 +157,6 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          version="4.0.4"/>
 
    <plugin
-         id="org.eclipse.photran.errorparsers.xlf"
-         download-size="0"
-         install-size="0"
-         version="4.0.4"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.photran.managedbuilder.gnu.ui"
          download-size="0"
          install-size="0"
@@ -177,10 +164,17 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.photran.managedbuilder.xlf.ui"
+         id="org.eclipse.photran.core.vpg"
          download-size="0"
          install-size="0"
-         version="4.0.4"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.ui.vpg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
