@@ -83,7 +83,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			try {
 				AttributeManager substitutionAttributeManager = createSubstitutionAttributes();
 				environment = doCreateEnvironment(substitutionAttributeManager);
-				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition()); 
+				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 				if (debugAttr != null && debugAttr.getValue()) {
 					command = doCreateDebugCommand(substitutionAttributeManager);
 				} else {
@@ -113,14 +113,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to execute command.", e);
 			}
 
-			changeJobState(JobAttributes.State.RUNNING);
-
 			try {
 				doExecutionStarted();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after launch.", e);
 			}
+
+			changeJobState(JobAttributes.State.RUNNING);
 
 			try {
 				doWaitExecution();
@@ -173,7 +173,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	abstract protected List<String> doCreateDebugCommand(AttributeManager attributeManager) throws CoreException;
 
 	abstract protected Map<String, String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException;
-	
+
 	protected AttributeManager createSubstitutionAttributes() throws CoreException {
 		AttributeManager newAttributeManager = new AttributeManager(getAttrMgr().getAttributes());
 //		AttributeManager newAttributeManager = new AttributeManager();
@@ -183,7 +183,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		IAttribute<?,?,?> extrAttributes[] = getExtraSubstitutionVariables();
 		newAttributeManager.addAttributes(extrAttributes);
 		for (IAttributeDefinition<?, ?, ?> attributeDefinition : getDefaultSubstitutionAttributes()) {
-			IAttribute<?, ?, ?> attribute = newAttributeManager.getAttribute(attributeDefinition.getId()); 
+			IAttribute<?, ?, ?> attribute = newAttributeManager.getAttribute(attributeDefinition.getId());
 			if (attribute == null) {
 				// Create one with default value
 				try {
@@ -195,11 +195,10 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		}
 		return newAttributeManager;
 	}
-	
+
 	abstract protected IAttribute<?, ?, ?>[] getExtraSubstitutionVariables() throws CoreException;
 
 	abstract protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes();
-	
 
 	/*
 	 * (non-Javadoc)

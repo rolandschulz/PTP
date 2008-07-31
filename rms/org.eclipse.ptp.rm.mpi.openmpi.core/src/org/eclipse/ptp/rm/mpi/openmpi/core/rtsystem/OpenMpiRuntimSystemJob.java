@@ -26,7 +26,10 @@ import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -90,7 +93,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			assert false; // This exception is not possible
 		}
 		final InputStreamListenerToOutputStream stdoutPipedStreamListener = new InputStreamListenerToOutputStream(stdoutOutputStream);
-		
+
 		Thread stdoutThread = new Thread() {
 			@Override
 			public void run() {
@@ -274,6 +277,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		 */
 		List<Process> newProcesses = map.getProcesses();
 		processIDs = new String[newProcesses.size()];
+		IPMachine ipMachine = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getMachineById(rtSystem.getMachineID());
 		for (Process newProcess : newProcesses) {
 			String nodename = newProcess.getNode().getName();
 			String nodeID = rtSystem.getNodeIDforName(nodename);
@@ -294,9 +298,15 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 
 			AttributeManager attrMgr = new AttributeManager();
 			attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(processName));
+			attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
 			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 			attrMgr.addAttributes(newProcess.getAttributeManager().getAttributes());
 			rtSystem.changeProcess(processID, attrMgr);
+
+
+			IPProcessControl control = (IPProcessControl) ipJob.getProcessById(processID);
+			IPNode node = ipMachine.getNodeById(nodeID);
+			control.addNode(node);
 		}
 	}
 
@@ -382,7 +392,6 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentKeysDefinition().create(keys));
 		}
 
-		//${envKeys:-x : -x :::}
 		newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentArgsDefinition().create());
 
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);

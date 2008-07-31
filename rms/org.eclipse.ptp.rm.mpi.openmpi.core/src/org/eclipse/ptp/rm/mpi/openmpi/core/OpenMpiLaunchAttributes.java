@@ -33,7 +33,7 @@ public class OpenMpiLaunchAttributes {
 
 	private final static StringAttributeDefinition environmentArgsDefinition = new StringAttributeDefinition(
 			ENV_ARGS_ATTR_ID, "Environment arguments", "Command line arguments to set environment variables for each openmpi process", false,
-			"${envKeys:-x : -x :::}");
+			"${envKeys:: -x ::-x :}");
 
 	/**
 	 * List of names of environment variables for the application.
