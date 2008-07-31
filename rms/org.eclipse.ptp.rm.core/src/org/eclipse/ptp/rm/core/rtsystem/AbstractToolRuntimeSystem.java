@@ -422,8 +422,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String subId = attrMgr.getAttribute(JobAttributes.getSubIdAttributeDefinition()).getValue();
 		String execName  = attrMgr.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValue();
 		String execPath = attrMgr.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValue();
+		String workDir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 		Integer numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
-//		List<String> progArgs = attrMgr.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
+		List<String> progArgs = attrMgr.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
 
 		/*
 		 * Copy these relevant attributes to IPJob.
@@ -431,13 +432,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		jobAttrMgr.addAttribute(JobAttributes.getSubIdAttributeDefinition().create(subId));
 		jobAttrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(execName));
 		jobAttrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(execPath));
+		jobAttrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(workDir));
 		try {
 			jobAttrMgr.addAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition().create(numProcs));
 		} catch (IllegalValueException e) {
 			PTPCorePlugin.log(e);
 		}
-		// TODO: Why does this not compile?
-//		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgsAttr));
+		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgs.toArray(new String[0])));
 
 		/*
 		 * Notify RM.

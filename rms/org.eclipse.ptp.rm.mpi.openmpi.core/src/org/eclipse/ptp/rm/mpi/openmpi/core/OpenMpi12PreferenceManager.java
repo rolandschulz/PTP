@@ -16,10 +16,10 @@ import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 
 public class OpenMpi12PreferenceManager extends AbstractToolsPreferenceManager {
 	private static final String LAUNCH_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${execPath}/${execName} ${progArgs}";
-	private static final String DEBUG_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${debugExecName}/${debugExecName} ${debugArgs}";
+	private static final String DEBUG_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${debugExecPath}/${debugExecName} ${debugArgs}";
 	private static final String DISCOVER_CMD = "ompi_info -a --parseable";
 	private static final String PATH = "";
-	private static final boolean USE_DEFAULTS = true;	
+	private static final boolean USE_DEFAULTS = true;
 
 	public static final String PREFIX = "openmpi-1.2-";
 
