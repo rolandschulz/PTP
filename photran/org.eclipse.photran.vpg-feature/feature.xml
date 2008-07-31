@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.photran.vpg_feature"
-      label="Photran Advanced Features"
+      label="Photran Advanced Features (Content Assist, Declaration View, Refactoring) (Eclipse Technology Incubation)"
       version="4.0.4"
-      provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
+      provider-name="University of Illinois at Urbana-Champaign"
       nl="en_US">
 
    <description url="http://www.example.com/description">

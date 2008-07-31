@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.photran_feature"
-      label="Photran (Eclipse Fortran Development Tools)"
+      label="Photran (Eclipse Fortran Development Tools) (Eclipse Technology Incubation)"
       version="4.0.4"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory">
 
@@ -124,7 +124,7 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
    <includes
          id="org.eclipse.photran.vpg_feature"
          version="4.0.4"
-         name="Photran Advanced Features"
+         name="Photran Advanced Features (Content Assist, Declaration View, Refactoring)"
          optional="true"/>
 
    <requires>
