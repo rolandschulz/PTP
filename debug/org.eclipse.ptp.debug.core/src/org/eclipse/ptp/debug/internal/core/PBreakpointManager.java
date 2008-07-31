@@ -235,8 +235,9 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @see org.eclipse.ptp.debug.internal.core.IPBreakpointManager#addSetBreakpoints(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.model.IPBreakpoint[])
 	 */
 	public void addSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints) {
-		if (breakpoints.length == 0)
+		if (breakpoints.length == 0) {
 			return;
+		}
 		for (IPBreakpoint bpt : breakpoints) {
 			IPDIBreakpoint pdiBreakpoint = null;
 			synchronized (getBreakpointMap()) {
@@ -939,5 +940,15 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				PTPDebugCorePlugin.log(e);
 			}
 		}
+	}
+	
+	/**
+	 * Update any pending breakpoints. This should be called when the debugger enters suspended state
+	 * to update any breakpoints that could not be set or deleted because tasks were running.
+	 * 
+	 * @throws PDIException
+	 */
+	public void updatePendingBreakpoints() throws PDIException {
+		getPDISession().getBreakpointManager().updatePendingBreakpoints();
 	}
 }

@@ -496,9 +496,11 @@ public class PDebugModel {
 	}
 	
 	/**
-	 * @param session
-	 * @param set_id
-	 * @param tasks
+	 * Add new tasks to a task set
+	 * 
+	 * @param session current debug session
+	 * @param set_id ID of the set to add the tasks to
+	 * @param tasks tasks to add to the set
 	 */
 	public void addTasks(IPSession session, String set_id, BitList tasks) {
 		BitList curSetTasks = getTasks(session, set_id);

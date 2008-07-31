@@ -36,23 +36,19 @@ public abstract class Breakpoint extends SessionObject implements IPDIBreakpoint
 	private int bpid = -1; //by default id is -1
 	private int type;
 	private boolean enable;
+	private boolean deleted = false;
 	private int internal_id;
-	
+
+	private BitList pendingTasks; // tasks remaining to set breakpoint
+
 	public Breakpoint(IPDISession session, BitList tasks, int type, IPDICondition condition, boolean enabled) {
 		super(session, tasks);
 		this.type = type;
 		this.condition = condition;
 		this.enable = enabled;
 		this.internal_id = internal_counter++;
+ 		this.pendingTasks = tasks.copy();
 	}
-	
-	/**
-	 * @param tasks
-	 */
-	public void changeTasks(BitList tasks) {
-		this.tasks = tasks;
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint#getBreakpointID()
 	 */
@@ -77,11 +73,15 @@ public abstract class Breakpoint extends SessionObject implements IPDIBreakpoint
 		return internal_id;
 	}
 	
-	/**
-	 * @return
+	public BitList getPendingTasks() {
+		return pendingTasks;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint#isDeleted()
 	 */
-	public int getType() {
-		return type;
+	public boolean isDeleted() {
+		return deleted;
 	}
 	
 	/* (non-Javadoc)
@@ -117,6 +117,13 @@ public abstract class Breakpoint extends SessionObject implements IPDIBreakpoint
 	 */
 	public void setCondition(IPDICondition condition) {
 		this.condition = condition;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint#setDeleted()
+	 */
+	public void setDeleted() {
+		this.deleted = true;
 	}
 	
 	/* (non-Javadoc)
