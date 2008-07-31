@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photran Virtual Program Graph Core Plug-in
 Bundle-SymbolicName: org.eclipse.photran.core.vpg;singleton:=true
-Bundle-Version: 4.0.3
+Bundle-Version: 4.0.4
 Bundle-Activator: org.eclipse.photran.core.vpg.Activator
 Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
 Require-Bundle: org.eclipse.core.runtime,

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.photran.vpg_feature"
-      label="Photran Analysis &amp; Refactoring Feature"
-      version="4.0.3"
+      label="Photran Advanced Features"
+      version="4.0.4"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
-      os="linux,macosx,solaris,win32"
       nl="en_US">
 
    <description url="http://www.example.com/description">
@@ -156,14 +155,14 @@ Inc. in the United States, other countries, or both.
          id="org.eclipse.photran.core.vpg"
          download-size="0"
          install-size="0"
-         version="4.0.3"
+         version="4.0.4"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.ui.vpg"
          download-size="0"
          install-size="0"
-         version="4.0.3"
+         version="4.0.4"
          unpack="false"/>
 
 </feature>

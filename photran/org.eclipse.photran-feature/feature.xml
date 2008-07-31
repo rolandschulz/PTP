@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.photran_feature"
-      label="Photran"
-      version="4.0.3"
+      label="Photran (Fortran Development Tools)"
+      version="4.0.4"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
-      os="linux,macosx,solaris,win32"
       nl="en_US">
 
    <description url="http://www.eclipse.org/photran">
@@ -12,10 +11,11 @@
    </description>
 
    <copyright url="http://www.eclipse.org/photran">
-      Copyright (c) 2006 University of Illinois at Urbana-Champaign, Los Alamos National Laboratory, and others.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the Eclipse Public License v1.0
-which accompanies this distribution, and is available at
+      Copyright (c) 2006-2008 University of Illinois at Urbana-Champaign,
+Los Alamos National Laboratory, and others.  All rights reserved.
+This program and the accompanying materials are made available
+under the terms of the Eclipse Public License v1.0 which
+accompanies this distribution and is available at
 http://www.eclipse.org/legal/epl-v10.html
    </copyright>
 
@@ -144,67 +144,72 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
       <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.ltk.core.refactoring"/>
-      <import plugin="org.eclipse.ltk.ui.refactoring"/>
-      <import feature="org.eclipse.cdt" version="4.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.cdt" version="5.0.0" match="compatible"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.photran.core"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.photran.cdtinterface"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.cdt.make.ui"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.cdt.debug.ui"/>
+      <import plugin="org.eclipse.photran.core.intel"/>
+      <import plugin="org.eclipse.photran.managedbuilder.core"/>
    </requires>
 
    <plugin
          id="org.eclipse.photran.core"
          download-size="0"
          install-size="0"
-         version="4.0.3"/>
+         version="4.0.4"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.core"
          download-size="0"
          install-size="0"
-         version="4.0.3"
+         version="4.0.4"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.ui"
          download-size="0"
          install-size="0"
-         version="4.0.3"/>
+         version="4.0.4"/>
 
    <plugin
          id="org.eclipse.photran.cdtinterface"
          download-size="0"
          install-size="0"
-         version="4.0.3"/>
+         version="4.0.4"/>
 
    <plugin
          id="org.eclipse.photran.ui"
          download-size="0"
          install-size="0"
-         version="4.0.3"/>
+         version="4.0.4"/>
 
    <plugin
          id="org.eclipse.photran.errorparsers.xlf"
          download-size="0"
          install-size="0"
-         version="4.0.3"
+         version="4.0.4"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.gnu.ui"
          download-size="0"
          install-size="0"
-         version="4.0.3"
+         version="4.0.4"
          unpack="false"/>
-
-   <plugin
-         id="org.eclipse.photran.managedbuilder.intel.ui"
-         download-size="0"
-         install-size="0"
-         version="4.0.3"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.xlf.ui"
          download-size="0"
          install-size="0"
-         version="4.0.3"
+         version="4.0.4"
          unpack="false"/>
 
 </feature>
