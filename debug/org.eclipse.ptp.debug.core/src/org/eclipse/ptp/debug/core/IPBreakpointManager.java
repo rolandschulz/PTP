@@ -19,15 +19,14 @@ import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
-/**
- * @author greg
- *
- */
 public interface IPBreakpointManager {
 
 	/**
-	 * @param tasks
-	 * @param breakpoints
+	 * Called when tasks are added to a task set. This causes the breakpoints
+	 * to be set on the new tasks also.
+	 * 
+	 * @param tasks new tasks being added to the set
+	 * @param breakpoints breakpoints that are to be updated
 	 */
 	public void addSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints);
 

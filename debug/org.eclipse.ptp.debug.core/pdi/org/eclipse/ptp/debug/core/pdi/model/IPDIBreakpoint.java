@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.model;
 
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -44,60 +45,93 @@ public interface IPDIBreakpoint extends IPDISessionObject {
 	public final static int HARDWARE = 0x2;
 	
 	/**
-	 * Determines whether this breakpoint is temporary
-	 * @return whether this breakpoint is temporary
+	 * Returns breakpoint id of this breakpoint
+	 * 
+	 * @return breakpoint id of this breakpoint
 	 */
-	boolean isTemporary();
-	
-	/**
-	 * Determines whether this breakpoint is hardware-assisted
-	 * @return whether this breakpoint is hardware-assisted
-	 */
-	boolean isHardware();
-	
-	/**
-	 * Determines whether this breakpoint is enabled
-	 * @return whether this breakpoint is enabled
-	 * @throws PDIException on failure
-	 */
-	boolean isEnabled() throws PDIException;
-	
-	/**
-	 * Sets the breakpoint state to be enabled or disabled.
-	 * @param enabled whether this breakpoint should be enabled
-	 * @throws PDIException on failure
-	 */
-	void setEnabled(boolean enabled) throws PDIException;
+	public int getBreakpointID();
 	
 	/**
 	 * Returns the condition of this breakpoint or null if no condition in this breakpoint
+	 * 
 	 * @return the condition of this breakpoint
 	 * @throws PDIException on failure
 	 */
-	IPDICondition getCondition() throws PDIException;
+	public IPDICondition getCondition() throws PDIException;
 	
 	/**
-	 * Sets the condition of this breakpoint
+	 * Returns internal breakpoint id
+	 * 
+	 * @return internal breakpoint id
+	 */
+	public int getInternalID();
+	
+	/**
+	 * This is the set of pending tasks for the current operation. If the breakpoint is marked
+	 * for deletion, it's the tasks that still require the breakpoint to be removed. Otherwise,
+	 * its the tasks on which the breakpoint still needs to be set.
+	 * 
+	 * @return pending tasks
+	 */
+	public BitList getPendingTasks();
+	
+	/**
+	 * Breakpoint has been marked for deletion. The breakpoint is not
+	 * actually removed until getPendingTasks().isEmpty() is true.
+	 * 
+	 * @return true if breakpoint is being deleted
+	 */
+	public boolean isDeleted();
+	
+	/**
+	 * Determines whether this breakpoint is enabled
+	 * 
+	 * @return whether this breakpoint is enabled
+	 * @throws PDIException on failure
+	 */
+	public boolean isEnabled() throws PDIException;
+	
+	/**
+	 * Determines whether this breakpoint is hardware-assisted
+	 * 
+	 * @return whether this breakpoint is hardware-assisted
+	 */
+	public boolean isHardware();
+	
+	/**
+	 * Determines whether this breakpoint is temporary
+	 * 
+	 * @return whether this breakpoint is temporary
+	 */
+	public boolean isTemporary();
+	
+	/**
+	 * Sets a breakpoint id for this breakpoint
+	 * 
+	 * @param bpid breakpoint id 
+	 */
+	public void setBreakpointID(int bpid);
+	
+	/**
+	 * Marks the breakpoint for deletion. The breakpoint should be
+	 * considered deleted at this point and no further operations
+	 * permitted.
+	 */
+	public void setDeleted();
+	
+	/**
+	 * Sets the breakpoint state to be enabled or disabled.
+	 * 
+	 * @param enabled whether this breakpoint should be enabled
+	 * @throws PDIException on failure
+	 */
+	public void setEnabled(boolean enabled) throws PDIException;
+	
+	/**
+	 * Sets the condition of this breakpoint.
+	 * 
 	 * @param condition the condition to set
 	 * @throws PDIException on failure
 	 */
 	void setCondition(IPDICondition condition) throws PDIException;
-	
-	/**
-	 * Returns internal breakpoint id
-	 * @return internal breakpoint id
-	 */
-	int getInternalID();
-	
-	/**
-	 * Returns breakpoint id of this breakpoint
-	 * @return breakpoint id of this breakpoint
-	 */
-	int getBreakpointID();
-	
-	/**
-	 * Sets a breakpoint id for this breakpoint
-	 * @param bpid breakpoint id 
-	 */
-	void setBreakpointID(int bpid);
 }

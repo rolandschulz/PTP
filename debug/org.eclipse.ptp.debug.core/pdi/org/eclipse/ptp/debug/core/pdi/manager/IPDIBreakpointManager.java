@@ -40,25 +40,21 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
  */
 public interface IPDIBreakpointManager extends IPDIManager {
 	/**
-	 * @param id
-	 * @return
-	 */
-	public IPDIBreakpoint getBreakpoint(int id);
-	
-	/**
-	 * Adds a breakpoint that is different from original task
-	 * @param tasks latest tasks
-	 * @param breakpoint breakpoint to be added
+	 * Called when new tasks are added to a set. Updates the breakpoint so that
+	 * it is set on the new tasks.
+	 * 
+	 * @param tasks tasks that have been added
+	 * @param breakpoint breakpoint to update
 	 * @throws PDIException on failure 
 	 */
-	void addSetBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
-
+	public void addSetBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
+	
 	/**
 	 * Create address location
 	 * @param address
 	 * @return
 	 */
-	IPDIAddressLocation createAddressLocation(BigInteger address);
+	public IPDIAddressLocation createAddressLocation(BigInteger address);
 
 	/**
 	 * Creates condition
@@ -67,52 +63,52 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @param tids
 	 * @return
 	 */
-	IPDICondition createCondition(int ignoreCount, String expression, String[] tids);
-	
+	public IPDICondition createCondition(int ignoreCount, String expression, String[] tids);
+
 	/**
 	 * Create function location
 	 * @param file
 	 * @param function
 	 * @return
 	 */
-	IPDIFunctionLocation createFunctionLocation(String file, String function);
-
+	public IPDIFunctionLocation createFunctionLocation(String file, String function);
+	
 	/**
 	 * Creates line location
 	 * @param file
 	 * @param line
 	 * @return
 	 */
-	IPDILineLocation createLineLocation(String file, int line);
+	public IPDILineLocation createLineLocation(String file, int line);
 
 	/**
 	 * Deletes all breakpoint of all processes
 	 * @throws PDIException on failure
 	 */
-	void deleteAllBreakpoints() throws PDIException;
+	public void deleteAllBreakpoints() throws PDIException;
 
 	/**
 	 * Deletes all breakpoints of specify process
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void deleteAllBreakpoints(BitList tasks) throws PDIException;
-	
+	public void deleteAllBreakpoints(BitList tasks) throws PDIException;
+
 	/**
 	 * Deletes breakpoint
 	 * @param tasks
 	 * @param breakpoint
 	 * @throws PDIException on failure 
 	 */
-	void deleteBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
-
+	public void deleteBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
+	
 	/**
 	 * Deletes a breakpoint that is different from original task
 	 * @param tasks latest tasks
 	 * @param breakpoint breakpoint to be deleted
 	 * @throws PDIException on failure 
 	 */
-	void deleteSetBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
+	public void deleteSetBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
 
 	/**
 	 * Disable breakpoint
@@ -120,15 +116,21 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @param breakpoint
 	 * @throws PDIException
 	 */
-	void disableBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
-	
+	public void disableBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
+
 	/**
 	 * Enables breakpoint
 	 * @param tasks
 	 * @param breakpoint
 	 * @throws PDIException
 	 */
-	void enableBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
+	public void enableBreakpoint(BitList tasks, IPDIBreakpoint breakpoint) throws PDIException;
+	
+	/**
+	 * @param id
+	 * @return
+	 */
+	public IPDIBreakpoint getBreakpoint(int id);
 	
 	/**
 	 * Sets address breakpoint
@@ -141,7 +143,7 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	IPDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, IPDIAddressLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException;
+	public IPDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, IPDIAddressLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException;
 
 	/**
 	 * Sets condition
@@ -150,7 +152,7 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @param newCondition
 	 * @throws PDIException
 	 */
-	void setCondition(BitList tasks, IPDIBreakpoint breakpoint, IPDICondition newCondition) throws PDIException;
+	public void setCondition(BitList tasks, IPDIBreakpoint breakpoint, IPDICondition newCondition) throws PDIException;
 
 	/**
 	 * Sets exceptionpoint
@@ -162,7 +164,7 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	IPDIExceptionpoint setExceptionpoint(BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch, boolean enabled) throws PDIException;
+	public IPDIExceptionpoint setExceptionpoint(BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch, boolean enabled) throws PDIException;
 	
 	/**
 	 * Sets function breakpoint
@@ -175,7 +177,7 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	IPDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, IPDIFunctionLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException;
+	public IPDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, IPDIFunctionLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException;
 
 	/**
 	 * Sets line breakpoint
@@ -188,7 +190,7 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	IPDILineBreakpoint setLineBreakpoint(BitList tasks, int type, IPDILineLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException;
+	public IPDILineBreakpoint setLineBreakpoint(BitList tasks, int type, IPDILineLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException;
 
 	/**
 	 * Sets watchpoint
@@ -201,5 +203,13 @@ public interface IPDIBreakpointManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	IPDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, IPDICondition condition, boolean enabled) throws PDIException;
+	public IPDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, IPDICondition condition, boolean enabled) throws PDIException;
+
+	/**
+	 * Update any pending breakpoints. This should be called when the debugger enters suspended state
+	 * to update any breakpoints that could not be set or deleted because tasks were running.
+	 * 
+	 * @throws PDIException
+	 */
+	public void updatePendingBreakpoints() throws PDIException;
 }

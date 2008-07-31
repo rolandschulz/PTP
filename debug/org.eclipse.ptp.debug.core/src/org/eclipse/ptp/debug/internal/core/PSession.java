@@ -262,6 +262,10 @@ public class PSession implements IPSession, IPDIEventListener {
 			} else if (event instanceof IPDIResumedEvent) {
 				fireResumeEvent((IPDIResumedEvent)event);
 			} else if (event instanceof IPDISuspendedEvent) {
+				try {
+					bptMgr.updatePendingBreakpoints();
+				} catch (PDIException e) {
+				}
 				fireSuspendEvent((IPDISuspendedEvent)event);
 			} else {
 				IPDebugEvent debugEvent = new PDebugEvent(this, IPDebugEvent.UNSPECIFIED, IPDebugEvent.UNSPECIFIED, getDebugInfo(event.getTasks()));		
