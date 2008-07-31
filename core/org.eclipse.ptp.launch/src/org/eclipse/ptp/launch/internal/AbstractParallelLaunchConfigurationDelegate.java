@@ -94,10 +94,8 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.RuleFactory;
-import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
@@ -309,6 +307,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 									} catch (CoreException e1) {
 										//FIXME Notifies error?
 									}
+									doCleanupJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
+											jobSub.getAttrMgr(), jobSub.getDebugger(), jobSub.getLaunch().getPJob());
 								}
 							}
 
@@ -501,6 +501,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @return
 	 * @throws CoreException
 	 */
+	@Deprecated
 	protected static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
 	} 
@@ -580,6 +581,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.LaunchConfigurationDelegate#getLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
 	 */
+	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PLaunch(configuration, mode, null);
 	}
@@ -631,6 +633,21 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,  
 			AttributeManager mgr, IPDebugger debugger, IPJob job);
 	
+	protected void doCleanupJobLaunch(ILaunchConfiguration configuration, String mode,
+			IPLaunch launch, AttributeManager attrMgr, IPDebugger debugger,
+			IPJob job) {
+		if (debugger != null) {
+			debugger.cleanup(configuration, attrMgr, launch);
+		}
+	}
+
+	protected void doPrepareJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,
+	AttributeManager mgr, IPDebugger debugger, IPJob job) {
+		if (debugger != null) {
+			debugger.prepare(configuration, mgr);
+		}
+	}
+
 	/**
 	 * Get all the attributes specified in the launch configuration.
 	 * 
@@ -753,6 +770,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @return IPath corresponding to program executable
 	 * @throws CoreException
 	 */
+	@Deprecated
 	protected IPath getProgramFile(ILaunchConfiguration configuration) throws CoreException {
 		IProject project = verifyProject(configuration);
 		String fileName = getProgramName(configuration);
@@ -894,6 +912,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
 		jobSubmissions.put(jobSub.getId(), jobSub);
 	
+		doPrepareJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
+				jobSub.getAttrMgr(), jobSub.getDebugger(), jobSub.getLaunch().getPJob());
 		rm.submitJob(jobSub.getId(), configuration, attrMgr, monitor);
 		
 		JobStatus status = jobSub.waitFor(monitor);
@@ -910,6 +930,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @throws CoreException
 	 * @deprecated
 	 */
+	@Deprecated
 	protected IBinaryObject verifyBinary(IProject project, IPath exePath) throws CoreException {
 		ICExtensionReference[] parserRef = CCorePlugin.getDefault().getBinaryParserExtensions(project);
 		for (int i = 0; i < parserRef.length; i++) {
@@ -970,6 +991,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @return
 	 * @deprecated
 	 */
+	@Deprecated
 	protected boolean verifyPath(String path) {
 		IPath programPath = new Path(path);
 		if (programPath == null || programPath.isEmpty() || !programPath.toFile().exists()) {
@@ -1251,7 +1273,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
 				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
 
-				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.core.LocalServices");
+				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
 				if (localServices != null) {
 					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
