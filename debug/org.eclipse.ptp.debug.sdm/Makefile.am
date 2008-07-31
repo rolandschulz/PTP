@@ -13,7 +13,9 @@ sdm_SOURCES =				src/client/startup.c\
 							src/server/test_backend.c \
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
-							src/impl/sdm_message_ompi.c \
+							src/impl/sdm_hello_proto.c \
+							src/impl/sdm_routetable_reader.c \
+							src/impl/sdm_message_tcpip.c \
 							src/impl/sdm_route_tree.c \
 							src/impl/sdm_set_bitset.c
 					
