@@ -109,13 +109,12 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		String env[] = new String[0];
 		IHostShell hostShell = null;
 		try {
-			hostShell = shellService.launchShell("", env,new NullProgressMonitor());  //$NON-NLS-1$
+			hostShell = shellService.runCommand(directory().toURI().getPath(), remoteCmd, env,new NullProgressMonitor());  //$NON-NLS-1$
 		} catch (SystemMessageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
-		hostShell.writeToShell(remoteCmd);
 		
 		Process p = new HostShellProcessAdapter(hostShell);
 		return new RSEProcess(p);
