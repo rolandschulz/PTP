@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.photran_feature"
-      label="Photran (Fortran Development Tools)"
+      label="Photran (Eclipse Fortran Development Tools)"
       version="4.0.4"
-      provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
-      nl="en_US">
+      provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory">
 
    <description url="http://www.eclipse.org/photran">
       Photran - An Eclipse-based Integrated Development Environment for Fortran
@@ -118,6 +117,10 @@ and re-export of encryption software, to see if this is permitted.
 Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in the United States, other countries, or both.
    </license>
 
+   <url>
+      <update label="Photran" url="http://www.eclipse.org/photran/updates"/>
+   </url>
+
    <includes
          id="org.eclipse.photran.intel"
          version="0.0.0"
@@ -133,31 +136,7 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          optional="true"/>
 
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ui.console"/>
-      <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import plugin="org.eclipse.ui.views"/>
       <import feature="org.eclipse.cdt" version="5.0.0" match="compatible"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.photran.core"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
-      <import plugin="org.eclipse.photran.cdtinterface"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
-      <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.cdt.make.ui"/>
-      <import plugin="org.eclipse.cdt.launch"/>
-      <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.cdt.debug.ui"/>
-      <import plugin="org.eclipse.photran.core.intel"/>
-      <import plugin="org.eclipse.photran.managedbuilder.core"/>
    </requires>
 
    <plugin

@@ -18,8 +18,12 @@
       %license
    </license>
 
+   <url>
+      <update label="Photran" url="http://www.eclipse.org/photran/updates"/>
+   </url>
+
    <requires>
-      <import feature="org.eclipse.photran_feature" version="4.0.3"/>
+      <import feature="org.eclipse.photran_feature" version="4.0.4" match="perfect"/>
    </requires>
 
    <plugin
