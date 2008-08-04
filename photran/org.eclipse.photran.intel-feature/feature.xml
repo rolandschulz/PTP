@@ -29,7 +29,6 @@
    <plugin
          id="org.eclipse.photran.managedbuilder.intel.ui"
          os="linux"
-         arch="ia64,x86"
          download-size="0"
          install-size="0"
          version="4.0.4"/>
@@ -37,7 +36,6 @@
    <plugin
          id="org.eclipse.photran.core.intel"
          os="linux"
-         arch="ia64,x86"
          download-size="0"
          install-size="0"
          version="4.0.4"/>
