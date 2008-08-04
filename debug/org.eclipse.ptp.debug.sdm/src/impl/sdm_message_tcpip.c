@@ -108,7 +108,7 @@ sdm_create_sockd_map()
 		}
 	}
 	sdm_set_free(all_nodes);
-	sdm_set_free(adjacent_nodes);
+	//sdm_set_free(adjacent_nodes);
 }
 
 /**
@@ -124,11 +124,13 @@ sdm_parent_port_bind(int parentbaseport)
 
 	struct sockaddr_in sockaddr_info;
 	struct sockaddr_in peersockaddr_info;
-	unsigned peeraddr_len;
 	struct in_addr addr = {INADDR_ANY};
+	unsigned peeraddr_len = sizeof(struct in_addr);
 
 	//.Create a socket and bind to the port
 	sockfd = socket(PF_INET, SOCK_STREAM, 0);
+
+	printf("[ACCEPT] sockfd: %d\n", sockfd);
 
 	memset(&sockaddr_info, 0, sizeof(struct sockaddr_in));
 	sockaddr_info.sin_family = AF_INET;
@@ -352,6 +354,7 @@ sdm_tcpip_init()
 				mapp->sockd = childsockd;
 				break;
 			}
+			mapp = mapp->next;
 		}
 
 		//printf("ID: %s, host: %s, port: %d\n", table_entry.nodeID, table_entry.hostname, table_entry.port);
@@ -482,6 +485,12 @@ sdm_get_active_sock_desc()
 	}
 	printf("fdmax: %d\n", fdmax);
 
+	if(fdmax < 0) {
+		// No children socket opened
+		printf("No children socket opened!\n");
+		return -2;
+	}
+
 	// Check if any of the sockets connected
 	// but don't block
 	selrv = select(fdmax + 1, &rfdset, NULL, NULL, &time);
@@ -492,6 +501,7 @@ sdm_get_active_sock_desc()
 		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "select syscall failed!\n");
 		return -1;
 	} else if(selrv == 0) { // No socket has data. Return appropriated code
+		printf("The sockets listened dont have data!\n");
 		return -2;
 	}
 
@@ -507,7 +517,7 @@ sdm_get_active_sock_desc()
 	}
 	if(parent_sockd_map != NULL) {
 		if(FD_ISSET(parent_sockd_map->sockd, &rfdset)) {
-			printf("parentsockd %d active on FD_SET\n", p->sockd);
+			printf("parentsockd %d active on FD_SET\n", parent_sockd_map->sockd);
 			return parent_sockd_map->sockd;
 		}
 	}
@@ -516,15 +526,23 @@ sdm_get_active_sock_desc()
 	return -1;
 }
 
+/**
+ * Provides the number of bytes to be read of the message
+ * (the size of the header is already subtracted)
+ */
 int
-sdm_get_count_from_socket(int sockfd, int *length)
+sdm_tcpip_msgheader_receive(int sockfd, int *length)
 {
 	int rv;
 
-	rv = read(sockfd, length, sizeof(int));
+	rv = read(sockfd, (void *)length, sizeof(int));
 
 	perror("Status on read syscall");
-	printf("Read %d bytes from the message\n", length);
+	printf("Read %d bytes from the message\n", *length);
+
+	// Subtract sizeof(*length), since header was read
+	*length -= sizeof(*length);
+
 
 	// Read cannot be empty or generate an error
 	if(rv <= 0) {
@@ -535,14 +553,14 @@ sdm_get_count_from_socket(int sockfd, int *length)
 }
 
 int
-sdm_get_message_from_socket(int sockfd, char *buf, int length)
+sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
 {
 	int rcount;
 
 	do {
 		rcount = read(sockfd, buf, length);
 		perror("Status on read syscall");
-		printf("Read %d bytes from the message\n", length);
+		printf("Read %d bytes from the message\n", rcount);
 
 		if(rcount < 0) {
 			return -1;
@@ -550,6 +568,29 @@ sdm_get_message_from_socket(int sockfd, char *buf, int length)
 		buf += rcount;
 		length -= rcount;
 	}while(length > 0);
+
+	return 0;
+}
+
+int
+sdm_tcpip_send(int sockd, char *buf, int length)
+{
+	int wcount;
+
+	// Write all message to the socket
+	do {
+		wcount = write(sockd, (void *)buf, length);
+		perror("write syscall status");
+		printf("wrote %d bytes\n", length);
+
+		if(wcount < 0) {
+			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Could not send message data - write syscall failed!\n");
+			return -1;
+		}
+
+		buf += wcount;
+		length -= wcount;
+	} while(length > 0);
 
 	return 0;
 }
@@ -664,8 +705,10 @@ sdm_message_finalize()
 int
 sdm_message_send(const sdm_message msg)
 {
-	int			len;
+	int			len, maxlen; // effective and maximum length of the message
+							 // these two vars must have the same size!
 	char *		p;
+	char *		header_addr; // Pointer to the header of the message
 	char *		buf;
 	sdm_id		dest_id;
 	sdm_idset	route;
@@ -694,24 +737,26 @@ sdm_message_send(const sdm_message msg)
 		 * This includes the length of the message at the beginning
 		 */
 
-		len = sizeof(len)
+		maxlen = sizeof(maxlen)
 			+ HEX_LEN
 			+ sdm_aggregate_serialized_length(msg->aggregate)
 			+ sdm_set_serialized_length(msg->src)
 			+ sdm_set_serialized_length(msg->dest)
 			+ msg->payload_len;
 
-		p = buf = (char *)malloc(len);
+		p = buf = (char *)malloc(maxlen);
 
-		printf("message len: %d\n", len);
+		printf("message maxlen: %d\n", maxlen);
+
+		// Saves the address of the header
+		header_addr = p;
+
+		p += (int)sizeof(maxlen); // Points to the body of the message
 
 		/*
-		 * Note: len was the maximum length of the serialized buffer, we
+		 * Note: maxlen was the maximum length of the serialized buffer, we
 		 * now calculate the actual length for the send.
 		 */
-
-		memcpy(p, (void *)&len, sizeof(len));
-		p += (int)sizeof(len);
 		len = sizeof(len);
 		len += HEX_LEN;
 		int_to_hex_str(msg->id, p, &p);
@@ -720,6 +765,9 @@ sdm_message_send(const sdm_message msg)
 		len += sdm_set_serialize(msg->dest, p, &p);
 		memcpy(p, msg->payload, msg->payload_len);
 		len += msg->payload_len;
+
+		// Copies the actual length to the header of the message
+		memcpy(header_addr, (void *)&len, sizeof(len));
 
 		printf("Created the message to send\n");
 
@@ -746,7 +794,11 @@ sdm_message_send(const sdm_message msg)
 			p = buf;
 
 			// Write all message to the socket
-			do {
+			if(sdm_tcpip_send(sockd, buf, len) < 0) {
+				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error sending message!\n");
+				return -1;
+			}
+			/*do {
 				wcount = write(sockd, (void *)p, len);
 				perror("write syscall status");
 				printf("wrote %d bytes\n", len);
@@ -758,7 +810,7 @@ sdm_message_send(const sdm_message msg)
 
 				p += wcount;
 				len -= wcount;
-			} while(len > 0);
+			} while(len > 0);*/
 
 			/*err = MPI_Send(buf, len, MPI_CHAR, dest_id, 0, MPI_COMM_WORLD);
 			if (err != MPI_SUCCESS) {
@@ -833,8 +885,10 @@ sdm_message_progress(void)
 	}*/
 
 	if (sockfd >= 0) {
-		err = sdm_get_count_from_socket(sockfd, &len);
+		err = sdm_tcpip_msgheader_receive(sockfd, &len);
 		//MPI_Get_count(&stat, MPI_CHAR, &len);
+
+		printf("Message header: %d\n", len);
 
 		if(err != 0) {
 			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error retrieving message size!\n");
@@ -845,7 +899,7 @@ sdm_message_progress(void)
 
 		sdm_message msg = sdm_message_new(buf, len);
 
-		if(sdm_get_message_from_socket(sockfd, buf, len) < 0) {
+		if(sdm_tcpip_msgbody_receive(sockfd, buf, len) < 0) {
 			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error retrieving message!\n");
 			return -1;
 		}

@@ -117,6 +117,8 @@ main(int argc, char *argv[])
 		case 'h':
 			host = optarg;
 			break;
+		case 'n':
+			break;
 		case 'j':
 			break;
 	#ifdef DEBUG
@@ -156,7 +158,6 @@ main(int argc, char *argv[])
 		goto error_out;
 	}
 
-error_out:
 	if (sdm_init(argc, argv) < 0) {
 		DEBUG_PRINTS(DEBUG_LEVEL_STARTUP, "sdm_init failed\n");
 		return 1;
@@ -175,4 +176,7 @@ error_out:
 	sdm_finalize();
 
 	return 0;
+
+error_out:
+	return 1;
 }
