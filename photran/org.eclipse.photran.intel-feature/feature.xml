@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://www.eclipse.org/photran/updates"/>
+      <update label="Photran" url="http://download.eclipse.org/technology/photran/update-site"/>
    </url>
 
    <requires>
