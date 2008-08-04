@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Core Plug-in
+Bundle-Name: PTP RM Core Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.rm.core
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
