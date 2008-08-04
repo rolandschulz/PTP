@@ -13,6 +13,8 @@
 
 #include <stdlib.h>
 
+#include <string.h>
+
 #include "sdm.h"
 
 static int	shutting_down = 0;
@@ -20,23 +22,77 @@ static int	shutting_down = 0;
 static void	recv_callback(sdm_message msg);
 
 /*
+ * Set node id and the number of machines executing (including master)
+ */
+int
+sdm_setup(int argc, char *argv[])
+{
+	int ch, size;
+	/*
+	 * Get the number of nodes
+	 */
+	size = -1;
+	for (ch = 0; ch < argc; ch++) {
+		char * arg = argv[ch];
+		if (strncmp(arg, "--numnodes", 10) == 0) {
+			size = (int)strtol(arg+11, NULL, 10);
+			break;
+		}
+	}
+	//size = 2;
+	
+	if(size == -1) {
+		return -1;
+	}
+	
+	printf("size %d\n", size);
+	
+	sdm_route_set_size(size);
+	// Set the ID of the master to the num of nodes less one
+	SDM_MASTER = size - 1;
+	
+	/*
+	 * Since the SDM servers will be started by the mpirun, get
+	 * the ID from the environment var.
+	 * Important! If the variable is not declared, then
+	 * this sdm is the master.
+	 */
+	char *envval = getenv("OMPI_MCA_ns_nds_vpid");
+	if(envval == NULL) {
+		// This is the master.
+		sdm_route_set_id(SDM_MASTER);
+	} else {
+		int id = strtol(envval, NULL, 10);
+		sdm_route_set_id(id);
+	}
+	
+	return 0;
+}
+
+/*
  * Initialize the abstraction layers
  */
 int
 sdm_init(int argc, char *argv[])
 {
-	if (sdm_message_init(argc, argv) < 0) {
+	if(sdm_setup(argc, argv) < 0) {
 		return -1;
 	}
 
 	if (sdm_route_init(argc, argv) < 0) {
 		return -1;
 	}
+	
+	if (sdm_message_init(argc, argv) < 0) {
+		return -1;
+	}
 
 	if (sdm_aggregate_init(argc, argv) < 0) {
 		return -1;
 	}
-
+	
+	printf("Initialization successful\n");
+	
 	sdm_message_set_recv_callback(recv_callback);
 
 	return 0;
