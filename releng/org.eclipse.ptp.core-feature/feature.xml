@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.core"
       label="%featureName"
-      version="2.0.1.qualifier"
+      version="2.1.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp.core"
       image="eclipse_update_120.jpg">
@@ -105,6 +105,20 @@
 
    <plugin
          id="org.eclipse.ptp.rm.remote"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rm.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rm.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
