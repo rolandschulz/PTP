@@ -20,7 +20,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.0"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
       <discovery label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.0"/>
    </url>
 
@@ -88,13 +88,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.ptp.remote"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.proxy.protocol"
