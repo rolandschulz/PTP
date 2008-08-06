@@ -35,6 +35,7 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.DefaultToolRuntimeSystemJob;
@@ -70,8 +71,8 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	/** Exception raised while parsing mpi map information. */
 	IOException parserException = null;
 
-	public OpenMpiRuntimSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
-		super(jobID, name, rtSystem, attrMgr);
+	public OpenMpiRuntimSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
+		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		 * Create a zero index job.
 		 */
 		final OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
-		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(rtSystem.getQueueID()).getJobById(getJobID());
+		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 		final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), "Open MPI run", 0);
 		processIDs = new String[] { zeroIndexProcessID } ;
 
@@ -377,10 +378,35 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionFinished() throws CoreException {
-		AttributeManager attrMrg = new AttributeManager();
-		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.EXITED));
+		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+	}
 
-		for (String processId : processIDs) {
+	private void changeAllProcessesStatus(State newState) {
+		final OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
+		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
+		
+		/*
+		 * Mark all running and starting processes as finished.
+		 */
+		List<String> ids = new ArrayList<String>();
+		for (IPProcess ipProcess : ipJob.getProcesses()) {
+			switch (ipProcess.getState()) {
+			case EXITED:
+			case ERROR:
+			case EXITED_SIGNALLED:
+				break;
+			case RUNNING:
+			case STARTING:
+			case SUSPENDED:
+			case UNKNOWN:
+				ids.add(ipProcess.getID());
+				break;
+			}
+		}
+		
+		AttributeManager attrMrg = new AttributeManager();
+		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
+		for (String processId : ids) {
 			rtSystem.changeProcess(processId, attrMrg);
 		}
 	}
@@ -398,6 +424,8 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			stdoutObserver.kill();
 			stdoutObserver = null;
 		}
+		// TODO: more cleanup?
+		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
 	}
 
 	@Override

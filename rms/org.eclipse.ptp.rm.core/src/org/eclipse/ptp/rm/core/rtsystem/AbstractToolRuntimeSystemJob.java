@@ -22,12 +22,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -36,16 +38,18 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {
 	protected String jobID;
+	protected String queueID;
 	protected IRemoteProcess process = null;
 	protected AttributeManager attrMgr;
 	protected AbstractToolRuntimeSystem rtSystem;
 
-	public AbstractToolRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem,
+	public AbstractToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
 			AttributeManager attrMgr) {
 		super(name);
 		this.attrMgr = attrMgr;
 		this.rtSystem = rtSystem;
 		this.jobID = jobID;
+		this.queueID = queueID;
 	}
 
 	@Override
@@ -56,6 +60,10 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		return super.getAdapter(adapter);
 	}
 
+	public String getQueueID() {
+		return queueID;
+	}
+	
 	public String getJobID() {
 		return jobID;
 	}
@@ -181,6 +189,19 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", jobID); //$NON-NLS-1$
+			final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
+			switch (ipJob.getState()) {
+			case TERMINATED:
+			case ERROR:
+				break;
+			case PENDING:
+			case RUNNING:
+			case STARTED:
+			case SUSPENDED:
+			case UNKNOWN:
+				changeJobState(JobAttributes.State.TERMINATED);
+				break;
+			}
 			doExecutionCleanUp();
 		}
 	}

@@ -37,9 +37,9 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	private TextInputStreamObserver stderrObserver;
 	private TextInputStreamObserver stdoutObserver;
 
-	public DefaultToolRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem,
+	public DefaultToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
 			AttributeManager attrMgr) {
-		super(jobID, name, rtSystem, attrMgr);
+		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
 
 	/*

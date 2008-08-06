@@ -359,7 +359,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		/*
 		 * Create the job that runs the application.
 		 */
-		Job job = createRuntimeSystemJob(jobID, attrMgr);
+		Job job = createRuntimeSystemJob(jobID, queueID, attrMgr);
 		jobs.put(jobID, job);
 		try {
 			pendingJobQueue.put(job);
@@ -368,7 +368,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 	}
 
-	abstract public Job createRuntimeSystemJob(String jobID, AttributeManager attrMgr) throws CoreException;
+	abstract public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) throws CoreException;
 
 	/*
 	 * (non-Javadoc)
