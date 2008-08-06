@@ -1,0 +1,5 @@
+org.eclipse.ptp.rm.core/debug/command=true
+org.eclipse.ptp.rm.core/debug/command/more=true
+org.eclipse.ptp.rm.core/debug/job=true
+org.eclipse.ptp.rm.core/debug/rts=true
+org.eclipse.ptp.rm.core/debug/rts/job=true

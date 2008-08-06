@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rtsystem;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,10 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -39,12 +43,14 @@ import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
+import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
@@ -65,16 +71,23 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	private class JobRunner implements Runnable {
 		public void run() {
+			DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: started job thread", rmConfiguration.getName()); //$NON-NLS-1$
 			try {
 				while (connection != null) {
 					Job job = pendingJobQueue.take();
+					if (job instanceof IToolRuntimeSystemJob)
+						DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: schedule job #{1}", rmConfiguration.getName(), ((IToolRuntimeSystemJob)job).getJobID()); //$NON-NLS-1$
+					else
+						DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: schedule job #{1}", rmConfiguration.getName(), job.getName());
 					job.schedule();
 				}
 			} catch (InterruptedException e) {
-//				e.printStackTrace();
+				// Ignore
 			} catch (Exception e) {
+				DebugUtil.error(DebugUtil.JOB_TRACING, "RTS {0}: {1}", rmConfiguration.getName(), e); //$NON-NLS-1$
 				PTPCorePlugin.log(e);
 			}
+			DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminated job thread", rmConfiguration.getName()); //$NON-NLS-1$
 		}
 	}
 
@@ -136,6 +149,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: startup", rmConfiguration.getName()); //$NON-NLS-1$
 		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
 		if (remoteServices == null) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not find remote services for resource manager"));
@@ -199,6 +213,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void shutdown(IProgressMonitor monitor) throws CoreException {
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: shutdown", rmConfiguration.getName()); //$NON-NLS-1$
 		doShutdown(monitor);
 
 		stopEvents();
@@ -246,6 +261,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
 	 */
 	public void startEvents() throws CoreException {
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: start events", rmConfiguration.getName()); //$NON-NLS-1$
 		/*
 		 * Create monitor jobs, if they do not already exist. They may exist but be suspended.
 		 * If the job is not applicate, then no job will be created, according to capabilities for the RM.
@@ -280,6 +296,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#stopEvents()
 	 */
 	public void stopEvents() throws CoreException {
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: stop events", rmConfiguration.getName()); //$NON-NLS-1$
 		if (periodicMonitorJob != null) {
 			periodicMonitorJob.cancel();
 		}
@@ -337,6 +354,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String jobID = createJob(queueID, attrMgr);
 		attrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobID));
 
+		DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: job submission #{0}, job id #{1}, queue id @{2}", rmConfiguration.getName(), subId, jobID, queueID); //$NON-NLS-1$
+
 		/*
 		 * Create the job that runs the application.
 		 */
@@ -356,9 +375,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(org.eclipse.ptp.core.elements.IPJob)
 	 */
 	public void terminateJob(IPJob ipJob) throws CoreException {
+		DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminate job #{1}", rmConfiguration.getName(), ipJob.getID()); //$NON-NLS-1$
 		Job j = jobs.get(ipJob.getID());
 		j.cancel();
-//		IToolRuntimeSystemJob rjob = jobs.get(job.getID());
+		// TODO implement properly
+		//		IToolRuntimeSystemJob rjob = jobs.get(job.getID());
 //		if (rjob != null) {
 //			rjob.terminate();
 //			jobs.remove(rjob);
@@ -371,29 +392,29 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @param id job ID
 	 * @param attrs new attributes
 	 */
-	protected void changeJobAttributes(String id, IAttribute<?, ?, ?>... attrs) {
-		ElementAttributeManager mgr = new ElementAttributeManager();
-		AttributeManager attrMgr = new AttributeManager();
-		for (IAttribute<?, ?, ?> attr : attrs) {
-			attrMgr.addAttribute(attr);
-		}
-		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
-	}
+//	protected void changeJobAttributes(String id, IAttribute<?, ?, ?>... attrs) {
+//		ElementAttributeManager mgr = new ElementAttributeManager();
+//		AttributeManager attrMgr = new AttributeManager();
+//		for (IAttribute<?, ?, ?> attr : attrs) {
+//			attrMgr.addAttribute(attr);
+//		}
+//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
+//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
+//	}
 
-	/**
-	 * Notify RM to change job state.
-	 *
-	 * @param id job ID
-	 * @param state new state
-	 */
-	protected void changeJobState(String id, JobAttributes.State state) {
-		ElementAttributeManager mgr = new ElementAttributeManager();
-		AttributeManager attrMgr = new AttributeManager();
-		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(state));
-		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
-	}
+//	/**
+//	 * Notify RM to change job state.
+//	 *
+//	 * @param id job ID
+//	 * @param state new state
+//	 */
+//	protected void changeJobState(String id, JobAttributes.State state) {
+//		ElementAttributeManager mgr = new ElementAttributeManager();
+//		AttributeManager attrMgr = new AttributeManager();
+//		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(state));
+//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
+//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
+//	}
 
 	/**
 	 * Notify RM to create a new job.
@@ -446,6 +467,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		mgr.setAttributeManager(new RangeSet(jobID), jobAttrMgr);
 		fireRuntimeNewJobEvent(eventFactory.newRuntimeNewJobEvent(parentID, mgr));
 
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new job #{1}", rmConfiguration.getName(), jobID); //$NON-NLS-1$
+
 		return jobID;
 	}
 
@@ -463,6 +486,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
 		fireRuntimeNewMachineEvent(eventFactory.newRuntimeNewMachineEvent(rmID, mgr));
+
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new machine #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
+
 		return id;
 	}
 
@@ -485,6 +511,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
 		fireRuntimeNewNodeEvent(eventFactory.newRuntimeNewNodeEvent(parentID, mgr));
+
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new node #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
+
 		return id;
 	}
 
@@ -502,6 +531,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
 		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(rmID, mgr));
+
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new queue #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
+
 		return id;
 	}
 
@@ -529,6 +561,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
 		fireRuntimeNewProcessEvent(eventFactory.newRuntimeNewProcessEvent(parentID, mgr));
+
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new process #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
+
 		return id;
 	}
 
@@ -539,6 +574,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		elementAttrs.setAttributeManager(new RangeSet(processID), attrMgr);
 		IRuntimeProcessChangeEvent event = eventFactory.newRuntimeProcessChangeEvent(elementAttrs);
 		fireRuntimeProcessChangeEvent(event);
+
+		for (IAttribute<?, ?, ?> attr : changedAttrMgr.getAttributes()) {
+			DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}, process #{1}: {2}={3}", rmConfiguration.getName(), processID, attr.getDefinition().getId(), attr.getValueAsString()); //$NON-NLS-1$
+		}
 	}
 
 	public void changeJob(String jobID, AttributeManager changedAttrMgr) {
@@ -548,6 +587,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		elementAttrs.setAttributeManager(new RangeSet(jobID), attrMgr);
 		IRuntimeJobChangeEvent event = eventFactory.newRuntimeJobChangeEvent(elementAttrs);
 		fireRuntimeJobChangeEvent(event);
+
+		for (IAttribute<?, ?, ?> attr : changedAttrMgr.getAttributes()) {
+			DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}, job #{1}: {2}={3}", rmConfiguration.getName(), jobID, attr.getDefinition().getId(), attr.getValueAsString()); //$NON-NLS-1$
+		}
 	}
 
 	public void changeNode(String nodeID, AttributeManager changedAttrMgr) {
@@ -557,6 +600,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		elementAttrs.setAttributeManager(new RangeSet(nodeID), attrMgr);
 		IRuntimeNodeChangeEvent event = eventFactory.newRuntimeNodeChangeEvent(elementAttrs);
 		fireRuntimeNodeChangeEvent(event);
+
+		for (IAttribute<?, ?, ?> attr : changedAttrMgr.getAttributes()) {
+			DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}, node #{1}: {2}={3}", rmConfiguration.getName(), nodeID, attr.getDefinition().getId(), attr.getValueAsString()); //$NON-NLS-1$
+		}
 	}
 
 	public void changeMachine(String machineID, AttributeManager changedAttrMgr) {
@@ -566,6 +613,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		elementAttrs.setAttributeManager(new RangeSet(machineID), attrMgr);
 		IRuntimeMachineChangeEvent event = eventFactory.newRuntimeMachineChangeEvent(elementAttrs);
 		fireRuntimeMachineChangeEvent(event);
+
+		for (IAttribute<?, ?, ?> attr : changedAttrMgr.getAttributes()) {
+			DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}, machine #{1}: {2}={3}", rmConfiguration.getName(), machineID, attr.getDefinition().getId(), attr.getValueAsString()); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -591,6 +642,19 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	public IRemoteProcessBuilder createProcessBuilder(List<String> command) {
 		return remoteServices.getProcessBuilder(connection, command);
+	}
+
+	public IRemoteProcessBuilder createProcessBuilder(List<String> command, String workdir) {
+		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+		IFileStore directory = null;
+		try {
+			directory = fileManager.getResource(new Path(workdir), new NullProgressMonitor());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
+		processBuilder.directory(directory);
+		return processBuilder;
 	}
 
 	public String getRmID() {

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
@@ -319,5 +320,10 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	@Override
 	protected IAttribute<?, ?, ?>[] getExtraSubstitutionVariables() throws CoreException {
 		return new IAttribute<?, ?, ?>[0];
+	}
+
+	@Override
+	protected String coCreateWorkingDirectory() {
+		return attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 	}
 }
