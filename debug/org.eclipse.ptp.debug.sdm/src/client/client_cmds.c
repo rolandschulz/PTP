@@ -157,7 +157,7 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, 
 	 * Create a bitset containing all processes
 	 */
 	dbg_procs = sdm_set_new();
-	sdm_set_add_all(dbg_procs, num_svrs-1);
+	sdm_set_add_all(dbg_procs, num_svrs);
 
 	/*
 	 * Reset state
