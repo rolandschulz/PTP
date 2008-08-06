@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -439,6 +441,36 @@ public class SDMDebugger implements IPDebugger {
 		} catch (IOException e) {
 			throw newCoreException(e);
 		}
+		
+		final BufferedReader err_reader = new BufferedReader(new InputStreamReader(sdmProcess.getErrorStream()));
+		final BufferedReader out_reader = new BufferedReader(new InputStreamReader(sdmProcess.getInputStream()));
+
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					String output;
+					while ((output = out_reader.readLine()) != null) {
+						System.out.println("sdm master: " + output); //$NON-NLS-1$
+					}
+				} catch (IOException e) {
+					// Ignore
+				}
+			}
+		}, "SDM master standard output thread").start(); //$NON-NLS-1$
+		
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					String line;
+					while ((line = err_reader.readLine()) != null) {
+						System.err.println("sdm master: " + line); //$NON-NLS-1$
+					}
+				} catch (IOException e) {
+					// Ignore
+				}
+			}
+		}, "SDM master error output thread").start(); //$NON-NLS-1$
+
 		sdmProcessBuilder = null;
 	}
 	
