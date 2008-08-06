@@ -11,8 +11,10 @@
 package org.eclipse.ptp.rm.core.rtsystem;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,6 +32,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.Activator;
+import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {
 	protected String jobID;
@@ -67,7 +70,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 	protected void changeJobState(JobAttributes.State newState) {
 		EnumeratedAttribute<JobAttributes.State> state = JobAttributes.getStateAttributeDefinition().create(newState);
-		rtSystem.changeJobAttributes(jobID, state);
+		AttributeManager attrManager = new AttributeManager();
+		attrManager.addAttribute(state);
+		rtSystem.changeJob(jobID, attrManager);
 	}
 
 	@Override
@@ -78,16 +83,31 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			/*
 			 * Calculate command and environment.
 			 */
+			DebugUtil.trace(DebugUtil.COMMAND_TRACING, "About to run RTS job #{0}.", jobID); //$NON-NLS-1$
 			List<String> command = null;
 			Map<String,String> environment = null;
+			String directory = null;
 			try {
 				AttributeManager substitutionAttributeManager = createSubstitutionAttributes();
 				environment = doCreateEnvironment(substitutionAttributeManager);
+				directory = coCreateWorkingDirectory();
 				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 				if (debugAttr != null && debugAttr.getValue()) {
 					command = doCreateDebugCommand(substitutionAttributeManager);
 				} else {
 					command = doCreateLaunchCommand(substitutionAttributeManager);
+				}
+				if (DebugUtil.RTS_JOB_TRACING) {
+					System.out.println("Available substitution macros:"); //$NON-NLS-1$
+					for (IAttribute<?, ?, ?> attr : substitutionAttributeManager.getAttributes()) {
+						System.out.println(MessageFormat.format("  {0}={1}", attr.getDefinition().getId(), attr.getValueAsString())); //$NON-NLS-1$
+					}
+					System.out.println("Environment variables:"); //$NON-NLS-1$
+					for (Entry<String, String> env : environment.entrySet()) {
+						System.out.println(MessageFormat.format("  {0}={1}", env.getKey(), env.getValue())); //$NON-NLS-1$
+					}
+					System.out.println(MessageFormat.format("Workdir: {0}", directory)); //$NON-NLS-1$
+					System.out.println(MessageFormat.format("Command: {0}", command.toString())); //$NON-NLS-1$
 				}
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -95,6 +115,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			try {
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
 				doBeforeExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -105,8 +126,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			 * Execute remote command for the job.
 			 */
 			try {
-				IRemoteProcessBuilder processBuilder = rtSystem.createProcessBuilder(command);
+				IRemoteProcessBuilder processBuilder = rtSystem.createProcessBuilder(command, directory);
 				processBuilder.environment().putAll(environment);
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: start", jobID); //$NON-NLS-1$
 				process = processBuilder.start();
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -114,6 +136,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			try {
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: handle start", jobID); //$NON-NLS-1$
 				doExecutionStarted();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -123,25 +146,29 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			changeJobState(JobAttributes.State.RUNNING);
 
 			try {
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
 				doWaitExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while waiting execution of command.", e);
 			}
 
+			DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
 			if (process.exitValue() != 0) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command, return exit value {0}.", process.exitValue()));
 			}
 
-			try {
-				process.waitFor();
-			} catch (InterruptedException e) {
-				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while terminating the command.", e);
-			}
+//			try {
+//				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
+//				process.waitFor();
+//			} catch (InterruptedException e) {
+//				changeJobState(JobAttributes.State.ERROR);
+//				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while terminating the command.", e);
+//			}
 
 			try {
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: handle finish", jobID); //$NON-NLS-1$
 				doExecutionFinished();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -153,6 +180,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			return new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Command successfull, return exit value {0}.", process.exitValue()));
 
 		} finally {
+			DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: cleanup", jobID); //$NON-NLS-1$
 			doExecutionCleanUp();
 		}
 	}
@@ -173,6 +201,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	abstract protected List<String> doCreateDebugCommand(AttributeManager attributeManager) throws CoreException;
 
 	abstract protected Map<String, String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException;
+
+	abstract protected String coCreateWorkingDirectory();
 
 	protected AttributeManager createSubstitutionAttributes() throws CoreException {
 		AttributeManager newAttributeManager = new AttributeManager(getAttrMgr().getAttributes());

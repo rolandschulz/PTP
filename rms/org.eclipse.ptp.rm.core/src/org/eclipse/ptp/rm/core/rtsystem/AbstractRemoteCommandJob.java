@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.Activator;
+import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
 /**
  * Abstract implementation of a job that executes a command on the remote host and parses its output.
@@ -104,6 +105,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			 * TODO: Substitution of attributes in the command strng
 			 * TODO: Append remote installation path to launch command.
 			 * TODO: Extend class to provide XML SAX parser.
+			 * TODO: Use better argument parser.
 			 */
 			ArgumentParser argumentParser = new ArgumentParser(command);
 			List<String> arguments = argumentParser.getArguments();
@@ -113,6 +115,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			try {
 				IRemoteProcessBuilder cmdBuilder = rtSystem.createProcessBuilder(arguments);
 				synchronized (this) {
+					DebugUtil.trace(DebugUtil.COMMAND_TRACING, "Run command: {0}", command); //$NON-NLS-1$
 					cmd = cmdBuilder.start();
 				}
 			} catch (IOException e) {
@@ -126,9 +129,9 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			try {
 				parse(stdout);
 			} catch (CoreException e) {
+				DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command parsing failed: {0}", e); //$NON-NLS-1$
 				parseStatus = e.getStatus();
 				if (parseStatus.getSeverity() == IStatus.ERROR) {
-//				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, parsingErrorMessage, e));
 					throw e;
 				}
 			}
@@ -136,19 +139,25 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			checkCancel(monitor);
 
 			try {
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: waiting to finish."); //$NON-NLS-1$
 				cmd.waitFor();
 			} catch (InterruptedException e) {
 				throw new CoreException(new Status(IStatus.INFO, Activator.PLUGIN_ID, interruptedErrorMessage, e));
 			}
 
+			DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: exit value {0}.", cmd.exitValue()); //$NON-NLS-1$
+
 			if (reschedule > 0) {
+				DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: reschedule in {0} miliseconds.", reschedule); //$NON-NLS-1$
 				schedule(reschedule);
 			}
 
 			return parseStatus;
 		} catch (CoreException e) {
+			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Command failed.", e);
 		} catch (Exception e) {
+			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Internal error", e);
 		} finally {
 			synchronized (this) {
