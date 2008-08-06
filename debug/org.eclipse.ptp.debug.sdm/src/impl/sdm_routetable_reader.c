@@ -1,8 +1,13 @@
+#include "config.h"
+
+#include <sys/param.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <dirent.h>
+
 #include "routetable.h"
 
 #define BUFFER_SIZE 255
@@ -102,12 +107,12 @@ read_routing_table_size(FILE *routing_file, int *size)
 	int rv;
 
 	fseek(routing_file, 0, SEEK_SET);
-	fscanf(routing_file, "%d\n", size);
+	rv = fscanf(routing_file, "%d\n", size);
 
 
 	if(ferror(routing_file) != 0)
 		return -1;
-	if(rv == EOF)
+	if(rv != 1)
 		return -2; // Just EOF
 
 	return 0;
@@ -145,7 +150,8 @@ wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec)
 		 * opening the rounting_file. On NFS file systems, fopen never sees
 		 * recently created files without the update.
 		 */
-		char * wd = get_current_dir_name();
+		char wd[MAXPATHLEN];
+		getcwd(wd, MAXPATHLEN);
 		DIR * dir = opendir(wd);
 		closedir(dir);
 		free(wd);
