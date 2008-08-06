@@ -307,8 +307,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 									} catch (CoreException e1) {
 										//FIXME Notifies error?
 									}
-									doCleanupJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
-											jobSub.getAttrMgr(), jobSub.getDebugger(), jobSub.getLaunch().getPJob());
+//									doCleanupJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
+//											jobSub.getAttrMgr(), jobSub.getDebugger(), jobSub.getLaunch().getPJob());
 								}
 							}
 
@@ -633,20 +633,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,  
 			AttributeManager mgr, IPDebugger debugger, IPJob job);
 	
-	protected void doCleanupJobLaunch(ILaunchConfiguration configuration, String mode,
-			IPLaunch launch, AttributeManager attrMgr, IPDebugger debugger,
-			IPJob job) {
-		if (debugger != null) {
-			debugger.cleanup(configuration, attrMgr, launch);
-		}
-	}
-
-	protected void doPrepareJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,
-	AttributeManager mgr, IPDebugger debugger, IPJob job) {
-		if (debugger != null) {
-			debugger.prepare(configuration, mgr);
-		}
-	}
+//	protected void doCleanupJobLaunch(ILaunchConfiguration configuration, String mode,
+//			IPLaunch launch, AttributeManager attrMgr, IPDebugger debugger,
+//			IPJob job) {
+//		if (debugger != null) {
+//			debugger.cleanup(configuration, attrMgr, launch);
+//		}
+//	}
 
 	/**
 	 * Get all the attributes specified in the launch configuration.
@@ -912,8 +905,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
 		jobSubmissions.put(jobSub.getId(), jobSub);
 	
-		doPrepareJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
-				jobSub.getAttrMgr(), jobSub.getDebugger(), jobSub.getLaunch().getPJob());
 		rm.submitJob(jobSub.getId(), configuration, attrMgr, monitor);
 		
 		JobStatus status = jobSub.waitFor(monitor);
