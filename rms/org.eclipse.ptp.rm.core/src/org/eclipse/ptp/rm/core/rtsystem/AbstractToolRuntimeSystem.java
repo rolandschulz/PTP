@@ -446,6 +446,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String workDir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 		Integer numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
 		List<String> progArgs = attrMgr.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
+		Boolean debugFlag = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition()).getValue();
 
 		/*
 		 * Copy these relevant attributes to IPJob.
@@ -460,7 +461,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			PTPCorePlugin.log(e);
 		}
 		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgs.toArray(new String[0])));
-
+		jobAttrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(debugFlag));
+		
 		/*
 		 * Notify RM.
 		 */
