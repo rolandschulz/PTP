@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -38,7 +38,7 @@ public class OpenMpiProcessMapText12Parser {
 
 	public static OpenMpiProcessMap parse(InputStream is) throws IOException {
 		OpenMpiProcessMapText12Parser parser = new OpenMpiProcessMapText12Parser();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 1);
 
 		parser.readLine1(reader);
 		parser.readLine2(reader);
@@ -108,7 +108,7 @@ public class OpenMpiProcessMapText12Parser {
 				throw new IOException("Invalid line: " + line);
 			}
 			s = m.group(2);
-			numProcesses = Integer.parseInt(s); 
+			numProcesses = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
 			throw new IOException("Invalid line: " + line);
 		}
@@ -124,7 +124,7 @@ public class OpenMpiProcessMapText12Parser {
 			int processIndex;
 			int processPid;
 			int applicationIndex;
-			
+
 			line = reader.readLine();
 			line = reader.readLine();
 			line = reader.readLine();
@@ -149,8 +149,17 @@ public class OpenMpiProcessMapText12Parser {
 			} catch (NumberFormatException e) {
 				throw new IOException("Invalid line: " + line);
 			}
-			line = reader.readLine();
-			
+
+			/*
+			 * Only read empty line between two consecutive processes.
+			 * Do not read line after last process, or parser may wait
+			 * for input from MPI application, blocking the parser thread
+			 * and preventing the proper setting of job in the model.
+			 */
+			if (i < numProcesses-1) {
+				line = reader.readLine();
+			}
+
 			OpenMpiProcessMap.Process proc = new OpenMpiProcessMap.Process(node, processIndex, processName, applicationIndex);
 			map.addProcess(proc);
 			try {
@@ -183,11 +192,11 @@ public class OpenMpiProcessMapText12Parser {
 		String line = reader.readLine();
 		Pattern p = Pattern.compile("[^:]*:\\s*\\w*\\s*(\\d*)[^:]*:\\s*(\\w*).*");
 		Matcher m = p.matcher(line);
-		
+
 		int applicationIndex;
 		String applicationName;
 		int numberOfProcessors;
-		
+
 		if (!m.matches() || m.groupCount() != 2)
 			throw new IOException("Invalid line: " + line);
 		try {
