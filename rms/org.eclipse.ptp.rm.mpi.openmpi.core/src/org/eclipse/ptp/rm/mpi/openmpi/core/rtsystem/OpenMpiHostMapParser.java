@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiHostMap.Host;
 
 public class OpenMpiHostMapParser {
@@ -62,6 +63,7 @@ public class OpenMpiHostMapParser {
 			if (! matcher.matches()) {
 				// Ignore the line
 				parser.map.hasErrors = true;
+				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Ignoring invalid line: '{0}'", line); //$NON-NLS-1$
 				continue;
 			}
 
@@ -114,6 +116,7 @@ public class OpenMpiHostMapParser {
 						host.setMaxNumProcessors(0);
 					}
 				} else {
+					DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Invalud attribute: '{0}'", matcher.group()); //$NON-NLS-1$
 					host.addErrors(OpenMpiHostMap.Host.ERR_UNKNOWN_ATTR);
 				}
 			}
@@ -134,6 +137,7 @@ public class OpenMpiHostMapParser {
 					}
 				}
 			}
+			DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "  {0} slots={1} max-slots={2}", host.getName(), host.getNumProcessors(), host.getMaxNumProcessors()); //$NON-NLS-1$
 		}
 
 		return parser.map;
