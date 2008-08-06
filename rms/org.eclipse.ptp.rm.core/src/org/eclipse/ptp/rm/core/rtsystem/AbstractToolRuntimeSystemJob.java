@@ -83,7 +83,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			/*
 			 * Calculate command and environment.
 			 */
-			DebugUtil.trace(DebugUtil.COMMAND_TRACING, "About to run RTS job #{0}.", jobID); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "About to run RTS job #{0}.", jobID); //$NON-NLS-1$
 			List<String> command = null;
 			Map<String,String> environment = null;
 			String directory = null;
@@ -115,7 +115,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			try {
-				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
 				doBeforeExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -128,7 +128,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			try {
 				IRemoteProcessBuilder processBuilder = rtSystem.createProcessBuilder(command, directory);
 				processBuilder.environment().putAll(environment);
-				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: start", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: start", jobID); //$NON-NLS-1$
 				process = processBuilder.start();
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -136,7 +136,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			try {
-				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: handle start", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle start", jobID); //$NON-NLS-1$
 				doExecutionStarted();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -146,14 +146,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			changeJobState(JobAttributes.State.RUNNING);
 
 			try {
-				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
 				doWaitExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while waiting execution of command.", e);
 			}
 
-			DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
 			if (process.exitValue() != 0) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command, return exit value {0}.", process.exitValue()));
@@ -168,7 +168,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 //			}
 
 			try {
-				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: handle finish", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle finish", jobID); //$NON-NLS-1$
 				doExecutionFinished();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -180,7 +180,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			return new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Command successfull, return exit value {0}.", process.exitValue()));
 
 		} finally {
-			DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: cleanup", jobID); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", jobID); //$NON-NLS-1$
 			doExecutionCleanUp();
 		}
 	}

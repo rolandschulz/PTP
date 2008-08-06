@@ -38,6 +38,7 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.DefaultToolRuntimeSystemJob;
+import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
@@ -98,6 +99,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		Thread stdoutThread = new Thread() {
 			@Override
 			public void run() {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", jobID); //$NON-NLS-1$
 				BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
 				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
@@ -105,11 +107,12 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 					while (line != null) {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-//							System.out.println(line);
+							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
 						}
 						line = stdoutBufferedReader.readLine();
 					}
 				} catch (IOException e) {
+					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: {0}", e); //$NON-NLS-1$
 					PTPCorePlugin.log(e);
 				} finally {
 					stdoutPipedStreamListener.disable();
@@ -127,6 +130,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 //						PTPCorePlugin.log(e);
 //					}
 				}
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", jobID); //$NON-NLS-1$
 			}
 		};
 
@@ -144,6 +148,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		Thread stderrThread = new Thread() {
 			@Override
 			public void run() {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", jobID); //$NON-NLS-1$
 				final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
 				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
@@ -152,11 +157,12 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 //							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-//							System.err.println(line);
+							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
 						}
 						line = stderrBufferedReader.readLine();
 					}
 				} catch (IOException e) {
+					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: {0}", e); //$NON-NLS-1$
 					PTPCorePlugin.log(e);
 				} finally {
 					stderrPipedStreamListener.disable();
@@ -174,6 +180,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 //						PTPCorePlugin.log(e);
 //					}
 				}
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", jobID); //$NON-NLS-1$
 			}
 		};
 
@@ -191,6 +198,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		Thread parserThread = new Thread() {
 			@Override
 			public void run() {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", jobID); //$NON-NLS-1$				
 				OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 				try {
 					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
@@ -222,15 +230,18 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 					 */
 					parserException = e;
 					process.destroy();
+					DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {0}", e); //$NON-NLS-1$
 				} finally {
 					parserPipedStreamListener.disable();
 					if (stderrObserver != null) {
 						stderrObserver.removeListener(parserPipedStreamListener);
 					}
 				}
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: finished", jobID); //$NON-NLS-1$
 			}
 		};
 
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", jobID); //$NON-NLS-1$
 		/*
 		 * Create and start listeners.
 		 */
@@ -258,6 +269,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		stdoutObserver.start();
 
 		try {
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting for display-map parser thread to finish", jobID); //$NON-NLS-1$
 			parserThread.join();
 		} catch (InterruptedException e) {
 			// Do nothing.
@@ -271,6 +283,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		/*
 		 * Copy job attributes from map.
 		 */
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", jobID); //$NON-NLS-1$
 		rtSystem.changeJob(getJobID(), map.getAttributeManager());
 
 		/*
@@ -314,6 +327,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			IPNode node = ipMachine.getNodeById(nodeID);
 			control.addNode(node);
 		}
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: finished updating model", jobID); //$NON-NLS-1$
 	}
 
 	@Override
@@ -322,26 +336,31 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		 * Wait until both stdout and stderr stop because stream are closed.
 		 * This means that the process has finished.
 		 */
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
 		try {
 			stderrObserver.join();
 		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+			// Ignore
 		}
-//		System.err.println("stderr finished");
+
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
 		try {
 			stdoutObserver.join();
 		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+			// Ignore
 		}
-//		System.err.println("stdout finished");
+		
 		/*
 		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", jobID); //$NON-NLS-1$
 		try {
 			process.waitFor();
 		} catch (InterruptedException e) {
 			// Ignore
 		}
+		
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", jobID); //$NON-NLS-1$
 	}
 
 	@Override

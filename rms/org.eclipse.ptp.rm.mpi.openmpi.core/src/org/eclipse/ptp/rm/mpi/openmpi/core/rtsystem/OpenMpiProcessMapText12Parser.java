@@ -47,13 +47,13 @@ public class OpenMpiProcessMapText12Parser {
 		}
 		parser.readLine3(reader);
 		for (int i = 0; i < parser.numNodes; i++) {
-			parser.readMappedNode(reader);
+			parser.readMappedNode(reader, i);
 		}
 
 		return parser.map;
 	}
 
-	private void readMappedNode(BufferedReader reader) throws IOException {
+	private void readMappedNode(BufferedReader reader, int nodeCounter) throws IOException {
 		// Mapped node:
 		// ignore
 		String line = reader.readLine();
@@ -151,12 +151,12 @@ public class OpenMpiProcessMapText12Parser {
 			}
 
 			/*
-			 * Only read empty line between two consecutive processes.
-			 * Do not read line after last process, or parser may wait
-			 * for input from MPI application, blocking the parser thread
-			 * and preventing the proper setting of job in the model.
+			 * This is tricky:
+			 * There is no empty line after the lass process.
+			 * Attempting the read one more line after the last process line will block the parser thread
+			 * and prevent the proper setting of job in the model.
 			 */
-			if (i < numProcesses-1) {
+			if ((i < numProcesses-1) || (nodeCounter < numNodes-1)) {
 				line = reader.readLine();
 			}
 

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
@@ -30,6 +31,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
+import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.mpi.openmpi.core.Activator;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiMachineAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiNodeAttributes;
@@ -191,9 +193,12 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		OpenMpiHostMap hostMap = null;
 		String hostFilePath = null;
 
-		Parameters.Parameter rds_param = params.getParameter("rds_hostfile_path");
-		Parameters.Parameter orte_param = params.getParameter("orte_default_hostfile");
+		Parameters.Parameter rds_param = params.getParameter("rds_hostfile_path"); //$NON-NLS-1$
+		Parameters.Parameter orte_param = params.getParameter("orte_default_hostfile"); //$NON-NLS-1$
 
+		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "rds_hostfile_path: {0}", (rds_param==null?"null":rds_param.getValue())); //$NON-NLS-1$  //$NON-NLS-2$
+		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "orte_default_hostfile: {0}", (orte_param==null?"null":orte_param.getValue())); //$NON-NLS-1$  //$NON-NLS-2$
+		
 		if (rds_param != null) {
 			hostFilePath = rds_param.getValue();
 			if (hostFilePath.trim().length() == 0) {
@@ -208,18 +213,25 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				}
 			}
 		}
+		
+		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "hostFilePath: {0}", (hostFilePath==null?"null":hostFilePath)); //$NON-NLS-1$  //$NON-NLS-2$
 
 		// Validate.
 		if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
 			if (hostFilePath == null) {
+				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Missing mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Discover command did not inform path to default hostfile. If necessary, set MCA parameters to define default hostfile path."));
 			}
+			DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Found mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
 		} else if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
 			if (hostFilePath == null) {
 				hostMap = new OpenMpiHostMap();
 				String hostname = getRemoteHostname(connection, remoteServices);
 				hostMap.addDefaultHost(hostname);
+				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Missing optional hostfile for Open MPI 1.3. Assuming {0} as default host.", hostname); //$NON-NLS-1$				
 				return hostMap;
+			} else {
+				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Found optional hostfile for Open MPI 1.3."); //$NON-NLS-1$
 			}
 		} else {
 			assert false;
@@ -231,6 +243,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 
 		// Try to read.
+		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Opening hostfile."); //$NON-NLS-1$
 		assert hostFilePath != null;
 		IProgressMonitor monitor = new NullProgressMonitor();
 		IFileStore hostfile;
@@ -247,6 +260,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			Status s = new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Failed read hostfile ({0}).", hostfile), e);
 			throw new CoreException(s);
 		}
+
+		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Parsing hostfile."); //$NON-NLS-1$
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			hostMap = OpenMpiHostMapParser.parse(reader);
@@ -269,7 +284,9 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 //					}
 				String hostname = getRemoteHostname(connection, remoteServices);
 				hostMap.addDefaultHost(hostname);
+				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Hostfile is empty. Added default host {0} for Open MPI 1.2.", hostname); //$NON-NLS-1$
 			} else if (rmConfiguration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Empty hostfile is not allowed for Open MPI 1.3."); //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind("Empty hostfile is not allowed ({0}).", hostfile)));
 			} else {
 				assert false;
@@ -309,10 +326,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		try {
 			String line;
 			while ((line = output.readLine()) != null) {
-				int nameStart = line.indexOf(":param:");
+				int nameStart = line.indexOf(":param:"); //$NON-NLS-1$
 				if (nameStart >= 0) {
 					nameStart += 7;
-					int pos = line.indexOf(":", nameStart);
+					int pos = line.indexOf(":", nameStart); //$NON-NLS-1$
 					if (pos >= 0) {
 						/*
 						 * If parameter is already in list, then update, otherwise add.
@@ -323,16 +340,22 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 							param = params.addParameter(name);
 						}
 						int pos2;
-						if ((pos2 = line.indexOf(":value:", pos)) >= 0) {
+						if ((pos2 = line.indexOf(":value:", pos)) >= 0) { //$NON-NLS-1$
 							param.setValue(line.substring(pos2 + 7));
-						} else if ((pos2 = line.indexOf(":status:", pos)) >= 0) {
-							if (line.substring(pos2 + 8).equals("read-only")) {
+						} else if ((pos2 = line.indexOf(":status:", pos)) >= 0) { //$NON-NLS-1$
+							if (line.substring(pos2 + 8).equals("read-only")) { //$NON-NLS-1$
 								param.setReadOnly(true);
 							}
-						} else if ((pos2 = line.indexOf(":help:", pos)) >= 0) {
+						} else if ((pos2 = line.indexOf(":help:", pos)) >= 0) { //$NON-NLS-1$
 							param.setHelp(line.substring(pos2 + 6));
 						}
 					}
+				}
+			}
+			if (DebugUtil.RTS_DISCOVER_TRACING) {
+				System.out.println("Open MPI parameters:"); //$NON-NLS-1$
+				for (Parameters.Parameter param : params.getParameters()) {
+					System.out.println(MessageFormat.format("  {0}={1}", param.getName(), param.getValue()));
 				}
 			}
 		} catch (IOException e) {
