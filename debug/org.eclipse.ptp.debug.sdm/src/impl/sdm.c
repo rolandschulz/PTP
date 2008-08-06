@@ -12,7 +12,7 @@
 #include "config.h"
 
 #include <stdlib.h>
-
+#include <stdio.h>
 #include <string.h>
 
 #include "sdm.h"
@@ -40,33 +40,46 @@ sdm_setup(int argc, char *argv[])
 		}
 	}
 	//size = 2;
-	
+
 	if(size == -1) {
 		return -1;
 	}
-	
+
 	printf("size %d\n", size);
-	
+
 	sdm_route_set_size(size);
-	// Set the ID of the master to the num of nodes less one
+	/*
+	 * Set the ID of the master to the num of nodes less one
+	 */
 	SDM_MASTER = size - 1;
-	
+
 	/*
 	 * Since the SDM servers will be started by the mpirun, get
 	 * the ID from the environment var.
 	 * Important! If the variable is not declared, then
 	 * this sdm is the master.
 	 */
-	char *envval = getenv("OMPI_MCA_ns_nds_vpid");
+
+#ifdef OMPI
+	char *envval = getenv("OMPI_MCA_orte_ess_vpid");
 	if(envval == NULL) {
-		// This is the master.
-		sdm_route_set_id(SDM_MASTER);
-	} else {
+		/*
+		 * Check version 1.2
+		 */
+		envval = getenv("OMPI_MCA_ns_nds_vpid");
+	}
+
+	if (envval != NULL) {
 		int id = strtol(envval, NULL, 10);
 		sdm_route_set_id(id);
+	} else {
+		sdm_route_set_id(SDM_MASTER);
 	}
-	
+
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 /*
@@ -82,7 +95,7 @@ sdm_init(int argc, char *argv[])
 	if (sdm_route_init(argc, argv) < 0) {
 		return -1;
 	}
-	
+
 	if (sdm_message_init(argc, argv) < 0) {
 		return -1;
 	}
@@ -90,9 +103,9 @@ sdm_init(int argc, char *argv[])
 	if (sdm_aggregate_init(argc, argv) < 0) {
 		return -1;
 	}
-	
+
 	printf("Initialization successful\n");
-	
+
 	sdm_message_set_recv_callback(recv_callback);
 
 	return 0;
