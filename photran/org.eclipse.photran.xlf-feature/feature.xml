@@ -145,6 +145,10 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems,
 Inc. in the United States, other countries, or both.
    </license>
 
+   <url>
+      <update label="Photran" url="http://download.eclipse.org/technology/photran/updates/eclipse3.4cdt5.0"/>
+   </url>
+
    <requires>
       <import feature="org.eclipse.photran_feature" version="4.0.4" match="perfect"/>
    </requires>
