@@ -35,7 +35,7 @@ dnl
 dnl Check for programs.
 dnl
 
-AC_PROG_CC([mpicc])
+AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
@@ -90,12 +90,6 @@ AC_FUNC_MEMCMP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gethostname select strdup strstr strtoul sigset sighold sigrelse)
-
-dnl Open MPI
-AC_PATH_PROG(ORTED, [orted], no)
-if test "$ac_cv_path_ORTED" != no; then
-	AC_DEFINE(OMPI,1,[Enable Open MPI support.])
-fi
 
 AH_VERBATIM([DEBUG],
 [#define DEBUG
