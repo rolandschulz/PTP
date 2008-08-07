@@ -35,16 +35,16 @@ public interface ITypeHierarchyService {
 
 	/**
 	 * Returns a pair of <code>ICElement</code>s corresponding to the
+	 * definition of the parent type of the given input, as well as the
+	 * definition of the input.
+	 */
+	ICElement[] findInput(Scope scope, ICElement memberInput, IProgressMonitor monitor);
+
+	/**
+	 * Returns a pair of <code>ICElement</code>s corresponding to the
 	 * definition of the parent type of the given selection in the
 	 * <code>IWorkingCopy</code>, as well as the definition of the
 	 * selection.
 	 */
-	ICElement[] findInput(Scope scope, ICElement memberInput);
-
-	/**
-	 * Returns a pair of <code>ICElement</code>s corresponding to the
-	 * definition of the parent type of the given input, as well as the
-	 * definition of the input.
-	 */
-	ICElement[] findInput(Scope scope, ICProject project, IWorkingCopy workingCopy, int selectionStart, int selectionLength) throws CoreException;
+	ICElement[] findInput(Scope scope, ICProject project, IWorkingCopy workingCopy, int selectionStart, int selectionLength, IProgressMonitor monitor) throws CoreException;
 }

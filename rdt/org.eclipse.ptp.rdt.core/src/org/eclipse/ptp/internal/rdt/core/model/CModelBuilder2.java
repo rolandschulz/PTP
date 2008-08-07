@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/model
  * Class: org.eclipse.cdt.internal.core.model.CModelBuilder2
- * Version: 1.34
+ * Version: 1.38.2.1
  */
 
 package org.eclipse.ptp.internal.rdt.core.model;
@@ -81,7 +81,6 @@ import org.eclipse.cdt.core.model.IStructure;
 import org.eclipse.cdt.core.parser.Keywords;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.core.dom.parser.IASTAmbiguousDeclaration;
-import org.eclipse.cdt.internal.core.dom.parser.IASTDeclarationAmbiguity;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor;
 import org.eclipse.cdt.internal.core.model.ASTStringUtil;
 import org.eclipse.cdt.internal.core.model.DebugLogConstants;
@@ -96,6 +95,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
  * @since 4.0
  */
 public class CModelBuilder2 {
+
+	private final static boolean DEBUG= Util.isActive(DebugLogConstants.MODEL);
 
 	private final TranslationUnit fTranslationUnit;
 	private final IProgressMonitor fProgressMonitor;
@@ -144,7 +145,7 @@ public class CModelBuilder2 {
 
 	private void checkCanceled() {
 		if (fProgressMonitor != null && fProgressMonitor.isCanceled()) {
-			Util.debugLog("CModelBuilder2: cancelled ", DebugLogConstants.MODEL, false); //$NON-NLS-1$
+			if (DEBUG) Util.debugLog("CModelBuilder2: cancelled ", DebugLogConstants.MODEL, false); //$NON-NLS-1$
 			throw new OperationCanceledException();
 		}
 	}
@@ -162,36 +163,33 @@ public class CModelBuilder2 {
 		// includes
 		final IASTPreprocessorIncludeStatement[] includeDirectives= ast.getIncludeDirectives();
 		Set<Include> allIncludes= new HashSet<Include>();
-		for (int i= 0; i < includeDirectives.length; i++) {
-			IASTPreprocessorIncludeStatement includeDirective= includeDirectives[i];
+		for (IASTPreprocessorIncludeStatement includeDirective : includeDirectives) {
 			if (isLocalToFile(includeDirective)) {
 				createInclusion(fTranslationUnit, includeDirective, allIncludes);
 			}
 		}
 		// macros
 		final IASTPreprocessorMacroDefinition[] macroDefinitions= ast.getMacroDefinitions();
-		for (int i= 0; i < macroDefinitions.length; i++) {
-			IASTPreprocessorMacroDefinition macroDefinition= macroDefinitions[i];
+		for (IASTPreprocessorMacroDefinition macroDefinition : macroDefinitions) {
 			if (isLocalToFile(macroDefinition)) {
 				createMacro(fTranslationUnit, macroDefinition);
 			}
 		}
 		// declarations
 		final IASTDeclaration[] declarations= ast.getDeclarations();
-		for (int i= 0; i < declarations.length; i++) {
-			IASTDeclaration declaration= declarations[i];
+		for (IASTDeclaration declaration : declarations) {
 			if (isLocalToFile(declaration)) {
 				createDeclaration(fTranslationUnit, declaration);
 			}
 		}
 
 		// sort by offset
-		final List<SourceManipulation> children= fTranslationUnit.getElementInfo().internalGetChildren();
-		Collections.sort(children, new Comparator<SourceManipulation>() {
-			public int compare(SourceManipulation o1, SourceManipulation o2) {
+		final List<ICElement> children= fTranslationUnit.getElementInfo().internalGetChildren();
+		Collections.sort(children, new Comparator<ICElement>() {
+			public int compare(ICElement o1, ICElement o2) {
 				try {
-					final SourceManipulationInfo info1= o1.getSourceManipulationInfo();
-					final SourceManipulationInfo info2= o2.getSourceManipulationInfo();
+					final SourceManipulationInfo info1= ((SourceManipulation) o1).getSourceManipulationInfo();
+					final SourceManipulationInfo info2= ((SourceManipulation) o2).getSourceManipulationInfo();
 					int delta= info1.getStartPos() - info2.getStartPos();
 					if (delta == 0) {
 						delta= info1.getIdStartPos() - info2.getIdStartPos();
@@ -212,15 +210,13 @@ public class CModelBuilder2 {
 			problemRequestor.beginReporting();
 			final IASTProblem[] ppProblems= ast.getPreprocessorProblems();
 			IASTProblem[] problems= ppProblems;
-			for (int i= 0; i < problems.length; i++) {
-				IASTProblem problem= problems[i];
+			for (IASTProblem problem : problems) {
 				if (isLocalToFile(problem)) {
 					problemRequestor.acceptProblem(problem);
 				}
 			}
 			problems= CPPVisitor.getProblems(ast);
-			for (int i= 0; i < problems.length; i++) {
-				IASTProblem problem= problems[i];
+			for (IASTProblem problem : problems) {
 				if (isLocalToFile(problem)) {
 					problemRequestor.acceptProblem(problem);
 				}
@@ -294,8 +290,6 @@ public class CModelBuilder2 {
 			// TODO [cmodel] problem declaration?
 		} else if (declaration instanceof IASTAmbiguousDeclaration) {
 			// TODO [cmodel] ambiguous declaration?
-		} else if (declaration instanceof IASTDeclarationAmbiguity) {
-			// TODO [cmodel] declaration ambiguity?
 		} else {
 			assert false : "TODO: " + declaration.getClass().getName(); //$NON-NLS-1$
 		}
@@ -321,8 +315,7 @@ public class CModelBuilder2 {
 		} else if (declaration instanceof IASTSimpleDeclaration) {
 			CElement[] elements= createSimpleDeclarations(parent, (IASTSimpleDeclaration)declaration, true);
 			String[] parameterTypes= ASTStringUtil.getTemplateParameterArray(templateDeclaration.getTemplateParameters());
-			for (int i= 0; i < elements.length; i++) {
-				CElement element= elements[i];
+			for (CElement element : elements) {
 				// set the template parameters
 				if (element instanceof StructureTemplate) {
 					StructureTemplate classTemplate= (StructureTemplate) element;
@@ -371,8 +364,7 @@ public class CModelBuilder2 {
 	 */
 	private void createLinkageSpecification(Parent parent, ICPPASTLinkageSpecification linkageDeclaration) throws CModelException, DOMException {
 		IASTDeclaration[] declarations= linkageDeclaration.getDeclarations();
-		for (int i= 0; i < declarations.length; i++) {
-			IASTDeclaration declaration= declarations[i];
+		for (IASTDeclaration declaration : declarations) {
 			if (linkageDeclaration.getFileLocation() != null || isLocalToFile(declaration)) {
 				createDeclaration(parent, declaration);
 			}
@@ -409,21 +401,18 @@ public class CModelBuilder2 {
 		if (declSpecifier instanceof IASTCompositeTypeSpecifier) {
 			if (declarator != null) {
 				return createTypedefOrFunctionOrVariable(parent, declSpecifier, declarator, isTemplate);
-			} else {
-				return createCompositeType(parent, (IASTCompositeTypeSpecifier)declSpecifier, isTemplate);
 			}
+			return createCompositeType(parent, (IASTCompositeTypeSpecifier)declSpecifier, isTemplate);
 		} else if (declSpecifier instanceof IASTElaboratedTypeSpecifier) {
 			if (declarator != null) {
 				return createTypedefOrFunctionOrVariable(parent, declSpecifier, declarator, isTemplate);
-			} else {
-				return createElaboratedTypeDeclaration(parent, (IASTElaboratedTypeSpecifier)declSpecifier, isTemplate);
 			}
+			return createElaboratedTypeDeclaration(parent, (IASTElaboratedTypeSpecifier)declSpecifier, isTemplate);
 		} else if (declSpecifier instanceof IASTEnumerationSpecifier) {
 			if (declarator != null) {
 				return createTypedefOrFunctionOrVariable(parent, declSpecifier, declarator, isTemplate);
-			} else {
-				return createEnumeration(parent, (IASTEnumerationSpecifier)declSpecifier);
 			}
+			return createEnumeration(parent, (IASTEnumerationSpecifier)declSpecifier);
 		} else if (declSpecifier instanceof IASTNamedTypeSpecifier) {
 			if (declarator != null) {
 				return createTypedefOrFunctionOrVariable(parent, declSpecifier, declarator, isTemplate);
@@ -444,21 +433,11 @@ public class CModelBuilder2 {
 		if (declSpecifier.getStorageClass() == IASTDeclSpecifier.sc_typedef) {
 			return createTypeDef(parent, declSpecifier, declarator);
 		}
-		if (declarator instanceof IASTFunctionDeclarator && !hasNestedPointerOperators(declarator)) {
-			return createFunctionDeclaration(parent, declSpecifier, (IASTFunctionDeclarator)declarator, isTemplate);
+		IASTDeclarator typeRelevant= CPPVisitor.findTypeRelevantDeclarator(declarator);
+		if (typeRelevant instanceof IASTFunctionDeclarator) {
+			return createFunctionDeclaration(parent, declSpecifier, (IASTFunctionDeclarator)typeRelevant, isTemplate);
 		}
 		return createVariable(parent, declSpecifier, declarator, isTemplate);
-	}
-
-	private boolean hasNestedPointerOperators(IASTDeclarator declarator) {
-		declarator= declarator.getNestedDeclarator();
-		while (declarator != null) {
-			if (declarator.getPointerOperators().length > 0) {
-				return true;
-			}
-			declarator= declarator.getNestedDeclarator();
-		}
-		return false;
 	}
 
 	private void createNamespace(Parent parent, ICPPASTNamespaceDefinition declaration) throws CModelException, DOMException{
@@ -490,8 +469,7 @@ public class CModelBuilder2 {
 		final Set<Namespace> savedNamespaces= fAllNamespaces;
 		fAllNamespaces= new HashSet<Namespace>();
 		IASTDeclaration[] nsDeclarations= declaration.getDeclarations();
-		for (int i= 0; i < nsDeclarations.length; i++) {
-			IASTDeclaration nsDeclaration= nsDeclarations[i];
+		for (IASTDeclaration nsDeclaration : nsDeclarations) {
 			if (declaration.getFileLocation() != null || isLocalToFile(nsDeclaration)) {
 				createDeclaration(element, nsDeclaration);
 			}
@@ -563,8 +541,7 @@ public class CModelBuilder2 {
 		// add to parent
 		parent.addChild(element);
 		final IASTEnumerator[] enumerators= enumSpecifier.getEnumerators();
-		for (int i= 0; i < enumerators.length; i++) {
-			final IASTEnumerator enumerator= enumerators[i];
+		for (final IASTEnumerator enumerator : enumerators) {
 			createEnumerator(element, enumerator);
 		}
 		// set enumeration position
@@ -638,8 +615,7 @@ public class CModelBuilder2 {
 			// store super classes names
 			final ICPPASTCompositeTypeSpecifier cppCompositeTypeSpecifier= (ICPPASTCompositeTypeSpecifier)compositeTypeSpecifier;
 			ICPPASTBaseSpecifier[] baseSpecifiers= cppCompositeTypeSpecifier.getBaseSpecifiers();
-			for (int i= 0; i < baseSpecifiers.length; i++) {
-				final ICPPASTBaseSpecifier baseSpecifier= baseSpecifiers[i];
+			for (final ICPPASTBaseSpecifier baseSpecifier : baseSpecifiers) {
 				final IASTName baseName= baseSpecifier.getName();
 				final ASTAccessVisibility visibility;
 				switch(baseSpecifier.getVisibility()) {
@@ -679,8 +655,7 @@ public class CModelBuilder2 {
 		pushDefaultVisibility(defaultVisibility);
 		try {
 			final IASTDeclaration[] memberDeclarations= compositeTypeSpecifier.getMembers();
-			for (int i= 0; i < memberDeclarations.length; i++) {
-				IASTDeclaration member= memberDeclarations[i];
+			for (IASTDeclaration member : memberDeclarations) {
 				if (compositeTypeSpecifier.getFileLocation() != null || isLocalToFile(member)) {
 					createDeclaration(element, member);
 				}
@@ -807,7 +782,7 @@ public class CModelBuilder2 {
 
 		final String functionName= ASTStringUtil.getSimpleName(name);
 		final String[] parameterTypes= ASTStringUtil.getParameterSignatureArray(declarator);
-		final String returnType= ASTStringUtil.getTypeString(declSpecifier, declarator);
+		final String returnType= ASTStringUtil.getReturnTypeString(declSpecifier, declarator);
 
 		final FunctionDeclaration element;
 		final FunctionInfo info;
@@ -828,8 +803,8 @@ public class CModelBuilder2 {
 			if (!isMethod && name instanceof ICPPASTQualifiedName) {
 				final IASTName[] names= ((ICPPASTQualifiedName)name).getNames();
 				if (isTemplate) {
-					for (int i= 0; i < names.length; i++) {
-						if (names[i] instanceof ICPPASTTemplateId) {
+					for (IASTName name2 : names) {
+						if (name2 instanceof ICPPASTTemplateId) {
 							isMethod= true;
 							break;
 						}
@@ -944,7 +919,7 @@ public class CModelBuilder2 {
 
 		final String functionName= ASTStringUtil.getSimpleName(name);
 		final String[] parameterTypes= ASTStringUtil.getParameterSignatureArray(declarator);
-		final String returnType= ASTStringUtil.getTypeString(declSpecifier, declarator);
+		final String returnType= ASTStringUtil.getReturnTypeString(declSpecifier, declarator);
 
 		final FunctionDeclaration element;
 		final FunctionInfo info;
@@ -1049,7 +1024,7 @@ public class CModelBuilder2 {
 	 *
 	 * @param element
 	 * @param astNode
-	 * @throws CModelException 
+	 * @throws CModelException
 	 */
 	private void setBodyPosition(SourceManipulation element, IASTNode astNode) throws CModelException {
 		setBodyPosition(element.getSourceManipulationInfo(), astNode);
@@ -1088,7 +1063,7 @@ public class CModelBuilder2 {
 	 *
 	 * @param element
 	 * @param astName
-	 * @throws CModelException 
+	 * @throws CModelException
 	 */
 	private void setIdentifierPosition(SourceManipulation element, IASTName astName) throws CModelException {
 		setIdentifierPosition(element.getSourceManipulationInfo(), astName);

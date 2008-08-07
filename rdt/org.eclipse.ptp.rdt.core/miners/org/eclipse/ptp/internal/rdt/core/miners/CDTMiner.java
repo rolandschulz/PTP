@@ -11,16 +11,17 @@
 package org.eclipse.ptp.internal.rdt.core.miners;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
@@ -28,33 +29,44 @@ import org.eclipse.cdt.core.dom.ast.IEnumerator;
 import org.eclipse.cdt.core.dom.ast.IFunction;
 import org.eclipse.cdt.core.dom.ast.IVariable;
 import org.eclipse.cdt.core.dom.ast.c.ICExternalBinding;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPFunction;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ILanguage;
+import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.NullLogService;
 import org.eclipse.cdt.core.parser.ParserLanguage;
 import org.eclipse.cdt.core.parser.ScannerInfo;
-import org.eclipse.cdt.internal.core.index.IndexFileLocation;
 import org.eclipse.cdt.internal.core.indexer.ILanguageMapper;
+import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dstore.core.miners.Miner;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
-import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
+import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
+import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
+import org.eclipse.ptp.internal.rdt.core.contentassist.CompletionProposalComputer;
+import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
+import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.index.DummyName;
+import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.model.CProject;
 import org.eclipse.ptp.internal.rdt.core.model.Path;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
+import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
+import org.eclipse.ptp.internal.rdt.core.typehierarchy.TypeHierarchyUtil;
 
 /**
  * @author crecoskie
@@ -73,6 +85,7 @@ public class CDTMiner extends Miner {
 	public static final String T_INDEX_DELTA_CHANGED = "Type.Index.Delta.Changed"; //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_ADDED = "Type.Index.Delta.Added"; //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_REMOVED = "Type.Index.Delta.Removed"; //$NON-NLS-1$
+	public static final String T_INDEX_SCANNER_INFO_PROVIDER = "Type.Index.ScannerInfoProvider"; //$NON-NLS-1$
 		
 	// scope management
 	public static final String C_SCOPE_REGISTER = "C_SCOPE_REGISTER"; //$NON-NLS-1$
@@ -85,11 +98,19 @@ public class CDTMiner extends Miner {
 	public static final String C_CALL_HIERARCHY_GET_CALLS = "C_CALL_HIERARCHY_GET_CALLS"; //$NON-NLS-1$
 	public static final String T_CALL_HIERARCHY_RESULT = "Type.CallHierarchy.Result"; //$NON-NLS-1$
 	public static final String C_CALL_HIERARCHY_GET_CALLERS = "C_CALL_HIERARCHY_GET_CALLERS"; //$NON-NLS-1$
-	public static final String C_CALL_HIERARCHY_GET_DEFINITIONS = "C_CALL_HIERARCHY_GET_DEFINITIONS"; //$NON-NLS-1$
+	public static final String C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT = "C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT"; //$NON-NLS-1$
+	public static final String C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY = "C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY"; //$NON-NLS-1$
 
 	// search service
 	public static final String C_SEARCH_RUN_QUERY = "C_SEARCH_RUN_QUERY"; //$NON-NLS-1$
 	public static final String T_SEARCH_RESULT = "Type.Search.Result"; //$NON-NLS-1$
+	
+	public static final String C_CONTENT_ASSIST_COMPUTE_PROPOSALS = "C_CONTENT_ASSIST_COMPUTE_PROPOSALS"; //$NON-NLS-1$
+	
+	// type hierarchy service
+	public static final String C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH = "C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH"; //$NON-NLS-1$
+	public static final String C_TYPE_HIERARCHY_FIND_INPUT1 = "C_TYPE_HIERARCHY_FIND_INPUT1"; //$NON-NLS-1$
+	public static final String C_TYPE_HIERARCHY_FIND_INPUT2 = "C_TYPE_HIERARCHY_FIND_INPUT2"; //$NON-NLS-1$
 	
 	public static String LINE_SEPARATOR;
 	
@@ -128,8 +149,7 @@ public class CDTMiner extends Miner {
 				}
 
 				else {
-					System.out
-							.println("bad datatype in call to RegisterScope()"); //$NON-NLS-1$
+					System.out.println("bad datatype in call to RegisterScope()"); //$NON-NLS-1$
 					System.out.flush();
 				}
 			}
@@ -149,20 +169,36 @@ public class CDTMiner extends Miner {
 		}
 
 		else if (name.equals(C_INDEX_START)) {
-			String scopeName = getString(theCommand, 1);
-
-			System.out.println("Indexing scope " + scopeName); //$NON-NLS-1$
-
-			handleIndexStart(scopeName, status);
-			
-			
-			System.out.println("Indexing complete."); //$NON-NLS-1$
-			System.out.flush();
-
+			try {
+				String scopeName = getString(theCommand, 1);
+				IStandaloneScannerInfoProvider provider = (IStandaloneScannerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
+	
+				System.out.println("Indexing scope " + scopeName); //$NON-NLS-1$
+	
+				handleIndexStart(scopeName, provider, status);
+				
+				System.out.println("Indexing complete."); //$NON-NLS-1$
+				System.out.flush();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		else if(name.equals(C_INDEX_DELTA)) {
 			String scopeName = getString(theCommand, 1);
+			IStandaloneScannerInfoProvider provider;
+			try {
+				provider = (IStandaloneScannerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return status;
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				return status;
+			}
 			
 			System.out.println("Indexing delta for scope " + scopeName); //$NON-NLS-1$
 			System.out.flush();
@@ -171,7 +207,7 @@ public class CDTMiner extends Miner {
 			List<String> changedFiles = new LinkedList<String>();
 			List<String> removedFiles = new LinkedList<String>();
 			
-			for (int i = 2; i < theCommand.getNestedSize() - 1; i++) {
+			for (int i = 3; i < theCommand.getNestedSize() - 1; i++) {
 				DataElement changeElement = getCommandArgument(theCommand, i);
 				String type = changeElement.getType();
 
@@ -197,13 +233,12 @@ public class CDTMiner extends Miner {
 				}
 
 				else {
-					System.out
-							.println("bad datatype in call to RegisterScope()"); //$NON-NLS-1$
+					System.out.println("bad datatype in call to RegisterScope()"); //$NON-NLS-1$
 					System.out.flush();
 				}
 			}
 			
-			handleIndexDelta(scopeName, addedFiles, changedFiles, removedFiles, status);
+			handleIndexDelta(scopeName, addedFiles, changedFiles, removedFiles, provider, status);
 			
 			System.out.println("Indexing complete."); //$NON-NLS-1$
 			System.out.flush();
@@ -212,76 +247,111 @@ public class CDTMiner extends Miner {
 		
 		else if(name.equals(C_INDEX_REINDEX))
 		{
-			String scopeName = getString(theCommand, 1);
-
-			System.out.println("Re-indexing scope " + scopeName); //$NON-NLS-1$
-
-			handleReindex(scopeName, status);
-			
-			System.out.println("Reindexing complete."); //$NON-NLS-1$
-			System.out.flush();
+			try {
+				String scopeName = getString(theCommand, 1);
+				IStandaloneScannerInfoProvider provider = (IStandaloneScannerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
+	
+				System.out.println("Re-indexing scope " + scopeName); //$NON-NLS-1$
+	
+				handleReindex(scopeName, provider, status);
+				
+				System.out.println("Reindexing complete."); //$NON-NLS-1$
+				System.out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 
 		}
 
 		else if (name.equals(C_CALL_HIERARCHY_GET_CALLERS)) {
-			String scopeName = getString(theCommand, 1);
-			String subjectName = getString(theCommand, 2);
-			String filePath = getString(theCommand, 3);
-			int selectionStart = getInteger(theCommand, 4);
-			int selectionLength = getInteger(theCommand, 5);
-			String projectName = getString(theCommand, 6);
-			String hostName = getString(theCommand, 7);
-			
-			System.out.println("Getting callers..."); //$NON-NLS-1$
-			System.out.flush();
-			
-			handleGetCallers(scopeName, projectName, subjectName, filePath, selectionStart, selectionLength, hostName, status);
-			
-			System.out.println("Finished getting callers."); //$NON-NLS-1$
-			System.out.flush();
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ICElement subject = (ICElement) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Getting callers..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				handleGetCallers(scopeName, subject, hostName, status);
+				
+				System.out.println("Finished getting callers."); //$NON-NLS-1$
+				System.out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 
 		else if (name.equals(C_CALL_HIERARCHY_GET_CALLS)) {
-			String scopeName = getString(theCommand, 1);
-			String subjectName = getString(theCommand, 2);
-			String filePath = getString(theCommand, 3);
-			int selectionStart = getInteger(theCommand, 4);
-			int selectionLength = getInteger(theCommand, 5);
-			String projectName = getString(theCommand, 6);
-			String hostName = getString(theCommand, 7);
-			
-			System.out.println("Getting callees..."); //$NON-NLS-1$
-			System.out.flush();
-			
-			handleGetCallees(scopeName, projectName, subjectName, filePath, selectionStart, selectionLength, hostName, status);
-			
-			System.out.println("Finished getting callees."); //$NON-NLS-1$
-			System.out.flush();
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ICElement subject = (ICElement) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Getting callees..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				handleGetCallees(scopeName, subject, hostName, status);
+				
+				System.out.println("Finished getting callees."); //$NON-NLS-1$
+				System.out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		
-		else if(name.equals(C_CALL_HIERARCHY_GET_DEFINITIONS)) {
-			String scopeName = getString(theCommand, 1);
-			String subjectName = getString(theCommand, 2);
-			String filePath = getString(theCommand, 3);
-			int selectionStart = getInteger(theCommand, 4);
-			int selectionLength = getInteger(theCommand, 5);
-			String projectName = getString(theCommand, 6);
-			String hostName = getString(theCommand, 7);
-			
-			System.out.println("Getting definitions..."); //$NON-NLS-1$
-			System.out.flush();
-			
-			handleGetDefinitions(scopeName, projectName, subjectName, filePath, selectionStart, selectionLength, hostName, status);
-			
-			System.out.println("Finished getting definitions."); //$NON-NLS-1$
-			System.out.flush();
+		else if(name.equals(C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ICElement subject = (ICElement) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Getting definitions..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				handleGetDefinitions(scopeName, hostName, subject, status);
+				
+				System.out.println("Finished getting definitions."); //$NON-NLS-1$
+				System.out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		
+		else if(name.equals(C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 3));
+				int selectionStart = getInteger(theCommand, 4);
+				int selectionLength = getInteger(theCommand, 5);
+				
+				System.out.println("Getting definitions..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				handleGetDefinitions(scopeName, hostName, unit, selectionStart, selectionLength, status);
+				
+				System.out.println("Finished getting definitions."); //$NON-NLS-1$
+				System.out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
 		else if (name.equals(C_SEARCH_RUN_QUERY)) {
 			try {
 				String scopeName = getString(theCommand, 1);
-				RemoteSearchQuery query = (RemoteSearchQuery) Serializer.deserialize(getString(theCommand, 2));
-				String hostName = getString(theCommand, 3);
+				String hostName = getString(theCommand, 2);
+				RemoteSearchQuery query = (RemoteSearchQuery) Serializer.deserialize(getString(theCommand, 3));
 				
 				System.out.println("Finding matches based on a pattern..."); //$NON-NLS-1$
 				System.out.flush();
@@ -297,7 +367,248 @@ public class CDTMiner extends Miner {
 			}
 		}
 
+		else if (name.equals(C_CONTENT_ASSIST_COMPUTE_PROPOSALS)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				RemoteContentAssistInvocationContext context = (RemoteContentAssistInvocationContext) Serializer.deserialize(getString(theCommand, 2));
+				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Computing completions..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				handleComputeCompletionProposals(scopeName, context, unit, status);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		else if (name.equals(C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ICElement input = (ICElement) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Computing type graph..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				handleComputeTypeGraph(scopeName, hostName, input, status);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (name.equals(C_TYPE_HIERARCHY_FIND_INPUT1)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ICElement input = (ICElement) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Finding type hierarchy input from element selection..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				String projectName = input.getCProject().getElementName();
+				handleFindTypeHierarchyInput(scopeName, hostName, projectName, input, status);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (name.equals(C_TYPE_HIERARCHY_FIND_INPUT2)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 3));
+				int selectionStart = getInteger(theCommand, 4);
+				int selectionLength = getInteger(theCommand, 5);
+				
+				System.out.println("Finding type hierarchy input from text selection..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				String projectName = unit.getCProject().getElementName();
+				handleFindTypeHierarchyInput(scopeName, hostName, unit, projectName, selectionStart, selectionLength, status);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return status;
+	}
+
+	protected void handleFindTypeHierarchyInput(String scopeName, String hostName, ITranslationUnit unit, String projectName, int selectionStart, int selectionLength, DataElement status) {
+		try {
+			System.out.println("File: " + unit.getLocationURI()); //$NON-NLS-1$
+			System.out.println("Element: " + unit.getElementName()); //$NON-NLS-1$
+			System.out.flush();
+			
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+			try {
+				IIndexLocationConverter converter = getLocationConverter(hostName);
+				ICElement[] result = null;
+				ICProject project = new CProject(projectName);
+				IASTName name= IndexQueries.getSelectedName(index, unit, selectionStart, selectionLength);
+				if (name != null) {
+					IBinding binding= name.resolveBinding();
+					if (TypeHierarchyUtil.isValidInput(binding)) {
+						ICElement member= null;
+						if (!TypeHierarchyUtil.isValidTypeInput(binding)) {
+							member= TypeHierarchyUtil.findDeclaration(project, index, name, binding, converter);
+							name= null;
+							binding= TypeHierarchyUtil.findTypeBinding(binding);
+						}
+						if (TypeHierarchyUtil.isValidTypeInput(binding)) {
+							ICElement input= TypeHierarchyUtil.findDefinition(project, index, name, binding, converter);
+							if (input != null) {
+								result = new ICElement[] {input, member};
+							}
+						}
+					}
+				}
+
+				if (result != null) {
+					System.out.println("Found input."); //$NON-NLS-1$
+					System.out.flush();
+				}
+				
+				String resultString = Serializer.serialize(result);
+				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
+			} finally {
+				index.releaseReadLock();
+				statusDone(status);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
+
+	protected void handleFindTypeHierarchyInput(String scopeName, String hostName, String projectName, ICElement input, DataElement status) {
+		try {
+			System.out.println("File: " + input.getLocationURI()); //$NON-NLS-1$
+			System.out.println("Element: " + input.getElementName()); //$NON-NLS-1$
+			System.out.flush();
+			
+			IIndexLocationConverter converter = getLocationConverter(hostName);
+			
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+			try {
+				ICElement[] result = null;
+				ICProject project = new CProject(projectName);
+				ICElement member = input;
+				IIndexName name= IndexQueries.elementToName(index, member);
+				if (name != null) {
+					member= IndexQueries.getCElementForName(project, index, name, converter);
+					IBinding binding= index.findBinding(name);
+					binding= TypeHierarchyUtil.findTypeBinding(binding);
+					if (TypeHierarchyUtil.isValidTypeInput(binding)) {
+						ICElement definition= TypeHierarchyUtil.findDefinition(project, index, null, binding, converter);
+						if (input != null) {
+							result = new ICElement[] {definition, member};
+						}
+					}
+				}
+
+				if (result != null) {
+					System.out.println("Found input."); //$NON-NLS-1$
+					System.out.flush();
+				}
+				
+				String resultString = Serializer.serialize(result);
+				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
+			} finally {
+				index.releaseReadLock();
+				statusDone(status);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
+	protected void handleComputeTypeGraph(String scopeName, String hostName, ICElement input, DataElement status) {
+		try {
+			System.out.println("File: " + input.getLocationURI()); //$NON-NLS-1$
+			System.out.println("Element: " + input.getElementName()); //$NON-NLS-1$
+			System.out.flush();
+			
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+			try {
+				IProgressMonitor monitor = new NullProgressMonitor();
+				THGraph graph = new THGraph();
+				graph.setLocationConverter(getLocationConverter(hostName));
+				graph.defineInputNode(index, input);
+				graph.addSuperClasses(index, monitor);
+				graph.addSubClasses(index, monitor);
+
+				System.out.println("Found " + graph.getLeaveNodes().size() + " leaf node(s)."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+
+				String resultString = Serializer.serialize(graph);
+				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
+			} finally {
+				index.releaseReadLock();
+				statusDone(status);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
+	protected void handleComputeCompletionProposals(String scopeName, RemoteContentAssistInvocationContext context, ITranslationUnit unit, DataElement status) {
+		try {
+			System.out.println("File: " + unit.getLocationURI()); //$NON-NLS-1$
+			System.out.println("Offset: " + context.getInvocationOffset()); //$NON-NLS-1$
+			System.out.flush();
+			
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+			try {
+				int style = ITranslationUnit.AST_SKIP_INDEXED_HEADERS | ITranslationUnit.AST_CONFIGURE_USING_SOURCE_CONTEXT;
+				int offset = context.getInvocationOffset();
+				IASTCompletionNode completionNode = unit.getCompletionNode(index, style, offset);
+				context.setCompletionNode(completionNode);
+				
+				List<Proposal> proposals;
+				if (completionNode == null) {
+					proposals = Collections.emptyList();
+				} else {
+					// If the completion node can provide us with a
+					// (usually more accurate) prefix, use that.
+					String prefix = completionNode.getPrefix();
+					if (prefix == null) {
+						prefix = context.computeIdentifierPrefix().toString();
+					}
+					CompletionProposalComputer computer = new CompletionProposalComputer();
+					proposals = computer.computeCompletionProposals(context, completionNode, prefix);
+				}
+
+				System.out.println("Found " + proposals.size() + " proposal(s)."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+
+				String resultString = Serializer.serialize(proposals);
+				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
+			} finally {
+				index.releaseReadLock();
+				statusDone(status);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 
 	protected void handleRunQuery(String scopeName, RemoteSearchQuery query, String hostName, DataElement status) {
@@ -308,11 +619,10 @@ public class CDTMiner extends Miner {
 			System.out.flush();
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
 
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
 			try {
-				System.out.println("Acquiring read lock"); //$NON-NLS-1$
-				System.out.flush();
-				index.acquireReadLock();
-				
 				query.runWithIndex(index, getLocationConverter(hostName), getProgressMonitor());
 				List<RemoteSearchMatch> matches = query.getMatches();
 
@@ -350,13 +660,13 @@ public class CDTMiner extends Miner {
 	}
 	
 	protected void handleIndexDelta(String scopeName, List<String> addedFiles,
-			List<String> changedFiles, List<String> removedFiles, DataElement status) {
+			List<String> changedFiles, List<String> removedFiles, IStandaloneScannerInfoProvider provider, DataElement status) {
 		try {
 
 //			statusWorking(status);
 			
-			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance()
-					.getIndexerForScope(scopeName);
+			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
+			indexer.setScannerInfoProvider(provider);
 			
 			ScopeManager scopeManager = ScopeManager.getInstance();
 			
@@ -416,26 +726,28 @@ public class CDTMiner extends Miner {
 		// call hierarchy
 		createCommandDescriptor(schemaRoot, "Get Callers", C_CALL_HIERARCHY_GET_CALLERS, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Get Calls", C_CALL_HIERARCHY_GET_CALLS, false); //$NON-NLS-1$
-		createCommandDescriptor(schemaRoot, "Get definitions", C_CALL_HIERARCHY_GET_DEFINITIONS, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Get definitions from element", C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Get definitions from working copy", C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, false); //$NON-NLS-1$
 		
 		// search
 		createCommandDescriptor(schemaRoot, "Run query", C_SEARCH_RUN_QUERY, false); //$NON-NLS-1$
 		
+		// content assist
+		createCommandDescriptor(schemaRoot, "Compute completion proposals", C_CONTENT_ASSIST_COMPUTE_PROPOSALS, false); //$NON-NLS-1$
+		
+		// type hierarchy
+		createCommandDescriptor(schemaRoot, "Compute type graph", C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Find input from element", C_TYPE_HIERARCHY_FIND_INPUT1, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Find input from text selection", C_TYPE_HIERARCHY_FIND_INPUT2, false); //$NON-NLS-1$
+		
 		_dataStore.refresh(schemaRoot);
 	}
 	
-	protected void handleGetDefinitions(String scopeName, String projectName, String subjectName,
-			String filePath, int selectionStart, int selectionLength,
-			String hostName, DataElement status) {
+	protected void handleGetDefinitions(String scopeName, String hostName, ICElement subject, DataElement status) {
 		try {
-
-			List<String> results = new LinkedList<String>();
-
-			System.out.println("Getting definitions for subject " + subjectName); //$NON-NLS-1$
+			System.out.println("Getting definitions for subject " + subject.getElementName()); //$NON-NLS-1$
 			System.out.println("scope: " + scopeName); //$NON-NLS-1$
-			System.out.println("path: " + filePath); //$NON-NLS-1$
-			System.out.println("selection: " + selectionStart + " " //$NON-NLS-1$ //$NON-NLS-2$
-					+ selectionLength);
+			System.out.println("path: " + subject.getLocationURI()); //$NON-NLS-1$
 
 			System.out.println("Getting index"); //$NON-NLS-1$
 			System.out.flush();
@@ -443,106 +755,123 @@ public class CDTMiner extends Miner {
 			// search the index for the name
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
 
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
 			try {
-				System.out.println("Acquiring read lock"); //$NON-NLS-1$
-				System.out.flush();
-				index.acquireReadLock();
-
-				// figure out what we've got selected
-
-				// first, get the AST for the file
-				System.out.println("Getting AST"); //$NON-NLS-1$
-				System.out.flush();
-				
-				IASTTranslationUnit unit = getASTTranslationUnit(filePath, index);
-
-				System.out.println("Finding name in AST"); //$NON-NLS-1$
-				System.out.flush();
-
-				FindNameForSelectionVisitor finder = new FindNameForSelectionVisitor(
-						filePath, selectionStart, selectionLength);
-				unit.accept(finder);
-
-				IASTName astName = finder.getSelectedName();
-
-				System.out.println("Got selected name of " //$NON-NLS-1$
-						+ new String(astName.toCharArray()));
-				System.out.flush();
-
-				System.out.println("Getting binding"); //$NON-NLS-1$
-				System.out.flush();
-				IBinding binding = astName.resolveBinding();
-
-				System.out.println("binding is of type " //$NON-NLS-1$
-						+ binding.getClass().getName());
-				System.out.flush();
-
-				// get the definitions out of the binding
-				IIndexName[] indexNames = index.findDefinitions(binding);
-				
-				for (int k = 0; k < indexNames.length; k++) {
-					String fileName = indexNames[k].getFile().getLocation()
-							.getFullPath();
-
-					System.out.println("File: " + fileName); //$NON-NLS-1$
-					System.out.flush();
+				ICElement[] definitions = null;
+				if (subject instanceof ISourceReference) {
+					ISourceReference input = (ISourceReference) subject;
+					ITranslationUnit tu = ((ISourceReference) subject).getTranslationUnit();
 					
-					int offset = indexNames[k].getNodeOffset();
-					
-					int length = indexNames[k].getNodeLength();
-					
-					// create the result
-					IIndexFileLocation location = createLocation(hostName, indexNames[k].getFile().getLocation());
-					ICElement cElement = BindingAdapter.adaptBinding(getFakeTranslationUnitForFile(projectName, location), binding, offset, length, true);
-					
-					if(cElement == null) {
-						System.out.println("ICElement is null"); //$NON-NLS-1$
-						System.out.flush();
+					if (needToFindDefinition(subject)) {
+						IBinding binding= IndexQueries.elementToBinding(index, subject);
+						if (binding != null) {
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null);
+							if (result.length > 0) {
+								definitions = result;
+							}
+						}
 					}
-					
-					if (cElement instanceof Serializable) {
-						results.add(Serializer.serialize(cElement));
-					}
-					
-					else {
-						System.out.println("ICElement is not serializable"); //$NON-NLS-1$
-						System.out.flush();
+					if (definitions == null) {
+						IIndexName name= IndexQueries.elementToName(index, subject);
+						if (name != null) {
+							ICElement handle= IndexQueries.getCElementForName(tu, index, name);
+							definitions = new ICElement[] {handle};
+						}
 					}
 				}
-				
-				Iterator<String> iterator = results.iterator();
-
-				while (iterator.hasNext()) {
-
-					String resultString = (String) iterator.next();
-
-					// create the result object
-					status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
-				}
-
-
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-
-				return;
+				// create the result object
+				String resultString = Serializer.serialize(definitions);
+				status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
 			}
-
 			finally {
 				index.releaseReadLock();
 				statusDone(status);
 			}
-
 		}
-
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
-		
 	}
 
+	private void handleGetDefinitions(String scopeName, String hostName, ITranslationUnit workingCopy, int selectionStart, int selectionLength, DataElement status) {
+		try {
+			System.out.println("Getting definitions for subject " + workingCopy.getElementName()); //$NON-NLS-1$
+			System.out.println("scope: " + scopeName); //$NON-NLS-1$
+			System.out.println("path: " + workingCopy.getLocationURI()); //$NON-NLS-1$
+			System.out.println("offset: " + selectionStart); //$NON-NLS-1$
+			System.out.println("length: " + selectionLength); //$NON-NLS-1$
+
+			System.out.println("Getting index"); //$NON-NLS-1$
+			System.out.flush();
+
+			// search the index for the name
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+			try {
+				ICElement[] definitions = null;
+				ICProject project = workingCopy.getCProject();
+
+				IASTName name= IndexQueries.getSelectedName(index, workingCopy, selectionStart, selectionLength);
+				if (name != null) {
+					IBinding binding= name.resolveBinding();
+					if (isRelevantForCallHierarchy(binding)) {
+						if (name.isDefinition()) {
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, null);
+							if (elem != null) {
+								definitions = new ICElement[]{elem};
+							}
+						}
+						else {
+							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null);
+							if (elems.length == 0) {
+								ICElement elem= null;
+								if (name.isDeclaration()) {
+									elem= IndexQueries.getCElementForName(project, index, name, null);
+								}
+								else {
+									elem= IndexQueries.findAnyDeclaration(index, project, binding, null);
+								}
+								if (elem != null) {
+									elems= new ICElement[]{elem};
+								}
+							}
+							definitions = elems;
+						}
+					}
+				}
+
+				// create the result object
+				String resultString = Serializer.serialize(definitions);
+				status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
+			}
+			finally {
+				index.releaseReadLock();
+				statusDone(status);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static boolean needToFindDefinition(ICElement elem) {
+		switch (elem.getElementType()) {
+		case ICElement.C_FUNCTION_DECLARATION:
+		case ICElement.C_METHOD_DECLARATION:
+		case ICElement.C_TEMPLATE_FUNCTION_DECLARATION:
+		case ICElement.C_TEMPLATE_METHOD_DECLARATION:
+			return true;
+		}
+		return false;
+	}
+	
 	private IIndexFileLocation createLocation(String hostName, IIndexFileLocation location) throws URISyntaxException {
-		return new IndexFileLocation(new URI("rse://" + hostName + location.getFullPath()), null); //$NON-NLS-1$
+		return new RemoteIndexFileLocation(null, new URI("rse://" + hostName + location.getFullPath())); //$NON-NLS-1$
 	}
 
 	protected void handleUnregisterScope(DataElement scopeName, DataElement status) {
@@ -553,158 +882,60 @@ public class CDTMiner extends Miner {
 		
 	}
 
-	protected void handleGetCallers(String scopeName, String projectName, String subjectName,
-			String filePath, int selectionStart, int selectionLength,
-			String hostName, DataElement status) {
-
+	protected void handleGetCallers(String scopeName, ICElement subject, String hostName, DataElement status) {
+		String subjectName = subject.getElementName();
+		System.out.println("Getting callers for subject " + subjectName); //$NON-NLS-1$
+		System.out.println("scope: " + scopeName); //$NON-NLS-1$
+		System.out.println("path: " + subject.getLocationURI()); //$NON-NLS-1$
+		System.out.flush();
+		
 		try {
-			List<String> results = new LinkedList<String>();
-			System.out.println("Getting callers for subject " + subjectName); //$NON-NLS-1$
-			System.out.println("scope: " + scopeName); //$NON-NLS-1$
-			System.out.println("path: " + filePath); //$NON-NLS-1$
-			System.out.println("selection: " + selectionStart + " " //$NON-NLS-1$ //$NON-NLS-2$
-					+ selectionLength);
+			CalledByResult result = new CalledByResult();
 
 			System.out.println("Getting index"); //$NON-NLS-1$
 			System.out.flush();
 
+			IIndexLocationConverter converter = getLocationConverter(hostName);
+			
+			// search the index for the name
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			try {
+				System.out.println("Acquiring read lock"); //$NON-NLS-1$
+				System.out.flush();
+				index.acquireReadLock();
 
-				// search the index for the name
-				IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
-
-				try {
-					System.out.println("Acquiring read lock"); //$NON-NLS-1$
-					System.out.flush();
-					index.acquireReadLock();
-
-					// figure out what we've got selected
-
-					// first, get the AST for the file
-					System.out.println("Getting AST"); //$NON-NLS-1$
-					System.out.flush();
-					IASTTranslationUnit unit = getASTTranslationUnit(filePath,
-							index);
-
-					System.out.println("Finding name in AST"); //$NON-NLS-1$
-					System.out.flush();
-
-					FindNameForSelectionVisitor finder = new FindNameForSelectionVisitor(
-							filePath, selectionStart, selectionLength);
-					unit.accept(finder);
-
-					IASTName astName = finder.getSelectedName();
-
-					System.out.println("Got selected name of " //$NON-NLS-1$
-							+ new String(astName.toCharArray()));
-					System.out.flush();
-
-					System.out.println("Getting binding"); //$NON-NLS-1$
-					System.out.flush();
-					IBinding binding = astName.resolveBinding();
-
-					System.out.println("binding is of type " //$NON-NLS-1$
-							+ binding.getClass().getName());
-					System.out.flush();
-
-					if (binding instanceof IFunction
-							|| binding instanceof ICPPFunction) {
-						System.out.println("Binding is a function"); //$NON-NLS-1$
-						System.out.flush();
-						// look at the callers
-						IIndexName[] names = null;
-						try {
-							System.out
-									.println("Getting references to function"); //$NON-NLS-1$
-							System.out.flush();
-							names = index.findReferences(binding);
-						} catch (CoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+				IBinding callee= IndexQueries.elementToBinding(index, subject);
+				ICProject project= subject.getCProject();
+				if (subject != null) {
+					IIndexName[] names= index.findReferences(callee);
+					for (int i = 0; i < names.length; i++) {
+						IIndexName rname = names[i];
+						IIndexName caller= rname.getEnclosingDefinition();
+						if (caller != null) {
+							ICElement elem= IndexQueries.getCElementForName(project, index, caller, converter);
+							if (elem != null) {
+								IIndexFileLocation indexLocation = createLocation(hostName, rname.getFile().getLocation());
+								IIndexName name = new DummyName(rname, rname.getFileLocation(), indexLocation);
+								result.add(elem, name);
+							} 
 						}
-
-						for (int i = 0; i < names.length; i++) {
-							IIndexName rname = names[i];
-							IIndexName caller;
-
-							try {
-								caller = rname.getEnclosingDefinition();
-								IBinding callerBinding = index
-										.findBinding(caller);
-
-								System.out.println("Found a caller: " //$NON-NLS-1$
-										+ new String(caller.toCharArray()));
-								System.out.flush();
-
-								System.out.println("Getting file location..."); //$NON-NLS-1$
-								System.out.flush();
-
-								String fileName = caller.getFile()
-										.getLocation().getFullPath();
-
-								System.out.println("File: " + fileName); //$NON-NLS-1$
-								System.out.flush();
-
-								int offset = caller.getNodeOffset();
-
-								int length = caller.getNodeLength();
-
-								IIndexFileLocation location = createLocation(hostName, caller.getFile().getLocation());
-								// create the result
-								ICElement cElement = BindingAdapter
-										.adaptBinding(
-												getFakeTranslationUnitForFile(projectName, location),
-												callerBinding, offset, length,
-												true);
-								System.out.println(cElement);
-								if (cElement instanceof Serializable) {
-
-									results.add(Serializer.serialize(cElement));
-
-								}
-
-							} catch (CoreException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-
 					}
-
-					else {
-						// error
-						System.out
-								.println("Attempt to do call hierarchy on non-function.  Name: " //$NON-NLS-1$
-										+ subjectName);
-
-					}
-
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-
-					return;
 				}
-
-				finally {
-
-					index.releaseReadLock();
-				}
-
-
-			Iterator<String> resultsIterator = results.iterator();
-
-			while (resultsIterator.hasNext()) {
-
-				String resultString = resultsIterator.next();
-
-				// create the result object
-				status.getDataStore().createObject(status,
-						T_CALL_HIERARCHY_RESULT, resultString);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
 			}
+			finally {
+				index.releaseReadLock();
+			}
+
+			// create the result object
+			String resultString = Serializer.serialize(result);
+			status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		
 		finally {
 			statusDone(status);
 		}
@@ -731,135 +962,43 @@ public class CDTMiner extends Miner {
 		return false;
 	}
 	
-	protected void handleGetCallees(String scopeName, String projectName, String subjectName,
-			String filePath, int selectionStart, int selectionLength,
-			String hostName, DataElement status) {
+	protected void handleGetCallees(String scopeName, ICElement subject, String hostName, DataElement status) {
+		String subjectName = subject.getElementName();
+		System.out.println("Getting callees for subject " + subjectName); //$NON-NLS-1$
+		System.out.println("scope: " + scopeName); //$NON-NLS-1$
+		System.out.println("path: " + subject.getLocationURI()); //$NON-NLS-1$
+		
 		try {
-
-			List<String> results = new LinkedList<String>();
-
-			System.out.println("Getting callees for subject " + subjectName); //$NON-NLS-1$
-			System.out.println("scope: " + scopeName); //$NON-NLS-1$
-			System.out.println("path: " + filePath); //$NON-NLS-1$
-			System.out.println("selection: " + selectionStart + " " //$NON-NLS-1$ //$NON-NLS-2$
-					+ selectionLength);
-
+			CallsToResult result = new CallsToResult();
+			
 			System.out.println("Getting index"); //$NON-NLS-1$
 			System.out.flush();
 
+			IIndexLocationConverter converter = getLocationConverter(hostName);
+			
 			// search the index for the name
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
-
 			try {
 				System.out.println("Acquiring read lock"); //$NON-NLS-1$
 				System.out.flush();
 				index.acquireReadLock();
 
-				// figure out what we've got selected
-
-				// first, get the AST for the file
-				System.out.println("Getting AST"); //$NON-NLS-1$
-				System.out.flush();
-				IASTTranslationUnit unit = getASTTranslationUnit(filePath, index);
-
-				System.out.println("Finding name in AST"); //$NON-NLS-1$
-				System.out.flush();
-
-				FindNameForSelectionVisitor finder = new FindNameForSelectionVisitor(
-						filePath, selectionStart, selectionLength);
-				unit.accept(finder);
-
-				IASTName astName = finder.getSelectedName();
-
-				System.out.println("Got selected name of " //$NON-NLS-1$
-						+ new String(astName.toCharArray()));
-				System.out.flush();
-
-				System.out.println("Getting binding"); //$NON-NLS-1$
-				System.out.flush();
-				IBinding binding = astName.resolveBinding();
-
-				System.out.println("binding is of type " //$NON-NLS-1$
-						+ binding.getClass().getName());
-				System.out.flush();
-
-				if (binding instanceof IFunction
-						|| binding instanceof ICPPFunction) {
-					System.out.println("Binding is a function"); //$NON-NLS-1$
-					System.out.flush();
-
-					IIndexName[] names = index.findDefinitions(binding);
-
-					// for each definition, find the callees and add them to the
-					// results
-					for (int k = 0; k < names.length; k++) {
-						IIndexName[] refs = names[k].getEnclosedNames();
-						for (int i = 0; i < refs.length; i++) {
-							IBinding calleeBinding = index.findBinding(refs[i]);
-							if (isRelevantForCallHierarchy(calleeBinding)) {
-								IIndexName[] defs = index
-										.findDefinitions(calleeBinding);
-								
-								for (int j = 0; j < defs.length; j++) {
-										IIndexName callee = defs[j];
-									
-										System.out.println("Found a callee: " //$NON-NLS-1$
-												+ new String(callee
-														.toCharArray()));
-										System.out.flush();
-
-										System.out
-												.println("Getting file location..."); //$NON-NLS-1$
-										System.out.flush();
-
-										String fileName = callee.getFile()
-												.getLocation().getFullPath();
-
-										System.out.println("File: " + fileName); //$NON-NLS-1$
-										System.out.flush();
-
-
-										int offset = callee.getNodeOffset();
-										
-										int length = callee.getNodeLength();
-										
-										IIndexFileLocation location = createLocation(hostName, callee.getFile().getLocation());
-
-										// create the result
-										ICElement cElement = BindingAdapter.adaptBinding(getFakeTranslationUnitForFile(projectName, location), calleeBinding, offset, length, true);
-										
-										if (cElement instanceof Serializable) {
-											results.add(Serializer.serialize(cElement));
-										}
-								}
+				IIndexName callerName= IndexQueries.elementToName(index, subject);
+				if (callerName != null) {
+					IIndexName[] refs= callerName.getEnclosedNames();
+					for (int i = 0; i < refs.length; i++) {
+						IIndexName name = refs[i];
+						IBinding binding= index.findBinding(name);
+						if (isRelevantForCallHierarchy(binding)) {
+							ICElement[] defs = IndexQueries.findRepresentative(index, binding, converter);
+							if (defs != null && defs.length > 0) {
+								IIndexFileLocation indexLocation = createLocation(hostName, name.getFile().getLocation());
+								IIndexName reference = new DummyName(name, name.getFileLocation(), indexLocation);
+								result.add(defs, reference);
 							}
 						}
 					}
 				}
-					
-					
-
-
-				else {
-					// error
-					System.out
-							.println("Attempt to do call hierarchy on non-function.  Name: " //$NON-NLS-1$
-									+ subjectName);
-
-				}
-
-				Iterator<String> iterator = results.iterator();
-
-				while (iterator.hasNext()) {
-
-					String resultString = iterator.next();
-
-					// create the result object
-					status.getDataStore().createObject(
-							status, T_CALL_HIERARCHY_RESULT, resultString);
-				}
-
-
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -872,6 +1011,9 @@ public class CDTMiner extends Miner {
 				statusDone(status);
 			}
 
+			// create the result object
+			String resultString = Serializer.serialize(result);
+			status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
 		}
 
 		catch (Throwable e) {
@@ -879,15 +1021,12 @@ public class CDTMiner extends Miner {
 		}
 	}
 
-	protected void handleIndexStart(String scopeName, DataElement status) {
-
+	protected void handleIndexStart(String scopeName, IStandaloneScannerInfoProvider provider, DataElement status) {
 		try {
-
-			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance()
-					.getIndexerForScope(scopeName);
-
-			Set<String> sources = ScopeManager.getInstance()
-					.getFilesForScope(scopeName);
+			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
+			indexer.setScannerInfoProvider(provider);
+			
+			Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
 			
 			List<String> sourcesList = new LinkedList<String>(sources);
 
@@ -906,8 +1045,9 @@ public class CDTMiner extends Miner {
 		}
 	}
 	
-	protected void handleReindex(String scopeName, DataElement status) {
+	protected void handleReindex(String scopeName, IStandaloneScannerInfoProvider provider, DataElement status) {
 		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
+		indexer.setScannerInfoProvider(provider);
 		
 		Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
 		

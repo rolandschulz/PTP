@@ -22,7 +22,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ast.ASTTypeUtil;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IBinding;
@@ -43,6 +42,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ptp.rdt.core.RDTLog;
 
 public abstract class CElement implements ICElement, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -156,7 +156,7 @@ public abstract class CElement implements ICElement, Serializable {
 		return fInfo;
 	}
 
-	protected List<SourceManipulation> internalGetChildren() {
+	protected List<ICElement> internalGetChildren() {
 		return Collections.emptyList();
 	}
 	
@@ -196,7 +196,7 @@ public abstract class CElement implements ICElement, Serializable {
 					return ASTAccessVisibility.PUBLIC;
 				}
 			} catch (DOMException e) {
-				CCorePlugin.log(e);
+				RDTLog.logError(e);
 			}
 		}
 		return ASTAccessVisibility.PUBLIC;
@@ -221,5 +221,37 @@ public abstract class CElement implements ICElement, Serializable {
 	@Override
 	public String toString() {
 		return "[" + getCProject() + "]" + getElementName() + " " + getClass().getName();  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof ICElement)) {
+			return false;
+		}
+		ICElement other = (ICElement) o;
+		String name = other.getElementName();
+		if (!fName.equals(name)) {
+			return false;
+		}
+		if (fType != other.getElementType()) {
+			return false;
+		}
+		URI location = other.getLocationURI();
+		if (fLocation != null) {
+			if (!fLocation.equals(location)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = fName.hashCode();
+		hash += 31 * fType;
+		if (fLocation != null) {  
+			hash += 47 * fLocation.hashCode();
+		}
+		return hash;
 	}
 }

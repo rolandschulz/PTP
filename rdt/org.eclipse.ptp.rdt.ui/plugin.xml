@@ -60,7 +60,7 @@
       <completionProposalComputer
             activate="true"
             categoryId="remoteParserProposalCategory"
-            class="org.eclipse.ptp.internal.rdt.ui.contentassist.LocalCompletionProposalAdapter">
+            class="org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteCompletionProposalAdapter">
          <partition type="__dftl_partition_content_type" />
          <partition type="__c_preprocessor" />
       </completionProposalComputer>
@@ -154,6 +154,57 @@
                class="org.eclipse.ptp.rdt.core.resources.RemoteNature">
          </run>
       </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
+            id="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
+            name="Remote Paths and Includes">
+         <filter
+               name="projectNature"
+               value="org.eclipse.ptp.rdt.core.remoteNature">
+         </filter>
+         <enabledWhen>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.core.model.ICProject">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IFolder">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.core.model.ICContainer">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IFile">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.core.model.ITranslationUnit">
+               </instanceof>
+            </or>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.ui.cPropertyTab">
+      <tab
+            class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteIncludeTab"
+            icon="icons/obj16/hfolder_obj.gif"
+            name="Remote Includes"
+            parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
+            tooltip="%Includes.tooltip"
+            weight="001">
+      </tab>
+      <tab
+            class="org.eclipse.cdt.ui.newui.SymbolTab"
+            icon="icons/obj16/define_obj.gif"
+            name="Symbols"
+            parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage">
+      </tab>
    </extension>
    
 </plugin>

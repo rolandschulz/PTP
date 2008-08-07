@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: org.eclipse.ptp.rdt.core;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.core.runtime,
@@ -21,7 +21,7 @@ Export-Package: org.eclipse.ptp.internal.rdt.core,
  org.eclipse.ptp.internal.rdt.core.serviceproviders;x-friends:="org.eclipse.ptp.rdt.ui",
  org.eclipse.ptp.internal.rdt.core.subsystems;x-friends:="org.eclipse.ptp.rdt.ui",
  org.eclipse.ptp.internal.rdt.core.typehierarchy;x-friends:="org.eclipse.ptp.rdt.ui",
- org.eclipse.ptp.rdt.core.activator,
+ org.eclipse.ptp.rdt.core,
  org.eclipse.ptp.rdt.core.messages,
  org.eclipse.ptp.rdt.core.resources,
  org.eclipse.ptp.rdt.core.serviceproviders

@@ -16,9 +16,9 @@ import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
+import org.eclipse.ptp.internal.rdt.core.typehierarchy.RemoteTypeHierarchyService;
 import org.eclipse.ptp.rdt.core.messages.Messages;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.services.core.ServiceProviderDescriptor;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
@@ -48,10 +48,6 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 		super(id, name, serviceId);
 	}
 	
-	private AbstractRemoteCIndexServiceProvider() {
-		this(ID, NAME, SERVICE_ID);
-	}
-
 	public void setConnection(IHost host, IConnectorService connectorService) {
 		fHost = host;
 		fConnectorService = connectorService;
@@ -91,7 +87,13 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 	}
 	
 	public ITypeHierarchyService getTypeHierarchyService() {
-		return null;
+		if(!isConfigured())
+			return null;
+		
+		if(fTypeHierarchyService== null)
+			fTypeHierarchyService = new RemoteTypeHierarchyService(fHost, fConnectorService);
+		
+		return fTypeHierarchyService;
 	}
 	
 	
