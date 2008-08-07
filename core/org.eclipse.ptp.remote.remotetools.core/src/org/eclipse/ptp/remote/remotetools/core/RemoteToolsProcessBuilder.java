@@ -71,7 +71,13 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 			IRemoteExecutionManager exeMgr = connection.createExecutionManager();
 			IRemoteExecutionTools exeTools = exeMgr.getExecutionTools();
 			IRemoteScript script = exeTools.createScript();
-			script.setScript(remoteCmd);
+			if(directory() != null) {
+				String setWorkingDirStr = "cd " + directory().toURI().getPath();
+				script.setScript(new String []{setWorkingDirStr, remoteCmd});
+			} else {
+				script.setScript(remoteCmd);
+			}
+			
 			for (Entry<String,String>  entry : environment().entrySet()) {
 				script.addEnvironment(entry.getKey()+"="+entry.getValue());
 			}
