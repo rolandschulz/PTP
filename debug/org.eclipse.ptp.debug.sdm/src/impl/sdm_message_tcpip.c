@@ -57,8 +57,6 @@ typedef struct id_sockd_map {
 static void (*sdm_recv_callback)(sdm_message msg) = NULL;
 static void	(*deliver_callback)(const sdm_message msg) = NULL;
 
-static void	setenviron(char *str, int val);
-
 #define MAX_PORT_INCREMENT 1000 /* Max port increment before failing */
 
 sdm_id_sockd_map_p children_sockd_map, parent_sockd_map; /* Leaf case, children = NULL
@@ -71,13 +69,14 @@ sdm_id_sockd_map_p children_sockd_map, parent_sockd_map; /* Leaf case, children 
 void
 sdm_create_sockd_map()
 {
-	sdm_idset all_nodes, adjacent_nodes;
+	sdm_idset all_nodes;
+	sdm_idset adjacent_nodes;
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] in sdm_create_sockd_map\n",
 			sdm_route_get_id());
 
 	// Set parent map
-	if(sdm_route_get_id() == SDM_MASTER) {
+	if (sdm_route_get_id() == SDM_MASTER) {
 		parent_sockd_map = NULL; // Root
 	} else {
 		parent_sockd_map = (sdm_id_sockd_map_p)malloc(sizeof(sdm_id_sockd_map));
@@ -89,7 +88,7 @@ sdm_create_sockd_map()
 	all_nodes = sdm_set_add_all(all_nodes, sdm_route_get_size()-1);
 
 	// Filter the parent node and master
-	if(parent_sockd_map != NULL) {
+	if (parent_sockd_map != NULL) {
 		sdm_set_remove_element(all_nodes, parent_sockd_map->id);
 		sdm_set_remove_element(all_nodes, SDM_MASTER);
 	}
@@ -101,8 +100,7 @@ sdm_create_sockd_map()
 
 	children_sockd_map = NULL;
 
-	if(!sdm_set_is_empty(adjacent_nodes)) { // Only non-leaf
-
+	if (!sdm_set_is_empty(adjacent_nodes)) {
 		// Traverse adjacent nodes adding them to the children linked list
 		sdm_id child;
 		sdm_id_sockd_map_p p;
@@ -118,7 +116,6 @@ sdm_create_sockd_map()
 		}
 	}
 	sdm_set_free(all_nodes);
-	//sdm_set_free(adjacent_nodes);
 }
 
 /**
@@ -553,8 +550,10 @@ sdm_tcpip_msgheader_receive(int sockfd, int *length)
 
 
 	// Read cannot be empty or generate an error
-	if(rv <= 0) {
-		perror("Status on read syscall");
+	if (rv <= 0) {
+		if (rv < 0) {
+			perror("Status on read syscall");
+		}
 		return -1;
 	}
 
@@ -570,13 +569,15 @@ sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
 		rcount = read(sockfd, buf, length);
 //		printf("Read %d bytes from the message\n", rcount);
 
-		if(rcount < 0) {
-			perror("Status on read syscall");
+		if (rcount <= 0) {
+			if (rcount < 0) {
+				perror("Status on read syscall");
+			}
 			return -1;
 		}
 		buf += rcount;
 		length -= rcount;
-	}while(length > 0);
+	} while(length > 0);
 
 	return 0;
 }
@@ -591,8 +592,10 @@ sdm_tcpip_send(int sockd, char *buf, int length)
 		wcount = write(sockd, (void *)buf, length);
 //		printf("wrote %d bytes\n", length);
 
-		if(wcount < 0) {
-			perror("write syscall status");
+		if (wcount <= 0) {
+			if (wcount < 0) {
+				perror("write syscall status");
+			}
 			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Could not send message data - write syscall failed!\n");
 			return -1;
 		}
@@ -617,79 +620,12 @@ sdm_tcpip_send(int sockd, char *buf, int length)
 int
 sdm_message_init(int argc, char *argv[])
 {
-	int		ch;
-	/*int		size;
-	int		rank;
-	int		jobid = -1;
-
-	int master = 0;*/
-
 	/*
 	 * Initializes the communication layer
 	 */
-	if(sdm_tcpip_init() < 0) {
+	if (sdm_tcpip_init() < 0) {
 		return -1;
 	}
-
-	/*
-	 * Get the number of nodes
-	 */
-	/*for (ch = 0; ch < argc; ch++) {
-		char * arg = argv[ch];
-		if (strncmp(arg, "--numnodes", 10) == 0) {
-			size = (int)strtol(arg+11, NULL, 10);
-			break;
-		}
-	}*/
-
-	/*sdm_route_set_size(size);
-	// Set the ID of the master to the num of nodes less one
-	SDM_MASTER = size - 1;*/
-
-	/*
-	 * Since the SDM servers will be started by the mpirun, get
-	 * the ID from the environment var.
-	 * Important! If the variable is not declared, then
-	 * this sdm is the master.
-	 */
-	/*char *envval = getenv("OMPI_MCA_ns_nds_vpid");
-	if(envval == NULL) {
-		// This is the master.
-		sdm_route_set_id(SDM_MASTER);
-	} else {
-		sdm_route_set_id(atoi(envval));
-	}*/
-
-
-
-	// Creates the linked list
-
-	/*for (ch = 0; ch < argc; ch++) {
-		char * arg = argv[ch];
-		if (strncmp(arg, "--jobid", 7) == 0) {
-			jobid = (int)strtol(arg+8, NULL, 10);
-			break;
-		}
-	}*/
-
-	/*MPI_Init(&argc, (char ***)&argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);*/
-
-	/*sdm_route_set_size(size);
-	sdm_route_set_id(rank);
-
-	SDM_MASTER = size - 1;
-
-#ifdef OMPI
-	if (rank != SDM_MASTER) {
-		setenviron("OMPI_MCA_ns_nds_jobid", jobid);
-		setenviron("OMPI_MCA_ns_nds_vpid", rank);
-		setenviron("OMPI_MCA_ns_nds_num_procs", size-1);
-	}
-/*#else*/ /* OMPI */
-/*#warning Debugging is not supported on this architecture*/
-/*#endif*/ /* OMPI */
 
 	return 0;
 }
@@ -702,7 +638,6 @@ sdm_message_finalize()
 {
 	// Clean the maps
 	sdm_clean_maps();
-	/*MPI_Finalize();*/
 }
 
 
@@ -786,9 +721,6 @@ sdm_message_send(const sdm_message msg)
 		 */
 
 		for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
-			int err;
-			int wcount;
-			int alen = len;
 			int sockd;
 
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
@@ -807,25 +739,6 @@ sdm_message_send(const sdm_message msg)
 				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error sending message!\n");
 				return -1;
 			}
-			/*do {
-				wcount = write(sockd, (void *)p, len);
-				perror("write syscall status");
-				printf("wrote %d bytes\n", len);
-
-				if(wcount < 0) {
-					DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Could not send message data - write syscall failed!\n");
-					return -1;
-				}
-
-				p += wcount;
-				len -= wcount;
-			} while(len > 0);*/
-
-			/*err = MPI_Send(buf, len, MPI_CHAR, dest_id, 0, MPI_COMM_WORLD);
-			if (err != MPI_SUCCESS) {
-				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Send failed!\n");
-				return -1;
-			}*/
 		}
 
 		/*
@@ -849,19 +762,16 @@ sdm_message_send(const sdm_message msg)
  * ready to read.
  *
  * @return the socket descriptor, -2 if no socket available for reading, -1 on failure
- */
-/**
+ *
  * Get the size of the message in bytes
  * @return 0 if successful, -1 if socket closed or error
- */
-/**
+ *
  * Get a message from a socket. Since message length comes
  * before the message, the sdm_get_count function must
  * be executed first
  *
  * @return 0 if successful, -1 if error
- */
-/**
+ *
  * Message progress. Caller is responsible for freeing allocated message resources.
  *
  * @return 0 on success, -1 on failure
@@ -869,38 +779,26 @@ sdm_message_send(const sdm_message msg)
 int
 sdm_message_progress(void)
 {
-	int				rcount;
-	int				err;
-	int				avail;
-	int				n;
-	int				len;
-	char *			buf;
-	/*MPI_Status		stat;*/
-	int selrv;
-	int				i;
+	int		n;
+	int		err;
+	int		len;
+	char *	buf;
 
 	// Retrieve the active socket descriptor
 	int sockfd = sdm_get_active_sock_desc();
 
 	if(sockfd == -1) {
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error retrieving socket descriptor\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving socket descriptor\n", sdm_route_get_id());
 		return -1;
 	}
-	/*err = MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &avail, &stat);
-
-	if (err != MPI_SUCCESS) {
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Iprobe failed!\n");
-		return -1;
-	}*/
 
 	if (sockfd >= 0) {
 		err = sdm_tcpip_msgheader_receive(sockfd, &len);
-		//MPI_Get_count(&stat, MPI_CHAR, &len);
 
 //		printf("Message header: %d\n", len);
 
 		if(err != 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error retrieving message size!\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving message size!\n", sdm_route_get_id());
 			return -1;
 		}
 
@@ -909,37 +807,31 @@ sdm_message_progress(void)
 		sdm_message msg = sdm_message_new(buf, len);
 
 		if(sdm_tcpip_msgbody_receive(sockfd, buf, len) < 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error retrieving message!\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving message!\n", sdm_route_get_id());
 			return -1;
 		}
 
-		/*err = MPI_Recv(buf, len, MPI_CHAR, stat.MPI_SOURCE, 0, MPI_COMM_WORLD, &stat);
-
-		if (err != MPI_SUCCESS) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv failed!\n");
-			return -1;
-		}*/
-
 //		printf("Init of message handling\n");
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n", sdm_route_get_id(), len, sdm_fetch_nodeid(sockfd));
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n",
+				sdm_route_get_id(), len, sdm_fetch_nodeid(sockfd));
 
 		msg->id = hex_str_to_int(buf, &buf);
 		len -= HEX_LEN;
 
 		if ((n = sdm_aggregate_deserialize(msg->aggregate, buf, &buf)) < 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
 			return -1;
 		}
 		len -= n;
 
 		if ((n = sdm_set_deserialize(msg->src, buf, &buf)) < 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
 			return -1;
 		}
 		len -= n;
 
 		if ((n = sdm_set_deserialize(msg->dest, buf, &buf)) < 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "MPI_Recv invalid header\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
 			return -1;
 		}
 		len -= n;
@@ -947,7 +839,8 @@ sdm_message_progress(void)
 		msg->payload = buf;
 		msg->payload_len = len;
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress agg=%s src=%s dest=%s\n", sdm_route_get_id(),
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress agg=%s src=%s dest=%s\n",
+				sdm_route_get_id(),
 				_aggregate_to_str(msg->aggregate),
 				_set_to_str(msg->src),
 				_set_to_str(msg->dest));
@@ -1072,21 +965,4 @@ sdm_message_deliver(const sdm_message msg)
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_deliver \n", sdm_route_get_id());
 		deliver_callback(msg);
 	}
-}
-
-static void
-setenviron(char *str, int val)
-{
-	char *	buf;
-
-	asprintf(&buf, "%d", val);
-	setenv(str, buf, 1);
-	free(buf);
-}
-
-static int
-getenviron(char *str)
-{
-	char *envval = getenv(str);
-	return atoi(envval);
 }
