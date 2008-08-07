@@ -21,11 +21,11 @@ import org.eclipse.cdt.core.model.IParent;
 public abstract class Parent extends CElement implements IParent {
 	private static final long serialVersionUID = 1L;
 
-	protected List<SourceManipulation> fChildren;
+	protected List<ICElement> fChildren;
 	
 	public Parent(ICElement parent, int type, String name) {
 		super(parent, type, name);
-		fChildren = new LinkedList<SourceManipulation>();
+		fChildren = new LinkedList<ICElement>();
 	}
 	
 	public ICElement[] getChildren() throws CModelException {
@@ -47,10 +47,10 @@ public abstract class Parent extends CElement implements IParent {
 	}
 	
 	public void addChild(CElement element) {
-		fChildren.add((SourceManipulation) element);
+		fChildren.add(element);
 	}
 
-	protected List<SourceManipulation> internalGetChildren() {
+	protected List<ICElement> internalGetChildren() {
 		return fChildren;
 	}
 }

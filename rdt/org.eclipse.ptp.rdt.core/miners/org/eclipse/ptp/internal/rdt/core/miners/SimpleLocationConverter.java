@@ -31,7 +31,6 @@ public class SimpleLocationConverter implements IIndexLocationConverter {
 	public IIndexFileLocation fromInternalFormat(String raw) {
 		try {
 			IPath path = new Path(raw);
-			path = path.setDevice(null);
 			StringBuilder buffer = new StringBuilder();
 			if (fScheme != null) {
 				buffer.append(fScheme);

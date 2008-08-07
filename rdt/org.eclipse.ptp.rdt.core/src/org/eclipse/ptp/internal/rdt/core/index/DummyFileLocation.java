@@ -11,12 +11,6 @@
 package org.eclipse.ptp.internal.rdt.core.index;
 
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
-
-/**
- * @author crecoskie
- *
- */
-import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.model.ISourceRange;
 
 public class DummyFileLocation implements IASTFileLocation {

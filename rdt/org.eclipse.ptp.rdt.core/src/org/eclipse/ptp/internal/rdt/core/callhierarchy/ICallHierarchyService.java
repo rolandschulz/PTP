@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.internal.rdt.core.callhierarchy;
 
-import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IWorkingCopy;

@@ -21,12 +21,19 @@ import java.util.Iterator;
 
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.internal.ui.typehierarchy.TypeHierarchyUI;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
-import org.eclipse.ptp.internal.rdt.core.typehierarchy.LocalTypeHierarchyService;
+import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.services.core.IService;
+import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
+import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
+import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
@@ -35,7 +42,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 
 public class THDropTargetListener implements DropTargetListener {
-	private static final ITypeHierarchyService fService = new LocalTypeHierarchyService();
 	private ICElement fInput;
 	private boolean fEnabled= true;
 	private IWorkbenchWindow fWindow;
@@ -96,7 +102,18 @@ public class THDropTargetListener implements DropTargetListener {
             Display.getCurrent().beep();
         }
         else {
-        	TypeHierarchyUtil.open(fService, fInput, fWindow);
+    		IProject project = fInput.getCProject().getProject();
+    		IServiceModelManager smm = ServiceModelManager.getInstance();
+    		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+
+    		IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+
+    		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+
+    		if (serviceProvider instanceof IIndexServiceProvider) {
+    			ITypeHierarchyService service = ((IIndexServiceProvider) serviceProvider).getTypeHierarchyService();
+    			TypeHierarchyUtil.open(service, fInput, fWindow);
+    		}
         }
     }
 

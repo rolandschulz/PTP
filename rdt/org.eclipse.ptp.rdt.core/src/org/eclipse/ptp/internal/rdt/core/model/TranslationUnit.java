@@ -39,8 +39,6 @@ import org.eclipse.cdt.internal.core.model.IBufferFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.miners.StandaloneSavedCodeReaderFactory;
 
 public class TranslationUnit extends Parent implements ITranslationUnit {
@@ -71,6 +69,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		} catch (CoreException e) {
 			throw new IllegalArgumentException(e);
 		}
+		setLocationURI(element.getLocationURI());
 	}
 
 	public IInclude createInclude(String name, boolean isStd,
@@ -138,9 +137,14 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return null;
 	}
 
-	public IASTCompletionNode getCompletionNode(IIndex index, int style,
-			int offset) throws CoreException {
-		// TODO Auto-generated method stub
+	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
+		checkState();
+		if (fLanguage != null && fScannerInfo != null && fLocation != null) {
+			IParserLogService log = new DefaultLogService();
+			ICodeReaderFactory fileCreator = StandaloneSavedCodeReaderFactory.getInstance();
+			CodeReader reader = getCodeReader();
+			return fLanguage.getCompletionNode(reader, fScannerInfo, fileCreator, index, log, offset);
+		}
 		return null;
 	}
 
@@ -273,6 +277,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map parse() {
 		// TODO Auto-generated method stub
 		return null;

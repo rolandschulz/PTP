@@ -17,7 +17,6 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfo;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
-import org.eclipse.ptp.internal.rdt.core.model.Parent;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElementQuery;
@@ -32,8 +31,7 @@ import org.eclipse.search.ui.ISearchQuery;
 public class RemoteSearchService extends AbstractRemoteService implements ISearchService {
 
 	public RemoteSearchService(IHost host, IConnectorService connectorService) {
-		fHost = host;
-		fConnectorService = connectorService;
+		super(host, connectorService);
 	}
 	
 	public ISearchQuery createSearchPatternQuery(Scope indexScope, ICElement[] searchScope, String scopeDescription, String patternStr, boolean isCaseSensitive, int searchFlags) {
@@ -48,7 +46,7 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 		ICElement[] result = new ICElement[searchScope.length];
 		for (int i = 0; i < searchScope.length; i++) {
 			try {
-				result[i] = ModelAdapter.adaptElement(null, searchScope[i], 0);
+				result[i] = ModelAdapter.adaptElement(null, searchScope[i], 0, false);
 			} catch (CModelException e) {
 				e.printStackTrace();
 			}
@@ -60,7 +58,7 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 		// Working around the lack of multiple inheritance in Java :(
 		if (object instanceof ICElement) {
 			try {
-				ICElement element = ModelAdapter.adaptElement(null, (ICElement) object, 0);
+				ICElement element = ModelAdapter.adaptElement(null, (ICElement) object, 0, false);
 				if (element instanceof ISourceReference) {
 					return (ISourceReference) element;
 				}
@@ -78,7 +76,7 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 
 	public ISearchQuery createSearchTextSelectionQuery(Scope indexScope, ICElement[] searchScope, ITranslationUnit element, ITextSelection selNode, int limitTo) {
 		try {
-			ITranslationUnit unit = ModelAdapter.adaptElement(null, element, 0);
+			ITranslationUnit unit = ModelAdapter.adaptElement(null, element, 0, false);
 			if (unit instanceof TranslationUnit) {
 				TranslationUnit tu = (TranslationUnit) unit;
 				tu.setASTContext(new RemoteScannerInfo());

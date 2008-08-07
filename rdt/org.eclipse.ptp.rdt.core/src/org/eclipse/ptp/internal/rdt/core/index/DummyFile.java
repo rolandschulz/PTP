@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.CoreException;
  *
  */
 public class DummyFile implements IIndexFile, Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	IIndexFileLocation fLocation;
 	
 	public DummyFile(IIndexFileLocation location) {

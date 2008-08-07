@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
-import org.eclipse.ptp.internal.rdt.core.callhierarchy.RemoteCallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
+import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
+import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.SystemStartHere;
+import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -27,6 +30,9 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"; //$NON-NLS-1$
 	private static final String HOST_NAME_KEY = "host-name"; //$NON-NLS-1$
 	private RemoteSearchService fSearchService;
+	private IContentAssistService fContentAssistService;
+	
+	private String fHostName;
 	
 	/**
 	 * @param id
@@ -45,13 +51,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	}
 
 	public void restoreState(IMemento providerMemento) {
-		IHost[] hosts = SystemStartHere.getConnections();
-		String hostName = providerMemento.getString(HOST_NAME_KEY);
-		for (IHost host : hosts) {
-			if (host.getAliasName().equals(hostName)) {
-				fHost = host;
-			}
-		}
+		fHostName = providerMemento.getString(HOST_NAME_KEY);
 	}
 
 	public void saveState(IMemento providerMemento) {
@@ -66,5 +66,40 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 			fSearchService = new RemoteSearchService(fHost, fConnectorService);
 		
 		return fSearchService;
+	}
+
+	public IContentAssistService getContentAssistService() {
+		if(!isConfigured())
+			return null;
+		
+		if(fContentAssistService == null)
+			fContentAssistService = new RemoteContentAssistService(fHost, fConnectorService);
+		
+		return fContentAssistService;
+	}
+	
+	@Override
+	public boolean isConfigured() {
+		if (fHost == null && fHostName != null) {
+			IHost[] hosts = SystemStartHere.getConnections();
+			for (IHost host : hosts) {
+				if (host.getAliasName().equals(fHostName)) {
+					setConnection(host, getDStoreConnectorService(host));
+				}
+			}
+			fHostName = null;
+		}
+		return super.isConfigured();
+	}
+	
+	public static IConnectorService getDStoreConnectorService(IHost host) {
+		IConnectorService[] connectorServices = host.getConnectorServices();
+		
+		for(int k = 0; k < connectorServices.length; k++) {
+			if(connectorServices[k] instanceof DStoreConnectorService)
+				return connectorServices[k];
+		}
+		
+		return null;
 	}
 }

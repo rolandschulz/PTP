@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -79,35 +80,32 @@ public class RemoteSearchQueryAdapter implements ISearchQuery {
 	}
 
 	public IStatus run(IProgressMonitor monitor) throws OperationCanceledException {
+		fSubsystem.checkAllProjects(monitor);
+		
 		RemoteSearchResult result= (RemoteSearchResult) getSearchResult();
 		result.removeAll();
 		
 		// Send query to remote side for processing
-		List<String> rawResults = fSubsystem.runQuery(fScope, fQuery, monitor);
-		
-		if (rawResults.size() > 0) {
+		List<RemoteSearchMatch> results = fSubsystem.runQuery(fScope, fQuery, monitor);
+	
+		if (results.size() > 0) {
+			Match[] matches = new Match[results.size()];
+			int i = 0;
 			try {
-				List<RemoteSearchMatch> results = (List<RemoteSearchMatch>) Serializer.deserialize(rawResults.get(0));
-				Match[] matches = new Match[results.size()];
-				int i = 0;
-				try {
-					for (RemoteSearchMatch match : results) {
-						matches[i] = new RemoteSearchMatchAdapter(match);
-						i++;
-					}
-					fResult.addMatches(matches);
-				} catch (CoreException e) {
-					CUIPlugin.log(e);
+				for (RemoteSearchMatch match : results) {
+					matches[i] = new RemoteSearchMatchAdapter(match);
+					i++;
 				}
-				return new Status(IStatus.OK, "org.eclipse.ptp.rdt.ui", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			} catch (IOException e) {
-				return new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.ui", e.getLocalizedMessage()); //$NON-NLS-1$
-			} catch (ClassNotFoundException e) {
-				return new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.ui", e.getLocalizedMessage()); //$NON-NLS-1$
+				fResult.addMatches(matches);
+			} catch (CoreException e) {
+				CUIPlugin.log(e);
 			}
-		}
-		else // no matches found
 			return new Status(IStatus.OK, "org.eclipse.ptp.rdt.ui", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else {
+			// no matches found
+			return new Status(IStatus.OK, "org.eclipse.ptp.rdt.ui", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 	
 	public RemoteSearchQuery getQuery() {

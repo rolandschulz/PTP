@@ -20,8 +20,6 @@ package org.eclipse.ptp.internal.rdt.core.index;
 
 import java.util.ArrayList;
 
-import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.IPositionConverter;
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
@@ -46,20 +44,16 @@ import org.eclipse.cdt.core.index.IIndexBinding;
 import org.eclipse.cdt.core.index.IIndexFile;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexInclude;
-import org.eclipse.cdt.core.index.IIndexMacro;
+import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.index.IndexFilter;
 import org.eclipse.cdt.core.index.IndexLocationFactory;
-import org.eclipse.cdt.core.model.CModelException;
-import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -68,6 +62,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.CElement;
+import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
+import org.eclipse.ptp.rdt.core.activator.Activator;
 
 public class IndexQueries {
 	private static final ICElement[] EMPTY_ELEMENTS = new ICElement[0];
@@ -236,10 +232,10 @@ public class IndexQueries {
 	}
 
 
-	public static ICElement[] findRepresentative(IIndex index, IBinding binding) throws CoreException {
-		ICElement[] defs = findAllDefinitions(index, binding);
+	public static ICElement[] findRepresentative(IIndex index, IBinding binding, IIndexLocationConverter converter) throws CoreException {
+		ICElement[] defs = findAllDefinitions(index, binding, converter);
 		if (defs.length == 0) {
-			ICElement elem = findAnyDeclaration(index, null, binding);
+			ICElement elem = findAnyDeclaration(index, null, binding, converter);
 			if (elem != null) {
 				defs = new ICElement[] { elem };
 			}
@@ -247,14 +243,14 @@ public class IndexQueries {
 		return defs;
 	}
 
-	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding) throws CoreException {
+	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding, IIndexLocationConverter converter) throws CoreException {
 		if (binding != null) {
 			IIndexName[] defs= index.findNames(binding, IIndex.FIND_DEFINITIONS | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
 
 			ArrayList<ICElement> result= new ArrayList<ICElement>();
 			for (int i = 0; i < defs.length; i++) {
 				IIndexName in = defs[i];
-				ICElement definition= getCElementForName((ICProject) null, index, in);
+				ICElement definition= getCElementForName((ICProject) null, index, in, converter);
 				if (definition != null) {
 					result.add(definition);
 				}
@@ -273,12 +269,12 @@ public class IndexQueries {
 	 * @param declName
 	 * @return the ICElementHandle or <code>null</code>.
 	 */
-	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IASTName declName) 
+	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IASTName declName, IIndexLocationConverter converter) 
 			throws CoreException {
 		assert !declName.isReference();
 		IBinding binding= declName.resolveBinding();
 		if (binding != null) {
-			ITranslationUnit tu= getTranslationUnit(preferProject, declName);
+			ITranslationUnit tu= getTranslationUnit(preferProject, declName, converter);
 			if (tu != null) {
 //				IFile file= (IFile) tu.getResource();
 //				long timestamp= file != null ? file.getLocalTimeStamp() : 0;
@@ -291,33 +287,34 @@ public class IndexQueries {
 				try {
 					return BindingAdapter.adaptBinding(tu, binding, loc.getNodeOffset(), loc.getNodeLength(), declName.isDefinition());
 				} catch (DOMException e) {
-					throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, "", e)); //$NON-NLS-1$
+					throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e)); //$NON-NLS-1$
 				}
 			}
 		}
 		return null;
 	}
 	
-	public static ITranslationUnit getTranslationUnit(ICProject cproject, IName name) {
-		return getTranslationUnit(cproject, name.getFileLocation());
+	public static ITranslationUnit getTranslationUnit(ICProject cproject, IName name, IIndexLocationConverter converter) {
+		return getTranslationUnit(cproject, name.getFileLocation(), converter);
 	}
 
-	private static ITranslationUnit getTranslationUnit(ICProject cproject, final IASTFileLocation fileLocation) {
+	private static ITranslationUnit getTranslationUnit(ICProject cproject, final IASTFileLocation fileLocation, IIndexLocationConverter converter) {
 		if (fileLocation != null) {
 			IPath path= Path.fromOSString(fileLocation.getFileName());
-			try {
-				return CoreModelUtil.findTranslationUnitForLocation(path, cproject);
-			} catch (CModelException e) {
-				CCorePlugin.log(e);
+			TranslationUnit unit = new TranslationUnit(null, path.lastSegment(), cproject == null ? null : cproject.getElementName());
+			if (converter != null) {
+				IIndexFileLocation location = converter.fromInternalFormat(fileLocation.getFileName());
+				unit.setLocationURI(location.getURI());
 			}
+			return unit;
 		}
 		return null;
 	}
 
-	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IIndexName declName) 
+	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IIndexName declName, IIndexLocationConverter converter) 
 			throws CoreException {
 		assert !declName.isReference();
-		ITranslationUnit tu= getTranslationUnit(preferProject, declName);
+		ITranslationUnit tu= getTranslationUnit(preferProject, declName, converter);
 		if (tu != null) {
 			return getCElementForName(tu, index, declName);
 		}
@@ -331,16 +328,16 @@ public class IndexQueries {
 		try {
 			return BindingAdapter.adaptBinding(tu, index.findBinding(declName), declName.getNodeOffset(), declName.getNodeLength(), declName.isDefinition());
 		} catch (DOMException e) {
-			throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, "", e)); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e)); //$NON-NLS-1$
 		}
 	}
 
-	public static ICElement findAnyDeclaration(IIndex index, ICProject preferProject, IBinding binding) 
+	public static ICElement findAnyDeclaration(IIndex index, ICProject preferProject, IBinding binding, IIndexLocationConverter converter) 
 			throws CoreException {
 		if (binding != null) {
 			IIndexName[] names= index.findNames(binding, IIndex.FIND_DECLARATIONS);
 			for (int i = 0; i < names.length; i++) {
-				ICElement elem= getCElementForName(preferProject, index, names[i]);
+				ICElement elem= getCElementForName(preferProject, index, names[i], converter);
 				if (elem != null) {
 					return elem;
 				}
@@ -349,13 +346,13 @@ public class IndexQueries {
 		return null;
 	}
 
-	public static ICElement attemptConvertionToHandle(IIndex index, ICElement input) throws CoreException {
+	public static ICElement attemptConvertionToHandle(IIndex index, ICElement input, IIndexLocationConverter converter) throws CoreException {
 		if (input instanceof CElement) {
 			return input;
 		}
 		IIndexName name= elementToName(index, input);
 		if (name != null) {
-			ICElement handle= getCElementForName(input.getCProject(), index, name);
+			ICElement handle= getCElementForName(input.getCProject(), index, name, converter);
 			if (handle != null) {
 				return handle;
 			}
@@ -363,7 +360,7 @@ public class IndexQueries {
 		return input;
 	}
 
-	public static IASTName getSelectedName(IIndex index, IWorkingCopy workingCopy, int selectionStart, int selectionLength) throws CoreException {
+	public static IASTName getSelectedName(IIndex index, ITranslationUnit workingCopy, int selectionStart, int selectionLength) throws CoreException {
 		if (workingCopy == null)
 			return null;
 		
