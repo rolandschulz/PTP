@@ -71,7 +71,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 				IIndexName rname = names[i];
 				IIndexName caller= rname.getEnclosingDefinition();
 				if (caller != null) {
-					ICElement elem= IndexQueries.getCElementForName(project, index, caller);
+					ICElement elem= IndexQueries.getCElementForName(project, index, caller, null);
 					if (elem != null) {
 						result.add(elem, rname);
 					} 
@@ -103,7 +103,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 				IIndexName name = refs[i];
 				IBinding binding= index.findBinding(name);
 				if (isRelevantForCallHierarchy(binding)) {
-					ICElement[] defs = IndexQueries.findRepresentative(index, binding);
+					ICElement[] defs = IndexQueries.findRepresentative(index, binding, null);
 					if (defs != null && defs.length > 0) {
 						result.add(defs, name);
 					}
@@ -125,7 +125,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 					if (needToFindDefinition(input)) {
 						IBinding binding= IndexQueries.elementToBinding(index, input);
 						if (binding != null) {
-							ICElement[] result= IndexQueries.findAllDefinitions(index, binding);
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null);
 							if (result.length > 0) {
 								return result;
 							}
@@ -164,20 +164,20 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 					IBinding binding= name.resolveBinding();
 					if (isRelevantForCallHierarchy(binding)) {
 						if (name.isDefinition()) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, name);
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, null);
 							if (elem != null) {
 								return new ICElement[]{elem};
 							}
 						}
 						else {
-							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding);
+							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null);
 							if (elems.length == 0) {
 								ICElement elem= null;
 								if (name.isDeclaration()) {
-									elem= IndexQueries.getCElementForName(project, index, name);
+									elem= IndexQueries.getCElementForName(project, index, name, null);
 								}
 								else {
-									elem= IndexQueries.findAnyDeclaration(index, project, binding);
+									elem= IndexQueries.findAnyDeclaration(index, project, binding, null);
 								}
 								if (elem != null) {
 									elems= new ICElement[]{elem};

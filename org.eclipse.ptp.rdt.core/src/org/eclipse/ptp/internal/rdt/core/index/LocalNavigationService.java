@@ -33,7 +33,7 @@ public class LocalNavigationService extends AbstractNavigationService {
 				return null;
 			} 
 			else {
-				return IndexQueries.attemptConvertionToHandle(index, input);
+				return IndexQueries.attemptConvertionToHandle(index, input, null);
 			}
 		}
 		finally {

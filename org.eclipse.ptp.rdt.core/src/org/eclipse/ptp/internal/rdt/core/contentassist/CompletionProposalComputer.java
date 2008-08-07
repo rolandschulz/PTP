@@ -15,7 +15,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.text.contentassist.DOMCompletionProposalComputer
- * Version: 1.18
+ * Version: 1.19
  */
 
 package org.eclipse.ptp.internal.rdt.core.contentassist;
@@ -234,8 +234,8 @@ public class CompletionProposalComputer {
 		if (context.isContextInformationStyle()) {
 			try {
 				ICPPConstructor[] constructors = classType.getConstructors();
-				for (int i = 0; i < constructors.length; i++) {
-					handleFunction(constructors[i], context, baseRelevance, proposals);
+				for (ICPPConstructor constructor : constructors) {
+					handleFunction(constructor, context, baseRelevance, proposals);
 				}
 			} catch (DOMException e) {
 			}
@@ -246,10 +246,10 @@ public class CompletionProposalComputer {
 				case ICPPClassType.k_class:
 					relevance= RelevanceConstants.CLASS_TYPE_RELEVANCE;
 					break;
-				case ICPPClassType.k_struct:
+				case ICompositeType.k_struct:
 					relevance= RelevanceConstants.STRUCT_TYPE_RELEVANCE;
 					break;
-				case ICPPClassType.k_union:
+				case ICompositeType.k_union:
 					relevance= RelevanceConstants.UNION_TYPE_RELEVANCE;
 					break;
 				}
@@ -277,7 +277,7 @@ public class CompletionProposalComputer {
 		String returnTypeStr = null;
 		try {
 			IParameter[] params = function.getParameters();
-			if (params != null)
+			if (params != null) {
 				for (int i = 0; i < params.length; ++i) {
 					IType paramType = params[i].getType();
 					if (i > 0) {
@@ -294,18 +294,18 @@ public class CompletionProposalComputer {
 					}
 				}
 			
-			if (function.takesVarArgs()) {
-				if (params.length > 0) {
-                    dispargs.append(',');
-                    idargs.append(',');
-                }
-                dispargs.append("..."); //$NON-NLS-1$
-                idargs.append("..."); //$NON-NLS-1$
-			} else if (params.length == 0) { // force the void in
-			    dispargs.append("void"); //$NON-NLS-1$
-                idargs.append("void"); //$NON-NLS-1$
-            }
-			
+				if (function.takesVarArgs()) {
+					if (params.length > 0) {
+						dispargs.append(',');
+						idargs.append(',');
+					}
+					dispargs.append("..."); //$NON-NLS-1$
+					idargs.append("..."); //$NON-NLS-1$
+				} else if (params.length == 0) { // force the void in
+					dispargs.append("void"); //$NON-NLS-1$
+					idargs.append("void"); //$NON-NLS-1$
+				}
+			}
 			IFunctionType functionType = function.getType();
 			if (functionType != null) {
 				IType returnType = functionType.getReturnType();

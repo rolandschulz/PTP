@@ -21,8 +21,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
-import org.eclipse.ptp.rdt.services.core.IService;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 
 /**
  * @author crecoskie
@@ -50,10 +48,6 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 		
 	}
 	
-	private RemoteIndexerTask() {
-		
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.dom.IPDOMIndexerTask#getIndexer()
 	 */

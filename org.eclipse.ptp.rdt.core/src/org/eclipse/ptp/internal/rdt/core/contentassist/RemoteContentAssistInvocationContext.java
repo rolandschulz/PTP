@@ -23,7 +23,7 @@ import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 public class RemoteContentAssistInvocationContext implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	IASTCompletionNode fCompletionNode;
+	transient IASTCompletionNode fCompletionNode;
 	boolean fInPreprocessorDirective;
 	boolean fIsContextInformationStyle;
 	int fContextInformationOffset;

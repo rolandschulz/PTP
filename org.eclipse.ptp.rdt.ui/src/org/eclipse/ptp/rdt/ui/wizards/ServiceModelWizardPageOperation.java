@@ -17,7 +17,6 @@ import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
-import org.eclipse.cdt.internal.core.CCoreInternals;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
@@ -31,11 +30,8 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
-import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.rdt.services.core.ServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
-import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 
 /**
  * @author crecoskie
@@ -53,6 +49,7 @@ public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@SuppressWarnings("unchecked")
 	public void run(IProgressMonitor monitor) throws InvocationTargetException,
 			InterruptedException {
 		
@@ -88,8 +85,6 @@ public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 				IService service = serviceModelManager.getService(serviceID);
 				
 				String serviceProviderID = serviceIDToProviderIDMap.get(serviceID);
-				
-				IServiceProviderDescriptor serviceProviderDescriptor = service.getProviderDescriptor(serviceProviderID);
 				
 				Object obj2 = MBSCustomPageManager.getPageProperty(
 						ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID,

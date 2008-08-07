@@ -26,20 +26,25 @@ import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.ui.text.contentassist.CCompletionProposal;
 import org.eclipse.cdt.internal.ui.text.contentassist.CContentAssistInvocationContext;
+import org.eclipse.cdt.internal.ui.text.contentassist.CProposalContextInformation;
 import org.eclipse.cdt.internal.ui.text.contentassist.ParsingBasedProposalComputer;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ptp.internal.rdt.core.contentassist.CompletionType;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
+import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteProposalContextInformation;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Visibility;
+import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -48,23 +53,14 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProposalComputer {
 
-	protected abstract IContentAssistService getService();
+	protected abstract IContentAssistService getService(IProject project);
 	
 	@Override
 	public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
 		try {
 			if (context instanceof CContentAssistInvocationContext) {
 				CContentAssistInvocationContext cContext = (CContentAssistInvocationContext) context;
-				
-				IContentAssistService service = getService();
-				IASTCompletionNode completionNode = service.getCompletionNode(null, context); // TODO: Provide IScope
-				if (completionNode == null) return Collections.EMPTY_LIST;
-				String prefix = completionNode.getPrefix();
-				if (prefix == null) {
-					prefix = cContext.computeIdentifierPrefix().toString();
-				}
-
-				return computeCompletionProposals(cContext, completionNode, prefix);
+				return computeCompletionProposals(cContext, null, null);
 			}
 		} catch (Exception e) {
 			CUIPlugin.log(e);
@@ -74,9 +70,12 @@ public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProp
 	}
 	
 	@Override
-	protected List computeCompletionProposals(CContentAssistInvocationContext context, IASTCompletionNode completionNode, String prefix) throws CoreException {
-		IContentAssistService service = getService();
-		List<CCompletionProposal> proposals = adaptProposals(context, service.computeCompletionProposals(null, context, completionNode, prefix)); // TODO: Provide IScope
+	protected List computeCompletionProposals(CContentAssistInvocationContext context, IASTCompletionNode node, String prefix) throws CoreException {
+		IProject project = ((CContentAssistInvocationContext) context).getProject().getProject();
+		IContentAssistService service = getService(project);
+		ITranslationUnit unit = context.getTranslationUnit();
+		Scope scope = Scope.WORKSPACE_ROOT_SCOPE; // TODO: Use local scope
+		List<CCompletionProposal> proposals = adaptProposals(context, service.computeCompletionProposals(scope, context, unit)); // TODO: Provide IScope
 		return proposals;
 	}
 
@@ -123,6 +122,15 @@ public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProp
 			}
 			image = CUIPlugin.getImageDescriptorRegistry().get(descriptor);
 			CCompletionProposal completion = new CCompletionProposal(replacement, offset, length, image, display, id, relevance, viewer);
+			completion.setCursorPosition(proposal.getCursorPosition());
+			
+			RemoteProposalContextInformation remoteContextInfo = proposal.getContextInformation();
+			if (remoteContextInfo != null) {
+				CProposalContextInformation contextInfo = new CProposalContextInformation(image, remoteContextInfo.getDisplayText(), remoteContextInfo.getDisplayArguments());
+				contextInfo.setContextInformationPosition(remoteContextInfo.getContextInformationPosition());
+				completion.setContextInformation(contextInfo);
+			}
+			
 			result.add(completion);
 		}
 		return result;

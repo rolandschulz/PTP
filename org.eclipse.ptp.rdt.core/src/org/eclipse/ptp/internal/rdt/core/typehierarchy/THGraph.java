@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IBinding;
@@ -37,11 +36,13 @@ import org.eclipse.cdt.core.dom.ast.cpp.ICPPBase;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexBinding;
+import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.rdt.core.RDTLog;
 
 public class THGraph implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -52,6 +53,8 @@ public class THGraph implements Serializable {
 	private HashSet<THGraphNode> fLeaveNodes= new HashSet<THGraphNode>();
 	private HashMap<ICElement, THGraphNode> fNodes= new HashMap<ICElement, THGraphNode>();
 	private boolean fFileIsIndexed;
+	
+	private transient IIndexLocationConverter fConverter;
 	
 	public THGraph() {
 	}
@@ -64,6 +67,10 @@ public class THGraph implements Serializable {
 		return fNodes.get(elem);
 	}
 
+	public void setLocationConverter(IIndexLocationConverter converter) {
+		fConverter = converter;
+	}
+	
 	private THGraphNode addNode(ICElement input) {
 		THGraphNode node= fNodes.get(input); 
 
@@ -136,13 +143,11 @@ public class THGraph implements Serializable {
 	public void defineInputNode(IIndex index, ICElement input) {
 		if (input != null) {
 			try {
-				if (IndexQueries.isIndexed(index, input)) {
-					fFileIsIndexed= true;
-					input= IndexQueries.attemptConvertionToHandle(index, input);
-					fInputNode= addNode(input);
-				}
+				fFileIsIndexed= true;
+				input= IndexQueries.attemptConvertionToHandle(index, input, fConverter);
+				fInputNode= addNode(input);
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				RDTLog.logError(e);
 			}
 		}
 	}
@@ -176,7 +181,7 @@ public class THGraph implements Serializable {
 						ICPPBase base= bases[i];
 						IName name= base.getBaseClassSpecifierName();
 						IBinding basecl= name != null ? index.findBinding(name) : base.getBaseClass();
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter);
 						for (int j = 0; j < baseElems.length; j++) {
 							ICElement baseElem = baseElems[j];
 							THGraphNode baseGraphNode= addNode(baseElem);
@@ -193,7 +198,7 @@ public class THGraph implements Serializable {
 					IType type= ct.getType();
 					if (type instanceof IBinding) {
 						IBinding basecl= (IBinding) type;
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter);
 						if (baseElems.length > 0) {
 							ICElement baseElem= baseElems[0];
 							THGraphNode baseGraphNode= addNode(baseElem);
@@ -207,9 +212,9 @@ public class THGraph implements Serializable {
 				}
 			} catch (DOMException e) {
 				// index bindings should not throw this kind of exception, might as well log it.
-				CCorePlugin.log(e);
+				RDTLog.logError(e);
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				RDTLog.logError(e);
 			}
 		}
 	}
@@ -242,7 +247,7 @@ public class THGraph implements Serializable {
 							IIndexName subClassDef= indexName.getEnclosingDefinition();
 							if (subClassDef != null) {
 								IBinding subClass= index.findBinding(subClassDef);
-								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass);
+								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter);
 								if (subClassElems.length > 0) {
 									ICElement subClassElem= subClassElems[0];
 									THGraphNode subGraphNode= addNode(subClassElem);
@@ -257,7 +262,7 @@ public class THGraph implements Serializable {
 					}
 				}
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				RDTLog.logError(e);
 			}
 		}
 	}
@@ -299,7 +304,7 @@ public class THGraph implements Serializable {
 			throws CoreException {
 		for (int i = 0; i < members.length; i++) {
 			IBinding binding = members[i];
-			ICElement[] elems= IndexQueries.findRepresentative(index, binding);
+			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter);
 			if (elems.length > 0) {
 				memberList.add(elems[0]);
 			}

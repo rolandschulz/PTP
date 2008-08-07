@@ -76,6 +76,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.swt.widgets.Display;
 
 public class OpenDeclarationsAction extends SelectionParseAction implements ASTRunnable {
@@ -243,7 +244,7 @@ public class OpenDeclarationsAction extends SelectionParseAction implements ASTR
 				}
 				return navigateCElements(elems);
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				RDTLog.logError(e);
 			}
 		}
 		return false;
@@ -465,7 +466,7 @@ public class OpenDeclarationsAction extends SelectionParseAction implements ASTR
 					try {
 						fSelectedText= document.get(reg.getOffset(), reg.getLength());
 					} catch (BadLocationException e) {
-						CCorePlugin.log(e);
+						RDTLog.logError(e);
 					}
 				}
 			}

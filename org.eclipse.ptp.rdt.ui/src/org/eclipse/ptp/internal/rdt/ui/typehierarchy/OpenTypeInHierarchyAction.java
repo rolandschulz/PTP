@@ -22,14 +22,21 @@ import org.eclipse.cdt.core.browser.ITypeReference;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.internal.ui.browser.opentype.ElementSelectionDialog;
 import org.eclipse.cdt.internal.ui.typehierarchy.Messages;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
-import org.eclipse.ptp.internal.rdt.core.typehierarchy.LocalTypeHierarchyService;
+import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.services.core.IService;
+import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
+import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
+import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -43,8 +50,6 @@ public class OpenTypeInHierarchyAction implements IWorkbenchWindowActionDelegate
 		ICElement.C_CLASS, ICElement.C_STRUCT, ICElement.C_TYPEDEF, ICElement.C_ENUMERATION,
 		ICElement.C_UNION };
 
-	private static final ITypeHierarchyService fService = new LocalTypeHierarchyService();
-	
 	private IWorkbenchWindow fWorkbenchWindow;
 
 	public OpenTypeInHierarchyAction() {
@@ -72,7 +77,18 @@ public class OpenTypeInHierarchyAction implements IWorkbenchWindowActionDelegate
 			MessageDialog.openError(getShell(), title, message);
 		} 
 		else {
-			TypeHierarchyUtil.open(fService, elements[0], fWorkbenchWindow);
+			IProject project = elements[0].getCProject().getProject();
+			IServiceModelManager smm = ServiceModelManager.getInstance();
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+
+			IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				ITypeHierarchyService service = ((IIndexServiceProvider) serviceProvider).getTypeHierarchyService();
+				TypeHierarchyUtil.open(service, elements[0], fWorkbenchWindow);
+			}
 		}
 	}
 	

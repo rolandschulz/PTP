@@ -10,15 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.index;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
@@ -32,10 +34,8 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
 public class RemoteIndexLifecycleService extends AbstractRemoteService implements IIndexLifecycleService {
 	
 	private Map<String, Scope> fStringToScopeMap = new TreeMap<String, Scope>();
-	public RemoteIndexLifecycleService(IHost host,
-			IConnectorService connectorService) {
-		fHost = host;
-		fConnectorService = connectorService;
+	public RemoteIndexLifecycleService(IHost host, IConnectorService connectorService) {
+		super(host, connectorService);
 	}
 
 	/* (non-Javadoc)
@@ -73,9 +73,9 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 	 */
 	public void reindex(Scope scope, List<ICElement> changedElements, IProgressMonitor monitor) {
 		ICIndexSubsystem indexSubsystem = getSubSystem();
-		
+		IStandaloneScannerInfoProvider provider = RemoteScannerInfoProviderFactory.getProvider(changedElements);
 		// TODO:  handle changedElements
-		indexSubsystem.reindexScope(scope, monitor);
+		indexSubsystem.reindexScope(scope, provider, monitor);
 
 	}
 
@@ -85,15 +85,19 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 	public void update(Scope scope, List<ICElement> newElements,
 			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor) {
 		
+		List<ICElement> elements = new ArrayList<ICElement>(newElements);
+		elements.addAll(changedElements);
+		
+		IStandaloneScannerInfoProvider provider = RemoteScannerInfoProviderFactory.getProvider(elements);
 		ICIndexSubsystem indexSubsystem = getSubSystem();
-		indexSubsystem.indexDelta(scope, newElements, changedElements, deletedElements, monitor);
-
+		indexSubsystem.indexDelta(scope, provider, newElements, changedElements, deletedElements, monitor);
 	}
 	
 	public void reindex(Scope scope, IProgressMonitor monitor) {
+		IStandaloneScannerInfoProvider provider = RemoteScannerInfoProviderFactory.getProvider(scope.getName());
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		
-		indexSubsystem.reindexScope(scope, monitor);
+		indexSubsystem.reindexScope(scope, provider, monitor);
 	}
 
 }

@@ -62,7 +62,6 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 	private boolean fComputeReferencedBy = true;
 	private WorkingSetFilterUI fFilter;
 	private RemoteCHViewPart fView;
-	private static INavigationService fNavigationService = new LocalNavigationService();
 
 	/**
 	 * Constructs the content provider.

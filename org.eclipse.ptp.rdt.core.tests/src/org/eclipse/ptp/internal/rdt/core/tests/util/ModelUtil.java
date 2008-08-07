@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.ILanguage;
@@ -78,5 +79,38 @@ public class ModelUtil {
 		String serialized = Serializer.serialize(object);
 		Object reconstituted = Serializer.deserialize(serialized);
 		return (T) reconstituted;
+	}
+
+	public static IASTCompletionNode findCompletionNode(ILanguage language, String name, String code, int offset) throws CoreException {
+		CodeReader reader = new CodeReader(name, code.toCharArray());
+		IScannerInfo scanInfo = new IScannerInfo() {
+			public Map<String, String> getDefinedSymbols() {
+				return Collections.emptyMap();
+			}
+
+			public String[] getIncludePaths() {
+				return new String[0];
+			}
+		};
+		ICodeReaderFactory fileCreator = new ICodeReaderFactory() {
+			public CodeReader createCodeReaderForInclusion(String path) {
+				return null;
+			}
+
+			public CodeReader createCodeReaderForTranslationUnit(String path) {
+				return null;
+			}
+
+			public ICodeReaderCache getCodeReaderCache() {
+				return null;
+			}
+
+			public int getUniqueIdentifier() {
+				return 0;
+			}
+		};
+		IIndex index = null;
+		IParserLogService log = new DefaultLogService();
+		return language.getCompletionNode(reader, scanInfo, fileCreator, index, log, offset);
 	}
 }

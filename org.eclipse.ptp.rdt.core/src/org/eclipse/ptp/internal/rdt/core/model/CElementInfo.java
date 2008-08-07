@@ -14,6 +14,8 @@ package org.eclipse.ptp.internal.rdt.core.model;
 import java.io.Serializable;
 import java.util.List;
 
+import org.eclipse.cdt.core.model.ICElement;
+
 public class CElementInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -26,7 +28,7 @@ public class CElementInfo implements Serializable {
 	public void setIsStructureKnown(boolean b) {
 	}
 
-	public List<SourceManipulation> internalGetChildren() {
+	public List<ICElement> internalGetChildren() {
 		return fParent.internalGetChildren();
 	}
 }

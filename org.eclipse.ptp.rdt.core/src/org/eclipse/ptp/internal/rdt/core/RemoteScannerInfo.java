@@ -13,28 +13,65 @@ package org.eclipse.ptp.internal.rdt.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.core.parser.IScannerInfo;
 
+/**
+ * An implementation of IScannerInfo that is Serializable and immutable.
+ *
+ */
 public class RemoteScannerInfo implements IScannerInfo, Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	Map<String, String> fSymbols;
-	ArrayList<String> fIncludePaths;
+	private Map<String, String> symbols;
+	private List<String> includePaths;
 
+	
+	/**
+	 * Creates an empty RemoteScannerInfo object.
+	 */
 	public RemoteScannerInfo() {
-		fSymbols = new HashMap<String, String>();
-		fIncludePaths = new ArrayList<String>();
+		symbols = Collections.emptyMap();
+		includePaths = Collections.emptyList();
 	}
 	
+	/**
+	 * Copy constructor.
+	 */
+	public RemoteScannerInfo(IScannerInfo scannerInfo) {
+		symbols = new HashMap<String, String>(scannerInfo.getDefinedSymbols());
+		includePaths = new ArrayList<String>(Arrays.asList(scannerInfo.getIncludePaths()));
+	}
+	
+	
+	public RemoteScannerInfo(Map<String, String> macroDefinitions, String[] includes) {
+		this(macroDefinitions, includes == null ? null : Arrays.asList(includes));
+	}
+	
+	public RemoteScannerInfo(Map<String, String> macroDefinitions, List<String> includes) {
+		this();
+		if(macroDefinitions != null)
+			symbols = macroDefinitions;
+		if(includes != null)
+			includePaths = includes;
+	}
+	
+
 	public Map<String, String> getDefinedSymbols() {
-		return Collections.unmodifiableMap(fSymbols);
+		return Collections.unmodifiableMap(symbols);
 	}
 
 	public String[] getIncludePaths() {
-		return fIncludePaths.toArray(new String[fIncludePaths.size()]);
+		return includePaths.toArray(new String[includePaths.size()]);
+	}
+	
+	@Override
+	public String toString() {
+		return includePaths + " " + symbols; //$NON-NLS-1$
 	}
 }

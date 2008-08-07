@@ -26,6 +26,13 @@ public class RemoteIndexFileLocation implements IIndexFileLocation, Serializable
 		fPath = path;
 	}
 	
+	public RemoteIndexFileLocation(IIndexFileLocation location) {
+		if (location != null) {
+			fURI = location.getURI();
+			fPath = location.getFullPath();
+		}
+	}
+
 	public String getFullPath() {
 		return fPath;
 	}

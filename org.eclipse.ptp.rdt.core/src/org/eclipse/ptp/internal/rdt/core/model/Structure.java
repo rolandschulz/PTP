@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class Structure extends StructureDeclaration implements IStructure {
 
 	public Structure(Parent parent, IStructure element) throws CModelException {
 		super(parent, element);
+		fSuperClasses = new LinkedList<SuperClassInfo>(); 
 		for (String superClass : element.getSuperClassesNames()) {
 			addSuperClass(superClass, element.getSuperClassAccess(superClass));
 		}
@@ -42,10 +44,12 @@ public class Structure extends StructureDeclaration implements IStructure {
 
 	public Structure(Parent parent, ICompositeType binding) throws DOMException {
 		super(parent, adaptASTClassType(binding), binding);
+		fSuperClasses = new LinkedList<SuperClassInfo>(); 
 	}
 
 	protected Structure(Parent parent, int type, ICompositeType binding) {
 		super(parent, type, binding);
+		fSuperClasses = new LinkedList<SuperClassInfo>(); 
 	}
 	
 	static int adaptASTClassType(ICompositeType type) throws DOMException {
@@ -105,7 +109,9 @@ public class Structure extends StructureDeclaration implements IStructure {
 		fSuperClasses.add(new SuperClassInfo(simpleName, visibility));
 	}
 	
-	private static class SuperClassInfo {
+	private static class SuperClassInfo implements Serializable {
+		private static final long serialVersionUID = 1L;
+		
 		public String name;
 		public ASTAccessVisibility visibility;
 		

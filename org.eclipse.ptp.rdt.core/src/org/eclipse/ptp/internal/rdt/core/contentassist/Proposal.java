@@ -74,7 +74,20 @@ public class Proposal implements Serializable {
 		fContextInformation = info;
 	}
 
+	public RemoteProposalContextInformation getContextInformation() {
+		return fContextInformation;
+	}
+	
 	public int getRelevance() {
 		return fRelevance;
+	}
+	
+	@Override
+	public String toString() {
+		return fDisplayText;
+	}
+
+	public int getCursorPosition() {
+		return fCursorPosition;
 	}
 }
