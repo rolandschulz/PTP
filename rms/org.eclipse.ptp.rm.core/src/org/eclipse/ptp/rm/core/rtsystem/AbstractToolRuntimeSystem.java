@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -376,14 +377,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	public void terminateJob(IPJob ipJob) throws CoreException {
 		DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminate job #{1}", rmConfiguration.getName(), ipJob.getID()); //$NON-NLS-1$
-		Job j = jobs.get(ipJob.getID());
-		j.cancel();
-		// TODO implement properly
-		//		IToolRuntimeSystemJob rjob = jobs.get(job.getID());
-//		if (rjob != null) {
-//			rjob.terminate();
-//			jobs.remove(rjob);
-//		}
+		Job job = jobs.get(ipJob.getID());
+		pendingJobQueue.remove(job);
+		job.cancel();
 	}
 
 	/**
@@ -446,7 +442,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String workDir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 		Integer numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
 		List<String> progArgs = attrMgr.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
-		Boolean debugFlag = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition()).getValue();
+		BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 
 		/*
 		 * Copy these relevant attributes to IPJob.
@@ -461,8 +457,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			PTPCorePlugin.log(e);
 		}
 		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgs.toArray(new String[0])));
-		jobAttrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(debugFlag));
-		
+		if (debugAttr != null) {
+			jobAttrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(debugAttr.getValue()));
+		}
+
 		/*
 		 * Notify RM.
 		 */
