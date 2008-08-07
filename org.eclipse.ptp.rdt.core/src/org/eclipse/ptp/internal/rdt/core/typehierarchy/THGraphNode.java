@@ -97,4 +97,9 @@ public class THGraphNode implements Serializable {
 			}
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return fElement == null ? null : fElement.toString();
+	}
 }

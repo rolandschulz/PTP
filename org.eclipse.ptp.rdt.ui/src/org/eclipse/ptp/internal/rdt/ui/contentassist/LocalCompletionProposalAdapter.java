@@ -11,13 +11,14 @@
 
 package org.eclipse.ptp.internal.rdt.ui.contentassist;
 
+import org.eclipse.core.resources.IProject;
+
 /**
  * Provides local index-based completions to CDT's content assist framework.
  */
 public class LocalCompletionProposalAdapter extends AbstractCompletionProposalAdapter {
 
-	@Override
-	protected IContentAssistService getService() {
+	protected IContentAssistService getService(IProject project) {
 		return new LocalContentAssistService();
 	}
 }

@@ -13,10 +13,10 @@ package org.eclipse.ptp.internal.rdt.ui.contentassist;
 
 import java.util.List;
 
-import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
-import org.eclipse.ptp.internal.rdt.core.model.Scope;;
+import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
 /**
  * Provides completion proposals during a content assist invocation.
@@ -35,13 +35,5 @@ public interface IContentAssistService {
 	 * @param prefix
 	 * @return
 	 */
-	List<Proposal> computeCompletionProposals(Scope scope, ContentAssistInvocationContext context, IASTCompletionNode completionNode, String prefix);
-	
-	/**
-	 * Returns the completion node associated with the given invocation context.
-	 * 
-	 * @param context
-	 * @return
-	 */
-	IASTCompletionNode getCompletionNode(Scope scope, ContentAssistInvocationContext context);
+	List<Proposal> computeCompletionProposals(Scope scope, ContentAssistInvocationContext context, ITranslationUnit unit);
 }

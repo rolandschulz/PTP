@@ -16,6 +16,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class Serializer {
 	static final char[] BASE64_ALPHABET = {
@@ -36,7 +38,8 @@ public class Serializer {
 
 	public static String serialize(Object o) throws IOException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		ObjectOutputStream out = new ObjectOutputStream(buffer);
+		GZIPOutputStream zipStream = new GZIPOutputStream(buffer);
+		ObjectOutputStream out = new ObjectOutputStream(zipStream);
 		out.writeObject(o);
 		out.close();
 		return encodeBase64(buffer.toByteArray(), 0, buffer.size());
@@ -45,7 +48,8 @@ public class Serializer {
 	public static Object deserialize(String data) throws IOException, ClassNotFoundException {
 		byte[] buffer = decodeBase64(data);
 		ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
-		ObjectInputStream in = new ObjectInputStream(stream);
+		GZIPInputStream zipStream = new GZIPInputStream(stream);
+		ObjectInputStream in = new ObjectInputStream(zipStream);
 		return in.readObject();
 	}
 

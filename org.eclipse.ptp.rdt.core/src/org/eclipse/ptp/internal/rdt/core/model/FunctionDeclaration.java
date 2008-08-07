@@ -11,6 +11,8 @@
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
+import java.util.Arrays;
+
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IFunction;
 import org.eclipse.cdt.core.model.CModelException;
@@ -121,4 +123,22 @@ public class FunctionDeclaration extends SourceManipulation implements IFunction
 		fIsStatic = isStatic;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (!super.equals(o)) {
+			return false;
+		}
+		if (!(o instanceof IFunctionDeclaration)) {
+			return false;
+		}
+		IFunctionDeclaration other = (IFunctionDeclaration) o;
+		if (!Arrays.equals(fParameterTypes, getParameterTypes())) {
+			return false;
+		}
+		String returnType = other.getReturnType();
+		if (fReturnType != null && !fReturnType.equals(returnType)) {
+			return false;
+		}
+		return true;
+	}
 }

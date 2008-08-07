@@ -28,9 +28,11 @@ import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.swt.widgets.Display;
@@ -49,7 +51,8 @@ public class TypeHierarchyUtil {
 	    	memberInput= input;
 	    	input= memberInput.getParent();
 	    	if (!TypeHierarchyUI.isValidTypeInput(input)) {
-	    		ICElement[] inputs= service.findInput(null, memberInput);
+	    		IProgressMonitor monitor = new NullProgressMonitor();
+	    		ICElement[] inputs= service.findInput(Scope.WORKSPACE_ROOT_SCOPE, memberInput, monitor);
 	    		if (inputs != null) {
 	    			input= inputs[0];
 	    			memberInput= inputs[1];
@@ -80,7 +83,7 @@ public class TypeHierarchyUtil {
 							IWorkingCopy workingCopy = CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
 							int selectionStart = sel.getOffset();
 							int selectionLength = sel.getLength();
-							final ICElement[] elems= service.findInput(null, project, workingCopy, selectionStart, selectionLength);
+							final ICElement[] elems= service.findInput(Scope.WORKSPACE_ROOT_SCOPE, project, workingCopy, selectionStart, selectionLength, monitor);
 							if (elems != null && elems.length == 2) {
 								display.asyncExec(new Runnable() {
 									public void run() {

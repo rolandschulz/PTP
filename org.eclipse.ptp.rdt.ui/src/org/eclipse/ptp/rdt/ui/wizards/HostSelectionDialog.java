@@ -15,9 +15,7 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
@@ -65,7 +63,9 @@ public class HostSelectionDialog extends Dialog {
      */
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
-        
+
+        getShell().setText(Messages.getString("HostSelectionDialog.1")); //$NON-NLS-1$
+		
         GridLayout layout = new GridLayout();
         layout.numColumns = 3;
         container.setLayout(layout);

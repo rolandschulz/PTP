@@ -33,17 +33,25 @@ import org.eclipse.cdt.internal.ui.typehierarchy.THSchedulingRule;
 import org.eclipse.cdt.internal.ui.viewsupport.IndexUI;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
+import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
-import org.eclipse.ptp.internal.rdt.core.typehierarchy.LocalTypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraphEdge;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraphNode;
+import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.services.core.IService;
+import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
+import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
+import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
@@ -68,8 +76,6 @@ class THHierarchyModel {
 	private static final ISchedulingRule RULE = new THSchedulingRule();
 	private static final Object[] NO_CHILDREN= new Object[0];
 
-	private ITypeHierarchyService fService = new LocalTypeHierarchyService();
-	
 	private ICElement fInput;
 	private int fHierarchyKind;
 	private boolean fShowInheritedMembers;
@@ -161,7 +167,18 @@ class THHierarchyModel {
 	protected IStatus onComputeGraph(Job job, IProgressMonitor monitor) {
 		THGraph graph = null;
 		try {
-			graph = fService.computeGraph(null, fInput, monitor);
+			IProject project = fInput.getCProject().getProject();
+			IServiceModelManager smm = ServiceModelManager.getInstance();
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+
+			IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				ITypeHierarchyService service = ((IIndexServiceProvider) serviceProvider).getTypeHierarchyService();
+				graph = service.computeGraph(Scope.WORKSPACE_ROOT_SCOPE, fInput, monitor);
+			}
 			if (monitor.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
