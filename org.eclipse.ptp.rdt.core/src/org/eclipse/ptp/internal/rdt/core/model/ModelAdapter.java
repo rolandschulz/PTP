@@ -11,9 +11,10 @@
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
+import java.util.LinkedList;
+
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
-import org.eclipse.cdt.core.model.ICModelStatusConstants;
 import org.eclipse.cdt.core.model.IEnumeration;
 import org.eclipse.cdt.core.model.IEnumerator;
 import org.eclipse.cdt.core.model.IField;
@@ -37,7 +38,6 @@ import org.eclipse.cdt.core.model.ITypeDef;
 import org.eclipse.cdt.core.model.IUsing;
 import org.eclipse.cdt.core.model.IVariable;
 import org.eclipse.cdt.core.model.IVariableDeclaration;
-import org.eclipse.cdt.internal.core.model.CModelStatus;
 import org.eclipse.core.runtime.IPath;
 
 public class ModelAdapter {
@@ -54,7 +54,11 @@ public class ModelAdapter {
 	 * @throws CModelException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends ICElement> T adaptElement(Parent parent, T element, int depth) throws CModelException {
+	public static <T extends ICElement> T adaptElement(Parent parent, T element, int depth, boolean adaptAncestors) throws CModelException {
+		if (parent == null && adaptAncestors) {
+			parent = adaptAncestors(element);
+		}
+		
 		Parent result;
 		switch (element.getElementType()) {
 		case ICElement.C_ENUMERATION:
@@ -138,23 +142,46 @@ public class ModelAdapter {
 			result = new TranslationUnit(parent, (ITranslationUnit) element);
 			break;
 		case ICElement.C_PROJECT:
+			result = new CProject(element.getElementName());
+			break;
 		default:
-			throw new CModelException(new CModelStatus(ICModelStatusConstants.INVALID_ELEMENT_TYPES));
+			return null;
 		}
 		
 		if (parent != null) {
 			parent.addChild(result);
 		}
 		
+		result.setCProject(new CProject(element.getCProject().getElementName()));
 		result.setLocationURI(element.getLocationURI());
 		result.setPath(element.getPath());
 		
 		if (depth != 0) {
-			for (SourceManipulation child : result.internalGetChildren()) {
-				result.addChild(adaptElement(result, child, depth - 1));
+			for (ICElement child : result.internalGetChildren()) {
+				result.addChild((CElement) adaptElement(result, child, depth - 1, adaptAncestors));
 			}
 		}
 		return (T) result;
+	}
+	
+	static Parent adaptAncestors(ICElement element) throws CModelException {
+		LinkedList<ICElement> ancestors = new LinkedList<ICElement>();  
+		ICElement current = element.getParent();
+		while (current != null) {
+			ancestors.addFirst(current);
+			current = current.getParent();
+		}
+		
+		Parent parent = null;
+		for (ICElement ancestor : ancestors) {
+			ICElement adapted = adaptElement(parent, ancestor, 0, false);
+			if (!(adapted instanceof Parent)) {
+				// Skip over ICElements we can't adapt
+				continue;
+			}
+			parent = (Parent) adapted;
+		}
+		return parent;
 	}
 	
 	IPath adaptPath(IPath path) {

@@ -21,7 +21,7 @@ public class AdapterTests extends ModelManipulationTestBase {
 
 	@Override
 	protected void manipulate(ICElement element) throws Exception {
-		ICElement adapted = ModelAdapter.adaptElement(null, element, -1);
+		ICElement adapted = ModelAdapter.adaptElement(null, element, -1, false);
 		Assert.assertEquals(element.getElementType(), adapted.getElementType());
 		Assert.assertEquals(element.getElementName(), adapted.getElementName());
 		

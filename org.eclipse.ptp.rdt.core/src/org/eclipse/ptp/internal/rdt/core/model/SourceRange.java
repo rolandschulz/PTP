@@ -53,8 +53,8 @@ public class SourceRange implements ISourceRange, Serializable {
 	
 	public SourceRange(IIndexName name, IASTFileLocation location) {
 		fEndLine = location.getEndingLineNumber();
-		fIdLength = name.getNodeOffset();
-		fIdStartPos = name.getNodeLength();
+		fIdLength = name.getNodeLength();
+		fIdStartPos = name.getNodeOffset();
 		fLength = location.getNodeLength();
 		fStartLine = location.getStartingLineNumber();
 		fStartPos = location.getNodeOffset();

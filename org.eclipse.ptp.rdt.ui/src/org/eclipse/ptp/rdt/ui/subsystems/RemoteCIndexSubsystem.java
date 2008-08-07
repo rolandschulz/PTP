@@ -14,11 +14,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
+import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModelUtil;
@@ -26,9 +30,8 @@ import org.eclipse.cdt.core.model.ICContainer;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IParent;
-import org.eclipse.cdt.core.model.ISourceRange;
-import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -39,17 +42,27 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreSchema;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
+import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
+import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
+import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
+import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
+import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
+import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
+import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
@@ -67,6 +80,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 
+	private Set<IProject> fInitializedProjects;
+	private ProjectChangeListener fProjectOpenListener;
+
 	protected RemoteCIndexSubsystem(IHost host,
 			IConnectorService connectorService) {
 		super(host, connectorService);
@@ -82,115 +98,27 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	 */
 	@Override
 	public void initializeSubSystem(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
 		super.initializeSubSystem(monitor);
 		
-		getDataStore().activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
+		fInitializedProjects = new HashSet<IProject>();
+		fProjectOpenListener = new ProjectChangeListener(this);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectOpenListener);
 		
-		try {
-			initializeAllScopes(monitor);
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		getDataStore().activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
 	}
 
-
-
-	/**
-	 * Initializes scopes for all projects associated with this service provider.
-	 * @throws CoreException 
-	 */
-	/**
-	 * @param monitor 
-	 * @throws CoreException
-	 */
-	protected void initializeAllScopes(IProgressMonitor monitor)
-			throws CoreException {
-
-		// Iterate through all open projects.
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot workspaceRoot = workspace.getRoot();
-		IProject[] projects = workspaceRoot.getProjects();
-
-		for (int k = 0; k < projects.length; k++) {
-			IProject project = projects[k];
-
-			// is the project open? if not, there's not much we can do
-			if (!project.isOpen())
-				continue;
-
-			// is this an RDT C/C++ project?
-			// check the project natures... we care about the project if it has
-			// both the remote nature and
-			// at least one of the CDT natures
-			try {
-				if (!project.hasNature(RemoteNature.REMOTE_NATURE_ID)
-						|| !(project.hasNature(CProjectNature.C_NATURE_ID) || project
-								.hasNature(CCProjectNature.CC_NATURE_ID)))
-					continue;
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-
-			// get the service model configuration for this project
-			final ServiceModelManager serviceModelManager = ServiceModelManager
-					.getInstance();
-			IServiceConfiguration config = serviceModelManager
-					.getActiveConfiguration(project);
-
-			// is the indexing service associated with our service provider?
-			if (config
-					.getServiceProvider(
-							serviceModelManager
-									.getService(RemoteCIndexServiceProvider.SERVICE_ID))
-					.equals(RemoteCIndexServiceProvider.ID)) {
-
-				// if so, initialize a scope for the project consisting of all
-				// its translation units
-				final List<ICElement> cElements = new LinkedList<ICElement>();
-
-				IResourceVisitor fileCollector = new IResourceVisitor() {
-
-					public boolean visit(IResource resource)
-							throws CoreException {
-
-						if (resource instanceof IFile) {
-							// add the path
-							ITranslationUnit tu = CoreModelUtil
-									.findTranslationUnit((IFile) resource);
-							cElements.add(tu);
-							return false;
-						}
-
-						return true;
-					}
-
-				};
-
-				// collect the translation units
-				project.accept(fileCollector);
-
-				Scope scope = new Scope(project.getName());
-
-				// unregister the scope if there already is one
-				unregisterScope(scope, monitor);
-
-				// register the new scope
-				registerScope(scope, cElements, monitor);
-
-			}
-
-		}
-
+	@Override
+	public void uninitializeSubSystem(IProgressMonitor monitor) {
+		super.uninitializeSubSystem(monitor);
+		
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectOpenListener);
+		fInitializedProjects = null;
 	}
-
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#startIndexOfScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus startIndexOfScope(Scope scope, IProgressMonitor monitor)
+	public IStatus startIndexOfScope(Scope scope, IStandaloneScannerInfoProvider provider, IProgressMonitor monitor)
 	{
 		DataStore dataStore = getDataStore();
 		   
@@ -211,6 +139,16 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
             	// need to know the scope
             	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
             	args.add(scopeElement);
+            	
+            	String serializedProvider = null;
+            	try {
+					serializedProvider = Serializer.serialize(provider);
+				} catch (IOException e) {
+					RDTLog.logError(e);
+				}
+				
+				DataElement providerElement = dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider);
+				args.add(providerElement);
             
            	
             	// execute the command
@@ -240,7 +178,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#reindexScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus reindexScope(Scope scope, IProgressMonitor monitor)
+	public IStatus reindexScope(Scope scope, IStandaloneScannerInfoProvider provider, IProgressMonitor monitor)
 	{
 		DataStore dataStore = getDataStore();
 		   
@@ -279,6 +217,17 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
             	            	
             	// need to know the scope
             	args.add(scope.getName());
+            	
+            	String serializedProvider = null;
+            	try {
+					serializedProvider = Serializer.serialize(provider);
+					System.out.println("length " + serializedProvider.length());//$NON-NLS-1$
+				} catch (IOException e) {
+					RDTLog.logError(e);
+				}
+				
+				DataElement providerElement = dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider);
+				args.add(providerElement);
             	
                 DataElement status = dataStore.command(queryCmd, args, result);   
                 int num = 0;
@@ -353,7 +302,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#indexDelta(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, java.util.List, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus indexDelta(Scope scope, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor)
+	public IStatus indexDelta(Scope scope, IStandaloneScannerInfoProvider provider, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor)
 	{
 		DataStore dataStore = getDataStore();
 		   
@@ -375,9 +324,20 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
             	            	
             	// need to know the scope
                	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-                
                	args.add(scopeElement);
                	
+               	
+               	String serializedProvider = null;
+            	try {
+					serializedProvider = Serializer.serialize(provider);
+				} catch (IOException e) {
+					RDTLog.logError(e);
+				}
+				
+				DataElement providerElement = dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider);
+				args.add(providerElement);
+				
+				
                	// iterate through the additions and create an object for each addition
                	Iterator<ICElement> iterator = newElements.iterator();
                	
@@ -605,6 +565,9 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#unregisterScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IStatus unregisterScope(Scope scope, IProgressMonitor monitor) {
+	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(scope.getName());
+		fInitializedProjects.remove(project);
+		
 		DataStore dataStore = getDataStore();
 		   
 	    if (dataStore != null)
@@ -659,347 +622,233 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	// call hierarchy
 	
 
-	public List<String> getCallers(Scope scope, ICElement subject, IProgressMonitor monitor) {
-		DataStore dataStore = getDataStore();
-		   
-	    if (dataStore != null)
-	    {
-	    	
-	     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
-	     	
-	    	
-	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_CALL_HIERARCHY_GET_CALLERS);
-            if (queryCmd != null)
-            {
-                      	
-            	ArrayList<Object> args = new ArrayList<Object>();
-
-            	DataElement dataElement;
-            	
-            	// need to know the scope
-            	dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-            	args.add(dataElement);
-            
-            	// the name of the thing we're getting the callers of
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, subject.getElementName());
-            	args.add(dataElement);         	
-            	
-            	// file name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_FILENAME_DESCRIPTOR, convertURIToRemotePath(subject.getLocationURI()));
-            	args.add(dataElement);
-            	
-            	ISourceReference sourceRef = (ISourceReference) subject;
-            	ISourceRange sourceRange = null;
-				try {
-					sourceRange = sourceRef.getSourceRange();
-				} catch (CModelException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-            	
-            	// selection start
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, new Integer(sourceRange.getIdStartPos()).toString());
-            	args.add(dataElement);
-            	
-            	// selection end
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, new Integer(sourceRange.getIdLength()).toString());
-            	args.add(dataElement);
-
-            	// project name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, subject.getCProject().getElementName());
-            	args.add(dataElement);
-            	
-            	// host name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, getHostName());
-            	args.add(dataElement);
-            	
-            	// execute the command
-            	//DataElement status = dataStore.command(queryCmd, dataStore.getDescriptorRoot(), true); 
-            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
-            	
-            	try
-                {
-                	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
-                }
-                catch (Exception e)
-                {                	
-                }
-            	
-                
-                List<String> results = new LinkedList<String>();
-                
-                for(int k = 0; k < status.getNestedSize(); k++)
-                {
-                	DataElement element = status.get(k);
-                	String result = element.getName();
-                	results.add(result);
-                	
-                }
-                
-                return results;
-            }	
-            
-            
-	    }
-	    
-	  return null;
-
+	public CalledByResult getCallers(Scope scope, ICElement subject, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getHostName(), subject }, null);
+		if (result == null) {
+			return new CalledByResult();
+		}
+		return (CalledByResult) result;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCallees(org.eclipse.ptp.internal.rdt.core.model.Scope, java.lang.String, java.lang.String, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public List<String> getCallees(Scope scope, ICElement subject, IProgressMonitor monitor) {
-		DataStore dataStore = getDataStore();
-		   
-	    if (dataStore != null)
-	    {
-	     	
-	     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
-	     	
-	    	
-	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_CALL_HIERARCHY_GET_CALLS);
-            if (queryCmd != null)
-            {
-                      	
-            	ArrayList<Object> args = new ArrayList<Object>();
-
-            	DataElement dataElement;
-            	
-            	// need to know the scope
-            	dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-            	args.add(dataElement);
-            
-               	// the name of the thing we're getting the callees of
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, subject.getElementName());
-            	args.add(dataElement);         	
-            	
-            	// file name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_FILENAME_DESCRIPTOR, convertURIToRemotePath(subject.getLocationURI()));
-            	args.add(dataElement);
-            	
-            	ISourceReference sourceRef = (ISourceReference) subject;
-            	ISourceRange sourceRange = null;
-				try {
-					sourceRange = sourceRef.getSourceRange();
-				} catch (CModelException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-            	
-            	// selection start
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, new Integer(sourceRange.getStartPos()).toString());
-            	args.add(dataElement);
-            	
-            	// selection end
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, new Integer(sourceRange.getIdLength()).toString());
-            	args.add(dataElement);
-
-            	// project name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, subject.getCProject().getElementName());
-            	args.add(dataElement);
-            	
-            	// host name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, getHostName());
-            	args.add(dataElement);
-            	
-            	// execute the command
-            	//DataElement status = dataStore.command(queryCmd, dataStore.getDescriptorRoot(), true); 
-            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
-            	
-            	try
-                {
-                	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
-                }
-                catch (Exception e)
-                {                	
-                }
-            	
-                
-                List<String> results = new LinkedList<String>();
-                
-                for(int k = 0; k < status.getNestedSize(); k++)
-                {
-                	DataElement element = status.get(k);
-                	String result = element.getName();
-                	results.add(result);
-                	
-                }
-                
-                return results;
-            }	
-            
-            
-	    }
-	    
-	  return null;
-
+	public CallsToResult getCallees(Scope scope, ICElement subject, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getHostName(), subject }, null);
+		if (result == null) {
+			return new CallsToResult();
+		}
+		return (CallsToResult) result;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCHDefinitions(org.eclipse.ptp.internal.rdt.core.model.Scope, java.lang.String, java.lang.String, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public List<String> getCHDefinitions(Scope scope, ICElement subject, IProgressMonitor monitor) {
+	public ICElement[] getCHDefinitions(Scope scope, ICElement subject, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getHostName(), subject }, null);
+		if (result == null) {
+			return new ICElement[0];
+		}
+		return (ICElement[]) result;
+	}
+	
+	public ICElement[] getCHDefinitions(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.7") + unit, 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, new Object[] { scope, getHostName(), unit, selectionStart, selectionLength }, null);
+		if (result == null) {
+			return new ICElement[0];
+		}
+		return (ICElement[]) result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<RemoteSearchMatch> runQuery(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY, new Object[] { scope, getHostName(), query  }, null);
+		if (result == null) {
+			return Collections.emptyList();
+		}
+		return (List<RemoteSearchMatch>) result;
+	}
+	
+	public List<Proposal> computeCompletionProposals(Scope scope, RemoteContentAssistInvocationContext context, ITranslationUnit unit) {
 		DataStore dataStore = getDataStore();
-		   
-	    if (dataStore != null)
+	    if (dataStore == null)
 	    {
-
-	     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
-	     	
-	    	
-	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS);
-            if (queryCmd != null)
-            {
-                      	
-            	ArrayList<Object> args = new ArrayList<Object>();
-
-            	DataElement dataElement;
-            	
-            	// need to know the scope
-            	dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-            	args.add(dataElement);
-            
-            	// the name of the thing we're getting the definitions of
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, subject.getElementName());
-            	args.add(dataElement);
-            	
-            	// file name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_FILENAME_DESCRIPTOR, convertURIToRemotePath(subject.getLocationURI()));
-            	args.add(dataElement);
-            	
-            	ISourceReference sourceRef = (ISourceReference) subject;
-            	ISourceRange sourceRange = null;
-				try {
-					sourceRange = sourceRef.getSourceRange();
-				} catch (CModelException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-            	
-            	// selection start
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, new Integer(sourceRange.getIdStartPos()).toString());
-            	args.add(dataElement);
-            	
-            	// selection end
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, new Integer(sourceRange.getIdLength()).toString());
-            	args.add(dataElement);
-            	
-            	// project name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, subject.getCProject().getElementName());
-            	args.add(dataElement);
-            	
-            	// host name
-            	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, getHostName());
-            	args.add(dataElement);
-            	
-            	// execute the command
-            	//DataElement status = dataStore.command(queryCmd, dataStore.getDescriptorRoot(), true); 
-            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
-            	
-            	try
-                {
-                	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
-                }
-                catch (Exception e)
-                {                	
-                }
-            	
-                
-                List<String> results = new LinkedList<String>();
-                
-                for(int k = 0; k < status.getNestedSize(); k++)
-                {
-                	DataElement element = status.get(k);
-                	String result = element.getName();
-                	results.add(result);
-                	
-                }
-                
-                return results;
-            }	
-            
-            
+	    	return Collections.emptyList();
 	    }
 	    
-	  return null;
+        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_CONTENT_ASSIST_COMPUTE_PROPOSALS);
+        
+        if (queryCmd == null)
+        {
+	    	return Collections.emptyList();
+        }
 
+     	NullProgressMonitor monitor = new NullProgressMonitor();
+     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+    	ArrayList<Object> args = new ArrayList<Object>();
+
+    	// need to know the scope
+    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+    	args.add(dataElement);
+
+    	// invocation context
+    	args.add(createSerializableElement(dataStore, context));
+    	
+    	// translation unit
+    	args.add(createSerializableElement(dataStore, unit));
+    	
+    	// execute the command
+    	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+    	
+    	try
+        {
+        	smonitor.waitForUpdate(status, monitor);
+        	if (monitor.isCanceled())
+        	{
+        		cancelOperation(monitor, status.getParent());
+        	}
+        }
+        catch (Exception e)
+        {
+        	e.printStackTrace();
+        }
+    	
+    	DataElement element = status.get(0);
+    	String data = element.getName();
+		try
+		{
+			Object result = Serializer.deserialize(data);
+			if (result == null || !(result instanceof List))
+			{
+				return Collections.emptyList();
+			}
+			return (List<Proposal>) result;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+    	return Collections.emptyList();
 	}
 	
-	public List<String> runQuery(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
+	public THGraph computeTypeGraph(Scope scope, ICElement input, IProgressMonitor monitor) {
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, new Object[] { scope, getHostName(), input }, monitor);
+		if (result == null) {
+			return new THGraph();
+		}
+		return (THGraph) result;
+	}
+	
+	public ICElement[] findTypeHierarchyInput(Scope scope, ICElement memberInput) {
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT1, new Object[] { scope, getHostName(), memberInput }, null);
+		if (result == null) {
+			return new ICElement[] { null, null };
+		}
+		return (ICElement[]) result;
+	}
+	
+	public ICElement[] findTypeHierarchyInput(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength) {
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit, new Integer(selectionStart), new Integer(selectionLength)}, null);
+		if (result == null) {
+			return new ICElement[] { null, null };
+		}
+		return (ICElement[]) result;
+	}
+	
+	public Object sendRequest(String requestType, Object[] arguments, IProgressMonitor monitor) {
 		DataStore dataStore = getDataStore();
-	    if (dataStore != null)
+	    if (dataStore == null)
 	    {
-	     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
-	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_SEARCH_RUN_QUERY);
-            if (queryCmd != null)
-            {
-            	ArrayList<Object> args = new ArrayList<Object>();
-            	DataElement dataElement;
-            	
-            	// need to know the scope
-            	dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-            	args.add(dataElement);
-            	
-            	// search query
-            	try {
-	            	String serializedQuery = Serializer.serialize(query);
-	            	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, serializedQuery));
-            	} catch (IOException e) {
-            		e.printStackTrace();
-            	}
-            	
-            	// host name
-            	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, getHostName()));
-            	
-            	// execute the command
-            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
-            	
-            	try
-                {
-                	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
-                }
-                catch (Exception e)
-                {                	
-                }
-            	
-                List<String> results = new LinkedList<String>();
-                for(int k = 0; k < status.getNestedSize(); k++)
-                {
-                	DataElement element = status.get(k);
-                	String result = element.getName();
-                	results.add(result);
-                	
-                }
-                return results;
-            }	
+	    	return null;
 	    }
-	  return null;
+	    
+        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), requestType);
+        
+        if (queryCmd == null)
+        {
+	    	return null;
+        }
+
+     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+    	ArrayList<Object> args = new ArrayList<Object>();
+
+    	for (Object argument : arguments) {
+    		if (argument instanceof Scope) {
+    	    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, ((Scope) argument).getName());
+    	    	args.add(dataElement);
+    		} else if (argument instanceof String) {
+            	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, (String) argument);
+            	args.add(dataElement);
+    		} else if (argument instanceof Integer
+    				|| argument instanceof Boolean
+    				|| argument instanceof Character
+    				|| argument instanceof Double
+    				|| argument instanceof Float) {
+            	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, argument.toString());
+            	args.add(dataElement);
+    		} else {
+    	    	args.add(createSerializableElement(dataStore, argument));
+    		}
+    	}
+    	
+    	// execute the command
+    	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+    	
+    	try
+        {
+    		IProgressMonitor progressMonitor;
+    		if (monitor == null) {
+    			progressMonitor = new NullProgressMonitor();
+    		} else {
+    			progressMonitor = monitor;
+    		}
+        	smonitor.waitForUpdate(status, progressMonitor);
+        	if (progressMonitor.isCanceled())
+        	{
+        		cancelOperation(progressMonitor, status.getParent());
+        	}
+        }
+        catch (Exception e)
+        {
+        	e.printStackTrace();
+        }
+    	
+    	DataElement element = status.get(0);
+    	if (element == null) {
+    		return null;
+    	}
+    	String data = element.getName();
+		try
+		{
+			Object result = Serializer.deserialize(data);
+			if (result == null)
+			{
+				return null;
+			}
+			return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+    	return null;
 	}
 	
+	private DataElement createSerializableElement(DataStore dataStore, Object object) {
+    	try {
+        	String serialized = Serializer.serialize(object);
+        	return dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, serialized);
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+	}
+
 	protected DataStore getDataStore()
 	{
 		IConnectorService connectorService = getConnectorService();
@@ -1020,4 +869,86 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 			dataStore.command(commandDescriptor, cmd, false, true);
 		}	
 	}
+	
+	public void checkAllProjects(IProgressMonitor monitor) {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot workspaceRoot = workspace.getRoot();
+
+		for (IProject project : workspaceRoot.getProjects()) {
+			// is the project open? if not, there's not much we can do
+			if (!project.isOpen())
+				continue;
+
+			// is this an RDT C/C++ project?
+			// check the project natures... we care about the project if it has
+			// both the remote nature and
+			// at least one of the CDT natures
+			try {
+				if (!project.hasNature(RemoteNature.REMOTE_NATURE_ID)
+						|| !(project.hasNature(CProjectNature.C_NATURE_ID)
+						|| project.hasNature(CCProjectNature.CC_NATURE_ID)))
+					continue;
+				
+				checkProject(project, monitor);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	}
+		
+	public void checkProject(IProject project, IProgressMonitor monitor) {
+		if (project == null || fInitializedProjects.contains(project)) {
+			return;
+		}
+		try {
+			initializeScope(project, monitor);
+		} catch (CoreException e) {
+			RDTLog.logError(e);
+		}
+	}
+
+	private void initializeScope(IProject project, IProgressMonitor monitor) throws CoreException {
+		// get the service model configuration for this project
+		final ServiceModelManager serviceModelManager = ServiceModelManager.getInstance();
+		IServiceConfiguration config = serviceModelManager.getActiveConfiguration(project);
+
+		// is the indexing service associated with our service provider?
+		IService service = serviceModelManager.getService(RemoteCIndexServiceProvider.SERVICE_ID);
+		IServiceProvider provider = config.getServiceProvider(service);
+		if (provider.getId().equals(RemoteCIndexServiceProvider.ID)) {
+
+			// if so, initialize a scope for the project consisting of all
+			// its translation units
+			final List<ICElement> cElements = new LinkedList<ICElement>();
+
+			IResourceVisitor fileCollector = new IResourceVisitor() {
+
+				public boolean visit(IResource resource) throws CoreException {
+					if (resource instanceof IFile) {
+						// add the path
+						ITranslationUnit tu = CoreModelUtil.findTranslationUnit((IFile) resource);
+						if (tu != null) {
+							cElements.add(tu);
+							return false;
+						}
+					}
+					return true;
+				}
+			};
+
+			// collect the translation units
+			project.accept(fileCollector);
+
+			Scope scope = new Scope(project.getName());
+
+			// unregister the scope if there already is one
+			unregisterScope(scope, monitor);
+
+			// register the new scope
+			registerScope(scope, cElements, monitor);
+			
+			fInitializedProjects.add(project);
+		}
+	}
+	
 }

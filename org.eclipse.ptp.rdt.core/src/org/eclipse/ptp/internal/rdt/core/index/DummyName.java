@@ -88,6 +88,10 @@ public class DummyName implements IIndexName, Serializable {
 		this(name.toString(), fileLocation, new SourceRange(name, location), name.isDefinition(), name.isDeclaration());
 	}
 
+	public DummyName(IIndexName name) throws CoreException {
+		this(name, name.getFileLocation(), name.getFile().getLocation());
+	}
+	
 	public IIndexName[] getEnclosedNames() throws CoreException {
 		return null;
 	}

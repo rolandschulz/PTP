@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.ui.text.contentassist.CContentAssistInvocationContext;
 import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.contentassist.CompletionProposalComputer;
@@ -25,22 +26,20 @@ import org.eclipse.ptp.internal.rdt.core.model.Scope;
 /**
  * Provides local index-based completions for content assist.
  */
-public class LocalContentAssistService extends AbstractContentAssistService {
+public class LocalContentAssistService implements IContentAssistService {
 	private static CompletionProposalComputer fComputer = new CompletionProposalComputer();
 
-	public List<Proposal> computeCompletionProposals(Scope scope, ContentAssistInvocationContext context, IASTCompletionNode completionNode, String prefix) {
+	public List<Proposal> computeCompletionProposals(Scope scope, ContentAssistInvocationContext context, ITranslationUnit unit) {
 		if (!(context instanceof CContentAssistInvocationContext)) {
 			return Collections.emptyList();
 		}
-		RemoteContentAssistInvocationContext remoteContext = adaptContext((CContentAssistInvocationContext) context);
-		return fComputer.computeCompletionProposals(remoteContext, completionNode, prefix);
-	}
-	
-	public IASTCompletionNode getCompletionNode(Scope scope, ContentAssistInvocationContext context) {
-		if (!(context instanceof CContentAssistInvocationContext)) {
-			return null;
+		
+		RemoteContentAssistInvocationContext remoteContext = ContentAssistUtil.adaptContext((CContentAssistInvocationContext) context);
+		IASTCompletionNode completionNode = ((CContentAssistInvocationContext) context).getCompletionNode();
+		String prefix = completionNode.getPrefix();
+		if (prefix == null) {
+			prefix = remoteContext.computeIdentifierPrefix().toString();
 		}
-		CContentAssistInvocationContext cContext = (CContentAssistInvocationContext) context;
-		return cContext.getCompletionNode();
+		return fComputer.computeCompletionProposals(remoteContext, completionNode, prefix);
 	}
 }

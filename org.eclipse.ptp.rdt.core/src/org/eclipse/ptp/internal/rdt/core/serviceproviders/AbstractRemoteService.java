@@ -10,6 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.serviceproviders;
 
+import org.eclipse.cdt.core.model.CModelException;
+import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.core.model.IWorkingCopy;
+import org.eclipse.cdt.core.parser.IScannerInfo;
+import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfoProviderFactory;
+import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
+import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
+import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
@@ -21,8 +29,9 @@ public class AbstractRemoteService {
 	protected IConnectorService fConnectorService;
 	protected ICIndexSubsystem fIndexSubsystem;
 
-	public AbstractRemoteService() {
-		super();
+	public AbstractRemoteService(IHost host, IConnectorService connectorService) {
+		fHost = host;
+		fConnectorService = connectorService;
 	}
 
 	protected ICIndexSubsystem getSubSystem() {
@@ -38,6 +47,23 @@ public class AbstractRemoteService {
 		}
 		
 		return fIndexSubsystem;
+	}
+
+	protected ITranslationUnit adaptWorkingCopy(IWorkingCopy workingCopy) throws CModelException {
+		ITranslationUnit unit;
+		
+		if (workingCopy.isConsistent()) {
+			unit = ModelAdapter.adaptElement(null, workingCopy, 0, true);
+		} else {
+			String contents = workingCopy.getSource();
+			unit = new WorkingCopy(null, workingCopy, contents);
+		}
+		
+		if (unit instanceof TranslationUnit) {
+			IScannerInfo scannerInfo = RemoteScannerInfoProviderFactory.getScannerInfo(unit.getResource());
+			((TranslationUnit) unit).setASTContext(scannerInfo);
+		}
+		return unit;
 	}
 
 }

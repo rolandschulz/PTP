@@ -22,11 +22,19 @@ import org.eclipse.cdt.internal.ui.typehierarchy.Messages;
 import org.eclipse.cdt.internal.ui.typehierarchy.TypeHierarchyUI;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.actions.SelectionDispatchAction;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
-import org.eclipse.ptp.internal.rdt.core.typehierarchy.LocalTypeHierarchyService;
+import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
+import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.services.core.IService;
+import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
+import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
+import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -34,8 +42,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 
-	private static final ITypeHierarchyService fService = new LocalTypeHierarchyService();
-	
 	private ITextEditor fEditor;
 
 	public OpenTypeHierarchyAction(IWorkbenchSite site) {
@@ -51,7 +57,18 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 	}
 
 	public void run(ITextSelection sel) {
-		TypeHierarchyUtil.open(fService, fEditor, sel);
+		IProject project = ((CEditor) fEditor).getInputCElement().getCProject().getProject();
+		IServiceModelManager smm = ServiceModelManager.getInstance();
+		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+
+		IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+
+		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+
+		if (serviceProvider instanceof IIndexServiceProvider) {
+			ITypeHierarchyService service = ((IIndexServiceProvider) serviceProvider).getTypeHierarchyService();
+			TypeHierarchyUtil.open(service, fEditor, sel);
+		}
 	}
 	
 	public void run(IStructuredSelection selection) {
@@ -59,7 +76,18 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 			Object selectedObject= selection.getFirstElement();
 			ICElement elem= (ICElement) getAdapter(selectedObject, ICElement.class);
 			if (elem != null) {
-				TypeHierarchyUtil.open(fService, elem, getSite().getWorkbenchWindow());
+				IProject project = elem.getCProject().getProject();
+				IServiceModelManager smm = ServiceModelManager.getInstance();
+				IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+
+				IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+
+				IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+
+				if (serviceProvider instanceof IIndexServiceProvider) {
+					ITypeHierarchyService service = ((IIndexServiceProvider) serviceProvider).getTypeHierarchyService();
+					TypeHierarchyUtil.open(service, elem, getSite().getWorkbenchWindow());
+				}
 			}
 		}
 	}

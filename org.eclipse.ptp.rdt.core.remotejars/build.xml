@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<!--
+ Copyright (c) 2008 IBM Corporation and others.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+ 
+ Contributors:
+   IBM - Initial API and implementation
+-->
+<project name="RDT Remote JARs" default="server.all" basedir=".">
+	
+	<property name="serverBaseName" value="rdt-server"/>
+	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
+	<property name="serverVersion" value="1.0"/>
+	
+	<property name="stylesheet" value="${basedir}/jardesc.xsl"/>
+	<property name="downloads" value="${basedir}/downloads"/>
+	<property name="remoteServerTempDir" value="${basedir}/rdt-server"/>
+	<property name="platformTempDir" value="${basedir}/platform.temp"/>
+	
+	<property name="platformBaseUrl" value="http://ganymede-mirror2.eclipse.org/eclipse/downloads/drops"/>
+	<property name="platformVersion" value="R-3.4-200806172000"/>
+	<property name="platformBaseName" value="eclipse-platform-3.4"/>
+	
+	<property name="coreRuntimeVersion" value="3.4.0.v20080512"/>
+	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
+	
+	<property name="equinoxVersion" value="3.4.0.v20080421-2006"/>
+	<property name="equinoxJar" value="org.eclipse.equinox.common_${equinoxVersion}.jar"/>
+	
+	<property name="filesystemVersion" value="1.2.0.v20080604-1400"/>
+	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
+	
+	<property name="rseBaseUrl" value="http://ganymede-mirror2.eclipse.org/dsdp/tm/downloads/drops"/>
+	<property name="rseVersion" value="R-3.0-200806202130"/>
+	<property name="dStoreBaseName" value="rseserver-3.0"/>
+	
+	<target name="fetch" depends="fetch.platform, fetch.rse"/>
+	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
+	
+	<target name="jar" depends="generate.build.scripts">
+		<ant antfile="${basedir}/build.cdtminer.xml">
+			<property name="basedir" value="${basedir}/.."/>
+			<property name="jarfile" value="${basedir}/cdtminer.jar"/>
+		</ant>
+		<ant antfile="${basedir}/build.cdtmodel.xml">
+			<property name="basedir" value="${basedir}/.."/>
+			<property name="jarfile" value="${basedir}/cdtmodel.jar"/>
+		</ant>
+		<ant antfile="${basedir}/build.cdtparser.xml">
+			<property name="basedir" value="${basedir}/.."/>
+			<property name="jarfile" value="${basedir}/cdtparser.jar"/>
+		</ant>
+		<ant antfile="${basedir}/build.stubs.xml">
+			<property name="basedir" value="${basedir}/.."/>
+			<property name="jarfile" value="${basedir}/stubs.jar"/>
+		</ant>
+		<antcall target="clean.except.jars"></antcall>
+	</target>
+	
+	<target name="generate.build.scripts" depends="generate.file.lists">
+		<xslt style="${stylesheet}" in="${basedir}/cdtminer.files.xml" out="${basedir}/build.cdtminer.xml">
+			<param name="bindir" expression="build"/>
+		</xslt>
+		<xslt style="${stylesheet}" in="${basedir}/cdtmodel.files.xml" out="${basedir}/build.cdtmodel.xml"/>
+		<xslt style="${stylesheet}" in="${basedir}/cdtparser.files.xml" out="${basedir}/build.cdtparser.xml"/>
+		<xslt style="${stylesheet}" in="${basedir}/stubs.files.xml" out="${basedir}/build.stubs.xml"/>
+	</target>
+	
+	<target name="generate.file.lists">
+		<java
+			fork="true"
+			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
+			classpath="${basedir}/build">
+			<arg value="cdtminer.jardesc"/>
+			<arg value="cdtminer.files.xml"/>
+			<arg value=".."/>
+		</java>
+		<java
+			fork="true"
+			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
+			classpath="${basedir}/build">
+			<arg value="cdtmodel.jardesc"/>
+			<arg value="cdtmodel.files.xml"/>
+			<arg value=".."/>
+		</java>
+		<java
+			fork="true"
+			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
+			classpath="${basedir}/build">
+			<arg value="cdtparser.jardesc"/>
+			<arg value="cdtparser.files.xml"/>
+			<arg value=".."/>
+		</java>
+		<java
+			fork="true"
+			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
+			classpath="${basedir}/build">
+			<arg value="stubs.jardesc"/>
+			<arg value="stubs.files.xml"/>
+			<arg value=".."/>
+		</java>
+	</target>
+	
+	<target name="clean" depends="clean.except.jars">
+		<delete dir="${basedir}" failonerror="false">
+			<include name="cdtminer.jar"/>
+			<include name="cdtmodel.jar"/>
+			<include name="cdtparser.jar"/>
+			<include name="stubs.jar"/>
+			<include name="${serverBaseName}-linux-*.tar"/>
+			<include name="${serverBaseName}-macosx-*.tar"/>
+			<include name="${serverBaseName}-unix-*.tar"/>
+			<include name="${serverBaseName}-windows-*.zip"/>
+		</delete>
+	</target>
+	
+	<target name="clean.except.jars">
+		<delete dir="${basedir}" failonerror="false">
+			<include name="build.cdtminer.xml"/>
+			<include name="build.cdtmodel.xml"/>
+			<include name="build.cdtparser.xml"/>
+			<include name="build.stubs.xml"/>
+			<include name="cdtminer.files.xml"/>
+			<include name="cdtmodel.files.xml"/>
+			<include name="cdtparser.files.xml"/>
+			<include name="stubs.files.xml"/>
+		</delete>
+		<delete dir="${remoteServerTempDir}"/>
+		<delete dir="${platformTempDir}"/>
+	</target>
+	
+	<target name="fetch.platform">
+		<mkdir dir="${downloads}"/>
+		<get src="${platformBaseUrl}/${platformVersion}/${platformBaseName}-win32.zip" dest="${downloads}/${platformBaseName}-win32.zip"/>
+	</target>
+		
+	<target name="fetch.rse">
+		<mkdir dir="${downloads}"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" dest="${downloads}/${dStoreBaseName}-windows.zip"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" dest="${downloads}/${dStoreBaseName}-linux.tar"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" dest="${downloads}/${dStoreBaseName}-unix.tar"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" dest="${downloads}/${dStoreBaseName}-macosx.tar"/>
+	</target>
+	
+	<target name="unpack.platform">
+		<unzip src="${downloads}/${platformBaseName}-win32.zip" dest="${platformTempDir}"/>
+	</target>
+			
+	<target name="prepare.remote.tar">
+		<property name="platform" value="linux"/>
+			
+		<delete dir="${remoteServerTempDir}"/>
+		<untar src="${downloads}/${dStoreBaseName}-${platform}.tar" dest="${remoteServerTempDir}"/>
+
+		<!-- Add RDT JARs to the server script's classpath -->
+		<antcall target="prepare.script.${platform}"/>
+	</target>
+	
+	<target name="prepare.script.linux">
+		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/stubs.jar"/>
+		<replace token=":$oldClasspath" value=":${rdtClassPath}:$oldClasspath" file="${remoteServerTempDir}/server.pl"/>
+	</target>
+	
+	<target name="prepare.script.unix">
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:stubs.jar"/>
+		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
+	</target>
+	
+	<target name="prepare.script.macosx">
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:stubs.jar"/>
+		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
+	</target>
+	
+	<target name="prepare.remote.zip">
+		<property name="platform" value="windows"/>
+			
+		<delete dir="${remoteServerTempDir}"/>
+		<unzip src="${downloads}/${dStoreBaseName}-${platform}.zip" dest="${remoteServerTempDir}"/>
+
+		<!-- Add RDT JARs to the server script's classpath -->
+		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\stubs.jar"/>
+		<replace token=";%CLASSPATH%" value=";${rdtClassPath};%CLASSPATH%" file="${remoteServerTempDir}/setup.bat"/>
+	</target>
+		
+	<target name="assemble.remote">
+		<!-- Copy over the RDT JARs and their dependencies -->
+		<copy todir="${remoteServerTempDir}" >
+			<fileset dir="${basedir}">
+				<include name="cdtminer.jar"/>
+				<include name="cdtmodel.jar"/>
+				<include name="cdtparser.jar"/>
+				<include name="stubs.jar"/>
+			</fileset>
+		</copy>
+			
+		<copy todir="${remoteServerTempDir}">
+			<fileset dir="${platformTempDir}/eclipse/plugins">
+				<include name="${coreRuntimeJar}"/>
+				<include name="${filesystemJar}"/>
+				<include name="${equinoxJar}"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="tar.remote" depends="prepare.remote.tar, assemble.remote">
+		<property name="platform" value="linux"/>
+			
+		<tar destfile="${serverJar}-${platform}-${serverVersion}.tar">
+			<fileset dir="${basedir}">
+				<include name="rdt-server/**/*"/>
+			</fileset>
+		</tar>
+		
+		<delete dir="${remoteServerTempDir}"/>
+	</target>
+
+	<target name="zip.remote" depends="prepare.remote.zip, assemble.remote">
+		<property name="platform" value="windows"/>
+			
+		<zip destfile="${serverJar}-${platform}-${serverVersion}.zip">
+			<fileset dir="${basedir}">
+				<include name="rdt-server/**/*"/>
+			</fileset>
+		</zip>
+		
+		<delete dir="${remoteServerTempDir}"/>
+	</target>
+	
+	<target name="all.remote">
+		<antcall target="zip.remote"/>
+		<antcall target="tar.remote">
+			<param name="platform" value="linux"/>
+		</antcall>
+		<antcall target="tar.remote">
+			<param name="platform" value="unix"/>
+		</antcall>
+		<antcall target="tar.remote">
+			<param name="platform" value="macosx"/>
+		</antcall>
+	</target>
+</project>
