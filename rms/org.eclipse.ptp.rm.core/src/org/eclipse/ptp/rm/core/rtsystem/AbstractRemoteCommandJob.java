@@ -41,7 +41,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	String processErrorMessage;
 	String parsingErrorMessage;
 	int reschedule = 0;
-	IRemoteProcess cmd;
+	IRemoteProcess jobProcess;
 	AbstractToolRuntimeSystem rtSystem;
 
 	/**
@@ -116,7 +116,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 				IRemoteProcessBuilder cmdBuilder = rtSystem.createProcessBuilder(arguments);
 				synchronized (this) {
 					DebugUtil.trace(DebugUtil.COMMAND_TRACING, "Run command: {0}", command); //$NON-NLS-1$
-					cmd = cmdBuilder.start();
+					jobProcess = cmdBuilder.start();
 				}
 			} catch (IOException e) {
 				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, processErrorMessage, e));
@@ -124,7 +124,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 
 			checkCancel(monitor);
 
-			BufferedReader stdout = new BufferedReader(new InputStreamReader(cmd.getInputStream()));
+			BufferedReader stdout = new BufferedReader(new InputStreamReader(jobProcess.getInputStream()));
 			IStatus parseStatus = Status.OK_STATUS;
 			try {
 				parse(stdout);
@@ -140,12 +140,12 @@ abstract public class AbstractRemoteCommandJob extends Job {
 
 			try {
 				DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: waiting to finish."); //$NON-NLS-1$
-				cmd.waitFor();
+				jobProcess.waitFor();
 			} catch (InterruptedException e) {
 				throw new CoreException(new Status(IStatus.INFO, Activator.PLUGIN_ID, interruptedErrorMessage, e));
 			}
 
-			DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: exit value {0}.", cmd.exitValue()); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: exit value {0}.", jobProcess.exitValue()); //$NON-NLS-1$
 
 			if (reschedule > 0) {
 				DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: reschedule in {0} miliseconds.", reschedule); //$NON-NLS-1$
@@ -161,8 +161,8 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Internal error", e);
 		} finally {
 			synchronized (this) {
-				cmd.destroy();
-				cmd = null;
+				jobProcess.destroy();
+				jobProcess = null;
 			}
 		}
 	}
@@ -176,9 +176,9 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	@Override
 	protected void canceling() {
 		synchronized (this) {
-			if (cmd != null) {
-				cmd.destroy();
-				cmd = null;
+			if (jobProcess != null) {
+				jobProcess.destroy();
+				jobProcess = null;
 			}
 		}
 	}
