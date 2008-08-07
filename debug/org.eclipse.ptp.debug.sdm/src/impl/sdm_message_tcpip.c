@@ -73,6 +73,9 @@ sdm_create_sockd_map()
 {
 	sdm_idset all_nodes, adjacent_nodes;
 
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] in sdm_create_sockd_map\n",
+			sdm_route_get_id());
+
 	// Set parent map
 	if(sdm_route_get_id() == SDM_MASTER) {
 		parent_sockd_map = NULL; // Root
@@ -83,13 +86,18 @@ sdm_create_sockd_map()
 
 	// Get all adjacent nodes
 	all_nodes = sdm_set_new();
-	all_nodes = sdm_set_add_all(all_nodes, SDM_MASTER);
+	all_nodes = sdm_set_add_all(all_nodes, sdm_route_get_size()-1);
+
+	// Filter the parent node and master
+	if(parent_sockd_map != NULL) {
+		sdm_set_remove_element(all_nodes, parent_sockd_map->id);
+		sdm_set_remove_element(all_nodes, SDM_MASTER);
+	}
+
 	adjacent_nodes = sdm_route_get_route(all_nodes);
 
-	// Filter the parent node
-	if(parent_sockd_map != NULL) {
-		sdm_set_remove_element(adjacent_nodes, parent_sockd_map->id);
-	}
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] adjacent nodes: %s\n",
+			sdm_route_get_id(), _set_to_str(adjacent_nodes));
 
 	children_sockd_map = NULL;
 
@@ -101,6 +109,8 @@ sdm_create_sockd_map()
 
 		for (child = sdm_set_first(adjacent_nodes); !sdm_set_done(adjacent_nodes);
 		 child = sdm_set_next(adjacent_nodes)) {
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] adding %d to my map\n",
+					sdm_route_get_id(), child);
 			p = (sdm_id_sockd_map_p)malloc(sizeof(sdm_id_sockd_map));
 			p->next = children_sockd_map;
 			p->id = child;
