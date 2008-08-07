@@ -205,7 +205,9 @@ sdm_aggregate_finalize(void)
 	 * Process remaining requests.
 	 */
 	while (!EmptyList(all_requests)) {
-		sdm_message_progress();
+		if (sdm_message_progress() < 0) {
+			break;
+		}
 		sdm_aggregate_progress();
 	}
 }
