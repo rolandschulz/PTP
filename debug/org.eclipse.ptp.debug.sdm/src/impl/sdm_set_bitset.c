@@ -124,6 +124,7 @@ sdm_set_add_all(const sdm_idset set, const sdm_id id)
 	bitset *b = bitset_new(id+1);
 	bitset_invert(b);
 	bitset_oreq(set->set, b);
+	bitset_free(b);
 	return set;
 }
 
