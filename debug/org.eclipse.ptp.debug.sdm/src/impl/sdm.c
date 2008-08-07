@@ -17,6 +17,14 @@
 
 #include "sdm.h"
 
+static char * MPIRankVars[] = {
+	"OMPI_MCA_orte_ess_vpid", 	/* Open MPI 1.3 */
+	"OMPI_MCA_ns_nds_vpid", 	/* Open MPI 1.2 */
+	"PMI_RANK", 				/* MPICH2 */
+	"MP_CHILD",					/* IBM PE */
+	NULL
+};
+
 static int	shutting_down = 0;
 
 static void	recv_callback(sdm_message msg);
@@ -27,7 +35,11 @@ static void	recv_callback(sdm_message msg);
 int
 sdm_setup(int argc, char *argv[])
 {
-	int ch, size;
+	int		ch;
+	int		size;
+	char *	envval;
+	char **	rank;
+
 	/*
 	 * Get the number of nodes
 	 */
@@ -60,13 +72,11 @@ sdm_setup(int argc, char *argv[])
 	 * this sdm is the master.
 	 */
 
-#ifdef OMPI
-	char *envval = getenv("OMPI_MCA_orte_ess_vpid");
-	if(envval == NULL) {
-		/*
-		 * Check version 1.2
-		 */
-		envval = getenv("OMPI_MCA_ns_nds_vpid");
+	for (rank = MPIRankVars; *rank != NULL; rank++) {
+		envval = getenv(*rank);
+		if (envval != NULL) {
+			break;
+		}
 	}
 
 	if (envval != NULL) {
@@ -77,9 +87,6 @@ sdm_setup(int argc, char *argv[])
 	}
 
 	return 0;
-#else
-	return -1;
-#endif
 }
 
 /*
