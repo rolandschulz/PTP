@@ -64,6 +64,13 @@ public class UploadExecution extends KillableExecution implements IRemoteUploadE
 		
 		super.startExecution();
 		Debug.println("Uploading " + remoteFile); //$NON-NLS-1$
+		
+		// Must wait the channel to open or we can have a racing on process
+		// trying to manipulate non-existent files (e.g. set file attributes after
+		// the upload)
+		while(channel.isClosed() || !channel.isConnected()) {
+			;
+		}
 	}
 
 	public String getErrorMessage() {
