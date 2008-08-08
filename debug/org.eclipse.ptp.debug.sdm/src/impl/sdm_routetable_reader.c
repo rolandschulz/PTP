@@ -138,30 +138,29 @@ close_routing_file(FILE *routing_file)
 int
 wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec)
 {
+	char wd[MAXPATHLEN];
+
+	getcwd(wd, MAXPATHLEN);
+
 	sec += 1;
 
 	// Wait for file to be created
-	do
-	{
-		sec--;
-
+	while (sec-- > 0) {
 		/*
 		 * List files to force an updated view of the working directory before
 		 * opening the rounting_file. On NFS file systems, fopen never sees
 		 * recently created files without the update.
 		 */
-		char wd[MAXPATHLEN];
-		getcwd(wd, MAXPATHLEN);
 		DIR * dir = opendir(wd);
 		closedir(dir);
 
 		*routing_file = fopen(filename, "r");
 
-		if(*routing_file == NULL) {
-			if(errno != ENOENT) {
+		if (*routing_file == NULL) {
+			if (errno != ENOENT) {
+				perror("fopen");
 				return -1;
 			}
-			perror("fopen");
 			// File not created yet. Wait...
 		} else {
 			int eff_size, size;
@@ -173,7 +172,7 @@ wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec)
 															// the after the header
 
 			printf("effsize: %d, size: %d, rv: %d\n", eff_size, size, rv);
-			switch(rv) {
+			switch (rv) {
 			case -1:
 				// error
 				return -1;
@@ -185,13 +184,14 @@ wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec)
 			default:
 				// We have file size. Now wait until effective file size equals
 				// file size
-				if((eff_size - 1) == size)
+				if ((eff_size - 1) == size)
 					return 0;
 				fclose(*routing_file);
 			}
 		}
+
 		sleep(1);
-	}while(sec > 0);
+	}
 
 	return -2;
 }
