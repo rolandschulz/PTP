@@ -42,19 +42,19 @@ import org.eclipse.ptp.rm.core.rtsystem.DefaultToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.Process;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
 
-public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
+public class OpenMPIRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	Object lock1 = new Object();
 
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
 	/** Information parsed from launch command. */
-	OpenMpiProcessMap map;
+	OpenMPIProcessMap map;
 
 	/** Mapping of processes created by this job. */
 //	private Map<String,String> processMap = new HashMap<String, String>();
@@ -71,7 +71,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	/** Exception raised while parsing mpi map information. */
 	IOException parserException = null;
 
-	public OpenMpiRuntimSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
+	public OpenMPIRuntimSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
 
@@ -80,7 +80,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		/*
 		 * Create a zero index job.
 		 */
-		final OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
+		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 		final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), "Open MPI run", 0);
 		processIDs = new String[] { zeroIndexProcessID } ;
@@ -200,13 +200,13 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 			@Override
 			public void run() {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", jobID); //$NON-NLS-1$				
-				OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
+				OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 				try {
 					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
-					if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
-						map = OpenMpiProcessMapText12Parser.parse(parserInputStream);
-					} else if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
-						map = OpenMpiProcessMapXml13Parser.parse(parserInputStream, new IOpenMpiProcessMapXml13ParserListener() {
+					if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+						map = OpenMPIProcessMapText12Parser.parse(parserInputStream);
+					} else if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
+						map = OpenMPIProcessMapXml13Parser.parse(parserInputStream, new IOpenMpiProcessMapXml13ParserListener() {
 							public void startDocument() {
 								// Empty
 							}
@@ -257,10 +257,10 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		stderrObserver.addListener(stderrPipedStreamListener);
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
-		OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) getRtSystem().getRmConfiguration();
-		if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
+		OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
+		if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 			stderrObserver.addListener(parserPipedStreamListener);
-		} else if (configuration.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
+		} else if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 			stdoutObserver.addListener(parserPipedStreamListener);
 		} else {
 			assert false;
@@ -382,7 +382,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	}
 
 	private void changeAllProcessesStatus(State newState) {
-		final OpenMpiRuntimeSystem rtSystem = (OpenMpiRuntimeSystem) getRtSystem();
+		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 		
 		/*
@@ -442,10 +442,10 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 				String key = var.substring(0, i);
 				keys[p++] = key;
 			}
-			newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentKeysDefinition().create(keys));
+			newAttributes.add(OpenMPILaunchAttributes.getEnvironmentKeysDefinition().create(keys));
 		}
 
-		newAttributes.add(OpenMpiLaunchAttributes.getEnvironmentArgsDefinition().create());
+		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentArgsDefinition().create());
 
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
 	}
@@ -454,7 +454,7 @@ public class OpenMpiRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
 		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
 		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
-				OpenMpiLaunchAttributes.getEnvironmentKeysDefinition(), OpenMpiLaunchAttributes.getEnvironmentArgsDefinition()
+				OpenMPILaunchAttributes.getEnvironmentKeysDefinition(), OpenMPILaunchAttributes.getEnvironmentArgsDefinition()
 			};
 		IAttributeDefinition<?, ?, ?>[]  allAttributes = new IAttributeDefinition[attributesFromSuper.length+moreAttributes.length];
 	   System.arraycopy(attributesFromSuper, 0, allAttributes, 0, attributesFromSuper.length);

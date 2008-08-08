@@ -16,14 +16,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiHostMap.Host;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIHostMap.Host;
 
-public class OpenMpiHostMapParser {
-	private OpenMpiHostMapParser() {
+public class OpenMPIHostMapParser {
+	private OpenMPIHostMapParser() {
 		// Do not allow instances.
 	}
 
-	OpenMpiHostMap map = new OpenMpiHostMap();
+	OpenMPIHostMap map = new OpenMPIHostMap();
 //	boolean hasErrors = false;
 
 	static Pattern pattern = Pattern.compile("\\s*(\\S+)((?:\\s+\\S+=\\d+)*)\\s*");
@@ -41,8 +41,8 @@ public class OpenMpiHostMapParser {
 	 */
 //	static Pattern othersPattern = Pattern.compile("^(?!.*\\s(?:count|cpus|slots|max-slots)\\s*=)", Pattern.CASE_INSENSITIVE);
 
-	public static OpenMpiHostMap parse(BufferedReader reader) throws IOException {
-		OpenMpiHostMapParser parser = new OpenMpiHostMapParser();
+	public static OpenMPIHostMap parse(BufferedReader reader) throws IOException {
+		OpenMPIHostMapParser parser = new OpenMPIHostMapParser();
 		String line;
 		while ((line = reader.readLine()) != null) {
 			/*
@@ -74,7 +74,7 @@ public class OpenMpiHostMapParser {
 			 * - If number of slots is omitted, but not max-slots, the it is assumed that slots=max-slots.
 			 * - If both number of slots and max-slots are give, then their values are kept, as long as slots<=max-slots.
 			 */
-			OpenMpiHostMap.Host host = new OpenMpiHostMap.Host(matcher.group(1));
+			OpenMPIHostMap.Host host = new OpenMPIHostMap.Host(matcher.group(1));
 			parser.map.hosts.add(host);
 			host.setNumProcessors(0);
 			host.setMaxNumProcessors(0);
@@ -99,7 +99,7 @@ public class OpenMpiHostMapParser {
 							host.setNumProcessors(0);
 						}
 					} catch (NumberFormatException e) {
-						host.addErrors(OpenMpiHostMap.Host.ERR_NUM_SLOTS);
+						host.addErrors(OpenMPIHostMap.Host.ERR_NUM_SLOTS);
 						host.setNumProcessors(1);
 					}
 				} else if (key.equalsIgnoreCase("max-slots")) {
@@ -117,7 +117,7 @@ public class OpenMpiHostMapParser {
 					}
 				} else {
 					DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Invalud attribute: '{0}'", matcher.group()); //$NON-NLS-1$
-					host.addErrors(OpenMpiHostMap.Host.ERR_UNKNOWN_ATTR);
+					host.addErrors(OpenMPIHostMap.Host.ERR_UNKNOWN_ATTR);
 				}
 			}
 			/*

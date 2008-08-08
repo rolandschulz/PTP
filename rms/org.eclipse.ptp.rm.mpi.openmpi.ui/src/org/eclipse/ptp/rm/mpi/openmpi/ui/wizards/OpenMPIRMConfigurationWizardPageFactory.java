@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerFactory;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
@@ -29,7 +29,7 @@ public class OpenMPIRMConfigurationWizardPageFactory extends
 				new OpenMPIToolConfigurationWizardPage(wizard) };
 	}
 
-	public Class<OpenMpiResourceManagerFactory> getRMFactoryClass() {
-		return OpenMpiResourceManagerFactory.class;
+	public Class<OpenMPIResourceManagerFactory> getRMFactoryClass() {
+		return OpenMPIResourceManagerFactory.class;
 	}
 }

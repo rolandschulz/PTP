@@ -18,22 +18,22 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 /**
  * OMPI-specific attributes
  */
-public class OpenMpiLaunchAttributes {
-	private static final String LAUNCH_ARGS_ATTR_ID = "mpiArgs";
-	private static final String ENV_KEYS_ATTR_ID = "envKeys";
-	private static final String ENV_ARGS_ATTR_ID = "mpiEnvArgs";
+public class OpenMPILaunchAttributes {
+	private static final String LAUNCH_ARGS_ATTR_ID = "Open_MPI_args";
+	private static final String ENV_KEYS_ATTR_ID = "Open_MPI_envKeys";
+	private static final String ENV_ARGS_ATTR_ID = "Open_MPI_env";
 
 	private final static StringAttributeDefinition launchArgs =
-		new StringAttributeDefinition(LAUNCH_ARGS_ATTR_ID, "openmpi arguments",
-				"Command line arguments for openmpi", false, "");
+		new StringAttributeDefinition(LAUNCH_ARGS_ATTR_ID, "Open MPI arguments",
+				"Command line arguments for Open MPI", false, "");
 
    private final static ArrayAttributeDefinition<String> environmentKeyDefinition = new ArrayAttributeDefinition<String>(
-			ENV_KEYS_ATTR_ID, "Environment variables", "Name of environment variables supplied to the each openmpi process", false,
+			ENV_KEYS_ATTR_ID, "Open MPI environment variables", "Name of environment variables supplied to the each Open MPI processes", false,
 			new String[0]);
 
 	private final static StringAttributeDefinition environmentArgsDefinition = new StringAttributeDefinition(
-			ENV_ARGS_ATTR_ID, "Environment arguments", "Command line arguments to set environment variables for each openmpi process", false,
-			"${envKeys:: -x ::-x :}");
+			ENV_ARGS_ATTR_ID, "Open MPI Environment arguments", "Command line arguments to set environment variables for each Open MPI processes", false,
+			"${Open_MPI_envKeys:: -x ::-x :}");
 
 	/**
 	 * List of names of environment variables for the application.

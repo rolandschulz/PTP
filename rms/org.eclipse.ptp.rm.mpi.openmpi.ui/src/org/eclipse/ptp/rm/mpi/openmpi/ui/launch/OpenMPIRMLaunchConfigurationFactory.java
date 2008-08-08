@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
 
 public class OpenMPIRMLaunchConfigurationFactory extends
 		AbstractRMLaunchConfigurationFactory {
@@ -26,7 +26,7 @@ public class OpenMPIRMLaunchConfigurationFactory extends
 
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {
-		return OpenMpiResourceManager.class;
+		return OpenMPIResourceManager.class;
 	}
 
 }

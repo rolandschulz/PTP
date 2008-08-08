@@ -21,9 +21,9 @@ import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 
-public class OpenMpiRuntimeSystem extends AbstractToolRuntimeSystem {
+public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	private Parameters params = new Parameters();
 
@@ -32,12 +32,12 @@ public class OpenMpiRuntimeSystem extends AbstractToolRuntimeSystem {
 	/** The queue that dispatches jobs to mpi. */
 	private String queueID;
 	/** List of hosts discovered for the machine. */
-	private OpenMpiHostMap hostMap;
+	private OpenMPIHostMap hostMap;
 	/** Mapping of discovered hosts and their ID for IPHost elements. */
 	private Map<String,String> hostToElementMap = new HashMap<String, String>();
 
-	public OpenMpiRuntimeSystem(Integer openmpi_rmid,
-			OpenMpiResourceManagerConfiguration config,
+	public OpenMPIRuntimeSystem(Integer openmpi_rmid,
+			OpenMPIResourceManagerConfiguration config,
 			AttributeDefinitionManager attrDefMgr) {
 		super(openmpi_rmid, config, attrDefMgr);
 	}
@@ -66,11 +66,11 @@ public class OpenMpiRuntimeSystem extends AbstractToolRuntimeSystem {
 		return hostToElementMap.get(hostname);
 	}
 
-	public OpenMpiHostMap getHostMap() {
+	public OpenMPIHostMap getHostMap() {
 		return hostMap;
 	}
 
-	protected void setHostMap(OpenMpiHostMap hostMap) {
+	protected void setHostMap(OpenMPIHostMap hostMap) {
 		this.hostMap = hostMap;
 	}
 
@@ -185,6 +185,6 @@ public class OpenMpiRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new OpenMpiRuntimSystemJob(jobID, queueID, "Open Mpi Job", this, attrMgr);
+		return new OpenMPIRuntimSystemJob(jobID, queueID, "Open Mpi Job", this, attrMgr);
 	}
 }

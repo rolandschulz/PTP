@@ -11,9 +11,9 @@
 package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpi12PreferenceManager;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpi13PreferenceManager;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Label;
 public class OpenMPIToolConfigurationWizardPage extends
 		AbstractToolRMConfigurationWizardPage {
 
-	String versionIds[] = new String[] { OpenMpiResourceManagerConfiguration.VERSION_12, OpenMpiResourceManagerConfiguration.VERSION_13 };
+	String versionIds[] = new String[] { OpenMPIResourceManagerConfiguration.VERSION_12, OpenMPIResourceManagerConfiguration.VERSION_13 };
 	String versionsNames[] = new String[] { "Open MPI 1.2", "Open MPI 1.3"};
 
 	protected Combo versionCombo;
@@ -54,7 +54,7 @@ public class OpenMPIToolConfigurationWizardPage extends
 	}
 
 	protected class DataSource extends AbstractToolRMConfigurationWizardPage.DataSource {
-		private OpenMpiResourceManagerConfiguration config;
+		private OpenMPIResourceManagerConfiguration config;
 		private String versionId = null;
 
 		public String getVersionId() {
@@ -108,7 +108,7 @@ public class OpenMPIToolConfigurationWizardPage extends
 
 		@Override
 		public void setConfig(IResourceManagerConfiguration configuration) {
-			this.config = (OpenMpiResourceManagerConfiguration) configuration;
+			this.config = (OpenMPIResourceManagerConfiguration) configuration;
 			super.setConfig(configuration);
 		}
 	}
@@ -124,7 +124,7 @@ public class OpenMPIToolConfigurationWizardPage extends
 	}
 
 	public OpenMPIToolConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES , "Open MPI", "Open MPI tool configuration", "Enter information to configure the Open MPI tool");
+		super(wizard, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , "Open MPI", "Open MPI tool configuration", "Enter information to configure the Open MPI tool");
 	}
 
 	@Override
@@ -163,16 +163,16 @@ public class OpenMPIToolConfigurationWizardPage extends
 		String launchCmd = null;
 		String debugCmd = null;
 		String discoverCmd = null;
-		if (dataSource.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_12)) {
-			Preferences preferences = OpenMpi12PreferenceManager.getPreferences();
-			launchCmd = preferences.getString(OpenMpi12PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_LAUNCH_CMD);
-			debugCmd = preferences.getString(OpenMpi12PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_DEBUG_CMD);
-			discoverCmd = preferences.getString(OpenMpi12PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_DISCOVER_CMD);
-		} else if (dataSource.getVersionId().equals(OpenMpiResourceManagerConfiguration.VERSION_13)) {
-			Preferences preferences = OpenMpi13PreferenceManager.getPreferences();
-			launchCmd = preferences.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_LAUNCH_CMD);
-			debugCmd = preferences.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi12PreferenceManager.PREFS_DEBUG_CMD);
-			discoverCmd = preferences.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DISCOVER_CMD);
+		if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			Preferences preferences = OpenMPI12PreferenceManager.getPreferences();
+			launchCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DISCOVER_CMD);
+		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
+			Preferences preferences = OpenMPI13PreferenceManager.getPreferences();
+			launchCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD);
 		} else {
 			assert false;
 		}

@@ -15,11 +15,11 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpi13PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
 
-public class OpenMpiResourceManagerConfiguration extends
+public class OpenMPIResourceManagerConfiguration extends
 		AbstractToolRMConfiguration implements Cloneable {
 
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
@@ -79,29 +79,29 @@ public class OpenMpiResourceManagerConfiguration extends
 		return config;
 	}
 
-	public static OpenMpiResourceManagerConfiguration load(
-			OpenMpiResourceManagerFactory factory, IMemento memento) {
+	public static OpenMPIResourceManagerConfiguration load(
+			OpenMPIResourceManagerFactory factory, IMemento memento) {
 		OpenMpiConfig openMpiConfig = loadOpenMpiConfig(factory, memento);
-		OpenMpiResourceManagerConfiguration config = new OpenMpiResourceManagerConfiguration(factory, openMpiConfig);
+		OpenMPIResourceManagerConfiguration config = new OpenMPIResourceManagerConfiguration(factory, openMpiConfig);
 		return config;
 	}
 
-	public OpenMpiResourceManagerConfiguration(OpenMpiResourceManagerFactory factory) {
+	public OpenMPIResourceManagerConfiguration(OpenMPIResourceManagerFactory factory) {
 		super(OPENMPI_CAPABILITIES, new ToolsConfig(), factory);
 
 		/*
 		 * By default, assume openmpi 1.3 configuration.
 		 */
-		Preferences prefs = OpenMpi13PreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_LAUNCH_CMD));
-		setDebugCmd(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DEBUG_CMD));
-		setDiscoverCmd(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_DISCOVER_CMD));
-		setRemoteInstallPath(prefs.getString(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-		setUseDefaults(prefs.getBoolean(OpenMpi13PreferenceManager.PREFIX + OpenMpi13PreferenceManager.PREFS_USE_DEFAULTS));
+		Preferences prefs = OpenMPI13PreferenceManager.getPreferences();
+		setLaunchCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD));
+		setDiscoverCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD));
+		setRemoteInstallPath(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+		setUseDefaults(prefs.getBoolean(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_USE_DEFAULTS));
 		setVersionId(VERSION_13);
 	}
 
-	public OpenMpiResourceManagerConfiguration(OpenMpiResourceManagerFactory factory,
+	public OpenMPIResourceManagerConfiguration(OpenMPIResourceManagerFactory factory,
 			OpenMpiConfig config) {
 		/*
 		 * By default, assume openmpi 1.3 configuration.
@@ -130,8 +130,8 @@ public class OpenMpiResourceManagerConfiguration extends
 				useDefaults());
 		OpenMpiConfig openMpiConfig = new OpenMpiConfig(toolsConfig, getVersionId());
 
-		return new OpenMpiResourceManagerConfiguration(
-				(OpenMpiResourceManagerFactory) getFactory(), openMpiConfig);
+		return new OpenMPIResourceManagerConfiguration(
+				(OpenMPIResourceManagerFactory) getFactory(), openMpiConfig);
 	}
 
 	@Override
@@ -142,13 +142,13 @@ public class OpenMpiResourceManagerConfiguration extends
 
 	@Override
 	public void setDefaultNameAndDesc() {
-		String name = "openmpi";
+		String name = "Open_MPI";
 		String conn = getConnectionName();
 		if (conn != null && !conn.equals(EMPTY_STRING)) {
 			name += "@" + conn; //$NON-NLS-1$
 		}
 		setName(name);
-		setDescription("openmpi Resource Manager");
+		setDescription("Open MPI Resource Manager");
 	}
 
 	public String getVersionId() {

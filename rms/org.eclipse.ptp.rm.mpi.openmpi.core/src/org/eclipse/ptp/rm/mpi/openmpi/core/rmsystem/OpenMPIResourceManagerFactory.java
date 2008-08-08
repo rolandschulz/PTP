@@ -17,12 +17,12 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
-public class OpenMpiResourceManagerFactory extends AbstractResourceManagerFactory {
+public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactory {
 
-	public OpenMpiResourceManagerFactory() {
+	public OpenMPIResourceManagerFactory() {
 		// QUESTION: Wouldnt it be better to take name from extension point?
 		// Extension point already has a name.
-		super("Open MPI (new)");
+		super("Open MPI");
 	}
 
 	public IResourceManagerConfiguration copyConfiguration(
@@ -32,20 +32,20 @@ public class OpenMpiResourceManagerFactory extends AbstractResourceManagerFactor
 
 	@Override
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
-		OpenMpiResourceManagerConfiguration configuration = (OpenMpiResourceManagerConfiguration) confIn;
+		OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) confIn;
 		PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
-		return new OpenMpiResourceManager(universe.getNextResourceManagerId(), universe, configuration);
+		return new OpenMPIResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
-		OpenMpiResourceManagerConfiguration conf = new OpenMpiResourceManagerConfiguration(this);
+		OpenMPIResourceManagerConfiguration conf = new OpenMPIResourceManagerConfiguration(this);
 
 		return conf;
 	}
 
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
-		return OpenMpiResourceManagerConfiguration.load(this, memento);
+		return OpenMPIResourceManagerConfiguration.load(this, memento);
 	}
 
 }

@@ -26,13 +26,13 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 /**
  * Node attributes
  */
-public class OpenMpiMachineAttributes {
+public class OpenMPIMachineAttributes {
 
-	private static final String STATUS_MESSAGE = "statusMessage";
+	private static final String STATUS_MESSAGE = "Open_MPI_statusMessage";
 
 	private final static StringAttributeDefinition statusMessageDef =
-		new StringAttributeDefinition(STATUS_MESSAGE, "Status message",
-				"Status message", true, "");
+		new StringAttributeDefinition(STATUS_MESSAGE, "Open MPI status message",
+				"Open MPI status message", true, "");
 
 	/**
 	 * Status message if it was not possible to discover the machine.

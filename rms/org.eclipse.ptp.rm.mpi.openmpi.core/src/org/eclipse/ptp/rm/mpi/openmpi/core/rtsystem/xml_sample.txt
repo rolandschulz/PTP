@@ -1,7 +1,0 @@
-<map>
-        <host name="localhost.localdomain" slots="1" max_slots="0"/>
-                <process rank="0"/>
-                <process rank="1"/>
-                <process rank="2"/>
-        </host>
-</map>

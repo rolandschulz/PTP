@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class OpenMpiHostMap {
+public class OpenMPIHostMap {
 	public static class Host {
 		public final static int NO_ERRORS = 0;
 		public final static int ERR_NUM_SLOTS = 1 << 1;
@@ -88,7 +88,7 @@ public class OpenMpiHostMap {
 	}
 
 	public void addDefaultHost(String name) {
-		OpenMpiHostMap.Host host = new OpenMpiHostMap.Host(name);
+		OpenMPIHostMap.Host host = new OpenMPIHostMap.Host(name);
 		host.numProcessors = 1;
 		host.maxNumProcessors = 0;
 		addHost(host);

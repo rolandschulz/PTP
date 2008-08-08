@@ -11,23 +11,23 @@
 package org.eclipse.ptp.rm.mpi.openmpi.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpi13PreferenceManager;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMpiResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.preferences.AbstractToolsPreferencePage;
 
 public class OpenMPI13PreferencePage extends AbstractToolsPreferencePage {
 
 	public OpenMPI13PreferencePage() {
-		super(OpenMpi13PreferenceManager.PREFIX, OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES, "Open MPI 1.3 preferences");
+		super(OpenMPI13PreferenceManager.PREFIX, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES, "Open MPI 1.3 preferences");
 	}
 
 	@Override
 	public Preferences getPreferences() {
-		return OpenMpi13PreferenceManager.getPreferences();
+		return OpenMPI13PreferenceManager.getPreferences();
 	}
 
 	@Override
 	public void savePreferences() {
-		OpenMpi13PreferenceManager.savePreferences();
+		OpenMPI13PreferenceManager.savePreferences();
 	}
 }

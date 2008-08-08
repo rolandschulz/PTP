@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
 
-public class OpenMpiProcessMap {
+public class OpenMPIProcessMap {
 
 	/**
 	 * An application launched by mpirun.
@@ -143,7 +143,7 @@ public class OpenMpiProcessMap {
 	final private List<Node> nodes = new ArrayList<Node>();
 	final private List<Process> processes = new ArrayList<Process>();
 	
-	public OpenMpiProcessMap() {
+	public OpenMPIProcessMap() {
 		// Nothing.
 	}
 	

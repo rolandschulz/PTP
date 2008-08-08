@@ -15,15 +15,15 @@ import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiRuntimeSystem;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIRuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
-public class OpenMpiResourceManager extends AbstractToolResourceManager {
+public class OpenMPIResourceManager extends AbstractToolResourceManager {
 
 	private Integer OPENMPI_RMID;
 
-	public OpenMpiResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
+	public OpenMPIResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id.toString(), universe, config);
 		OPENMPI_RMID = id;
 	}
@@ -34,10 +34,10 @@ public class OpenMpiResourceManager extends AbstractToolResourceManager {
 	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
-		OpenMpiResourceManagerConfiguration config = (OpenMpiResourceManagerConfiguration) getConfiguration();
+		OpenMPIResourceManagerConfiguration config = (OpenMPIResourceManagerConfiguration) getConfiguration();
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
-		return new OpenMpiRuntimeSystem(OPENMPI_RMID, config, attrDefMgr);
+		return new OpenMPIRuntimeSystem(OPENMPI_RMID, config, attrDefMgr);
 	}
 
 }
