@@ -95,6 +95,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	            updateLaunchConfigurationDialog();
 	        } else if (source == localAppButton) {
 	        	handleLocalApplicationButtonSelected();
+	        	updateLaunchConfigurationDialog();
 	        } else if (source == browseAppButton) {
 	        	handleBrowseLocalApplicationButtonSelected();
 	        }
