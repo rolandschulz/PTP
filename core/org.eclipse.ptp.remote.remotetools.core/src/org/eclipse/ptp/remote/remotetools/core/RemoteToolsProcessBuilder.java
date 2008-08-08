@@ -30,7 +30,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, List<String> command) {
 		super(conn, command);
-		remoteEnv.putAll(System.getenv());
+//		remoteEnv.putAll(System.getenv());
 		this.connection = conn;
 	}
 	
