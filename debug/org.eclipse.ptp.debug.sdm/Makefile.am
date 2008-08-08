@@ -39,7 +39,12 @@ test_mi_CFLAGS =			-I./include -I./src/mi $(AM_CFLAGS) -g
 test_mi_LDFLAGS = 			-g
 test_mi_LDADD =				libmi.a
 
-noinst_HEADERS =			include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h include/signalinfo.h
+noinst_HEADERS =			include/breakpoint.h \
+							include/dbg.h \
+							include/location.h \
+							include/stackframe.h \
+							include/memoryinfo.h \
+							include/signalinfo.h
 
 noinst_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
 
