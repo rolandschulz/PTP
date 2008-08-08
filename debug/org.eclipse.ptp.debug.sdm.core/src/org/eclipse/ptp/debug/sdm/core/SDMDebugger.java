@@ -18,9 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
@@ -66,13 +63,13 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIManagerFactory;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
+import org.eclipse.ptp.debug.sdm.core.SDMRunner.SDMMasterState;
 import org.eclipse.ptp.debug.sdm.core.pdi.PDIDebugger;
+import org.eclipse.ptp.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
@@ -90,50 +87,7 @@ public class SDMDebugger implements IPDebugger {
 	private IPDIRequestFactory requestFactory = null;
 
 	IFileStore routingFileStore = null;
-	private List<String> dbgArgs;
-	private IRemoteProcess sdmProcess = null;
-	private IRemoteProcessBuilder sdmProcessBuilder = null;
-	
-	private class SDMStarter extends Thread {
-		private CoreException e;
-		private IPLaunch launch;
-		
-		public SDMStarter(IPLaunch launch) {
-			super();
-			this.launch = launch;
-		}
-
-		@Override
-		public void run() {
-			synchronized (this) {
-				try {
-					wait(3000);
-					startMasterSDM(launch);
-					
-					/*
-					 * Check if process has completed early (failed)
-					 */
-					wait(100);
-					if (sdmProcess.isCompleted()) {
-						throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), NLS.bind("Master SDM process finished early with exit code {0}.", sdmProcess.exitValue()), e));
-					}
-				} catch (InterruptedException e) {
-					stopMasterSDM();
-					this.e = new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), "Start of master SDM was interrupted", e));
-				} catch (CoreException e) {
-					this.e = new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), "Failed to create master SDM process", e));
-				}
-			}
-		}
-				
-		/**
-		 * Gets the exception that describes why SDM master failed to start.
-		 * @return A CoreException if SDM failed to start of null if SDM was successful.
-		 */
-		public CoreException getCoreException() {
-			return e;
-		}
-	}
+	SDMRunner sdmRunner = null;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath)
@@ -151,29 +105,21 @@ public class SDMDebugger implements IPDebugger {
 		if (requestFactory == null) {
 			requestFactory = new SDMRequestFactory();
 		}
-		
+
 		/*
 		 * Writing the rounting file actually starts the SDM servers.
 		 */
 		writeRoutingFile(launch);
 
 		/*
-		 * Delay starting the master SDM (aka SDM client), to wait intil SDM servers have started and until the sessions
-		 * is listening on the debugger socket.
+		 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions
+		 * are listening on the debugger socket.
 		 */
-		SDMStarter sdmStarter = new SDMStarter(launch);
-		sdmStarter.start();
+		sdmRunner.setJob(launch.getPJob());
+		sdmRunner.schedule();
+
 		IPDISession session = createSession(timeout, launch, corefile);
-		while (sdmStarter.isAlive()) {
-			try {
-				sdmStarter.join();
-			} catch (InterruptedException e) {
-				// Ignore and continue waiting.
-			}
-		}
-		if (sdmStarter.getCoreException() != null) {
-			throw sdmStarter.getCoreException();
-		}
+
 		return session;
 	}
 
@@ -196,7 +142,17 @@ public class SDMDebugger implements IPDebugger {
 			throw newCoreException(e);
 		}
 
+		/*
+		 * Store information to create routing file later.
+		 */
 		prepareRoutingFile(configuration, attrMgr, monitor);
+
+		/*
+		 * Prepare the Master SDM controller thread.
+		 */
+		IResourceManagerControl rm = null;
+		rm = (IResourceManagerControl) getResourceManager(configuration);
+		sdmRunner = new SDMRunner(rm);
 	}
 
 	/* (non-Javadoc)
@@ -210,7 +166,7 @@ public class SDMDebugger implements IPDebugger {
 			attrMgr.addAttribute(dbgArgsAttr);
 		}
 
-		dbgArgs = dbgArgsAttr.getValue();
+		List<String> dbgArgs = dbgArgsAttr.getValue();
 
 		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
 
@@ -256,17 +212,44 @@ public class SDMDebugger implements IPDebugger {
 			attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
 		}
 		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
-		
-		prepareMasterSDM(configuration, attrMgr, new NullProgressMonitor());
+
+		/*
+		 * Save SDM command line for future use.
+		 */
+		List<String> sdmCommand = new ArrayList<String>();
+		sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue());
+		sdmCommand.addAll(dbgArgs);
+		sdmRunner.setCommand(sdmCommand);
+		sdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
 	}
 
-//	public void cleanup(ILaunchConfiguration configuration,
-//			AttributeManager attrMgr, IPLaunch launch) {
-//		if (process != null) {
-//			process.destroy();
-//			process = null;
-//		}
-//	}
+	public void cleanup(ILaunchConfiguration configuration, AttributeManager attrMgr, IPLaunch launch) {
+		if (sdmRunner != null) {
+			if (sdmRunner.getSdmState() == SDMMasterState.RUNNING) {
+				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: still running, cancel is to be issued soon"); //$NON-NLS-1$
+				new Thread("SDM master killer thread") {
+					@Override
+					public void run() {
+						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master killer: thread started"); //$NON-NLS-1$
+						synchronized (this) {
+							try {
+								wait(5000);
+							} catch (InterruptedException e) {
+								// Ignore
+							}
+						}
+						if (sdmRunner.getSdmState() == SDMMasterState.RUNNING) {
+							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master killer: cancel SDM master now"); //$NON-NLS-1$
+							sdmRunner.cancel();
+						} else {
+							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master killer: do not cancel SDM master, since it finished by itself."); //$NON-NLS-1$
+						}
+						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master killer: thread finished"); //$NON-NLS-1$
+					}
+				}.start();
+			}
+		}
+	}
 
 	/**
 	 * Get the PDI debugger implementation. Creates the class if necessary.
@@ -402,83 +385,4 @@ public class SDMDebugger implements IPDebugger {
 			throw newCoreException(e);
 		}
 	}
-	
-	private void prepareMasterSDM(ILaunchConfiguration configuration,
-			AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
-		IResourceManagerControl rm = null;
-		
-		List<String> cmd = new ArrayList<String>();
-		cmd.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue());
-		cmd.addAll(dbgArgs);
-
-		try {
-			rm = (IResourceManagerControl) getResourceManager(configuration);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		IResourceManagerConfiguration conf = rm.getConfiguration();
-		AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-		IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
-		IRemoteConnection connection = connectionManager.getConnection(remConf.getConnectionName());
-		sdmProcessBuilder = remoteServices.getProcessBuilder(connection, cmd);
-		String workdir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
-		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-		IFileStore directory = null;
-		try {
-			directory = fileManager.getResource(new Path(workdir), monitor);
-		} catch (IOException e) {
-			throw newCoreException(e);
-		}
-		sdmProcessBuilder.directory(directory);
-	}
-	
-	private void startMasterSDM(IPLaunch launch) throws CoreException {
-		assert sdmProcess == null;
-		assert sdmProcessBuilder != null;
-		try {
-			sdmProcess = sdmProcessBuilder.start();
-		} catch (IOException e) {
-			throw newCoreException(e);
-		}
-		
-		final BufferedReader err_reader = new BufferedReader(new InputStreamReader(sdmProcess.getErrorStream()));
-		final BufferedReader out_reader = new BufferedReader(new InputStreamReader(sdmProcess.getInputStream()));
-
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					String output;
-					while ((output = out_reader.readLine()) != null) {
-						System.out.println("sdm master: " + output); //$NON-NLS-1$
-					}
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-		}, "SDM master standard output thread").start(); //$NON-NLS-1$
-		
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					String line;
-					while ((line = err_reader.readLine()) != null) {
-						System.err.println("sdm master: " + line); //$NON-NLS-1$
-					}
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-		}, "SDM master error output thread").start(); //$NON-NLS-1$
-
-		sdmProcessBuilder = null;
-	}
-	
-	public void stopMasterSDM() {
-		if (sdmProcess != null) {
-			sdmProcess.destroy();
-			sdmProcess = null;
-		}
-	}
-
 }

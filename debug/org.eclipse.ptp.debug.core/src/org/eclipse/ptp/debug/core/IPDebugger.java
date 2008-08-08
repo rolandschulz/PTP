@@ -69,6 +69,5 @@ public interface IPDebugger {
 	 */
 	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
 
-//	public void prepare(ILaunchConfiguration configuration, AttributeManager attrMgr);
-//	public void cleanup(ILaunchConfiguration configuration, AttributeManager attrMgr, IPLaunch launch);
+	public void cleanup(ILaunchConfiguration configuration, AttributeManager attrMgr, IPLaunch launch);
 }

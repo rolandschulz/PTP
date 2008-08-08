@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly marked, 
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
  * so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ *
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.launch.internal;
@@ -36,6 +36,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -52,16 +53,16 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.WorkbenchException;
 /**
- * 
+ *
  */
-public class ParallelLaunchConfigurationDelegate 
+public class ParallelLaunchConfigurationDelegate
 	extends AbstractParallelLaunchConfigurationDelegate {
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
 	 */
 	@Override
-	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch, 
+	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch,
 			AttributeManager mgr, final IPDebugger debugger, final IPJob job) {
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
@@ -70,7 +71,7 @@ public class ParallelLaunchConfigurationDelegate
 				setDefaultSourceLocator(launch, configuration);
 				final IProject project = verifyProject(configuration);
 				final IPath execPath = verifyExecutablePath(configuration);
-				
+
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -99,6 +100,7 @@ public class ParallelLaunchConfigurationDelegate
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
 						} catch (InterruptedException e) {
 							System.out.println("Debug job launch interrupted: " + e.getMessage()); //$NON-NLS-1$
+							terminateJob(job);
 						} catch (InvocationTargetException e) {
 							String msg = e.getMessage();
 							Throwable t = e.getCause();
@@ -107,19 +109,47 @@ public class ParallelLaunchConfigurationDelegate
 							}
 							System.out.println("Error completing debug job launch: " + msg); //$NON-NLS-1$
 							PTPLaunchPlugin.errorDialog("Error completing debug job launch", t);
+							PTPLaunchPlugin.log(t);
+							terminateJob(job);
 						}
 					}
 				});
-			} catch (CoreException e) {
-				//FIXME: Error dialog?
-				System.out.println("Error completing debug job launch"); //$NON-NLS-1$
+			} catch (final CoreException e) {
+				/*
+				 * Completion of launch fails, then terminate the job and display error message.
+				 */
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						PTPLaunchPlugin.errorDialog("Error completing launch", e.getStatus());
+					}
+				});
+				PTPLaunchPlugin.log(e);
+				terminateJob(job);
 			}
-			
 		} else {
 			new RuntimeProcess(launch, job, null);
 		}
 	}
-	
+
+	@Override
+	protected void doCleanuoLaunch(ILaunchConfiguration configuration,
+			String mode, IPLaunch launch, AttributeManager attrMgr,
+			IPDebugger debugger, IPJob job) {
+		if (debugger != null) {
+			debugger.cleanup(configuration, attrMgr, launch);
+		}
+	}
+
+	private void terminateJob(final IPJob job) {
+		try {
+			IResourceManager rm = job.getQueue().getResourceManager();
+			rm.terminateJob(job);
+		} catch (CoreException e1) {
+			// Ignore, but log
+			PTPLaunchPlugin.log(e1);
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -137,14 +167,14 @@ public class ParallelLaunchConfigurationDelegate
 		}
 		IPDebugger debugger = null;
 		IPJob job = null;
-		
-		monitor.worked(10); 
+
+		monitor.worked(10);
 		monitor.subTask("Copying data . . .");
-		
+
 		// All copy pre-"job submission" occurs here
 		copyExecutable(configuration, monitor);
 		doPreLaunchSynchronization(configuration, monitor);
-		
+
 		//switch perspective
 		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 		AttributeManager attrManager = getAttributeManager(configuration);
@@ -153,12 +183,12 @@ public class ParallelLaunchConfigurationDelegate
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 				monitor.subTask("Configuring debug setting . . ."); //$NON-NLS-1$
-				
+
 				/*
-				 * Create the debugger extension, then the connection point for the debug server. 
+				 * Create the debugger extension, then the connection point for the debug server.
 				 * The debug server is launched via the submitJob() command.
 				 */
-				
+
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
 				debugger.initialize(configuration, attrManager, monitor);
@@ -167,12 +197,12 @@ public class ParallelLaunchConfigurationDelegate
 				}
 				debugger.getLaunchAttributes(configuration, attrManager);
 			}
-			
+
 			monitor.worked(10);
 			monitor.subTask("Submitting the job . . ."); //$NON-NLS-1$
-			
+
 			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
-			
+
 			monitor.worked(10);
 		} catch (CoreException e) {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
@@ -188,7 +218,7 @@ public class ParallelLaunchConfigurationDelegate
 
 	/**
 	 * Show the PTP Debug view
-	 * 
+	 *
 	 * @param viewID
 	 */
 	protected void showPTPDebugView(final String viewID) {
@@ -212,11 +242,11 @@ public class ParallelLaunchConfigurationDelegate
 			});
 		}
 	}
-	
-	
+
+
 	/**
 	 * Used to force switching to the PTP Debug perspective
-	 * 
+	 *
 	 * @param perspectiveID
 	 */
 	protected void switchPerspective(final String perspectiveID) {
