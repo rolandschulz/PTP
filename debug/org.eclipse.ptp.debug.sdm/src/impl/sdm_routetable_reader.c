@@ -154,7 +154,6 @@ wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec)
 		getcwd(wd, MAXPATHLEN);
 		DIR * dir = opendir(wd);
 		closedir(dir);
-		free(wd);
 
 		*routing_file = fopen(filename, "r");
 
