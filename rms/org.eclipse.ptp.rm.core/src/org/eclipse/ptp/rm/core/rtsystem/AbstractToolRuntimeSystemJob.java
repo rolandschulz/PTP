@@ -43,6 +43,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected AttributeManager attrMgr;
 	protected AbstractToolRuntimeSystem rtSystem;
 
+	private boolean terminateJobFlag = false;
+
 	public AbstractToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
 			AttributeManager attrMgr) {
 		super(name);
@@ -63,7 +65,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	public String getQueueID() {
 		return queueID;
 	}
-	
+
 	public String getJobID() {
 		return jobID;
 	}
@@ -161,10 +163,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while waiting execution of command.", e);
 			}
 
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
 			if (process.exitValue() != 0) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command, return exit value {0}.", process.exitValue()));
+				if (! terminateJobFlag) {
+					return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command, return exit value {0}.", process.exitValue()));
+				} else {
+					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
+					return Status.CANCEL_STATUS;
+				}
 			}
 
 //			try {
@@ -257,6 +264,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#terminate()
 	 */
 	public void terminate() {
+		terminateJobFlag = true;
 		if (process != null) {
 			process.destroy();
 		}
