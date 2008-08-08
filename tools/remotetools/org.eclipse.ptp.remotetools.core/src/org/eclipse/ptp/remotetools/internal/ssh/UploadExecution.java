@@ -69,7 +69,13 @@ public class UploadExecution extends KillableExecution implements IRemoteUploadE
 		// trying to manipulate non-existent files (e.g. set file attributes after
 		// the upload)
 		while(channel.isClosed() || !channel.isConnected()) {
-			;
+			synchronized (this) {
+				try {
+					this.wait(10);
+				} catch (InterruptedException e) {
+					// Ignore
+				}
+			}
 		}
 	}
 
