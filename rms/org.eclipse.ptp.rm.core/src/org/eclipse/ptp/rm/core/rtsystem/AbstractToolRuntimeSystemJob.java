@@ -100,7 +100,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			try {
 				AttributeManager substitutionAttributeManager = createSubstitutionAttributes();
 				environment = doCreateEnvironment(substitutionAttributeManager);
-				directory = coCreateWorkingDirectory();
+				directory = doCreateWorkingDirectory();
 				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 				if (debugAttr != null && debugAttr.getValue()) {
 					command = doCreateDebugCommand(substitutionAttributeManager);
@@ -230,7 +230,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 	abstract protected Map<String, String> doCreateEnvironment(AttributeManager substitutionAttributeManager) throws CoreException;
 
-	abstract protected String coCreateWorkingDirectory();
+	abstract protected String doCreateWorkingDirectory();
 
 	protected AttributeManager createSubstitutionAttributes() throws CoreException {
 		AttributeManager newAttributeManager = new AttributeManager(getAttrMgr().getAttributes());
