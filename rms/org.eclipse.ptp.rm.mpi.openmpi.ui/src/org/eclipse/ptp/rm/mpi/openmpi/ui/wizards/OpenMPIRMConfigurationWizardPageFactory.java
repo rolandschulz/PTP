@@ -16,17 +16,17 @@ import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
 
-public class OpenMpiRMConfigurationWizardPageFactory extends
+public class OpenMPIRMConfigurationWizardPageFactory extends
 	RMConfigurationWizardPageFactory {
 
-	public OpenMpiRMConfigurationWizardPageFactory() {
+	public OpenMPIRMConfigurationWizardPageFactory() {
 		// no-op
 	}
 
 	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
 		return new RMConfigurationWizardPage[] {
-				new OpenMpiRMConfigurationWizardPage(wizard),
-				new OpenMpiToolConfigurationWizardPage(wizard) };
+				new OpenMPIRMConfigurationWizardPage(wizard),
+				new OpenMPIToolConfigurationWizardPage(wizard) };
 	}
 
 	public Class<OpenMpiResourceManagerFactory> getRMFactoryClass() {

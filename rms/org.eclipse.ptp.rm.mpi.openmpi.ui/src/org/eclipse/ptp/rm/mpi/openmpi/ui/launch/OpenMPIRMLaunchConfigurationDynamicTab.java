@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
-import org.eclipse.ptp.rm.mpi.openmpi.ui.Activator;
+import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,10 +43,10 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
-public class OpenMpiRMLaunchConfigurationDynamicTab extends
+public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		AbstractRMLaunchConfigurationDynamicTab {
 	
-	private static final String ATTR_BASE = Activator.PLUGIN_ID + ".launchAttributes";
+	private static final String ATTR_BASE = OpenMPIUIPlugin.PLUGIN_ID + ".launchAttributes";
 	private static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs";
 	private static final String ATTR_BYSLOT = ATTR_BASE + ".bySlot";
 	private static final String ATTR_NOOVERSUBSCRIBE = ATTR_BASE + ".noOversubscribe";
@@ -217,7 +217,7 @@ public class OpenMpiRMLaunchConfigurationDynamicTab extends
 		
 	DataSource dataSource = new DataSource();
 
-	public OpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm) {
+	public OpenMPIRMLaunchConfigurationDynamicTab(IResourceManager rm) {
 	}
 
 	/* (non-Javadoc)

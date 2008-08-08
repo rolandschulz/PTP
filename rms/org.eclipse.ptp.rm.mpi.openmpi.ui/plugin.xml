@@ -4,34 +4,34 @@
 <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMpi12PreferencePage"
-            id="org.eclipse.ptp.rm.openmpi.ui.preferences.openmpi12"
-            name="openmpi 1.2">
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.OpenMPI"
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMPI12PreferencePage"
+            id="org.eclipse.ptp.rm.openmpi.ui.preferences.OpenMPI12"
+            name="Open MPI 1.2">
       </page>
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.EmptyPage"
-            id="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
-            name="openmpi">
+            id="org.eclipse.ptp.ui.preferences.rmPreferencesPage.OpenMPI"
+            name="Open MPI">
       </page>
       <page
-            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.openmpi"
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMpi13PreferencePage"
-            id="org.eclipse.ptp.rm.openmpi.ui.preferences.openmpi13"
-            name="openmpi 1.3">
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage.OpenMPI"
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.OpenMPI13PreferencePage"
+            id="org.eclipse.ptp.rm.openmpi.ui.preferences.OpenMPI13"
+            name="Open MPI 1.3">
       </page>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.rmConfigurations">
       <configurationWizard
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMpiRMConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMConfigurationWizardPageFactory"
             id="org.eclipse.ptp.rm.openmpi.ui.configurationWizard"/>
    </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.launch.OpenMpiRMLaunchConfigurationFactory"
-            id="org.eclipse.ptp.rm.open.ui.launchConfiguration"/>
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.launch.OpenMPIRMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.rm.openmpi.ui.launchConfiguration"/>
    </extension>
 </plugin>
