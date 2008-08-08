@@ -68,6 +68,15 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				updatePage();
 			}
 		}
+	
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
+		public void widgetSelected(SelectionEvent e) {
+			Object source = e.getSource();
+			updateSettings();
+			updatePage();
+		}
 	}
 	
 	public static final String EMPTY_STRING = "";
