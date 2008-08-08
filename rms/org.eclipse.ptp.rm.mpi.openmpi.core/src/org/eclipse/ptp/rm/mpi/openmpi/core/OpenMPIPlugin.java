@@ -16,18 +16,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin {
+public class OpenMPIPlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.core";
 
 	// The shared instance
-	private static Activator plugin;
+	private static OpenMPIPlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public OpenMPIPlugin() {
 	}
 
 	/*
@@ -38,8 +38,8 @@ public class Activator extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		OpenMpi12PreferenceManager.initializePreferences();
-		OpenMpi13PreferenceManager.initializePreferences();
+		OpenMPI12PreferenceManager.initializePreferences();
+		OpenMPI13PreferenceManager.initializePreferences();
 	}
 
 	/*
@@ -57,7 +57,7 @@ public class Activator extends Plugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static OpenMPIPlugin getDefault() {
 		return plugin;
 	}
 }

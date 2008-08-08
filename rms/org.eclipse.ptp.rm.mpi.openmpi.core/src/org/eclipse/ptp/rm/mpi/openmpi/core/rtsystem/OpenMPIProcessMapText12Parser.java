@@ -23,21 +23,21 @@ import java.util.regex.Pattern;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIApplicationAttributes;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiNodeAttributes;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiJobAttributes.MappingMode;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes.MappingMode;
 
-public class OpenMpiProcessMapText12Parser {
-	private OpenMpiProcessMapText12Parser() {
+public class OpenMPIProcessMapText12Parser {
+	private OpenMPIProcessMapText12Parser() {
 		// Do not allow instances.
 	}
 
-	OpenMpiProcessMap map = new OpenMpiProcessMap();
+	OpenMPIProcessMap map = new OpenMPIProcessMap();
 	int numApplications;
 	int numNodes;
 
-	public static OpenMpiProcessMap parse(InputStream is) throws IOException {
-		OpenMpiProcessMapText12Parser parser = new OpenMpiProcessMapText12Parser();
+	public static OpenMPIProcessMap parse(InputStream is) throws IOException {
+		OpenMPIProcessMapText12Parser parser = new OpenMPIProcessMapText12Parser();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 1);
 
 		parser.readLine1(reader);
@@ -78,7 +78,7 @@ public class OpenMpiProcessMapText12Parser {
 			throw new IOException("Invalid line: " + line);
 		}
 
-		OpenMpiProcessMap.Node node = new OpenMpiProcessMap.Node(nodeIndex, nodeName);
+		OpenMPIProcessMap.Node node = new OpenMPIProcessMap.Node(nodeIndex, nodeName);
 		map.addNode(node);
 
 		// Daemon name:
@@ -101,9 +101,9 @@ public class OpenMpiProcessMapText12Parser {
 		try {
 			String s = m.group(1);
 			if (s.equalsIgnoreCase("true")) {
-				node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getOversubscribedDefinition().create(true));
+				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedDefinition().create(true));
 			} else if (s.equalsIgnoreCase("false")) {
-				node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getOversubscribedDefinition().create(false));
+				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedDefinition().create(false));
 			} else {
 				throw new IOException("Invalid line: " + line);
 			}
@@ -160,7 +160,7 @@ public class OpenMpiProcessMapText12Parser {
 				line = reader.readLine();
 			}
 
-			OpenMpiProcessMap.Process proc = new OpenMpiProcessMap.Process(node, processIndex, processName, applicationIndex);
+			OpenMPIProcessMap.Process proc = new OpenMPIProcessMap.Process(node, processIndex, processName, applicationIndex);
 			map.addProcess(proc);
 			try {
 				proc.getAttributeManager().addAttribute(ProcessAttributes.getPIDAttributeDefinition().create(processPid));
@@ -221,7 +221,7 @@ public class OpenMpiProcessMapText12Parser {
 			throw new IOException("Invalid line: " + line);
 		}
 
-		OpenMpiProcessMap.Application application = new OpenMpiProcessMap.Application(applicationIndex, applicationName, numberOfProcessors);
+		OpenMPIProcessMap.Application application = new OpenMPIProcessMap.Application(applicationIndex, applicationName, numberOfProcessors);
 		map.addApplication(application);
 
 		// Argv[0]: hellio
@@ -290,14 +290,14 @@ public class OpenMpiProcessMapText12Parser {
 		try {
 			String s = m.group(1);
 			try {
-				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getVpidStart().create(Integer.parseInt(s)));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidStart().create(Integer.parseInt(s)));
 			} catch (IllegalValueException e) {
 			// This is not possible.
 				assert false;
 			}
 			s = m.group(2);
 			try {
-				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getVpidRange().create(Integer.parseInt(s)));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidRange().create(Integer.parseInt(s)));
 			} catch (IllegalValueException e) {
 			// This is not possible.
 				assert false;
@@ -317,18 +317,18 @@ public class OpenMpiProcessMapText12Parser {
 		if (!m.matches() || m.groupCount() != 4)
 			throw new IOException("Invalid line: " + line);
 		try {
-			map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getHostname().create(m.group(1)));
+			map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getHostname().create(m.group(1)));
 			try {
-				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getMpiJobId().create(Integer.parseInt(m.group(3))));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMpiJobId().create(Integer.parseInt(m.group(3))));
 			} catch (IllegalValueException e) {
 				// This is not possible.
 				assert false;
 			}
 			String mode = m.group(4);
 			if (mode.equalsIgnoreCase("bynode")) {
-				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(MappingMode.BY_NODE));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMappingModeDefinition().create(MappingMode.BY_NODE));
 			} else if (mode.equalsIgnoreCase("byslot")) {
-				map.getAttributeManager().addAttribute(OpenMpiJobAttributes.getMappingModeDefinition().create(MappingMode.BY_SLOT));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMappingModeDefinition().create(MappingMode.BY_SLOT));
 			} else {
 				throw new IOException("Invalid line: " + line);
 			}
@@ -340,7 +340,7 @@ public class OpenMpiProcessMapText12Parser {
 	public static void main(String[] args) {
 		try {
 			FileInputStream is = new FileInputStream("test.txt");
-			OpenMpiProcessMapText12Parser.parse(is);
+			OpenMPIProcessMapText12Parser.parse(is);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

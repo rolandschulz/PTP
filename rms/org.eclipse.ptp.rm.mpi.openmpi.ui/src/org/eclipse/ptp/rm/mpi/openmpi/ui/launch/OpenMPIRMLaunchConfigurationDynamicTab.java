@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiLaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -310,7 +310,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			// TODO: Handle this exception?
 			Assert.isTrue(false);
 		} 
-		attrs.add(OpenMpiLaunchAttributes.getLaunchArgumentsAttributeDefinition().create(launchArgs));
+		attrs.add(OpenMPILaunchAttributes.getLaunchArgumentsAttributeDefinition().create(launchArgs));
 		
 		return attrs.toArray(new IAttribute<?,?,?>[attrs.size()]);
 	}

@@ -14,9 +14,9 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 
 
-public class OpenMpi12PreferenceManager extends AbstractToolsPreferenceManager {
-	private static final String LAUNCH_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${execPath}/${execName} ${progArgs}";
-	private static final String DEBUG_CMD = "mpirun -display-map ${mpiArgs} ${mpiEnvArgs} ${debugExecPath}/${debugExecName} ${debugArgs}";
+public class OpenMPI12PreferenceManager extends AbstractToolsPreferenceManager {
+	private static final String LAUNCH_CMD = "mpirun -display-map ${Open_MPI_args} ${Open_MPI_env} ${execPath}/${execName} ${progArgs}";
+	private static final String DEBUG_CMD = "mpirun -display-map ${Open_MPI_args} ${Open_MPI_env} ${debugExecPath}/${debugExecName} ${debugArgs}";
 	private static final String DISCOVER_CMD = "ompi_info -a --parseable";
 	private static final String PATH = "";
 	private static final boolean USE_DEFAULTS = true;
@@ -24,15 +24,15 @@ public class OpenMpi12PreferenceManager extends AbstractToolsPreferenceManager {
 	public static final String PREFIX = "openmpi-1.2-";
 
 	public static Preferences getPreferences() {
-		return Activator.getDefault().getPluginPreferences();
+		return OpenMPIPlugin.getDefault().getPluginPreferences();
 	}
 
 	public static void savePreferences() {
-		Activator.getDefault().savePluginPreferences();
+		OpenMPIPlugin.getDefault().savePluginPreferences();
 	}
 
 	public static void initializePreferences() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		Preferences preferences = OpenMPIPlugin.getDefault().getPluginPreferences();
 		// Initialize only preferences as in OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
 		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, LAUNCH_CMD);
 		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, DEBUG_CMD);

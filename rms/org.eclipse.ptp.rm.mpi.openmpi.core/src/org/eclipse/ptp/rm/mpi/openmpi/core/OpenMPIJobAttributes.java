@@ -29,7 +29,7 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 /**
  * Node attributes
  */
-public class OpenMpiJobAttributes {
+public class OpenMPIJobAttributes {
 
 	public enum MappingMode {
 		UNKNOWN,
@@ -49,19 +49,19 @@ public class OpenMpiJobAttributes {
 //				"Number of mapped nodes", true, 0);
 
 	private final static IntegerAttributeDefinition mpiJobId =
-		new IntegerAttributeDefinition(MPI_JOB_ID_ATTR_ID, "openmpi job id",
-				"openmpi job id", true, 0);
+		new IntegerAttributeDefinition(MPI_JOB_ID_ATTR_ID, "Open MPI job id",
+				"Open MPI job id", true, 0);
 
 	private final static IntegerAttributeDefinition vpidStart =
-		new IntegerAttributeDefinition(VPID_START_ATTR_ID, "vpid start",
-				"vpid start", true, 0);
+		new IntegerAttributeDefinition(VPID_START_ATTR_ID, "Open MPI vpid start",
+				"Open MPI vpid start", true, 0);
 
 	private final static IntegerAttributeDefinition vpidRange =
-		new IntegerAttributeDefinition(VPID_RANGE_ATTR_ID, "vpid range",
-				"vpid range", true, 0);
+		new IntegerAttributeDefinition(VPID_RANGE_ATTR_ID, "Open MPI vpid range",
+				"Open MPI vpid range", true, 0);
 
     private final static EnumeratedAttributeDefinition<MappingMode> mappingModeDefinition =
-        new EnumeratedAttributeDefinition<MappingMode>(MAPPING_MODE_ATTR_ID, "Mapping mode", "Mapping mode",
+        new EnumeratedAttributeDefinition<MappingMode>(MAPPING_MODE_ATTR_ID, "Open MPI mapping mode", "Open MPI mapping mode",
                 true, MappingMode.UNKNOWN);
     
     private final static StringAttributeDefinition hostname = 

@@ -14,7 +14,7 @@ public class OpenMPIApplicationAttributes {
 
 	private final static ArrayAttributeDefinition<String> effectiveOpenMPIProgArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(EFFECTIVE_OPEN_MPI_PROG_ARGS_ATTR_ID, "Program Arguments for Open MPI processes",
-				"Effective command-line arguments by Opensupplied to executable", true, null);
+				"Effective command-line arguments by OpenMPI supplied to executable", true, null);
 	
 	private final static StringAttributeDefinition effectiveOpenMPIWorkingDirAttrDef = 
 		new StringAttributeDefinition(EFFECTIVE_OPEN_MPI_WORKING_DIR_ATTR_ID, "Working Directory for Open MPI processes",

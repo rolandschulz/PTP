@@ -16,15 +16,15 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMpiNodeAttributes;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMpiProcessMap.Node;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class OpenMpiProcessMapXml13Parser {
-	private OpenMpiProcessMapXml13Parser() {
+public class OpenMPIProcessMapXml13Parser {
+	private OpenMPIProcessMapXml13Parser() {
 		// Do not allow instances.
 	}
 
@@ -99,7 +99,7 @@ public class OpenMpiProcessMapXml13Parser {
 		}
 	}
 
-	protected final OpenMpiProcessMap map = new OpenMpiProcessMap();
+	protected final OpenMPIProcessMap map = new OpenMPIProcessMap();
 	protected final StackContextHandler handler = new StackContextHandler(new DocumentHandler());
 	protected final ListenerList listeners = new ListenerList();
 	
@@ -218,7 +218,7 @@ public class OpenMpiProcessMapXml13Parser {
 		private int max_slots = 0;
 
 		private Node node;
-		private List<OpenMpiProcessMap.Process> processes = new ArrayList<OpenMpiProcessMap.Process>();
+		private List<OpenMPIProcessMap.Process> processes = new ArrayList<OpenMPIProcessMap.Process>();
 
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
@@ -271,14 +271,14 @@ public class OpenMpiProcessMapXml13Parser {
 			node = new Node(host_counter++, name);
 			map.addNode(node);
 			try {
-				node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getNumberOfNodesAttributeDefinition().create(num_slots));
+				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(num_slots));
 			} catch (IllegalValueException e) {
 				// This is not possible
 				PTPCorePlugin.log(e);
 			}
 			if (has_max_slots) {
 				try {
-					node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(max_slots));
+					node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(max_slots));
 				} catch (IllegalValueException e) {
 					// This is not possible
 					PTPCorePlugin.log(e);
@@ -293,7 +293,7 @@ public class OpenMpiProcessMapXml13Parser {
 			 * If yes, then the node is oversubcribed.
 			 */
 			assert node != null;
-			node.getAttributeManager().addAttribute(OpenMpiNodeAttributes.getOversubscribedDefinition().create(processes.size() > num_slots));
+			node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedDefinition().create(processes.size() > num_slots));
 			super.finish();
 		}
 	}
@@ -326,18 +326,18 @@ public class OpenMpiProcessMapXml13Parser {
 
 		@Override
 		public void finish() throws SAXException {
-			OpenMpiProcessMap.Process process = new OpenMpiProcessMap.Process(node, rank, Integer.toString(rank), 1);
+			OpenMPIProcessMap.Process process = new OpenMPIProcessMap.Process(node, rank, Integer.toString(rank), 1);
 			map.addProcess(process);
 			super.finish();
 		}
 	}
 
-	public static OpenMpiProcessMap parse(InputStream is) throws IOException {
+	public static OpenMPIProcessMap parse(InputStream is) throws IOException {
 		return parse(is, null);
 	}
 
-	public static OpenMpiProcessMap parse(InputStream is, IOpenMpiProcessMapXml13ParserListener listener) throws IOException {
-		OpenMpiProcessMapXml13Parser parser = new OpenMpiProcessMapXml13Parser();
+	public static OpenMPIProcessMap parse(InputStream is, IOpenMpiProcessMapXml13ParserListener listener) throws IOException {
+		OpenMPIProcessMapXml13Parser parser = new OpenMPIProcessMapXml13Parser();
 		if (listener != null) {
 			parser.addListener(listener);
 		}
@@ -367,7 +367,7 @@ public class OpenMpiProcessMapXml13Parser {
 	public static void main(String[] args) {
 		try {
 			FileInputStream is = new FileInputStream("xml_sample.txt");
-			OpenMpiProcessMap map = OpenMpiProcessMapXml13Parser.parse(is);
+			OpenMPIProcessMap map = OpenMPIProcessMapXml13Parser.parse(is);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

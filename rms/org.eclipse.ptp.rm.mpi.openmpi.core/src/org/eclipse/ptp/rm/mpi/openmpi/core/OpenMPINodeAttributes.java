@@ -28,28 +28,28 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 /**
  * Node attributes
  */
-public class OpenMpiNodeAttributes {
+public class OpenMPINodeAttributes {
 
-	private static final String NUM_NODES_ID = "numNodes";
-	private static final String MAX_NUM_NODES_ID = "maxNumNodes";
-	private static final String STATUS_MESSAGE = "statusMessage";
-	private static final String OVERSUBSCRIBED = "oversubscribed";
+	private static final String NUM_NODES_ID = "Open_MPI_numNodes";
+	private static final String MAX_NUM_NODES_ID = "Open_MPI_maxNumNodes";
+	private static final String STATUS_MESSAGE = "Open_MPI_statusMessage";
+	private static final String OVERSUBSCRIBED = "Open_MPI_oversubscribed";
 
 	private final static IntegerAttributeDefinition numNodesDef =
-		new IntegerAttributeDefinition(NUM_NODES_ID, "Number of nodes",
-				"Number of nodes on the host", true, 0);
+		new IntegerAttributeDefinition(NUM_NODES_ID, "Open MPI number of nodes",
+				"Open MPI number of nodes on the host", true, 0);
 
 	private final static IntegerAttributeDefinition maxNumNodesDef =
-		new IntegerAttributeDefinition(MAX_NUM_NODES_ID, "Maximal number of nodes",
-				"Maximal number of nodes on the host", true, 0);
+		new IntegerAttributeDefinition(MAX_NUM_NODES_ID, "Open MPI maximal number of nodes",
+				"Open MPI maximal number of nodes on the host", true, 0);
 
 	private final static StringAttributeDefinition statusMessageDef =
-		new StringAttributeDefinition(STATUS_MESSAGE, "Status message",
-				"Status message", true, "");
+		new StringAttributeDefinition(STATUS_MESSAGE, "Open MPI status message",
+				"Open MPI status message", true, "");
 	
 	private final static BooleanAttributeDefinition oversubscribedDefinition =
-		new BooleanAttributeDefinition(OVERSUBSCRIBED, "Oversubscribed",
-		"Oversubscribed node (more processes than available)", true, false); 
+		new BooleanAttributeDefinition(OVERSUBSCRIBED, "Open MPI oversubscribed",
+		"Open MPI oversubscribed node (more processes than available)", true, false); 
 
 	/**
 	 * Number of slots suggested on the node.
