@@ -29,6 +29,6 @@
          id="org.eclipse.ptp.pldt.lapi"
          download-size="0"
          install-size="0"
-         version="2.0.0.qualifier"/>
+         version="0.0.0"/>
 
 </feature>
