@@ -149,7 +149,8 @@ sdm_parent_port_bind(int parentbaseport)
 		if(bind(sockfd, (struct sockaddr *)&(sockaddr_info), sizeof(struct sockaddr_in)) < 0) {
 			if(errno != EADDRINUSE) {
 				// Error!
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "Could not bind to the port! - errno %d\n", errno);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Could not bind to the port! - errno %d\n",
+						sdm_route_get_id(), errno);
 				return -1;
 			}
 		} else { // Bound successfully
@@ -160,7 +161,7 @@ sdm_parent_port_bind(int parentbaseport)
 	}
 
 	if(listen(sockfd, 5) < 0) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "Error listening to the port %d!\n", parentport);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error listening to the port %d!\n", sdm_route_get_id(), parentport);
 		return -1;
 	}
 
@@ -173,8 +174,8 @@ sdm_parent_port_bind(int parentbaseport)
 
 		if(peersockfd < 0) {
 			perror("Status of accepting data from parent");
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "Could not accept port connection on port %d - errno %d!\n",
-					parentport, errno);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Could not accept port connection on port %d - errno %d!\n",
+					sdm_route_get_id(), parentport, errno);
 			return -1;
 		}
 
@@ -215,7 +216,7 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 		sockfd = socket(PF_INET, SOCK_STREAM, 0);
 		if(sockfd < 0) {
 			perror("Socket");
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "socket syscall error\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] socket syscall error\n", sdm_route_get_id());
 			return -1;
 		}
 
@@ -223,7 +224,8 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 		sprintf(port_str, "%d", childport);
 		if(getaddrinfo(hostname, port_str, &hints, &result)) {
 			perror("getaddrinfo");
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "getaddrinfo error. hostname: %s, port: %s\n", hostname, port_str);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] getaddrinfo error. hostname: %s, port: %s\n",
+					sdm_route_get_id(), hostname, port_str);
 			return -1;
 		}
 		//printf("connecting to hostname %s port %d\n", hostname, childport);
@@ -232,7 +234,8 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 				(errno != ETIMEDOUT) ) {
 				perror("connect");
 				freeaddrinfo(result);
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "connect error. hostname: %s, port: %s\n", hostname, port_str);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] connect error. hostname: %s, port: %s\n",
+						sdm_route_get_id(), hostname, port_str);
 				return -1;
 			}
 		} else {
@@ -246,7 +249,8 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 		}
 	}
 	// No valid peer found!
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "No port found for the sdm child. hostname: %s\n", hostname);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] No port found for the sdm child. hostname: %s\n",
+			sdm_route_get_id(), hostname);
 	return -1;
 }
 
@@ -269,10 +273,10 @@ sdm_tcpip_init()
 	rv = wait_for_routing_file("routing_file", &rt_file, 10); //TODO: Get filename from the environment
 	if(rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error opening the routing file\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error opening the routing file\n", sdm_route_get_id());
 		return -1;
 	} else if(rv == -2){
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Timeout while waiting for routing file\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Timeout while waiting for routing file\n", sdm_route_get_id());
 		return -1;
 	}
 
@@ -284,7 +288,7 @@ sdm_tcpip_init()
 
 		rv = read_routing_table_size(rt_file, &tbl_size);
 		if(rv < 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error reading routing table size\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table size\n", sdm_route_get_id());
 			goto error;
 		}
 
@@ -294,7 +298,7 @@ sdm_tcpip_init()
 			rv = read_routing_table_entry(rt_file, &table_entry);
 
 			if(rv < 0) {
-				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error reading routing table entry\n");
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
 				goto error;
 				/*close_routing_file(rt_file);
 				return -1;*/
@@ -330,7 +334,7 @@ sdm_tcpip_init()
 
 	rv = read_routing_table_size(rt_file, &tbl_size);
 	if(rv < 0) {
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error reading routing table size\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table size\n", sdm_route_get_id());
 		goto error;
 	}
 	// For each entry, scan the children structure to see if the ID matches
@@ -339,7 +343,7 @@ sdm_tcpip_init()
 		rv = read_routing_table_entry(rt_file, &table_entry);
 
 		if(rv < 0) {
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error reading routing table entry\n");
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
 			goto error;
 		}
 
