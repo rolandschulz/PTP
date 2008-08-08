@@ -323,7 +323,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected String coCreateWorkingDirectory() {
+	protected String doCreateWorkingDirectory() {
 		return attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 	}
 }
