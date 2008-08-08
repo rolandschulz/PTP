@@ -26,11 +26,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-public class OpenMpiToolConfigurationWizardPage extends
+public class OpenMPIToolConfigurationWizardPage extends
 		AbstractToolRMConfigurationWizardPage {
 
 	String versionIds[] = new String[] { OpenMpiResourceManagerConfiguration.VERSION_12, OpenMpiResourceManagerConfiguration.VERSION_13 };
-	String versionsNames[] = new String[] { "openmpi 1.2", "openmpi 1.3"};
+	String versionsNames[] = new String[] { "Open MPI 1.2", "Open MPI 1.3"};
 
 	protected Combo versionCombo;
 
@@ -100,7 +100,7 @@ public class OpenMpiToolConfigurationWizardPage extends
 		@Override
 		protected void validateLocal() throws ValidationException {
 			if (versionId == null) {
-				throw new ValidationException("No openmpi version selected");
+				throw new ValidationException("No Open MPI version selected");
 			}
 			super.validateLocal();
 		}
@@ -123,7 +123,7 @@ public class OpenMpiToolConfigurationWizardPage extends
 		return new DataSource();
 	}
 
-	public OpenMpiToolConfigurationWizardPage(RMConfigurationWizard wizard) {
+	public OpenMPIToolConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES , "Open MPI", "Open MPI tool configuration", "Enter information to configure the Open MPI tool");
 	}
 
@@ -147,7 +147,7 @@ public class OpenMpiToolConfigurationWizardPage extends
 		 */
 
 		Label label = new Label(contents, SWT.NONE);
-		label.setText("openmpi version:");
+		label.setText("Open MPI version:");
 
 		versionCombo = new Combo(contents, SWT.DROP_DOWN | SWT.READ_ONLY);
 		for (int i = 0; i < versionsNames.length; i++) {

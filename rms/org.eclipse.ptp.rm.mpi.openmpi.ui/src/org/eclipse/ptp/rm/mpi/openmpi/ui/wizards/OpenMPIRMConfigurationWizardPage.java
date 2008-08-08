@@ -13,13 +13,13 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
-public final class OpenMpiRMConfigurationWizardPage extends
+public final class OpenMPIRMConfigurationWizardPage extends
 	AbstractRemoteResourceManagerConfigurationWizardPage {
 
-	public OpenMpiRMConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, "openmpi Connection Configuration");
-		setTitle("openmpi Connection Configuration");
-		setDescription("Enter openmpi connection information");
+	public OpenMPIRMConfigurationWizardPage(RMConfigurationWizard wizard) {
+		super(wizard, "Open MPI connection configuration");
+		setTitle("Open MPI connection configuration");
+		setDescription("Enter Open MPI connection information");
 	}
 
 }
