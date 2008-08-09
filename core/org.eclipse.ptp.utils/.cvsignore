@@ -11,3 +11,4 @@ bitset_test
 .gdb_history
 args_test
 rangeset_test
+a.out.dSYM
