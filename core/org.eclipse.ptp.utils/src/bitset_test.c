@@ -98,13 +98,13 @@ void
 test_str(int tnum)
 {
 	char *		str2;
-	char * 		str1 = "17:6411EDA";
+	char * 		str1 = "17:6411eda";
 	char *		end;
 	bitset *	b = str_to_bitset(str1, &end);
 	str2 = bitset_to_str(b);
 	if (strncmp(str1, str2, 9) != 0) {
 		printf("TEST_%d FAIL: %s != %s\n", tnum, str1, str2);
-	} else if (*end != 'A') {
+	} else if (*end != 'a') {
 		printf("TEST_%d FAIL: end == %d\n", tnum, *end);
 	} else {
 		printf("TEST_%d SUCCEDED\n", tnum);

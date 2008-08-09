@@ -302,9 +302,10 @@ static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b
  * Return a string representation of a bitset. We use hex to compress
  * the string somewhat and drop leading zeros.
  *
- * Format is "nnnnnnnn:bbbbbbb..." where "nnnnnnnn" is a hex representation of the
- * actual number of bits, and "bbbbb...." are bits in the
- * set (in hex).
+ * Format is "NN:HHHHHH..." where "NN" is the actual number of bits in hex,
+ * and "HHHHH...." is a hex representation of the bits in the set. The number
+ * of characters in the bit string is always exactly enough to represent all
+ * the bits.
  */
 char *
 bitset_to_str(bitset *b)
@@ -379,8 +380,7 @@ str_to_bitset(char *str, char **end)
 		nbits += digittoint(*str);
 	}
 
-	bytes = NUM_BYTES(nbits);
-	chars = bytes << 1;
+	chars = (nbits >> 2) + 1;
 
 	if (*str++ != ':' || nbits == 0) {
 		return NULL;
@@ -388,7 +388,7 @@ str_to_bitset(char *str, char **end)
 
 	bp = bitset_new(nbits);
 
-	for (pos = (bytes << 3) - 1; *str != '\0' && isxdigit(*str) && chars > 0; str++, chars--) {
+	for (pos = (chars << 2) - 1; *str != '\0' && isxdigit(*str) && pos >= 0; str++) {
 		b = digittoint(*str);
 		for (n = 3; n >= 0; n--, pos--) {
 			if (b & (1 << n)) {
