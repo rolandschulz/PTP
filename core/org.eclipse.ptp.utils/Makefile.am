@@ -9,7 +9,8 @@ libutils_a_SOURCES =	src/bitset.c \
 						src/hash.c \
 						src/handler.c \
 						src/compat.c \
-						src/rangeset.c
+						src/rangeset.c \
+						src/serdes.c
 						
 libutils_a_CFLAGS =		-I./include $(AM_CFLAGS) -g 
 
