@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #ifndef _DBG_EVENT_H_
 #define _DBG_EVENT_H_
 
@@ -64,23 +64,23 @@
 
 struct dbg_suspend_event {
 	int	reason;
-	
+
 	union {
 		int				bpid;	/* DBGEV_SUSPEND_BPHIT */
 		signalinfo *	sig;	/* DBGEV_SUSPEND_SIGNAL */
 	} ev_u;
-	
+
 	int				thread_id;
 	stackframe *	frame;
 	int				depth;
-	
+
 	List *			changed_vars;
 };
 typedef struct dbg_suspend_event	dbg_suspend_event;
 
 struct dbg_exit_event {
 	int	reason;
-	
+
 	union {
 		int				exit_status;	/* DBGEV_EXIT_NORMAL */
 		signalinfo *	sig;			/* DBGEV_EXIT_SIGNAL */
@@ -99,7 +99,7 @@ struct dbg_bpset_event {
 	breakpoint *	bp;
 };
 typedef struct dbg_bpset_event	dbg_bpset_event;
-	
+
 struct dbg_data_event {
 	char *	type_desc;
 	AIF *	data;
@@ -129,73 +129,73 @@ struct dbg_event {
 	int			event_id;
 	int			trans_id;
 	bitset *	procs;
-	
+
 	union {
 		/*
 		 * DBGEV_INIT
 		 */
 		int					num_servers;
-		
+
 		/*
 		 * DBGEV_BPSET
 		 */
 		dbg_bpset_event		bpset_event;
-		
+
 		/*
 		 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS, DBGEV_SIGNALS
 		 */
 		List *				list;
-		
+
 		/*
 		 * DBGEV_TYPE
 		 */
 		char *				type_desc;
-		
+
 		/*
 		 * DBGEV_DATA
 		 */
 		dbg_data_event		data_event;
-			
+
 		/*
 		 * DBGEV_EXIT
 		 */
 		dbg_exit_event		exit_event;
-		
+
 		/*
 		 * DBGEV_ERROR
 		 */
 		dbg_error_event		error_event;
-	
+
 		/*
 		 * DBGEV_SUSPEND
 		 */
 		dbg_suspend_event	suspend_event;
-		
-		/* 
+
+		/*
 		 * DBGEV_STACK_DEPTH
 		 */
 		int					stack_depth;
-		 
+
 		/*
 		 * DBGEV_DATAR_MEM
 		 */
 		memoryinfo *		meminfo;
-		
+
 		/*
 		 * DBGEV_THREADS
 		 */
 		dbg_threads_event	threads_event;
-		
+
 		/*
 		 * DBGEV_THREAD_SELECT
 		 */
 		dbg_thread_select_event	thread_select_event;
-		
+
 		/*
 		 * DBGEV_DATA_EVA_EX
 		 */
 		char * data_expression;
-		
+
 		/*
 		 * DBGEV_PARTIAL_AIF
 		 */
@@ -206,7 +206,7 @@ struct dbg_event {
 typedef struct dbg_event dbg_event;
 
 extern int 			DbgDeserializeEvent(int, int, char **, dbg_event **);
-extern int 			DbgSerializeEvent(dbg_event *, char **);
+extern int 			DbgSerializeEvent(dbg_event *, char **, int *);
 extern dbg_event *	NewDbgEvent(int);
 extern void			FreeDbgEvent(dbg_event *);
 extern dbg_event *	DbgErrorEvent(int, char *);

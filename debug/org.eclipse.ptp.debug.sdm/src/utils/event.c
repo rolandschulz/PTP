@@ -1,19 +1,19 @@
 /******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly 
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ *
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
 #ifdef __gnu_linux__
@@ -43,15 +43,15 @@ dbg_add_breakpoint(proxy_msg *m, breakpoint *bp)
 {
 	proxy_msg_add_int(m, bp->id);
 	proxy_msg_add_int(m, bp->ignore);
-	proxy_msg_add_int(m, bp->special); 
+	proxy_msg_add_int(m, bp->special);
 	proxy_msg_add_int(m, bp->deleted);
 	proxy_msg_add_string(m, bp->type);
 	dbg_add_location(m, &bp->loc);
 	proxy_msg_add_int(m, bp->hits);
 }
 
-static void 
-dbg_add_signalinfo(proxy_msg *m, signalinfo *sig) 
+static void
+dbg_add_signalinfo(proxy_msg *m, signalinfo *sig)
 {
 	if (sig == NULL) {
 		proxy_msg_add_string(m, EMPTY);
@@ -72,18 +72,18 @@ dbg_add_stackframe(proxy_msg *m, stackframe *sf)
 		proxy_msg_add_string(m, EMPTY);
 		return;
 	}
-	
+
 	proxy_msg_add_int(m, sf->level);
-	dbg_add_location(m, &sf->loc);	
+	dbg_add_location(m, &sf->loc);
 }
 
 static void
 dbg_add_strings(proxy_msg *m, List *lst)
 {
 	char *	s;
-	
+
 	proxy_msg_add_int(m, SizeOfList(lst));
-	
+
 	for (SetList(lst); (s = (char *)GetListElement(lst)) != NULL; ) {
 		proxy_msg_add_string(m, s);
 	}
@@ -93,53 +93,53 @@ static void
 dbg_add_stackframes(proxy_msg *m, List *lst)
 {
 	stackframe *	s;
-	
+
 	proxy_msg_add_int(m, SizeOfList(lst));
-	
+
 	for (SetList(lst); (s = (stackframe *)GetListElement(lst)) != NULL; ) {
 		dbg_add_stackframe(m, s);
 	}
 }
 
-static void 
-dbg_add_signals(proxy_msg *m, List *lst) 
+static void
+dbg_add_signals(proxy_msg *m, List *lst)
 {
 	signalinfo *	s;
-	
+
 	proxy_msg_add_int(m, SizeOfList(lst));
-	
+
 	for (SetList(lst); (s = (signalinfo *)GetListElement(lst)) != NULL; ) {
 		dbg_add_signalinfo(m, s);
 	}
 }
 
-static void 
-dbg_add_memory(proxy_msg *m, memory *mem) 
+static void
+dbg_add_memory(proxy_msg *m, memory *mem)
 {
 	if (mem == NULL) {
 		proxy_msg_add_string(m, EMPTY);
 		return;
 	}
-	
+
 	proxy_msg_add_string(m, mem->addr);
 	proxy_msg_add_string(m, mem->ascii);
 	dbg_add_strings(m, mem->data);
 }
 
-static void 
-dbg_add_memories(proxy_msg *m, List *lst) 
+static void
+dbg_add_memories(proxy_msg *m, List *lst)
 {
 	memory *	mem;
-	
+
 	proxy_msg_add_int(m, SizeOfList(lst));
-	
+
 	for (SetList(lst); (mem = (memory *)GetListElement(lst)) != NULL; ) {
 		dbg_add_memory(m, mem);
 	}
 }
 
-static void 
-dbg_add_memoryinfo(proxy_msg *m, memoryinfo *meninfo) 
+static void
+dbg_add_memoryinfo(proxy_msg *m, memoryinfo *meninfo)
 {
 	if (meninfo == NULL) {
 		proxy_msg_add_string(m, EMPTY);
@@ -165,13 +165,13 @@ dbg_add_aif(proxy_msg *m, AIF *a)
 
 /*
  * Serialize a debug event for sending between debug servers.
- * 
+ *
  * Note that the serialized event does not include the bitset, since it is
  * only relevant to communication with the client. The bitset is
  * added just prior to sending back to the client.
  */
 int
-DbgSerializeEvent(dbg_event *e, char **result)
+DbgSerializeEvent(dbg_event *e, char **result, int *len)
 {
 	int			res = 0;
 	proxy_msg *	p = NULL;
@@ -180,24 +180,24 @@ DbgSerializeEvent(dbg_event *e, char **result)
 		return -1;
 
 	p = new_proxy_msg(e->event_id, e->trans_id);
-	
+
 	switch (e->event_id)
 	{
 	case DBGEV_OK:
 		break;
-		
+
 	case DBGEV_ERROR:
 		proxy_msg_add_int(p, e->dbg_event_u.error_event.error_code);
 		proxy_msg_add_string(p, e->dbg_event_u.error_event.error_msg);
 		break;
-	
+
 	case DBGEV_INIT:
 		proxy_msg_add_int(p, e->dbg_event_u.num_servers);
 		break;
-	
-	case DBGEV_SUSPEND:	
+
+	case DBGEV_SUSPEND:
 		proxy_msg_add_int(p, e->dbg_event_u.suspend_event.reason);
-		
+
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_BPHIT:
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.ev_u.bpid);
@@ -205,7 +205,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.depth);
 			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
 			break;
-			
+
 		case DBGEV_SUSPEND_SIGNAL:
 			dbg_add_signalinfo(p, e->dbg_event_u.suspend_event.ev_u.sig);
 			dbg_add_stackframe(p, e->dbg_event_u.suspend_event.frame);
@@ -213,7 +213,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.depth);
 			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
 			break;
-	
+
 		case DBGEV_SUSPEND_STEP:
 		case DBGEV_SUSPEND_INT:
 			dbg_add_stackframe(p, e->dbg_event_u.suspend_event.frame);
@@ -228,14 +228,14 @@ DbgSerializeEvent(dbg_event *e, char **result)
  		proxy_msg_add_int(p, e->dbg_event_u.bpset_event.bpid);
 		dbg_add_breakpoint(p, e->dbg_event_u.bpset_event.bp);
 		break;
-		
+
 	case DBGEV_SIGNALS:
  		dbg_add_signals(p, e->dbg_event_u.list);
 		break;
-	
+
 	case DBGEV_EXIT:
 		proxy_msg_add_int(p, e->dbg_event_u.exit_event.reason);
-	 	
+
 		switch (e->dbg_event_u.exit_event.reason) {
 		case DBGEV_EXIT_NORMAL:
 			proxy_msg_add_int(p, e->dbg_event_u.exit_event.ev_u.exit_status);
@@ -246,7 +246,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 			break;
 		}
 		break;
-	
+
 	case DBGEV_FRAMES:
  		dbg_add_stackframes(p, e->dbg_event_u.list);
 		break;
@@ -255,12 +255,12 @@ DbgSerializeEvent(dbg_event *e, char **result)
  		proxy_msg_add_int(p, e->dbg_event_u.thread_select_event.thread_id);
 		dbg_add_stackframe(p, e->dbg_event_u.thread_select_event.frame);
 		break;
-	
+
 	case DBGEV_THREADS:
  		proxy_msg_add_int(p, e->dbg_event_u.threads_event.thread_id);
 		dbg_add_strings(p, e->dbg_event_u.threads_event.list);
 		break;
-		
+
 	case DBGEV_STACK_DEPTH:
  		proxy_msg_add_int(p, e->dbg_event_u.stack_depth);
 		break;
@@ -268,7 +268,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 	case DBGEV_DATAR_MEM:
  		dbg_add_memoryinfo(p, e->dbg_event_u.meminfo);
 		break;
-		
+
 	case DBGEV_VARS:
  		dbg_add_strings(p, e->dbg_event_u.list);
 		break;
@@ -285,11 +285,11 @@ DbgSerializeEvent(dbg_event *e, char **result)
  		dbg_add_aif(p, e->dbg_event_u.data_event.data);
 		proxy_msg_add_string(p, e->dbg_event_u.data_event.type_desc);
 		break;
-	
+
 	case DBGEV_DATA_EVA_EX:
  		proxy_msg_add_string(p, e->dbg_event_u.data_expression);
 		break;
-		
+
 	case DBGEV_PARTIAL_AIF:
  		dbg_add_aif(p, e->dbg_event_u.partial_aif_event.data);
 		proxy_msg_add_string(p, e->dbg_event_u.partial_aif_event.type_desc);
@@ -300,8 +300,8 @@ DbgSerializeEvent(dbg_event *e, char **result)
 		res = -1;
 		break;
 	}
-	
-	return proxy_serialize_msg(p, result);
+
+	return proxy_serialize_msg(p, result, len);
 }
 
 static int
@@ -309,10 +309,10 @@ dbg_str_to_int(char ***args, int *nargs, int *val)
 {
 	if (*nargs < 1)
 		return -1;
-		
+
 	proxy_get_int(*(*args)++, val);
 	*nargs--;
-	
+
 	return 0;
 }
 
@@ -321,10 +321,10 @@ dbg_copy_str(char ***args, int *nargs, char **str)
 {
 	if (*nargs < 1)
 		return -1;
-		
+
 	*str = strdup(*(*args)++);
 	*nargs--;
-	
+
 	return 0;
 }
 
@@ -333,10 +333,10 @@ dbg_str_to_data(char ***args, int *nargs, char **data, int *len)
 {
 	if (*nargs < 1)
 		return -1;
-		
+
 	proxy_get_data(*(*args)++, data, len);
 	*nargs--;
-	
+
 	return 0;
 }
 
@@ -350,7 +350,7 @@ dbg_str_to_location(char ***args, int *nargs, location *loc)
 			FreeLocation(loc);
 			return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -359,13 +359,13 @@ dbg_str_to_breakpoint(char ***args, int *nargs, breakpoint **bp)
 {
 	int				id;
 	breakpoint *	b;
-	
+
 	if (dbg_str_to_int(args, nargs, &id) < 0) {
 		return -1;
 	}
-		
+
 	b = NewBreakpoint(id);
-	
+
 	if (dbg_str_to_int(args, nargs, &b->ignore) < 0 ||
 		dbg_str_to_int(args, nargs, &b->special) < 0 ||
 		dbg_str_to_int(args, nargs, &b->deleted) < 0 ||
@@ -377,7 +377,7 @@ dbg_str_to_breakpoint(char ***args, int *nargs, breakpoint **bp)
 	}
 
 	*bp = b;
-	
+
 	return 0;
 }
 
@@ -386,55 +386,55 @@ dbg_str_to_stackframe(char ***args, int *nargs, stackframe **frame)
 {
 	int				level;
 	stackframe *	sf;
-	
+
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
 		*nargs--;
 		*frame = NULL;
 		return 0;
 	}
-	
+
 	if (dbg_str_to_int(args, nargs, &level) < 0) {
 		return -1;
 	}
-		
+
 	sf = NewStackframe(level);
-	
+
 	if (dbg_str_to_location(args, nargs, &sf->loc) < 0) {
 		FreeStackframe(sf);
 		return -1;
 	}
-	
+
 	*frame = sf;
-	
+
 	return 0;
 }
 
-static int 
-dbg_str_to_signalinfo(char ***args, int *nargs, signalinfo **sig) 
+static int
+dbg_str_to_signalinfo(char ***args, int *nargs, signalinfo **sig)
 {
 	signalinfo *s;
-	
+
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
 		*nargs--;
 		*sig = NULL;
 		return 0;
 	}
-	
+
 	s = NewSignalInfo();
-	
+
 	if (dbg_copy_str(args, nargs, &s->name) < 0 ||
 		dbg_str_to_int(args, nargs, &s->stop) < 0 ||
 		dbg_str_to_int(args, nargs, &s->print) < 0 ||
-		dbg_str_to_int(args, nargs, &s->pass) < 0 || 
+		dbg_str_to_int(args, nargs, &s->pass) < 0 ||
 		dbg_copy_str(args, nargs, &s->desc) < 0) {
 			FreeSignalInfo(s);
 			return -1;
 	}
 
 	*sig = s;
-	
+
 	return 0;
 }
 
@@ -448,9 +448,9 @@ dbg_str_to_stackframes(char ***args, int *nargs, List **lst)
 	if (dbg_str_to_int(args, nargs, &count) < 0) {
 		return -1;
 	}
-	
+
 	*lst = NewList();
-	
+
 	for (i = 0; i < count; i++) {
 		if (dbg_str_to_stackframe(args, nargs, &sf) < 0) {
 			DestroyList(*lst, FreeStackframe);
@@ -458,12 +458,12 @@ dbg_str_to_stackframes(char ***args, int *nargs, List **lst)
 		}
 		AddToList(*lst, (void *)sf);
 	}
-	
+
 	return 0;
 }
 
-static int 
-dbg_str_to_signals(char ***args, int *nargs, List **lst) 
+static int
+dbg_str_to_signals(char ***args, int *nargs, List **lst)
 {
 	int				i;
 	int				count;
@@ -471,9 +471,9 @@ dbg_str_to_signals(char ***args, int *nargs, List **lst)
 
 	if (dbg_str_to_int(args, nargs, &count) < 0) {
 	}
-		
+
 	*lst = NewList();
-	
+
 	for (i = 0; i < count; i++) {
 		if (dbg_str_to_signalinfo(args, nargs, &sig) < 0) {
 			DestroyList(*lst, FreeMemory);
@@ -481,7 +481,7 @@ dbg_str_to_signals(char ***args, int *nargs, List **lst)
 		}
 		AddToList(*lst, (void *)sig);
 	}
-	
+
 	return 0;
 }
 
@@ -491,13 +491,13 @@ dbg_str_to_list(char ***args, int *nargs, List **lst)
 	int		i;
 	int		count;
 	char *	str;
-	
+
 	if (dbg_str_to_int(args, nargs, &count) < 0) {
 		return -1;
 	}
-		
+
 	*lst = NewList();
-	
+
 	for (i = 0; i < count; i++) {
 		if (dbg_copy_str(args, nargs, &str) < 0) {
 			DestroyList(*lst, free);
@@ -505,7 +505,7 @@ dbg_str_to_list(char ***args, int *nargs, List **lst)
 		}
 		AddToList(*lst, (void *)str);
 	}
-	
+
 	return 0;
 }
 
@@ -516,24 +516,24 @@ dbg_str_to_aif(char ***args, int *nargs, AIF **res)
 	AIF *	a;
 	char *	fmt;
 	char *	data;
-	
+
 	if (dbg_copy_str(args, nargs, &fmt) < 0 ||
 		dbg_str_to_data(args, nargs, &data, &data_len) < 0) {
 			return -1;
 	}
-	
+
 	a = NewAIF(0, 0);
 	AIF_FORMAT(a) = fmt;
 	AIF_DATA(a) = data;
 	AIF_LEN(a) = data_len;
-	
+
 	*res = a;
-	
+
 	return 0;
 }
 
-static int 
-dbg_str_to_memory_data(char ***args, int *nargs, List **lst) 
+static int
+dbg_str_to_memory_data(char ***args, int *nargs, List **lst)
 {
 	int		i;
 	int		count;
@@ -544,7 +544,7 @@ dbg_str_to_memory_data(char ***args, int *nargs, List **lst)
 	}
 
 	*lst = NewList();
-	
+
 	for (i = 0; i < count; i++) {
 		if (dbg_copy_str(args, nargs, &str) < 0) {
 			DestroyList(*lst, free);
@@ -552,23 +552,23 @@ dbg_str_to_memory_data(char ***args, int *nargs, List **lst)
 		}
 		AddToList(*lst, (void *)str);
 	}
-	
+
 	return 0;
 }
 
 
-static int 
-dbg_str_to_memory(char ***args, int *nargs, List **lst) 
+static int
+dbg_str_to_memory(char ***args, int *nargs, List **lst)
 {
 	int			i;
 	int			count;
 	memory *	m;
-	
+
 	if (dbg_str_to_int(args, nargs, &count) < 0) {
 	}
 
 	*lst = NewList();
-	
+
 	for (i = 0; i < count; i++) {
 		m = NewMemory();
 		if (dbg_copy_str(args, nargs, &m->addr) < 0 ||
@@ -579,18 +579,18 @@ dbg_str_to_memory(char ***args, int *nargs, List **lst)
 		}
 		AddToList(*lst, (void *)m);
 	}
-	
+
 	return 0;
 }
 
-static int 
-dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info) 
+static int
+dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info)
 {
 	memoryinfo * meminfo;
-	
+
 	if (*nargs < 1)
 		return -1;
-		
+
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
 		*nargs--;
@@ -598,7 +598,7 @@ dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info)
 	}
 
 	meminfo = NewMemoryInfo();
-	
+
 	if (dbg_copy_str(args, nargs, &meminfo->addr) < 0 ||
 		dbg_str_to_int(args, nargs, (int *)&meminfo->nextRow) < 0 ||
 		dbg_str_to_int(args, nargs, (int *)&meminfo->prevRow) < 0 ||
@@ -610,9 +610,9 @@ dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info)
 			FreeMemoryInfo(meminfo);
 			return -1;
 	}
-	
+
 	*info = meminfo;
-	
+
 	return 0;
 }
 
@@ -626,29 +626,29 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 {
 	dbg_event *	e = NULL;
 	bitset *	procs = NULL;
-	
+
 	proxy_get_bitset(*args++, &procs);
 	nargs--;
 
 	e = NewDbgEvent(id);
-		
+
 	switch (id)
 	{
 	case DBGEV_OK:
 		break;
-		
+
 	case DBGEV_ERROR:
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.error_event.error_code);
 		dbg_copy_str(&args, &nargs, &e->dbg_event_u.error_event.error_msg);
 		break;
-		
+
 	case DBGEV_INIT:
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.num_servers);
 		break;
-		
+
 	case DBGEV_SUSPEND:
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.reason);
-			
+
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_BPHIT:
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.ev_u.bpid);
@@ -672,13 +672,13 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.depth);
 			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
-		
+
 		default:
 			goto error_out;
 		}
-		
+
 		break;
-	
+
 	case DBGEV_BPSET:
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.bpset_event.bpid);
 		dbg_str_to_breakpoint(&args, &nargs, &e->dbg_event_u.bpset_event.bp);
@@ -687,10 +687,10 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 	case DBGEV_SIGNALS:
 		dbg_str_to_signals(&args, &nargs, &e->dbg_event_u.list);
 		break;
-	
+
 	case DBGEV_EXIT:
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.exit_event.reason);
-			
+
 		switch (e->dbg_event_u.exit_event.reason) {
 		case DBGEV_EXIT_NORMAL:
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.exit_event.ev_u.exit_status);
@@ -699,11 +699,11 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 		case DBGEV_EXIT_SIGNAL:
 			dbg_str_to_signalinfo(&args, &nargs, &e->dbg_event_u.exit_event.ev_u.sig);
 			break;
-			
+
 		default:
 			goto error_out;
 		}
-		
+
 		break;
 
 	case DBGEV_FRAMES:
@@ -714,7 +714,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.thread_select_event.thread_id);
 		dbg_str_to_stackframe(&args, &nargs, &e->dbg_event_u.thread_select_event.frame);
 		break;
-	
+
 	case DBGEV_THREADS:
 		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.threads_event.thread_id);
 		dbg_str_to_list(&args, &nargs, &e->dbg_event_u.threads_event.list);
@@ -727,7 +727,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 	case DBGEV_DATAR_MEM:
 		dbg_str_to_memoryinfo(&args, &nargs, &e->dbg_event_u.meminfo);
 		break;
-	
+
 	case DBGEV_VARS:
 		dbg_str_to_list(&args, &nargs, &e->dbg_event_u.list);
 		break;
@@ -758,41 +758,41 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 	default:
 		goto error_out;
 	}
-	
+
 	e->procs = procs;
 	*ev = e;
-	
+
 	return 0;
-	
+
 error_out:
 
 	if (procs != NULL)
 		bitset_free(procs);
-	
+
 	if (e != NULL)
 		FreeDbgEvent(e);
-		
+
 	return -1;
 }
 
-dbg_event *	
+dbg_event *
 NewDbgEvent(int event) {
 	dbg_event *	e = (dbg_event *)malloc(sizeof(dbg_event));
-	
+
 	memset((void *)e, 0, sizeof(dbg_event));
-	 
+
 	e->event_id = event;
-	
+
 	return e;
 }
 
-void	
+void
 FreeDbgEvent(dbg_event *e) {
 	switch (e->event_id) {
 	case DBGEV_OK:
 	case DBGEV_INIT:
 		break;
-		
+
 	case DBGEV_SUSPEND:
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_SIGNAL:
@@ -802,18 +802,18 @@ FreeDbgEvent(dbg_event *e) {
 		case DBGEV_SUSPEND_INT:
 		case DBGEV_SUSPEND_STEP:
 			break;
-			
+
 		case DBGEV_SUSPEND_BPHIT:
 			break;
 		}
-		
+
 		if (e->dbg_event_u.suspend_event.frame != NULL)
 			FreeStackframe(e->dbg_event_u.suspend_event.frame);
 		if (e->dbg_event_u.suspend_event.changed_vars != NULL)
 			DestroyList(e->dbg_event_u.suspend_event.changed_vars, free);
 
 		break;
-			
+
 	case DBGEV_EXIT:
 		switch (e->dbg_event_u.suspend_event.reason) {
 			case DBGEV_EXIT_SIGNAL:
@@ -824,29 +824,29 @@ FreeDbgEvent(dbg_event *e) {
 				break;
 		}
 		break;
-		
+
 	case DBGEV_FRAMES:
 		if (e->dbg_event_u.list != NULL)
 			DestroyList(e->dbg_event_u.list, FreeStackframe);
 		break;
-		
+
 	case DBGEV_DATA:
 		if (e->dbg_event_u.data_event.data != NULL)
 			AIFFree(e->dbg_event_u.data_event.data);
 		if (e->dbg_event_u.data_event.type_desc != NULL)
 			free(e->dbg_event_u.data_event.type_desc);
 		break;
-		
+
 	case DBGEV_TYPE:
 		if (e->dbg_event_u.type_desc != NULL)
 			free(e->dbg_event_u.type_desc);
 		break;
-		
+
 	case DBGEV_THREAD_SELECT:
 		if (e->dbg_event_u.thread_select_event.frame != NULL)
 			FreeStackframe(e->dbg_event_u.thread_select_event.frame);
 		break;
-			
+
 	case DBGEV_THREADS:
 		if (e->dbg_event_u.threads_event.list != NULL)
 			DestroyList(e->dbg_event_u.threads_event.list, free);
@@ -887,7 +887,7 @@ FreeDbgEvent(dbg_event *e) {
 			free(e->dbg_event_u.partial_aif_event.name);
 		break;
 	}
-	
+
 	if (e->procs != NULL)
 		bitset_free(e->procs);
 
@@ -898,10 +898,10 @@ dbg_event *
 DbgErrorEvent(int err, char *msg)
 {
 	dbg_event *	e = NewDbgEvent(DBGEV_ERROR);
-	
+
 	e->dbg_event_u.error_event.error_code = err;
 	if (msg != NULL)
 		e->dbg_event_u.error_event.error_msg = strdup(msg);
-		
+
 	return e;
 }
