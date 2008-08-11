@@ -29,6 +29,7 @@
 #include "proxy_msg.h"
 #include "args.h"
 #include "list.h"
+#include "serdes.h"
 #include "compat.h"
 
 #ifdef __linux__
@@ -45,16 +46,18 @@ static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B
  * Note: packet length is added when the packet is transmitted.
  */
 int
-proxy_serialize_msg(proxy_msg *m, char **result)
+proxy_serialize_msg(proxy_msg *m, char **result, int *result_len)
 {
 	int		i;
 	int		hdr_len;
 	int		arg_len;
 	int		len = 0;
 	char *	packet;
+	char *	p;
 
-	if (m == NULL)
+	if (m == NULL) {
 		return -1;
+	}
 
 	/*
 	 * Compute packet length.
@@ -71,23 +74,26 @@ proxy_serialize_msg(proxy_msg *m, char **result)
 	/*
 	 * Allocate packet
 	 */
-	packet = (char *)malloc(hdr_len + len + 1);
+	packet = p = (char *)malloc(hdr_len + len);
 
-	sprintf(packet, " %0*x:%0*x:%0*x",
-		MSG_ID_SIZE, m->msg_id & MSG_ID_MASK,
-		MSG_TRANS_ID_SIZE, m->trans_id & MSG_TRANS_ID_MASK,
-		MSG_NARGS_SIZE, m->num_args & MSG_NARGS_MASK);
-
-	len = hdr_len;
+	*p++ = ' ';
+	int_to_hex_str(m->msg_id, p, MSG_ID_SIZE, &p);
+	*p++ = ':';
+	int_to_hex_str(m->trans_id, p, MSG_TRANS_ID_SIZE, &p);
+	*p++ = ':';
+	int_to_hex_str(m->num_args, p, MSG_NARGS_SIZE, &p);
 
 	for (i = 0; i < m->num_args; i++) {
 		arg_len = strlen(m->args[i]);
-		sprintf(packet + len, " %0*x:%s",
-			MSG_ARG_LEN_SIZE, arg_len & MSG_ARG_LEN_MASK, m->args[i]);
-		len += arg_len + MSG_ARG_LEN_SIZE + 2;
+		*p++ = ' ';
+		int_to_hex_str(arg_len, p, MSG_ARG_LEN_SIZE, &p);
+		*p++ = ':';
+		memcpy(p, m->args[i], arg_len);
+		p += arg_len;
 	}
 
 	*result = packet;
+	*result_len = hdr_len + len;
 
 	return 0;
 }
@@ -138,11 +144,12 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	int			trans_id;
 	int			num_args;
 	proxy_msg *	m = NULL;
-	char		sep;
 	char *		arg;
 	char *		end;
 
-	if (packet == NULL || *packet != ' ' || packet_len < MSG_ID_SIZE + MSG_TRANS_ID_SIZE + MSG_NARGS_SIZE + 3) {
+	if (packet == NULL ||
+			*packet != ' ' ||
+			packet_len < MSG_ID_SIZE + MSG_TRANS_ID_SIZE + MSG_NARGS_SIZE + 3) {
 		return -1;
 	}
 
@@ -150,43 +157,37 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	 * message ID
 	 */
 	packet++; /* Skip space */
-	end = packet + MSG_ID_SIZE;
-	sep = *end;
-	*end = '\0';
-	msg_id = strtol(packet, NULL, 16);
-	*end++ = sep;
+	msg_id = hex_str_to_int(packet, MSG_ID_SIZE, &end);
+	end++; /* Skip separator */
 
 	/*
 	 * transaction ID
 	 */
 	packet = end;
-	end = packet + MSG_TRANS_ID_SIZE;
-	sep = *end;
-	*end = '\0';
-	trans_id = strtol(packet, NULL, 16);
-	*end++ = sep;
+	trans_id = hex_str_to_int(packet, MSG_TRANS_ID_SIZE, &end);
+	end++;
 
 	/*
 	 * number of args
 	 */
 	packet = end;
-	end = packet + MSG_NARGS_SIZE;
-	sep = *end;
-	*end = '\0';
-	num_args = strtol(packet, NULL, 16);
-	*end++ = sep;
+	num_args = hex_str_to_int(packet, MSG_NARGS_SIZE, &end);
+	end++;
 
 	m = new_proxy_msg(msg_id, trans_id);
 
 	packet = end;
+	packet_len -= (MSG_ID_SIZE + MSG_TRANS_ID_SIZE + MSG_NARGS_SIZE + 3);
 
 	for (i = 0; i < num_args; i++) {
-		if (proxy_msg_decode_string(packet, &arg, &packet) < 0) {
+		if (proxy_msg_decode_string(packet, packet_len, &arg, &end) < 0) {
 			free_proxy_msg(m);
 			return -1;
 		}
 		proxy_msg_add_string_nocopy(m, arg);
-		packet++; /* skip space */
+		end++; /* skip space */
+		packet_len -= (end - packet);
+		packet = end;
 	}
 
 	*msg = m;
@@ -199,25 +200,20 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
  * the end of the string in 'end'
  */
 int
-proxy_msg_decode_string(char *str, char **arg, char **end)
+proxy_msg_decode_string(char *str, int len, char **arg, char **end)
 {
 	int		arg_len;
-	int 	str_len = strlen(str);
-	char	sep;
 	char *	ep;
 	char *	p;
 
-	if (str_len < MSG_ARG_LEN_SIZE + 1) {
+	if (len < MSG_ARG_LEN_SIZE + 1) {
 		return -1;
 	}
 
-	ep = str + MSG_ARG_LEN_SIZE;
-	sep = *ep;
-	*ep = '\0';
-	arg_len = strtol(str, NULL, 16);
-	*ep++ = sep;
+	arg_len = hex_str_to_int(str, MSG_ARG_LEN_SIZE, &ep);
+	ep++;
 
-	if (str_len < MSG_ARG_LEN_SIZE + arg_len + 1) {
+	if (len < MSG_ARG_LEN_SIZE + arg_len + 1) {
 		return -1;
 	}
 

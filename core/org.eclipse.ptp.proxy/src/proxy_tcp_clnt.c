@@ -1,19 +1,19 @@
 /******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly 
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ *
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
 
@@ -22,7 +22,7 @@
  * client debugger, since they may be running on different hosts, and will
  * certainly be running in different processes.
  */
- 
+
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
@@ -70,7 +70,7 @@ proxy_tcp_clnt_recv_msgs(int fd, void *data)
 {
 	proxy_clnt *				clnt = (proxy_clnt *)data;
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)clnt->clnt_data;
-	
+
 	return proxy_tcp_recv_msgs(conn);
 }
 
@@ -83,28 +83,28 @@ proxy_tcp_clnt_init(proxy_clnt *pc, void **data, char *attr, va_list ap)
 	int					port;
 	char *				host = NULL;
 	proxy_tcp_conn *		conn;
-	
+
 	while (attr != NULL) {
 		if (strcmp(attr, "host") == 0)
 			host = strdup(va_arg(ap, char *));
 		else if (strcmp(attr, "port") == 0)
 			port = va_arg(ap, int);
-			
+
 		attr = va_arg(ap, char *);
 	}
 
 	proxy_tcp_create_conn(&conn);
-	
+
 	conn->clnt = pc;
 	if (host != NULL)
 		conn->host = strdup(host);
 	conn->port = port;
 
 	*data = (void *)conn;
-	
+
 	return PROXY_RES_OK;
 }
-		
+
 /**
  * Connect to a remote proxy.
  */
@@ -116,35 +116,35 @@ proxy_tcp_clnt_connect(proxy_clnt *pc)
 	long int					haddr;
 	struct sockaddr_in		scket;
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)pc->clnt_data;
-		        
+
 	if (conn->host == NULL) {
 		proxy_set_error(PROXY_ERR_CLIENT, "no host specified");
 		return PROXY_RES_ERR;
 	}
-	
+
 	hp = gethostbyname(conn->host);
-	        
+
 	if (hp == (struct hostent *)NULL) {
 		proxy_set_error(PROXY_ERR_CLIENT, "could not find host");
 		return PROXY_RES_ERR;
 	}
-	
+
 	haddr = ((hp->h_addr[0] & 0xff) << 24) |
 			((hp->h_addr[1] & 0xff) << 16) |
 			((hp->h_addr[2] & 0xff) <<  8) |
 			((hp->h_addr[3] & 0xff) <<  0);
-	
+
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		return PROXY_RES_ERR;
 	}
-	
+
 	memset (&scket,0,sizeof(scket));
 	scket.sin_family = PF_INET;
 	scket.sin_port = htons((u_short) conn->port);
 	scket.sin_addr.s_addr = htonl(haddr);
-	
+
 	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
@@ -162,51 +162,51 @@ proxy_tcp_clnt_connect(proxy_clnt *pc)
 	return PROXY_RES_OK;
 }
 
-static int 
+static int
 proxy_tcp_clnt_create(proxy_clnt *pc)
 {
 	socklen_t				slen;
 	SOCKET					sd;
 	struct sockaddr_in		sname;
 	proxy_tcp_conn *		conn = (proxy_tcp_conn *)pc->clnt_data;
-	
+
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		return PROXY_RES_ERR;
 	}
-	
+
 	memset (&sname, 0, sizeof(sname));
 	sname.sin_family = PF_INET;
 	sname.sin_port = htons(conn->port);
 	sname.sin_addr.s_addr = htonl(INADDR_ANY);
-	
+
 	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return PROXY_RES_ERR;
 	}
-	
+
 	slen = sizeof(sname);
-	
+
 	if ( getsockname(sd, (struct sockaddr *)&sname, &slen) == SOCKET_ERROR )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return PROXY_RES_ERR;
 	}
-	
+
 	if ( listen(sd, 5) == SOCKET_ERROR )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return PROXY_RES_ERR;
 	}
-	
+
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
-	
+
 	RegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)pc);
 	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_tcp_clnt_event_callback, (void *)pc);
 	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_tcp_clnt_cmd_callback, (void *)pc);
@@ -222,14 +222,14 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	struct sockaddr			addr;
 	proxy_clnt *			pc = (proxy_clnt *)data;
 	proxy_tcp_conn *		conn = (proxy_tcp_conn *)pc->clnt_data;
-	
+
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
 	if (ns < 0) {
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		return PROXY_RES_ERR;
 	}
-	
+
 	/*
 	 * Only allow one connection at a time.
 	 */
@@ -237,10 +237,10 @@ proxy_tcp_clnt_accept(int fd, void *data)
 		CLOSE_SOCKET(ns); // reject
 		return PROXY_RES_OK;
 	}
-	
+
 	conn->sess_sock = ns;
 	conn->connected++;
-	
+
 	RegisterFileHandler(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)pc);
 
 	if (pc->clnt_helper_funcs->eventhandler != NULL) {
@@ -249,9 +249,9 @@ proxy_tcp_clnt_accept(int fd, void *data)
 		pc->clnt_helper_funcs->eventhandler(m, pc->clnt_helper_funcs->eventdata);
 		free_proxy_msg(m);
 	}
-	
+
 	return PROXY_RES_OK;
-	
+
 }
 
 static void
@@ -266,7 +266,7 @@ proxy_tcp_clnt_process_events(proxy_msg *msg, void *data)
 	CallEventHandlers(PROXY_EVENT_HANDLER, (void *)msg);
 }
 
-static int 
+static int
 proxy_tcp_clnt_progress(proxy_clnt *clnt)
 {
 	fd_set					rfds;
@@ -281,7 +281,7 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 
 	/* Set up fd sets */
 	GenerateFDSets(&nfds, &rfds, &wfds, &efds);
-	
+
 	if (clnt->clnt_timeout == NULL) {
 		timeout = NULL;
 	} else {
@@ -290,15 +290,15 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
-	
+
 		switch (res) {
 		case INVALID_SOCKET:
 			if ( errno == EINTR )
 				continue;
-		
+
 			perror("socket");
 			return PROXY_RES_ERR;
-		
+
 		case 0:
 			/* Timeout. */
 			break;
@@ -307,12 +307,12 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 			if (CallFileHandlers(&rfds, &wfds, &efds) < 0)
 				return PROXY_RES_ERR;
 		}
-	
+
 		break;
 	}
 
 	proxy_tcp_clnt_process_cmds();
-	
+
 	return PROXY_RES_OK;
 }
 
@@ -331,7 +331,7 @@ proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 	if (proxy_tcp_get_msg(conn, &result, &len) <= 0 ||
 		clnt->clnt_helper_funcs->eventhandler == NULL)
 		return;
-	
+
 	if (proxy_deserialize_msg(result, len, &m) < 0) {
 		m = new_proxy_msg(PROXY_EV_MESSAGE, 0); // TODO trans id should NOT be 0
 		proxy_msg_add_int(m, 3); /* 3 attributes */
@@ -339,9 +339,9 @@ proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 		proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, PROXY_ERR_PROTO);
 		proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, "Could not covert to event");
 	}
-	
+
 	free(result);
-	
+
 	clnt->clnt_helper_funcs->eventhandler(m, clnt->clnt_helper_funcs->eventdata);
 }
 
@@ -352,12 +352,13 @@ proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 static void
 proxy_tcp_clnt_cmd_callback(void *cmd_data, void *data)
 {
+	int						len;
 	char *					str;
 	proxy_clnt *			clnt = (proxy_clnt *)cmd_data;
 	proxy_tcp_conn *		conn = (proxy_tcp_conn *)clnt->clnt_data;
 	proxy_msg *				msg = (proxy_msg *)data;
 
-	if (proxy_serialize_msg(msg, &str) < 0) {
+	if (proxy_serialize_msg(msg, &str, &len) < 0) {
 		/*
 		 * TODO should send an error back to proxy peer
 		 */
@@ -365,6 +366,6 @@ proxy_tcp_clnt_cmd_callback(void *cmd_data, void *data)
 		return;
 	}
 
-	(void)proxy_tcp_send_msg(conn, str, strlen(str));
+	(void)proxy_tcp_send_msg(conn, str, len);
 	free(str);
 }

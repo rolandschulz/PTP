@@ -1,19 +1,19 @@
 /******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly 
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ *
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
 
@@ -69,12 +69,13 @@ proxy_svr_funcs proxy_stdio_svr_funcs =
 static void
 proxy_stdio_svr_event_callback(void *ev_data, void *data)
 {
+	int					len;
 	proxy_svr *			svr = (proxy_svr *)ev_data;
 	proxy_stdio_conn *	conn = (proxy_stdio_conn *)svr->svr_data;
 	proxy_msg *			msg = (proxy_msg *)data;
 	char *				str;
-	
-	if (proxy_serialize_msg(msg, &str) < 0) {
+
+	if (proxy_serialize_msg(msg, &str, &len) < 0) {
 		/*
 		 * TODO should send an error back to proxy peer
 		 */
@@ -82,9 +83,7 @@ proxy_stdio_svr_event_callback(void *ev_data, void *data)
 		return;
 	}
 
-	DEBUG_PRINT("SVR reply <%s>\n", str);
-	
-	(void)proxy_stdio_send_msg(conn, str, strlen(str));
+	(void)proxy_stdio_send_msg(conn, str, len);
 	free(str);
 }
 
@@ -113,16 +112,16 @@ proxy_stdio_svr_init(proxy_svr *svr, void **data)
 	proxy_stdio_create_conn(&conn);
 	conn->svr = svr;
 	*data = (void *)conn;
-	
+
 	return PROXY_RES_OK;
 }
 
 /**
- * Create server socket and bind address to it. 
- * 
+ * Create server socket and bind address to it.
+ *
  * @return conn structure containing server socket and port
  */
-static int 
+static int
 proxy_stdio_svr_create(proxy_svr *svr, int port)
 {
 	return PROXY_RES_OK;
@@ -138,30 +137,30 @@ proxy_stdio_svr_connect(proxy_svr *svr, char *host, int port)
 
 	conn->sess_in = 0;
 	conn->sess_out = 1;
-	
+
 	RegisterFileHandler(conn->sess_in, READ_FILE_HANDLER, proxy_stdio_svr_recv_msgs, (void *)svr);
 	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_stdio_svr_event_callback, (void *)svr);
 	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_stdio_svr_cmd_callback, (void *)svr);
-	
+
 	return PROXY_RES_OK;
 }
 
 /**
  * Cleanup prior to server exit.
  */
-static void 
+static void
 proxy_stdio_svr_finish(proxy_svr *svr)
 {
 	proxy_stdio_conn *	conn = (proxy_stdio_conn *)svr->svr_data;
-	
+
 	if (conn->sess_in != INVALID_SOCKET) {
 		UnregisterFileHandler(conn->sess_in);
 	}
-	
+
 	if (conn->sess_out != INVALID_SOCKET) {
 		UnregisterFileHandler(conn->sess_out);
 	}
-	
+
 	proxy_stdio_destroy_conn(conn);
 }
 
@@ -181,7 +180,7 @@ proxy_stdio_svr_process_events(proxy_msg *msg, void *data)
 }
 
 /**
- * Processes any queued events Also checks for ready file descriptors 
+ * Processes any queued events Also checks for ready file descriptors
  * and calls appropriate handlers.
  */
 static int
@@ -199,7 +198,7 @@ proxy_stdio_svr_progress(proxy_svr *svr)
 
 	/* Set up fd sets */
 	GenerateFDSets(&nfds, &rfds, &wfds, &efds);
-	
+
 	if (svr->svr_timeout == NULL) {
 		timeout = NULL;
 	} else {
@@ -208,15 +207,15 @@ proxy_stdio_svr_progress(proxy_svr *svr)
 
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
-	
+
 		switch (res) {
 		case INVALID_SOCKET:
 			if ( errno == EINTR )
 				continue;
-		
+
 			perror("socket");
 			return PROXY_RES_ERR;
-		
+
 		case 0:
 			/* Timeout. */
 			break;
@@ -225,13 +224,13 @@ proxy_stdio_svr_progress(proxy_svr *svr)
 			if (CallFileHandlers(&rfds, &wfds, &efds) < 0)
 				return PROXY_RES_ERR;
 		}
-	
+
 		break;
 	}
 
 	proxy_stdio_svr_process_cmds();
 
-	return 0;	
+	return 0;
 }
 
 /*
@@ -251,7 +250,7 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 	proxy_cmd			cmd;
 
 	DEBUG_PRINT("SVR received <%s>\n", msg);
-	
+
 	if (proxy_deserialize_msg(msg, len, &m) < 0) {
 		proxy_msg *err = new_proxy_msg(0, PROXY_EV_MESSAGE);
 		proxy_msg_add_int(err, 3); /* 3 attributes */
@@ -264,9 +263,9 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 		proxy_queue_msg(svr->svr_events, err);
 		return 0;
 	}
-    
+
     idx = m->msg_id - cmd_tab->cmd_base;
-                    
+
 	if (idx >= 0 && idx < cmd_tab->cmd_size) {
 		cmd = cmd_tab->cmd_funcs[idx];
 		if (cmd != NULL) {
@@ -283,9 +282,9 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 		free(err_str);
 		proxy_queue_msg(svr->svr_events, err);
 	}
-	
+
 	free_proxy_msg(m);
-	
+
 	return 0;
 }
 
@@ -294,6 +293,6 @@ proxy_stdio_svr_recv_msgs(int fd, void *data)
 {
 	proxy_svr *			svr = (proxy_svr *)data;
 	proxy_stdio_conn *	conn = (proxy_stdio_conn *)svr->svr_data;
-	
+
 	return proxy_stdio_recv_msgs(conn);
 }
