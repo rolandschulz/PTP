@@ -122,13 +122,13 @@ dbg_clnt_cmd_completed(sdm_message msg)
 }
 
 static int
-send_command(sdm_idset dest, int timeout, char *cmd, void *cbdata)
+send_command(sdm_idset dest, int timeout, char *cmd, int len, void *cbdata)
 {
 	sdm_message 	msg;
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send_command %s\n", sdm_route_get_id(), _set_to_str(dest));
 
-	msg = sdm_message_new(cmd, strlen(cmd));
+	msg = sdm_message_new(cmd, len);
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
 	sdm_set_union(sdm_message_get_destination(msg), dest);
 
@@ -220,14 +220,15 @@ int
 DbgClntStartSession(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_STARTSESSION_CMD, tid);
 
 	proxy_msg_add_int(msg, SERVER_TIMEOUT);
 	proxy_msg_add_args_nocopy(msg, nargs, args);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(dbg_procs, DBG_EV_WAITALL, buf, NULL);
+	res = send_command(dbg_procs, DBG_EV_WAITALL, buf, len, NULL);
 
 	free_proxy_msg(msg);
 
@@ -241,6 +242,7 @@ int
 DbgClntSetLineBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	bitset *	set;
 	char *		buf;
 	proxy_msg *	msg;
@@ -253,9 +255,9 @@ DbgClntSetLineBreakpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SETLINEBREAKPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -267,6 +269,7 @@ int
 DbgClntSetFuncBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -279,9 +282,9 @@ DbgClntSetFuncBreakpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SETFUNCBREAKPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -293,6 +296,7 @@ int
 DbgClntDeleteBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -305,9 +309,9 @@ DbgClntDeleteBreakpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_DELETEBREAKPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -319,6 +323,7 @@ int
 DbgClntEnableBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -331,9 +336,9 @@ DbgClntEnableBreakpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_ENABLEBREAKPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -345,6 +350,7 @@ int
 DbgClntDisableBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -357,9 +363,9 @@ DbgClntDisableBreakpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_DISABLEBREAKPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -371,6 +377,7 @@ int
 DbgClntConditionBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -383,9 +390,9 @@ DbgClntConditionBreakpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_CONDITIONBREAKPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -397,6 +404,7 @@ int
 DbgClntBreakpointAfter(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -409,9 +417,9 @@ DbgClntBreakpointAfter(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_BREAKPOINTAFTER_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -423,6 +431,7 @@ int
 DbgClntSetWatchpoint(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -435,9 +444,9 @@ DbgClntSetWatchpoint(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SETWATCHPOINT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -452,6 +461,7 @@ int
 DbgClntGo(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -464,9 +474,9 @@ DbgClntGo(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_GO_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITSOME, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITSOME, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -478,6 +488,7 @@ int
 DbgClntStep(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -490,9 +501,9 @@ DbgClntStep(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_STEP_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITSOME, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITSOME, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -504,6 +515,7 @@ int
 DbgClntTerminate(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -516,9 +528,9 @@ DbgClntTerminate(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_TERMINATE_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -530,6 +542,7 @@ int
 DbgClntSuspend(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -542,9 +555,9 @@ DbgClntSuspend(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SUSPEND_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -561,6 +574,7 @@ int
 DbgClntListStackframes(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -573,9 +587,9 @@ DbgClntListStackframes(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_LISTSTACKFRAMES_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -587,6 +601,7 @@ int
 DbgClntSetCurrentStackframe(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -599,9 +614,9 @@ DbgClntSetCurrentStackframe(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SETCURRENTSTACKFRAME_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -616,6 +631,7 @@ int
 DbgClntEvaluateExpression(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -628,9 +644,9 @@ DbgClntEvaluateExpression(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -642,6 +658,7 @@ int
 DbgClntGetType(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -654,9 +671,9 @@ DbgClntGetType(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_GETTYPE_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -668,6 +685,7 @@ int
 DbgClntListLocalVariables(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -680,9 +698,9 @@ DbgClntListLocalVariables(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_LISTLOCALVARIABLES_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -694,6 +712,7 @@ int
 DbgClntListArguments(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -706,9 +725,9 @@ DbgClntListArguments(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_LISTARGUMENTS_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -720,6 +739,7 @@ int
 DbgClntListGlobalVariables(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -732,9 +752,9 @@ DbgClntListGlobalVariables(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_LISTGLOBALVARIABLES_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -746,6 +766,7 @@ int
 DbgClntListInfoThreads(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -758,9 +779,9 @@ DbgClntListInfoThreads(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_LISTINFOTHREADS_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -772,6 +793,7 @@ int
 DbgClntSetThreadSelect(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -784,9 +806,9 @@ DbgClntSetThreadSelect(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SETTHREADSELECT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -798,6 +820,7 @@ int
 DbgClntStackInfoDepth(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -810,9 +833,9 @@ DbgClntStackInfoDepth(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_STACKINFODEPTH_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -824,6 +847,7 @@ int
 DbgClntDataReadMemory(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -836,9 +860,9 @@ DbgClntDataReadMemory(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_DATAREADMEMORY_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -850,6 +874,7 @@ int
 DbgClntDataWriteMemory(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -862,9 +887,9 @@ DbgClntDataWriteMemory(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_DATAWRITEMEMORY_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -876,6 +901,7 @@ int
 DbgClntListSignals(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -888,9 +914,9 @@ DbgClntListSignals(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_LISTSIGNALS_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -902,6 +928,7 @@ int
 DbgClntSignalInfo(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -914,9 +941,9 @@ DbgClntSignalInfo(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_SIGNALINFO_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -928,6 +955,7 @@ int
 DbgClntCLIHandle(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -940,9 +968,9 @@ DbgClntCLIHandle(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_CLIHANDLE_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -954,6 +982,7 @@ int
 DbgClntQuit(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 
@@ -961,9 +990,9 @@ DbgClntQuit(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_QUIT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, nargs, args);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(dbg_procs, DBG_EV_WAITALL, buf, NULL);
+	res = send_command(dbg_procs, DBG_EV_WAITALL, buf, len, NULL);
 
 	free_proxy_msg(msg);
 
@@ -1042,6 +1071,7 @@ int
 DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -1054,9 +1084,9 @@ DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -1067,6 +1097,7 @@ int
 DbgClntGetPartialAIF(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -1079,9 +1110,9 @@ DbgClntGetPartialAIF(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_GETPARTIALAIF_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);
@@ -1092,6 +1123,7 @@ int
 DbgClntVariableDelete(int tid, int nargs, char **args)
 {
 	int			res;
+	int			len;
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
@@ -1104,9 +1136,9 @@ DbgClntVariableDelete(int tid, int nargs, char **args)
 
 	msg = new_proxy_msg(DBG_VARIABLEDELETE_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
-	proxy_serialize_msg(msg, &buf);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, NULL);
+	res = send_command(bitset_to_idset(set), DBG_EV_WAITALL, buf, len, NULL);
 
 	bitset_free(set);
 	free_proxy_msg(msg);

@@ -142,8 +142,6 @@ wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec)
 
 	getcwd(wd, MAXPATHLEN);
 
-	sec += 1;
-
 	// Wait for file to be created
 	while (sec-- > 0) {
 		/*

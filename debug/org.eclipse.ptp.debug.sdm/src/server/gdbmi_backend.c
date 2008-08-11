@@ -801,9 +801,11 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 
 	free(prog_path);
 
-	cmd = MIExecArguments(args);
-	SendCommandWait(sess, cmd);
-	MICommandFree(cmd);
+	if (*args != NULL) {
+		cmd = MIExecArguments(args);
+		SendCommandWait(sess, cmd);
+		MICommandFree(cmd);
+	}
 
 	for (e = env; e != NULL && *e != NULL; e++) {
 		cmd = MIGDBSet("environment", *e);

@@ -51,6 +51,23 @@ extern int	svr_isshutdown(void);
 
 static dbg_backend *	backend;
 
+char *
+stringify(char *buf, int len)
+{
+	static char *	str_buf = NULL;
+
+	if (str_buf != NULL) {
+		free(str_buf);
+	}
+
+	str_buf = (char *)malloc(len + 1);
+
+	memcpy(str_buf, buf, len);
+	str_buf[len] = '\0';
+
+	return str_buf;
+}
+
 /*
  * Aggregate debugger response.
  */
@@ -61,19 +78,15 @@ event_callback(dbg_event *e, int data)
 	char *		buf;
 	sdm_message	msg;
 
-	if (DbgSerializeEvent(e, &buf) < 0)
+	if (DbgSerializeEvent(e, &buf, &len) < 0) {
 		return;
+	}
 
-	len = strlen(buf);
-
-	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server event_callback '%s'\n", sdm_route_get_id(), buf);
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server event_callback '%s'\n", sdm_route_get_id(), stringify(buf, len));
 
 	msg = sdm_message_new(buf, len);
 	sdm_message_set_id(msg, data);
 	sdm_set_add_element(sdm_message_get_destination(msg), SDM_MASTER);
-
-	//sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_HASH, buf, len);
-
 	sdm_aggregate_message(msg, SDM_AGGREGATE_UPSTREAM | SDM_AGGREGATE_INIT);
 }
 
@@ -87,11 +100,13 @@ deliver_callback(const sdm_message msg)
 	int		len;
 	char *	buf;
 
-	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] server deliver_callback\n", sdm_route_get_id());
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] Enter deliver_callback\n", sdm_route_get_id());
 
 	sdm_message_get_payload(msg, &buf, &len);
 	id = sdm_message_get_id(msg);
 	(void)svr_dispatch(backend, buf, len, id);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] Leaving deliver_callback\n", sdm_route_get_id());
 }
 
 /*
@@ -99,8 +114,12 @@ deliver_callback(const sdm_message msg)
  */
 static int
 aggregate_callback(sdm_message msg) {
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] Enter aggregate_callback\n", sdm_route_get_id());
+
 	sdm_message_set_send_callback(msg, sdm_message_free);
 	sdm_message_send(msg);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] Leaving aggregate_callback\n", sdm_route_get_id());
 	return 0;
 }
 
@@ -135,7 +154,6 @@ void
 server(dbg_backend *dbgr)
 {
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "starting server on [%d,%d]\n", sdm_route_get_id(), sdm_route_get_size());
-	printf("starting server on [%d,%d]\n", sdm_route_get_id(), sdm_route_get_size());
 
 	backend = dbgr;
 

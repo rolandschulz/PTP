@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,7 +30,7 @@ MICommand *
 MICommandNew(char *command, int class)
 {
 	MICommand *	cmd;
-	
+
 	cmd = (MICommand *)malloc(sizeof(MICommand));
 	cmd->command = strdup(command);
 	cmd->options = (char **)malloc(MICOMMAND_OPT_SIZE * sizeof(char *));
@@ -47,7 +47,7 @@ void
 MICommandFree(MICommand *cmd)
 {
 	int i;
-	
+
 	if (cmd->command != NULL)
 		free(cmd->command);
 	if (cmd->num_options > 0) {
@@ -64,17 +64,17 @@ void
 MICommandAddOption(MICommand *cmd, char *opt, char *arg)
 {
 	int add = 1;
-	
+
 	if (arg != NULL)
 		add++;
-		
+
 	if (cmd->num_options + add > cmd->opt_size) {
 		cmd->opt_size += MICOMMAND_OPT_SIZE;
 		cmd->options = (char **)realloc(cmd->options, cmd->opt_size * sizeof(char *));
 	}
-	
+
 	cmd->options[cmd->num_options++] = strdup(opt);
-	
+
 	if (arg != NULL)
 		cmd->options[cmd->num_options++] = strdup(arg);
 }
@@ -105,7 +105,7 @@ MICommandResultOK(MICommand *cmd)
 {
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return 0;
-		
+
 	return cmd->output->rr->resultClass == cmd->expected_class;
 }
 
@@ -124,21 +124,21 @@ MICommandResultErrorMessage(MICommand *cmd)
 	MIResult *	r;
 	MIString *	s;
 	char *		res = NULL;
-	
+
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 
 	if (MICommandResultClass(cmd) != MIResultRecordERROR)
 		return NULL;
-	
+
 	for (SetList(cmd->output->rr->results); (r = (MIResult *)GetListElement(cmd->output->rr->results)) != NULL;) {
-		if (r->value != NULL) {	
+		if (r->value != NULL) {
 			s = MIValueToString(r->value);
 			res = strdup(MIStringToCString(s));
 			break;
 		}
 	}
-	
+
 	return res;
 }
 
@@ -149,28 +149,28 @@ MICommandToString(MICommand *cmd)
 	int				size;
 	static int		str_size = 0;
 	static char *	str_res = NULL;
-	
-	size = strlen(cmd->command) + 1;
-	
+
+	size = strlen(cmd->command) + 3;
+
 	for (i = 0; i < cmd->num_options; i++)
 		size += strlen(cmd->options[i]) + 1;
-		
+
 	if (size > str_size) {
 		if (str_res != NULL)
 			free(str_res);
 		str_res = (char *)malloc(size);
 		str_size = size;
 	}
-	
+
 	strcpy(str_res, cmd->command);
-	
+
 	for (i = 0; i < cmd->num_options; i++) {
 		strcat(str_res, " ");
 		strcat(str_res, cmd->options[i]);
 	}
-	
+
 	strcat(str_res, "\n");
-	
+
 	return str_res;
 }
 
