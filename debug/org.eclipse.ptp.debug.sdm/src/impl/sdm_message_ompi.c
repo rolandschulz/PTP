@@ -299,11 +299,15 @@ sdm_message_new(char *buf, int len)
 void
 sdm_message_free(sdm_message msg)
 {
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Enter sdm_message_free\n", sdm_route_get_id());
+
 	free(msg->buf);
 	sdm_set_free(msg->src);
 	sdm_set_free(msg->dest);
 	sdm_aggregate_free(msg->aggregate);
 	free(msg);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Leaving sdm_message_free\n", sdm_route_get_id());
 }
 
 unsigned int

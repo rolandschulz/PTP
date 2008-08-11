@@ -28,6 +28,7 @@
 #include "sdm.h"
 
 #define SDM_EVENT_WAIT_TIME 100000
+#define AGGREGATE_VALUE_LEN	8
 
 struct sdm_aggregate {
 	unsigned int	value;	/* Timeout or hash value */
@@ -81,7 +82,7 @@ sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
 {
 	char *	e;
 
-	int_to_hex_str(a->value, buf, &e);
+	int_to_hex_str(a->value, buf, AGGREGATE_VALUE_LEN, &e);
 	if (end != NULL) {
 		*end = e;
 	}
@@ -91,7 +92,7 @@ sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
 int
 sdm_aggregate_serialized_length(const sdm_aggregate a)
 {
-	return HEX_LEN;
+	return AGGREGATE_VALUE_LEN;
 }
 
 int
@@ -99,7 +100,7 @@ sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
 {
 	char *	e;
 
-	a->value = hex_str_to_int(str, &e);
+	a->value = hex_str_to_int(str, AGGREGATE_VALUE_LEN, &e);
 	if (end != NULL) {
 		*end = e;
 	}
@@ -256,14 +257,9 @@ sdm_aggregate_copy(const sdm_aggregate a1, const sdm_aggregate a2)
 char *
 _aggregate_to_str(sdm_aggregate a)
 {
-	static char *	res = NULL;
+	static char res[AGGREGATE_VALUE_LEN+1];
 
-	if (res != NULL) {
-		free(res);
-	}
-
-	res = (char *)malloc(sizeof(int)+1);
-	int_to_hex_str(a->value, res, NULL);
+	int_to_hex_str(a->value, res, AGGREGATE_VALUE_LEN, NULL);
 	return res;
 }
 
@@ -303,10 +299,15 @@ new_request(sdm_idset dest, int id, int timeout)
 static void
 free_request(request *r)
 {
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Enter free_request\n", sdm_route_get_id());
+
 	RemoveFromList(all_requests, (void *)r);
 	sdm_set_free(r->outstanding);
 	HashDestroy(r->replys, NULL);
 	free(r);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Leaving free_request\n", sdm_route_get_id());
+
 }
 
 /*

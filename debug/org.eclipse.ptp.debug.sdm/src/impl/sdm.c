@@ -51,13 +51,12 @@ sdm_setup(int argc, char *argv[])
 			break;
 		}
 	}
-	//size = 2;
 
 	if(size == -1) {
 		return -1;
 	}
 
-	printf("size %d\n", size);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] size %d\n", sdm_route_get_id(), size);
 
 	sdm_route_set_size(size);
 	/*
@@ -95,7 +94,7 @@ sdm_setup(int argc, char *argv[])
 int
 sdm_init(int argc, char *argv[])
 {
-	if(sdm_setup(argc, argv) < 0) {
+	if (sdm_setup(argc, argv) < 0) {
 		return -1;
 	}
 
@@ -111,7 +110,7 @@ sdm_init(int argc, char *argv[])
 		return -1;
 	}
 
-	printf("Initialization successful\n");
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Initialization successful\n", sdm_route_get_id());
 
 	sdm_message_set_recv_callback(recv_callback);
 
@@ -148,8 +147,11 @@ sdm_progress(void)
 static void
 recv_callback(sdm_message msg)
 {
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Enter recv_callback\n", sdm_route_get_id());
+
 	if (sdm_set_contains(sdm_message_get_source(msg), SDM_MASTER)) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got downstream message src=%s, dest=%s\n", sdm_route_get_id(),
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got downstream message src=%s, dest=%s\n",
+				sdm_route_get_id(),
 				_set_to_str(sdm_message_get_source(msg)),
 				_set_to_str(sdm_message_get_destination(msg)));
 
@@ -182,7 +184,8 @@ recv_callback(sdm_message msg)
 		 */
 		sdm_message_send(msg);
 	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got upstream message src=%s, dest=%s\n", sdm_route_get_id(),
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got upstream message src=%s, dest=%s\n",
+				sdm_route_get_id(),
 				_set_to_str(sdm_message_get_source(msg)),
 				_set_to_str(sdm_message_get_destination(msg)));
 
@@ -191,4 +194,6 @@ recv_callback(sdm_message msg)
 		 */
 		sdm_aggregate_message(msg, SDM_AGGREGATE_UPSTREAM);
 	}
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Leaving recv_callback\n", sdm_route_get_id());
 }

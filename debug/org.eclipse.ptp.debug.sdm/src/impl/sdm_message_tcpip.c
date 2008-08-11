@@ -32,6 +32,9 @@
 #include "routetable.h"
 #include "helloproto.h"
 
+#define MESSAGE_LENGTH_SIZE	8
+#define MESSAGE_ID_SIZE		8
+
 struct sdm_message {
 	unsigned int	id;				/* ID of the message */
 	sdm_idset		dest; 			/* Destinations of the message */
@@ -543,23 +546,30 @@ sdm_get_active_sock_desc()
 int
 sdm_tcpip_msgheader_receive(int sockfd, int *length)
 {
-	int rv;
+	int		n;
+	int		len;
+	char *	p;
+	char	length_str[MESSAGE_LENGTH_SIZE];
 
-	rv = read(sockfd, (void *)length, sizeof(int));
+	p = length_str;
+	len = MESSAGE_LENGTH_SIZE;
 
-//	printf("Read %d bytes from the message\n", *length);
-
-	// Subtract sizeof(*length), since header was read
-	*length -= sizeof(*length);
-
-
-	// Read cannot be empty or generate an error
-	if (rv <= 0) {
-		if (rv < 0) {
-			perror("Status on read syscall");
+	while ((n = read(sockfd, p, len)) < len) {
+		if (n <= 0) {
+			if (n < 0) {
+				if (errno == EINTR) {
+					continue;
+				}
+				perror("Status on read syscall");
+			}
+			return -1;
 		}
-		return -1;
+
+		p += n;
+		len -= n;
 	}
+
+	*length = hex_str_to_int(length_str, MESSAGE_LENGTH_SIZE, NULL) - MESSAGE_LENGTH_SIZE;
 
 	return 0;
 }
@@ -567,21 +577,21 @@ sdm_tcpip_msgheader_receive(int sockfd, int *length)
 int
 sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
 {
-	int rcount;
+	int n;
 
-	do {
-		rcount = read(sockfd, buf, length);
-//		printf("Read %d bytes from the message\n", rcount);
-
-		if (rcount <= 0) {
-			if (rcount < 0) {
+	while ((n = read(sockfd, buf, length)) < length) {
+		if (n <= 0) {
+			if (n < 0) {
+				if (errno == EINTR) {
+					continue;
+				}
 				perror("Status on read syscall");
 			}
 			return -1;
 		}
-		buf += rcount;
-		length -= rcount;
-	} while(length > 0);
+		buf += n;
+		length -= n;
+	}
 
 	return 0;
 }
@@ -653,7 +663,8 @@ sdm_message_finalize()
 int
 sdm_message_send(const sdm_message msg)
 {
-	int			len, maxlen; // effective and maximum length of the message
+	int			len;
+	int			maxlen; // effective and maximum length of the message
 							 // these two vars must have the same size!
 	char *		p;
 	char *		header_addr; // Pointer to the header of the message
@@ -685,8 +696,8 @@ sdm_message_send(const sdm_message msg)
 		 * This includes the length of the message at the beginning
 		 */
 
-		maxlen = sizeof(maxlen)
-			+ HEX_LEN
+		maxlen = MESSAGE_LENGTH_SIZE
+			+ MESSAGE_ID_SIZE
 			+ sdm_aggregate_serialized_length(msg->aggregate)
 			+ sdm_set_serialized_length(msg->src)
 			+ sdm_set_serialized_length(msg->dest)
@@ -694,20 +705,18 @@ sdm_message_send(const sdm_message msg)
 
 		p = buf = (char *)malloc(maxlen);
 
-//		printf("message maxlen: %d\n", maxlen);
-
 		// Saves the address of the header
 		header_addr = p;
 
-		p += (int)sizeof(maxlen); // Points to the body of the message
+		p += MESSAGE_LENGTH_SIZE; // Points to the body of the message
 
 		/*
 		 * Note: maxlen was the maximum length of the serialized buffer, we
 		 * now calculate the actual length for the send.
 		 */
-		len = sizeof(len);
-		len += HEX_LEN;
-		int_to_hex_str(msg->id, p, &p);
+		len = MESSAGE_LENGTH_SIZE;
+		len += MESSAGE_ID_SIZE;
+		int_to_hex_str(msg->id, p, MESSAGE_ID_SIZE, &p);
 		len += sdm_aggregate_serialize(msg->aggregate, p, &p);
 		len += sdm_set_serialize(msg->src, p, &p);
 		len += sdm_set_serialize(msg->dest, p, &p);
@@ -715,9 +724,7 @@ sdm_message_send(const sdm_message msg)
 		len += msg->payload_len;
 
 		// Copies the actual length to the header of the message
-		memcpy(header_addr, (void *)&len, sizeof(len));
-
-//		printf("Created the message to send\n");
+		int_to_hex_str(len, header_addr, MESSAGE_LENGTH_SIZE, NULL);
 
 		/*
 		 * Send the message to each destination, converting the
@@ -731,15 +738,13 @@ sdm_message_send(const sdm_message msg)
 
 			// Get socket descriptor corresponding to the node where the message will be sent
 			sockd = sdm_fetch_sockd(dest_id);
-			if(sockd < 0) {
+			if (sockd < 0) {
 				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Socket descriptor not found!\n");
 				return -1;
 			}
 
-			p = buf;
-
 			// Write all message to the socket
-			if(sdm_tcpip_send(sockd, buf, len) < 0) {
+			if (sdm_tcpip_send(sockd, buf, len) < 0) {
 				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error sending message!\n");
 				return -1;
 			}
@@ -751,12 +756,16 @@ sdm_message_send(const sdm_message msg)
 		free(buf);
 	}
 
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] About to call send_complete\n", sdm_route_get_id());
+
 	/*
 	 * Notify that the send is complete.
 	 */
 	if (msg->send_complete != NULL) {
 		msg->send_complete(msg);
 	}
+
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Leaving sdm_message_send\n", sdm_route_get_id());
 
 	return 0;
 }
@@ -797,9 +806,9 @@ sdm_message_progress(void)
 	}
 
 	if (sockfd >= 0) {
-		err = sdm_tcpip_msgheader_receive(sockfd, &len);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] receiving header\n", sdm_route_get_id());
 
-//		printf("Message header: %d\n", len);
+		err = sdm_tcpip_msgheader_receive(sockfd, &len);
 
 		if(err != 0) {
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving message size!\n", sdm_route_get_id());
@@ -815,12 +824,11 @@ sdm_message_progress(void)
 			return -1;
 		}
 
-//		printf("Init of message handling\n");
 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n",
 				sdm_route_get_id(), len, sdm_fetch_nodeid(sockfd));
 
-		msg->id = hex_str_to_int(buf, &buf);
-		len -= HEX_LEN;
+		msg->id = hex_str_to_int(buf, MESSAGE_ID_SIZE, &buf);
+		len -= MESSAGE_ID_SIZE;
 
 		if ((n = sdm_aggregate_deserialize(msg->aggregate, buf, &buf)) < 0) {
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
@@ -849,11 +857,13 @@ sdm_message_progress(void)
 				_set_to_str(msg->src),
 				_set_to_str(msg->dest));
 
-//		printf("End of message handling\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] About to call recv_callback\n", sdm_route_get_id());
 
 		if (sdm_recv_callback  != NULL) {
 			sdm_recv_callback(msg);
 		}
+
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Finished recv_callback\n", sdm_route_get_id());
 	}
 
 	return 0;
