@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #ifndef _PROXY_MSG_H_
 #define _PROXY_MSG_H_
 
@@ -52,8 +52,8 @@ extern void			proxy_get_data(char *, char **, int *);
 extern void			proxy_get_int(char *, int *);
 extern void			proxy_get_bitset(char *, bitset **);
 extern int 			proxy_deserialize_msg(char *, int len, proxy_msg **);
-extern int 			proxy_serialize_msg(proxy_msg *, char **);
-extern int			proxy_msg_decode_string(char *, char **, char **);
+extern int 			proxy_serialize_msg(proxy_msg *, char **, int *);
+extern int			proxy_msg_decode_string(char *, int, char **, char **);
 extern void			proxy_msg_add_int(proxy_msg *, int);
 extern void			proxy_msg_add_string(proxy_msg *, char *);
 extern void			proxy_msg_add_string_nocopy(proxy_msg *, char *);
