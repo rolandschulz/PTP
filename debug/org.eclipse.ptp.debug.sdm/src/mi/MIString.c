@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
@@ -26,6 +26,16 @@
 #include <string.h>
 
 #include "MIString.h"
+
+/*
+ * Number of strings to keep before recycling. This allows
+ * MIIntToCString to be called multiple times in an argument
+ * list.
+ */
+#define NUM_STRINGS		5
+
+static int		str_ptr = -1;
+static char *	strings[NUM_STRINGS];
 
 MIString *
 MIStringNew(char *fmt, ...)
@@ -38,7 +48,7 @@ MIStringNew(char *fmt, ...)
 	vasprintf(&s->buf, fmt, ap);
 	va_end(ap);
 	s->slen = strlen(s->buf);
-	
+
 	return s;
 }
 
@@ -54,16 +64,16 @@ MIStringAppend(MIString *str, MIString *str2)
 {
 	int len = str->slen + str2->slen;
 	char *buf = (char *)malloc(len + 1);
-	
+
 	memcpy(buf, str->buf, str->slen);
 	memcpy(&buf[str->slen], str2->buf, str2->slen);
 	buf[len] = '\0';
-	
+
 	free(str->buf);
-	
+
 	str->buf = buf;
 	str->slen = len;
-	
+
 	MIStringFree(str2);
 }
 
@@ -76,10 +86,24 @@ MIStringToCString(MIString *str)
 char *
 MIIntToCString(int val)
 {
-	static char *	str = NULL;
-	
-	if (str != NULL)
-		free(str);
-	asprintf(&str, "%d", val);
-	return str;
+	char **	s;
+
+	if (str_ptr < 0) {
+		memset(strings, 0, NUM_STRINGS);
+		str_ptr = 0;
+	}
+
+	if (str_ptr++ == NUM_STRINGS) {
+		str_ptr = 0;
+	}
+
+	s = &strings[str_ptr];
+
+	if (*s != NULL) {
+		free(*s);
+	}
+
+	asprintf(s, "%d", val);
+
+	return *s;
 }

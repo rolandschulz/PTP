@@ -7,3 +7,4 @@ config.h
 autom4te.cache
 .deps
 stamp-h1
+a.out.dSYM

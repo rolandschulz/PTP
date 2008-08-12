@@ -146,11 +146,13 @@ char *
 MICommandToString(MICommand *cmd)
 {
 	int				i;
+	int				cmd_len = strlen(cmd->command);
 	int				size;
+	char *			s;
 	static int		str_size = 0;
 	static char *	str_res = NULL;
 
-	size = strlen(cmd->command) + 3;
+	size = cmd_len + 3;
 
 	for (i = 0; i < cmd->num_options; i++)
 		size += strlen(cmd->options[i]) + 1;
@@ -160,16 +162,23 @@ MICommandToString(MICommand *cmd)
 			free(str_res);
 		str_res = (char *)malloc(size);
 		str_size = size;
+
 	}
 
-	strcpy(str_res, cmd->command);
+
+	s = str_res;
+	memcpy(s, cmd->command, cmd_len);
+	s += cmd_len;
 
 	for (i = 0; i < cmd->num_options; i++) {
-		strcat(str_res, " ");
-		strcat(str_res, cmd->options[i]);
+		int len = strlen(cmd->options[i]);
+		*s++ = ' ';
+		memcpy(s, cmd->options[i], len);
+		s += len;
 	}
 
-	strcat(str_res, "\n");
+	*s++ = '\n';
+	*s++ = '\0';
 
 	return str_res;
 }
