@@ -148,13 +148,12 @@ svr_dispatch(dbg_backend *db, char *cmd_str, int len, int data)
 	svr_cmd		cmd;
 
 	event_data = data;
-printf("about to deserialize\n"); fflush(stdout);
+
 	if (proxy_deserialize_msg(cmd_str, len, &msg) < 0) {
 		svr_res = DBGRES_ERR;
 		DbgSetError(DBGERR_DEBUGGER, "bad debug message format");
 		return 0;
 	}
-printf("finish deserialize\n"); fflush(stdout);
 
 	idx = msg->msg_id - DBG_CMD_BASE;
 
