@@ -21,5 +21,41 @@
                id="org.eclipse.cdt.core.ccnature">
          </nature>
       </service>
+      <service
+            id="org.eclipse.ptp.rdt.core.BuildService"
+            name="%BuildService.name">
+         <nature
+               id="org.eclipse.cdt.core.cnature">
+         </nature>
+         <nature
+               id="org.eclipse.cdt.core.ccnature">
+         </nature>
+      </service>
+   </extension>
+   <extension
+         id="remoteMakeNature"
+         name="%RemoteMakeNature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.ptp.rdt.core.resources.RemoteMakeNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.eclipse.ptp.rdt.core.remoteMakeBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="org.eclipse.ptp.rdt.core.remoteMakeBuilder"
+         name="%RemoteMakeBuilder.name"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="true"
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder">
+         </run>
+      </builder>
    </extension>
 </plugin>

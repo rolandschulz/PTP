@@ -30,6 +30,7 @@ import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
@@ -61,7 +62,7 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 		IServiceModelManager smm = ServiceModelManager.getInstance();
 		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
 
-		IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+		IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 
 		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 
@@ -80,7 +81,7 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 				IServiceModelManager smm = ServiceModelManager.getInstance();
 				IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
 
-				IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+				IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 
 				IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 
