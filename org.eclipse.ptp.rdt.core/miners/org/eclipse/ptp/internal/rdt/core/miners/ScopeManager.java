@@ -63,7 +63,8 @@ public class ScopeManager {
 	public void removeFileFromScope(String scope, String filename) {
 		Set<String> scopeFiles = getFilesForScope(scope);
 		
-		scopeFiles.remove(filename);
+		if(scopeFiles != null)
+			scopeFiles.remove(filename);
 	}
 	
 	public Set<String> getAllScopes() {

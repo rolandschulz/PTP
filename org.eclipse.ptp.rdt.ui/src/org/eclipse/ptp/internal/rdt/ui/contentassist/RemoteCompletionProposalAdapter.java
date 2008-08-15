@@ -14,6 +14,7 @@ package org.eclipse.ptp.internal.rdt.ui.contentassist;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
@@ -30,7 +31,7 @@ public class RemoteCompletionProposalAdapter extends AbstractCompletionProposalA
 	protected IContentAssistService getService(IProject project) {
 		ServiceModelManager manager = ServiceModelManager.getInstance();
 		IServiceConfiguration config = manager.getActiveConfiguration(project);
-		IService service = manager.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+		IService service = manager.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 		IServiceProvider provider = config.getServiceProvider(service);
 		
 		if (!(provider instanceof IIndexServiceProvider)) {

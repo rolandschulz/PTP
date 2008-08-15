@@ -35,6 +35,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.LocalCallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
@@ -84,7 +85,7 @@ public class OpenElementInCallHierarchyAction implements IWorkbenchWindowActionD
 			IServiceModelManager smm = ServiceModelManager.getInstance();
 			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(elements[0].getCProject().getProject());
 			
-			IService indexingService = smm.getService(RemoteFastIndexer.INDEXING_SERVICE_ID);
+			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 			
 			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 			

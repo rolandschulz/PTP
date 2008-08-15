@@ -14,6 +14,7 @@ import org.eclipse.cdt.core.dom.IPDOMIndexerTask;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.pdom.indexer.AbstractPDOMIndexer;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.IServiceModelManager;
@@ -28,8 +29,6 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 	
 	public static final String ID = "org.eclipse.ptp.rdt.core.RemoteFastIndexer"; //$NON-NLS-1$
 	
-	public static final String INDEXING_SERVICE_ID = "org.eclipse.ptp.rdt.core.CIndexingService"; //$NON-NLS-1$
-
 	public IPDOMIndexerTask createTask(ITranslationUnit[] added,
 			ITranslationUnit[] changed, ITranslationUnit[] removed) {
 		
@@ -37,7 +36,7 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 		
 		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject().getProject());
 		
-		IService indexingService = smm.getService(INDEXING_SERVICE_ID);
+		IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 		
 		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 		
