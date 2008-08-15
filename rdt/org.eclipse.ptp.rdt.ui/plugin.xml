@@ -156,11 +156,28 @@
       </runtime>
    </extension>
    <extension
+         point="org.eclipse.cdt.ui.CDTWizard">
+      <wizard
+            class="org.eclipse.ptp.rdt.ui.wizards.RemoteMakefileWizard"
+            name="Remote Makefile Project">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rdt.services.providers">
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
+            configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
+            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"
+            name="RDT Remote Build Service"
+            serviceId="org.eclipse.ptp.rdt.core.BuildService">
+      </provider>
+   </extension>
+   <extension
          point="org.eclipse.ui.propertyPages">
       <page
             class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
             id="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
-            name="Remote Paths and Includes">
+            name="%page.name.0">
          <filter
                name="projectNature"
                value="org.eclipse.ptp.rdt.core.remoteNature">

@@ -77,7 +77,7 @@ public class HostSelectionDialog extends Dialog {
         // combo for hosts
         final Combo hostCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
         // set layout to grab horizontal space
-        hostCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
+        hostCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         
         // populate the combo with a list of hosts
         IHost[] hosts = SystemStartHere.getConnections();
@@ -155,7 +155,7 @@ public class HostSelectionDialog extends Dialog {
      * @see org.eclipse.jface.dialogs.Dialog#getInitialSize()
      */
     protected Point getInitialSize() {
-        return new Point(500, 375);
+        return new Point(500, 125);
     }
 
 	/* (non-Javadoc)
