@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.binding;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
@@ -37,7 +35,6 @@ import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistGroupsNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
@@ -241,8 +238,7 @@ class DefinitionCollector extends BindingCollector
         {
             Token name = groups.get(i).getNamelistGroupName();
             Token object = groups.get(i).getVariableName();
-            if (name != null) addDefinition(name,
-                                            Definition.Classification.NAMELIST);
+            if (name != null) addDefinition(name, Definition.Classification.NAMELIST);
         }
     }
 
@@ -272,9 +268,14 @@ class DefinitionCollector extends BindingCollector
         
         IASTListNode<ASTCommonBlockListNode> list = node.getCommonBlockList();
         for (int i = 0; i < list.size(); i++)
+        {
             if (list.get(i).getCommonBlock().getName() != null)
-                addDefinition(list.get(i).getCommonBlock().getName().getCommonBlockName(),
-                              Definition.Classification.COMMON_BLOCK);
+            {
+                Token commonBlockName = list.get(i).getCommonBlock().getName().getCommonBlockName();
+                addDefinition(commonBlockName, Definition.Classification.COMMON_BLOCK);
+                vpg.markFileAsUsingCommonBlock(file, commonBlockName.getText());
+            }
+        }
     }
 
     // # R740

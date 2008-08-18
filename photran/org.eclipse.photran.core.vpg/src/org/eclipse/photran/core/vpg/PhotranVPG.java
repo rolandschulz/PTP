@@ -5,10 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.types.Type;
@@ -215,28 +211,39 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		for (String filename : db.getOutgoingDependenciesFrom("module:" + canonicalizeIdentifier(moduleName)))
 		{
 			IFile file = getIFileForFilename(filename);
-			if (file == null)
-			{
-				System.err.println("************** CAN'T MAP " + filename + " TO AN IFILE");
-				try {
-					ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor()
-					{
-						public boolean visit(IResource resource) throws CoreException
-						{
-							System.err.println(resource.getFullPath().toOSString());
-							return true;
-						}
-						
-					});
-				} catch (CoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+//			if (file == null)
+//			{
+//				System.err.println("************** CAN'T MAP " + filename + " TO AN IFILE");
+//				try {
+//					ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor()
+//					{
+//						public boolean visit(IResource resource) throws CoreException
+//						{
+//							System.err.println(resource.getFullPath().toOSString());
+//							return true;
+//						}
+//						
+//					});
+//				} catch (CoreException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
 			if (file != null) files.add(file);
 		}
 		return files;
 	}
+
+    public List<IFile> findFilesThatUseCommonBlock(String commonBlockName)
+    {
+        // The unnamed common block is stored with the empty name as its name
+        if (commonBlockName == null) commonBlockName = "";
+        
+        List<IFile> files = new LinkedList<IFile>();
+        for (String filename : db.getIncomingDependenciesTo("common:" + canonicalizeIdentifier(commonBlockName)))
+            files.add(getIFileForFilename(filename));
+        return files;
+    }
 	
 	public Definition getDefinitionFor(PhotranTokenRef tokenRef)
 	{

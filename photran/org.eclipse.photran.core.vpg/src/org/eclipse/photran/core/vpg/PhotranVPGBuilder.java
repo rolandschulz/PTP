@@ -63,6 +63,11 @@ public class PhotranVPGBuilder extends PhotranVPG
 	{
 	    db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "module:" + canonicalizeIdentifier(moduleName)));
 	}
+
+    public void markFileAsUsingCommonBlock(IFile file, String commonBlockName)
+    {
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "common:" + canonicalizeIdentifier(commonBlockName)));
+    }
 	
 	public void setDefinitionFor(PhotranTokenRef tokenRef, Definition definition)
 	{
@@ -135,10 +140,15 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
     }
 
+    static boolean isVirtualFile(String filename)
+    {
+        return filename.startsWith("module:") || filename.startsWith("common:");
+    }
+    
     @Override
     protected boolean shouldListFileInIndexerProgressMessages(String filename)
     {
-        return !filename.startsWith("module:");
+        return !isVirtualFile(filename);
     }
 
     @Override
@@ -195,7 +205,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     @Override
     protected void calculateDependencies(final String filename)
     {
-        if (filename.startsWith("module:")) return;
+        if (isVirtualFile(filename)) return;
         
         SourceForm sourceForm = determineSourceForm(filename);
         try
@@ -243,7 +253,7 @@ public class PhotranVPGBuilder extends PhotranVPG
 
     private void calculateDependencies(String filename, IAccumulatingLexer lexer)
     {
-        if (!filename.startsWith("module:"))
+        if (!isVirtualFile(filename))
         {
             db.deleteAllIncomingDependenciesFor(filename);
             db.deleteAllOutgoingDependenciesFor(filename);
@@ -290,7 +300,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     @Override
     protected IFortranAST parse(final String filename)
     {
-        if (filename.startsWith("module:")) return null;
+        if (isVirtualFile(filename)) return null;
         
         IFile file = getIFileForFilename(filename);
         SourceForm sourceForm = determineSourceForm(filename);
@@ -327,7 +337,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     @Override
     protected void populateVPG(String filename, IFortranAST ast)
     {
-        if (!filename.startsWith("module:"))
+        if (!isVirtualFile(filename))
         {
             db.deleteAllIncomingDependenciesFor(filename);
             db.deleteAllOutgoingDependenciesFor(filename);

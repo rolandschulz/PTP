@@ -44,6 +44,7 @@ import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
+import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
@@ -247,26 +248,31 @@ public abstract class FortranRefactoring extends Refactoring
     /**
      * Parses the given list of Fortran statements.
      * <p>
-     * Internally, <code>string</code> is embedded into the following program
-     * <pre>
-     * program p
-     *   (string is placed here)
-     * end program
-     * </pre>
-     * which is parsed and its body extracted and returned,
-     * so <code>string</code> must "make sense" (syntactically) in this context.
-     * No semantic analysis is done; it is only necessary that the
-     * program be syntactically correct.
-     * </pre>
+     * @see parseLiteralStatement
      */
     protected IASTListNode<IBodyConstruct> parseLiteralStatementSequence(String string)
     {
         string = "program p\n" + string + "\nend program";
+        return ((ASTMainProgramNode)parseLiteralProgramUnit(string)).getBody();
+    }
+
+    /**
+     * Parses the given Fortran program unit.
+     * <p>
+     * No semantic analysis is done; it is only necessary that the
+     * program unit be syntactically correct.
+     */
+    protected IProgramUnit parseLiteralProgramUnit(String string)
+    {
         try
         {
-            IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(string.getBytes()), "(none)", SourceForm.UNPREPROCESSED_FREE_FORM, true);
+            IAccumulatingLexer lexer = LexerFactory.createLexer(
+                new ByteArrayInputStream(string.getBytes()), "(none)",
+                SourceForm.UNPREPROCESSED_FREE_FORM, true);
             if (parser == null) parser = new Parser();
-            return ((ASTMainProgramNode)new FortranAST(null, parser.parse(lexer), lexer.getTokenList()).getRoot().getProgramUnitList().get(0)).getBody();
+            
+            FortranAST ast = new FortranAST(null, parser.parse(lexer), lexer.getTokenList());
+            return ast.getRoot().getProgramUnitList().get(0);
         }
         catch (Exception e)
         {

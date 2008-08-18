@@ -452,6 +452,11 @@
                path="group.reorganize"><!-- See IContextMenuConstants -->
             <separator name="refactorings"/>
          </menu>
+         <action 
+               label="Move COMMON to &amp;Module" 
+               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/>
          <!--action 
                label="E&amp;xtract Procedure..." 
                class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
