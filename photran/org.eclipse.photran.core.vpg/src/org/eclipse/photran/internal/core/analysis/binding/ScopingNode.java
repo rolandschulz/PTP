@@ -57,7 +57,6 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeNameNode;
-import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
@@ -316,7 +315,7 @@ public abstract class ScopingNode extends ASTNode
             throw new UnsupportedOperationException();
     }
 
-    public IASTListNode<IBodyConstruct> getBody()
+    public IASTListNode<? extends IASTNode /*IBodyConstruct*/> getBody()
     {
         // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
         // AND DYNAMICALLY DISPATCHED TO!
@@ -330,13 +329,13 @@ public abstract class ScopingNode extends ASTNode
         else if (this instanceof ASTSubroutineSubprogramNode)
             return ((ASTSubroutineSubprogramNode)this).getBody();
         else if (this instanceof ASTModuleNode)
-            return ((ASTModuleNode)this).getBody();
+            return ((ASTModuleNode)this).getModuleBody();
         else if (this instanceof ASTBlockDataSubprogramNode)
-            return ((ASTBlockDataSubprogramNode)this).getBody();
+            return ((ASTBlockDataSubprogramNode)this).getBlockDataBody();
         else if (this instanceof ASTDerivedTypeDefNode)
-            return ((ASTDerivedTypeDefNode)this).getBody();
+            return ((ASTDerivedTypeDefNode)this).getDerivedTypeBody();
         else if (this instanceof ASTInterfaceBlockNode)
-            return ((ASTInterfaceBlockNode)this).getBody();
+            return ((ASTInterfaceBlockNode)this).getInterfaceBlockBody();
         else
             throw new UnsupportedOperationException();
     }

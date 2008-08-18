@@ -7228,7 +7228,8 @@ public class Parser
         public static String print(IASTNode node, String currentPreprocessorDirective, PrintStream out)
         {
             for (IASTNode child : node.getChildren())
-                currentPreprocessorDirective = child.printOn(out, currentPreprocessorDirective);
+                if (child != null)
+                    currentPreprocessorDirective = child.printOn(out, currentPreprocessorDirective);
             return currentPreprocessorDirective;
         }
     }
@@ -8094,7 +8095,8 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
         protected void traverseChildren(IASTNode node)
         {
             for (IASTNode child : node.getChildren())
-                child.accept(this);
+                if (child != null)
+                    child.accept(this);
         }
 
         public void visitASTNode(IASTNode node) {}
@@ -8437,7 +8439,8 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
         protected void traverseChildren(IASTNode node)
         {
             for (IASTNode child : node.getChildren())
-                child.accept(this);
+                if (child != null)
+                    child.accept(this);
         }
 
         public void visitASTNode(IASTNode node) { traverseChildren(node); }

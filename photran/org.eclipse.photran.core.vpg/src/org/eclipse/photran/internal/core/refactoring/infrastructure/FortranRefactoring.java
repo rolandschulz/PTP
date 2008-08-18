@@ -429,20 +429,20 @@ public abstract class FortranRefactoring extends Refactoring
         return false;
     }
 
-    protected IASTListNode<IBodyConstruct> findEnclosingBodyNode(IFortranAST ast, ITextSelection selection)
+    protected IASTListNode<? extends IASTNode> findEnclosingBodyNode(IFortranAST ast, ITextSelection selection)
     {
         Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
         if (firstToken == null || lastToken == null) return null;
 
-        IASTListNode<IBodyConstruct> bodyAtBeginning = this.findEnclosingBodyNode(firstToken);
-        IASTListNode<IBodyConstruct> bodyAtEnd = this.findEnclosingBodyNode(lastToken);
+        IASTListNode<? extends IASTNode> bodyAtBeginning = this.findEnclosingBodyNode(firstToken);
+        IASTListNode<? extends IASTNode> bodyAtEnd = this.findEnclosingBodyNode(lastToken);
         if (bodyAtBeginning == null || bodyAtEnd == null || bodyAtBeginning != bodyAtEnd) return null;
 
         return bodyAtBeginning;
     }
     
-    private IASTListNode<IBodyConstruct> findEnclosingBodyNode(Token token)
+    private IASTListNode<? extends IASTNode> findEnclosingBodyNode(Token token)
     {
         ScopingNode scope = token.findNearestAncestor(ScopingNode.class);
         return scope == null ? null : scope.getBody();
@@ -487,16 +487,16 @@ public abstract class FortranRefactoring extends Refactoring
 //        public List<IBodyConstruct> statements = new ArrayList<IBodyConstruct>();
 //    }
     
-    protected List<IBodyConstruct> findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
+    protected List<? extends IASTNode> findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
     {
-        IASTListNode<IBodyConstruct> body = this.findEnclosingBodyNode(ast, selection);
+        IASTListNode<? extends IASTNode> body = this.findEnclosingBodyNode(ast, selection);
         if (body == null) return null;
         
-        List<IBodyConstruct> result = new ArrayList<IBodyConstruct>();
+        List<IASTNode> result = new ArrayList<IASTNode>();
         
         for (int i = 0; i < body.size(); i++)
         {
-            IBodyConstruct thisBodyConstruct = body.get(i);
+            IASTNode thisBodyConstruct = body.get(i);
             
             Token firstToken = thisBodyConstruct.findFirstToken();
             Token lastToken = thisBodyConstruct.findLastToken();

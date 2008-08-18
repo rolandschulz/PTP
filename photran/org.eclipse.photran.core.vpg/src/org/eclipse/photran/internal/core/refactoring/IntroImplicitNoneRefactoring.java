@@ -11,6 +11,7 @@
 package org.eclipse.photran.internal.core.refactoring;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -29,6 +30,7 @@ import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
@@ -91,6 +93,7 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
     // Change
     ///////////////////////////////////////////////////////////////////////////
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
     {
@@ -106,7 +109,8 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
                 if (implicitStmt != null) implicitStmt.removeFromTree();
                 
                 IASTListNode<IBodyConstruct> newDeclarations = constructDeclarations(scope);
-                scope.getBody().addAll(0, newDeclarations);
+                IASTListNode<IASTNode> body = (IASTListNode<IASTNode>)scope.getBody();
+                body.addAll(0, newDeclarations);
                 Reindenter.reindent(newDeclarations, astOfFileInEditor);
             }
         }
