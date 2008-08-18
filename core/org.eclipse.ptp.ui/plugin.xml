@@ -15,6 +15,13 @@
         id="org.eclipse.ptp.ui.views.parallelMachinesView"
         name="%ParallelMachinesView.name">
   </view>
+  <view
+        category="org.eclipse.ptp.ui.views"
+        class="org.eclipse.ptp.ui.views.MachinesNodesView"
+        icon="icons/parallel_perspective.gif"
+        id="org.eclipse.ptp.ui.views.MachinesNodesView"
+        name="%MachinesNodesView.name">
+  </view>
 		<view
 			name="%ParallelJobsView.name"
 			icon="icons/parallel_perspective.gif"
