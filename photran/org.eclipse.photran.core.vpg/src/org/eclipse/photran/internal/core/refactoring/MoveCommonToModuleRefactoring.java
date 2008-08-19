@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,10 +36,14 @@ import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
+import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 
 /**
  * Refactoring to move a COMMON block into a module.
@@ -91,6 +98,9 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
         findEnclosingCommonBlock();
         determineEnclosingCommonBlockName();
         determineAffectedFiles();
+        
+        // TODO: Require implicit none?
+        
         // TODO: Make sure all uses of this common block are identical (names, types)
         // so that USE-ing the module will not cause naming conflicts
     }
@@ -108,15 +118,11 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     
     private void determineEnclosingCommonBlockName()
     {
-        assert commonBlockToMove != null;
-        
         nameOfCommonBlockToMove = getCommonBlockName(commonBlockToMove);
     }
     
     private String getCommonBlockName(ASTCommonBlockNode commonBlockToMove)
     {
-        assert commonBlockToMove != null;
-        
         ASTCommonBlockNameNode commonBlockNameToken = commonBlockToMove.getName();
         if (commonBlockNameToken != null)
             return commonBlockNameToken.getCommonBlockName().getText();
@@ -126,8 +132,6 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     
     private void determineAffectedFiles() throws PreconditionFailure
     {
-        assert commonBlockToMove != null && nameOfCommonBlockToMove != null;
-        
         affectedFiles = new HashSet<IFile>();
         affectedFiles.addAll(vpg.findFilesThatUseCommonBlock(nameOfCommonBlockToMove));
     }
@@ -193,27 +197,35 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
 
     private void populateModuleWithDeclarations(ASTModuleNode module, Token variable)
     {
+        List<ISpecificationPartConstruct> specificationStmts = findSpecificationStmtsFor(variable);
+        module.getModuleBody().addAll(specificationStmts);
+    }
+
+    private List<ISpecificationPartConstruct> findSpecificationStmtsFor(Token variable)
+    {
         List<Definition> defs = variable.resolveBinding();
-        if (defs.size() != 1) throw new Error(); // TODO
+        if (defs.size() == 1)
+            return findSpecificationStmtsFor(defs.get(0));
+        else
+            throw new Error(); // TODO
+    }
 
-        Definition def = defs.get(0);
-
+    private List<ISpecificationPartConstruct> findSpecificationStmtsFor(Definition def)
+    {
+        List<ISpecificationPartConstruct> result = new LinkedList<ISpecificationPartConstruct>();
+        
         ASTTypeDeclarationStmtNode typeDecl = def.getTokenRef().findToken().findNearestAncestor(ASTTypeDeclarationStmtNode.class);
         if (typeDecl != null)
-        {
-            module.getModuleBody().add(typeDecl);
-            typeDecl.removeFromTree();
-        }
+            result.add(typeDecl);
 
         for (PhotranTokenRef tokRef : def.findAllReferences())
         {
             ISpecificationStmt enclosingSpecStmt = tokRef.findToken().findNearestAncestor(ISpecificationStmt.class);
             if (enclosingSpecStmt != null && !(enclosingSpecStmt instanceof ASTCommonStmtNode))
-            {
-                module.getModuleBody().add(enclosingSpecStmt);
-                enclosingSpecStmt.removeFromTree();
-            }
+                result.add(enclosingSpecStmt);
         }
+        
+        return result;
     }
 
     private void addModuleAtBeginningOfFile(ASTModuleNode module)
@@ -223,33 +235,86 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
 
     private void replaceCommonBlockWithModuleUseIn(IFile file)
     {
-        IFortranAST ast = vpg.acquireTransientAST(file);
-        ast.accept(new CommonBlockReplacer());
+        final IFortranAST ast = vpg.acquireTransientAST(file);
+        
+        ast.accept(new ASTVisitor()
+        {
+            @Override
+            public void visitASTNode(IASTNode node)
+            {
+                IASTNode parent = node.getParent();
+                
+                if (parent == null)
+                {
+                    if (node == ast.getRoot())
+                        return;
+                    else
+                        throw new Error("No parent for child node!");
+                }
+                
+                for (IASTNode child : parent.getChildren())
+                    if (child == node)
+                        return;
+                
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                node.printOn(new PrintStream(out), null);
+                throw new Error("Orphaned child node in " + node.findFirstToken().getFile().getName() + ": " + out.toString());
+            }
+        });
+        
+        ast.accept(new CommonBlockReplacer(ast));
     }
     
     private class CommonBlockReplacer extends GenericASTVisitor
     {
+        private IFortranAST ast;
         private ASTUseStmtNode useStmt = (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName);
         
-        @SuppressWarnings("unchecked")
-        @Override
-        public void visitASTCommonBlockNode(ASTCommonBlockNode node)
+        public CommonBlockReplacer(IFortranAST ast)
         {
-            if (commonBlockHasSameName(node))
+            this.ast = ast;
+        }
+
+        @Override
+        public void visitASTCommonBlockNode(ASTCommonBlockNode commonBlock)
+        {
+            if (commonBlockHasSameName(commonBlock))
             {
-                ASTCommonStmtNode enclosingCommonStmt = node.findNearestAncestor(ASTCommonStmtNode.class);
+                removeSpecificationStmtsForCommonBlockVars(commonBlock);
                 
-                if (containsOnlyOneCommonBlock(enclosingCommonStmt))
+                ASTCommonStmtNode enclosingCommonStmt = commonBlock.findNearestAncestor(ASTCommonStmtNode.class);
+                
+                if (commonStmtContainsOnlyOneCommonBlock(enclosingCommonStmt))
                 {
                     enclosingCommonStmt.replaceWith(useStmt);
                 }
                 else
                 {
-                    node.findNearestAncestor(ASTCommonBlockListNode.class).removeFromTree();
-                    ASTListNode body = (ASTListNode)enclosingCommonStmt.getParent();
-                    body.add(body.indexOf(enclosingCommonStmt), useStmt);
+                    removeCommonBlockFromCommonStmt(commonBlock);
+                    addUseStmtAfterCommonStmt(enclosingCommonStmt);
                 }
+                
+                Reindenter.reindent(useStmt, ast);
             }
+        }
+
+        private void removeSpecificationStmtsForCommonBlockVars(ASTCommonBlockNode commonBlock)
+        {
+            for (ASTCommonBlockObjectNode obj : commonBlock.getCommonBlockObjectList())
+                for (ISpecificationPartConstruct specStmt : findSpecificationStmtsFor(obj.getVariableName()))
+                    specStmt.removeFromTree();
+        }
+
+        private void removeCommonBlockFromCommonStmt(ASTCommonBlockNode node)
+        {
+            node.findNearestAncestor(ASTCommonBlockListNode.class).removeFromTree();
+        }
+
+        @SuppressWarnings("unchecked")
+        private void addUseStmtAfterCommonStmt(ASTCommonStmtNode enclosingCommonStmt)
+        {
+            ASTListNode body = (ASTListNode)enclosingCommonStmt.getParent();
+            body.add(body.indexOf(enclosingCommonStmt), useStmt);
         }
 
         private boolean commonBlockHasSameName(ASTCommonBlockNode commonBlock)
@@ -259,7 +324,7 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
             return cnameOfThisCommonBlock.equals(cnameOfCommonBlockToMove);
         }
 
-        private boolean containsOnlyOneCommonBlock(ASTCommonStmtNode enclosingCommonStmt)
+        private boolean commonStmtContainsOnlyOneCommonBlock(ASTCommonStmtNode enclosingCommonStmt)
         {
             return enclosingCommonStmt.getCommonBlockList().size() == 1;
         }
