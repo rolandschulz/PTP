@@ -360,7 +360,6 @@ public abstract class FortranRefactoring extends Refactoring
     
     // TEXT<->TREE MAPPING ////////////////////////////////////////////////////
     
-    @SuppressWarnings("unchecked")
     protected Token findEnclosingToken(IFortranAST ast, final ITextSelection selection)
     {
         for (Token token : new IterableWrapper<Token>(ast))
