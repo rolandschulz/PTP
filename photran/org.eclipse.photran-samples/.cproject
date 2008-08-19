@@ -17,21 +17,7 @@
 </scannerInfoProvider>
 </profile>
 </storageModule>
-<storageModule moduleId="org.eclipse.cdt.core.pathentry">
-<pathentry kind="out" path=""/>
-<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-<pathentry kind="src" path="src-fixed-form"/>
-<pathentry kind="src" path="src-fortran-and-c"/>
-<pathentry kind="src" path="src-gaussian-elimination"/>
-<pathentry kind="src" path="src-includes"/>
-<pathentry kind="src" path="src-language-features"/>
-<pathentry kind="src" path="src-line-fitting"/>
-<pathentry kind="src" path="src-modules"/>
-<pathentry kind="src" path="src-scoping"/>
-<pathentry kind="src" path="src-implicits-1"/>
-<pathentry kind="src" path="src-implicits-2"/>
-<pathentry kind="src" path="src-implicits-3"/>
-</storageModule>
+
 <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 <buildTargets>
 <target name="all" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
@@ -75,6 +61,24 @@
 </extension>
 </extensions>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+<pathentry kind="out" path=""/>
+<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
+<pathentry kind="src" path="src-fixed-form"/>
+<pathentry kind="src" path="src-fortran-and-c"/>
+<pathentry kind="src" path="src-gaussian-elimination"/>
+<pathentry kind="src" path="src-includes"/>
+<pathentry kind="src" path="src-language-features"/>
+<pathentry kind="src" path="src-line-fitting"/>
+<pathentry kind="src" path="src-modules"/>
+<pathentry kind="src" path="src-scoping"/>
+<pathentry kind="src" path="src-implicits-1"/>
+<pathentry kind="src" path="src-implicits-2"/>
+<pathentry kind="src" path="src-implicits-3"/>
+<pathentry kind="src" path="src-common"/>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 </cconfiguration>
 </storageModule>
 </cproject>
