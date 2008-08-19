@@ -73,6 +73,9 @@ public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProp
 	protected List computeCompletionProposals(CContentAssistInvocationContext context, IASTCompletionNode node, String prefix) throws CoreException {
 		IProject project = ((CContentAssistInvocationContext) context).getProject().getProject();
 		IContentAssistService service = getService(project);
+		if (service == null) {
+			return Collections.emptyList();
+		}
 		ITranslationUnit unit = context.getTranslationUnit();
 		Scope scope = Scope.WORKSPACE_ROOT_SCOPE; // TODO: Use local scope
 		List<CCompletionProposal> proposals = adaptProposals(context, service.computeCompletionProposals(scope, context, unit)); // TODO: Provide IScope
