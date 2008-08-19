@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,9 +37,7 @@ import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 
@@ -236,32 +232,6 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     private void replaceCommonBlockWithModuleUseIn(IFile file)
     {
         final IFortranAST ast = vpg.acquireTransientAST(file);
-        
-        ast.accept(new ASTVisitor()
-        {
-            @Override
-            public void visitASTNode(IASTNode node)
-            {
-                IASTNode parent = node.getParent();
-                
-                if (parent == null)
-                {
-                    if (node == ast.getRoot())
-                        return;
-                    else
-                        throw new Error("No parent for child node!");
-                }
-                
-                for (IASTNode child : parent.getChildren())
-                    if (child == node)
-                        return;
-                
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                node.printOn(new PrintStream(out), null);
-                throw new Error("Orphaned child node in " + node.findFirstToken().getFile().getName() + ": " + out.toString());
-            }
-        });
-        
         ast.accept(new CommonBlockReplacer(ast));
     }
     
