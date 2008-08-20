@@ -63,7 +63,7 @@ public class ASTSFVarNameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value;
+        case 0:  this.name = (ASTNameNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

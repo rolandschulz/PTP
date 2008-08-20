@@ -63,7 +63,7 @@ public class ASTTargetNameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.targetName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.targetName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -28,8 +28,8 @@ public class ASTRdCtlSpecNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTRdCtlSpecNode
     IASTListNode<ASTRdIoCtlSpecListNode> rdIoCtlSpecList; // in ASTRdCtlSpecNode
-    ASTUFExprNode readUnitExpr; // in ASTRdCtlSpecNode
     org.eclipse.photran.internal.core.lexer.Token readUnitIsAsterisk; // in ASTRdCtlSpecNode
+    ASTUFExprNode readUnitExpr; // in ASTRdCtlSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTRdCtlSpecNode
 
     public IASTListNode<ASTRdIoCtlSpecListNode> getRdIoCtlSpecList()
@@ -43,17 +43,6 @@ public class ASTRdCtlSpecNode extends ASTNode
     }
 
 
-    public ASTUFExprNode getReadUnitExpr()
-    {
-        return this.readUnitExpr;
-    }
-
-    public void setReadUnitExpr(ASTUFExprNode newValue)
-    {
-        this.readUnitExpr = newValue;
-    }
-
-
     public boolean readUnitIsAsterisk()
     {
         return this.readUnitIsAsterisk != null;
@@ -62,6 +51,17 @@ public class ASTRdCtlSpecNode extends ASTNode
     public void setReadUnitIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.readUnitIsAsterisk = newValue;
+    }
+
+
+    public ASTUFExprNode getReadUnitExpr()
+    {
+        return this.readUnitExpr;
+    }
+
+    public void setReadUnitExpr(ASTUFExprNode newValue)
+    {
+        this.readUnitExpr = newValue;
     }
 
 
@@ -82,8 +82,8 @@ public class ASTRdCtlSpecNode extends ASTNode
         {
         case 0:  return this.hiddenTLparen;
         case 1:  return this.rdIoCtlSpecList;
-        case 2:  return this.readUnitExpr;
-        case 3:  return this.readUnitIsAsterisk;
+        case 2:  return this.readUnitIsAsterisk;
+        case 3:  return this.readUnitExpr;
         case 4:  return this.hiddenTRparen;
         default: return null;
         }
@@ -93,11 +93,11 @@ public class ASTRdCtlSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.rdIoCtlSpecList = (IASTListNode<ASTRdIoCtlSpecListNode>)value;
-        case 2:  this.readUnitExpr = (ASTUFExprNode)value;
-        case 3:  this.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.rdIoCtlSpecList = (IASTListNode<ASTRdIoCtlSpecListNode>)value; return;
+        case 2:  this.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.readUnitExpr = (ASTUFExprNode)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

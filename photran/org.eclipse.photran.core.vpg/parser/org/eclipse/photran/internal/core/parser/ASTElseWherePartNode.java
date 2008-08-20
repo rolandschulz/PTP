@@ -76,8 +76,8 @@ public class ASTElseWherePartNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
-        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
+        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
+        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

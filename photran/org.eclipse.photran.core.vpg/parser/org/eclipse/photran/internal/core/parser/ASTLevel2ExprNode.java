@@ -115,11 +115,11 @@ public class ASTLevel2ExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTLevel2ExprNode)value;
-        case 1:  this.addOperand = (ASTAddOperandNode)value;
-        case 2:  this.addOp = (ASTOperatorNode)value;
-        case 3:  this.rhs = (ASTSignNode)value;
-        case 4:  this.rhsExpr = (ASTAddOperandNode)value;
+        case 0:  this.lhsExpr = (ASTLevel2ExprNode)value; return;
+        case 1:  this.addOperand = (ASTAddOperandNode)value; return;
+        case 2:  this.addOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhs = (ASTSignNode)value; return;
+        case 4:  this.rhsExpr = (ASTAddOperandNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

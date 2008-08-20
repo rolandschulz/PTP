@@ -26,21 +26,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTTargetNode extends ASTNode
 {
+    ASTExprNode expr; // in ASTTargetNode
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTTargetNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTargetNode
-    ASTExprNode expr; // in ASTTargetNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTargetNode
-
-    public boolean isNull()
-    {
-        return this.isNull != null;
-    }
-
-    public void setIsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isNull = newValue;
-    }
-
 
     public ASTExprNode getExpr()
     {
@@ -50,6 +39,17 @@ public class ASTTargetNode extends ASTNode
     public void setExpr(ASTExprNode newValue)
     {
         this.expr = newValue;
+    }
+
+
+    public boolean isNull()
+    {
+        return this.isNull != null;
+    }
+
+    public void setIsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isNull = newValue;
     }
 
 
@@ -68,9 +68,9 @@ public class ASTTargetNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isNull;
-        case 1:  return this.hiddenTLparen;
-        case 2:  return this.expr;
+        case 0:  return this.expr;
+        case 1:  return this.isNull;
+        case 2:  return this.hiddenTLparen;
         case 3:  return this.hiddenTRparen;
         default: return null;
         }
@@ -80,10 +80,10 @@ public class ASTTargetNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.expr = (ASTExprNode)value;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.expr = (ASTExprNode)value; return;
+        case 1:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

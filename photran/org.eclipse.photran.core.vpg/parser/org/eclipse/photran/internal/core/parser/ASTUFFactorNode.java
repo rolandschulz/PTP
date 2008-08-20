@@ -102,10 +102,10 @@ public class ASTUFFactorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.rhsPrimary = (ASTUFPrimaryNode)value;
-        case 1:  this.lhsPrimary = (ASTUFPrimaryNode)value;
-        case 2:  this.powerOp = (ASTOperatorNode)value;
-        case 3:  this.rhsExpr = (ASTUFFactorNode)value;
+        case 0:  this.rhsPrimary = (ASTUFPrimaryNode)value; return;
+        case 1:  this.lhsPrimary = (ASTUFPrimaryNode)value; return;
+        case 2:  this.powerOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhsExpr = (ASTUFFactorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

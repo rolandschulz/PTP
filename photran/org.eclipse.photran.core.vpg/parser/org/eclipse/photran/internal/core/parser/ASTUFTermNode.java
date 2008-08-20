@@ -128,12 +128,12 @@ public class ASTUFTermNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.UFFactor = (ASTUFFactorNode)value;
-        case 1:  this.lhsExpr = (ASTUFTermNode)value;
-        case 2:  this.multOp = (ASTOperatorNode)value;
-        case 3:  this.rhsExpr = (ASTUFFactorNode)value;
-        case 4:  this.concatOp = (ASTOperatorNode)value;
-        case 5:  this.rhsPrimary = (ASTUFPrimaryNode)value;
+        case 0:  this.UFFactor = (ASTUFFactorNode)value; return;
+        case 1:  this.lhsExpr = (ASTUFTermNode)value; return;
+        case 2:  this.multOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhsExpr = (ASTUFFactorNode)value; return;
+        case 4:  this.concatOp = (ASTOperatorNode)value; return;
+        case 5:  this.rhsPrimary = (ASTUFPrimaryNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

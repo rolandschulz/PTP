@@ -93,11 +93,11 @@ public class ASTCharLengthNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.lengthExpr = (ASTExprNode)value;
-        case 3:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.lengthExpr = (ASTExprNode)value; return;
+        case 3:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

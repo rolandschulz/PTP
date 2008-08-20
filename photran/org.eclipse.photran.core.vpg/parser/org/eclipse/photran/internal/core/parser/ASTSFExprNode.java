@@ -115,11 +115,11 @@ public class ASTSFExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.SFTerm = (ASTSFTermNode)value;
-        case 1:  this.lhsExpr = (ASTSFExprNode)value;
-        case 2:  this.rhs = (ASTSignNode)value;
-        case 3:  this.addOp = (ASTOperatorNode)value;
-        case 4:  this.rhsExpr = (ASTAddOperandNode)value;
+        case 0:  this.SFTerm = (ASTSFTermNode)value; return;
+        case 1:  this.lhsExpr = (ASTSFExprNode)value; return;
+        case 2:  this.rhs = (ASTSignNode)value; return;
+        case 3:  this.addOp = (ASTOperatorNode)value; return;
+        case 4:  this.rhsExpr = (ASTAddOperandNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

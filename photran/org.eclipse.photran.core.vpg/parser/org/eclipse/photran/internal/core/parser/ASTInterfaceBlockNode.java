@@ -90,9 +90,9 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
     {
         switch (index)
         {
-        case 0:  this.interfaceStmt = (ASTInterfaceStmtNode)value;
-        case 1:  this.interfaceBlockBody = (IASTListNode<IInterfaceSpecification>)value;
-        case 2:  this.endInterfaceStmt = (ASTEndInterfaceStmtNode)value;
+        case 0:  this.interfaceStmt = (ASTInterfaceStmtNode)value; return;
+        case 1:  this.interfaceBlockBody = (IASTListNode<IInterfaceSpecification>)value; return;
+        case 2:  this.endInterfaceStmt = (ASTEndInterfaceStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

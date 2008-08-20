@@ -89,9 +89,9 @@ public class ASTElseConstructNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.elseStmt = (ASTElseStmtNode)value;
-        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value;
-        case 2:  this.endIfStmt = (ASTEndIfStmtNode)value;
+        case 0:  this.elseStmt = (ASTElseStmtNode)value; return;
+        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value; return;
+        case 2:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

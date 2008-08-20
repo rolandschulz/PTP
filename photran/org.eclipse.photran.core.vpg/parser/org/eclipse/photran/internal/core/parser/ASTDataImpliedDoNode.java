@@ -129,17 +129,17 @@ public class ASTDataImpliedDoNode extends ASTNode implements IDataIDoObject, IDa
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.dataIDoObjectList = (IASTListNode<IDataIDoObject>)value;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.impliedDoVariable = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.lb = (ASTExprNode)value;
-        case 6:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.ub = (ASTExprNode)value;
-        case 8:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.step = (ASTExprNode)value;
-        case 10: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.dataIDoObjectList = (IASTListNode<IDataIDoObject>)value; return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.impliedDoVariable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.lb = (ASTExprNode)value; return;
+        case 6:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.ub = (ASTExprNode)value; return;
+        case 8:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.step = (ASTExprNode)value; return;
+        case 10: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

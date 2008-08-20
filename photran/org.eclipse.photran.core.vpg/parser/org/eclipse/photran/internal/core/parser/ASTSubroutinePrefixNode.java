@@ -65,8 +65,8 @@ public class ASTSubroutinePrefixNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value;
-        case 1:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value; return;
+        case 1:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

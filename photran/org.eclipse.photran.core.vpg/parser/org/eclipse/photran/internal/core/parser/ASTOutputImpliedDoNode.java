@@ -140,18 +140,18 @@ public class ASTOutputImpliedDoNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.expr = (ASTExprNode)value;
-        case 2:  this.outputItemList1 = (ASTOutputItemList1Node)value;
-        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.impliedDoVariable = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.lb = (ASTExprNode)value;
-        case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 8:  this.ub = (ASTExprNode)value;
-        case 9:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 10: this.step = (ASTExprNode)value;
-        case 11: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.expr = (ASTExprNode)value; return;
+        case 2:  this.outputItemList1 = (ASTOutputItemList1Node)value; return;
+        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.impliedDoVariable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.lb = (ASTExprNode)value; return;
+        case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.ub = (ASTExprNode)value; return;
+        case 9:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.step = (ASTExprNode)value; return;
+        case 11: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

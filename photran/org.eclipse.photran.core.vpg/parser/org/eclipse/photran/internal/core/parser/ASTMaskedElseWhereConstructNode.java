@@ -115,11 +115,11 @@ public class ASTMaskedElseWhereConstructNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.maskedElseWhereStmt = (ASTMaskedElseWhereStmtNode)value;
-        case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
-        case 2:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value;
-        case 3:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
-        case 4:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value;
+        case 0:  this.maskedElseWhereStmt = (ASTMaskedElseWhereStmtNode)value; return;
+        case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
+        case 2:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
+        case 3:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
+        case 4:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

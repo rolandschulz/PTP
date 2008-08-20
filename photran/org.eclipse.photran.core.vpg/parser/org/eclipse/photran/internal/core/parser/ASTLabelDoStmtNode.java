@@ -110,14 +110,14 @@ public class ASTLabelDoStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTDo = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.lblRef = (ASTLblRefNode)value;
-        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.loopControl = (ASTLoopControlNode)value;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTDo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.lblRef = (ASTLblRefNode)value; return;
+        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.loopControl = (ASTLoopControlNode)value; return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

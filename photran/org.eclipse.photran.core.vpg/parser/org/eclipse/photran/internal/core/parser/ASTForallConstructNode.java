@@ -94,9 +94,9 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
     {
         switch (index)
         {
-        case 0:  this.forallConstructStmt = (ASTForallConstructStmtNode)value;
-        case 1:  this.forallBody = (IASTListNode<IForallBodyConstruct>)value;
-        case 2:  this.endForallStmt = (ASTEndForallStmtNode)value;
+        case 0:  this.forallConstructStmt = (ASTForallConstructStmtNode)value; return;
+        case 1:  this.forallBody = (IASTListNode<IForallBodyConstruct>)value; return;
+        case 2:  this.endForallStmt = (ASTEndForallStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

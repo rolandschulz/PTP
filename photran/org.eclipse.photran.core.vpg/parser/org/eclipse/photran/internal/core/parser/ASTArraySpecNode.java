@@ -102,10 +102,10 @@ public class ASTArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value;
-        case 1:  this.assumedSizeSpec = (ASTAssumedSizeSpecNode)value;
-        case 2:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value;
-        case 3:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value;
+        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
+        case 1:  this.assumedSizeSpec = (ASTAssumedSizeSpecNode)value; return;
+        case 2:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value; return;
+        case 3:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

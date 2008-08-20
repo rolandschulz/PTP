@@ -76,8 +76,8 @@ public class ASTLevel1ExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.definedUnaryOp = (ASTOperatorNode)value;
-        case 1:  this.rhsPrimary = (ASTPrimaryNode)value;
+        case 0:  this.definedUnaryOp = (ASTOperatorNode)value; return;
+        case 1:  this.rhsPrimary = (ASTPrimaryNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -81,10 +81,10 @@ public class ASTEquivalenceStmtNode extends ASTNode implements ISpecificationStm
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEquivalence = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.equivalenceSetList = (IASTListNode<ASTEquivalenceSetNode>)value;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEquivalence = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.equivalenceSetList = (IASTListNode<ASTEquivalenceSetNode>)value; return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

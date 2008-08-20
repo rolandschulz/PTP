@@ -78,9 +78,9 @@ public class ASTFunctionArgListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.functionArg = (ASTFunctionArgNode)value;
+        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.functionArg = (ASTFunctionArgNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

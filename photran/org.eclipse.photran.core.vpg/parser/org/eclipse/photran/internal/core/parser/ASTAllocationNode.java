@@ -91,10 +91,10 @@ public class ASTAllocationNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.allocateObject = (IASTListNode<ASTAllocateObjectNode>)value;
-        case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.allocateObject = (IASTListNode<ASTAllocateObjectNode>)value; return;
+        case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

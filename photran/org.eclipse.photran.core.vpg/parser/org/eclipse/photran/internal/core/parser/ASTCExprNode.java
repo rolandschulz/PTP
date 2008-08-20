@@ -89,9 +89,9 @@ public class ASTCExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTCExprNode)value;
-        case 1:  this.concatOp = (ASTOperatorNode)value;
-        case 2:  this.rhsPrimary = (ASTCPrimaryNode)value;
+        case 0:  this.lhsExpr = (ASTCExprNode)value; return;
+        case 1:  this.concatOp = (ASTOperatorNode)value; return;
+        case 2:  this.rhsPrimary = (ASTCPrimaryNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

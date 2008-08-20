@@ -109,13 +109,13 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.typeSpec = (ASTTypeSpecNode)value;
-        case 2:  this.attrSpecSeq = (IASTListNode<ASTAttrSpecSeqNode>)value;
-        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.entityDeclList = (IASTListNode<ASTEntityDeclNode>)value;
-        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.typeSpec = (ASTTypeSpecNode)value; return;
+        case 2:  this.attrSpecSeq = (IASTListNode<ASTAttrSpecSeqNode>)value; return;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.entityDeclList = (IASTListNode<ASTEntityDeclNode>)value; return;
+        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

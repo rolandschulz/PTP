@@ -78,9 +78,9 @@ public class ASTRenameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -107,12 +107,12 @@ public class ASTGenericSpecNode extends ASTNode implements IAccessId
     {
         switch (index)
         {
-        case 0:  this.isDefinedOperator = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.isAssignmentOperator = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.definedOperator = (ASTDefinedOperatorNode)value;
-        case 4:  this.equalsToken = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.isDefinedOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isAssignmentOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.definedOperator = (ASTDefinedOperatorNode)value; return;
+        case 4:  this.equalsToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

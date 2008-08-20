@@ -90,9 +90,9 @@ public class ASTModuleNode extends ScopingNode implements IProgramUnit
     {
         switch (index)
         {
-        case 0:  this.moduleStmt = (ASTModuleStmtNode)value;
-        case 1:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value;
-        case 2:  this.endModuleStmt = (ASTEndModuleStmtNode)value;
+        case 0:  this.moduleStmt = (ASTModuleStmtNode)value; return;
+        case 1:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value; return;
+        case 2:  this.endModuleStmt = (ASTEndModuleStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

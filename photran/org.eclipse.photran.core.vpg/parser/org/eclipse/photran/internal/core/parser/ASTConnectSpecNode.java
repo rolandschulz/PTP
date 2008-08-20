@@ -245,32 +245,32 @@ public class ASTConnectSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTDelimeq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.delimExpr = (ASTCExprNode)value;
-        case 3:  this.hiddenTActioneq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.actionExpr = (ASTCExprNode)value;
-        case 5:  this.hiddenTAccesseq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.hiddenTFileeq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.fileExpr = (ASTCExprNode)value;
-        case 8:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.hiddenTStatuseq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 10: this.hiddenTPadeq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 11: this.accessExpr = (ASTCExprNode)value;
-        case 12: this.hiddenTPositioneq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 13: this.positionExpr = (ASTCExprNode)value;
-        case 14: this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 15: this.ioStatVar = (ASTScalarVariableNode)value;
-        case 16: this.hiddenTFormeq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 17: this.formExpr = (ASTCExprNode)value;
-        case 18: this.hiddenTBlankeq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 19: this.blankExpr = (ASTCExprNode)value;
-        case 20: this.statusExpr = (ASTCExprNode)value;
-        case 21: this.padExpr = (ASTCExprNode)value;
-        case 22: this.unitIdentifier = (ASTUnitIdentifierNode)value;
-        case 23: this.errLbl = (ASTLblRefNode)value;
-        case 24: this.hiddenTRecleq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 25: this.reclExpr = (ASTExprNode)value;
+        case 0:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTDelimeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.delimExpr = (ASTCExprNode)value; return;
+        case 3:  this.hiddenTActioneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.actionExpr = (ASTCExprNode)value; return;
+        case 5:  this.hiddenTAccesseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.hiddenTFileeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.fileExpr = (ASTCExprNode)value; return;
+        case 8:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.hiddenTStatuseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenTPadeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.accessExpr = (ASTCExprNode)value; return;
+        case 12: this.hiddenTPositioneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 13: this.positionExpr = (ASTCExprNode)value; return;
+        case 14: this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 15: this.ioStatVar = (ASTScalarVariableNode)value; return;
+        case 16: this.hiddenTFormeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 17: this.formExpr = (ASTCExprNode)value; return;
+        case 18: this.hiddenTBlankeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 19: this.blankExpr = (ASTCExprNode)value; return;
+        case 20: this.statusExpr = (ASTCExprNode)value; return;
+        case 21: this.padExpr = (ASTCExprNode)value; return;
+        case 22: this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 23: this.errLbl = (ASTLblRefNode)value; return;
+        case 24: this.hiddenTRecleq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 25: this.reclExpr = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

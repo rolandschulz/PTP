@@ -106,12 +106,12 @@ public class ASTSubroutineArgNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.expr = (ASTExprNode)value;
-        case 3:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.expr = (ASTExprNode)value; return;
+        case 3:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

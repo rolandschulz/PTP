@@ -91,10 +91,10 @@ public class ASTIntentSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

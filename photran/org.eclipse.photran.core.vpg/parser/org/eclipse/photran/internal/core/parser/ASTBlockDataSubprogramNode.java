@@ -90,9 +90,9 @@ public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramU
     {
         switch (index)
         {
-        case 0:  this.blockDataStmt = (ASTBlockDataStmtNode)value;
-        case 1:  this.blockDataBody = (IASTListNode<IBlockDataBodyConstruct>)value;
-        case 2:  this.endBlockDataStmt = (ASTEndBlockDataStmtNode)value;
+        case 0:  this.blockDataStmt = (ASTBlockDataStmtNode)value; return;
+        case 1:  this.blockDataBody = (IASTListNode<IBlockDataBodyConstruct>)value; return;
+        case 2:  this.endBlockDataStmt = (ASTEndBlockDataStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -84,12 +84,12 @@ public class ASTEndInterfaceStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEndinterface = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTInterface = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.endName = (ASTEndNameNode)value;
-        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEndinterface = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTInterface = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.endName = (ASTEndNameNode)value; return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

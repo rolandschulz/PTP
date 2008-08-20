@@ -63,7 +63,7 @@ public class ASTSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.subscriptExpr = (ASTExprNode)value;
+        case 0:  this.subscriptExpr = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -103,10 +103,10 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.tIdent = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.tScon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.tEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.tIdent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.tScon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.tEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -84,12 +84,12 @@ public class ASTStmtFunctionRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
-        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.expr = (ASTExprNode)value;
-        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.expr = (ASTExprNode)value; return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

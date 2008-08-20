@@ -89,9 +89,9 @@ public class ASTAndOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.notOp = (ASTOperatorNode)value;
-        case 1:  this.level4Expr = (ASTLevel4ExprNode)value;
-        case 2:  this.rhsExpr = (ASTLevel4ExprNode)value;
+        case 0:  this.notOp = (ASTOperatorNode)value; return;
+        case 1:  this.level4Expr = (ASTLevel4ExprNode)value; return;
+        case 2:  this.rhsExpr = (ASTLevel4ExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

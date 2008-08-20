@@ -116,11 +116,11 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     {
         switch (index)
         {
-        case 0:  this.functionStmt = (ASTFunctionStmtNode)value;
-        case 1:  this.subroutineStmt = (ASTSubroutineStmtNode)value;
-        case 2:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value;
-        case 3:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value;
-        case 4:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value;
+        case 0:  this.functionStmt = (ASTFunctionStmtNode)value; return;
+        case 1:  this.subroutineStmt = (ASTSubroutineStmtNode)value; return;
+        case 2:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; return;
+        case 3:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
+        case 4:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

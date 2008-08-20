@@ -89,9 +89,9 @@ public class ASTElseWhereConstructNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.elseWhereStmt = (ASTElseWhereStmtNode)value;
-        case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
-        case 2:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
+        case 0:  this.elseWhereStmt = (ASTElseWhereStmtNode)value; return;
+        case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
+        case 2:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

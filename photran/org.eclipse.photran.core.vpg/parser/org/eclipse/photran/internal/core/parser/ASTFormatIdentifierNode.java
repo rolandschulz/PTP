@@ -26,20 +26,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTFormatIdentifierNode extends ASTNode
 {
-    ASTCExprNode formatExpr; // in ASTFormatIdentifierNode
     org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTFormatIdentifierNode
+    ASTCExprNode formatExpr; // in ASTFormatIdentifierNode
     ASTLblRefNode formatLbl; // in ASTFormatIdentifierNode
-
-    public ASTCExprNode getFormatExpr()
-    {
-        return this.formatExpr;
-    }
-
-    public void setFormatExpr(ASTCExprNode newValue)
-    {
-        this.formatExpr = newValue;
-    }
-
 
     public boolean formatIsAsterisk()
     {
@@ -49,6 +38,17 @@ public class ASTFormatIdentifierNode extends ASTNode
     public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.formatIsAsterisk = newValue;
+    }
+
+
+    public ASTCExprNode getFormatExpr()
+    {
+        return this.formatExpr;
+    }
+
+    public void setFormatExpr(ASTCExprNode newValue)
+    {
+        this.formatExpr = newValue;
     }
 
 
@@ -78,8 +78,8 @@ public class ASTFormatIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.formatExpr;
-        case 1:  return this.formatIsAsterisk;
+        case 0:  return this.formatIsAsterisk;
+        case 1:  return this.formatExpr;
         case 2:  return this.formatLbl;
         default: return null;
         }
@@ -89,9 +89,9 @@ public class ASTFormatIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.formatExpr = (ASTCExprNode)value;
-        case 1:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.formatLbl = (ASTLblRefNode)value;
+        case 0:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.formatExpr = (ASTCExprNode)value; return;
+        case 2:  this.formatLbl = (ASTLblRefNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

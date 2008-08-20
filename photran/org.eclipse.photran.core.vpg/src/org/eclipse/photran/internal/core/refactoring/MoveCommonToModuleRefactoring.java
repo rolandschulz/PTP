@@ -26,7 +26,6 @@ import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTCommonBlockListNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNameNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockObjectNode;
@@ -240,7 +239,7 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
             }
             else
             {
-                removeCommonBlockFromCommonStmt(commonBlock);
+                commonBlock.removeFromTree();
                 addUseStmtAfterCommonStmt(useStmt, enclosingCommonStmt);
             }
             
@@ -268,6 +267,11 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     
     private void removeSpecificationStmtsForCommonBlockVars(ASTCommonBlockNode commonBlock)
     {
+        // TODO: Should only remove this variable, not the entire spec statement
+        //   common a, b
+        //   integer :: a, b
+        // will cause an IllegalStateException since the decl statement will be removed twice
+        
         for (ASTCommonBlockObjectNode obj : commonBlock.getCommonBlockObjectList())
             for (ISpecificationPartConstruct specStmt : findSpecificationStmtsFor(obj.getVariableName()))
                 specStmt.removeFromTree();
@@ -276,11 +280,6 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     private ASTUseStmtNode constructUseStmt()
     {
         return (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName);
-    }
-
-    private void removeCommonBlockFromCommonStmt(ASTCommonBlockNode node)
-    {
-        node.findNearestAncestor(ASTCommonBlockListNode.class).removeFromTree();
     }
 
     @SuppressWarnings("unchecked")

@@ -83,11 +83,11 @@ public class ASTModuleProcedureStmtNode extends ASTNode implements IInterfaceSpe
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTProcedure = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.procedureNameList = (IASTListNode<ASTProcedureNameListNode>)value;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTProcedure = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.procedureNameList = (IASTListNode<ASTProcedureNameListNode>)value; return;
+        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

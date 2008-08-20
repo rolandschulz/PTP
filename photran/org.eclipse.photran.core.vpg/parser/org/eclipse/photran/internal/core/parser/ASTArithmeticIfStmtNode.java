@@ -128,17 +128,17 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.expr = (ASTExprNode)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.first = (ASTLblRefNode)value;
-        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.second = (ASTLblRefNode)value;
-        case 8:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.third = (ASTLblRefNode)value;
-        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.expr = (ASTExprNode)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.first = (ASTLblRefNode)value; return;
+        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.second = (ASTLblRefNode)value; return;
+        case 8:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.third = (ASTLblRefNode)value; return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

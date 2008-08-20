@@ -201,23 +201,23 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     {
         switch (index)
         {
-        case 0:  this.lblDef = (ASTLblDefNode)value;
-        case 1:  this.lhsVariable = (ASTNameNode)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.lhsExprList = (IASTListNode<ASTSFExprListNode>)value;
-        case 4:  this.lhsNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value;
-        case 8:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
-        case 10: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 11: this.substringRange = (ASTSubstringRangeNode)value;
-        case 12: this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 13: this.rhs = (ASTExprNode)value;
-        case 14: this.isPointerAssignment = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 15: this.target = (ASTTargetNode)value;
-        case 16: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.lblDef = (ASTLblDefNode)value; return;
+        case 1:  this.lhsVariable = (ASTNameNode)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.lhsExprList = (IASTListNode<ASTSFExprListNode>)value; return;
+        case 4:  this.lhsNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; return;
+        case 8:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 10: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.substringRange = (ASTSubstringRangeNode)value; return;
+        case 12: this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 13: this.rhs = (ASTExprNode)value; return;
+        case 14: this.isPointerAssignment = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 15: this.target = (ASTTargetNode)value; return;
+        case 16: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

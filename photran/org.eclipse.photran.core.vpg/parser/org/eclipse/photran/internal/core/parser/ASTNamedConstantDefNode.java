@@ -78,9 +78,9 @@ public class ASTNamedConstantDefNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.namedConstant = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.initializationExpr = (ASTExprNode)value;
+        case 0:  this.namedConstant = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.initializationExpr = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

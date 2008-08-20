@@ -76,8 +76,8 @@ public class ASTSelectCaseRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value;
-        case 1:  this.endSelectStmt = (ASTEndSelectStmtNode)value;
+        case 0:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value; return;
+        case 1:  this.endSelectStmt = (ASTEndSelectStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

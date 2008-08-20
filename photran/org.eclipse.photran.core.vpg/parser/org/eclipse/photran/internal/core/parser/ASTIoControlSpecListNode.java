@@ -91,10 +91,10 @@ public class ASTIoControlSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.formatIdentifier = (ASTFormatIdentifierNode)value;
-        case 3:  this.ioControlSpec = (ASTIoControlSpecNode)value;
+        case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.formatIdentifier = (ASTFormatIdentifierNode)value; return;
+        case 3:  this.ioControlSpec = (ASTIoControlSpecNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

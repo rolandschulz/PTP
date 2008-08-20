@@ -130,13 +130,13 @@ public class ASTUnsignedArithmeticConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.complexConst = (ASTComplexConstNode)value;
-        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.dblConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.realConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.namedConstKind = (ASTNamedConstantUseNode)value;
+        case 0:  this.complexConst = (ASTComplexConstNode)value; return;
+        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.dblConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.realConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

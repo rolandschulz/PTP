@@ -120,11 +120,11 @@ public class ASTFunctionSubprogramNode extends ScopingNode implements IInternalS
     {
         switch (index)
         {
-        case 0:  this.functionStmt = (ASTFunctionStmtNode)value;
-        case 1:  this.body = (IASTListNode<IBodyConstruct>)value;
-        case 2:  this.containsStmt = (ASTContainsStmtNode)value;
-        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value;
-        case 4:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value;
+        case 0:  this.functionStmt = (ASTFunctionStmtNode)value; return;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; return;
+        case 2:  this.containsStmt = (ASTContainsStmtNode)value; return;
+        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
+        case 4:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

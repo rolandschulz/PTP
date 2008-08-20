@@ -104,11 +104,11 @@ public class ASTOutputItemList1Node extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.outputItemList1 = (ASTOutputItemList1Node)value;
-        case 1:  this.expr1 = (ASTExprNode)value;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value;
-        case 4:  this.expr2 = (ASTExprNode)value;
+        case 0:  this.outputItemList1 = (ASTOutputItemList1Node)value; return;
+        case 1:  this.expr1 = (ASTExprNode)value; return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value; return;
+        case 4:  this.expr2 = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

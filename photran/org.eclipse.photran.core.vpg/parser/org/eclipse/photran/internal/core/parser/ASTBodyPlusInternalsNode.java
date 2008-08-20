@@ -89,9 +89,9 @@ public class ASTBodyPlusInternalsNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.body = (IASTListNode<IBodyConstruct>)value;
-        case 1:  this.containsStmt = (ASTContainsStmtNode)value;
-        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value;
+        case 0:  this.body = (IASTListNode<IBodyConstruct>)value; return;
+        case 1:  this.containsStmt = (ASTContainsStmtNode)value; return;
+        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

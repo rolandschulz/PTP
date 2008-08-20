@@ -95,12 +95,12 @@ public class ASTPositionSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.ioStatVar = (ASTScalarVariableNode)value;
-        case 3:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
-        case 5:  this.errLbl = (ASTLblRefNode)value;
+        case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.ioStatVar = (ASTScalarVariableNode)value; return;
+        case 3:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 5:  this.errLbl = (ASTLblRefNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

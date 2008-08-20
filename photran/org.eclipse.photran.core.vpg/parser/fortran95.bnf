@@ -983,17 +983,36 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 #<Comblock> ::=
 #  | T_SLASH                   T_SLASH
 #  | T_SLASH <CommonBlockName> T_SLASH
-#JO--X
+##JO--X
+## R549
+#<CommonStmt> ::=
+#  (inline):<LblDef> -:T_COMMON <CommonBlockList> -:T_EOS
+#(list):<CommonBlockList> ::=
+#  |                             <CommonBlock>
+#  | <CommonBlockList>           <CommonBlock>
+#  | <CommonBlockList> -:T_COMMA <CommonBlock>
+#<CommonBlock> ::=
+#  |                                            <CommonBlockObjectList>
+#  | -:T_SLASH                        -:T_SLASH <CommonBlockObjectList>
+#  | -:T_SLASH name:<CommonBlockName> -:T_SLASH <CommonBlockObjectList>
+#(list):<CommonBlockObjectList> ::=
+#  |                         <CommonBlockObject>
+#  | <CommonBlockObjectList> <CommonBlockObject>
+#
+## R550
+#<CommonBlockObject> ::=
+#  | (inline):<VariableName>
+#  | (inline):<ArrayDeclarator>
+#JO--XX
 # R549
 <CommonStmt> ::=
   (inline):<LblDef> -:T_COMMON <CommonBlockList> -:T_EOS
 (list):<CommonBlockList> ::=
-  |                             <CommonBlock>
-  | <CommonBlockList>           <CommonBlock>
-  | <CommonBlockList> -:T_COMMA <CommonBlock>
+  |                   <CommonBlock>
+  | <CommonBlockList> <CommonBlock>
 <CommonBlock> ::=
-  |                                             <CommonBlockObjectList>
-  | -:T_SLASH                         -:T_SLASH <CommonBlockObjectList>
+  |                                            <CommonBlockObjectList>
+  | -:T_SLASH                        -:T_SLASH <CommonBlockObjectList>
   | -:T_SLASH name:<CommonBlockName> -:T_SLASH <CommonBlockObjectList>
 (list):<CommonBlockObjectList> ::=
   |                         <CommonBlockObject>
@@ -1003,6 +1022,8 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 <CommonBlockObject> ::=
   | (inline):<VariableName>
   | (inline):<ArrayDeclarator>
+  | (inline):<VariableName>    -:T_COMMA
+  | (inline):<ArrayDeclarator> -:T_COMMA
 
 
 #######################################################################################################################

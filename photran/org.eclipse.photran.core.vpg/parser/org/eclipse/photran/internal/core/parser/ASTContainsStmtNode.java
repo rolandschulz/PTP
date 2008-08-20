@@ -68,9 +68,9 @@ public class ASTContainsStmtNode extends ASTNode implements IModuleSubprogramPar
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTContains = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTContains = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

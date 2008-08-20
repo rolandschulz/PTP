@@ -102,10 +102,10 @@ public class ASTFormatEditNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.editElement = (ASTEditElementNode)value;
-        case 3:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.editElement = (ASTEditElementNode)value; return;
+        case 3:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

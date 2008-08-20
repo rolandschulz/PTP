@@ -76,8 +76,8 @@ public class ASTSectionSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.expr = (ASTExprNode)value;
-        case 1:  this.subscriptTriplet = (ASTSubscriptTripletNode)value;
+        case 0:  this.expr = (ASTExprNode)value; return;
+        case 1:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

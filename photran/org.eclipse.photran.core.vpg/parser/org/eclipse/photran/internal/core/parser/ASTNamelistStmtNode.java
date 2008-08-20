@@ -92,10 +92,10 @@ public class ASTNamelistStmtNode extends ASTNode implements ISpecificationStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.tNamelist = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.namelistGroups = (IASTListNode<ASTNamelistGroupsNode>)value;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.tNamelist = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.namelistGroups = (IASTListNode<ASTNamelistGroupsNode>)value; return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

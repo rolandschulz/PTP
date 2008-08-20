@@ -110,14 +110,14 @@ public class ASTCloseSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.errLbl = (ASTLblRefNode)value;
-        case 2:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
-        case 4:  this.hiddenTStatuseq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.statusExpr = (ASTCExprNode)value;
-        case 6:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.ioStatVar = (ASTScalarVariableNode)value;
+        case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.errLbl = (ASTLblRefNode)value; return;
+        case 2:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 4:  this.hiddenTStatuseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.statusExpr = (ASTCExprNode)value; return;
+        case 6:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.ioStatVar = (ASTScalarVariableNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

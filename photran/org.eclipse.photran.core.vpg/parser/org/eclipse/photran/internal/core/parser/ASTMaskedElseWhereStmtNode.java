@@ -101,15 +101,15 @@ public class ASTMaskedElseWhereStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTElsewhere = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.maskExpr = (ASTExprNode)value;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTElsewhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.maskExpr = (ASTExprNode)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

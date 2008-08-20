@@ -63,7 +63,7 @@ public class ASTMaskExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.maskExpr = (ASTExprNode)value;
+        case 0:  this.maskExpr = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

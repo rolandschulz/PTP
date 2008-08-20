@@ -104,11 +104,11 @@ public class ASTInterfaceStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.interfaceToken = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.genericName = (ASTGenericNameNode)value;
-        case 3:  this.genericSpec = (ASTGenericSpecNode)value;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.interfaceToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.genericName = (ASTGenericNameNode)value; return;
+        case 3:  this.genericSpec = (ASTGenericSpecNode)value; return;
+        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

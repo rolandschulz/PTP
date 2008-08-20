@@ -76,8 +76,8 @@ public class ASTPointerObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value;
-        case 1:  this.pointerField = (IASTListNode<ASTPointerFieldNode>)value;
+        case 0:  this.name = (ASTNameNode)value; return;
+        case 1:  this.pointerField = (IASTListNode<ASTPointerFieldNode>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

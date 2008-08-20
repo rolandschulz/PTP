@@ -54,8 +54,8 @@ public class ASTDeferredShapeSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

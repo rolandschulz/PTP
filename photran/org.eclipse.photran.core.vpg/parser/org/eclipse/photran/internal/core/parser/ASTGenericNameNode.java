@@ -64,7 +64,7 @@ public class ASTGenericNameNode extends ASTNode implements IAccessId
     {
         switch (index)
         {
-        case 0:  this.genericName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.genericName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

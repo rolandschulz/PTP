@@ -63,7 +63,7 @@ public class ASTUpperBoundNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.ub = (ASTExprNode)value;
+        case 0:  this.ub = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

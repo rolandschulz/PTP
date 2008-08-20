@@ -76,8 +76,8 @@ public class ASTKindParamNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value;
-        case 1:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
+        case 1:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

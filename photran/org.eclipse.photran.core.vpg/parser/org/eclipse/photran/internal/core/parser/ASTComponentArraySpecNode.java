@@ -76,8 +76,8 @@ public class ASTComponentArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value;
-        case 1:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value;
+        case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
+        case 1:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

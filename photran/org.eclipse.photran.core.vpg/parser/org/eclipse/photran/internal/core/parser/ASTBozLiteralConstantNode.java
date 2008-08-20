@@ -89,9 +89,9 @@ public class ASTBozLiteralConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -108,13 +108,13 @@ public class ASTForallTripletSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.lb = (ASTSubscriptNode)value;
-        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.ub = (ASTSubscriptNode)value;
-        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.stepExpr = (ASTExprNode)value;
+        case 0:  this.name = (ASTNameNode)value; return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.lb = (ASTSubscriptNode)value; return;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.ub = (ASTSubscriptNode)value; return;
+        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.stepExpr = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

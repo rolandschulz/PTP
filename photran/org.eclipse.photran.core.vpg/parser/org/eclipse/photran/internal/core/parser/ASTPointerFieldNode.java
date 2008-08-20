@@ -132,14 +132,14 @@ public class ASTPointerFieldNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value;
-        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.SFExprList = (IASTListNode<ASTSFExprListNode>)value;
-        case 4:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.hasDerivedTypeComponentRef = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.componentName = (ASTNameNode)value;
+        case 0:  this.name = (ASTNameNode)value; return;
+        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.SFExprList = (IASTListNode<ASTSFExprListNode>)value; return;
+        case 4:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.hasDerivedTypeComponentRef = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.componentName = (ASTNameNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

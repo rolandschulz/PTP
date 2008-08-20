@@ -180,16 +180,16 @@ public class ASTDefinedOperatorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.orOp = (ASTOperatorNode)value;
-        case 1:  this.multOp = (ASTOperatorNode)value;
-        case 2:  this.equivOp = (ASTOperatorNode)value;
-        case 3:  this.andOp = (ASTOperatorNode)value;
-        case 4:  this.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.relOp = (ASTOperatorNode)value;
-        case 6:  this.powerOp = (ASTOperatorNode)value;
-        case 7:  this.notOp = (ASTOperatorNode)value;
-        case 8:  this.concatOp = (ASTOperatorNode)value;
-        case 9:  this.addOp = (ASTOperatorNode)value;
+        case 0:  this.orOp = (ASTOperatorNode)value; return;
+        case 1:  this.multOp = (ASTOperatorNode)value; return;
+        case 2:  this.equivOp = (ASTOperatorNode)value; return;
+        case 3:  this.andOp = (ASTOperatorNode)value; return;
+        case 4:  this.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.relOp = (ASTOperatorNode)value; return;
+        case 6:  this.powerOp = (ASTOperatorNode)value; return;
+        case 7:  this.notOp = (ASTOperatorNode)value; return;
+        case 8:  this.concatOp = (ASTOperatorNode)value; return;
+        case 9:  this.addOp = (ASTOperatorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

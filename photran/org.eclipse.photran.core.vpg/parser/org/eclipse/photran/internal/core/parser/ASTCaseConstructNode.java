@@ -90,9 +90,9 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
     {
         switch (index)
         {
-        case 0:  this.selectCaseStmt = (ASTSelectCaseStmtNode)value;
-        case 1:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value;
-        case 2:  this.endSelectStmt = (ASTEndSelectStmtNode)value;
+        case 0:  this.selectCaseStmt = (ASTSelectCaseStmtNode)value; return;
+        case 1:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value; return;
+        case 2:  this.endSelectStmt = (ASTEndSelectStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

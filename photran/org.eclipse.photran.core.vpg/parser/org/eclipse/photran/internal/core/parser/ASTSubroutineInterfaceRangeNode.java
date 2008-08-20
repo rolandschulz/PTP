@@ -76,8 +76,8 @@ public class ASTSubroutineInterfaceRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value;
-        case 1:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value;
+        case 0:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; return;
+        case 1:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

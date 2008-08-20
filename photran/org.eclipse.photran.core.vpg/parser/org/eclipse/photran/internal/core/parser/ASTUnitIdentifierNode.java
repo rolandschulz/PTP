@@ -76,8 +76,8 @@ public class ASTUnitIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.expression = (ASTUFExprNode)value;
+        case 0:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.expression = (ASTUFExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

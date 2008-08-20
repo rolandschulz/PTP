@@ -90,9 +90,9 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     {
         switch (index)
         {
-        case 0:  this.derivedTypeStmt = (ASTDerivedTypeStmtNode)value;
-        case 1:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value;
-        case 2:  this.endTypeStmt = (ASTEndTypeStmtNode)value;
+        case 0:  this.derivedTypeStmt = (ASTDerivedTypeStmtNode)value; return;
+        case 1:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value; return;
+        case 2:  this.endTypeStmt = (ASTEndTypeStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -119,13 +119,13 @@ public class ASTEditElementNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

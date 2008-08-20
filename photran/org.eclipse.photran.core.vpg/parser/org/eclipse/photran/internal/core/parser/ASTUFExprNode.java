@@ -115,11 +115,11 @@ public class ASTUFExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTUFExprNode)value;
-        case 1:  this.rhs2 = (ASTSignNode)value;
-        case 2:  this.UFTerm = (ASTUFTermNode)value;
-        case 3:  this.addOp = (ASTOperatorNode)value;
-        case 4:  this.rhsExpr = (ASTUFTermNode)value;
+        case 0:  this.lhsExpr = (ASTUFExprNode)value; return;
+        case 1:  this.rhs2 = (ASTSignNode)value; return;
+        case 2:  this.UFTerm = (ASTUFTermNode)value; return;
+        case 3:  this.addOp = (ASTOperatorNode)value; return;
+        case 4:  this.rhsExpr = (ASTUFTermNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -102,10 +102,10 @@ public class ASTLevel5ExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.equivOperand = (ASTEquivOperandNode)value;
-        case 1:  this.lhsExpr = (ASTLevel5ExprNode)value;
-        case 2:  this.equivOp = (ASTOperatorNode)value;
-        case 3:  this.rhsExpr = (ASTEquivOperandNode)value;
+        case 0:  this.equivOperand = (ASTEquivOperandNode)value; return;
+        case 1:  this.lhsExpr = (ASTLevel5ExprNode)value; return;
+        case 2:  this.equivOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhsExpr = (ASTEquivOperandNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

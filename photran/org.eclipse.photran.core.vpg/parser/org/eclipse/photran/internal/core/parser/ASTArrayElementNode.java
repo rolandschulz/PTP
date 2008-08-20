@@ -94,11 +94,11 @@ public class ASTArrayElementNode extends ASTNode implements IDataIDoObject
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.structureComponent = (IASTListNode<ASTStructureComponentNode>)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.structureComponent = (IASTListNode<ASTStructureComponentNode>)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -102,10 +102,10 @@ public class ASTWhereRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value;
-        case 1:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value;
-        case 2:  this.endWhereStmt = (ASTEndWhereStmtNode)value;
-        case 3:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value;
+        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
+        case 1:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
+        case 2:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
+        case 3:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

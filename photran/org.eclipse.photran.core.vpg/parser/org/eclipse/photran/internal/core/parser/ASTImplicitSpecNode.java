@@ -76,8 +76,8 @@ public class ASTImplicitSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.typeSpec = (ASTTypeSpecNode)value;
-        case 1:  this.charRanges = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.typeSpec = (ASTTypeSpecNode)value; return;
+        case 1:  this.charRanges = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

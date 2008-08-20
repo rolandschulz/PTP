@@ -80,10 +80,10 @@ public class ASTSavedEntityNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

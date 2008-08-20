@@ -82,11 +82,11 @@ public class ASTEquivalenceSetNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.variable = (ASTVariableNode)value;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.equivalentObjects = (IASTListNode<ASTEquivalenceObjectListNode>)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.variable = (ASTVariableNode)value; return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.equivalentObjects = (IASTListNode<ASTEquivalenceObjectListNode>)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

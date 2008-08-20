@@ -76,8 +76,8 @@ public class ASTInterfaceRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.interfaceBlockBody = (IASTListNode<IInterfaceSpecification>)value;
-        case 1:  this.endInterfaceStmt = (ASTEndInterfaceStmtNode)value;
+        case 0:  this.interfaceBlockBody = (IASTListNode<IInterfaceSpecification>)value; return;
+        case 1:  this.endInterfaceStmt = (ASTEndInterfaceStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

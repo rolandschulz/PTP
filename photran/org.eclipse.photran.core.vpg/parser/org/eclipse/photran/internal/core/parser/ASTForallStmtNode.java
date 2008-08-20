@@ -118,15 +118,15 @@ public class ASTForallStmtNode extends ASTNode implements IActionStmt, IBodyCons
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTForall = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value;
-        case 4:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.assignment = (ASTAssignmentStmtNode)value;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTForall = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value; return;
+        case 4:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.assignment = (ASTAssignmentStmtNode)value; return;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

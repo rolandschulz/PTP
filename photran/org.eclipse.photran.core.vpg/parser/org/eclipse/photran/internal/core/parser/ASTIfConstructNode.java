@@ -116,11 +116,11 @@ public class ASTIfConstructNode extends ASTNode implements IExecutableConstruct
     {
         switch (index)
         {
-        case 0:  this.ifThenStmt = (ASTIfThenStmtNode)value;
-        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value;
-        case 2:  this.elseConstruct = (ASTElseConstructNode)value;
-        case 3:  this.elseIfConstruct = (ASTElseIfConstructNode)value;
-        case 4:  this.endIfStmt = (ASTEndIfStmtNode)value;
+        case 0:  this.ifThenStmt = (ASTIfThenStmtNode)value; return;
+        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value; return;
+        case 2:  this.elseConstruct = (ASTElseConstructNode)value; return;
+        case 3:  this.elseIfConstruct = (ASTElseIfConstructNode)value; return;
+        case 4:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

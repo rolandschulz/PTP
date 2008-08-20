@@ -63,7 +63,7 @@ public class ASTLowerBoundNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (ASTExprNode)value;
+        case 0:  this.lb = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

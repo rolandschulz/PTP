@@ -102,15 +102,15 @@ public class ASTEndfileStmtNode extends ASTNode implements IActionStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTEndfile = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTFile = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
-        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.positionSpecList = (IASTListNode<ASTPositionSpecListNode>)value;
-        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEndfile = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTFile = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.positionSpecList = (IASTListNode<ASTPositionSpecListNode>)value; return;
+        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

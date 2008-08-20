@@ -28,7 +28,7 @@ public class ASTCommonStmtNode extends ASTNode implements ISpecificationStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTCommonStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTCommon; // in ASTCommonStmtNode
-    IASTListNode<ASTCommonBlockListNode> commonBlockList; // in ASTCommonStmtNode
+    IASTListNode<ASTCommonBlockNode> commonBlockList; // in ASTCommonStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCommonStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -42,12 +42,12 @@ public class ASTCommonStmtNode extends ASTNode implements ISpecificationStmt
     }
 
 
-    public IASTListNode<ASTCommonBlockListNode> getCommonBlockList()
+    public IASTListNode<ASTCommonBlockNode> getCommonBlockList()
     {
         return this.commonBlockList;
     }
 
-    public void setCommonBlockList(IASTListNode<ASTCommonBlockListNode> newValue)
+    public void setCommonBlockList(IASTListNode<ASTCommonBlockNode> newValue)
     {
         this.commonBlockList = newValue;
     }
@@ -81,10 +81,10 @@ public class ASTCommonStmtNode extends ASTNode implements ISpecificationStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTCommon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.commonBlockList = (IASTListNode<ASTCommonBlockListNode>)value;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTCommon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.commonBlockList = (IASTListNode<ASTCommonBlockNode>)value; return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

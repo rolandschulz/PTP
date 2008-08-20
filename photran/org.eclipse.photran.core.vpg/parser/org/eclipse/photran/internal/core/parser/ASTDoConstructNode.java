@@ -64,7 +64,7 @@ public class ASTDoConstructNode extends ASTNode implements IExecutableConstruct
     {
         switch (index)
         {
-        case 0:  this.labelDoStmt = (ASTLabelDoStmtNode)value;
+        case 0:  this.labelDoStmt = (ASTLabelDoStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

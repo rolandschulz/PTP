@@ -108,12 +108,12 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     {
         switch (index)
         {
-        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.dataRef = (IASTListNode<ASTDataRefNode>)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.substringRange = (ASTSubstringRangeNode)value;
+        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.dataRef = (IASTListNode<ASTDataRefNode>)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.substringRange = (ASTSubstringRangeNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

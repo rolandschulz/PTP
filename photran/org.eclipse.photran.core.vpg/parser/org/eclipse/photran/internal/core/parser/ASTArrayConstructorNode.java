@@ -67,9 +67,9 @@ public class ASTArrayConstructorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparenslash = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.acValueList = (IASTListNode<ASTAcValueNode>)value;
-        case 2:  this.hiddenTSlashrparen = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.hiddenTLparenslash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.acValueList = (IASTListNode<ASTAcValueNode>)value; return;
+        case 2:  this.hiddenTSlashrparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

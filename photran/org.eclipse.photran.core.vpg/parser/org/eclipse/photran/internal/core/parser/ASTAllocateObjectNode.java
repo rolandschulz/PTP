@@ -76,8 +76,8 @@ public class ASTAllocateObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value;
-        case 1:  this.variableName = (ASTVariableNameNode)value;
+        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
+        case 1:  this.variableName = (ASTVariableNameNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

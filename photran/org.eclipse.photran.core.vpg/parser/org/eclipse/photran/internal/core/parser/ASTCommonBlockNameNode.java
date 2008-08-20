@@ -63,7 +63,7 @@ public class ASTCommonBlockNameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

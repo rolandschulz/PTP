@@ -63,7 +63,7 @@ public class ASTFunctionNameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.functionName = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.functionName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

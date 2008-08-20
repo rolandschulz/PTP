@@ -102,10 +102,10 @@ public class ASTSubroutineRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.body = (IASTListNode<IBodyConstruct>)value;
-        case 1:  this.containsStmt = (ASTContainsStmtNode)value;
-        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value;
-        case 3:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value;
+        case 0:  this.body = (IASTListNode<IBodyConstruct>)value; return;
+        case 1:  this.containsStmt = (ASTContainsStmtNode)value; return;
+        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
+        case 3:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

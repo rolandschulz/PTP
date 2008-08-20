@@ -110,14 +110,14 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value;
-        case 2:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.subroutineName = (ASTSubroutineNameNode)value;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value; return;
+        case 2:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.subroutineName = (ASTSubroutineNameNode)value; return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

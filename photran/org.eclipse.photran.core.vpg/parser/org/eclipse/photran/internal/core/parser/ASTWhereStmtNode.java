@@ -102,12 +102,12 @@ public class ASTWhereStmtNode extends ASTNode implements IActionStmt, IBodyConst
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.maskExpr = (ASTMaskExprNode)value;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.assignmentStmt = (ASTAssignmentStmtNode)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.maskExpr = (ASTMaskExprNode)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.assignmentStmt = (ASTAssignmentStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

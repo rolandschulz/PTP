@@ -76,8 +76,8 @@ public class ASTSubstrConstNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.substringRange = (ASTSubstringRangeNode)value;
+        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.substringRange = (ASTSubstringRangeNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

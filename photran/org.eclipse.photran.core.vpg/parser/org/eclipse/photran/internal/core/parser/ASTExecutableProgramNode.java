@@ -63,7 +63,7 @@ public class ASTExecutableProgramNode extends ScopingNode
     {
         switch (index)
         {
-        case 0:  this.programUnitList = (IASTListNode<IProgramUnit>)value;
+        case 0:  this.programUnitList = (IASTListNode<IProgramUnit>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

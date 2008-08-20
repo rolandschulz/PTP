@@ -132,14 +132,14 @@ public class ASTSFPrimaryNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.SFDataRef = (IASTListNode<ASTSFDataRefNode>)value;
-        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.arrayConstructor = (ASTArrayConstructorNode)value;
-        case 3:  this.functionReference = (ASTFunctionReferenceNode)value;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.nestedExpression = (ASTExprNode)value;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.SFVarName = (ASTSFVarNameNode)value;
+        case 0:  this.SFDataRef = (IASTListNode<ASTSFDataRefNode>)value; return;
+        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.arrayConstructor = (ASTArrayConstructorNode)value; return;
+        case 3:  this.functionReference = (ASTFunctionReferenceNode)value; return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.nestedExpression = (ASTExprNode)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.SFVarName = (ASTSFVarNameNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

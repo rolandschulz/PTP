@@ -78,9 +78,9 @@ public class ASTCloseSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.unitIdentifier = (ASTUnitIdentifierNode)value;
-        case 2:  this.closeSpec = (ASTCloseSpecNode)value;
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 2:  this.closeSpec = (ASTCloseSpecNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

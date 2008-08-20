@@ -113,15 +113,15 @@ public class ASTInquireStmtNode extends ASTNode implements IActionStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTInquire = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.inquireSpecList = (IASTListNode<ASTInquireSpecListNode>)value;
-        case 4:  this.hiddenTIolengtheq = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.ioLengthVar = (ASTScalarVariableNode)value;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.outputItemList = (ASTOutputItemListNode)value;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTInquire = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.inquireSpecList = (IASTListNode<ASTInquireSpecListNode>)value; return;
+        case 4:  this.hiddenTIolengtheq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.ioLengthVar = (ASTScalarVariableNode)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.outputItemList = (ASTOutputItemListNode)value; return;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

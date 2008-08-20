@@ -114,16 +114,16 @@ public class ASTForallConstructStmtNode extends ASTNodeWithErrorRecoverySymbols
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.hiddenTForall = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value;
-        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value;
-        case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTForall = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value; return;
+        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value; return;
+        case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

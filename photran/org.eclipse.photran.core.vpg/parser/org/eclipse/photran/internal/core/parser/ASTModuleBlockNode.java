@@ -76,8 +76,8 @@ public class ASTModuleBlockNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value;
-        case 1:  this.endModuleStmt = (ASTEndModuleStmtNode)value;
+        case 0:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value; return;
+        case 1:  this.endModuleStmt = (ASTEndModuleStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

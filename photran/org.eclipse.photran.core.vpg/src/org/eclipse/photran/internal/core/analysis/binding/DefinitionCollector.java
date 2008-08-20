@@ -19,7 +19,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTCommonBlockListNode;
+import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDefStmtNode;
@@ -266,12 +266,12 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        IASTListNode<ASTCommonBlockListNode> list = node.getCommonBlockList();
+        IASTListNode<ASTCommonBlockNode> list = node.getCommonBlockList();
         for (int i = 0; i < list.size(); i++)
         {
-            if (list.get(i).getCommonBlock().getName() != null)
+            if (list.get(i).getName() != null)
             {
-                Token commonBlockName = list.get(i).getCommonBlock().getName().getCommonBlockName();
+                Token commonBlockName = list.get(i).getName().getCommonBlockName();
                 addDefinition(commonBlockName, Definition.Classification.COMMON_BLOCK);
                 vpg.markFileAsUsingCommonBlock(file, commonBlockName.getText());
             }

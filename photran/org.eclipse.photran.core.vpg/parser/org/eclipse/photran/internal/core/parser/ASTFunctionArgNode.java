@@ -78,9 +78,9 @@ public class ASTFunctionArgNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.expr = (ASTExprNode)value;
+        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.expr = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

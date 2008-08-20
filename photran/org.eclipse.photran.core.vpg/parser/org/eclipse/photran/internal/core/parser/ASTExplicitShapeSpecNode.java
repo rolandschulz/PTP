@@ -78,9 +78,9 @@ public class ASTExplicitShapeSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (ASTExprNode)value;
-        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.ub = (ASTExprNode)value;
+        case 0:  this.lb = (ASTExprNode)value; return;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.ub = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

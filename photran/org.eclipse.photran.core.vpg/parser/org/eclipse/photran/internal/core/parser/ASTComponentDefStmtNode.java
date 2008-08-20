@@ -111,14 +111,14 @@ public class ASTComponentDefStmtNode extends ASTNode implements IDerivedTypeBody
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.typeSpec = (ASTTypeSpecNode)value;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.componentAttrSpecList = (IASTListNode<ASTComponentAttrSpecNode>)value;
-        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 6:  this.componentDeclList = (IASTListNode<ASTComponentDeclNode>)value;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.typeSpec = (ASTTypeSpecNode)value; return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.componentAttrSpecList = (IASTListNode<ASTComponentAttrSpecNode>)value; return;
+        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.componentDeclList = (IASTListNode<ASTComponentDeclNode>)value; return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

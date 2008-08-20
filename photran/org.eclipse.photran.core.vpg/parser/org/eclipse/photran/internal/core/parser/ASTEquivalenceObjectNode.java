@@ -63,7 +63,7 @@ public class ASTEquivalenceObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variable = (ASTVariableNode)value;
+        case 0:  this.variable = (ASTVariableNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

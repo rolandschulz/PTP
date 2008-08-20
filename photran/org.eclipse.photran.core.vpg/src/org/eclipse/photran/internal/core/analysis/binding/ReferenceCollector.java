@@ -21,7 +21,7 @@ import org.eclipse.photran.internal.core.parser.ASTAssignedGotoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTCommonBlockListNode;
+import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCycleStmtNode;
@@ -217,12 +217,12 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        IASTListNode<ASTCommonBlockListNode> list = node.getCommonBlockList();
+        IASTListNode<ASTCommonBlockNode> list = node.getCommonBlockList();
         if (list == null) return;
         
         for (int i = 0; i < list.size(); i++)
         {
-            IASTListNode<ASTCommonBlockObjectNode> objects = list.get(i).getCommonBlock().getCommonBlockObjectList();
+            IASTListNode<ASTCommonBlockObjectNode> objects = list.get(i).getCommonBlockObjectList();
             for (int j = 0; j < objects.size(); j++)
             {
                 ASTCommonBlockObjectNode obj = objects.get(j);

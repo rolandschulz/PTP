@@ -77,8 +77,8 @@ public class ASTStructureComponentNode extends ASTNode implements IDataIDoObject
     {
         switch (index)
         {
-        case 0:  this.variableName = (ASTVariableNameNode)value;
-        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value;
+        case 0:  this.variableName = (ASTVariableNameNode)value; return;
+        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

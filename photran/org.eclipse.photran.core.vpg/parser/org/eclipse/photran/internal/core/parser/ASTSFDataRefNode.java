@@ -106,12 +106,12 @@ public class ASTSFDataRefNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 4:  this.hasDerivedTypeComponentName = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.componentName = (ASTNameNode)value;
+        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hasDerivedTypeComponentName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.componentName = (ASTNameNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

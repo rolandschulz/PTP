@@ -121,14 +121,14 @@ public class ASTSFExprListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 2:  this.sectionSubscript = (ASTSectionSubscriptNode)value;
-        case 3:  this.lb = (ASTSFExprNode)value;
-        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 5:  this.ub = (ASTExprNode)value;
-        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 7:  this.step = (ASTExprNode)value;
+        case 0:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.sectionSubscript = (ASTSectionSubscriptNode)value; return;
+        case 3:  this.lb = (ASTSFExprNode)value; return;
+        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.ub = (ASTExprNode)value; return;
+        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.step = (ASTExprNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

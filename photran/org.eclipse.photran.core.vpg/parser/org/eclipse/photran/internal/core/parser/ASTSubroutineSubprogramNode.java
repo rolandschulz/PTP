@@ -120,11 +120,11 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     {
         switch (index)
         {
-        case 0:  this.subroutineStmt = (ASTSubroutineStmtNode)value;
-        case 1:  this.body = (IASTListNode<IBodyConstruct>)value;
-        case 2:  this.containsStmt = (ASTContainsStmtNode)value;
-        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value;
-        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value;
+        case 0:  this.subroutineStmt = (ASTSubroutineStmtNode)value; return;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; return;
+        case 2:  this.containsStmt = (ASTContainsStmtNode)value; return;
+        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
+        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

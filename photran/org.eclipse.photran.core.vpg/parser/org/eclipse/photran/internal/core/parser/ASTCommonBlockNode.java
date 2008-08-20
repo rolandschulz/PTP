@@ -80,10 +80,10 @@ public class ASTCommonBlockNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 1:  this.name = (ASTCommonBlockNameNode)value;
-        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value;
-        case 3:  this.commonBlockObjectList = (IASTListNode<ASTCommonBlockObjectNode>)value;
+        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.name = (ASTCommonBlockNameNode)value; return;
+        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.commonBlockObjectList = (IASTListNode<ASTCommonBlockObjectNode>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
