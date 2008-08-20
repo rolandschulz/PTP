@@ -15,6 +15,12 @@ program main
     common /common/ c, d, e /common2/ f, g, /common3/ h
     complex :: c
     dimension c(3)
+    ! double precision :: d, e, f, g, h
+    double precision :: d
+    double precision :: e
+    double precision :: f
+    double precision :: g
+    double precision :: h
 
     a = 1
     b = 2.3
