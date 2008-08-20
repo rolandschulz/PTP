@@ -12,7 +12,7 @@ program main
     integer :: a
     real    :: b
 
-    common /common/ c
+    common /common/ c, d, e /common2/ f, g, /common3/ h
     complex :: c
     dimension c(3)
 
