@@ -25,6 +25,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNameNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
@@ -35,8 +36,9 @@ import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 
@@ -230,20 +232,14 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
         {
             removeSpecificationStmtsForCommonBlockVars(commonBlock);
             
-            ASTUseStmtNode useStmt = constructUseStmt();
-            
             ASTCommonStmtNode enclosingCommonStmt = commonBlock.findNearestAncestor(ASTCommonStmtNode.class);
-            if (commonStmtContainsOnlyOneCommonBlock(enclosingCommonStmt))
-            {
-                enclosingCommonStmt.replaceWith(useStmt);
-            }
-            else
-            {
-                commonBlock.removeFromTree();
-                addUseStmtAfterCommonStmt(useStmt, enclosingCommonStmt);
-            }
             
-            Reindenter.reindent(useStmt, ast);
+            addUseStmtAtBeginningOfScopeContaining(enclosingCommonStmt, ast);
+
+            if (commonStmtContainsOnlyOneCommonBlock(enclosingCommonStmt))
+                enclosingCommonStmt.removeFromTree();
+            else
+                commonBlock.removeFromTree();
         }
     }
     
@@ -276,17 +272,16 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
             for (ISpecificationPartConstruct specStmt : findSpecificationStmtsFor(obj.getVariableName()))
                 specStmt.removeFromTree();
     }
-    
-    private ASTUseStmtNode constructUseStmt()
-    {
-        return (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName);
-    }
 
     @SuppressWarnings("unchecked")
-    private void addUseStmtAfterCommonStmt(ASTUseStmtNode useStmt, ASTCommonStmtNode enclosingCommonStmt)
+    private void addUseStmtAtBeginningOfScopeContaining(ASTCommonStmtNode enclosingCommonStmt, IFortranAST ast)
     {
-        ASTListNode body = (ASTListNode)enclosingCommonStmt.getParent();
-        body.add(body.indexOf(enclosingCommonStmt), useStmt);
+        ASTUseStmtNode useStmt = (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName);
+        
+        ScopingNode enclosingScope = enclosingCommonStmt.findNearestAncestor(ScopingNode.class);
+        ((IASTListNode<IASTNode>)enclosingScope.getBody()).add(0, useStmt);
+        
+        Reindenter.reindent(useStmt, ast);
     }
 
     private boolean commonBlockHasSameName(ASTCommonBlockNode commonBlock)
