@@ -1,0 +1,105 @@
+    
+    // Debugging ----------------------------------------------------------------------------------
+
+    /** Prints a textual representation of the global scope (and all nested scopes) */
+    public void printGlobalSymbolTableOn(PrintStream out)
+    {
+        Scope scope = this;
+        while (scope.parentScope != null) scope = scope.parentScope;
+        out.println(scope.toString(0));
+    }
+
+    /**
+     * Describe the contents of this symbol table.
+     * 
+     * @param indent Number of spaces to indent each line. (This is useful when displaying nested
+     *            symbol tables.)
+     * @return <code>String</code>
+     */
+    public String toString(int indent)
+    {
+        StringBuffer sb = new StringBuffer();
+        
+        if (internal)
+        {
+            indent(indent, sb);
+            sb.append("* Internal/contained\n");
+        }
+        
+        if (entriesArePrivateByDefault)
+        {
+            indent(indent, sb);
+            sb.append("* Default visibility is PRIVATE\n");
+        }
+
+        // Write out implicit spec if top level table or if it differs from its parent
+        if (parentScope == null || implicitSpec != parentScope.implicitSpec)
+        {
+            indent(indent, sb);
+            sb.append("* Implicit ");
+            sb.append(implicitSpec == null ? "none\n\n" : "enabled\n\n");
+        }
+
+//        // Write out module import info
+//        for (ModuleUse useInfo : moduleUseInfo)
+//        {
+//            indent(indent, sb);
+//            sb.append("* Use ");
+//            sb.append(useInfo.toString());
+//            sb.append("\n");
+//        }
+
+        // Write out entries
+        for (int i = 0; i < bindings.size(); i++)
+        {
+            Binding b = bindings.get(i);
+            if (!(b instanceof Intrinsic))
+            {
+                sb.append(b == null ? "(null binding)" : b.toString(indent));
+                sb.append("\n");
+                
+                if (b instanceof Definition)
+                {
+                    for (Binding ref : findAllReferences((Definition)b))
+                    {
+                        indent(indent + 4, sb);
+                        sb.append("Referenced" + ref.describeLocation() + "\n");
+                    }
+                }
+            }
+        }
+
+        // Write out nested scopes
+        for (int i = 0; i < nestedScopes.size(); i++)
+        {
+            Scope ns = nestedScopes.get(i);
+            
+            if (ns == null)
+                sb.append("(null nested scope)");
+            else
+            {
+                sb.append("\n");
+                indent(indent, sb);
+                sb.append("Nested scope");
+                if (ns.parentEntry != null) sb.append(" for " + ns.parentEntry);
+                sb.append(":\n");
+                sb.append(ns.toString(indent + 4));
+            }
+        }
+        
+        return sb.toString();
+    }
+
+    protected void indent(int indent, StringBuffer sb)
+    {
+        for (int i = 0; i < indent; i++)
+            sb.append(' ');
+    }
+
+    /**
+     * Return a friendly listing of the contents of this symbol table.
+     */
+    public String toString()
+    {
+        return toString(0);
+    }
