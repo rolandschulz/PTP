@@ -127,4 +127,24 @@ public class UPCCHelpBook extends CHelpBookImpl {
 			description=key+" description";
 		return description;
 	}
+	
+	/**
+	 * Workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=237331
+	 * ("CHelpProvider not called for UPC")
+	 * so that UPC help will get called.
+	 * CDT bug fix required for this to work otherwise.
+	 * For example, in TranslationUnit to make the UPC type 'inherit' from the C type.
+	 * <p>
+	 * This returns an invalid number as a workaround.
+	 * This will cause the default part of the switch in CHelpBookDescriptor.matches()
+	 * to execute and the UPC help will
+	 * match for all files. Not pretty but it will work for now.
+	 * @see org.eclipse.cdt.internal.core.model.TranslationUnit
+	 * 
+	 */
+	@SuppressWarnings("restriction")// just for the javadoc comment to not get warning :)
+	@Override
+	public int getCHelpType() {
+		return -1;
+	}
 }
