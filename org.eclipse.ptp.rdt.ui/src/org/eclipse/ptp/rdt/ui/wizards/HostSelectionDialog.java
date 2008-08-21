@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
@@ -24,7 +25,9 @@ import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.SystemStartHere;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.ui.wizards.newconnection.RSEDefaultNewConnectionWizard;
+import org.eclipse.rse.ui.wizards.newconnection.RSEMainNewConnectionWizard;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -96,7 +99,6 @@ public class HostSelectionDialog extends Dialog {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
-				
 			}
 
 			public void widgetSelected(SelectionEvent e) {
@@ -110,30 +112,28 @@ public class HostSelectionDialog extends Dialog {
         // button for creating new connections
         Button newConnectionButton = new Button(container, SWT.PUSH);
         newConnectionButton.setText(Messages.getString("HostSelectionDialog.0")); //$NON-NLS-1$
-        newConnectionButton.addSelectionListener(new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-				
-			}
+        newConnectionButton.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent e) {
 				// launch the RSE New Connection Wizard
-				RSEDefaultNewConnectionWizard wizard = new RSEDefaultNewConnectionWizard();
+				RSEMainNewConnectionWizard wizard = new RSEMainNewConnectionWizard();
 				WizardDialog wizardDialog = new WizardDialog(getShell(), wizard);
 				wizardDialog.open();
 				
-				// get the new host, if any
-				IHost host = wizard.getCreatedHost();
-				
-				// add the host
-				int index = hostCombo.getItemCount() - 1;
-				hostCombo.add(host.getAliasName(), index);
-	        	fHostComboIndexToHostMap.put(index, host);
-	        	
-	        	// select the new host
-	        	hostCombo.select(index);
-	            fSelectedHost = host;
+				IWizard actualWizard = wizard.getSelectedWizard();
+				if(actualWizard instanceof RSEDefaultNewConnectionWizard) {
+					// get the new host, if any
+					IHost host = ((RSEDefaultNewConnectionWizard)actualWizard).getCreatedHost();
+					
+					// add the host
+					int index = hostCombo.getItemCount() - 1;
+					hostCombo.add(host.getAliasName(), index);
+		        	fHostComboIndexToHostMap.put(index, host);
+		        	
+		        	// select the new host
+		        	hostCombo.select(index);
+		            fSelectedHost = host;
+				}
 			}
         	
         });
