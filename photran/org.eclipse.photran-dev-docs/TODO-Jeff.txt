@@ -1,0 +1,4 @@
+- Preproc substring bug
+- Open Decl error message
+- Persist project properties
+- New Fortran file wizard and menu item
