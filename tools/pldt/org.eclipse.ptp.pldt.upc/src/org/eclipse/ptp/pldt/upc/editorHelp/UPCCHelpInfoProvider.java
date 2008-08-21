@@ -20,6 +20,8 @@ import org.eclipse.ptp.pldt.common.editorHelp.CHelpProviderImpl;
  * <b>Note:</b> This  requires a fix to CDT post-5.0.0 release
  * to org.eclipse.cdt.internal.core.model.TranslationUnit  - to recognize content-type of UPC to be a deriviative ("kindOf") the C content type.
  * <p>See https://bugs.eclipse.org/bugs/show_bug.cgi?id=237331  
+ * <p>Further note: a workaround has been applied in UCCCHelpBook to not require the CDT patch
+ * 
  * 
  * @author Beth Tibbitts
  *
