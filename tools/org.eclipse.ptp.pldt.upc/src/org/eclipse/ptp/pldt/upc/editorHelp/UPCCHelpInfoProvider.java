@@ -27,7 +27,7 @@ import org.eclipse.ptp.pldt.common.editorHelp.CHelpProviderImpl;
 public class UPCCHelpInfoProvider extends CHelpProviderImpl {
 
 	public UPCCHelpInfoProvider() {
-		System.out.println("UPCCHelpInfoProvider ctor()...");//debug only , to see when called
+		//System.out.println("UPCCHelpInfoProvider ctor()...");//debug only , to see when called
 	}
 
 	public void initialize() {
