@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -50,6 +51,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IModelManager;
@@ -708,7 +710,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		/*
 		 * Collect attributes from Environment tab
 		 */
-		String[] envArr = DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
+		String[] envArr = getEnvironmentToAppend(configuration);
 		if (envArr != null) {
 			attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 		}
@@ -1304,4 +1306,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		}
 		return null;
 	}
+	
+	protected static String [] getEnvironmentToAppend(ILaunchConfiguration configuration) throws CoreException {
+		Map<?,?> defaultEnv = null;
+		Map<?,?> configEnv = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, defaultEnv);
+		if (configEnv == null) {
+			return null;
+		}
+		if (! configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true)) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Parallel launcher does not support replacing all environment variables on remote environment."));			
+		}
+
+		List<String> strings = new ArrayList<String>(configEnv.size());
+		Iterator<?> iter= configEnv.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<?,?> entry = (Entry<?, ?>) iter.next();
+			String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            strings.add(key+"="+value);
+            
+		}
+		return (String[]) strings.toArray(new String[strings.size()]);
+	}
+
 }
