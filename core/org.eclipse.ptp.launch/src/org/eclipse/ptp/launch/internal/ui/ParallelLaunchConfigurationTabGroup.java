@@ -20,7 +20,6 @@ package org.eclipse.ptp.launch.internal.ui;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
-import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
@@ -28,6 +27,7 @@ import org.eclipse.ptp.launch.ui.ApplicationTab;
 import org.eclipse.ptp.launch.ui.ArgumentsTab;
 import org.eclipse.ptp.launch.ui.DebuggerTab;
 import org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab;
+import org.eclipse.ptp.launch.ui.EnvironmentTab;
 import org.eclipse.ptp.launch.ui.ResourcesTab;
 
 /**
