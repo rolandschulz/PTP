@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.dialogs;
 
-import java.util.HashMap;
-
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.IWorkingSet;
@@ -29,18 +27,12 @@ public class RemoteContentProvider extends WorkbenchContentProvider {
 	IWorkingSet workingSet;
 	DeferredTreeContentManager manager;
 
-	HashMap<Object, Object[]> cachedChildren;
-	
-	public RemoteContentProvider(){
-		cachedChildren = new HashMap<Object, Object[]>();
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
-			manager = new DeferredTreeContentManager(this, (AbstractTreeViewer) viewer);
+			manager = new DeferredTreeContentManager((AbstractTreeViewer) viewer);
 		} else {
 			manager = null;
 		}
@@ -75,19 +67,12 @@ public class RemoteContentProvider extends WorkbenchContentProvider {
 	 * @see org.eclipse.ui.model.WorkbenchContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object element) {
-		//check to see if we already have the children cached in the tree map
-		Object[] children = cachedChildren.get(element);
-		if (children != null) {
-		  	return children;
-		}
 		if (manager != null) {
-			children = manager.getChildren(element);
+			Object[] children = manager.getChildren(element);
 			if (children != null) {
-				cachedChildren.put(element, children);
 				return children;
 			}
 		}
-		children = super.getChildren(element);
-		return children;
+		return super.getChildren(element);
 	}
 }
