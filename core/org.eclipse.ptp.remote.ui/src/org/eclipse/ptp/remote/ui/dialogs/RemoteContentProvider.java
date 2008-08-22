@@ -23,9 +23,8 @@ import org.eclipse.ui.progress.DeferredTreeContentManager;
  * on the tree expansion box.
  */
 public class RemoteContentProvider extends WorkbenchContentProvider {
-
-	IWorkingSet workingSet;
-	DeferredTreeContentManager manager;
+	private IWorkingSet workingSet;
+	private DeferredTreeContentManager manager;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
@@ -39,6 +38,9 @@ public class RemoteContentProvider extends WorkbenchContentProvider {
 		super.inputChanged(viewer, oldInput, newInput);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#hasChildren(java.lang.Object)
+	 */
 	public boolean hasChildren(Object element) {
 		if (manager != null && manager.isDeferredAdapter(element)) {
 			return manager.mayHaveChildren(element);
