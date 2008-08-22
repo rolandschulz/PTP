@@ -12,25 +12,41 @@ package org.eclipse.ptp.remote.remotetools.ui;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.dialogs.RemoteResourceBrowser;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
-	private IRemoteFileManager fileMgr;
+	private IRemoteServices services = null;
+	private IRemoteConnection connection = null;
+	private boolean showConnections;
 	
-	public RemoteToolsUIFileManager(IRemoteFileManager fileMgr) {
-		this.fileMgr = fileMgr;
+	public RemoteToolsUIFileManager(IRemoteServices services, IRemoteConnection conn) {
+		this.services = services;
+		this.connection = conn;
+		showConnections(false);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 */
+	public void showConnections(boolean enable) {
+		/*
+		 * Force connection list if no connection supplied
+		 */
+		showConnections = enable || (connection == null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(fileMgr, shell);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(services, connection, shell);
 		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
 		browser.setInitialPath(filterPath);
+		browser.showConnections(showConnections);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
@@ -45,9 +61,10 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseFile(Shell shell, String message, String filterPath) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(fileMgr, shell);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(services, connection, shell);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
+		browser.showConnections(showConnections);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
