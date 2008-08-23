@@ -187,7 +187,7 @@ public class RemoteServicesProviderSelectionDialog extends Dialog {
 	 */
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
-				.getUIConnectionManager(fSelectedProvider.getConnectionManager());
+				.getUIConnectionManager();
 		return connectionManager;
 	}
 

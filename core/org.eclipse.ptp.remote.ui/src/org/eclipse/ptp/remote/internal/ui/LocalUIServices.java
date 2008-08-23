@@ -11,7 +11,6 @@
 package org.eclipse.ptp.remote.internal.ui;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
@@ -31,7 +30,7 @@ public class LocalUIServices implements IRemoteUIServicesDelegate {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
 	 */
-	public IRemoteUIConnectionManager getUIConnectionManager(IRemoteConnectionManager mgr) {
+	public IRemoteUIConnectionManager getUIConnectionManager() {
 		return new LocalUIConnectionManager();
 	}
 
@@ -39,6 +38,6 @@ public class LocalUIServices implements IRemoteUIServicesDelegate {
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteUIFileManager getUIFileManager(IRemoteConnection connection) {
-		return new LocalUIFileManager();
+		return new LocalUIFileManager(connection);
 	}
 }

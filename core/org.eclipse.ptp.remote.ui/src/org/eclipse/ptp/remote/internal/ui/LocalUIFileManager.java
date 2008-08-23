@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.SWT;
@@ -22,6 +23,12 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 public class LocalUIFileManager implements IRemoteUIFileManager {
+	private IRemoteConnection connection;
+	
+	public LocalUIFileManager(IRemoteConnection connection) {
+		this.connection = connection;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
@@ -42,7 +49,7 @@ public class LocalUIFileManager implements IRemoteUIFileManager {
 		
 		return new Path(path);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
@@ -62,5 +69,12 @@ public class LocalUIFileManager implements IRemoteUIFileManager {
 		}
 
 		return new Path(path);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return connection;
 	}
 }

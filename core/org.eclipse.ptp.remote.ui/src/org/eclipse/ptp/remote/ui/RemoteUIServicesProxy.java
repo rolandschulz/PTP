@@ -12,7 +12,6 @@ package org.eclipse.ptp.remote.ui;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
@@ -86,12 +85,12 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
 	 */
-	public IRemoteUIConnectionManager getUIConnectionManager(IRemoteConnectionManager manager) {
+	public IRemoteUIConnectionManager getUIConnectionManager() {
 		loadServices();
 		if (delegate == null) {
 			return null;
 		}
-		return delegate.getUIConnectionManager(manager);
+		return delegate.getUIConnectionManager();
 	}
 	
 	/* (non-Javadoc)
