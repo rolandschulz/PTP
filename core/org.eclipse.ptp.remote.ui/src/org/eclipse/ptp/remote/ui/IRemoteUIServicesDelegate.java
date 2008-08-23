@@ -11,10 +11,16 @@
 package org.eclipse.ptp.remote.ui;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 
 
 public interface IRemoteUIServicesDelegate {
+	/**
+	 * Get a UI connection manager for managing connections
+	 * 
+	 * @return UI connection manager or null if no connection manager operations are supported
+	 */
+	public IRemoteUIConnectionManager getUIConnectionManager();
+	
 	/**
 	 * Get a UI file manager for managing remote files
 	 * 
@@ -22,11 +28,4 @@ public interface IRemoteUIServicesDelegate {
 	 * @return UI file manager or null if no file manager operations are supported
 	 */
 	public IRemoteUIFileManager getUIFileManager(IRemoteConnection connection);
-	
-	/**
-	 * Get a UI connection manager for managing connections
-	 * 
-	 * @return UI connection manager or null if no connection manager operations are supported
-	 */
-	public IRemoteUIConnectionManager getUIConnectionManager(IRemoteConnectionManager mgr);
 }

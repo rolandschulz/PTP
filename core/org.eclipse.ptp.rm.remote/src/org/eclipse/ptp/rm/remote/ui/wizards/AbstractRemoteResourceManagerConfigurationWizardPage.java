@@ -562,7 +562,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			connectionManager = remoteServices.getConnectionManager();
 			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 			if (remUIServices != null) {
-				uiConnectionManager = remUIServices.getUIConnectionManager(connectionManager);
+				uiConnectionManager = remUIServices.getUIConnectionManager();
 			}
 			IRemoteConnection[] connections = connectionManager.getConnections();
 			connectionCombo.removeAll();
