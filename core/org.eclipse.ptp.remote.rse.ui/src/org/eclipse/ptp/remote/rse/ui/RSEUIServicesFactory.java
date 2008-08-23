@@ -19,6 +19,6 @@ public class RSEUIServicesFactory implements IRemoteUIServicesFactory {
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesFactory#getServices(org.eclipse.ptp.remote.core.IRemoteServices)
 	 */
 	public IRemoteUIServicesDelegate getServices(IRemoteServices services) {
-		return RSEUIServices.getInstance();
+		return RSEUIServices.getInstance(services);
 	}
 }

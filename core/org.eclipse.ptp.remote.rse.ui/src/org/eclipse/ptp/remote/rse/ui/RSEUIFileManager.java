@@ -13,6 +13,9 @@ package org.eclipse.ptp.remote.rse.ui;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.rse.core.RSEConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.rse.core.model.IHost;
@@ -22,20 +25,25 @@ import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.swt.widgets.Shell;
 
 public class RSEUIFileManager implements IRemoteUIFileManager {
-	private RSEConnection connection;
+	private IRemoteConnectionManager connMgr;
+	private IRemoteConnection connection;
+	private IHost connHost;
 
-	public RSEUIFileManager(RSEConnection conn) {
+	public RSEUIFileManager(IRemoteServices services, RSEConnection conn) {
+		this.connMgr = services.getConnectionManager();
 		this.connection = conn;
+		this.connHost = conn.getHost();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		IHost host = connection.getHost();
-		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell, message, host);
+		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell, message, connHost);
 		dlg.setBlockOnOpen(true);
 		if(dlg.open() == Window.OK) {
+			connHost = dlg.getSelectedConnection();
+			connection = connMgr.getConnection(connHost.getName());
 			Object retObj = dlg.getSelectedObject();
 			if(retObj instanceof IRemoteFile) {
 				IRemoteFile selectedFile = (IRemoteFile) retObj;
@@ -49,10 +57,11 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseFile(Shell shell, String message, String filterPath) {
-		IHost host = connection.getHost();
-		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, host);
+		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
 		dlg.setBlockOnOpen(true);
 		if(dlg.open() == Window.OK) {
+			connHost = dlg.getSelectedConnection();
+			connection = connMgr.getConnection(connHost.getName());
 			Object retObj = dlg.getSelectedObject();
 			if(retObj instanceof IRemoteFile) {
 				IRemoteFile selectedFile = (IRemoteFile) retObj;
@@ -60,5 +69,12 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			}
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return connection;
 	}
 }
