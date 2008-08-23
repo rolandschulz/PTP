@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PTP Remote Tools Adapter Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.remote.remotetools.core;singleton:=true
 Bundle-Version: 2.1.0.qualifier
-Bundle-Activator: org.eclipse.ptp.remote.remotetools.core.Activator
+Bundle-Activator: org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin
 Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,

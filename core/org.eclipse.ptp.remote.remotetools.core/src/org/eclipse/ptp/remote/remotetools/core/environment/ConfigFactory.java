@@ -18,7 +18,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.remotetools.core.Activator;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.AttributeNames;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.DefaultValues;
 import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
@@ -96,7 +96,7 @@ public class ConfigFactory {
 	
 	private void createCurrentMapFromPreferences() {
 		currentMap = new HashMap<String, String>();
-		Preferences store = Activator.getDefault().getPluginPreferences();
+		Preferences store = RemoteToolsAdapterCorePlugin.getDefault().getPluginPreferences();
 		currentMap.put(ATTR_LOGIN_USERNAME, store.getString(ATTR_LOGIN_USERNAME));
 		currentMap.put(ATTR_CONNECTION_ADDRESS, store.getString(ATTR_CONNECTION_ADDRESS));
 		currentMap.put(ATTR_CONNECTION_PORT, store.getString(ATTR_CONNECTION_PORT));
@@ -120,7 +120,7 @@ public class ConfigFactory {
 			config.setCipherType(attributes.getString(ATTR_CIPHER_TYPE));
 			return config;
 		} catch (IllegalAttributeException e) {
-			throw new CoreException(new Status(Status.ERROR, Activator.getDefault().getBundle().getSymbolicName(), 0, e.getMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(), 0, e.getMessage(), e));
 		}
 	}
 }

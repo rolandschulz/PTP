@@ -75,7 +75,7 @@ public class RemoteToolsFileStore extends FileStore {
 			items = exeMgr.getRemoteFileTools().listItems(remoteItem.getPath());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					e.getMessage()));
 		}
 		
@@ -101,7 +101,7 @@ public class RemoteToolsFileStore extends FileStore {
 		}
 		catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					"Could not delete file", e));
 		}
 	}
@@ -194,7 +194,7 @@ public class RemoteToolsFileStore extends FileStore {
 			exeMgr.getRemoteFileTools().createDirectory(remoteItem.getPath());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(), 
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(), 
 					"The directory could not be created", e));
 		}
 			
@@ -209,14 +209,14 @@ public class RemoteToolsFileStore extends FileStore {
 			throws CoreException {
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					"Is a directory"));
 		}
 		try {
 			return exeMgr.getRemoteCopyTools().executeDownload(remoteItem.getPath()).getInputStreamFromProcessRemoteFile();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					"Could not get input stream", e));
 		}
 	}
@@ -230,14 +230,14 @@ public class RemoteToolsFileStore extends FileStore {
 			
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					"Is a directory"));
 		}
 		try {
 			return exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath()).getOutputStreamToProcessRemoteFile();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					"Could not open output stream", e));
 		}
 	}
@@ -272,7 +272,7 @@ public class RemoteToolsFileStore extends FileStore {
 			}
 		} catch(Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					Activator.getDefault().getBundle().getSymbolicName(),
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					e.getMessage(), e));
 		}
 	}
