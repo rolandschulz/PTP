@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.remotetools.core.Activator;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
@@ -181,7 +181,7 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 	}
 
 	protected String getPluginId() {
-		return Activator.PLUGIN_ID;
+		return RemoteToolsAdapterCorePlugin.PLUGIN_ID;
 	}
 
 	public String getSystemWorkspace() {
