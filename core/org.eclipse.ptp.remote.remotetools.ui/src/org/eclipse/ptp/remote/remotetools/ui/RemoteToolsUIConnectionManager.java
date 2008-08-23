@@ -12,6 +12,7 @@ package org.eclipse.ptp.remote.remotetools.ui;
 
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
@@ -24,8 +25,8 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 	private TargetTypeElement remoteHost = null;
 	private IRemoteConnectionManager connMgr = null;
 	
-	public RemoteToolsUIConnectionManager(IRemoteConnectionManager connMgr) {
-		this.connMgr = connMgr;
+	public RemoteToolsUIConnectionManager(IRemoteServices services) {
+		this.connMgr = services.getConnectionManager();
 		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
 		for (Object obj : targetMgr.getTypeElements()) {
 			TargetTypeElement element = (TargetTypeElement)obj;

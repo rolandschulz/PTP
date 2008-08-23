@@ -28,4 +28,12 @@
             name="Remote Tools">
       </remoteUIServices>
    </extension>
+   <extension
+         point="org.eclipse.ui.ide.filesystemSupport">
+      <filesystemContributor
+            class="org.eclipse.ptp.remote.remotetools.ui.RemoteToolsFileSystemContributor"
+            label="Remote Tools"
+            scheme="remotetools">
+      </filesystemContributor>
+   </extension>
 </plugin>

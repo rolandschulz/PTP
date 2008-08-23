@@ -11,6 +11,7 @@
 package org.eclipse.ptp.remote.remotetools.ui;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -40,6 +41,13 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return connection;
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
@@ -50,11 +58,12 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
-		IPath path = browser.getPath();
+		connection = browser.getConnection();
+		String path = browser.getPath();
 		if (path == null) {
 			return null;
 		}
-		return path;
+		return new Path(path);
 	}
 
 	/* (non-Javadoc)
@@ -68,10 +77,11 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
-		IPath path = browser.getPath();
+		connection = browser.getConnection();
+		String path = browser.getPath();
 		if (path == null) {
 			return null;
 		}
-		return path;
+		return new Path(path);
 	}
 }
