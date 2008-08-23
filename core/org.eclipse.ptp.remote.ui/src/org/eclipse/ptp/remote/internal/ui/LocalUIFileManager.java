@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class LocalUIFileManager implements IRemoteUIFileManager {
 	private IRemoteConnection connection;
-	
+
 	public LocalUIFileManager(IRemoteConnection connection) {
 		this.connection = connection;
 	}
@@ -49,7 +49,7 @@ public class LocalUIFileManager implements IRemoteUIFileManager {
 		
 		return new Path(path);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
@@ -70,11 +70,17 @@ public class LocalUIFileManager implements IRemoteUIFileManager {
 
 		return new Path(path);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return connection;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 */
+	public void showConnections(boolean enable) {
 	}
 }

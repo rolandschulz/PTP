@@ -31,23 +31,6 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
-	 */
-	public void showConnections(boolean enable) {
-		/*
-		 * Force connection list if no connection supplied
-		 */
-		showConnections = enable || (connection == null);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
-	 */
-	public IRemoteConnection getConnection() {
-		return connection;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public IPath browseDirectory(Shell shell, String message, String filterPath) {
@@ -65,7 +48,7 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 		}
 		return new Path(path);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
@@ -83,5 +66,22 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 			return null;
 		}
 		return new Path(path);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return connection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 */
+	public void showConnections(boolean enable) {
+		/*
+		 * Force connection list if no connection supplied
+		 */
+		showConnections = enable || (connection == null);
 	}
 }

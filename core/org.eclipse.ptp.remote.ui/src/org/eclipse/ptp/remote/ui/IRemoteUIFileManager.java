@@ -47,4 +47,11 @@ public interface IRemoteUIFileManager {
 	 * @return selected connection
 	 */
 	public IRemoteConnection getConnection();
+	
+	/**
+	 * Show a list of available connections if possible.
+	 * 
+	 * @param enable enable connection list
+	 */
+	public void showConnections(boolean enable);
 }

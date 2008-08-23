@@ -26,15 +26,15 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RSEUIFileManager implements IRemoteUIFileManager {
 	private IRemoteConnectionManager connMgr;
+
 	private IRemoteConnection connection;
 	private IHost connHost;
-
 	public RSEUIFileManager(IRemoteServices services, RSEConnection conn) {
 		this.connMgr = services.getConnectionManager();
 		this.connection = conn;
 		this.connHost = conn.getHost();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
@@ -70,11 +70,17 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return connection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 */
+	public void showConnections(boolean enable) {
 	}
 }
