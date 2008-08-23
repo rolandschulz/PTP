@@ -102,9 +102,18 @@ public class RemoteResourceBrowser extends Dialog {
 		this.services = services;
 		this.connection = conn;
 		this.connMgr = services.getConnectionManager();
-		this.uiConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services).getUIConnectionManager(this.connMgr);
+		this.uiConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services).getUIConnectionManager();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
 		setType(FILE_BROWSER | DIRECTORY_BROWSER);
+	}
+	
+	/**
+	 * Get the connection that was selected
+	 * 
+	 * @return selected connection
+	 */
+	public IRemoteConnection getConnection() {
+		return connection;
 	}
 	
 	/**
@@ -112,11 +121,11 @@ public class RemoteResourceBrowser extends Dialog {
 	 * 
 	 * @return selected path
 	 */
-	public IPath getPath() {
+	public String getPath() {
 		if (remotePath.equals("")) {
 			return null;
 		}
-		return new Path(remotePath);
+		return remotePath;
 	}
 
 	/**
