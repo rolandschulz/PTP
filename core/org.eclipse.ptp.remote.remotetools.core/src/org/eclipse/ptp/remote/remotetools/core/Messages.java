@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  */
-package org.eclipse.ptp.remote.remotetools.core.environment;
+package org.eclipse.ptp.remote.remotetools.core;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -20,11 +20,16 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS
 {
-	private static final String BUNDLE_ID = "org.eclipse.ptp.remote.remotetools.core.environment.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_ID = "org.eclipse.ptp.remote.remotetools.core.messages"; //$NON-NLS-1$
 
 	public static String TargetControl_create_MonitorConnecting;
 	public static String TargetControl_resume_CannotResume;
 	public static String TargetControl_stop_CannotPause;
+	public static String RemoteToolsConnection_connectionNotOpen;
+	public static String RemoteToolsConnection_remotePort;
+	public static String RemoteToolsConnection_open;
+	public static String RemoteToolsConnection_forwarding;
+	public static String RemoteToolsConnection_close;
 	
 	static {
 		// load message values from bundle file

@@ -47,7 +47,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("Closing connection...", 1);
+		monitor.beginTask(Messages.RemoteToolsConnection_close, 1);
 		try {
 			control.kill(monitor);
 		} catch (CoreException e) {
@@ -72,7 +72,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort)
 			throws RemoteConnectionException {
 		if (!isOpen()) {
-			throw new RemoteConnectionException("Connection is not open");
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
 		try {
 			control.getExecutionManager().createTunnel(localPort, fwdAddress, fwdPort);
@@ -91,7 +91,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public int forwardLocalPort(String fwdAddress, int fwdPort,
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		if (!isOpen()) {
-			throw new RemoteConnectionException("Connection is not open");
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
 		return 0;
 	}
@@ -102,7 +102,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort)
 			throws RemoteConnectionException {
 		if (!isOpen()) {
-			throw new RemoteConnectionException("Connection is not open");
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
 		try {
 			control.getExecutionManager().getPortForwardingTools().forwardRemotePort(remotePort, fwdAddress, fwdPort);
@@ -123,7 +123,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("Setting up remote forwarding", 10);
+		monitor.beginTask(Messages.RemoteToolsConnection_forwarding, 10);
 		/*
 		 * Start with a different port number, in case we're doing this all on localhost.
 		 */
@@ -138,7 +138,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				forwardRemotePort(remotePort, fwdAddress, fwdPort);
 			} catch (AddressInUseException e) {
 				if (++remotePort == fwdPort) {
-					throw new UnableToForwardPortException("Could not allocate remote port");
+					throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
 				}
 				monitor.worked(1);
 			}
@@ -181,9 +181,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("Opening connection...", 2);
+		monitor.beginTask(Messages.RemoteToolsConnection_open, 2);
 		if (control.query() == ITargetStatus.STOPPED) {
-			Job job = new Job("Start the  Environment") {
+			Job job = new Job("Start the Environment") {
 				protected IStatus run(IProgressMonitor monitor) {
 					
 					IStatus status = null;
