@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.ui;
 
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.rse.core.RSEConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.rse.core.IRSESystemType;
@@ -21,8 +22,8 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 	private SystemNewConnectionAction action;
 	private RSEConnectionManager manager;
 
-	public RSEUIConnectionManager(RSEConnectionManager manager) {
-		this.manager = manager;
+	public RSEUIConnectionManager(IRemoteServices services) {
+		this.manager = (RSEConnectionManager)services.getConnectionManager();
 	}
 	
 	/* (non-Javadoc)
