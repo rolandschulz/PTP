@@ -11,6 +11,7 @@
 package org.eclipse.ptp.remote.ui;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Shell;
 
 public interface IRemoteUIFileManager {
@@ -39,4 +40,11 @@ public interface IRemoteUIFileManager {
 	 * @return the path to the file relative to the remote system or null if the browser was cancelled
 	 */
 	public IPath browseFile(Shell shell, String message, String initialPath);
+	
+	/**
+	 * Get the last connection that was selected in the browser.
+	 * 
+	 * @return selected connection
+	 */
+	public IRemoteConnection getConnection();
 }
