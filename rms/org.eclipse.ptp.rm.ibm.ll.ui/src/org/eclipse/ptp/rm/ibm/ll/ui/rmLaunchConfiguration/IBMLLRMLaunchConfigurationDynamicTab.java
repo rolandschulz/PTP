@@ -57,6 +57,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerConfiguration;
@@ -467,8 +468,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":getInputFile entered.");
 		if (remoteUIService != null) {
-			selectedFile = remoteUIService.getUIFileManager(remoteConnection)
-					.browseFile(parentShell, Messages.getString(titleID),
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID),
 							getFileDialogPath(pathAttrID)).toString();
 		}
 		if (selectedFile != null) {
@@ -499,8 +501,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":getOutputFile entered.");
 		if (remoteUIService != null) {
-			selectedFile = remoteUIService.getUIFileManager(remoteConnection)
-					.browseFile(parentShell, Messages.getString(titleID),
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID),
 							getFileDialogPath(pathAttrID)).toString();
 		}
 		if (selectedFile != null) {
@@ -531,8 +534,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":getDirectory entered.");
 		if (remoteUIService != null) {
-			selectedFile = remoteUIService.getUIFileManager(remoteConnection)
-					.browseDirectory(parentShell, Messages.getString(titleID),
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID),
 							getFileDialogPath(pathAttrID)).toString();
 		}
 		if (selectedFile != null) {

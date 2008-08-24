@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 
 public interface IRemoteUIServicesDelegate {
@@ -22,10 +21,9 @@ public interface IRemoteUIServicesDelegate {
 	public IRemoteUIConnectionManager getUIConnectionManager();
 	
 	/**
-	 * Get a UI file manager for managing remote files
+	 * Get a UI file manager for managing remote files.
 	 * 
-	 * @param fileMgr remote file manager
 	 * @return UI file manager or null if no file manager operations are supported
 	 */
-	public IRemoteUIFileManager getUIFileManager(IRemoteConnection connection);
+	public IRemoteUIFileManager getUIFileManager();
 }

@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.ui;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.rse.core.RSEConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -29,7 +33,9 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
 	 */
-	public void newConnection(Shell shell) {
+	public IRemoteConnection newConnection(Shell shell) {
+		IRemoteConnection[] oldConns = manager.getConnections();
+
 		if (action == null) {
  			action = new SystemNewConnectionAction(shell, false, false, null);
  	   		IRSESystemType systemType = RSECorePlugin.getTheCoreRegistry().getSystemTypeById(IRSESystemType.SYSTEMTYPE_SSH_ONLY_ID);
@@ -47,5 +53,33 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 		}
 		
 		manager.refreshConnections();
+		
+		/*
+		 * Try to work out which is the new connection. Assumes that connections
+		 * can only be created, NOT removed.
+		 */
+		IRemoteConnection[] newConns = manager.getConnections();
+		
+		if (newConns.length <= oldConns.length) {
+			return null;
+		}
+
+		Arrays.sort(oldConns, new Comparator<IRemoteConnection>() {
+			public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+				return c1.getName().compareToIgnoreCase(c2.getName());
+			}
+		});
+		Arrays.sort(newConns, new Comparator<IRemoteConnection>() {
+			public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+				return c1.getName().compareToIgnoreCase(c2.getName());
+			}
+		});
+		for (int i = 0; i < oldConns.length; i++) {
+			if (!oldConns[i].equals(newConns[i])) {
+				return newConns[i];
+			}
+		}
+		
+		return newConns[newConns.length-1];
 	}
 }

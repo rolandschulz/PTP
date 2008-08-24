@@ -49,6 +49,14 @@ public interface IRemoteUIFileManager {
 	public IRemoteConnection getConnection();
 	
 	/**
+	 * Set the connection to use for file browsing
+	 * 
+	 * @param connection connection to use for file browsing
+	 */
+	public void setConnection(IRemoteConnection connection);
+	
+	
+	/**
 	 * Show a list of available connections if possible.
 	 * 
 	 * @param enable enable connection list

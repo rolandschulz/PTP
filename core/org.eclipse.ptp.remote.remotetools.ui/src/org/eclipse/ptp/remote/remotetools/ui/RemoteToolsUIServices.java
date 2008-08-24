@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -39,10 +38,10 @@ public class RemoteToolsUIServices implements IRemoteUIServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager()
 	 */
-	public IRemoteUIFileManager getUIFileManager(IRemoteConnection connection) {
-		return new RemoteToolsUIFileManager(services, connection);
+	public IRemoteUIFileManager getUIFileManager() {
+		return new RemoteToolsUIFileManager(services);
 	}
 
 	/**

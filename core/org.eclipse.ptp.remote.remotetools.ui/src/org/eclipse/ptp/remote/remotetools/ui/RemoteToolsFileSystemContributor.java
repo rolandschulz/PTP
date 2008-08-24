@@ -43,7 +43,8 @@ public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 	public URI browseFileSystem(String initialPath, Shell shell) {
 		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID);
 		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
-		IRemoteUIFileManager fileMgr = uiServices.getUIFileManager(null);
+		IRemoteUIFileManager fileMgr = uiServices.getUIFileManager();
+		fileMgr.showConnections(true);
 		IPath path = fileMgr.browseDirectory(shell, "Browse File System", initialPath);
 		if (path != null) {
 			IRemoteConnection conn = fileMgr.getConnection();

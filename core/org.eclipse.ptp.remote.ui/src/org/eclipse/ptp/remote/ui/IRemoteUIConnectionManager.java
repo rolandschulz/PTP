@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Shell;
 
 
@@ -17,6 +18,8 @@ public interface IRemoteUIConnectionManager {
 	/**
 	 * Create a new connection. The implementation can chose to do this in any way,
 	 * but typically will use a dialog or wizard.
+	 * 
+	 * @return newly created remote connection
 	 */
-	public void newConnection(Shell shell);
+	public IRemoteConnection newConnection(Shell shell);
 }

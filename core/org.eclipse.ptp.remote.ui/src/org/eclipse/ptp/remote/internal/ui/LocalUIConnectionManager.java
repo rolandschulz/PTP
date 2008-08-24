@@ -10,14 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.internal.ui;
 
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.swt.widgets.Shell;
 
 
 public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
+	private IRemoteServices services;
+	
+	public LocalUIConnectionManager(IRemoteServices services) {
+		this.services = services;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
 	 */
-	public void newConnection(Shell shell) {
+	public IRemoteConnection newConnection(Shell shell) {
+		return services.getConnectionManager().getConnections()[0];
 	}
 }

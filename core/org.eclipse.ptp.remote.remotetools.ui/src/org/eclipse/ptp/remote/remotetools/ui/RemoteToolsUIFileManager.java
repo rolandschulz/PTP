@@ -22,12 +22,10 @@ import org.eclipse.swt.widgets.Shell;
 public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	private IRemoteServices services = null;
 	private IRemoteConnection connection = null;
-	private boolean showConnections;
+	private boolean showConnections = false;
 	
-	public RemoteToolsUIFileManager(IRemoteServices services, IRemoteConnection conn) {
+	public RemoteToolsUIFileManager(IRemoteServices services) {
 		this.services = services;
-		this.connection = conn;
-		showConnections(false);
 	}
 
 	/* (non-Javadoc)
@@ -76,12 +74,16 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public void setConnection(IRemoteConnection connection) {
+		this.connection = connection;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
 	 */
 	public void showConnections(boolean enable) {
-		/*
-		 * Force connection list if no connection supplied
-		 */
-		showConnections = enable || (connection == null);
+		showConnections = enable;
 	}
 }
