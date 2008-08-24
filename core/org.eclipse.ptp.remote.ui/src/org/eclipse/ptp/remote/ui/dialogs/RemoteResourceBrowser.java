@@ -87,7 +87,7 @@ public class RemoteResourceBrowser extends Dialog {
 	private String dialogTitle;
 	private String dialogLabel;
 	
-	private boolean showConnections = true;
+	private boolean showConnections = false;
 	private String remotePath = EMPTY_STRING;
 	private String initialPath = null;
 	private IRemoteServices services = null;
@@ -101,6 +101,9 @@ public class RemoteResourceBrowser extends Dialog {
 		setShellStyle(SWT.RESIZE | getShellStyle());
 		this.services = services;
 		this.connection = conn;
+		if (conn == null) {
+			showConnections = true;
+		}
 		this.connMgr = services.getConnectionManager();
 		this.uiConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services).getUIConnectionManager();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
@@ -360,6 +363,7 @@ public class RemoteResourceBrowser extends Dialog {
 	private void updateConnectionCombo(IRemoteConnection conn) {
 		IRemoteConnectionManager mgr = services.getConnectionManager();
 		IRemoteConnection[] conns = mgr.getConnections();
+		
 		if (conns.length > 0) {
 			Arrays.sort(conns, new Comparator<IRemoteConnection>() {
 				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
@@ -367,7 +371,9 @@ public class RemoteResourceBrowser extends Dialog {
 				}
 			});
 		}
+		
 		connectionCombo.removeAll();
+		
 		int selected = -1;
 		for (int i = 0; i < conns.length; i++) {
 			connectionCombo.add(conns[i].getName());
@@ -375,7 +381,13 @@ public class RemoteResourceBrowser extends Dialog {
 				selected = i;
 			}
 		}
-		connectionCombo.select(selected);
+		
+		if (selected < 0) {
+			connectionCombo.deselectAll();
+		} else {
+			connectionCombo.select(selected);
+		}
+		
 		connectionSelected();
 	}
 

@@ -404,7 +404,8 @@ public class ORTEConfigurationWizardPage extends RMConfigurationWizardPage {
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
 			}
-			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager(connection);
+			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
+			fileMgr.setConnection(connection);
 			
 			String initialPath = "//"; // Start at root since ORTED is probably installed in the system somewhere
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("ORTEConfigurationWizardPage.select"), initialPath); //$NON-NLS-1$

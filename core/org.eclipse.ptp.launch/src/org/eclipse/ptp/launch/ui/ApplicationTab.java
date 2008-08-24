@@ -468,8 +468,10 @@ public class ApplicationTab extends LaunchConfigurationTab {
     	if (remServices != null && remUIServices != null) {
     		IRemoteConnection remCon = remServices.getConnectionManager().getConnection(rmConf.getConnectionName());
     		if (remCon != null) {
-    			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager(remCon);
+    			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
     			if (fileMgr != null) {
+    				fileMgr.setConnection(remCon);
+    				fileMgr.showConnections(false);
     				IPath path = fileMgr.browseFile(getShell(), "Select application to execute", initPath);
     				if (path != null) {
     					appText.setText(path.toString());
@@ -522,8 +524,9 @@ public class ApplicationTab extends LaunchConfigurationTab {
     	if(localServices != null && localUIServices != null) {
     		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 			IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
-			IRemoteUIFileManager localUIFileManger = localUIServices.getUIFileManager(lconn); 
-			IPath path = localUIFileManger.browseFile(getShell(), "Select the executable file to be copied", initPath);
+			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager(); 
+			localUIFileMgr.setConnection(lconn);
+			IPath path = localUIFileMgr.browseFile(getShell(), "Select the executable file to be copied", initPath);
 			if (path != null) {
 				localAppText.setText(path.toString());
 			}

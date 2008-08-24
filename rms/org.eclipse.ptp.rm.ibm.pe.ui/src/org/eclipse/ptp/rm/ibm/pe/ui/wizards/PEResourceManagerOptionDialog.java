@@ -21,6 +21,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
@@ -112,7 +113,9 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
-			selectedFile = remoteUIService.getUIFileManager(remoteConnection).browseDirectory(PEResourceManagerOptionDialog.this.parentShell,
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseDirectory(parentShell, 
 					Messages.getString("PEDialogs.librarySelectorTitle"), "/").toString();
 		}
 		if (selectedFile != null) {

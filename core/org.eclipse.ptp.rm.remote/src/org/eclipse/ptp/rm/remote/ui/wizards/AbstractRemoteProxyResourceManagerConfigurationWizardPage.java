@@ -709,8 +709,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			if (connection.isOpen()) {
 				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 				if (remoteUIServices != null) {
-					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager(connection);
+					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 					if (fileMgr != null) {
+						fileMgr.setConnection(connection);
 						String correctPath = serverText.getText();
 						IPath selectedPath = fileMgr.browseFile(getShell(), Messages.getString("RemoteProxyConfigurationWizard.select"), correctPath); //$NON-NLS-1$
 						if (selectedPath != null) {

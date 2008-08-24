@@ -10,7 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.ui;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -40,15 +44,44 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
 	 */
-	public void newConnection(Shell shell) {
+	public IRemoteConnection newConnection(Shell shell) {
 		if (remoteHost != null) {
+			IRemoteConnection[] oldConns = connMgr.getConnections();
+			
 			EnvironmentWizard wizard = new EnvironmentWizard(remoteHost);
 			WizardDialog dialog = new WizardDialog(shell, wizard);
 			dialog.create();
 			dialog.setBlockOnOpen(true);
+			
 			if (dialog.open() == WizardDialog.OK) {
-				connMgr.getConnections();
+				/*
+				 * Locate the new connection and return it. Assumes connections can
+				 * only be created, NOT removed.
+				 */
+				IRemoteConnection[] newConns = connMgr.getConnections();
+				
+				if (newConns.length <= oldConns.length) {
+					return null;
+				}
+				
+				Arrays.sort(oldConns, new Comparator<IRemoteConnection>() {
+					public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+						return c1.getName().compareToIgnoreCase(c2.getName());
+					}
+				});
+				Arrays.sort(newConns, new Comparator<IRemoteConnection>() {
+					public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+						return c1.getName().compareToIgnoreCase(c2.getName());
+					}
+				});
+				for (int i = 0; i < oldConns.length; i++) {
+					if (!oldConns[i].equals(newConns[i])) {
+						return newConns[i];
+					}
+				}
+				return newConns[newConns.length-1];
 			}
 		}
+		return null;
 	}
 }

@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.rse.core.RSEConnection;
 import org.eclipse.ptp.remote.rse.core.RSEServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -34,17 +32,17 @@ public class RSEUIServices extends RSEServices implements IRemoteUIServicesDeleg
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager()
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager() {
 		return new RSEUIConnectionManager(services);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager()
 	 */
-	public IRemoteUIFileManager getUIFileManager(IRemoteConnection connection) {
-		return new RSEUIFileManager(services, (RSEConnection)connection);
+	public IRemoteUIFileManager getUIFileManager() {
+		return new RSEUIFileManager(services);
 	}
 	
 	/**

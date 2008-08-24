@@ -19,6 +19,6 @@ public class LocalUIServicesFactory implements IRemoteUIServicesFactory {
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesFactory#getServices(org.eclipse.ptp.remote.core.IRemoteServices)
 	 */
 	public IRemoteUIServicesDelegate getServices(IRemoteServices services) {
-		return LocalUIServices.getInstance();
+		return LocalUIServices.getInstance(services);
 	}
 }

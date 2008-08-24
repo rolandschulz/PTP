@@ -10,20 +10,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.internal.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
 
 public class LocalUIServices implements IRemoteUIServicesDelegate {
 	private static LocalUIServices instance = new LocalUIServices();
+	private static LocalUIConnectionManager connMgr = null;
+	private static LocalUIFileManager fileMgr = null;
 
 	/**
 	 * Get shared instance of this class
 	 * 
 	 * @return instance
 	 */
-	public static LocalUIServices getInstance() {
+	public static LocalUIServices getInstance(IRemoteServices services) {
+		connMgr = new LocalUIConnectionManager(services);
+		fileMgr = new LocalUIFileManager();
 		return instance;
 	}
 	
@@ -31,13 +35,13 @@ public class LocalUIServices implements IRemoteUIServicesDelegate {
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager() {
-		return new LocalUIConnectionManager();
+		return connMgr;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
-	public IRemoteUIFileManager getUIFileManager(IRemoteConnection connection) {
-		return new LocalUIFileManager(connection);
+	public IRemoteUIFileManager getUIFileManager() {
+		return fileMgr;
 	}
 }

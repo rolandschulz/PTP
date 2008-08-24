@@ -590,7 +590,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
 			}
-			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager(connection);
+			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
+			fileMgr.setConnection(connection);
 
 			String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere
 			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), "Select path to Open MPI installation", initialPath);
