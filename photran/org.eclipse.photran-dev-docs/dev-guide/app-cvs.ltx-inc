@@ -81,6 +81,7 @@ code, Part~I can be skipped.
 	\item  Check out the following projects under org.eclipse.photran:
 	       \begin{itemize}
 	       \item  org.eclipse.photran-dev-docs (if you intend to contribute to the documentation)
+	       \item  org.eclipse.photran-samples (sample Fortran programs)
 	       \item  org.eclipse.photran.cdtinterface
 	       \item  org.eclipse.photran.core
 	       \item  org.eclipse.photran.core.intel
