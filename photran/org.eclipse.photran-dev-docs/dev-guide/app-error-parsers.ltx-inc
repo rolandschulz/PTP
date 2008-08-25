@@ -1,54 +1,56 @@
 % Creating an Error Parser
 
-\textit{Last Updated 4/4/07}
-
-Error parsers scan the output of \texttt{make} for error messages
-for a particular compiler.
-When they see an error message they can recognize, they extract the
-filename, line number, and error message, and use it to populate the
+Error parsers scan the output of \texttt{make} for error messages for a
+particular compiler. When they see an error message they can recognize, they
+extract the filename, line number, and error message, and use it to populate the
 Problems view.
 
 For an example, see \texttt{IntelFortranErrorParser}.
-(It's a mere 74 lines.)
+(It's a mere 60 lines.)
 
-To create a new error parser, do the following.
-\begin{itemize}
+To create a new error parser, do the following. 
+
+\begin{itemize} 
+	
 \item We will assume that your error parser class will be in the
-\texttt{errorparsers} folder in the org.eclipse.photran.core
-plug-in and added to the
-\texttt{org.eclipse.photran.internal.errorparsers} package.
+\texttt{errorparsers} folder in the \texttt{org.eclipse.photran.core} plug-in 
+and added to the \\\texttt{org.eclipse.photran.internal.errorparsers} package.
 
 \item Define a class implementing \texttt{IErrorParser}
 
 \item Implement \texttt{public boolean processLine(String line,
-ErrorParserManager eoParser)}
-  which should always return false because ErrorParserManager appears not to
-  use the result in a rational way
+ErrorParserManager eoParser)} which should always return false because
+ErrorParserManager appears not to use the result in a rational way
 
-\item In org.eclipse.photran.core's \texttt{plugin.xml}, find the place
-where we define all of the Fortran error parsers.  Basically, copy an
-existing one.  Your addition will look something like this:
-\begin{verbatim}
-   <extension
-         id="IntelFortranErrorParser"
-         name="Photran Error Parser for Some New Fortran Compiler"
-         point="org.eclipse.cdt.core.ErrorParser">
-      <errorparser
-            class="org.eclipse.photran.internal.errorparsers.MyErrorParser">
-      </errorparser>
-   </extension>
-\end{verbatim}
+\item In org.eclipse.photran.core's \texttt{plugin.xml}, find the place where we
+define all of the Fortran error parsers. Basically, copy an existing one. Your
+addition will look something like this:
+
+\pagebreak
+
+\begin{lstlisting}[frame=lines, language=xml]
+<extension
+      id="IntelFortranErrorParser"
+      name="Photran Error Parser for Some New Fortran Compiler"
+      point="org.eclipse.cdt.core.ErrorParser">
+   <errorparser
+         class="org.eclipse.photran.internal.errorparsers.MyErrorParser">
+   </errorparser>
+</extension>
+\end{lstlisting}
 
 \item Your new error parser will appear in the error parser list in the
 Preferences automatically, and it will be automatically added to new projects.
-For existing projects, you will need to open the project properties dialog
-and add the new error parser to the project manually.
+For existing projects, you will need to open the project properties dialog and
+add the new error parser to the project manually.
 
 \end{itemize}
 
-\textbf{Note.}  Error parsers to not have to be implemented in the Photran
-Core plug-in.  In fact, they do not have to be implemented in Photran at all.
-If you create a brand new plug-in, you can specify org.eclipse.cdt.core
+\textbf{Note.} Error parsers do not have to be implemented in the Photran Core
+plug-in. In fact, they do not have to be implemented as part of Photran at all.
+If you create a brand new plug-in, you can specify \texttt{org.eclipse.cdt.core}
 as a dependency, include the above XML snippet in your plug-in's
-\texttt{plugin.xml}, and include your custom error parser class in that
-plug-in.
+\texttt{plugin.xml}, and include your custom error parser class in that plug-in.
+The plug-in system for Eclipse will recognize your plug-in, detect that it
+extends the \texttt{org.eclipse.cdt.core.ErrorParser} extension point, and add
+it to the list of implemented error parsers automatically.

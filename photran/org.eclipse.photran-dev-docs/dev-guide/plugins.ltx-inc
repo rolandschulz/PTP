@@ -1,137 +1,155 @@
 % Plug-in Decomposition
+\section{Introduction}
 
-\textit{Last Updated 4/4/07}
+This chapter presents a high-level overview of the different projects and
+plug-ins in Photran. It serves as a guide for developers reverse-engineering
+Photran to \emph{guess-and-locate} where certain components are. It also serves
+as a guide for contributers on \emph{where} to put their contributions.
 
-The following projects comprise the ``base'' of Photran.
-All sources in these projects are Java 4.
+The following sections are grouped by feature. A feature is a collection of
+related Eclipse plug-ins that the user can install as a whole.
 
-\begin{itemize}
+\section{Base Photran Feature: \\org.eclipse.photran-feature}
 
-\item org.eclipse.photran-feature
-
-	This is the Eclipse feature for Photran, used to build the Zip
-	file distributed to users.  (A feature is a grouping of related
-	plug-ins.)
-
-\item org.eclipse.photran.cdtinterface
-
-	This contains all of the components (core and user interface) related
-	to integration with the CDT.  It includes
-	\begin{itemize}
-	\item ILanguage for Fortran (i.e., the means
-              of adding Fortran to the list of languages recognized
-              by the CDT)
-	\item Fortran model elements, and icons for the Outline and Projects views
-	\item Simple lexical analyzer-based model builder, and an extension
-	      point for contributing more sophisticated model builders
-	\item Fortran perspective, Fortran Projects view, and new project wizards
-	\end{itemize}
-
-\item org.eclipse.photran.core
-
-	This is the Photran Core plug-in.  It contains much of the
-	Fortran-specific ``behind the scenes'' functionality:
-	\begin{itemize}
-	\item Utility classes
-	\item Error parsers for Fortran compilers
-	\item Fortran 95 lexical analyzer
-	\item Workspace preferences
-	\end{itemize}
-
-\item org.eclipse.photran.core.errorparsers.xlf
-
-	Error parser for the XLF compiler.
-	Managed by Craig Rasmussen at LANL.
-
-\item org.eclipse.photran.managedbuilder.core, \\
-      org.eclipse.photran.managedbuilder.gnu.ui, \\
-      org.eclipse.photran.managedbuilder.xlf.ui, \\
-      org.eclipse.photran.managedbuilder.ui
-
-	Support for Managed Build projects using the GNU toolchain.
-	Managed by Craig Rasmussen at LANL.
-
-\item org.eclipse.photran.core.intel, \\
-      org.eclipse.photran.intel-feature, \\
-      org.eclipse.photran.managedbuilder.intel.ui
-
-	Support for Managed Build projects using Intel toolchains.
-	Maintained by Bill Hilliard at Intel.
-
-\item org.eclipse.photran.ui
-
-	This contains the Fortran-specific components of the user interface:
-	\begin{itemize}
-	\item Editor
-	\item Preference pages
-	\end{itemize}
-
-\end{itemize}
-
-\noindent
-The following projects support parsing, analysis, and refactoring of Fortran sources.
-They are written in Java 5.
-The Virtual Program Graph is described in more detail later.
+The following projects comprise the ``base'' of Photran. All sources in these projects are Java 4.
 
 \begin{itemize}
 
-\item org.eclipse.photran.vpg.core
+\item \textbf{org.eclipse.photran.cdtinterface}
 
-	This contains the parsing, analysis, and refactoring infrastructure.
-	\begin{itemize}
-	\item Fortran parser and abstract syntax tree (AST)
-	\item Fortran preprocessor (to handle INCLUDE lines)
-	\item Parser-based model builder
-	\item Virtual Program Graph library (vpg-eclipse.jar)
-	\item Photran's Virtual Program Graph (VPG)
-	\item Utility classes (e.g., \texttt{SemanticError}, \texttt{LineCol})
-	\item Project property pages
-	\item Binding analysis (equivalent to symbol tables)
-	\item Type checker (incomplete)
-	\item Refactoring/program transformation engine
-	\item Refactorings
-	\end{itemize}
+This contains all of the components (core and user interface) related
+to integration with the CDT.  It includes:
+\begin{itemize}
+\item FortranLanguage for Fortran (i.e., the means of adding Fortran to the list
+of languages recognized by the CDT)
+\item Fortran model elements, and icons for the Outline and Projects Views
+\item \emph{Simple} lexical analyzer-based model builder and an extension
+point for contributing more sophisticated model builders
+\item Fortran perspective, Fortran Projects view, and new project wizards
+\end{itemize}
 
-\item org.eclipse.photran.core.vpg.tests, \\
-      org.eclipse.photran.core.vpg.tests.failing
+For more information about CDT, see Chapter~\ref{cha:cdt}.
 
-	JUnit Plug-in tests for the VPG core plug-in.
-	
-	All tests in org.eclipse.photran.core.vpg.tests should pass.
-	Test suites and test cases are placed in the ``failing'' plug-in until all of their tests pass.
-	
-	These plug-ins \textit{must} be run as a ``JUnit Plug-in Test,'' not a ``JUnit Test.''
-	In the launch configuration, the environment variable TESTING must be set to some non-empty value.
-	(This ensures that the VPG will not try to run in the background and interfere with testing.)
+\item \textbf{org.eclipse.photran.core}
 
-\item org.eclipse.photran.ui.vpg
+This is the Photran Core plug-in. It contains much of the Fortran-specific
+``behind the scenes'' functionality:
 
-	UI contributions that depend on the org.eclipse.photran.core.vpg plug-in.
-	Currently, this is the
-	Open Declaration action,
-	a project property page where the user can customize the search path for Fortran modules and include files,
-	and all of the actions in the Refactoring menu.
-	Search and other VPG-dependent features will be placed here in the future.
+\begin{itemize}
+\item Utility classes
+\item Error parsers for Fortran compilers
+\item Fortran 95 lexical analyzer
+\item Workspace preferences
+\end{itemize}
+
+\item \textbf{org.eclipse.photran.managedbuilder.core}, \\
+      \textbf{org.eclipse.photran.managedbuilder.gnu.ui}, \\
+      \textbf{org.eclipse.photran.managedbuilder.ui}
+
+Support for Managed Build projects using the GNU toolchain. Managed by Craig Rasmussen at LANL.
+
+\item \textbf{org.eclipse.photran.ui}
+
+This contains the Fortran-specific components of the user interface:
+
+\begin{itemize}
+\item Fortran Editors
+\item Preference pages
+\end{itemize}
 
 \end{itemize}
 
-\noindent
+\section{Virtual Program Graph (VPG) feature: \\org.eclipse.photran.vpg-feature}
+
+The following projects support parsing, analysis, and refactoring of Fortran
+sources. They are written in Java 5. The Virtual Program Graph is described in
+more detail in Chapter~\ref{cha:parsing}.
+
+\begin{itemize}
+
+\item \textbf{org.eclipse.photran.vpg.core}
+
+This contains the parsing, analysis, and refactoring infrastructure.
+\begin{itemize}
+\item Fortran parser and abstract syntax tree (AST)
+\item Fortran preprocessor (to handle INCLUDE lines)
+\item Parser-based model builder
+\item Virtual Program Graph library (vpg-eclipse.jar)
+\item Photran's Virtual Program Graph (VPG)
+\item Utility classes (e.g., \texttt{SemanticError}, \texttt{LineCol})
+\item Project property pages
+\item Binding analysis (equivalent to symbol tables)
+\item Refactoring/program transformation engine
+\item Refactorings
+\end{itemize}
+
+\item \textbf{org.eclipse.photran.core.vpg.tests}, \\
+      \textbf{org.eclipse.photran.core.vpg.tests.failing}
+
+JUnit Plug-in tests for the VPG core plug-in.
+
+All tests in org.eclipse.photran.core.vpg.tests should pass. Test suites and
+test cases are placed in the ``failing'' plug-in project until all of their
+tests pass.
+
+These plug-ins \textit{must} be run as a ``JUnit Plug-in Test'' ()\textbf{not} a
+``JUnit Test''). In the launch configuration, the environment variable TESTING
+must be set to some non-empty value. (This ensures that the VPG will not try to
+run in the background and interfere with testing.)
+
+\item \textbf{org.eclipse.photran.ui.vpg}
+
+UI contributions that depend on the \texttt{org.eclipse.photran.core.vpg}
+plug-in. Currently, this includes (1) the Open Declaration action, a project
+property page where the user can customize the search path for Fortran modules
+and include files, and (2) all of the actions in the Refactoring menu. Search
+and other VPG-dependent features will be placed here in the future.
+
+\end{itemize}
+
+\section{XL Fortran Compiler Feature: \\org.eclipse.photran.xlf-feature}
+
+The following are plug-ins to support the
+\href{http://www-306.ibm.com/software/awdtools/fortran/}{XL Fortran compiler}.
+
+\begin{itemize}
+\item \textbf{org.eclipse.photran.core.errorparsers.xlf}, \\
+      \textbf{org.eclipse.photran.managedbuilder.xlf.ui}
+
+Support for Managed Build projects using XL toolchains. Managed by Craig
+Rasmussen at LANL.
+
+\end{itemize}
+
+\section{Intel Fortran Compiler Feature: \\org.eclipse.photran.intel-feature}
+
+The following are plug-ins to support the \href{http://www.intel.com/cd/software/products/asmo-na/eng/compilers/284132.htm}{Intel Fortran Compiler}.
+
+\begin{itemize}
+\item \textbf{org.eclipse.photran.core.intel}, \\
+      \textbf{org.eclipse.photran.managedbuilder.intel.ui}
+
+Support for Managed Build projects using Intel toolchains. Maintained by Bill
+Hilliard at Intel.
+
+\end{itemize}
+
+\section{Non-plug-in projects}
+
 The following projects are in CVS but are not distributed to users:
 
 \begin{itemize}
 
-\item org.eclipse.photran-dev-docs
+\item \textbf{org.eclipse.photran-dev-docs}
 
-    Developer documentation, including this document
-    (\texttt{dev-guide/*}), CVS instructions
-    (\texttt{dev-guide/cvs-instructions.pdf}),
-	the materials from our presentation at EclipseCon 2006 on adding a new
-	language to the CDT, and a spreadsheet
-    mapping features in the Fortran language to JUnit tests
-    (\texttt{language-coverage/*}).
+Developer documentation, including this document (\texttt{dev-guide/*}), CVS
+instructions (\texttt{dev-guide/cvs-instructions.pdf}), the materials from our
+presentation at EclipseCon 2006 on adding a new language to the CDT, and a
+spreadsheet mapping features in the Fortran language to JUnit tests
+(\texttt{language-coverage/*}).
 
-\item org.eclipse.photran-samples
+\item \textbf{org.eclipse.photran-samples}
 
-	A Photran project containing an assortment of Fortran code.
+A Photran project containing an assortment of Fortran code.
 
 \end{itemize}

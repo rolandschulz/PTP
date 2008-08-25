@@ -1,3 +1,17 @@
+\section{Introduction}
+
+The C/C++ Development Tools (CDT)\footnote{See
+\url{http://www.eclipse.org/cdt/}} enables Eclipse to function as a first-class
+C/C++ IDE. CDT provides features that a programmer expects from an IDE such
+as project management, automated build, integrated debugging, etc. In addition,
+CDT also provides extension points for writing IDEs for other programming
+languages that follow the C/C++ edit-compile-debug-compile cycle closely;
+Fortran is one such language.
+
+Photran builds upon the CDT by leveraging its extension points. As such, it
+needs to follow certain conventions and expectations of the CDT. In this
+chapter, we discuss those conventions and expectations.
+
 \section{CDT Terminology}
 
 The following are CDT terms that will be used extensively when discussing
@@ -6,8 +20,8 @@ Photran.
 \begin{itemize}
 
 \item \textbf{Standard Make projects} are ordinary Eclipse projects, except that
-the CDT (and Photran) recognize them as being ``their own'' type of project (as
-opposed to, say, projects for JDT, EMF, or another Eclipse-based tool). The user
+CDT and Photran recognize them as being ``their own'' type of project (as
+opposed to, say, projects for JDT, EMF, or another Eclipse-based tool). Users
 must supply their own Makefile, typically with targets ``clean'' and ``all.''
 CDT/Photran cleans and builds the project by running \texttt{make}.
 
@@ -18,7 +32,7 @@ project. The \textbf{Managed Build System} is the part of CDT and Photran that
 handles all of this.
 
 \item \textbf{Binary parsers} are able to detect whether a file is a legal
-executable for a platform (and extract other information from it). The CDT
+executable for a platform (and extract other information from it). CDT
 provides binary parsers for Windows (PE), Linux (ELF), Mac OS X (Mach), and
 others. Photran does not provide any additional binary parsers.
 
@@ -26,26 +40,34 @@ others. Photran does not provide any additional binary parsers.
 error parser, for example. Photran provides error parsers for Lahey Fortran, F,
 g95, and others. Essentially, error parsers scan the output of \texttt{make} for
 error messages for their associated compiler. When they see an error message
-they can recognize, they extract the filename, line number, and error message,
-and use it to populate the Problems view.
+that they recognize, they extract the filename, line number, and error message,
+and use it to populate the Problems View. See
+Appendix~\ref{ap:creating_an_error_parser} for an example on how to create an
+error parser.
 
 \item CDT keeps a \textbf{model} of all of the files in a project. The model is
-essentially a tree of \textbf{elements}, which all derive from a (CDT Core)
+essentially a tree of \textbf{elements}, which all derive from the (CDT Core)
 class \texttt{ICElement}. It is described in the next section.
 
 \end{itemize}
 
 \section{The Model}
 
+\emph{This section describes the CDT model in detail. Understanding the CDT
+model is useful for contributors who are interested in modifying the UI and how
+Fortran projects are managed in the Fortran perspective. Contributors who are
+interested in creating refactorings and program analysis tools should
+familiarize themselves with the Abstract Syntax Tree (AST) and Virtual Program
+Graph (VPG) described in Chapter~\ref{cha:parsing}.}
+
 The Fortran Projects view in Photran is essentially a visualization of
 the CDT's \textit{model}, a tree data structure describing the contents
 of all Fortran Projects in the workspace as well as the high-level contents
 (functions, aggregate types, etc.) of source files.
 
-Alain Magloire (CDT) described the model, A.K.A. the \texttt{ICElement}
-hierarchy, in the thread
-``Patch to create ICoreModel interface''
-on the cdt-dev mailing list:
+Alain Magloire (CDT) describes the model, A.K.A. the \texttt{ICElement}
+hierarchy, in the thread ``Patch to create ICoreModel interface'' on the cdt-dev
+mailing list:
 
 \begin{verbatim}
 So I'll explain a little about the ICElement and what we get out of it for
@@ -88,7 +110,9 @@ conditions) etc .... For a complete interface/view of the language, clients
 should use the __AST__ interface.
 \end{verbatim}
 
-From another one of Alain's posts in that thread:
+\pagebreak
+
+From another of Alain's posts in that thread:
 
 \begin{verbatim}
 Lets make sure we are on the same length about the ICElement hierarchy.
@@ -114,39 +138,124 @@ The CoreModel uses information taken from:
 to build the hierarchy.
 \end{verbatim}
 
+\shabox{The CDT model should \textbf{not} be confused with the Abstract Syntax
+Tree (AST) model that is discussed in Section~\ref{sec:ast_structure}. They are
+\textbf{not} identical. It is best to think of the CDT model as containing a
+\emph{partial/simplified view} of the AST model to represent the
+\emph{interesting} elements in the source code (program names, function names,
+subroutine names) \textbf{in addition} to a model of the current workspace
+resources (Fortran projects, Fortran source files, binary executables). \emph{In
+other words, the CDT model knows about the language and the resources}. The AST,
+on the other hand, completely models \emph{everything} in the source file (but
+nothing about the resources), including low-level elements that the user is
+unlikely to be interested in knowing about (assignment nodes, variable
+declarations). While low-level, these elements are useful for refactoring and 
+program analysis.}
+
+By conforming to the CDT model, Photran is able to reuse various UI
+elements for \emph{free}. For instance, the Outline View for Photran is managed
+by CDT; Photran just needs to provide a CDT-compatible model to represent its
+project and source files.
+
+The \texttt{FortranLanguage} class is responsible for initializing concrete
+classes that will build up the model that CDT expects. For more
+information, refer to the FortranLanguage.java file in the
+\texttt{org.eclipse.photran.cdtinterface} plug-in project.
+
+There are \textbf{two} options for creating suitable \emph{model builders}:
+\begin{enumerate}
+\item The \texttt{org.eclipse.photran.cdtinterface} plug-in project defines the
+\\ \texttt{org.eclipse.photran.cdtinterface.modelbuilder} extension point that
+other plug-ins can extend. Plug-ins extending that extension point are
+responsible for providing a suitable model builder. Using this option, it is
+possible to have multiple model builders. The model builder to use can be
+selected in the workspace preferences (under Fortran $>$ CDT Interface).
+
+\item If there are no plug-ins that extend the
+\texttt{org.eclipse.photran.cdtinterface.modelbuilder} extension point, then
+Photran falls back on a default implementation. The default implementation is
+provided by the \texttt{SimpleFortranModelBuilder} class. It relies on simple
+lexical analysis to build the model. This simple model builder might not be able
+to accurately handle the more complicated features of the Fortran language.
+\end{enumerate}
+
+The Photran VPG (see Section~\ref{sec:virtual_program_graph}) inside the
+\texttt{org.eclipse.photran.core.vpg} project uses the first option to
+contribute a model builder. The relevant classes are under the
+\texttt{org.eclipse.photran.internal.core.model} package i.e.
+\texttt{FortranModelBuilder}, \texttt{FortranModelBuildingVisitor} and 
+\texttt{FortranParseTreeModelBuildingVisitor}.
+
+As mentioned in the post by Alain, all model elements must implement the
+\texttt{ICElement} interface for CDT to recognize them. In Photran, the
+\texttt{FortranElement} class implements the \texttt{ICElement} interface and
+serves as the base class for all Fortran elements such as subroutines,
+functions, modules, variables, etc. Each subclass of \texttt{FortranElement}
+corresponds to an element that can be displayed in the Outline View.
+
+\section{Reusing UI Elements}
+
+Various UI elements in Photran are also reused from the CDT through subclassing.
+For instance, the \texttt{NewProjectDropDownAction} class shown in
+Listing~\ref{lst:newprojectdropdownaction} is a subclass of
+\texttt{AbstractWizardDropDownAction} declared in CDT.
+\texttt{AbstractWizardDropDownAction} provides most of the implementation and
+our subclass just provides the Photran-specific details such as the actual
+action that will be invoked.
+ 
+\begin{code}
+\begin{lstlisting}
+public class NewProjectDropDownAction extends AbstractWizardDropDownAction
+{
+	public NewProjectDropDownAction()
+	{
+		super();
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
+			 ICHelpContextIds.OPEN_PROJECT_WIZARD_ACTION);
+	}
+	
+	protected IAction[] getWizardActions()
+	{
+		return FortranWizardRegistry.getProjectWizardActions();
+	}
+}
+\end{lstlisting}
+\caption{\texttt{NewProjectDropDownAction} class}
+\label{lst:newprojectdropdownaction}
+\end{code}
+
+Our \texttt{NewProjectDropDownAction} is invoked through the right-click menu by
+going to New... $>$ Other $>$ Fortran. It creates a new Fortran project in the
+current workspace.
+
+In addition, we could also customize the icons for each UI element by modifying
+the appropriate attributes in the plugin.xml file in the
+\texttt{org.eclipse.photran.cdtinterface} project.
+
 \section{The CDT Debugger and \texttt{gdb}}
+
+Currently, Photran re-uses the CDT debugger as-is and does not contribute any
+enhancements to it. Here is a brief summary of how the debugger works:
 
 \begin{itemize}
 
 \item The so-called CDT debugger is actually just a graphical interface to
-\texttt{gdb}, or more specifically to \texttt{gdb/mi}.  If something
-doesn't work, try it in \texttt{gdb} directly, or using another
-\texttt{gdb}-based tool such as DDD.
+\texttt{gdb}, or more specifically to \texttt{gdb/mi}. So, if something doesn't
+appear to work, it is advisable to try it in \texttt{gdb} directly or to use
+another \texttt{gdb}-based tool such as DDD.
 
-\item The debugger UI ``contributes'' breakpoint markers and actions
-to the editor.  The ``set breakpoint'' action, and the breakpoint markers
-that appear in the ruler of the CDT (and Photran) editors are handled
-entirely by the debug UI: You will \textit{not} find code for them in the
-Photran UI plug-in.
+\item The debugger UI ``contributes'' breakpoint markers and actions to the
+editor. The ``set breakpoint'' action, and the breakpoint markers that appear in
+the ruler of the CDT (and Photran) editors are handled \textbf{entirely} by the
+CDT debug UI; there is no code for this in Photran. The ``set breakpoint''
+action is enabled by calling \lstinline!setRulerContextMenuId("#CEditorRulerContext");! 
+in the \texttt{AbstractFortranEditor} constructor.
 
 \item \texttt{gdb} reads debug symbols from the executable it is debugging.
 That is how it knows what line it's on, what file to open, etc.  Photran
 has \textit{nothing} to do with this: These symbols are written entirely
 by the compiler.  Moreover, the compiler determines what shows up in the
-Variables view.  If the debugger views seem to be a mess, it is the
+Variables View.  If the debugger views seem to be a mess, it is the
 compiler's fault, not Photran's.
 
 \end{itemize}
-
-% TODO: Stuff to add-in from Jeff's e-mail
-
-% Contributed to CDT:
-% FortranLanguage (contributed to org.eclipse.cdt.core.language)
-% Contributes a model builder and possibly a DOM parser to CDT.  Note that these are contributed to extension points defined in org.eclipse.photran.cdtinterface, which in turn contributes them to org.eclipse.cdt.core.language via the FortranLanguage class.
-% Reused from CDT:
-% Some UI reused through copying (no better alternative): FortranPerspectiveFactory, large parts of org.eclipse.photran.cdtinterface's plugin.xml
-% Lots of UI reused through subclassing: FortranView, NewFileDropDownAction, and many others
-% FortranElement (base class for elements in Photran's model) subclasses from CDT model classes
-% Some portions of the editor reused from CDT.  Would have to read the code to remember the details.
-% I'm not sure about Managed Make.
-% The debugger is reused as-is.  The user is able to set breakpoints in the Fortran editor because we reuse the C Editor's ruler context (see AbstractFortranEditor ctor).

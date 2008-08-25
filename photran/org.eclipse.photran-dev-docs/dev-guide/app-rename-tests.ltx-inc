@@ -1,93 +1,122 @@
 % Creating a Rename Refactoring Test Case
 
-\textit{Last Updated 4/12/07}
-
-\bfseries{\large This information is out of date and is being updated (8/07).}
-
 JUnit tests for the Rename refactoring are located in the
-org.eclipse.photran.refactoring.tests plug-in.  A Rename test
+\texttt{org.eclipse.photran.refactoring.tests} plug-in project. A Rename test
 has two components:
+
 \begin{enumerate}
+
 \item one or more Fortran files, which contain the code to be refactored, and
-\item a JUnit test suite class, which creates tests attempting to rename the identifiers in that file.
+
+\item a JUnit test suite class, which creates tests attempting to rename the
+identifiers in that file.
+
 \end{enumerate}
 
-The Fortran files are stored as .f90 files in the rename-test-code folder.
-The JUnit tests are similarly-named Java classes in the
+The Fortran files are stored as .f90 files in the \emph{rename-test-code}
+folder. The JUnit tests are similarly-named Java classes in the
 \texttt{org.eclipse.photran.refactoring.tests.rename} package.
 
-A sample JUnit test suite is the following.  The more complex tests follow a similar structure.
-Here, the \texttt{vars} array records all of the identifiers and the line/column positions on which they occur.
-The test suite constructor attempts to rename each identifier to \texttt{z} and also to
+A sample JUnit test suite is the following. The more complex tests follow a
+similar structure. Here, the \texttt{vars} array records all of the identifiers
+and the line/column positions on which they occur. The test suite constructor
+attempts to rename each identifier to \texttt{z} and also to
 \texttt{a\_really\_really\_long\_name}.
 
-{\footnotesize\begin{verbatim}
+\shabox{Because our strategy for testing requires the \emph{exact} line and
+column position, using tabs instead of spaces for indenting could interfere with
+the positioning. Therefore, for testing purposes, test cases (the Fortran test
+files) should be indented with \textbf{spaces only}. However, when an actual
+Fortran programmer invokes a refactoring through the Eclipse UI, the indentation
+with tabs or spaces is not a problem because the Eclipse editor is smart enough
+to provide the correct position (based on expanding tabs into spaces
+internally). } \\
+
+\begin{lstlisting}[frame=lines]
 public class Rename2 extends RenameTestSuite
 {
-    ///////////////////////////////////////////////////////////////////////////
-    //
-    // RECORD POSITIONS OF ALL IDENTIFIERS IN RENAME2.F90, AND
-    // GROUP THEM ACCORDING TO WHICH ONES SHOULD BE RENAMED TOGETHER
-    //
-    ///////////////////////////////////////////////////////////////////////////
-    
-    private String filename = "rename2.f90";
-    
-    private Ident[] vars = new Ident[]
-    {
-        var(filename, "Main", new LineCol[] { lc(2,9), lc(27,13) }),
-        var(filename, "one", new LineCol[] { lc(4,16), lc(12,14), lc(16,11), lc(20,11) }),
-        var(filename, "two", new LineCol[] { lc(5,27), lc(10,13), lc(13,14), lc(17,14) }),
-        var(filename, "three", new LineCol[] { lc(6,16), lc(14,9), lc(18,9) }),
-        var(filename, "four", new LineCol[] { lc(10,21), lc(15,14), lc(19,14) })
-    };
-    
-    ///////////////////////////////////////////////////////////////////////////
-    //
-    // TEST CASES
-    //
-    ///////////////////////////////////////////////////////////////////////////
-    
-    public static Test suite() throws Exception
-    {
-        return new Rename2();
-    }
-    
-    public Rename2() throws Exception
-    {
-        startTests("Renaming program with comments and line continuations");
-        for (String name : new String[] { "z", "a_really_really_long_name" })
-            for (Ident var : vars)
-                addSuccessTests(var, name);
-        endTests();
-    }
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// RECORD POSITIONS OF ALL IDENTIFIERS IN RENAME2.F90, AND
+	// GROUP THEM ACCORDING TO WHICH ONES SHOULD BE RENAMED TOGETHER
+	//
+	/////////////////////////////////////////////////////////////////////////
+
+	private String filename = "rename2.f90";
+
+	private Ident[] vars = new Ident[]
+	{
+	    var(filename, "Main", new LineCol[] { lc(2,9), lc(27,13) }),
+	    var(filename, "one", new LineCol[] { lc(4,16), lc(12,14), 
+		                                       lc(16,11), lc(20,11) }),
+	    var(filename, "two", new LineCol[] { lc(5,27), lc(10,13),
+		                                       lc(13,14), lc(17,14) }),
+	    var(filename, "three", new LineCol[] { lc(6,16), lc(14,9), 
+		                                         lc(18,9) }),
+	    var(filename, "four", new LineCol[] { lc(10,21), lc(15,14),
+		                                        lc(19,14) })
+	};
+
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// TEST CASES
+	//
+	/////////////////////////////////////////////////////////////////////////
+
+	public static Test suite() throws Exception
+	{
+	    return new Rename2();
+	}
+
+	public Rename2() throws Exception
+	{
+	    startTests("Renaming program with comments and line continuations");
+	    for (String name : new String[] { "z", "a_really_really_long_name" })
+	        for (Ident var : vars)
+	            addSuccessTests(var, name);
+	    endTests();
+	}
 }
-\end{verbatim}}
+\end{lstlisting}
 
-The \texttt{addSuccessTests} method adds several test cases to the suite:
-it simulates the user clicking on each occurrence of the identifier
-and asking to rename that instance.  (Of course, no matter which occurrence is clicked on,
-all instances should be renamed\ldots but this has occasionally not happened.)
+The \texttt{addSuccessTests} method adds several test cases to the suite: it
+simulates the user clicking on each occurrence of the identifier and asking to
+rename that instance. (Of course, no matter which occurrence is clicked on, all
+instances should be renamed\ldots but this has occasionally not happened.)
 
-If the rename should not have succeeded---that is, a precondition would not be
-met---\texttt{addPreconditionTests} should have been
-called rather than \texttt{addSuccessTests}.
+If the rename should not have succeeded--that is, a precondition would not be
+met--\texttt{addPreconditionTests} should have been called rather than
+\texttt{addSuccessTests}. A good testing strategy ensures that a program behaves
+correctly: it should do \textbf{only} what it is supposed to do and nothing
+more. In our case, it should rename only the identifiers that are affected and
+ensure that the other identifiers are left untouched.
 
-\texttt{Rename3} is a slightly more complicated example, which renames identifiers spanning
-multiple files.  In this case, a large boolean matrix is used to record which identifiers
-should be renamable to which other identifiers:
-{\footnotesize\begin{verbatim}
-    private boolean[][] expectSuccess = new boolean[][]
-    {
-        // IMPORTANT:
-        // * Modules can't be renamed, hence the rows of "false" for moduleA, moduleB, and moduleC
-        // * Everything except myProgram and external should probably be renameable to myProgram, but this a corner case which we'll ignore
-        
-        /* vvv can be renamed to >>>    myProgram, aRenamed3, bRenamed3, contained, external, ...
-        /* myProgram */ new boolean[] { false,     true,      true,      true,      false,    ...
-        /* aRenamed3 */ new boolean[] { false,     false,     false,     false,     false,    ...
-        /* bRenamed3 */ new boolean[] { false,     false,     false,     false,     false,    ...
-        /* contained */ new boolean[] { false,     false,     false,     false,     false,    ...
-        /* external  */ new boolean[] { false,     false,     false,     false,     false,    ...
-        ...
-\end{verbatim}}
+\texttt{Rename3} is a slightly more complicated example, which renames
+identifiers spanning multiple files. In this case, a large boolean matrix is
+used to record which identifiers should be renamable to which other identifiers:
+
+\begin{code}
+\begin{lstlisting}
+private boolean[][] expectSuccess = new boolean[][]
+{
+    
+/* vvv can be renamed to >>>    myProgram, aRenamed3, bRenamed3, contained, 
+/* myProgram */ new boolean[] { false,     true,      true,      true,  ...      
+/* aRenamed3 */ new boolean[] { true,      false,     false,     false, ...    
+/* bRenamed3 */ new boolean[] { true,      false,     false,     false, ...    
+/* contained */ new boolean[] { true,      false,     false,     false, ...    
+/* external  */ new boolean[] { false,     false,     false,     false, ...    
+/* moduleA   */ new boolean[] { false,     false,     false,     false, ...    
+/* aSub1of3  */ new boolean[] { true,      false,     false,     false, ...    
+/* aSub2of3  */ new boolean[] { true,      false,     false,     false, ...    
+/* aSub3of3  */ new boolean[] { true,      true,      true,      true,  ...    
+/* moduleB   */ new boolean[] { false,     false,     false,     false, ...    
+/* bSub1of3  */ new boolean[] { true,      true,      true,      true,  ...    
+/* bSub2of3  */ new boolean[] { true,      false,     false,     false, ...    
+/* bSub3of3  */ new boolean[] { true,      true,      true,      true,  ...    
+/* moduleC   */ new boolean[] { false,     false,     false,     false, ...    
+/* cSub      */ new boolean[] { true,      true,      true,      true,  ...    
+};
+\end{lstlisting}
+\caption{Partial representation of the boolean matrix in \texttt{Rename3}}
+\end{code}

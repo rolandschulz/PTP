@@ -1,39 +1,40 @@
 % Introduction
-
-\textit{Last Updated 08/01/07}
+\vspace{-0.5in}
 
 Photran is an IDE for Fortran 90/95 and Fortran 77 that is built on top of
 Eclipse. It is structured as an Eclipse feature, in other words, as a set of
 plug-ins that are designed to be used together. Starting with version 3.0, it is
-an extension of CDT, the Eclipse IDE for C/C++. Previous versions of Photran
-were created by hacking a copy of the CDT to support Fortran instead of C/C++,
-but now we have developed a mechanism for adding new languages into the CDT,
-allowing the Fortran support code to be in its own set of plug-ins.
+an extension of C/C++ Development Tools (CDT), the Eclipse IDE for C/C++.
+Previous versions of Photran were created by hacking a copy of CDT to support
+Fortran instead of C/C++, but now we have developed a mechanism for adding new
+languages into CDT, allowing the Fortran support code to be in its own set of
+plug-ins.
 
 Our purpose in writing Photran was to create a refactoring tool for Fortran.
 Thus, Photran has a complete parser and program representation. Photran adds a
-Fortran editor and several preference pages to the CDT user interface, as well
-as a Fortran Managed Make project type.
+Fortran editor and several preference pages to the CDT user interface, as
+well as a Fortran Managed Make project type.
 
-\section{How To Read This Guide} % (fold)
-\label{sec:how_to_read_this_guide}
+\vspace{-0.2in}
+
+\section{How To Read This Guide} 
 
 This document explains the design of Photran so that interested contributors
 could fix a bug or add a refactoring. Contributors should know how to use
-Photran and how the CDT works. There is a short
+Photran and how CDT works. There is a short
 \href{http://www.eclipse.org/photran/documentation.php}{\emph{Getting Started
 Guide}} on the Photran website.
 
-Contributors also need to understand Eclipse and Eclipse plug-ins before you
-read this document. We recommend reading
+Contributors also need to understand Eclipse and how to build Eclipse plug-ins
+before they read this document. We recommend reading
 \href{http://www.amazon.com/Eclipse-Building-Commercial-Quality-Plug-Ins/dp/0321228472}{\emph{Building
 Commercial-Quality Plug-ins}} and
 \href{http://www.amazon.com/Java-Developers-Guide-Eclipse-2nd/dp/0321305027/}{\emph{The
 Java Developer's Guide to Eclipse}} for Eclipse newcomers.
 
 This is a \emph{duplex} guide. The main chapters provide general descriptions of
-the various components and how they interact. The appendix describe concrete
+the various components and how they interact. The appendix describes concrete
 examples from Photran so that contributors can familiarize themselves with
-actual code and implementation details.
-
-% section how_to_read_this_guide (end)
+actual code and implementation details. This guide complements the source code
+in the repository; it is \underline{not a substitute} for reading the actual
+source code.

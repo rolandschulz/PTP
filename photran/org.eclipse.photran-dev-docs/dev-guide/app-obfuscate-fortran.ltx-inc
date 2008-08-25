@@ -1,0 +1,179 @@
+\section{Introduction}
+
+Contributing a new refactoring to Photran is best done by following a working
+example.
+
+This paragraph describes the general approach: First, an action must be added to
+both the editor popup menu \textbf{and} the Refactor menu in the menu bar by
+modifying the plugin.xml file. Then, the action delegate and its accompanying
+refactoring wizard have to be coded; these two classes are responsible for
+populating the user interface of the refactoring wizard dialog. Finally, the
+actual Fortran refactoring itself has to be coded.
+
+The remaining sections go into the details of each of those steps based on a
+simple (but not useful) refactoring example: obfuscating Fortran by removing the
+comments and adding redundant comments to the header. The source code is
+available from
+\url{http://subversion.cs.uiuc.edu/pub/svn/FruitFly/edu.uiuc.nchen.obfuscator/trunk/}
+
+\section{Modifying the plugin.xml}
+
+There are \textbf{four} extensions points (from the Eclipse core) that our plug-in needs to extend:
+
+\begin{description}
+
+ \item [\texttt{org.eclipse.ui.commands}] Creates a new command \emph{category}
+to represent our refactoring. This category will be referenced by the other
+extensions in the plugin.xml file.
+
+ \item [\texttt{org.eclipse.ui.actionSets}] This extension point is used to add
+menus and menu items to the Fortran perspective.
+
+ \item [\texttt{org.eclipse.ui.actionSetPartAssociations}] Allows our
+refactoring to be visible/enabled in the context of the Fortran editor.
+
+ \item [\texttt{org.eclipse.ui.popupMenus}] Displays our refactoring in the
+pop-up menu that appears during a right-click.
+
+ \item [\texttt{org.eclipse.ui.bindings}] (Optional) Allows our refactoring to
+be invoked via keyboard shortcuts. For instance the Fortran Rename Refactoring
+is bound to the Alt + Shift + R keyboard shortcut, which is the same as the one
+for the Java Rename Refactoring.
+
+\end{description}
+
+Please refer to the documentation and schema description for each extension point; the documentation is available from Help $>$ Help Contents in Eclipse.
+
+Fortran currently does \textbf{not} use the newer \texttt{org.eclipse.ui.menus}
+extension points (introduced in Eclipse 3.3) for adding menus, menu items and
+pop-up menus.
+
+It is possible to use the newer \texttt{org.eclipse.ui.menus} extension point if
+desired, but this chapter uses the older extension points to remain consistent
+with how Photran is doing it.
+
+For more information, see the plugin.xml file of our refactoring example.
+
+\section{Creating an Action Delegate and a Refactoring Wizard}
+
+The \texttt{org.eclipse.ui.actionSets} and \texttt{org.eclipse.ui.popupMenus}
+extension points that were extended in our plugin.xml file require a reference
+to action delegate class that we need to provide.
+
+For a Fortran refactoring, our action delegate should extend the
+\\\texttt{AbstractFortranRefactoringActionDelegate} class \textbf{and} implement
+the \\\texttt{IWorkbenchWindowActionDelegate} and \texttt{IEditorActionDelegate}
+interfaces.
+
+The most important method in our action delegate class is the
+\textbf{constructor}. The constructor has to be done in a particular way so that
+everything is setup correctly. Listing~\ref{lst:obfuscateaction} shows how the constructor needs to be setup.
+
+\begin{code}
+\begin{lstlisting}
+public class ObfuscateAction extends AbstractFortranRefactoringActionDelegate
+	implements IWorkbenchWindowActionDelegate, IEditorActionDelegate {
+
+    public ObfuscateAction() {
+			super(ObfuscateRefactoring.class, ObfuscateRefactoringWizard.class);
+    }
+		
+		...
+}
+\end{lstlisting}
+\caption{\texttt{ObfuscateAction} for our simple refactoring example}
+\label{lst:obfuscateaction}
+\end{code}
+
+Inside our constructor, we need to call the parent constructor that takes
+\textbf{two} parameters: the class of the actual refactoring object (e.g.
+ObfuscateRefactoring) and the class of the actual refactoring wizard (e.g.
+ObfuscateRefactoringWizard). The parent class will dynamically create the
+refactoring object and refactoring wizard using Java reflection.
+
+Our refactoring wizard needs to be a subclass of
+\texttt{AbstractFortranRefactoringWizard}. The only method that we are required
+to implement is the \texttt{doAddUserInputPages} method. This page is
+responsible for creating a page for the wizard. For instance, a refactoring such
+as rename refactoring requires the user to provide a new name. So the
+\texttt{doAddUserInputPages} is responsible for creating the interface for that.
+
+Ideally, if our refactoring does not require the user to provide any input, it
+should just have an empty \texttt{doAddUserInputPages} method. However, because
+of a bug in the Mac OS X version of Eclipse, it is necessary to add a
+\emph{dummy} page. Without this dummy page the refactoring will cause the entire
+Eclipse UI to lock up on Mac OS X. Listing~\ref{lst:dummy_wizard_page} shows how
+to add a dummy input page. \\
+
+\begin{code}
+\begin{lstlisting}
+protected void doAddUserInputPages() {
+    addPage(new UserInputWizardPage(refactoring.getName()) {
+
+	public void createControl(Composite parent) {
+	    Composite top = new Composite(parent, SWT.NONE);
+	    initializeDialogUnits(top);
+	    setControl(top);
+
+	    top.setLayout(new GridLayout(1, false));
+
+	    Label lbl = new Label(top, SWT.NONE);
+	    lbl.setText("Click OK to obfuscate the current Fortran file. 
+			To see what changes will be made, click Preview.");
+
+	}
+    });
+}
+\end{lstlisting}
+\caption{Adding a \texttt{dummy} wizard input page}
+\label{lst:dummy_wizard_page}
+\end{code}
+
+\section{Creating the Actual Refactoring}
+
+Section~\ref{sec:structure_of_a_fortran_refactoring} gives a good overview of
+the \textbf{four} methods that a Fortran refactoring needs to implement. And
+Section~\ref{sec:refactoring_caveats} gives an overview of things to avoid while
+performing a refactoring. Our example refactoring conforms to the lessons in
+both those sections.
+
+Here we briefly describe the four methods in our example:
+
+\begin{description}
+
+ \item [getName] This just returns the text ``Obfuscate Fortran Code''
+describing our refactoring. This text will be used as the title of the
+refactoring wizard dialog.
+
+ \item [doCheckInitialConditions] Our simple refactoring does not have any
+\emph{real} initial conditions. Our refactoring can proceed as long as the
+current file can be parsed as valid Fortran source code. This is automatically
+checked by the \texttt{FortranRefactoring} parent class.
+
+ Instead we use this method as a hook to perform some simple program analysis --
+acquiring the names of all the functions and subroutines in the current file. We
+will print these names later as part of the header comment. 
+
+	\item [doCheckFinalConditions] Since we do not require the user to provide any
+additional input, there are no final conditions to check.
+
+	\item [doCreateChange] The actual refactoring changes are constructed in this
+method. 
+
+We iterate through every token in the current file to check if it has a comment
+string. Comment strings are acquired by calling \texttt{Token\#getWhiteBefore()}
+and \texttt{Token\#getWhiteAfter()}. Following the advice of
+Section~\ref{sec:refactoring_caveats}, we store a list of all the tokens (call
+this list TokensWithComments) that contain comment strings. Once we have
+iterated through all the tokens, we proceed to remove the comments for tokens in
+our TokensWithComments list. Removing comments is done by calling
+\texttt{Token\#setWhiteBefore()} and \texttt{Token\#setWhiteAfter()} with blank
+strings as parameters.
+
+Finally, we create a header comment that just lists all the functions and
+subroutines in the current source file and add that to the preamble of the main
+program.
+
+\end{description}
+
+For more information, please consult the source code for our example.

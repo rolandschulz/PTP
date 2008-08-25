@@ -1,10 +1,11 @@
 % Getting the Photran Sources from CVS
 
-\textit{Last Updated 07/21/08}
+\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.4} and a 
+\textbf{Java 5} or later JVM. We recommend the 
+\href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.}
 
-\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.4} and a \textbf{Java 5} or later JVM.}
-
-If you already have CDT 5.0 installed and do not need to edit the CDT source code, Part~I can be skipped.
+If you already have CDT 5.0 installed and do not need to edit the CDT source 
+code, Part~I can be skipped.
 
 \newcounter{running_counter}
 \textbf{Part~I.  Check out the CDT 5.0 sources from CVS}
@@ -20,17 +21,27 @@ If you already have CDT 5.0 installed and do not need to edit the CDT source cod
 	         Password:        & (no password) \\
 	         Connection type: & pserver \\
 	\end{tabular}
-	\item  Right-click on :pserver:anonymous@dev.eclipse.org:/cvsroot/tools, and choose
-	       Refresh Branches...
-	\item  In the dialog box, scroll down, check the box next to org.eclipse.cdt, and click Finish.
-	       When prompted, click on Search Deeply.  You will have to wait for a few minutes (possibly up to 10 minutes) for processing to complete and the dialog to disappear.
-	\item  Now, in the CVS Repositories view
+	\item  In the CVS Repositories view
 	       \begin{itemize}
 	       \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
-	       \item  Then expand ``Versions''
-	       \item  Then expand ``org.eclipse.cdt CDT\_5\_0\_0''
-	       \item  Then expand ``all''
+	       \item  Then expand ``HEAD''
 	       \end{itemize}
+	\item  Right-click on ``org.eclipse.cdt''
+	\item  Select ``Configure Branches and Versions\ldots''
+	\item  Under ``Browse files for tags'', expand ``all'', then expand 	
+	       ``org.eclipse.cdt'', then click on the .project file
+	\item  Under ``New tags found in the selected files'', click on the Deselect 
+	       All button, then check cdt\_5\_0 in the list above it
+  \item	 Click Add Checked Tags
+	\item	 Click OK
+	\item  Now, in the CVS Repositories view
+				 \begin{itemize}
+				 \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
+		     \item  Then expand ``Branches''
+				 \item  Then expand ``cdt\_5\_0''
+		     \item  Then expand ``org.eclipse.cdt cdt\_5\_0\_0''
+		     \item  Then expand ``all''
+			  \end{itemize}
 	\item  Click on the first entry under ``all''
 	       (it should be org.eclipse.cdt), then shift-click on the last entry
 	       under ``all'' (it should be org.eclipse.cdt.ui.tests).
@@ -49,6 +60,7 @@ If you already have CDT 5.0 installed and do not need to edit the CDT source cod
 	\setcounter{enumi}{\value{running_counter}}
 	\item In Eclipse, switch to the CVS Repository Exploring perspective.
 	\item Right-click the CVS Repositories view; choose New, Repository Location
+	\pagebreak
 	\item Enter the following information, then click Finish: \\
 	\textit{If you are a Photran committer:} \\
 	\begin{tabular}{ll}
@@ -68,7 +80,7 @@ If you already have CDT 5.0 installed and do not need to edit the CDT source cod
 	    org.eclipse.photran
 	\item  Check out the following projects under org.eclipse.photran:
 	       \begin{itemize}
-	       \item  org.eclipse.photran-dev-docs
+	       \item  org.eclipse.photran-dev-docs (if you intend to contribute to the documentation)
 	       \item  org.eclipse.photran.cdtinterface
 	       \item  org.eclipse.photran.core
 	       \item  org.eclipse.photran.core.intel
@@ -76,7 +88,6 @@ If you already have CDT 5.0 installed and do not need to edit the CDT source cod
 	       \item  org.eclipse.photran.core.vpg.tests
 	       \item  org.eclipse.photran.core.vpg.tests.failing
 	       \item  org.eclipse.photran.errorparsers.xlf
-	       \item  org.eclipse.photran.intel-feature
 	       \item  org.eclipse.photran.managedbuilder.core
 	       \item  org.eclipse.photran.managedbuilder.gnu.ui
 	       \item  org.eclipse.photran.managedbuilder.intel.ui
@@ -84,16 +95,15 @@ If you already have CDT 5.0 installed and do not need to edit the CDT source cod
 	       \item  org.eclipse.photran.managedbuilder.xlf.ui
 	       \item  org.eclipse.photran.ui
 	       \item  org.eclipse.photran.ui.vpg
-	       \item  org.eclipse.photran.vpg-feature
 	       \end{itemize}
-	       (The debug and launch plug-ins are not part of Photran 4.0 and will
-	       not compile.  The analysis and refactoring plug-ins have been deprecated;
-	       they do not contain any files, since that functionality is in the
-	       VPG plug-ins.)
+	       (The debug and launch plug-ins are not part of Photran 4.0 and will not
+         compile. The analysis and refactoring plug-ins have been deprecated;
+         they do not contain any files, since that functionality is in the VPG
+         plug-ins.)
 
-			The sources should all compile (albeit with lots of warnings).
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}
+The sources should all compile (albeit with lots of warnings).
 
 \vspace{1em}
 \noindent\textbf{Part~III.  Running the test cases}
@@ -101,14 +111,41 @@ If you already have CDT 5.0 installed and do not need to edit the CDT source cod
 \begin{enumerate}
 	\setcounter{enumi}{\value{running_counter}}
 	\item In Package Explorer view, select the \texttt{org.eclipse.photran.core.vpg.tests} project.
-	\item Right-click on that project and select Run As $>$ Run Configurations... A dialog will appear.
+	\item Right-click on that project and select Run As $>$ Run Configurations\ldots. A dialog will appear.
 	\item In that dialog, create a new \textbf{JUnit Plug-in Test} launch configuration. Call it ``Photran-Tests''.
 	\item For the configuration that you have just created, switch to the ``Environment'' tab and create a new variable called ``TESTING'' with a value of 1.
 	\item Select ``Run'' to run the tests. To run the tests again, just launch the ``Photran-Tests'' configuration from the Eclipse Run menu.
 
 	\vspace{.5em}
-	\noindent\textit{\textbf{Note.} Some JUnit tests for the parser and refactoring
-	engine require closed-source code that is not available in CVS.  A warning will
-	appear in the JUnit runner if this code is not available.}
+	\noindent\textit{\textbf{Note.} Some JUnit tests for the parser and      
+	refactoring engine require closed-source code that is not available in CVS. 
+	A warning will appear in the JUnit runner if this code is not available.}
+	\setcounter{running_counter}{\value{enumi}}
+\end{enumerate}
 
+\vspace{1em}
+\noindent\textbf{Part~IV. Deploying Photran Feature}
+\begin{enumerate}
+	\setcounter{enumi}{\value{running_counter}}
+	\item If you are interested in creating a \emph{deployable feature} for
+        Photran, you also need to check out these \textbf{additional} four 
+        projects from CVS:
+				\begin{itemize}
+					\item org.eclipse.photran-feature
+          \item org.eclipse.photran.intel-feature
+					\item org.eclipse.photran.vpg-feature
+					\item org.eclipse.photran.xlf-feature
+				\end{itemize}
+	\item In Eclipse, select File $>$ Export\ldots
+	\item In the dialog that pops-up, select Plug-in Development $>$ Deployable features.
+	\item Click next.
+	\item In the list, select
+		\begin{itemize}
+			\item org.eclipse.photran\_feature (4.0.4)
+			\item org.eclipse.photran.intel (4.0.4)
+			\item org.eclipse.photran.vpg\_feature (4.0.4)
+			\item org.eclipse.photran.xlf\_feature (4.0.4)
+		\end{itemize}		
+	\item Specify a destination folder to export those features. Click Finish.
+	\item The Photran features are ready for deployment.
 \end{enumerate}

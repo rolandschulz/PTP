@@ -1,262 +1,657 @@
 % Parsing and Program Analysis
 
-\textit{Last Updated 10/2/07}
+\section{Parsing}
 
-\section{The Virtual Program Graph}
+Before any program analysis can be done, the source code of the Fortran program
+has to be parsed. Photran provides support for both fixed-form (Fortran 77) and
+free-form Fortran (Fortran 90 \& 95) source code. The parser in Photran is
+generated using the Ludwig parser/AST generator by Jeff Overbey. It is based on
+the \emph{fortran95.bnf} grammar file.
 
-In Photran, it is almost never necessary to call the lexer, parser, or analysis components directly.  Instead, it
-uses a \textit{virtual program graph} (VPG), which provides the fa\,cade of a whole-program abstract syntax tree with
-embedded analysis information.
+Figure~\ref{fig:images_parser_chain} shows the lexer \& parser tool chain in
+Photran. Preliminary support for the preprocessor (\texttt{INCLUDE} directives)
+has also been implemented in the current version of the tool chain.
 
-An overview of VPGs is available at the following link and will not repeated here:
+\begin{image}
+	\centering
+			\includegraphics[height=3in]{images/parser_chain.png}
+			\caption{Photran preprocessor/lexer/parser chain}
+		\label{fig:images_parser_chain}
+\end{image}
 
-http://jeff.over.bz/software/vpg/doc/
+\section{Virtual Program Graph}
+\label{sec:virtual_program_graph}
 
-\section{Using the Photran VPG}
+% I can't seem to get the cedilla fa\c{c}ade to render in my version of LaTeX
+In Photran, it is \emph{almost} never necessary to call the lexer, parser, or
+analysis components directly. Instead, Photran uses a \textbf{virtual program
+graph} (VPG), which provides the facade of a whole-program abstract syntax tree
+(AST) with embedded analysis information. In general, program analysis should be
+performed through the Photran VPG.
 
-\subsection{Acquiring and Releasing Translation Units}
+An overview of VPGs is available at the following link:
+\url{http://jeff.over.bz/software/vpg/doc/}. It provides the background
+necessary for the remaining sections of this chapter.
 
-\texttt{PhotranVPG} is a singleton object responsible for constructing
-ASTs for Fortran source code.  ASTs are retrieved by invoking either
-{\footnotesize\begin{verbatim}
-    public IFortranAST acquireTransientAST(IFile file)
-\end{verbatim}}
-or
-{\footnotesize\begin{verbatim}
-	public IFortranAST acquirePermanentAST(IFile file)
-\end{verbatim}}
+\subsection{Using the Photran VPG}
 
-A \textit{transient AST} can be garbage collected as soon as references to any
-of its nodes disappear.  A \textit{permanent AST} will be explicitly kept in
-memory until a call is made to either
-{\footnotesize\begin{verbatim}
-	public void releaseAST(IFile file)
-\end{verbatim}}
-or
-{\footnotesize\begin{verbatim}
-	public void releaseAllASTs()
-\end{verbatim}}
+\subsubsection{Acquiring and Releasing Translation Units}
+% TODO Make sure that this fits nicely into the page
+\texttt{PhotranVPG} is a \emph{singleton} object responsible for constructing
+ASTs for Fortran source code. ASTs are retrieved by invoking either of these
+methods:
+\begin{code}
+\begin{lstlisting}[numbers=none]
+public IFortranAST acquireTransientAST(IFile file)
+
+public IFortranAST acquirePermanentAST(IFile file)
+\end{lstlisting}
+\caption{Acquiring the Fortran AST}
+\end{code}
+
+\vspace{-0.15in}
+
+The returned object is an IFortranAST, an object which has a method for
+returning the root node of the AST as well as methods to quickly locate tokens
+in the AST by offset or line information. A \emph{transient AST} can be garbage
+collected as soon as references to any of its nodes disappear. A \emph{permanent
+AST} will be explicitly kept in memory until a call is made to either of the 
+following methods:
+\begin{code}
+\begin{lstlisting}[numbers=none]
+public void releaseAST(IFile file)
+
+public void releaseAllASTs()
+\end{lstlisting}
+\caption{Releasing the Fortran AST}
+\end{code}
+
+Often, it is better to acquire a transient AST and rely on the garbage collector
+to reclaim the memory once we are done using it. However, there are times when
+acquiring a permanent AST would be more beneficial performance-wise. For
+instance, if we will be using the same AST multiple times during a refactoring,
+it would be better to just acquire a permanent AST. This prevents the garbage
+collector from reclaiming the memory midway through the refactoring once all
+references to the AST have been invalidated. While it is always possible to
+reacquire the same AST, doing so can be an expensive operation since it requires
+\emph{lexing}, \emph{parsing} \textbf{and} finally \emph{reconstructing} the AST
+from scratch.
 
 Only one AST for a particular file is in memory at any particular point in time,
-so successive requests for the same
-\texttt{IFile} will return the same (pointer-identical) AST
-until the AST is released (permanent) or garbage collected (transient).
+so successive requests for the same \texttt{IFile} will return the same
+(pointer-identical) AST until the AST is released (permanent) or garbage
+collected (transient).
+
+\subsubsection{Caveat}
+
+It is important to note that, because \texttt{PhotranVPG} is a singleton object,
+one must be careful about accessing it from multiple threads. Most of the time,
+when an AST is required, it will be from an action contributed to the Fortran
+editor; in this case, the action will usually be a descendant of
+\texttt{FortranEditorActionDelegate}, and synchronization will be handled
+automatically. For instance, all refactoring actions in Photran are descendants
+of \texttt{FortranEditorActionDelegate} and their accesses to
+\texttt{PhotranVPG} are being synchronized automatically.
+
+Otherwise, the thread must either be scheduled using a
+\texttt{VPGSchedulingRule} or it must lock the entire workspace . See
+\texttt{EclipseVPG\#queueJobToEnsureVPGIsUpToDate} as an example on how to use
+the \texttt{VPGSchedulingRule} and \texttt{FortranEditorActionDelegate\#run} as
+an example of how to lock the entire workspace.
+
+As a guideline, contributors who are interested in accessing the VPG should
+consider structuring their contributions as descendants of
+\texttt{FortranEditorActionDelegate} since that is the simplest mechanism (all
+synchronization is already taken care of automatically). However, if such an
+approach is not feasible, then they should consider using
+\texttt{VPGSchedulingRule} before resorting to locking the entire workspace.
 
 \subsection{The Program Representation: IFortranAST}
 
-The \texttt{acquireTransient/PermanentAST} methods return an object implementing \texttt{IFortranAST}.
+The \texttt{acquireTransientAST} and \texttt{acquirePermanentAST} methods return
+an object implementing \texttt{IFortranAST}. Listing~\ref{lst:ifortranast} shows
+the methods in IFortranAST.
 
-\lstset{language=Java}
-
-\begin{lstlisting}
+\begin{code}
+\begin{lstlisting}[firstnumber=25]
 public interface IFortranAST extends Iterable<Token>
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Visitor Support
-    ///////////////////////////////////////////////////////////////////////////
-
-    public void visitTopDownUsing(ASTVisitor visitor);
-    public void visitBottomUpUsing(ASTVisitor visitor);
-    public void visitOnlyThisNodeUsing(ASTVisitor visitor);
-    public void visitUsing(GenericParseTreeVisitor visitor);
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // Other Methods
-    ///////////////////////////////////////////////////////////////////////////
-
-    public ASTExecutableProgramNode getRoot();
-
-    public Iterator<Token> iterator();
-    public Token findTokenByStreamOffsetLength(int offset, int length);
-    public Token findFirstTokenOnLine(int line);
-    public Token findTokenByFileOffsetLength(IFile file, int offset, int length);
+	///////////////////////////////////////////////////////////////////////////
+	// Visitor Support
+	///////////////////////////////////////////////////////////////////////////
+	
+	public void accept(IASTVisitor visitor);
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Other Methods
+	///////////////////////////////////////////////////////////////////////////
+	
+	public ASTExecutableProgramNode getRoot();
+	
+	public Iterator<Token> iterator();
+	public Token findTokenByStreamOffsetLength(int offset, int length);
+	public Token findFirstTokenOnLine(int line);
+	public Token findTokenByFileOffsetLength(IFile file, int offset, int length);
 }
 \end{lstlisting}
+\caption{\texttt{IFortranAST} (see IFortranAST.java)}
+\label{lst:ifortranast}
+\end{code}
 
-The \texttt{getRoot} method returns the root of the AST, while the \texttt{find...}
-methods provide an efficient means to search for tokens based on their lexical
-positioning.
+The \texttt{getRoot} method returns the root of the AST, while the
+\texttt{find...} methods provide efficient means to search for tokens based
+on their lexical positioning in the source code.
 
-\subsection{AST Structure}
+The \texttt{accept} method allows an external visitor to traverse the AST. This
+method is usually used when it is necessary to ``collect'' information about
+certain nodes. For more information see Section~\ref{sec:ast_structure} on what
+nodes can be visited.
 
-The Fortran AST comprises several hundred classes.  The class names of AST nodes all begin with
-\texttt{AST}, and all are located in the \texttt{org.eclipse.photran.internal.core.parser} package.
-The AST classes are generated automatically from the parsing grammar,
-\texttt{fortran95.bnf}.
+Because \texttt{IFortranAST} extends the \texttt{Iterable} interface, it is
+possible to use the \emph{foreach} loop to conveniently iterate through all the
+tokens in the AST e.g. \\ \lstinline!for (Token token : new IterableWrapper<Token>(ast))!
 
-\subsubsection{Ordinary AST Nodes}
+\section{AST Structure}
+\label{sec:ast_structure}
 
-The children of any AST node are retrieved by calling one of its \texttt{get...}
-methods, which return \texttt{null} if that child is not present.
-For example, \texttt{fortran95.bnf} defines a \textit{$<$ProgramUnit$>$} as follows.
+Photran's (rewritable) AST is generated along with the parser, so the structure
+of an AST is determined by the structure of the parsing grammar (see the
+\emph{fortran95.bnf} file). The generated classes are located in the
+\texttt{org.eclipse.photran.internal.core.parser} package in the
+\texttt{org.eclipse.photran.core.vpg} project. The easiest way to visualize the
+structure of a particular file's AST is to view it in the Outline view (see
+Section~\ref{sec:how_to_get_acquainted_with_the_program_representation}).
+However determining all possible ASTs for a particular construct requires
+scrutinizing the parsing grammar file.
+
+\subsection{Ordinary AST Nodes}
+\label{sub:ordinary_ast_nodes}
+
+Generally speaking, there is one AST node for each nonterminal in the grammar
+and one accessor method for each symbol on its right-hand side (unless the
+symbol name is prefixed with a hyphen, in which case it is omitted). For
+example, the following specification\footnote{All grammar
+specifications are taken from the \emph{fortran95.bnf} file. The \# RXXX number
+provides a reference to the actual specification in the grammar file.}
 
 {\footnotesize\begin{verbatim}
-# R202
-<ProgramUnit> ::=
-    <MainProgram>
-  | <FunctionSubprogram>
-  | <SubroutineSubprogram>
-  | <Module>
-  | <BlockDataSubprogram>
+# R533
+<DataStmtSet> ::= <DataStmtObjectList> -:T_SLASH <DataStmtValueList> -:T_SLASH
 \end{verbatim}}
 
-An \texttt{ASTProgramUnitNode} object, then, provides the following interface.
+generates the AST node class \texttt{ASTDataStmtSetNode} shown in
+Listing~\ref{lst:astdatastmtsetnode_api}. Notice the \emph{presence} of the
+\texttt{getDataStmtObjectList} and \texttt{getDataStmtValueList} getters methods
+and the \emph{absence} of any method for accessing T\_SLASH.
 
+\shabox{The convention is to generate a class with the name
+\texttt{\color{LightMagenta}AST}$<$nonterminal
+name$>$\texttt{\color{LightMagenta}Node} that extends \texttt{ASTNode}. For
+instance \# R533 will generate the
+\texttt{{\color{LightMagenta}AST}DataStmtSet{\color{LightMagenta}Node}} class.}
+
+The following sections describe additional annotations that can be used to
+modify the standard convention when necessary. These annotations are not
+considered part of the standard BNF notation but they are supported by the
+underlying Ludwig parser generator.
+
+\begin{code}
 \begin{lstlisting}
-public class ASTProgramUnitNode extends ParseTreeNode
+public class ASTDataStmtSetNode extends ASTNode
 {
-    public ASTMainProgramNode getASTMainProgram() { ... }
-    public ASTFunctionSubprogramNode getASTFunctionSubprogram() { ... }
-    public ASTSubroutineSubprogramNode getASTSubroutineSubprogram() { ... }
-    public ASTModuleNode getASTModule() { ... }
-    public ASTBlockDataSubprogramNode getASTBlockDataSubprogram() { ... }
+	public IASTListNode<IDataStmtObject> getDataStmtObjectList() {...}
+
+	public void setDataStmtObjectList(IASTListNode<IDataStmtObject> newValue) {...}
+
+	public IASTListNode<ASTDataStmtValueNode> getDataStmtValueList() {...}
+
+	public void setDataStmtValueList(IASTListNode<ASTDataStmtValueNode> newValue) {...}
+
+	... 
 }
 \end{lstlisting}
+\caption{\texttt{ASTDataStmtSetNode} generated from \# R533}
+\label{lst:astdatastmtsetnode_api}
+\end{code}
 
-\subsubsection{List Nodes (Recursive Productions)}
+\subsubsection{Annotation \#1: \texttt{(list)}}
 
 Recursive productions are treated specially, since they are used frequently to
-express lists in the grammar.  The recursive member is labeled in the grammar
-with an @ symbol.  For example,
+express lists in the grammar. The recursive member is labeled in the grammar
+with the \texttt{(list)} annotation. For example, the following specification
 
 {\footnotesize\begin{verbatim}
-<Body> ::=
-    <BodyConstruct>
-  | @:<Body> <BodyConstruct>
+# R538
+(list):<DataStmtValueList> ::=
+  |                               <DataStmtValue>
+  | <DataStmtValueList> -:T_COMMA <DataStmtValue>
 \end{verbatim}}
 
-indicates that a \textit{$<$Body$>$} consists of several \textit{$<$BodyConstruct$>$}s.
-They can be iterated with code such as the following.
+means that the AST will contain an object of type
+\texttt{List$<$ASTDataStmtValueNode$>$} whenever a \verb!<DataStmtValueList>!
+appears in the grammar. For instance, \# R533 (just described in the previous
+section) uses the \texttt{DataStmtValueList} construct. Notice in
+Listing~\ref{lst:astdatastmtsetnode_api} that the return type of
+\texttt{getDataStmtValueList} is a \texttt{List}.
+
+Putting an object that implements the \texttt{java.util.List} into the tree
+(rather than having a chain of nodes) makes it easier to iterate through the
+list, determine its size and insert new child nodes.
+
+\subsubsection{Annotation \#2: \texttt{(superclass)}}
+
+The \texttt{(superclass)} annotation is used to create an interface that is
+implemented by all symbols on the right-hand side of the specification will
+implement. For example, the following specifications
 
 {\footnotesize\begin{verbatim}
-for (int i = 0, size = astBodyNode.size(); i < size; i++)
-    doSomething(astBodyNode.getASTBodyConstruct(i);
+# R207
+(superclass):<DeclarationConstruct> ::=
+  | <DerivedTypeDef>
+  | <InterfaceBlock>
+  | <TypeDeclarationStmt>
+  | <SpecificationStmt>
+
+...
+
+# R214
+(superclass):<SpecificationStmt> ::=
+  | <AccessStmt>
+  | <AllocatableStmt>
+  | <CommonStmt>
+  | <DataStmt>
+  | <DimensionStmt>
+  | <EquivalenceStmt>
+  | <ExternalStmt>
+  | <IntentStmt>
+  | <IntrinsicStmt>
+  | <NamelistStmt>
+  | <OptionalStmt>
+  | <PointerStmt>
+  | <SaveStmt>
+  | <TargetStmt>
+  | <UnprocessedIncludeStmt>
 \end{verbatim}}
 
-\subsubsection{Elevated Nodes}
+mean that an \textbf{interface} -- not a class -- named
+\texttt{ISpecificationStmt} will be generated for \# R214, and
+\texttt{ASTAccessStmtNode}, \texttt{ASTAllocatableStmtNode},
+\texttt{ASTCommonStmtNode}, etc will implement that interface. In addition,
+because \verb!<SpecificationStmt>! is used inside \# R207 which also uses the
+\texttt{(superclass):} annotation, \texttt{ISpecificationStmt} also extends the
+\texttt{IDeclarationConstruct} interface from \# R207 i.e.
 
-Consider the following productions for a main program in Fortran.
+\begin{lstlisting}[numbers=none]
+	public interface ISpecificationStmt extends IASTNode, IDeclarationConstruct
+\end{lstlisting}
+
+So, it is possible for an AST node to implement multiple interfaces based on the 
+specifications in the grammar.
+
+Using the \texttt{(superclass)} annotation gives those nonterminals in \# R214
+nodes a common type; most notably, a \texttt{Visitor} can override the
+\texttt{visit(ISpecificationStmt)} method to treat all three node types
+uniformly.
+
+\subsubsection{Annotation \#3: \texttt{(bool)}}
+
+The \texttt{(bool)} annotation indicates that an accessor method will return a
+\lstinline!boolean! rather than an actual AST node. For example, the following
+specification
 
 {\footnotesize\begin{verbatim}
+# R511
+<AccessSpec> ::=
+  | isPublic(bool):T_PUBLIC
+  | isPrivate(bool):T_PRIVATE
+\end{verbatim}}
+
+will generate the \texttt{ASTAccessSpecNode} class as shown in Listing~\ref{lst:astaccessspecnode_api}.
+
+\begin{code}
+\begin{lstlisting}
+public class ASTAccessSpecNode extends ASTNode
+{
+	// in ASTAccessSpecNode
+	Token isPrivate;
+	// in ASTAccessSpecNode 
+	Token isPublic; 
+	
+	public boolean isPrivate() {...}
+	
+	public void setIsPrivate(Token newValue) {...}
+	
+	public boolean isPublic() {...}
+	
+	public void setIsPublic(Token newValue) {...}
+	
+	...
+}
+\end{lstlisting}
+\caption{ASTAccessSpecNode generated from \# R511}
+\label{lst:astaccessspecnode_api}
+\end{code}
+Notice on lines 8 \& 12 that the methods return \lstinline!boolean! values
+instead of \texttt{ASTNode}s. The \lstinline!boolean! values are usually used to
+test the presence of that particular \texttt{ASTNode} in the source code.
+
+\subsubsection{Annotation \#4: Labels}
+
+Specification \# R511 also illustrates the use of \emph{labels} in the grammar
+file: \verb!isPublic(bool):T_PUBLIC! results in a method called
+\texttt{isPublic} instead of \verb!getT_PUBLIC!. The use of labels can greatly
+enhance the readability of the program by making its intent clearer.
+
+\subsubsection{Annotation \#5: \texttt{(inline)}}
+
+Consider the following specifications for a main program in Fortran:
+
+{\footnotesize\begin{verbatim}
+# R1101
 <MainProgram> ::=
   |               <MainRange>
   | <ProgramStmt> <MainRange>
 
 <MainRange> ::=
-    <Body>              <EndProgramStmt>
+  | <Body>              <EndProgramStmt>
   | <BodyPlusInternals> <EndProgramStmt>
-  |                     <EndProgramStmt>
+  |
 \end{verbatim}}
 
-From the standpoint of a typical Fortran user,
-a main program consists of a Program statement, a body (list of statements), perhaps some internal
-subprograms, and an End Program statement.
-This does not match the definition of a MainProgram in the parsing grammar above: the body and End Program
-statement are relegated to a separate MainRange nonterminal. 
+From the standpoint of a typical Fortran programmer, a main program consists of
+a Program statement, a body (list of statements), perhaps some internal
+subprograms, and an End Program statement. This does not match the definition of
+a \verb!<MainProgram>! in the parsing grammar above: \verb!<Body>! and
+\verb!<EndProgStmt>! are relegated to a separate \verb!<MainRange>! nonterminal.
 
-The solution is to label the MainRange nonterminal with a caret (\^), indicating that it is an ``elevated'' or
-``pulled-up'' node.
+The solution is to label the MainRange nonterminal with the \texttt{(inline)} annotation, indicating that it is to be in-lined:
 
 {\footnotesize\begin{verbatim}
-<MainProgram> ::=
-  |               ^:<MainRange>
-  | <ProgramStmt> ^:<MainRange>
+# R1101
+(customsuperclass=ScopingNode):<MainProgram> ::=
+  |               (inline):<MainRange>
+  | <ProgramStmt> (inline):<MainRange>
 
 <MainRange> ::=
-    <Body>              <EndProgramStmt>
-  | <BodyPlusInternals> <EndProgramStmt>
-  |                     <EndProgramStmt>
+  | <Body>                       <EndProgramStmt>
+  | (inline):<BodyPlusInternals> <EndProgramStmt>
+  |
 \end{verbatim}}
 
-This means that accessor methods that would otherwise be in a separate MainRange object will be placed in the
-MainProgram object instead.  This means that an \texttt{ASTMainProgramNode} object has the following interface.
+This means that accessor methods that would otherwise be in a separate
+\texttt{ASTMainRangeNode} class will be placed in the
+\texttt{ASTMainProgramNode} class instead.
+Listing~\ref{lst:astmainprogramnode_api} shows that the accessors that were
+previously in \texttt{ASTMainRangeNode} have been in-lined to
+\texttt{ASTMainProgramNode}. Now there is no longer any need for a
+\texttt{ASTMainRangeNode} class.
 
-\begin{lstlisting}[numbers=none]
-    public ASTProgramStmtNode getProgramStmt();
-    public ASTBodyNode getBody();
-    public ASTBodyPlusInternalsNode getBodyPlusInternals();
-    public ASTEndProgramStmtNode getEndProgramStmt();
+\begin{code}
+\begin{lstlisting}
+public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
+{
+	public ASTProgramStmtNode getProgramStmt()
+	
+	public void setProgramStmt(ASTProgramStmtNode newValue)
+	
+	public IASTListNode<IBodyConstruct> getBody()
+	
+	public void setBody(IASTListNode<IBodyConstruct> newValue)
+	
+	public ASTContainsStmtNode getContainsStmt()
+	
+	public void setContainsStmt(ASTContainsStmtNode newValue)
+	
+	public IASTListNode<IInternalSubprogram> getInternalSubprograms()
+	
+	public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
+	
+	public ASTEndProgramStmtNode getEndProgramStmt()
+	
+	public void setEndProgramStmt(ASTEndProgramStmtNode newValue)
+	
+	...
+}
 \end{lstlisting}
+\caption{\texttt{ASTMainProgramNode} generated from \# R1101}
+\label{lst:astmainprogramnode_api}
+\end{code}
 
-\subsubsection{Tokens}
+\subsubsection{Annotation \#6: \texttt{(customsuperclass=*)}}
+
+Specification \# R1101 in the previous section also illustrates the use of the
+\\ \texttt{(customsuperclass=ScopingNode)} annotation. This makes
+\texttt{ScopingNode} the parent of the \texttt{ASTMainProgramNode} class. Note
+that \texttt{ScopingNode} (or whichever custom super class is chosen) has to be
+a descendant of \texttt{ASTNode} because every node in the AST has to be of that
+type (either directly or as a descendant).
+
+The \texttt{(customsuperclass=*)} annotation is a useful technique for
+delegating external methods that cannot be expressed through the grammar BNF
+file into a separate hand-coded class while still having the benefits of an
+auto-generated parser and AST.
+
+\subsection{Tokens}
+\label{sub:tokens}
 
 \texttt{Token}s form the leaves of the AST.  They record, among other things,
+
 \begin{itemize}
 \item The terminal symbol in the grammar that the token is an instance of (\texttt{getTerminal()})
 \item The actual text of the token (\texttt{getText()})
-\item The line, column, offset, and length of the token text in the source file (\texttt{getLine(), getCol(), getOffset(), getLength()})
+\item The line, column, offset, and length of the token text in the source file (\texttt{getLine(), getCol(), getFileOffset(), getLength()})
 \end{itemize}
+
 Most of the remaining fields are used internally for refactoring.
+
+\subsection{Fortran Program AST Example}
+
+The previous sections describe the conventions and additional annotations that
+are used to construct the AST nodes. While the conventions and annotations
+themselves are simple, the Fortran grammar is extremely complicated and contains
+hundreds of grammar specifications. Essentially, even the simplest Fortran
+program might contain a very complicated AST. For instance this simple Fortran
+program: \\
+
+\begin{lstlisting}[language=Fortran, frame=lines]
+program main
+  	integer a
+end	
+\end{lstlisting}
+
+generates the AST shown in Figure~\ref{fig:simple_fortran_ast}. As an exercise,
+the reader is encouraged to derive the structure of the AST from the grammar
+specifications in the \emph{fortran.bnf} file beginning with \# R201,
+\verb!<ExecutableProgram>!.
+
+Moreover, modifying our previous program slightly to contain an array as shown
+below, causes the AST structure to become extremely complicated. The reader is
+encouraged to create a file containing this program and view the resulting AST
+in the Outline View in Photran. Notice how the \verb!(5)! expression for
+specifying the dimension of the array requires building up an entire hierarchy
+of \texttt{ASTLevel5ExprNode}, \texttt{ASTLevel4ExprNode},
+\texttt{ASTLevel3ExprNode}, \ldots \\
+
+\begin{lstlisting}[language=Fortran, frame=lines]
+program main
+  	integer a(5) ! This declares an array of 5 integers
+end	
+\end{lstlisting}
+
+
+\begin{image}
+	\centering
+			\includegraphics[height=4in]{images/simple_fortran_AST.png}
+			\caption{AST for simple Fortran program as viewed through the Outline View}
+		\label{fig:simple_fortran_ast}
+\end{image}
+
+Fortunately, it is not necessary to know every specification in the grammar. For
+most refactoring and program analysis tasks, it is sufficient to rely on the
+information that the VPG provides. If that is insufficient, then it is usually
+enough to construct a Visitor to visit \emph{only} the nodes of interest and
+``collect'' the information that is required.
 
 \section{Scope and Binding Analysis}
 
-Certain nodes in a Fortran AST represent a lexical scope.  All of these are declared as subclasses of
-\texttt{ScopingNode.}
+Currently, the only semantic analysis performed by Photran is binding analysis:
+mapping \emph{identifiers} to their \emph{declarations}. Compilers usually do
+this using symbol tables but Photran uses a more IDE/refactoring-based approach.
+
+Certain nodes in a Fortran AST represent a lexical scope. All of these nodes are
+declared as subclasses of \texttt{ScopingNode}:
+
 \begin{itemize}
 \item ASTBlockDataSubprogramNode
 \item ASTDerivedTypeDefNode
 \item ASTExecutableProgramNode
 \item ASTFunctionSubprogramNode
-\item ASTInterfaceBlockNode\footnote{An interface block defines a nested scope only if it is a named interface.
-                                     Anonymous (unnamed) interfaces provide signatures for subprograms in their
-                                     enclosing scope.}
+\item ASTInterfaceBlockNode\footnote{An interface block defines a nested scope only if it is a named interface.Anonymous (unnamed) interfaces provide signatures for subprograms in their enclosing scope.}
 \item ASTMainProgramNode
 \item ASTModuleNode
 \item ASTSubroutineSubprogramNode
 \end{itemize}
 
-The enclosing scope of a \texttt{Token} can be retrieved by calling the following method on the \texttt{Token} object.
+Each of the subclasses of \texttt{ScopingNode} represents a scoping unit in
+Fortran. The \texttt{ScopingNode} class has several public methods that provide
+information about a scope. For example, one can retrieve a list of all of the
+symbols declared in that scope; retrieve information about its
+\texttt{IMPLICIT} specification; find its header statement (e.g. a
+\texttt{FUNCTION} or \texttt{PROGRAM} statement); and so forth.
+
+The enclosing scope of a \texttt{Token} can be retrieved by calling the
+following method on the \texttt{Token} object:
  
-{\footnotesize\begin{verbatim}
-    public ScopingNode getEnclosingScope()
-\end{verbatim}}
+\begin{lstlisting}[numbers=none]
+public ScopingNode getEnclosingScope()
+\end{lstlisting}
 
-Identifier tokens (\texttt{Token}s for which \texttt{token.getTerminal() == Terminal.T\_IDENT}),
-which represent functions, variables, etc. in the Fortran grammar, are \emph{bound} to a declaration.
-(The introduction to VPGs (URL above) provides an example visually.)  Although, ideally, every identifier
-will be bound to exactly one declaration, this is not always the case (the programmer may have written incorrect code,
-or Photran may not have enough information to resolve the binding uniquely).  So the \texttt{resolveBinding} method
-on a token has the following signature: 
+Identifier tokens (\texttt{Token}s for which \texttt{token.getTerminal() ==
+Terminal.T\_IDENT}), which represent functions, variables, etc. in the Fortran
+grammar, are \emph{bound} to a declaration\footnote{The introduction to VPGs
+earlier in this chapter (URL above) provides an example visually.}. Although,
+ideally, every identifier will be bound to exactly one declaration, this is not
+always the case: the programmer may have written incorrect code, or Photran may
+not have enough information to resolve the binding uniquely). So the
+\texttt{resolveBinding} method returns a \emph{list} of \texttt{Definition}
+objects:
 
-{\footnotesize\begin{verbatim}
-    public List<Definition> resolveBinding()
-\end{verbatim}}
+\begin{lstlisting}[numbers=none]
+public List<Definition> resolveBinding()
+\end{lstlisting}
 
-The \texttt{Definition} object contains information about what type of entity was defined (local variable, function,
-common block, etc.), array information (if applicable), whether it was defined implicitly, etc.
+A \texttt{Definition} object contains many public methods which provide a wealth
+of information. From a \texttt{Definition} object, it is possible to get a list
+of all the references to a particular declaration (using
+\texttt{findAllReferences}) and where that particular declaration is located in
+the source code (using \texttt{getTokenRef}). Both of these methods return a
+\texttt{PhotranTokenRef} object. See Section~\ref{sub:token_or_tokenref} for a
+comparison between \texttt{Token} and \texttt{TokenRef}.
 
-\section{Type Checking}
+\subsection{Examples of Binding Analysis} 
 
-The type of any expression (\texttt{ASTExprNode}) can be determined by invoking the static method
-\texttt{TypeChecker.getTypeOf(node)}.  At the time of writing, this behavior is not completely implemented.
+\subsubsection{Obtaining the \texttt{Definition} of a variable}
 
+If you have a reference to the \texttt{Token} object of that variable (for
+instance through iterating over all \texttt{Tokens} in the current Fortran AST)
+then use:
 
+\begin{lstlisting}[numbers=none, frame=lines]
+// myToken is the reference to that variable
+List<Definition> bindings = myToken.resolveBinding();
+
+if(bindings.size() == 0)
+	throw new Exception(myToken.getText() + " is not declared");
+else if (bindings.size() > 1)
+	throw new Exception(myToken.getText() + " is an ambiguous reference");
+
+Definition definition = bindings.get(0);
+\end{lstlisting}
+
+If you do \textbf{not} have a reference to a \texttt{Token} but you know the
+name of the identifier, you can first construct a \emph{hypothetical}
+\texttt{Token} representing an identifier and search for that in a
+\emph{particular} \texttt{ScopingNode} (possibly obtained by calling the static
+method \texttt{ScopingNode.getEnclosingScope(IASTNode node)}).
+\\
+
+\begin{lstlisting}[numbers=none, frame=lines]
+Token myToken = new Token(Terminal.T_IDENT, "myNameOfIdentifier");
+List<PhotranTokenRef> definitions = myScopingNode.manuallyResolve(myToken);
+\end{lstlisting}
+
+If you want to search for the identifier in \textbf{all} \texttt{ScopingNodes}
+for the current source file, then retrieve all the \texttt{ScopingNodes} and
+manually iterate through each one. Remember that the root of the AST is a
+\texttt{ScopingNode} and you may obtain the root of the AST through the
+\texttt{getRoot} method declared in \texttt{IFortranAST}.
+\\
+
+\begin{lstlisting}[numbers=none, frame=lines]
+List<ScopingNode> scopes = myRoot.getAllContainedScopes();
+
+for (ScopingNode scopingNode : scopes)
+{
+	// search through each ScopingNode
+}
+\end{lstlisting}
+
+\subsubsection{Examples in \texttt{FortranEditorASTActionDelegate} subclasses}
+
+The following subclasses of \texttt{FortranEditorASTActionDelegate} all contain short working examples of how to use the binding analysis API in Photran:
+\begin{itemize}
+	\item DisplaySymbolTable
+	\item FindAllDeclarationsInScope
+	\item OpenDeclaration
+	\item SelectEnclosingScope
+\end{itemize}
 
 \section{How to Get Acquainted with the Program Representation}
+\label{sec:how_to_get_acquainted_with_the_program_representation}
+
+\emph{All these features work on \textbf{Fortran projects}. A new Fortran
+project can be created via File $>$ New $>$ Fortran $>$ Fortran Project. These
+features do not work on individual Fortran source files.}
 
 \subsection{Visualizing ASTs}
 
-Photran can display ASTs rather than the ordinary Outline view.
-This behavior can be enabled from the Fortran workspace preferences
-(click on Window $>$ Preferences in Windows/Linux, or
-Eclipse $>$ Preferences in Mac OS X).  Clicking on an AST node in the Outline
-view will move the cursor to that construct's position in the source file.
+Photran can display ASTs in place of the ordinary Outline view.
+This behavior can be enabled from the Fortran workspace preferences:
+
+\begin{itemize}
+	\item Click on Window $>$ Preferences in Windows/Linux, orEclipse $>$ Preferences in Mac OS X.
+	\item Select ``Fortran'' on the left hand side of the preference dialog (do not expand it).
+	\item Select ``(Debugging) Show entire parse tree rather than Outline view''
+\end{itemize}
+  
+Clicking on an AST \texttt{node}Token in the Outline view will move the cursor
+to that construct's position in the source file.
 
 \subsection{Visually Resolving Bindings}
 
-In a Fortran editor, click on an identifier (positioning the cursor over it),
-and press F3 (or click Navigate $>$ Open Declaration, or right-click and choose Open Declaration.)  The
-binding will be resolved and the declaration highlighted.  If there are multiple bindings, a popup window will open
-and one can be selected.  If the identifier is bound to a declaration in a module defined in a different file, an
-editor will be opened on that file.
+This feature is disabled by default since it requires performing an update on
+the VPG database each time the file is saved -- an operation that could be
+expensive for larger files. To enable this feature, right-click on the current
+Fortran project folder (\textbf{not} the individual Fortran source file) in the
+Fortran Projects View and select ``Properties''. In the dialog that pops-up,
+navigate to Fortran General $>$ Analysis/Refactoring. Select the ``Enable
+Fortran Declaration view'' checkbox.
+
+Then, in a Fortran editor, click on an identifier (position the cursor over
+it), and press F3 (or click Navigate $>$ Open Declaration, or right-click and
+choose Open Declaration.) The binding will be resolved and the declaration
+highlighted. If there are multiple bindings, a pop-up window will open and one
+can be selected. If the identifier is bound to a declaration in a module defined
+in a different file, an editor will be opened on that file.
 
 \subsection{Visualizing Enclosing Scopes}
 
-Click on any token in the Fortran editor, and click Refactor $>$ (Debugging) $>$ Select Enclosing Scope.
-The entire range of source text for that token's enclosing \texttt{ScopingNode} will be highlighted.
+Click on any token in the Fortran editor, and click Refactor $>$ (Debugging) $>$
+Select Enclosing Scope. The entire range of source text for that token's
+enclosing \texttt{ScopingNode} will be highlighted.
 
 \subsection{Visualizing Definitions}
 
-Open a file in the Fortran editor, and
-click Refactor $>$ (Debugging) $>$ Display Symbol Table for Current File.
-Indentation shows scope nesting, and each line summarizes the information in a \texttt{Definition} object.
+Open a file in the Fortran editor, and click Refactor $>$ (Debugging) $>$
+Display Symbol Table for Current File. Indentation shows scope nesting, and each
+line summarizes the information in a \texttt{Definition} object.

@@ -3,11 +3,21 @@
 
 %\usepackage{anysize}
 %\marginsize{0.5in}{0.5in}{0.5in}{0.5in}
+
+
+% Unnumbered footnotes
+\long\def\symbolfootnote[#1]#2{\begingroup\def\thefootnote{\fnsymbol{footnote}}
+\footnote[#1]{#2}\endgroup}
+
 \usepackage{fullpage}
-\usepackage{graphicx}
+\usepackage[pdftex]{graphicx}
+\usepackage{color} 
+\definecolor{LightMagenta}{cmyk}{0.1,0.8,0,0.1} 
 
 \usepackage{listings}
-\lstset{numbers=left, numberstyle=\tiny, numbersep=5pt, captionpos=b, basicstyle=\footnotesize} 
+\lstset{numbers=left, numberstyle=\tiny, tabsize=2, numbersep=5pt, captionpos=b,
+basicstyle=\footnotesize, showstringspaces=false,
+emphstyle=\color{LightMagenta}\bfseries, language=Java}
 
 \usepackage[pdftex]{hyperref}
 \hypersetup{
@@ -18,7 +28,15 @@
     urlcolor=blue
 }
 
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{image}{htp}{lop}[chapter]
+\floatname{image}{Figure}
 
+\newfloat{code}{htp}{lop}[chapter]
+\floatname{code}{Listing}
+
+\usepackage{shadow}
 
 \hyphenpenalty=5000
 \tolerance=1000
@@ -41,36 +59,48 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Introduction}
+\chapter{Introduction}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{cha:introduction}
 \input{intro.ltx-inc}
 
-\chapter{Interactions with the CDT}
+\chapter{Interactions with CDT}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{cha:cdt}
 \input{cdt.ltx-inc}
 
-\chapter{Plug-in Decomposition}
+\chapter{Plug-in Decomposition}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{cha:plugins}
 \input{plugins.ltx-inc}
 
-\chapter{Parsing and Program Analysis}
+\chapter{Parsing and Program Analysis}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{cha:parsing}
 \input{parsing.ltx-inc}
 
-\chapter{Refactoring}
+\chapter{Refactoring}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{cha:refactoring}
 \input{refactoring.ltx-inc}
 
-\chapter{Photran Editor}
+\chapter{Photran Editors}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{cha:editor}
 \input{editor.ltx-inc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 
-\chapter{Getting the Photran 4.0 Sources from CVS}
-\vspace{0.5em}
+\chapter{Getting the Photran 4.0 Sources from CVS}\symbolfootnote[0]{Last significant update: 08/08/08}
 \input{app-cvs.ltx-inc}
 
-\chapter{Creating an Error Parser}
+\chapter{Creating an Error Parser}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{ap:creating_an_error_parser}
 \input{app-error-parsers.ltx-inc}
 
-\chapter{Creating Tests for the Rename Refactoring}
+\chapter{Simple Fortran Refactoring Example}\symbolfootnote[0]{Last significant update: 08/08/08}
+\label{app:obfuscate_refactoring}
+\input{app-obfuscate-fortran.ltx-inc}
+
+\chapter{Creating Tests for the Rename Refactoring}\symbolfootnote[0]{Last significant update: 08/08/08}
 \input{app-rename-tests.ltx-inc}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
