@@ -186,7 +186,7 @@ public class SDMDebugger implements IPDebugger {
 		}
 
 		int numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
-		dbgArgs.add("--numnodes=" + (numProcs+1)); //$NON-NLS-1$
+		dbgArgs.add("--numprocs=" + numProcs); //$NON-NLS-1$
 
 
 

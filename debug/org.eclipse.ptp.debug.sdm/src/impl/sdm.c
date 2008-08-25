@@ -41,12 +41,12 @@ sdm_setup(int argc, char *argv[])
 	char **	rank;
 
 	/*
-	 * Get the number of nodes
+	 * Get the number of processes
 	 */
 	size = -1;
 	for (ch = 0; ch < argc; ch++) {
 		char * arg = argv[ch];
-		if (strncmp(arg, "--numnodes", 10) == 0) {
+		if (strncmp(arg, "--numprocs", 10) == 0) {
 			size = (int)strtol(arg+11, NULL, 10);
 			break;
 		}
@@ -58,11 +58,12 @@ sdm_setup(int argc, char *argv[])
 
 	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] size %d\n", sdm_route_get_id(), size);
 
-	sdm_route_set_size(size);
+	sdm_route_set_size(size+1);
+
 	/*
-	 * Set the ID of the master to the num of nodes less one
+	 * Set the ID of the master to one greater than the last process [0 ... size-1]
 	 */
-	SDM_MASTER = size - 1;
+	SDM_MASTER = size;
 
 	/*
 	 * Since the SDM servers will be started by the mpirun, get

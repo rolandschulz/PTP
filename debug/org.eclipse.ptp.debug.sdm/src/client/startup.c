@@ -41,7 +41,7 @@ static struct option longopts[] = {
 	{"port",			required_argument,	NULL, 	'p'},
 	{"host",			required_argument,	NULL, 	'h'},
 	{"jobid",			required_argument,	NULL, 	'j'},
-	{"numnodes",		required_argument, 	NULL,	'n'},
+	{"numprocs",		required_argument, 	NULL,	'n'},
 #ifdef DEBUG
 	{"debug",			optional_argument,	NULL, 	'd'},
 #endif /* DEBUG */
