@@ -24,16 +24,16 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTComponentDefStmtNode extends ASTNode implements IDerivedTypeBodyConstruct
+public class ASTDataComponentDefStmtNode extends ASTNode implements IComponentDefStmt
 {
-    org.eclipse.photran.internal.core.lexer.Token label; // in ASTComponentDefStmtNode
-    ASTTypeSpecNode typeSpec; // in ASTComponentDefStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTComponentDefStmtNode
-    IASTListNode<ASTComponentAttrSpecNode> componentAttrSpecList; // in ASTComponentDefStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTComponentDefStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTComponentDefStmtNode
-    IASTListNode<ASTComponentDeclNode> componentDeclList; // in ASTComponentDefStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token label; // in ASTDataComponentDefStmtNode
+    ASTTypeSpecNode typeSpec; // in ASTDataComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTDataComponentDefStmtNode
+    IASTListNode<ASTComponentAttrSpecNode> componentAttrSpecList; // in ASTDataComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTDataComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTDataComponentDefStmtNode
+    IASTListNode<ASTComponentDeclNode> componentDeclList; // in ASTDataComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTDataComponentDefStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
@@ -81,8 +81,8 @@ public class ASTComponentDefStmtNode extends ASTNode implements IDerivedTypeBody
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTComponentDefStmtNode(this);
-        visitor.visitIDerivedTypeBodyConstruct(this);
+        visitor.visitASTDataComponentDefStmtNode(this);
+        visitor.visitIComponentDefStmt(this);
         visitor.visitASTNode(this);
     }
 

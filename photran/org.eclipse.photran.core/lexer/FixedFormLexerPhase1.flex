@@ -270,6 +270,26 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 
 <YYSTANDARD,YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
+// New for Fortran 2003 //////////////////////////////////
+"EXTENDS"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_EXTENDS); }
+"ABSTRACT"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ABSTRACT); }
+"BIND"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_BIND); }
+"PASS"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_PASS); }
+"NOPASS"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NOPASS); }
+"GENERIC"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_GENERIC); }
+"NON_OVERRIDABLE"				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NON_OVERRIDABLE); }
+"DEFERRED"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_DEFERRED); }
+"FINAL"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_FINAL); }
+"KIND"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_KIND); }
+"LEN"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_LEN); }
+"ENUM"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ENUM); }
+"ENUMERATOR"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ENUMERATOR); }
+"CLASS"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_CLASS); }
+"ASYNCHRONOUS"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ASYNCHRONOUS); }
+"PROTECTED"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_PROTECTED); }
+"VALUE"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_VALUE); }
+"VOLATILE"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_VOLATILE); }
+// Same as for Fortran 77/90/95 //////////////////////////////////
 "ACCESS="						{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ACCESSEQ); }
 "ACTION="						{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ACTIONEQ); }
 "ADVANCE="						{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ADVANCEEQ); }

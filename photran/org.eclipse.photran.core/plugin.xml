@@ -121,7 +121,7 @@
       <!-- Individual content types for free and fixed format -->
 	  <content-type id="freeFormFortranSource" name="Fortran Source File - Free Format"
 		  base-type="org.eclipse.photran.core.fortranSource"
-		  file-extensions="f77,f90,f95"
+		  file-extensions="f77,f90,f95,f03"
 		  priority="high"/>
 	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
 		  base-type="org.eclipse.photran.core.fortranSource"

@@ -146,7 +146,7 @@ public class FreeFormLexerPhase2 implements ILexer
     private void processNextStatement() throws Exception
     {
         readNextStatement();
-
+        
         retainAsKeyword = new boolean[tokenStream.size()];
         for (int i = 0; i < retainAsKeyword.length; i++)
             retainAsKeyword[i] = false;
@@ -170,6 +170,8 @@ public class FreeFormLexerPhase2 implements ILexer
         markAdditionalChanges();    // Must have idPos set
 
         markSubprogramChanges();    // Must have idPos set
+        
+        markFortran2003Changes();
 
         applyChanges();
 
@@ -359,6 +361,13 @@ public class FreeFormLexerPhase2 implements ILexer
         applySameRulesTo(Terminal.T_OPTIONAL);
         applySameRulesTo(Terminal.T_SAVE);
         applySameRulesTo(Terminal.T_TARGET);
+        // BEGIN FORTRAN 2003
+        applySameRulesTo(Terminal.T_ASYNCHRONOUS);
+        applySameRulesTo(Terminal.T_PROTECTED);
+        applySameRulesTo(Terminal.T_VALUE);
+        applySameRulesTo(Terminal.T_VOLATILE);
+        applySameRulesTo(Terminal.T_BIND);
+        // END FORTRAN 2003
         
         // R506, R507
         addRules(Terminal.T_KINDEQ,
@@ -599,6 +608,83 @@ public class FreeFormLexerPhase2 implements ILexer
                 retainAsKeyword[i] = (i != idPos);
     }
     
+    private void markFortran2003Changes()
+    {
+        if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_TYPE)
+        {
+            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            {
+                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                if (t == Terminal.T_EXTENDS
+                    || t == Terminal.T_ABSTRACT
+                    || t == Terminal.T_BIND
+                    || t == Terminal.T_KIND
+                    || t == Terminal.T_LEN)
+                {
+                    retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
+                }
+                else if (t == Terminal.T_COLON)
+                {
+                    break;
+                }
+            }
+        }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_INTEGER)
+        {
+            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            {
+                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                if (t == Terminal.T_KIND
+                    || t == Terminal.T_LEN)
+                {
+                    retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
+                }
+                else if (t == Terminal.T_COLON)
+                {
+                    break;
+                }
+            }
+        }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_PROCEDURE)
+        {
+            retainAsKeyword[firstTokenPos] = true;
+            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            {
+                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                if (t == Terminal.T_PASS
+                    || t == Terminal.T_NOPASS
+                    || t == Terminal.T_NON_OVERRIDABLE
+                    || t == Terminal.T_DEFERRED)
+                {
+                    retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
+                }
+            }
+        }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_ENUM)
+        {
+            retainAsKeyword[firstTokenPos] = true;
+            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            {
+                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                if (t == Terminal.T_BIND)
+                {
+                    retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
+                }
+            }
+        }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_END)
+        {
+            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            {
+                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                if (t == Terminal.T_ENUM)
+                {
+                    retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
+                }
+            }
+        }
+    }
+    
     /**
      * Determines whether the current statement is a subprogram declaration and,
      * if so, returns the position of the identifier that is the subprogram name.
@@ -828,7 +914,7 @@ public class FreeFormLexerPhase2 implements ILexer
     {
         public abstract boolean appliesToTokenAt(int tokenPos);
     }
-    
+
     /**
      * The statement must be a type declaration statement, and the token
      * under investigation must appear before the name of the variable being
@@ -855,6 +941,15 @@ public class FreeFormLexerPhase2 implements ILexer
                 // Part of the return type in a function declaration
                 declKeywordsStartAt = 1;
                 declIdentifierPos = idPos;
+            }
+            // Fortran 2003
+            else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_PROCEDURE
+                || ((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_GENERIC
+                || ((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_CLASS)
+            {
+                // Part of the return type in a function declaration
+                declKeywordsStartAt = 1;
+                declIdentifierPos = tokenStream.size()-1; // TODO: Not quite right
             }
             else return false;
         

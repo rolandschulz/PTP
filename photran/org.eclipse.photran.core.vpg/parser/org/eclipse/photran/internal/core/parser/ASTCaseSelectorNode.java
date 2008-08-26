@@ -27,20 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTCaseSelectorNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCaseSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseSelectorNode
     IASTListNode<ASTCaseValueRangeNode> caseValueRangeListSelector; // in ASTCaseSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCaseSelectorNode
-    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseSelectorNode
-
-    public IASTListNode<ASTCaseValueRangeNode> getCaseValueRangeListSelector()
-    {
-        return this.caseValueRangeListSelector;
-    }
-
-    public void setCaseValueRangeListSelector(IASTListNode<ASTCaseValueRangeNode> newValue)
-    {
-        this.caseValueRangeListSelector = newValue;
-    }
-
 
     public boolean hasDefaultSelector()
     {
@@ -50,6 +39,17 @@ public class ASTCaseSelectorNode extends ASTNode
     public void setHasDefaultSelector(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasDefaultSelector = newValue;
+    }
+
+
+    public IASTListNode<ASTCaseValueRangeNode> getCaseValueRangeListSelector()
+    {
+        return this.caseValueRangeListSelector;
+    }
+
+    public void setCaseValueRangeListSelector(IASTListNode<ASTCaseValueRangeNode> newValue)
+    {
+        this.caseValueRangeListSelector = newValue;
     }
 
 
@@ -69,9 +69,9 @@ public class ASTCaseSelectorNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTLparen;
-        case 1:  return this.caseValueRangeListSelector;
-        case 2:  return this.hiddenTRparen;
-        case 3:  return this.hasDefaultSelector;
+        case 1:  return this.hasDefaultSelector;
+        case 2:  return this.caseValueRangeListSelector;
+        case 3:  return this.hiddenTRparen;
         default: return null;
         }
     }
@@ -81,9 +81,9 @@ public class ASTCaseSelectorNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; return;
-        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

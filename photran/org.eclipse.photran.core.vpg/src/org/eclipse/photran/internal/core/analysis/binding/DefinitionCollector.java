@@ -22,7 +22,7 @@ import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
-import org.eclipse.photran.internal.core.parser.ASTComponentDefStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDataComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTEntryStmtNode;
@@ -43,6 +43,7 @@ import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
@@ -80,8 +81,13 @@ class DefinitionCollector extends BindingCollector
         
         Definition d = addDefinition(node.getTypeName(), Definition.Classification.DERIVED_TYPE, Type.VOID);
         
-        if (node.getAccessSpec() != null)
-            d.setVisibility(node.getAccessSpec());
+//        if (node.getAccessSpec() != null)
+//            d.setVisibility(node.getAccessSpec());
+        // Change for Fortran 2003
+        if (node.getTypeAttrSpecList() != null)
+            for (ASTTypeAttrSpecNode attrSpec : node.getTypeAttrSpecList())
+                if (attrSpec.getAccessSpec() != null)
+                    d.setVisibility(attrSpec.getAccessSpec());
     }
 
     // # R424
@@ -122,7 +128,7 @@ class DefinitionCollector extends BindingCollector
     // | <ComponentName> T_ASTERISK <CharLength>
     // | <ComponentName>
 
-    @Override public void visitASTComponentDefStmtNode(ASTComponentDefStmtNode node)
+    @Override public void visitASTDataComponentDefStmtNode(ASTDataComponentDefStmtNode node)
     {
         super.traverseChildren(node);
         

@@ -487,6 +487,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return letterFollowsParenthetical;
             else if (keyword.equalsIgnoreCase("then"))
                 return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos));
+            // BEGIN FORTRAN 2003
+            else if (keyword.equalsIgnoreCase("bind"))
+                return openContextComma && match("enum", firstTokenPos);
+            // END FORTRAN 2003
             else
             {
                 int precedingKeywordOffset = findPrecedingKeyword(column);
@@ -518,6 +522,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit") || precedingKeyword.equalsIgnoreCase("end");
             else if (keyword.equalsIgnoreCase("while"))
                 return precedingKeyword.equalsIgnoreCase("do");
+            // BEGIN FORTRAN 2003
+            else if (keyword.equalsIgnoreCase("interface"))
+                return precedingKeyword.equalsIgnoreCase("abstract");
+            // END FORTRAN 2003
             else
                 return precedingKeyword.equalsIgnoreCase("end");
         }

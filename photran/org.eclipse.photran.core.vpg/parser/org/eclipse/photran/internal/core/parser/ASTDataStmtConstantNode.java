@@ -26,21 +26,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTDataStmtConstantNode extends ASTNode
 {
-    ASTConstantNode constant; // in ASTDataStmtConstantNode
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTDataStmtConstantNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDataStmtConstantNode
+    ASTConstantNode constant; // in ASTDataStmtConstantNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDataStmtConstantNode
-
-    public ASTConstantNode getConstant()
-    {
-        return this.constant;
-    }
-
-    public void setConstant(ASTConstantNode newValue)
-    {
-        this.constant = newValue;
-    }
-
 
     public boolean isNull()
     {
@@ -50,6 +39,17 @@ public class ASTDataStmtConstantNode extends ASTNode
     public void setIsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNull = newValue;
+    }
+
+
+    public ASTConstantNode getConstant()
+    {
+        return this.constant;
+    }
+
+    public void setConstant(ASTConstantNode newValue)
+    {
+        this.constant = newValue;
     }
 
 
@@ -68,9 +68,9 @@ public class ASTDataStmtConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.constant;
-        case 1:  return this.isNull;
-        case 2:  return this.hiddenTLparen;
+        case 0:  return this.isNull;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.constant;
         case 3:  return this.hiddenTRparen;
         default: return null;
         }
@@ -80,9 +80,9 @@ public class ASTDataStmtConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.constant = (ASTConstantNode)value; return;
-        case 1:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.constant = (ASTConstantNode)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

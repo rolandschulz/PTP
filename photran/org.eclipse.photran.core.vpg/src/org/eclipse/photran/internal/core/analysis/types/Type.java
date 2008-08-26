@@ -74,7 +74,7 @@ public abstract class Type implements Serializable
         else if (node.isCharacter())
             return Type.CHARACTER;
         else if (node.isDerivedType())
-            return new DerivedType(node.getTypeName().getText());
+            return node.getTypeName() == null ? new DerivedType("") : new DerivedType(node.getTypeName().getText());
         else
             throw new Error("Unexpected case parsing <TypeSpec> node");
     }

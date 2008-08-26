@@ -187,7 +187,10 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         "NML", "NONE", "NON_OVERRIDABLE", "NOPASS", "NULLIFY", "NUMBER", "ONLY", "OPEN", "OPENED", "OPERATOR", "OPTIONAL", "OUT", "PAD", "PARAMETER", "PASS", "PAUSE",
         "POINTER", "POSITION", "PRECISION", "PRINT", "PRIVATE", "PROCEDURE", "PROGRAM", "PROTECTED", "PUBLIC", "PURE", "READ", "READWRITE", "REC", "RECL", "RECURSIVE", "RESULT",
         "RETURN", "REWIND", "SAVE", "SELECT", "SEQUENCE", "SEQUENTIAL", "SIZE", "STAT", "STATUS", "STOP", "SUBROUTINE", "TARGET", "THEN", "TO", "TYPE", "UNFORMATTED",
-        "UNIT", "USE", "VOLATILE", "WHERE", "WHILE", "WRITE" };
+        "UNIT", "USE", "VOLATILE", "WHERE", "WHILE", "WRITE",
+        // Fortran 2003
+        "EXTENDS", "ABSTRACT", "BIND", "GENERIC", "PASS", "NOPASS", "NON_OVERRIDABLE", "DEFERRED", "FINAL",
+        "ENUM", "ENUMERATOR", "CLASS", "VALUE" };
 
     private static String[] fgTextualOperators = { ".AND.", ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
 

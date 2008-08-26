@@ -208,6 +208,26 @@ public final class Terminal
     public static final Terminal T_HCON = new Terminal("Hollerith constant");
     public static final Terminal T_EXIT = new Terminal("exit");
     public static final Terminal T_UNEXPECTED_CHARACTER = new Terminal("extraneous character");
+    
+    // New for Fortran 2003
+    public static final Terminal T_EXTENDS = new Terminal("extends");
+    public static final Terminal T_ABSTRACT = new Terminal("abstract");
+    public static final Terminal T_BIND = new Terminal("bind");
+    public static final Terminal T_PASS = new Terminal("pass");
+    public static final Terminal T_NOPASS = new Terminal("nopass");
+    public static final Terminal T_GENERIC = new Terminal("generic");
+    public static final Terminal T_NON_OVERRIDABLE = new Terminal("non_overridable");
+    public static final Terminal T_DEFERRED = new Terminal("deferred");
+    public static final Terminal T_FINAL = new Terminal("final");
+    public static final Terminal T_KIND = new Terminal("kind");
+    public static final Terminal T_LEN = new Terminal("len");
+    public static final Terminal T_ENUM = new Terminal("enum");
+    public static final Terminal T_ENUMERATOR = new Terminal("enumerator");
+    public static final Terminal T_CLASS = new Terminal("class");
+    public static final Terminal T_ASYNCHRONOUS = new Terminal("asynchronous");
+    public static final Terminal T_PROTECTED = new Terminal("protected");
+    public static final Terminal T_VALUE = new Terminal("value");
+    public static final Terminal T_VOLATILE = new Terminal("volatile");
 
     private String description;
 

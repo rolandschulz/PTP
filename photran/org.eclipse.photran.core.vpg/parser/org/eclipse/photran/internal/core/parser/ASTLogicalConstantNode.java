@@ -26,22 +26,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTLogicalConstantNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstantNode
     org.eclipse.photran.internal.core.lexer.Token isTrue; // in ASTLogicalConstantNode
+    org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstantNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTLogicalConstantNode
     org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTLogicalConstantNode
     ASTNamedConstantUseNode namedConstKind; // in ASTLogicalConstantNode
-
-    public boolean isFalse()
-    {
-        return this.isFalse != null;
-    }
-
-    public void setIsFalse(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isFalse = newValue;
-    }
-
 
     public boolean isTrue()
     {
@@ -51,6 +40,17 @@ public class ASTLogicalConstantNode extends ASTNode
     public void setIsTrue(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isTrue = newValue;
+    }
+
+
+    public boolean isFalse()
+    {
+        return this.isFalse != null;
+    }
+
+    public void setIsFalse(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isFalse = newValue;
     }
 
 
@@ -91,8 +91,8 @@ public class ASTLogicalConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isFalse;
-        case 1:  return this.isTrue;
+        case 0:  return this.isTrue;
+        case 1:  return this.isFalse;
         case 2:  return this.hiddenTUnderscore;
         case 3:  return this.intKind;
         case 4:  return this.namedConstKind;
@@ -104,8 +104,8 @@ public class ASTLogicalConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;

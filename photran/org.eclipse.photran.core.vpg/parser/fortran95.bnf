@@ -217,6 +217,7 @@
   | <NamelistStmt>
   | <OptionalStmt>
   | <PointerStmt>
+  | <CrayPointerStmt> # JO
   | <SaveStmt>
   | <TargetStmt>
   | <UnprocessedIncludeStmt>
@@ -839,6 +840,18 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
   | (inline):<PointerName> -:T_LPAREN <DeferredShapeSpecList> -:T_RPAREN
 
 <PointerName> ::= pointerName:T_IDENT
+
+# JO - Cray Pointers
+
+<CrayPointerStmt> ::=
+  | (inline):<LblDef> -:T_POINTER <CrayPointerStmtObjectList> -:T_EOS
+
+(list):<CrayPointerStmtObjectList> ::=
+  |                                       <CrayPointerStmtObject>
+  | <CrayPointerStmtObjectList> -:T_COMMA <CrayPointerStmtObject>
+
+<CrayPointerStmtObject> ::=
+  | -:T_LPAREN (inline):<PointerName> -:T_COMMA <TargetObject> -:T_RPAREN
 
 # R529   <ObjectName> renamed to <TargetName> to simplify Semantic Analysis
 <TargetStmt> ::=

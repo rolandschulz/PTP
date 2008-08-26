@@ -7,7 +7,7 @@ import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
-import org.eclipse.photran.internal.core.parser.ASTComponentDefStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDataComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
@@ -169,7 +169,7 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         addToModel(node, setPos(new FortranElement.DerivedType(getCurrentParent(), token), node));
     }
 
-    public void visitASTComponentDefStmtNode(ASTComponentDefStmtNode node)
+    public void visitASTDataComponentDefStmtNode(ASTDataComponentDefStmtNode node)
     {
         for (ASTComponentDeclNode decl : node.getComponentDeclList())
             addToModelNoChildren(setPos(new FortranElement.Variable(getCurrentParent(), decl.getComponentName().getComponentName()), node));
