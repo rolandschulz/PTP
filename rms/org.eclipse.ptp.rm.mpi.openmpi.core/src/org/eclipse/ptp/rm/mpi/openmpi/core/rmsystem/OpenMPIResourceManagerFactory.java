@@ -24,6 +24,10 @@ public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactor
 		// Extension point already has a name.
 		super("Open MPI");
 	}
+	
+	protected OpenMPIResourceManagerFactory(String name) {
+		super(name);
+	}
 
 	public IResourceManagerConfiguration copyConfiguration(
 			IResourceManagerConfiguration configuration) {
