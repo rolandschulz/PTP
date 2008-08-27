@@ -6,10 +6,11 @@
 # Note - pattern substitution: $(patsubst %.f90,%.exe,$(wildcard *.f90))
 
 # Command to run your Fortran compiler
-FORTRAN=`which gfortran ifort gfortran g95 2>/dev/null | head -1`
+FORTRAN=`which gfortran ifort g95 2>/dev/null | head -1`
 DEBUGSWITCH=-g
-INCLUDESWITCH=-L
+INCLUDESWITCH=-I
 LIBSWITCH=-L
+OPTSWITCH=-O4
 OUTSWITCH=-o
 EXEFILE=a.exe
 
@@ -46,6 +47,7 @@ build:
 	               $(INCLUDESWITCH)$$dir \
 	               $(LIBSWITCH). \
 	               $(LIBSWITCH)$$dir \
+	               $(OPTSWITCH) \
 	               $$dir/$(SRCFILES); \
 	    echo "<=====" Done compiling sources in $$dir; \
 	  fi \
