@@ -82,6 +82,7 @@
 <pathentry kind="src" path="src-jacobi-1-eoshift"/>
 <pathentry kind="src" path="src-jacobi-2-arrays"/>
 <pathentry kind="src" path="src-jacobi-3-loops"/>
+<pathentry kind="src" path="src-cray-pointers"/>
 </storageModule>
 </cconfiguration>
 </storageModule>

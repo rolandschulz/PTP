@@ -10,6 +10,7 @@ FORTRAN=`which gfortran ifort g95 2>/dev/null | head -1`
 DEBUGSWITCH=-g
 INCLUDESWITCH=-I
 LIBSWITCH=-L
+CRAYSWITCH=-fcray-pointer
 OPTSWITCH=-O4
 OUTSWITCH=-o
 EXEFILE=a.exe
@@ -48,6 +49,7 @@ build:
 	               $(LIBSWITCH). \
 	               $(LIBSWITCH)$$dir \
 	               $(OPTSWITCH) \
+	               $(CRAYSWITCH) \
 	               $$dir/$(SRCFILES); \
 	    echo "<=====" Done compiling sources in $$dir; \
 	  fi \
