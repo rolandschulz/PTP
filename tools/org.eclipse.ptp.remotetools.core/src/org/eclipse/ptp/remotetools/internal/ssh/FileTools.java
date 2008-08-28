@@ -248,7 +248,7 @@ public class FileTools implements IRemoteFileTools {
 	}
 
 
-	public IRemoteItem [] listItems(String root) throws RemoteOperationException {
+	public IRemoteItem [] listItems(String root) throws RemoteOperationException, RemoteConnectionException, CancelException {
 		validateRemotePath(root);
 		Vector files;
 		try { 
@@ -256,6 +256,8 @@ public class FileTools implements IRemoteFileTools {
 		} catch (SftpException e) {
 			throw new RemoteOperationException(Messages.RemoteFileTools_ListFiles_FailedListRemote, e);
 		}
+		
+		cacheUserData();
 		
 		List result = new ArrayList();
 		Enumeration enumeration = files.elements();
