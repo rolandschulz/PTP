@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  */
-package org.eclipse.ptp.remote.remotetools.core;
+package org.eclipse.ptp.remote.remotetools.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 

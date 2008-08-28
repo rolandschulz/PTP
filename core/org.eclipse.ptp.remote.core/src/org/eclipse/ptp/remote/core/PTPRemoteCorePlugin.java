@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -153,7 +154,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}    
 
 	// Active remote services plugins (not necessarily loaded)
-	private Map<String, RemoteServicesProxy> allRemoteServices;	
+	private Map<String, RemoteServicesProxy> allRemoteServicesById;	
+	private Map<String, RemoteServicesProxy> allRemoteServicesByScheme;	
 	
 	// Default remote services for new RM wizard
 	private IRemoteServices defaultRemoteServices;
@@ -170,14 +172,29 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 * @return remote services
 	 */
 	public synchronized IRemoteServices[] getAllRemoteServices() {
-		if (allRemoteServices == null) {
-			allRemoteServices = retrieveRemoteServices();
-		}
-		IRemoteServices[] services = allRemoteServices.values().toArray(new IRemoteServices[allRemoteServices.size()]);
+		retrieveRemoteServices();
+		IRemoteServices[] services = allRemoteServicesById.values().toArray(new IRemoteServices[allRemoteServicesById.size()]);
 		Arrays.sort(services, new RemoteServicesSorter());
 		return services;
 	}
 	
+	/**
+	 * Get the connection identified by a URI
+	 * 
+	 * @param uri
+	 * @return connection
+	 */
+	public IRemoteConnection getConnection(URI uri) {
+		IRemoteServices services = getRemoteServices(uri);
+		if (services != null) {
+			String host = uri.getHost();
+			if (host != null) {
+				return services.getConnectionManager().getConnection(host);
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Retrieve the default remote services plugin. The default is the LocalServices
 	 * provider if it exists, the last plugin otherwise.
@@ -198,17 +215,30 @@ public class PTPRemoteCorePlugin extends Plugin {
 		
 		return defaultRemoteServices;
 	}
-
+	
 	/**
 	 * Get the remote services identified by id
 	 * 
 	 * @return services
 	 */
 	public synchronized IRemoteServices getRemoteServices(String id) {
-		if (allRemoteServices == null) {
-			allRemoteServices = retrieveRemoteServices();
+		retrieveRemoteServices();
+		return allRemoteServicesById.get(id);
+	}
+
+	/**
+	 * Get the remote services identified by a URI
+	 * 
+	 * @param uri
+	 * @return remote services
+	 */
+	public IRemoteServices getRemoteServices(URI uri) {
+		retrieveRemoteServices();
+		String scheme = uri.getScheme();
+		if (scheme != null) {
+			return allRemoteServicesByScheme.get(uri.getScheme());
 		}
-		return allRemoteServices.get(id);
+		return null;
 	}
 	
 	/*
@@ -220,7 +250,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 		plugin = this;
 		defaultRemoteServices = null;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
@@ -233,27 +263,29 @@ public class PTPRemoteCorePlugin extends Plugin {
     /**
 	 * Find and load all remoteServices plugins.
 	 */
-	private Map<String, RemoteServicesProxy> retrieveRemoteServices() {
-    	IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
-		final IExtension[] extensions = extensionPoint.getExtensions();
-		
-		Map<String, RemoteServicesProxy> services = new HashMap<String, RemoteServicesProxy>(5);
-		
-		for (IExtension ext : extensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-		
-			for (IConfigurationElement ce : elements)
-			{
-				RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
-				if (proxy.initialize()) {
-					services.put(proxy.getId(), proxy);
-				} else {
-					log("Failed to initialize remote service: " + proxy.getId() + "(" + proxy.getName() + ")");  //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
+	private void retrieveRemoteServices() {
+		if (allRemoteServicesById == null) {
+			allRemoteServicesById = new HashMap<String, RemoteServicesProxy>();
+			allRemoteServicesByScheme = new HashMap<String, RemoteServicesProxy>();
+			
+	    	IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
+			final IExtension[] extensions = extensionPoint.getExtensions();
+			
+			for (IExtension ext : extensions) {
+				final IConfigurationElement[] elements = ext.getConfigurationElements();
+			
+				for (IConfigurationElement ce : elements)
+				{
+					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
+					if (proxy.initialize()) {
+						allRemoteServicesById.put(proxy.getId(), proxy);
+						allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
+					} else {
+						log("Failed to initialize remote service: " + proxy.getId() + "(" + proxy.getName() + ")");  //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
+					}
 				}
 			}
 		}
-		
-		return services;
     }
 }

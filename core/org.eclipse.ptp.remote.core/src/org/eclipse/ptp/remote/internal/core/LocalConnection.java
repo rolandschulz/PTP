@@ -12,6 +12,8 @@ package org.eclipse.ptp.remote.internal.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 
@@ -20,8 +22,11 @@ public class LocalConnection implements IRemoteConnection {
 	private String address;
 	private String username;
 	private boolean connected;
+	private IRemoteConnectionManager conMgr;
+	private final IRemoteConnection connection = this;
 	
-	public LocalConnection() {
+	public LocalConnection(IRemoteConnectionManager conMgr) {
+		this.conMgr = conMgr;
 		this.name = "Local";
 		this.address = "localhost";
 		this.username = System.getProperty("user.name");
@@ -32,6 +37,17 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public void close(IProgressMonitor monitor) {
 		connected = false;
+		
+		conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+			public IRemoteConnection getConnection() {
+				return connection;
+			}
+
+			public int getType() {
+				return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
+			}
+			
+		});
 	}
 	
 	/* (non-Javadoc)
@@ -99,6 +115,17 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
 		connected = true;
+		
+		conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+			public IRemoteConnection getConnection() {
+				return connection;
+			}
+
+			public int getType() {
+				return IRemoteConnectionChangeEvent.CONNECTION_OPENED;
+			}
+			
+		});	
 	}
 
 	/* (non-Javadoc)

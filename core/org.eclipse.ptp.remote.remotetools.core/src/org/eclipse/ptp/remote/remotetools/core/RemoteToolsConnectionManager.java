@@ -14,7 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.remotetools.core.environment.PTPTargetControl;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
@@ -25,6 +28,7 @@ import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
+	private final ListenerList listeners = new ListenerList();
 	private TargetTypeElement remoteHost = null;
 	private Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
 	
@@ -40,6 +44,52 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		refreshConnections();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#fireConnectionChangeEvent(org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
+	 */
+	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
+	 */
+	public IRemoteConnection getConnection(String name) {
+		refreshConnections();
+		return connections.get(name);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
+	 */
+	public IRemoteConnection[] getConnections() {
+		refreshConnections();
+		return connections.values().toArray(new IRemoteConnection[connections.size()]);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public void removeConnection(IRemoteConnection conn) {
+		connections.remove(conn);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.remove(listener);
+	}
+
 	/**
 	 * Refresh the list of connections that we know about. Deals with connection that are added or deleted
 	 * by another entity.
@@ -58,29 +108,13 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 					 */
 					String address = (String) element.getAttributes().get("ptp.connection-address");
 					String user = (String) element.getAttributes().get("ptp.login-username");
-					newConns.put(element.getName(), new RemoteToolsConnection(element.getName(), address, user, (PTPTargetControl)control));
+					conn = new RemoteToolsConnection(element.getName(), address, user, (PTPTargetControl)control);
+					((PTPTargetControl)control).setConnection(this, conn);
 				} catch (CoreException e) {
 				}
-			} else {
-				newConns.put(element.getName(), conn);
 			}
+			newConns.put(element.getName(), conn);
 		}
 		connections = newConns;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
-	 */
-	public IRemoteConnection getConnection(String name) {
-		refreshConnections();
-		return connections.get(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
-	 */
-	public IRemoteConnection[] getConnections() {
-		refreshConnections();
-		return connections.values().toArray(new IRemoteConnection[connections.size()]);
 	}
 }

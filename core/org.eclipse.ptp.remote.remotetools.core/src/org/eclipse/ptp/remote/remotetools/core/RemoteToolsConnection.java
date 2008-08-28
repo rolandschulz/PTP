@@ -21,6 +21,7 @@ import org.eclipse.ptp.remote.core.exception.AddressInUseException;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.remotetools.core.environment.PTPTargetControl;
+import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -44,15 +45,20 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
 	public synchronized void close(IProgressMonitor monitor) {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
+			if (monitor == null) {
+				monitor = new NullProgressMonitor();
+			}
+			
+			monitor.beginTask(Messages.RemoteToolsConnection_close, 1);
+			
+			if (isOpen()) {
+				try {
+					control.kill(monitor);
+				} catch (CoreException e) {
+			}
+				
+			monitor.done();
 		}
-		monitor.beginTask(Messages.RemoteToolsConnection_close, 1);
-		try {
-			control.kill(monitor);
-		} catch (CoreException e) {
-		}
-		monitor.done();
 	}
 	
 	/**

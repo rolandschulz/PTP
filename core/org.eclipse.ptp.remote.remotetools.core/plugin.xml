@@ -6,7 +6,8 @@
       <remoteServices
             class="org.eclipse.ptp.remote.remotetools.core.RemoteToolsServicesFactory"
             id="org.eclipse.ptp.remote.RemoteTools"
-            name="Remote Tools">
+            name="Remote Tools"
+            scheme="remotetools">
       </remoteServices>
    </extension>
    <extension

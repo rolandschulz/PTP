@@ -26,6 +26,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 public class RemoteServicesProxy implements IRemoteServices {
 	private static final String ATTR_ID = "id";
 	private static final String ATTR_NAME = "name";
+	private static final String ATTR_SCHEME = "scheme";
 	private static final String ATTR_CLASS = "class";
 	
 	private static String getAttribute(IConfigurationElement configElement, String name, String defaultValue) {
@@ -44,6 +45,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	private final IConfigurationElement configElement;
 	private final String id;
 	private final String name;
+	private final String scheme;
 	private IRemoteServicesFactory factory;
 	private IRemoteServicesDelegate delegate;
 	
@@ -51,6 +53,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 		this.configElement = configElement;
 		this.id = getAttribute(configElement, ATTR_ID, null);
 		this.name = getAttribute(configElement, ATTR_NAME, this.id);
+		this.scheme = getAttribute(configElement, ATTR_SCHEME, null);
 		getAttribute(configElement, ATTR_CLASS, null);
 		this.factory = null;
 		this.delegate = null;
@@ -64,7 +67,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 		loadServices();
 		return delegate.getConnectionManager();
 	}
-	
+
 	/**
 	 * Get the factory from the plugin
 	 * 
@@ -126,6 +129,13 @@ public class RemoteServicesProxy implements IRemoteServices {
 			String... command) {
 		loadServices();
 		return delegate.getProcessBuilder(conn, command);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getScheme()
+	 */
+	public String getScheme() {
+		return scheme;
 	}
 	
 	/* (non-Javadoc)

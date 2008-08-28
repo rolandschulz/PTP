@@ -6,7 +6,8 @@
       <remoteServices
             class="org.eclipse.ptp.remote.rse.core.RSEServicesFactory"
             id="org.eclipse.ptp.remote.RSERemoteServices"
-            name="RSE">
+            name="RSE"
+            scheme="rse">
       </remoteServices>
    </extension>
 
