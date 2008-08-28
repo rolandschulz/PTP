@@ -24,7 +24,7 @@ JARFILE=Fortran2003Parser.jar
 GENERATED_JAVA_FILES=FortranLexer.java FortranParser.java
 CLASS_FILES=FortranLexer.class FortranParser.class \
             FortranStream.class FortranTokenStream.class \
-            FortranLexicalPrepass.class FortranMain.class 
+            FortranLexicalPrepass.class FrontEnd.class 
 GENERATED_CLASS_FILES=FortranLexer*DFA*.class
 GENERATED_TOKEN_FILES=FortranLexer.tokens FortranParser.tokens
 
@@ -36,45 +36,43 @@ F90_TEST_DIRS="misc" "program-unit"
 all: $(GENERATED_JAVA_FILES) $(CLASS_FILES) 
 
 runTests: $(CLASS_FILES)
-	$(JAVA) FortranMain test_files/*.f03 test_files/*.f90
+	$(JAVA) FrontEnd test_files/*.f03 test_files/*.f90
 
 runDraftTests: $(CLASS_FILES)
 	@for dir in $(DRAFT_TEST_DIRS) ; do \
-           $(JAVA) FortranMain $$dir/*.f03; \
+           $(JAVA) FrontEnd $$dir/*.f03; \
         done;
 
 runAllTests: $(CLASS_FILES)
 	$(MAKE) runTests
 	$(MAKE) runDraftTests
 	@for dir in $(F90_TEST_DIRS) ; do \
-           $(JAVA) FortranMain $$dir/*.f90; \
+           $(JAVA) FrontEnd $$dir/*.f90; \
         done;
 
-FortranLexer.java: FortranLexer.g  FortranStream.class
-	$(JAVA) org.antlr.Tool $<
-FortranParser.java: FortranParser.g FortranLexer.tokens
+FortranLexer.java: FortranLexer.g
+	$(JAVA) -Xms256M -Xmx512M org.antlr.Tool -Xconversiontimeout 2000 $<
+
+FortranParser.java: FortranParser.g FortranLexer.java
 	$(JAVA) org.antlr.Tool $<
 
 FortranLexer.class: FortranLexer.java FortranLexer.tokens
-	$(JAVAC) $<
+	$(JAVAC) *.java
 
 FortranParser.class: FortranParser.java FortranLexer.tokens
-	$(JAVAC) $<
+	$(JAVAC) *.java
 
 FortranStream.class: FortranStream.java
-	$(JAVAC) $<
+	$(JAVAC) *.java
 
 FortranTokenStream.class: FortranTokenStream.java
-	$(JAVAC) $<
+	$(JAVAC) *.java
 
-FortranLexicalPrepass.class: FortranLexicalPrepass.java \
-                             FortranTokenStream.class
-	$(JAVAC) $<
+FortranLexicalPrepass.class: FortranLexicalPrepass.java
+	$(JAVAC) *.java
 
-FortranMain.class: FortranMain.java FortranLexer.class \
-                   FortranParser.class FortranTokenStream.class \
-                   FortranStream.class FortranLexicalPrepass.class
-	$(JAVAC) $<
+FrontEnd.class: FrontEnd.java
+	$(JAVAC) *.java
 
 jarFile: $(CLASS_FILES)
 	$(JAR) cf $(JARFILE) $(CLASS_FILES) $(GENERATED_CLASS_FILES)
