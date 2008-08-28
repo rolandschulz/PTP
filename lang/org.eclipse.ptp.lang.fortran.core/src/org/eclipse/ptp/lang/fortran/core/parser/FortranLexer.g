@@ -29,13 +29,12 @@ options {
  * @author Craig E Rasmussen, Christopher D. Rickett, Jeffrey Overbey
  */
  
-package fortran.ofp.parser.java;
+package org.eclipse.ptp.lang.fortran.core.parser;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Stack;
 
-import fortran.ofp.parser.java.FortranToken;
 }
 
 @members {

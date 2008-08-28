@@ -57,8 +57,8 @@ options {
  * @author Craig E Rasmussen, Christopher D. Rickett, Bryan Rasmussen
  */
  
- package fortran.ofp.parser.java;
- import fortran.ofp.parser.java.IActionEnums;
+ package org.eclipse.ptp.lang.fortran.core.parser;
+ import org.eclipse.ptp.lang.fortran.core.parser.IActionEnums;
 }
 
 @members {
