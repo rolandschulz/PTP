@@ -17,8 +17,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.remotetools.core.Messages;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
+import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
@@ -60,6 +63,9 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 	 */
 	private int state;
 	
+	private IRemoteConnectionManager conMgr;
+	private IRemoteConnection connection;
+
 	/**
 	 * Creates a target control. If some attribute related to the environment has an invalid
 	 * format, an exception is thrown. Simulator attributes are not checked yet, but will be checked when the target is
@@ -80,6 +86,11 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		currentTargetConfig = configFactory.createTargetConfig();
 	}
 
+	public void setConnection(IRemoteConnectionManager conMgr, IRemoteConnection conn) {
+		this.conMgr = conMgr;
+		this.connection = conn;
+	}
+	
 	/**
 	 * Connect to the remote host. On every error or possible failure, an exception
 	 * (CoreException) is thrown, whose (multi)status describe the error(s) that prevented creating the target control.
@@ -124,6 +135,18 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 			setState(CONNECTING);
 			super.create(monitor);
 			setState(CONNECTED);
+			
+			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				public IRemoteConnection getConnection() {
+					return connection;
+				}
+	
+				public int getType() {
+					return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
+				}
+				
+			});
+			
 			monitor.worked(1);
 		} catch (CoreException e) {
 			disconnect();
@@ -141,6 +164,9 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#createTargetSocket(int)
+	 */
 	public TargetSocket createTargetSocket(int port) {
 		Assert.isTrue(isConnected());
 		TargetSocket socket = new TargetSocket();
@@ -149,6 +175,9 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		return socket;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#destroy()
+	 */
 	public void destroy() throws CoreException {
 		// End all jobs, if possible, then disconnect
 		try {
@@ -177,28 +206,54 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		return super.createRemoteExecutionManager();
 	}
 
+	/**
+	 * @return
+	 */
 	public String getName() {
 		return targetElement.getName();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#getPluginId()
+	 */
 	protected String getPluginId() {
 		return RemoteToolsAdapterCorePlugin.PLUGIN_ID;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.extension.ITargetVariables#getSystemWorkspace()
+	 */
 	public String getSystemWorkspace() {
 		return currentTargetConfig.getSystemWorkspace();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#kill(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public boolean kill(IProgressMonitor monitor) throws CoreException {
 		try {
 			setState(DISCONNECTING);
 			super.kill(monitor);
 		} finally {
 			setState(NOT_OPERATIONAL);
+			
+			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				public IRemoteConnection getConnection() {
+					return connection;
+				}
+	
+				public int getType() {
+					return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
+				}
+				
+			});	
 		}
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#query()
+	 */
 	public synchronized int query() {
 		switch (state) {
 		case NOT_OPERATIONAL:
@@ -217,15 +272,24 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#resume(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public boolean resume(IProgressMonitor monitor) throws CoreException {
 		throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
 				Messages.TargetControl_resume_CannotResume, null));
 	}
 	
+	/**
+	 * @param state
+	 */
 	private synchronized void setState(int state) {
 		this.state = state;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#stop(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public boolean stop(IProgressMonitor monitor) throws CoreException {
 		throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
 				Messages.TargetControl_stop_CannotPause, null));

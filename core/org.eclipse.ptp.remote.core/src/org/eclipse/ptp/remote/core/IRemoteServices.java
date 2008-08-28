@@ -28,6 +28,13 @@ public interface IRemoteServices extends IRemoteServicesDelegate {
 	public String getName();
 	
 	/**
+	 * Get the EFS scheme provided by this service.
+	 * 
+	 * @return display name
+	 */
+	public String getScheme();
+
+	/**
 	 * Get state of this service
 	 * 
 	 * @return true if initialized successfully

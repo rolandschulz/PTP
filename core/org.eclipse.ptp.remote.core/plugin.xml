@@ -7,7 +7,8 @@
       <remoteServices
             class="org.eclipse.ptp.remote.internal.core.LocalServicesFactory"
             id="org.eclipse.ptp.remote.LocalServices"
-            name="Local">
+            name="Local"
+            scheme="file">
       </remoteServices>
    </extension>
 
