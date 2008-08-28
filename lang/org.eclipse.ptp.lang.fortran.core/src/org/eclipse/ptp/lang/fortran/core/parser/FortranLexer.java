@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 FortranLexer.g 2008-04-20 16:05:48
+// $ANTLR 3.1 FortranLexer.g 2008-08-28 10:52:36
 
 /**
  * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
@@ -30,25 +30,29 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Stack;
 
+
+
 import org.antlr.runtime.*;
+import java.util.Stack;
+import java.util.List;
 import java.util.ArrayList;
 
 public class FortranLexer extends Lexer {
     public static final int T_COLON_COLON=24;
     public static final int T_ENDBLOCKDATA=172;
     public static final int T_ENDSUBROUTINE=183;
-    public static final int T_BIND=190;
     public static final int T_ENDFILE=176;
+    public static final int T_BIND=190;
     public static final int Special_Character=18;
     public static final int T_GREATERTHAN_EQ=30;
-    public static final int T_LABEL_DO_TERMINAL=193;
     public static final int T_FORALL=106;
+    public static final int T_LABEL_DO_TERMINAL=193;
     public static final int T_NON_OVERRIDABLE=126;
-    public static final int T_NONE=124;
     public static final int T_WRITE=169;
+    public static final int T_NONE=124;
     public static final int T_COMMON=80;
-    public static final int T_CYCLE=83;
     public static final int SQ_Rep_Char=6;
+    public static final int T_CYCLE=83;
     public static final int T_ASTERISK=22;
     public static final int Letter=16;
     public static final int T_UNFORMATTED=162;
@@ -76,38 +80,38 @@ public class FortranLexer extends Lexer {
     public static final int T_FORALL_CONSTRUCT_STMT=206;
     public static final int T_NE=46;
     public static final int T_ENDPROGRAM=181;
-    public static final int T_THEN=159;
     public static final int T_DIMENSION=187;
+    public static final int T_THEN=159;
     public static final int T_OPEN=130;
     public static final int T_ASSIGNMENT=69;
-    public static final int T_ABSTRACT=66;
     public static final int T_REAL=62;
-    public static final int T_STMT_FUNCTION=197;
+    public static final int T_ABSTRACT=66;
     public static final int T_FINAL=104;
+    public static final int T_STMT_FUNCTION=197;
     public static final int T_FORMAT=107;
     public static final int BINARY_CONSTANT=11;
     public static final int Digit=13;
     public static final int T_PRECISION=139;
     public static final int T_INTEGER=61;
     public static final int T_EXTENDS=101;
-    public static final int T_RETURN=149;
     public static final int T_TYPE=161;
+    public static final int T_RETURN=149;
     public static final int T_SELECT=152;
-    public static final int T_IDENT=210;
     public static final int T_GE=50;
-    public static final int T_PERIOD_EXPONENT=58;
+    public static final int T_IDENT=210;
     public static final int T_PARAMETER=134;
+    public static final int T_PERIOD_EXPONENT=58;
     public static final int MISC_CHAR=212;
-    public static final int T_INTENT=118;
     public static final int T_NOPASS=127;
+    public static final int T_INTENT=118;
     public static final int T_ENDASSOCIATE=170;
     public static final int T_INQUIRE_STMT_2=207;
     public static final int T_PRINT=138;
     public static final int T_FORMATTED=108;
-    public static final int T_EXTERNAL=102;
     public static final int T_IMPORT=115;
-    public static final int DQ_Rep_Char=7;
+    public static final int T_EXTERNAL=102;
     public static final int T_PRIVATE=140;
+    public static final int DQ_Rep_Char=7;
     public static final int T_DIGIT_STRING=10;
     public static final int T_PLUS=37;
     public static final int T_POWER=38;
@@ -118,10 +122,10 @@ public class FortranLexer extends Lexer {
     public static final int T_SLASH_SLASH=41;
     public static final int T_EQ_GT=28;
     public static final int T_LE=48;
-    public static final int T_GOTO=112;
     public static final int T_IN=116;
-    public static final int T_PERIOD=59;
+    public static final int T_GOTO=112;
     public static final int T_COLON=23;
+    public static final int T_PERIOD=59;
     public static final int T_ALLOCATE=68;
     public static final int T_TRUE=51;
     public static final int T_UNDERSCORE=44;
@@ -136,7 +140,6 @@ public class FortranLexer extends Lexer {
     public static final int T_DOUBLEPRECISION=90;
     public static final int T_DO=88;
     public static final int T_WHILE=168;
-    public static final int Tokens=213;
     public static final int T_ASSOCIATE=71;
     public static final int T_NEQV=57;
     public static final int T_LPAREN=34;
@@ -225,21 +228,21 @@ public class FortranLexer extends Lexer {
     public static final int HEX_CONSTANT=14;
     public static final int T_GENERIC=110;
     public static final int T_ENDDO=173;
-    public static final int Digit_String=9;
     public static final int T_READ=146;
+    public static final int Digit_String=9;
     public static final int T_NOT=53;
-    public static final int T_EQUALS=26;
     public static final int T_ENDIF=178;
+    public static final int T_EQUALS=26;
     public static final int T_WAIT=166;
     public static final int T_ENDBLOCK=171;
-    public static final int T_COMPLEX=63;
     public static final int T_ONLY=129;
+    public static final int T_COMPLEX=63;
     public static final int T_PROCEDURE=141;
     public static final int T_INTRINSIC=120;
     public static final int T_ELSEWHERE=95;
     public static final int T_ENDENUM=174;
-    public static final int T_PROGRAM=142;
     public static final int T_SAVE=151;
+    public static final int T_PROGRAM=142;
     public static final int EOF=-1;
     public static final int T_HOLLERITH=191;
     public static final int T_INTERFACE=119;
@@ -256,13 +259,13 @@ public class FortranLexer extends Lexer {
         protected StringBuilder whiteText = new StringBuilder();
 
         public Token emit() {
-            FortranToken t = new FortranToken(input, type, channel,
-                tokenStartCharIndex, getCharIndex()-1);
-            t.setLine(tokenStartLine);
-            t.setText(text);
-            t.setCharPositionInLine(tokenStartCharPositionInLine);
+            FortranToken t = new FortranToken(input, state.type, state.channel,
+                                          state.tokenStartCharIndex, getCharIndex()-1);
+            t.setLine(state.tokenStartLine);
+            t.setText(state.text);
+            t.setCharPositionInLine(state.tokenStartCharPositionInLine);
 
-            if(channel == HIDDEN) {
+            if (state.channel == HIDDEN) {
                 whiteText.append(getText());
             } else {
                 t.setWhiteText(whiteText.toString());
@@ -297,11 +300,11 @@ public class FortranLexer extends Lexer {
          * values are.  This is done when we switch streams for including files.
          */    
         private void resetLexerState() {
-            tokenStartCharIndex = input.index();
-            tokenStartCharPositionInLine = input.getCharPositionInLine();
-            tokenStartLine = input.getLine();
-            token = null;
-            text = null;
+            state.tokenStartCharIndex = input.index();
+            state.tokenStartCharPositionInLine = input.getCharPositionInLine();
+            state.tokenStartLine = input.getLine();
+            state.token = null;
+            state.text = null;
         }// end resetLexerState()
 
 
@@ -474,17 +477,26 @@ public class FortranLexer extends Lexer {
         }// end includeFile()
 
 
+
+    // delegates
+    // delegators
+
     public FortranLexer() {;} 
     public FortranLexer(CharStream input) {
-        super(input);
+        this(input, new RecognizerSharedState());
+    }
+    public FortranLexer(CharStream input, RecognizerSharedState state) {
+        super(input,state);
+
     }
     public String getGrammarFileName() { return "FortranLexer.g"; }
 
-    // $ANTLR start T_EOS
+    // $ANTLR start "T_EOS"
     public final void mT_EOS() throws RecognitionException {
         try {
             int _type = T_EOS;
-            // FortranLexer.g:306:7: ( ';' | ( '\\r' )? ( '\\n' ) )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:305:7: ( ';' | ( '\\r' )? ( '\\n' ) )
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -496,22 +508,22 @@ public class FortranLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("284:1: T_EOS : ( ';' | ( '\\r' )? ( '\\n' ) );", 2, 0, input);
+                    new NoViableAltException("", 2, 0, input);
 
                 throw nvae;
             }
             switch (alt2) {
                 case 1 :
-                    // FortranLexer.g:306:9: ';'
+                    // FortranLexer.g:305:9: ';'
                     {
                     match(';'); 
 
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:307:10: ( '\\r' )? ( '\\n' )
+                    // FortranLexer.g:306:10: ( '\\r' )? ( '\\n' )
                     {
-                    // FortranLexer.g:307:10: ( '\\r' )?
+                    // FortranLexer.g:306:10: ( '\\r' )?
                     int alt1=2;
                     int LA1_0 = input.LA(1);
 
@@ -520,7 +532,7 @@ public class FortranLexer extends Lexer {
                     }
                     switch (alt1) {
                         case 1 :
-                            // FortranLexer.g:307:11: '\\r'
+                            // FortranLexer.g:306:11: '\\r'
                             {
                             match('\r'); 
 
@@ -529,8 +541,8 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:307:18: ( '\\n' )
-                    // FortranLexer.g:307:19: '\\n'
+                    // FortranLexer.g:306:18: ( '\\n' )
+                    // FortranLexer.g:306:19: '\\n'
                     {
                     match('\n'); 
 
@@ -541,7 +553,8 @@ public class FortranLexer extends Lexer {
                     break;
 
             }
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
 
                 // if the previous token was a T_EOS, then the one we're 
                 // processing now is whitespace, so throw it away.
@@ -550,11 +563,11 @@ public class FortranLexer extends Lexer {
                 // we need to ignore it.  
                 if(prevToken == null || 
                     (prevToken != null && prevToken.getType() == T_EOS)) {
-                    channel=HIDDEN;
+                    _channel=HIDDEN;
                 } 
 
                 if(includeLine) {
-                    channel=HIDDEN;
+                    _channel=HIDDEN;
                     // Part of include file handling..
                     includeFile();
                     includeLine = false;
@@ -566,36 +579,39 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end T_EOS
+    // $ANTLR end "T_EOS"
 
-    // $ANTLR start CONTINUE_CHAR
+    // $ANTLR start "CONTINUE_CHAR"
     public final void mCONTINUE_CHAR() throws RecognitionException {
         try {
             int _type = CONTINUE_CHAR;
-            // FortranLexer.g:316:15: ( '&' )
-            // FortranLexer.g:316:17: '&'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:315:15: ( '&' )
+            // FortranLexer.g:315:17: '&'
             {
             match('&'); 
              continueFlag = !continueFlag;
             //                       _channel = 99;
-                                channel=HIDDEN;
-            //                     channel=99;
+                                _channel=HIDDEN;
+            //                     _channel=99;
                     
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end CONTINUE_CHAR
+    // $ANTLR end "CONTINUE_CHAR"
 
-    // $ANTLR start T_CHAR_CONSTANT
+    // $ANTLR start "T_CHAR_CONSTANT"
     public final void mT_CHAR_CONSTANT() throws RecognitionException {
         try {
             int _type = T_CHAR_CONSTANT;
-            // FortranLexer.g:326:9: ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:325:9: ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ )
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -607,15 +623,15 @@ public class FortranLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("325:1: T_CHAR_CONSTANT : ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ );", 7, 0, input);
+                    new NoViableAltException("", 7, 0, input);
 
                 throw nvae;
             }
             switch (alt7) {
                 case 1 :
-                    // FortranLexer.g:326:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
+                    // FortranLexer.g:325:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
                     {
-                    // FortranLexer.g:326:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
+                    // FortranLexer.g:325:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -629,10 +645,10 @@ public class FortranLexer extends Lexer {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // FortranLexer.g:326:12: '\\'' ( SQ_Rep_Char )* '\\''
+                    	    // FortranLexer.g:325:12: '\\'' ( SQ_Rep_Char )* '\\''
                     	    {
                     	    match('\''); 
-                    	    // FortranLexer.g:326:17: ( SQ_Rep_Char )*
+                    	    // FortranLexer.g:325:17: ( SQ_Rep_Char )*
                     	    loop3:
                     	    do {
                     	        int alt3=2;
@@ -645,7 +661,7 @@ public class FortranLexer extends Lexer {
 
                     	        switch (alt3) {
                     	    	case 1 :
-                    	    	    // FortranLexer.g:326:19: SQ_Rep_Char
+                    	    	    // FortranLexer.g:325:19: SQ_Rep_Char
                     	    	    {
                     	    	    mSQ_Rep_Char(); 
 
@@ -674,16 +690,16 @@ public class FortranLexer extends Lexer {
                      
                                 if(includeLine) 
                     //                 _channel=99;
-                                    channel=HIDDEN;
-                    //             channel=99;
+                                    _channel=HIDDEN;
+                    //             _channel=99;
                             
 
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:332:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
+                    // FortranLexer.g:331:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
                     {
-                    // FortranLexer.g:332:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
+                    // FortranLexer.g:331:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
                     int cnt6=0;
                     loop6:
                     do {
@@ -697,10 +713,10 @@ public class FortranLexer extends Lexer {
 
                         switch (alt6) {
                     	case 1 :
-                    	    // FortranLexer.g:332:12: '\\\"' ( DQ_Rep_Char )* '\\\"'
+                    	    // FortranLexer.g:331:12: '\\\"' ( DQ_Rep_Char )* '\\\"'
                     	    {
                     	    match('\"'); 
-                    	    // FortranLexer.g:332:17: ( DQ_Rep_Char )*
+                    	    // FortranLexer.g:331:17: ( DQ_Rep_Char )*
                     	    loop5:
                     	    do {
                     	        int alt5=2;
@@ -713,7 +729,7 @@ public class FortranLexer extends Lexer {
 
                     	        switch (alt5) {
                     	    	case 1 :
-                    	    	    // FortranLexer.g:332:19: DQ_Rep_Char
+                    	    	    // FortranLexer.g:331:19: DQ_Rep_Char
                     	    	    {
                     	    	    mDQ_Rep_Char(); 
 
@@ -742,44 +758,48 @@ public class FortranLexer extends Lexer {
                      
                                 if(includeLine) 
                     //                _channel=99;
-                                    channel=HIDDEN;
-                    //             channel=99;
+                                    _channel=HIDDEN;
+                    //             _channel=99;
                             
 
                     }
                     break;
 
             }
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CHAR_CONSTANT
+    // $ANTLR end "T_CHAR_CONSTANT"
 
-    // $ANTLR start T_DIGIT_STRING
+    // $ANTLR start "T_DIGIT_STRING"
     public final void mT_DIGIT_STRING() throws RecognitionException {
         try {
             int _type = T_DIGIT_STRING;
-            // FortranLexer.g:341:2: ( Digit_String )
-            // FortranLexer.g:341:4: Digit_String
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:340:9: ( Digit_String )
+            // FortranLexer.g:340:17: Digit_String
             {
             mDigit_String(); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DIGIT_STRING
+    // $ANTLR end "T_DIGIT_STRING"
 
-    // $ANTLR start BINARY_CONSTANT
+    // $ANTLR start "BINARY_CONSTANT"
     public final void mBINARY_CONSTANT() throws RecognitionException {
         try {
             int _type = BINARY_CONSTANT;
-            // FortranLexer.g:346:5: ( ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\'' | ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"' )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:345:5: ( ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\'' | ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"' )
             int alt10=2;
             int LA10_0 = input.LA(1);
 
@@ -794,33 +814,32 @@ public class FortranLexer extends Lexer {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("345:1: BINARY_CONSTANT : ( ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\'' | ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"' );", 10, 1, input);
+                        new NoViableAltException("", 10, 1, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("345:1: BINARY_CONSTANT : ( ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\'' | ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"' );", 10, 0, input);
+                    new NoViableAltException("", 10, 0, input);
 
                 throw nvae;
             }
             switch (alt10) {
                 case 1 :
-                    // FortranLexer.g:346:7: ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\''
+                    // FortranLexer.g:345:7: ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\''
                     {
                     if ( input.LA(1)=='B'||input.LA(1)=='b' ) {
                         input.consume();
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     match('\''); 
-                    // FortranLexer.g:346:22: ( '0' .. '1' )+
+                    // FortranLexer.g:345:22: ( '0' .. '1' )+
                     int cnt8=0;
                     loop8:
                     do {
@@ -834,7 +853,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt8) {
                     	case 1 :
-                    	    // FortranLexer.g:346:23: '0' .. '1'
+                    	    // FortranLexer.g:345:23: '0' .. '1'
                     	    {
                     	    matchRange('0','1'); 
 
@@ -855,20 +874,19 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:347:7: ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"'
+                    // FortranLexer.g:346:7: ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"'
                     {
                     if ( input.LA(1)=='B'||input.LA(1)=='b' ) {
                         input.consume();
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     match('\"'); 
-                    // FortranLexer.g:347:22: ( '0' .. '1' )+
+                    // FortranLexer.g:346:22: ( '0' .. '1' )+
                     int cnt9=0;
                     loop9:
                     do {
@@ -882,7 +900,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // FortranLexer.g:347:23: '0' .. '1'
+                    	    // FortranLexer.g:346:23: '0' .. '1'
                     	    {
                     	    matchRange('0','1'); 
 
@@ -904,59 +922,60 @@ public class FortranLexer extends Lexer {
                     break;
 
             }
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end BINARY_CONSTANT
+    // $ANTLR end "BINARY_CONSTANT"
 
-    // $ANTLR start OCTAL_CONSTANT
+    // $ANTLR start "OCTAL_CONSTANT"
     public final void mOCTAL_CONSTANT() throws RecognitionException {
         try {
             int _type = OCTAL_CONSTANT;
-            // FortranLexer.g:352:5: ( ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\'' | ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"' )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:351:5: ( ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\'' | ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"' )
             int alt13=2;
             int LA13_0 = input.LA(1);
 
             if ( (LA13_0=='O'||LA13_0=='o') ) {
                 int LA13_1 = input.LA(2);
 
-                if ( (LA13_1=='\"') ) {
-                    alt13=2;
-                }
-                else if ( (LA13_1=='\'') ) {
+                if ( (LA13_1=='\'') ) {
                     alt13=1;
+                }
+                else if ( (LA13_1=='\"') ) {
+                    alt13=2;
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("351:1: OCTAL_CONSTANT : ( ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\'' | ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"' );", 13, 1, input);
+                        new NoViableAltException("", 13, 1, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("351:1: OCTAL_CONSTANT : ( ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\'' | ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"' );", 13, 0, input);
+                    new NoViableAltException("", 13, 0, input);
 
                 throw nvae;
             }
             switch (alt13) {
                 case 1 :
-                    // FortranLexer.g:352:7: ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\''
+                    // FortranLexer.g:351:7: ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\''
                     {
                     if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
                         input.consume();
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     match('\''); 
-                    // FortranLexer.g:352:22: ( '0' .. '7' )+
+                    // FortranLexer.g:351:22: ( '0' .. '7' )+
                     int cnt11=0;
                     loop11:
                     do {
@@ -970,7 +989,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // FortranLexer.g:352:23: '0' .. '7'
+                    	    // FortranLexer.g:351:23: '0' .. '7'
                     	    {
                     	    matchRange('0','7'); 
 
@@ -991,20 +1010,19 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:353:7: ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"'
+                    // FortranLexer.g:352:7: ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"'
                     {
                     if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
                         input.consume();
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     match('\"'); 
-                    // FortranLexer.g:353:22: ( '0' .. '7' )+
+                    // FortranLexer.g:352:22: ( '0' .. '7' )+
                     int cnt12=0;
                     loop12:
                     do {
@@ -1018,7 +1036,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt12) {
                     	case 1 :
-                    	    // FortranLexer.g:353:23: '0' .. '7'
+                    	    // FortranLexer.g:352:23: '0' .. '7'
                     	    {
                     	    matchRange('0','7'); 
 
@@ -1040,18 +1058,20 @@ public class FortranLexer extends Lexer {
                     break;
 
             }
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end OCTAL_CONSTANT
+    // $ANTLR end "OCTAL_CONSTANT"
 
-    // $ANTLR start HEX_CONSTANT
+    // $ANTLR start "HEX_CONSTANT"
     public final void mHEX_CONSTANT() throws RecognitionException {
         try {
             int _type = HEX_CONSTANT;
-            // FortranLexer.g:358:5: ( ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:357:5: ( ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' )
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -1066,33 +1086,32 @@ public class FortranLexer extends Lexer {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("357:1: HEX_CONSTANT : ( ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' );", 16, 1, input);
+                        new NoViableAltException("", 16, 1, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("357:1: HEX_CONSTANT : ( ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' );", 16, 0, input);
+                    new NoViableAltException("", 16, 0, input);
 
                 throw nvae;
             }
             switch (alt16) {
                 case 1 :
-                    // FortranLexer.g:358:7: ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\''
+                    // FortranLexer.g:357:7: ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\''
                     {
                     if ( input.LA(1)=='Z'||input.LA(1)=='z' ) {
                         input.consume();
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     match('\''); 
-                    // FortranLexer.g:358:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
+                    // FortranLexer.g:357:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
                     int cnt14=0;
                     loop14:
                     do {
@@ -1113,10 +1132,9 @@ public class FortranLexer extends Lexer {
 
                     	    }
                     	    else {
-                    	        MismatchedSetException mse =
-                    	            new MismatchedSetException(null,input);
-                    	        recover(mse);    throw mse;
-                    	    }
+                    	        MismatchedSetException mse = new MismatchedSetException(null,input);
+                    	        recover(mse);
+                    	        throw mse;}
 
 
                     	    }
@@ -1136,20 +1154,19 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:359:7: ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"'
+                    // FortranLexer.g:358:7: ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"'
                     {
                     if ( input.LA(1)=='Z'||input.LA(1)=='z' ) {
                         input.consume();
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     match('\"'); 
-                    // FortranLexer.g:359:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
+                    // FortranLexer.g:358:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
                     int cnt15=0;
                     loop15:
                     do {
@@ -1170,10 +1187,9 @@ public class FortranLexer extends Lexer {
 
                     	    }
                     	    else {
-                    	        MismatchedSetException mse =
-                    	            new MismatchedSetException(null,input);
-                    	        recover(mse);    throw mse;
-                    	    }
+                    	        MismatchedSetException mse = new MismatchedSetException(null,input);
+                    	        recover(mse);
+                    	        throw mse;}
 
 
                     	    }
@@ -1194,52 +1210,54 @@ public class FortranLexer extends Lexer {
                     break;
 
             }
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end HEX_CONSTANT
+    // $ANTLR end "HEX_CONSTANT"
 
-    // $ANTLR start WS
+    // $ANTLR start "WS"
     public final void mWS() throws RecognitionException {
         try {
             int _type = WS;
-            // FortranLexer.g:363:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' ) )
-            // FortranLexer.g:363:8: ( ' ' | '\\r' | '\\t' | '\\u000C' )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:362:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' ) )
+            // FortranLexer.g:362:8: ( ' ' | '\\r' | '\\t' | '\\u000C' )
             {
             if ( input.LA(1)=='\t'||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
             // _channel=99;
-                        channel=HIDDEN;
-            //             channel=99;
+                        _channel=HIDDEN;
+            //             _channel=99;
             //             _channel=99;
                     
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end WS
+    // $ANTLR end "WS"
 
-    // $ANTLR start Digit_String
+    // $ANTLR start "Digit_String"
     public final void mDigit_String() throws RecognitionException {
         try {
-            // FortranLexer.g:376:14: ( ( Digit )+ )
-            // FortranLexer.g:376:16: ( Digit )+
+            // FortranLexer.g:375:14: ( ( Digit )+ )
+            // FortranLexer.g:375:16: ( Digit )+
             {
-            // FortranLexer.g:376:16: ( Digit )+
+            // FortranLexer.g:375:16: ( Digit )+
             int cnt17=0;
             loop17:
             do {
@@ -1253,7 +1271,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt17) {
             	case 1 :
-            	    // FortranLexer.g:376:16: Digit
+            	    // FortranLexer.g:375:16: Digit
             	    {
             	    mDigit(); 
 
@@ -1276,12 +1294,12 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end Digit_String
+    // $ANTLR end "Digit_String"
 
-    // $ANTLR start Alphanumeric_Character
+    // $ANTLR start "Alphanumeric_Character"
     public final void mAlphanumeric_Character() throws RecognitionException {
         try {
-            // FortranLexer.g:381:24: ( Letter | Digit | '_' )
+            // FortranLexer.g:380:24: ( Letter | Digit | '_' )
             // FortranLexer.g:
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
@@ -1289,10 +1307,9 @@ public class FortranLexer extends Lexer {
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
@@ -1301,12 +1318,12 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end Alphanumeric_Character
+    // $ANTLR end "Alphanumeric_Character"
 
-    // $ANTLR start Special_Character
+    // $ANTLR start "Special_Character"
     public final void mSpecial_Character() throws RecognitionException {
         try {
-            // FortranLexer.g:385:5: ( ' ' .. '/' | ':' .. '@' | '[' .. '^' | '`' | '{' .. '~' )
+            // FortranLexer.g:384:5: ( ' ' .. '/' | ':' .. '@' | '[' .. '^' | '`' | '{' .. '~' )
             // FortranLexer.g:
             {
             if ( (input.LA(1)>=' ' && input.LA(1)<='/')||(input.LA(1)>=':' && input.LA(1)<='@')||(input.LA(1)>='[' && input.LA(1)<='^')||input.LA(1)=='`'||(input.LA(1)>='{' && input.LA(1)<='~') ) {
@@ -1314,10 +1331,9 @@ public class FortranLexer extends Lexer {
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
@@ -1326,23 +1342,22 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end Special_Character
+    // $ANTLR end "Special_Character"
 
-    // $ANTLR start Rep_Char
+    // $ANTLR start "Rep_Char"
     public final void mRep_Char() throws RecognitionException {
         try {
-            // FortranLexer.g:393:10: (~ ( '\\'' | '\\\"' ) )
-            // FortranLexer.g:393:12: ~ ( '\\'' | '\\\"' )
+            // FortranLexer.g:392:10: (~ ( '\\'' | '\\\"' ) )
+            // FortranLexer.g:392:12: ~ ( '\\'' | '\\\"' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
@@ -1351,23 +1366,22 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end Rep_Char
+    // $ANTLR end "Rep_Char"
 
-    // $ANTLR start SQ_Rep_Char
+    // $ANTLR start "SQ_Rep_Char"
     public final void mSQ_Rep_Char() throws RecognitionException {
         try {
-            // FortranLexer.g:396:13: (~ ( '\\'' ) )
-            // FortranLexer.g:396:15: ~ ( '\\'' )
+            // FortranLexer.g:395:13: (~ ( '\\'' ) )
+            // FortranLexer.g:395:15: ~ ( '\\'' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
@@ -1376,23 +1390,22 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end SQ_Rep_Char
+    // $ANTLR end "SQ_Rep_Char"
 
-    // $ANTLR start DQ_Rep_Char
+    // $ANTLR start "DQ_Rep_Char"
     public final void mDQ_Rep_Char() throws RecognitionException {
         try {
-            // FortranLexer.g:398:13: (~ ( '\\\"' ) )
-            // FortranLexer.g:398:15: ~ ( '\\\"' )
+            // FortranLexer.g:397:13: (~ ( '\\\"' ) )
+            // FortranLexer.g:397:15: ~ ( '\\\"' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
@@ -1401,23 +1414,22 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end DQ_Rep_Char
+    // $ANTLR end "DQ_Rep_Char"
 
-    // $ANTLR start Letter
+    // $ANTLR start "Letter"
     public final void mLetter() throws RecognitionException {
         try {
-            // FortranLexer.g:401:8: ( ( 'a' .. 'z' | 'A' .. 'Z' ) )
-            // FortranLexer.g:401:10: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // FortranLexer.g:400:8: ( ( 'a' .. 'z' | 'A' .. 'Z' ) )
+            // FortranLexer.g:400:10: ( 'a' .. 'z' | 'A' .. 'Z' )
             {
             if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
@@ -1426,13 +1438,13 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end Letter
+    // $ANTLR end "Letter"
 
-    // $ANTLR start Digit
+    // $ANTLR start "Digit"
     public final void mDigit() throws RecognitionException {
         try {
-            // FortranLexer.g:404:7: ( '0' .. '9' )
-            // FortranLexer.g:404:9: '0' .. '9'
+            // FortranLexer.g:403:7: ( '0' .. '9' )
+            // FortranLexer.g:403:9: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -1442,17 +1454,18 @@ public class FortranLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end Digit
+    // $ANTLR end "Digit"
 
-    // $ANTLR start PREPROCESS_LINE
+    // $ANTLR start "PREPROCESS_LINE"
     public final void mPREPROCESS_LINE() throws RecognitionException {
         try {
             int _type = PREPROCESS_LINE;
-            // FortranLexer.g:406:17: ( '#' (~ ( '\\n' | '\\r' ) )* )
-            // FortranLexer.g:406:19: '#' (~ ( '\\n' | '\\r' ) )*
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:405:17: ( '#' (~ ( '\\n' | '\\r' ) )* )
+            // FortranLexer.g:405:19: '#' (~ ( '\\n' | '\\r' ) )*
             {
             match('#'); 
-            // FortranLexer.g:406:23: (~ ( '\\n' | '\\r' ) )*
+            // FortranLexer.g:405:23: (~ ( '\\n' | '\\r' ) )*
             loop18:
             do {
                 int alt18=2;
@@ -1465,17 +1478,16 @@ public class FortranLexer extends Lexer {
 
                 switch (alt18) {
             	case 1 :
-            	    // FortranLexer.g:406:23: ~ ( '\\n' | '\\r' )
+            	    // FortranLexer.g:405:23: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
 
             	    }
             	    else {
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
 
 
             	    }
@@ -1487,724 +1499,800 @@ public class FortranLexer extends Lexer {
             } while (true);
 
              // _channel=99;
-                        channel=HIDDEN;
-            //             channel=99;
+                        _channel=HIDDEN;
+            //             _channel=99;
                     
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end PREPROCESS_LINE
+    // $ANTLR end "PREPROCESS_LINE"
 
-    // $ANTLR start T_INCLUDE
+    // $ANTLR start "T_INCLUDE"
     public final void mT_INCLUDE() throws RecognitionException {
         try {
             int _type = T_INCLUDE;
-            // FortranLexer.g:412:16: ( 'INCLUDE' )
-            // FortranLexer.g:412:18: 'INCLUDE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:411:16: ( 'INCLUDE' )
+            // FortranLexer.g:411:18: 'INCLUDE'
             {
             match("INCLUDE"); 
 
              includeLine = true; // _channel=99;
-                        channel=HIDDEN;
-            //             channel=99;
+                        _channel=HIDDEN;
+            //             _channel=99;
                     
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INCLUDE
+    // $ANTLR end "T_INCLUDE"
 
-    // $ANTLR start T_ASTERISK
+    // $ANTLR start "T_ASTERISK"
     public final void mT_ASTERISK() throws RecognitionException {
         try {
             int _type = T_ASTERISK;
-            // FortranLexer.g:422:17: ( '*' )
-            // FortranLexer.g:422:19: '*'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:421:17: ( '*' )
+            // FortranLexer.g:421:19: '*'
             {
             match('*'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ASTERISK
+    // $ANTLR end "T_ASTERISK"
 
-    // $ANTLR start T_COLON
+    // $ANTLR start "T_COLON"
     public final void mT_COLON() throws RecognitionException {
         try {
             int _type = T_COLON;
-            // FortranLexer.g:423:17: ( ':' )
-            // FortranLexer.g:423:19: ':'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:422:17: ( ':' )
+            // FortranLexer.g:422:19: ':'
             {
             match(':'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_COLON
+    // $ANTLR end "T_COLON"
 
-    // $ANTLR start T_COLON_COLON
+    // $ANTLR start "T_COLON_COLON"
     public final void mT_COLON_COLON() throws RecognitionException {
         try {
             int _type = T_COLON_COLON;
-            // FortranLexer.g:424:17: ( '::' )
-            // FortranLexer.g:424:19: '::'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:423:17: ( '::' )
+            // FortranLexer.g:423:19: '::'
             {
             match("::"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_COLON_COLON
+    // $ANTLR end "T_COLON_COLON"
 
-    // $ANTLR start T_COMMA
+    // $ANTLR start "T_COMMA"
     public final void mT_COMMA() throws RecognitionException {
         try {
             int _type = T_COMMA;
-            // FortranLexer.g:425:17: ( ',' )
-            // FortranLexer.g:425:19: ','
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:424:17: ( ',' )
+            // FortranLexer.g:424:19: ','
             {
             match(','); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_COMMA
+    // $ANTLR end "T_COMMA"
 
-    // $ANTLR start T_EQUALS
+    // $ANTLR start "T_EQUALS"
     public final void mT_EQUALS() throws RecognitionException {
         try {
             int _type = T_EQUALS;
-            // FortranLexer.g:426:17: ( '=' )
-            // FortranLexer.g:426:19: '='
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:425:17: ( '=' )
+            // FortranLexer.g:425:19: '='
             {
             match('='); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EQUALS
+    // $ANTLR end "T_EQUALS"
 
-    // $ANTLR start T_EQ_EQ
+    // $ANTLR start "T_EQ_EQ"
     public final void mT_EQ_EQ() throws RecognitionException {
         try {
             int _type = T_EQ_EQ;
-            // FortranLexer.g:427:17: ( '==' )
-            // FortranLexer.g:427:19: '=='
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:426:17: ( '==' )
+            // FortranLexer.g:426:19: '=='
             {
             match("=="); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EQ_EQ
+    // $ANTLR end "T_EQ_EQ"
 
-    // $ANTLR start T_EQ_GT
+    // $ANTLR start "T_EQ_GT"
     public final void mT_EQ_GT() throws RecognitionException {
         try {
             int _type = T_EQ_GT;
-            // FortranLexer.g:428:17: ( '=>' )
-            // FortranLexer.g:428:19: '=>'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:427:17: ( '=>' )
+            // FortranLexer.g:427:19: '=>'
             {
             match("=>"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EQ_GT
+    // $ANTLR end "T_EQ_GT"
 
-    // $ANTLR start T_GREATERTHAN
+    // $ANTLR start "T_GREATERTHAN"
     public final void mT_GREATERTHAN() throws RecognitionException {
         try {
             int _type = T_GREATERTHAN;
-            // FortranLexer.g:429:17: ( '>' )
-            // FortranLexer.g:429:19: '>'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:428:17: ( '>' )
+            // FortranLexer.g:428:19: '>'
             {
             match('>'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GREATERTHAN
+    // $ANTLR end "T_GREATERTHAN"
 
-    // $ANTLR start T_GREATERTHAN_EQ
+    // $ANTLR start "T_GREATERTHAN_EQ"
     public final void mT_GREATERTHAN_EQ() throws RecognitionException {
         try {
             int _type = T_GREATERTHAN_EQ;
-            // FortranLexer.g:430:17: ( '>=' )
-            // FortranLexer.g:430:19: '>='
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:429:17: ( '>=' )
+            // FortranLexer.g:429:19: '>='
             {
             match(">="); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GREATERTHAN_EQ
+    // $ANTLR end "T_GREATERTHAN_EQ"
 
-    // $ANTLR start T_LESSTHAN
+    // $ANTLR start "T_LESSTHAN"
     public final void mT_LESSTHAN() throws RecognitionException {
         try {
             int _type = T_LESSTHAN;
-            // FortranLexer.g:431:17: ( '<' )
-            // FortranLexer.g:431:19: '<'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:430:17: ( '<' )
+            // FortranLexer.g:430:19: '<'
             {
             match('<'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LESSTHAN
+    // $ANTLR end "T_LESSTHAN"
 
-    // $ANTLR start T_LESSTHAN_EQ
+    // $ANTLR start "T_LESSTHAN_EQ"
     public final void mT_LESSTHAN_EQ() throws RecognitionException {
         try {
             int _type = T_LESSTHAN_EQ;
-            // FortranLexer.g:432:17: ( '<=' )
-            // FortranLexer.g:432:19: '<='
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:431:17: ( '<=' )
+            // FortranLexer.g:431:19: '<='
             {
             match("<="); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LESSTHAN_EQ
+    // $ANTLR end "T_LESSTHAN_EQ"
 
-    // $ANTLR start T_LBRACKET
+    // $ANTLR start "T_LBRACKET"
     public final void mT_LBRACKET() throws RecognitionException {
         try {
             int _type = T_LBRACKET;
-            // FortranLexer.g:433:17: ( '[' )
-            // FortranLexer.g:433:19: '['
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:432:17: ( '[' )
+            // FortranLexer.g:432:19: '['
             {
             match('['); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LBRACKET
+    // $ANTLR end "T_LBRACKET"
 
-    // $ANTLR start T_LPAREN
+    // $ANTLR start "T_LPAREN"
     public final void mT_LPAREN() throws RecognitionException {
         try {
             int _type = T_LPAREN;
-            // FortranLexer.g:434:17: ( '(' )
-            // FortranLexer.g:434:19: '('
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:433:17: ( '(' )
+            // FortranLexer.g:433:19: '('
             {
             match('('); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LPAREN
+    // $ANTLR end "T_LPAREN"
 
-    // $ANTLR start T_MINUS
+    // $ANTLR start "T_MINUS"
     public final void mT_MINUS() throws RecognitionException {
         try {
             int _type = T_MINUS;
-            // FortranLexer.g:435:17: ( '-' )
-            // FortranLexer.g:435:19: '-'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:434:17: ( '-' )
+            // FortranLexer.g:434:19: '-'
             {
             match('-'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_MINUS
+    // $ANTLR end "T_MINUS"
 
-    // $ANTLR start T_PERCENT
+    // $ANTLR start "T_PERCENT"
     public final void mT_PERCENT() throws RecognitionException {
         try {
             int _type = T_PERCENT;
-            // FortranLexer.g:436:17: ( '%' )
-            // FortranLexer.g:436:19: '%'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:435:17: ( '%' )
+            // FortranLexer.g:435:19: '%'
             {
             match('%'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PERCENT
+    // $ANTLR end "T_PERCENT"
 
-    // $ANTLR start T_PLUS
+    // $ANTLR start "T_PLUS"
     public final void mT_PLUS() throws RecognitionException {
         try {
             int _type = T_PLUS;
-            // FortranLexer.g:437:17: ( '+' )
-            // FortranLexer.g:437:19: '+'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:436:17: ( '+' )
+            // FortranLexer.g:436:19: '+'
             {
             match('+'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PLUS
+    // $ANTLR end "T_PLUS"
 
-    // $ANTLR start T_POWER
+    // $ANTLR start "T_POWER"
     public final void mT_POWER() throws RecognitionException {
         try {
             int _type = T_POWER;
-            // FortranLexer.g:438:17: ( '**' )
-            // FortranLexer.g:438:19: '**'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:437:17: ( '**' )
+            // FortranLexer.g:437:19: '**'
             {
             match("**"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_POWER
+    // $ANTLR end "T_POWER"
 
-    // $ANTLR start T_SLASH
+    // $ANTLR start "T_SLASH"
     public final void mT_SLASH() throws RecognitionException {
         try {
             int _type = T_SLASH;
-            // FortranLexer.g:439:17: ( '/' )
-            // FortranLexer.g:439:19: '/'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:438:17: ( '/' )
+            // FortranLexer.g:438:19: '/'
             {
             match('/'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SLASH
+    // $ANTLR end "T_SLASH"
 
-    // $ANTLR start T_SLASH_EQ
+    // $ANTLR start "T_SLASH_EQ"
     public final void mT_SLASH_EQ() throws RecognitionException {
         try {
             int _type = T_SLASH_EQ;
-            // FortranLexer.g:440:17: ( '/=' )
-            // FortranLexer.g:440:19: '/='
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:439:17: ( '/=' )
+            // FortranLexer.g:439:19: '/='
             {
             match("/="); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SLASH_EQ
+    // $ANTLR end "T_SLASH_EQ"
 
-    // $ANTLR start T_SLASH_SLASH
+    // $ANTLR start "T_SLASH_SLASH"
     public final void mT_SLASH_SLASH() throws RecognitionException {
         try {
             int _type = T_SLASH_SLASH;
-            // FortranLexer.g:441:17: ( '//' )
-            // FortranLexer.g:441:19: '//'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:440:17: ( '//' )
+            // FortranLexer.g:440:19: '//'
             {
             match("//"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SLASH_SLASH
+    // $ANTLR end "T_SLASH_SLASH"
 
-    // $ANTLR start T_RBRACKET
+    // $ANTLR start "T_RBRACKET"
     public final void mT_RBRACKET() throws RecognitionException {
         try {
             int _type = T_RBRACKET;
-            // FortranLexer.g:442:17: ( ']' )
-            // FortranLexer.g:442:19: ']'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:441:17: ( ']' )
+            // FortranLexer.g:441:19: ']'
             {
             match(']'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_RBRACKET
+    // $ANTLR end "T_RBRACKET"
 
-    // $ANTLR start T_RPAREN
+    // $ANTLR start "T_RPAREN"
     public final void mT_RPAREN() throws RecognitionException {
         try {
             int _type = T_RPAREN;
-            // FortranLexer.g:443:17: ( ')' )
-            // FortranLexer.g:443:19: ')'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:442:17: ( ')' )
+            // FortranLexer.g:442:19: ')'
             {
             match(')'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_RPAREN
+    // $ANTLR end "T_RPAREN"
 
-    // $ANTLR start T_UNDERSCORE
+    // $ANTLR start "T_UNDERSCORE"
     public final void mT_UNDERSCORE() throws RecognitionException {
         try {
             int _type = T_UNDERSCORE;
-            // FortranLexer.g:444:17: ( '_' )
-            // FortranLexer.g:444:19: '_'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:443:17: ( '_' )
+            // FortranLexer.g:443:19: '_'
             {
             match('_'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_UNDERSCORE
+    // $ANTLR end "T_UNDERSCORE"
 
-    // $ANTLR start T_EQ
+    // $ANTLR start "T_EQ"
     public final void mT_EQ() throws RecognitionException {
         try {
             int _type = T_EQ;
-            // FortranLexer.g:446:17: ( '.EQ.' )
-            // FortranLexer.g:446:19: '.EQ.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:445:17: ( '.EQ.' )
+            // FortranLexer.g:445:19: '.EQ.'
             {
             match(".EQ."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EQ
+    // $ANTLR end "T_EQ"
 
-    // $ANTLR start T_NE
+    // $ANTLR start "T_NE"
     public final void mT_NE() throws RecognitionException {
         try {
             int _type = T_NE;
-            // FortranLexer.g:447:17: ( '.NE.' )
-            // FortranLexer.g:447:19: '.NE.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:446:17: ( '.NE.' )
+            // FortranLexer.g:446:19: '.NE.'
             {
             match(".NE."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NE
+    // $ANTLR end "T_NE"
 
-    // $ANTLR start T_LT
+    // $ANTLR start "T_LT"
     public final void mT_LT() throws RecognitionException {
         try {
             int _type = T_LT;
-            // FortranLexer.g:448:17: ( '.LT.' )
-            // FortranLexer.g:448:19: '.LT.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:447:17: ( '.LT.' )
+            // FortranLexer.g:447:19: '.LT.'
             {
             match(".LT."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LT
+    // $ANTLR end "T_LT"
 
-    // $ANTLR start T_LE
+    // $ANTLR start "T_LE"
     public final void mT_LE() throws RecognitionException {
         try {
             int _type = T_LE;
-            // FortranLexer.g:449:17: ( '.LE.' )
-            // FortranLexer.g:449:19: '.LE.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:448:17: ( '.LE.' )
+            // FortranLexer.g:448:19: '.LE.'
             {
             match(".LE."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LE
+    // $ANTLR end "T_LE"
 
-    // $ANTLR start T_GT
+    // $ANTLR start "T_GT"
     public final void mT_GT() throws RecognitionException {
         try {
             int _type = T_GT;
-            // FortranLexer.g:450:17: ( '.GT.' )
-            // FortranLexer.g:450:19: '.GT.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:449:17: ( '.GT.' )
+            // FortranLexer.g:449:19: '.GT.'
             {
             match(".GT."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GT
+    // $ANTLR end "T_GT"
 
-    // $ANTLR start T_GE
+    // $ANTLR start "T_GE"
     public final void mT_GE() throws RecognitionException {
         try {
             int _type = T_GE;
-            // FortranLexer.g:451:17: ( '.GE.' )
-            // FortranLexer.g:451:19: '.GE.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:450:17: ( '.GE.' )
+            // FortranLexer.g:450:19: '.GE.'
             {
             match(".GE."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GE
+    // $ANTLR end "T_GE"
 
-    // $ANTLR start T_TRUE
+    // $ANTLR start "T_TRUE"
     public final void mT_TRUE() throws RecognitionException {
         try {
             int _type = T_TRUE;
-            // FortranLexer.g:453:17: ( '.TRUE.' )
-            // FortranLexer.g:453:19: '.TRUE.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:452:17: ( '.TRUE.' )
+            // FortranLexer.g:452:19: '.TRUE.'
             {
             match(".TRUE."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_TRUE
+    // $ANTLR end "T_TRUE"
 
-    // $ANTLR start T_FALSE
+    // $ANTLR start "T_FALSE"
     public final void mT_FALSE() throws RecognitionException {
         try {
             int _type = T_FALSE;
-            // FortranLexer.g:454:17: ( '.FALSE.' )
-            // FortranLexer.g:454:19: '.FALSE.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:453:17: ( '.FALSE.' )
+            // FortranLexer.g:453:19: '.FALSE.'
             {
             match(".FALSE."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FALSE
+    // $ANTLR end "T_FALSE"
 
-    // $ANTLR start T_NOT
+    // $ANTLR start "T_NOT"
     public final void mT_NOT() throws RecognitionException {
         try {
             int _type = T_NOT;
-            // FortranLexer.g:456:17: ( '.NOT.' )
-            // FortranLexer.g:456:19: '.NOT.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:455:17: ( '.NOT.' )
+            // FortranLexer.g:455:19: '.NOT.'
             {
             match(".NOT."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NOT
+    // $ANTLR end "T_NOT"
 
-    // $ANTLR start T_AND
+    // $ANTLR start "T_AND"
     public final void mT_AND() throws RecognitionException {
         try {
             int _type = T_AND;
-            // FortranLexer.g:457:17: ( '.AND.' )
-            // FortranLexer.g:457:19: '.AND.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:456:17: ( '.AND.' )
+            // FortranLexer.g:456:19: '.AND.'
             {
             match(".AND."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_AND
+    // $ANTLR end "T_AND"
 
-    // $ANTLR start T_OR
+    // $ANTLR start "T_OR"
     public final void mT_OR() throws RecognitionException {
         try {
             int _type = T_OR;
-            // FortranLexer.g:458:17: ( '.OR.' )
-            // FortranLexer.g:458:19: '.OR.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:457:17: ( '.OR.' )
+            // FortranLexer.g:457:19: '.OR.'
             {
             match(".OR."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_OR
+    // $ANTLR end "T_OR"
 
-    // $ANTLR start T_EQV
+    // $ANTLR start "T_EQV"
     public final void mT_EQV() throws RecognitionException {
         try {
             int _type = T_EQV;
-            // FortranLexer.g:459:17: ( '.EQV.' )
-            // FortranLexer.g:459:19: '.EQV.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:458:17: ( '.EQV.' )
+            // FortranLexer.g:458:19: '.EQV.'
             {
             match(".EQV."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EQV
+    // $ANTLR end "T_EQV"
 
-    // $ANTLR start T_NEQV
+    // $ANTLR start "T_NEQV"
     public final void mT_NEQV() throws RecognitionException {
         try {
             int _type = T_NEQV;
-            // FortranLexer.g:460:17: ( '.NEQV.' )
-            // FortranLexer.g:460:19: '.NEQV.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:459:17: ( '.NEQV.' )
+            // FortranLexer.g:459:19: '.NEQV.'
             {
             match(".NEQV."); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NEQV
+    // $ANTLR end "T_NEQV"
 
-    // $ANTLR start T_PERIOD_EXPONENT
+    // $ANTLR start "T_PERIOD_EXPONENT"
     public final void mT_PERIOD_EXPONENT() throws RecognitionException {
         try {
             int _type = T_PERIOD_EXPONENT;
-            // FortranLexer.g:463:5: ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:462:5: ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ )
             int alt28=4;
             alt28 = dfa28.predict(input);
             switch (alt28) {
                 case 1 :
-                    // FortranLexer.g:463:7: '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // FortranLexer.g:462:7: '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
                     match('.'); 
-                    // FortranLexer.g:463:11: ( '0' .. '9' )+
+                    // FortranLexer.g:462:11: ( '0' .. '9' )+
                     int cnt19=0;
                     loop19:
                     do {
@@ -2218,7 +2306,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt19) {
                     	case 1 :
-                    	    // FortranLexer.g:463:12: '0' .. '9'
+                    	    // FortranLexer.g:462:12: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2239,12 +2327,11 @@ public class FortranLexer extends Lexer {
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
-                    // FortranLexer.g:463:47: ( '+' | '-' )?
+                    // FortranLexer.g:462:47: ( '+' | '-' )?
                     int alt20=2;
                     int LA20_0 = input.LA(1);
 
@@ -2260,10 +2347,9 @@ public class FortranLexer extends Lexer {
 
                             }
                             else {
-                                MismatchedSetException mse =
-                                    new MismatchedSetException(null,input);
-                                recover(mse);    throw mse;
-                            }
+                                MismatchedSetException mse = new MismatchedSetException(null,input);
+                                recover(mse);
+                                throw mse;}
 
 
                             }
@@ -2271,7 +2357,7 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:463:60: ( '0' .. '9' )+
+                    // FortranLexer.g:462:60: ( '0' .. '9' )+
                     int cnt21=0;
                     loop21:
                     do {
@@ -2285,7 +2371,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt21) {
                     	case 1 :
-                    	    // FortranLexer.g:463:61: '0' .. '9'
+                    	    // FortranLexer.g:462:61: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2305,7 +2391,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:464:7: '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // FortranLexer.g:463:7: '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
                     match('.'); 
                     if ( (input.LA(1)>='D' && input.LA(1)<='E')||(input.LA(1)>='d' && input.LA(1)<='e') ) {
@@ -2313,12 +2399,11 @@ public class FortranLexer extends Lexer {
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
-                    // FortranLexer.g:464:35: ( '+' | '-' )?
+                    // FortranLexer.g:463:35: ( '+' | '-' )?
                     int alt22=2;
                     int LA22_0 = input.LA(1);
 
@@ -2334,10 +2419,9 @@ public class FortranLexer extends Lexer {
 
                             }
                             else {
-                                MismatchedSetException mse =
-                                    new MismatchedSetException(null,input);
-                                recover(mse);    throw mse;
-                            }
+                                MismatchedSetException mse = new MismatchedSetException(null,input);
+                                recover(mse);
+                                throw mse;}
 
 
                             }
@@ -2345,7 +2429,7 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:464:48: ( '0' .. '9' )+
+                    // FortranLexer.g:463:48: ( '0' .. '9' )+
                     int cnt23=0;
                     loop23:
                     do {
@@ -2359,7 +2443,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt23) {
                     	case 1 :
-                    	    // FortranLexer.g:464:49: '0' .. '9'
+                    	    // FortranLexer.g:463:49: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2379,10 +2463,10 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // FortranLexer.g:465:7: '.' ( '0' .. '9' )+
+                    // FortranLexer.g:464:7: '.' ( '0' .. '9' )+
                     {
                     match('.'); 
-                    // FortranLexer.g:465:11: ( '0' .. '9' )+
+                    // FortranLexer.g:464:11: ( '0' .. '9' )+
                     int cnt24=0;
                     loop24:
                     do {
@@ -2396,7 +2480,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt24) {
                     	case 1 :
-                    	    // FortranLexer.g:465:12: '0' .. '9'
+                    	    // FortranLexer.g:464:12: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2416,9 +2500,9 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // FortranLexer.g:466:7: ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // FortranLexer.g:465:7: ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
-                    // FortranLexer.g:466:7: ( '0' .. '9' )+
+                    // FortranLexer.g:465:7: ( '0' .. '9' )+
                     int cnt25=0;
                     loop25:
                     do {
@@ -2432,7 +2516,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt25) {
                     	case 1 :
-                    	    // FortranLexer.g:466:8: '0' .. '9'
+                    	    // FortranLexer.g:465:8: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2453,12 +2537,11 @@ public class FortranLexer extends Lexer {
 
                     }
                     else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
-                    // FortranLexer.g:466:43: ( '+' | '-' )?
+                    // FortranLexer.g:465:43: ( '+' | '-' )?
                     int alt26=2;
                     int LA26_0 = input.LA(1);
 
@@ -2474,10 +2557,9 @@ public class FortranLexer extends Lexer {
 
                             }
                             else {
-                                MismatchedSetException mse =
-                                    new MismatchedSetException(null,input);
-                                recover(mse);    throw mse;
-                            }
+                                MismatchedSetException mse = new MismatchedSetException(null,input);
+                                recover(mse);
+                                throw mse;}
 
 
                             }
@@ -2485,7 +2567,7 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:466:56: ( '0' .. '9' )+
+                    // FortranLexer.g:465:56: ( '0' .. '9' )+
                     int cnt27=0;
                     loop27:
                     do {
@@ -2499,7 +2581,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt27) {
                     	case 1 :
-                    	    // FortranLexer.g:466:57: '0' .. '9'
+                    	    // FortranLexer.g:465:57: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2520,930 +2602,1028 @@ public class FortranLexer extends Lexer {
                     break;
 
             }
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PERIOD_EXPONENT
+    // $ANTLR end "T_PERIOD_EXPONENT"
 
-    // $ANTLR start T_PERIOD
+    // $ANTLR start "T_PERIOD"
     public final void mT_PERIOD() throws RecognitionException {
         try {
             int _type = T_PERIOD;
-            // FortranLexer.g:469:17: ( '.' )
-            // FortranLexer.g:469:19: '.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:468:17: ( '.' )
+            // FortranLexer.g:468:19: '.'
             {
             match('.'); 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PERIOD
+    // $ANTLR end "T_PERIOD"
 
-    // $ANTLR start T_XYZ
+    // $ANTLR start "T_XYZ"
     public final void mT_XYZ() throws RecognitionException {
         try {
             int _type = T_XYZ;
-            // FortranLexer.g:477:17: ( '__XYZ__' )
-            // FortranLexer.g:477:19: '__XYZ__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:476:17: ( '__XYZ__' )
+            // FortranLexer.g:476:19: '__XYZ__'
             {
             match("__XYZ__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_XYZ
+    // $ANTLR end "T_XYZ"
 
-    // $ANTLR start T_INTEGER
+    // $ANTLR start "T_INTEGER"
     public final void mT_INTEGER() throws RecognitionException {
         try {
             int _type = T_INTEGER;
-            // FortranLexer.g:479:17: ( 'INTEGER' )
-            // FortranLexer.g:479:25: 'INTEGER'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:478:17: ( 'INTEGER' )
+            // FortranLexer.g:478:25: 'INTEGER'
             {
             match("INTEGER"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INTEGER
+    // $ANTLR end "T_INTEGER"
 
-    // $ANTLR start T_REAL
+    // $ANTLR start "T_REAL"
     public final void mT_REAL() throws RecognitionException {
         try {
             int _type = T_REAL;
-            // FortranLexer.g:480:17: ( 'REAL' )
-            // FortranLexer.g:480:25: 'REAL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:479:17: ( 'REAL' )
+            // FortranLexer.g:479:25: 'REAL'
             {
             match("REAL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_REAL
+    // $ANTLR end "T_REAL"
 
-    // $ANTLR start T_COMPLEX
+    // $ANTLR start "T_COMPLEX"
     public final void mT_COMPLEX() throws RecognitionException {
         try {
             int _type = T_COMPLEX;
-            // FortranLexer.g:481:17: ( 'COMPLEX' )
-            // FortranLexer.g:481:25: 'COMPLEX'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:480:17: ( 'COMPLEX' )
+            // FortranLexer.g:480:25: 'COMPLEX'
             {
             match("COMPLEX"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_COMPLEX
+    // $ANTLR end "T_COMPLEX"
 
-    // $ANTLR start T_CHARACTER
+    // $ANTLR start "T_CHARACTER"
     public final void mT_CHARACTER() throws RecognitionException {
         try {
             int _type = T_CHARACTER;
-            // FortranLexer.g:482:17: ( 'CHARACTER' )
-            // FortranLexer.g:482:25: 'CHARACTER'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:481:17: ( 'CHARACTER' )
+            // FortranLexer.g:481:25: 'CHARACTER'
             {
             match("CHARACTER"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CHARACTER
+    // $ANTLR end "T_CHARACTER"
 
-    // $ANTLR start T_LOGICAL
+    // $ANTLR start "T_LOGICAL"
     public final void mT_LOGICAL() throws RecognitionException {
         try {
             int _type = T_LOGICAL;
-            // FortranLexer.g:483:17: ( 'LOGICAL' )
-            // FortranLexer.g:483:25: 'LOGICAL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:482:17: ( 'LOGICAL' )
+            // FortranLexer.g:482:25: 'LOGICAL'
             {
             match("LOGICAL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LOGICAL
+    // $ANTLR end "T_LOGICAL"
 
-    // $ANTLR start T_ABSTRACT
+    // $ANTLR start "T_ABSTRACT"
     public final void mT_ABSTRACT() throws RecognitionException {
         try {
             int _type = T_ABSTRACT;
-            // FortranLexer.g:485:17: ( 'ABSTRACT' )
-            // FortranLexer.g:485:25: 'ABSTRACT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:484:17: ( 'ABSTRACT' )
+            // FortranLexer.g:484:25: 'ABSTRACT'
             {
             match("ABSTRACT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ABSTRACT
+    // $ANTLR end "T_ABSTRACT"
 
-    // $ANTLR start T_ALLOCATABLE
+    // $ANTLR start "T_ALLOCATABLE"
     public final void mT_ALLOCATABLE() throws RecognitionException {
         try {
             int _type = T_ALLOCATABLE;
-            // FortranLexer.g:486:17: ( 'ALLOCATABLE' )
-            // FortranLexer.g:486:25: 'ALLOCATABLE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:485:17: ( 'ALLOCATABLE' )
+            // FortranLexer.g:485:25: 'ALLOCATABLE'
             {
             match("ALLOCATABLE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ALLOCATABLE
+    // $ANTLR end "T_ALLOCATABLE"
 
-    // $ANTLR start T_ALLOCATE
+    // $ANTLR start "T_ALLOCATE"
     public final void mT_ALLOCATE() throws RecognitionException {
         try {
             int _type = T_ALLOCATE;
-            // FortranLexer.g:487:17: ( 'ALLOCATE' )
-            // FortranLexer.g:487:25: 'ALLOCATE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:486:17: ( 'ALLOCATE' )
+            // FortranLexer.g:486:25: 'ALLOCATE'
             {
             match("ALLOCATE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ALLOCATE
+    // $ANTLR end "T_ALLOCATE"
 
-    // $ANTLR start T_ASSIGNMENT
+    // $ANTLR start "T_ASSIGNMENT"
     public final void mT_ASSIGNMENT() throws RecognitionException {
         try {
             int _type = T_ASSIGNMENT;
-            // FortranLexer.g:488:17: ( 'ASSIGNMENT' )
-            // FortranLexer.g:488:25: 'ASSIGNMENT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:487:17: ( 'ASSIGNMENT' )
+            // FortranLexer.g:487:25: 'ASSIGNMENT'
             {
             match("ASSIGNMENT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ASSIGNMENT
+    // $ANTLR end "T_ASSIGNMENT"
 
-    // $ANTLR start T_ASSIGN
+    // $ANTLR start "T_ASSIGN"
     public final void mT_ASSIGN() throws RecognitionException {
         try {
             int _type = T_ASSIGN;
-            // FortranLexer.g:490:17: ( 'ASSIGN' )
-            // FortranLexer.g:490:25: 'ASSIGN'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:489:17: ( 'ASSIGN' )
+            // FortranLexer.g:489:25: 'ASSIGN'
             {
             match("ASSIGN"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ASSIGN
+    // $ANTLR end "T_ASSIGN"
 
-    // $ANTLR start T_ASSOCIATE
+    // $ANTLR start "T_ASSOCIATE"
     public final void mT_ASSOCIATE() throws RecognitionException {
         try {
             int _type = T_ASSOCIATE;
-            // FortranLexer.g:491:17: ( 'ASSOCIATE' )
-            // FortranLexer.g:491:25: 'ASSOCIATE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:490:17: ( 'ASSOCIATE' )
+            // FortranLexer.g:490:25: 'ASSOCIATE'
             {
             match("ASSOCIATE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ASSOCIATE
+    // $ANTLR end "T_ASSOCIATE"
 
-    // $ANTLR start T_ASYNCHRONOUS
+    // $ANTLR start "T_ASYNCHRONOUS"
     public final void mT_ASYNCHRONOUS() throws RecognitionException {
         try {
             int _type = T_ASYNCHRONOUS;
-            // FortranLexer.g:492:17: ( 'ASYNCHRONOUS' )
-            // FortranLexer.g:492:25: 'ASYNCHRONOUS'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:491:17: ( 'ASYNCHRONOUS' )
+            // FortranLexer.g:491:25: 'ASYNCHRONOUS'
             {
             match("ASYNCHRONOUS"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ASYNCHRONOUS
+    // $ANTLR end "T_ASYNCHRONOUS"
 
-    // $ANTLR start T_BACKSPACE
+    // $ANTLR start "T_BACKSPACE"
     public final void mT_BACKSPACE() throws RecognitionException {
         try {
             int _type = T_BACKSPACE;
-            // FortranLexer.g:493:17: ( 'BACKSPACE' )
-            // FortranLexer.g:493:25: 'BACKSPACE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:492:17: ( 'BACKSPACE' )
+            // FortranLexer.g:492:25: 'BACKSPACE'
             {
             match("BACKSPACE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_BACKSPACE
+    // $ANTLR end "T_BACKSPACE"
 
-    // $ANTLR start T_BLOCK
+    // $ANTLR start "T_BLOCK"
     public final void mT_BLOCK() throws RecognitionException {
         try {
             int _type = T_BLOCK;
-            // FortranLexer.g:494:17: ( 'BLOCK' )
-            // FortranLexer.g:494:25: 'BLOCK'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:493:17: ( 'BLOCK' )
+            // FortranLexer.g:493:25: 'BLOCK'
             {
             match("BLOCK"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_BLOCK
+    // $ANTLR end "T_BLOCK"
 
-    // $ANTLR start T_BLOCKDATA
+    // $ANTLR start "T_BLOCKDATA"
     public final void mT_BLOCKDATA() throws RecognitionException {
         try {
             int _type = T_BLOCKDATA;
-            // FortranLexer.g:495:17: ( 'BLOCKDATA' )
-            // FortranLexer.g:495:25: 'BLOCKDATA'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:494:17: ( 'BLOCKDATA' )
+            // FortranLexer.g:494:25: 'BLOCKDATA'
             {
             match("BLOCKDATA"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_BLOCKDATA
+    // $ANTLR end "T_BLOCKDATA"
 
-    // $ANTLR start T_CALL
+    // $ANTLR start "T_CALL"
     public final void mT_CALL() throws RecognitionException {
         try {
             int _type = T_CALL;
-            // FortranLexer.g:496:17: ( 'CALL' )
-            // FortranLexer.g:496:25: 'CALL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:495:17: ( 'CALL' )
+            // FortranLexer.g:495:25: 'CALL'
             {
             match("CALL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CALL
+    // $ANTLR end "T_CALL"
 
-    // $ANTLR start T_CASE
+    // $ANTLR start "T_CASE"
     public final void mT_CASE() throws RecognitionException {
         try {
             int _type = T_CASE;
-            // FortranLexer.g:497:17: ( 'CASE' )
-            // FortranLexer.g:497:25: 'CASE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:496:17: ( 'CASE' )
+            // FortranLexer.g:496:25: 'CASE'
             {
             match("CASE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CASE
+    // $ANTLR end "T_CASE"
 
-    // $ANTLR start T_CLASS
+    // $ANTLR start "T_CLASS"
     public final void mT_CLASS() throws RecognitionException {
         try {
             int _type = T_CLASS;
-            // FortranLexer.g:498:17: ( 'CLASS' )
-            // FortranLexer.g:498:25: 'CLASS'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:497:17: ( 'CLASS' )
+            // FortranLexer.g:497:25: 'CLASS'
             {
             match("CLASS"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CLASS
+    // $ANTLR end "T_CLASS"
 
-    // $ANTLR start T_CLOSE
+    // $ANTLR start "T_CLOSE"
     public final void mT_CLOSE() throws RecognitionException {
         try {
             int _type = T_CLOSE;
-            // FortranLexer.g:499:17: ( 'CLOSE' )
-            // FortranLexer.g:499:25: 'CLOSE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:498:17: ( 'CLOSE' )
+            // FortranLexer.g:498:25: 'CLOSE'
             {
             match("CLOSE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CLOSE
+    // $ANTLR end "T_CLOSE"
 
-    // $ANTLR start T_COMMON
+    // $ANTLR start "T_COMMON"
     public final void mT_COMMON() throws RecognitionException {
         try {
             int _type = T_COMMON;
-            // FortranLexer.g:500:17: ( 'COMMON' )
-            // FortranLexer.g:500:25: 'COMMON'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:499:17: ( 'COMMON' )
+            // FortranLexer.g:499:25: 'COMMON'
             {
             match("COMMON"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_COMMON
+    // $ANTLR end "T_COMMON"
 
-    // $ANTLR start T_CONTAINS
+    // $ANTLR start "T_CONTAINS"
     public final void mT_CONTAINS() throws RecognitionException {
         try {
             int _type = T_CONTAINS;
-            // FortranLexer.g:501:17: ( 'CONTAINS' )
-            // FortranLexer.g:501:25: 'CONTAINS'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:500:17: ( 'CONTAINS' )
+            // FortranLexer.g:500:25: 'CONTAINS'
             {
             match("CONTAINS"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CONTAINS
+    // $ANTLR end "T_CONTAINS"
 
-    // $ANTLR start T_CONTINUE
+    // $ANTLR start "T_CONTINUE"
     public final void mT_CONTINUE() throws RecognitionException {
         try {
             int _type = T_CONTINUE;
-            // FortranLexer.g:502:17: ( 'CONTINUE' )
-            // FortranLexer.g:502:25: 'CONTINUE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:501:17: ( 'CONTINUE' )
+            // FortranLexer.g:501:25: 'CONTINUE'
             {
             match("CONTINUE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CONTINUE
+    // $ANTLR end "T_CONTINUE"
 
-    // $ANTLR start T_CYCLE
+    // $ANTLR start "T_CYCLE"
     public final void mT_CYCLE() throws RecognitionException {
         try {
             int _type = T_CYCLE;
-            // FortranLexer.g:503:17: ( 'CYCLE' )
-            // FortranLexer.g:503:25: 'CYCLE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:502:17: ( 'CYCLE' )
+            // FortranLexer.g:502:25: 'CYCLE'
             {
             match("CYCLE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CYCLE
+    // $ANTLR end "T_CYCLE"
 
-    // $ANTLR start T_DATA
+    // $ANTLR start "T_DATA"
     public final void mT_DATA() throws RecognitionException {
         try {
             int _type = T_DATA;
-            // FortranLexer.g:504:17: ( 'DATA' )
-            // FortranLexer.g:504:25: 'DATA'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:503:17: ( 'DATA' )
+            // FortranLexer.g:503:25: 'DATA'
             {
             match("DATA"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DATA
+    // $ANTLR end "T_DATA"
 
-    // $ANTLR start T_DEFAULT
+    // $ANTLR start "T_DEFAULT"
     public final void mT_DEFAULT() throws RecognitionException {
         try {
             int _type = T_DEFAULT;
-            // FortranLexer.g:505:17: ( 'DEFAULT' )
-            // FortranLexer.g:505:25: 'DEFAULT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:504:17: ( 'DEFAULT' )
+            // FortranLexer.g:504:25: 'DEFAULT'
             {
             match("DEFAULT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DEFAULT
+    // $ANTLR end "T_DEFAULT"
 
-    // $ANTLR start T_DEALLOCATE
+    // $ANTLR start "T_DEALLOCATE"
     public final void mT_DEALLOCATE() throws RecognitionException {
         try {
             int _type = T_DEALLOCATE;
-            // FortranLexer.g:506:17: ( 'DEALLOCATE' )
-            // FortranLexer.g:506:25: 'DEALLOCATE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:505:17: ( 'DEALLOCATE' )
+            // FortranLexer.g:505:25: 'DEALLOCATE'
             {
             match("DEALLOCATE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DEALLOCATE
+    // $ANTLR end "T_DEALLOCATE"
 
-    // $ANTLR start T_DEFERRED
+    // $ANTLR start "T_DEFERRED"
     public final void mT_DEFERRED() throws RecognitionException {
         try {
             int _type = T_DEFERRED;
-            // FortranLexer.g:507:17: ( 'DEFERRED' )
-            // FortranLexer.g:507:25: 'DEFERRED'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:506:17: ( 'DEFERRED' )
+            // FortranLexer.g:506:25: 'DEFERRED'
             {
             match("DEFERRED"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DEFERRED
+    // $ANTLR end "T_DEFERRED"
 
-    // $ANTLR start T_DO
+    // $ANTLR start "T_DO"
     public final void mT_DO() throws RecognitionException {
         try {
             int _type = T_DO;
-            // FortranLexer.g:508:17: ( 'DO' )
-            // FortranLexer.g:508:25: 'DO'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:507:17: ( 'DO' )
+            // FortranLexer.g:507:25: 'DO'
             {
             match("DO"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DO
+    // $ANTLR end "T_DO"
 
-    // $ANTLR start T_DOUBLE
+    // $ANTLR start "T_DOUBLE"
     public final void mT_DOUBLE() throws RecognitionException {
         try {
             int _type = T_DOUBLE;
-            // FortranLexer.g:509:17: ( 'DOUBLE' )
-            // FortranLexer.g:509:25: 'DOUBLE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:508:17: ( 'DOUBLE' )
+            // FortranLexer.g:508:25: 'DOUBLE'
             {
             match("DOUBLE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DOUBLE
+    // $ANTLR end "T_DOUBLE"
 
-    // $ANTLR start T_DOUBLEPRECISION
+    // $ANTLR start "T_DOUBLEPRECISION"
     public final void mT_DOUBLEPRECISION() throws RecognitionException {
         try {
             int _type = T_DOUBLEPRECISION;
-            // FortranLexer.g:510:18: ( 'DOUBLEPRECISION' )
-            // FortranLexer.g:510:25: 'DOUBLEPRECISION'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:509:18: ( 'DOUBLEPRECISION' )
+            // FortranLexer.g:509:25: 'DOUBLEPRECISION'
             {
             match("DOUBLEPRECISION"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DOUBLEPRECISION
+    // $ANTLR end "T_DOUBLEPRECISION"
 
-    // $ANTLR start T_DOUBLECOMPLEX
+    // $ANTLR start "T_DOUBLECOMPLEX"
     public final void mT_DOUBLECOMPLEX() throws RecognitionException {
         try {
             int _type = T_DOUBLECOMPLEX;
-            // FortranLexer.g:511:16: ( 'DOUBLECOMPLEX' )
-            // FortranLexer.g:511:25: 'DOUBLECOMPLEX'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:510:16: ( 'DOUBLECOMPLEX' )
+            // FortranLexer.g:510:25: 'DOUBLECOMPLEX'
             {
             match("DOUBLECOMPLEX"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DOUBLECOMPLEX
+    // $ANTLR end "T_DOUBLECOMPLEX"
 
-    // $ANTLR start T_ELEMENTAL
+    // $ANTLR start "T_ELEMENTAL"
     public final void mT_ELEMENTAL() throws RecognitionException {
         try {
             int _type = T_ELEMENTAL;
-            // FortranLexer.g:512:17: ( 'ELEMENTAL' )
-            // FortranLexer.g:512:25: 'ELEMENTAL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:511:17: ( 'ELEMENTAL' )
+            // FortranLexer.g:511:25: 'ELEMENTAL'
             {
             match("ELEMENTAL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ELEMENTAL
+    // $ANTLR end "T_ELEMENTAL"
 
-    // $ANTLR start T_ELSE
+    // $ANTLR start "T_ELSE"
     public final void mT_ELSE() throws RecognitionException {
         try {
             int _type = T_ELSE;
-            // FortranLexer.g:513:17: ( 'ELSE' )
-            // FortranLexer.g:513:25: 'ELSE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:512:17: ( 'ELSE' )
+            // FortranLexer.g:512:25: 'ELSE'
             {
             match("ELSE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ELSE
+    // $ANTLR end "T_ELSE"
 
-    // $ANTLR start T_ELSEIF
+    // $ANTLR start "T_ELSEIF"
     public final void mT_ELSEIF() throws RecognitionException {
         try {
             int _type = T_ELSEIF;
-            // FortranLexer.g:514:17: ( 'ELSEIF' )
-            // FortranLexer.g:514:25: 'ELSEIF'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:513:17: ( 'ELSEIF' )
+            // FortranLexer.g:513:25: 'ELSEIF'
             {
             match("ELSEIF"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ELSEIF
+    // $ANTLR end "T_ELSEIF"
 
-    // $ANTLR start T_ELSEWHERE
+    // $ANTLR start "T_ELSEWHERE"
     public final void mT_ELSEWHERE() throws RecognitionException {
         try {
             int _type = T_ELSEWHERE;
-            // FortranLexer.g:515:17: ( 'ELSEWHERE' )
-            // FortranLexer.g:515:25: 'ELSEWHERE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:514:17: ( 'ELSEWHERE' )
+            // FortranLexer.g:514:25: 'ELSEWHERE'
             {
             match("ELSEWHERE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ELSEWHERE
+    // $ANTLR end "T_ELSEWHERE"
 
-    // $ANTLR start T_ENTRY
+    // $ANTLR start "T_ENTRY"
     public final void mT_ENTRY() throws RecognitionException {
         try {
             int _type = T_ENTRY;
-            // FortranLexer.g:516:17: ( 'ENTRY' )
-            // FortranLexer.g:516:25: 'ENTRY'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:515:17: ( 'ENTRY' )
+            // FortranLexer.g:515:25: 'ENTRY'
             {
             match("ENTRY"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENTRY
+    // $ANTLR end "T_ENTRY"
 
-    // $ANTLR start T_ENUM
+    // $ANTLR start "T_ENUM"
     public final void mT_ENUM() throws RecognitionException {
         try {
             int _type = T_ENUM;
-            // FortranLexer.g:517:17: ( 'ENUM' )
-            // FortranLexer.g:517:25: 'ENUM'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:516:17: ( 'ENUM' )
+            // FortranLexer.g:516:25: 'ENUM'
             {
             match("ENUM"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENUM
+    // $ANTLR end "T_ENUM"
 
-    // $ANTLR start T_ENUMERATOR
+    // $ANTLR start "T_ENUMERATOR"
     public final void mT_ENUMERATOR() throws RecognitionException {
         try {
             int _type = T_ENUMERATOR;
-            // FortranLexer.g:518:17: ( 'ENUMERATOR' )
-            // FortranLexer.g:518:25: 'ENUMERATOR'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:517:17: ( 'ENUMERATOR' )
+            // FortranLexer.g:517:25: 'ENUMERATOR'
             {
             match("ENUMERATOR"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENUMERATOR
+    // $ANTLR end "T_ENUMERATOR"
 
-    // $ANTLR start T_EQUIVALENCE
+    // $ANTLR start "T_EQUIVALENCE"
     public final void mT_EQUIVALENCE() throws RecognitionException {
         try {
             int _type = T_EQUIVALENCE;
-            // FortranLexer.g:519:17: ( 'EQUIVALENCE' )
-            // FortranLexer.g:519:25: 'EQUIVALENCE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:518:17: ( 'EQUIVALENCE' )
+            // FortranLexer.g:518:25: 'EQUIVALENCE'
             {
             match("EQUIVALENCE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EQUIVALENCE
+    // $ANTLR end "T_EQUIVALENCE"
 
-    // $ANTLR start T_EXIT
+    // $ANTLR start "T_EXIT"
     public final void mT_EXIT() throws RecognitionException {
         try {
             int _type = T_EXIT;
-            // FortranLexer.g:520:17: ( 'EXIT' )
-            // FortranLexer.g:520:25: 'EXIT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:519:17: ( 'EXIT' )
+            // FortranLexer.g:519:25: 'EXIT'
             {
             match("EXIT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EXIT
+    // $ANTLR end "T_EXIT"
 
-    // $ANTLR start T_EXTENDS
+    // $ANTLR start "T_EXTENDS"
     public final void mT_EXTENDS() throws RecognitionException {
         try {
             int _type = T_EXTENDS;
-            // FortranLexer.g:521:17: ( 'EXTENDS' )
-            // FortranLexer.g:521:25: 'EXTENDS'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:520:17: ( 'EXTENDS' )
+            // FortranLexer.g:520:25: 'EXTENDS'
             {
             match("EXTENDS"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EXTENDS
+    // $ANTLR end "T_EXTENDS"
 
-    // $ANTLR start T_EXTERNAL
+    // $ANTLR start "T_EXTERNAL"
     public final void mT_EXTERNAL() throws RecognitionException {
         try {
             int _type = T_EXTERNAL;
-            // FortranLexer.g:522:17: ( 'EXTERNAL' )
-            // FortranLexer.g:522:25: 'EXTERNAL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:521:17: ( 'EXTERNAL' )
+            // FortranLexer.g:521:25: 'EXTERNAL'
             {
             match("EXTERNAL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EXTERNAL
+    // $ANTLR end "T_EXTERNAL"
 
-    // $ANTLR start T_FILE
+    // $ANTLR start "T_FILE"
     public final void mT_FILE() throws RecognitionException {
         try {
             int _type = T_FILE;
-            // FortranLexer.g:523:17: ( 'FILE' )
-            // FortranLexer.g:523:25: 'FILE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:522:17: ( 'FILE' )
+            // FortranLexer.g:522:25: 'FILE'
             {
             match("FILE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FILE
+    // $ANTLR end "T_FILE"
 
-    // $ANTLR start T_FINAL
+    // $ANTLR start "T_FINAL"
     public final void mT_FINAL() throws RecognitionException {
         try {
             int _type = T_FINAL;
-            // FortranLexer.g:524:17: ( 'FINAL' )
-            // FortranLexer.g:524:25: 'FINAL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:523:17: ( 'FINAL' )
+            // FortranLexer.g:523:25: 'FINAL'
             {
             match("FINAL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FINAL
+    // $ANTLR end "T_FINAL"
 
-    // $ANTLR start T_FLUSH
+    // $ANTLR start "T_FLUSH"
     public final void mT_FLUSH() throws RecognitionException {
         try {
             int _type = T_FLUSH;
-            // FortranLexer.g:525:17: ( 'FLUSH' )
-            // FortranLexer.g:525:25: 'FLUSH'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:524:17: ( 'FLUSH' )
+            // FortranLexer.g:524:25: 'FLUSH'
             {
             match("FLUSH"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FLUSH
+    // $ANTLR end "T_FLUSH"
 
-    // $ANTLR start T_FORALL
+    // $ANTLR start "T_FORALL"
     public final void mT_FORALL() throws RecognitionException {
         try {
             int _type = T_FORALL;
-            // FortranLexer.g:526:17: ( 'FORALL' )
-            // FortranLexer.g:526:25: 'FORALL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:525:17: ( 'FORALL' )
+            // FortranLexer.g:525:25: 'FORALL'
             {
             match("FORALL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FORALL
+    // $ANTLR end "T_FORALL"
 
-    // $ANTLR start T_FORMAT
+    // $ANTLR start "T_FORMAT"
     public final void mT_FORMAT() throws RecognitionException {
         try {
             int _type = T_FORMAT;
-            // FortranLexer.g:527:17: ( 'FORMAT' )
-            // FortranLexer.g:527:25: 'FORMAT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:526:17: ( 'FORMAT' )
+            // FortranLexer.g:526:25: 'FORMAT'
             {
             match("FORMAT"); 
 
@@ -3451,1602 +3631,1770 @@ public class FortranLexer extends Lexer {
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FORMAT
+    // $ANTLR end "T_FORMAT"
 
-    // $ANTLR start T_FORMATTED
+    // $ANTLR start "T_FORMATTED"
     public final void mT_FORMATTED() throws RecognitionException {
         try {
             int _type = T_FORMATTED;
-            // FortranLexer.g:528:17: ( 'FORMATTED' )
-            // FortranLexer.g:528:25: 'FORMATTED'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:527:17: ( 'FORMATTED' )
+            // FortranLexer.g:527:25: 'FORMATTED'
             {
             match("FORMATTED"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FORMATTED
+    // $ANTLR end "T_FORMATTED"
 
-    // $ANTLR start T_FUNCTION
+    // $ANTLR start "T_FUNCTION"
     public final void mT_FUNCTION() throws RecognitionException {
         try {
             int _type = T_FUNCTION;
-            // FortranLexer.g:529:17: ( 'FUNCTION' )
-            // FortranLexer.g:529:25: 'FUNCTION'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:528:17: ( 'FUNCTION' )
+            // FortranLexer.g:528:25: 'FUNCTION'
             {
             match("FUNCTION"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FUNCTION
+    // $ANTLR end "T_FUNCTION"
 
-    // $ANTLR start T_GENERIC
+    // $ANTLR start "T_GENERIC"
     public final void mT_GENERIC() throws RecognitionException {
         try {
             int _type = T_GENERIC;
-            // FortranLexer.g:530:17: ( 'GENERIC' )
-            // FortranLexer.g:530:25: 'GENERIC'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:529:17: ( 'GENERIC' )
+            // FortranLexer.g:529:25: 'GENERIC'
             {
             match("GENERIC"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GENERIC
+    // $ANTLR end "T_GENERIC"
 
-    // $ANTLR start T_GO
+    // $ANTLR start "T_GO"
     public final void mT_GO() throws RecognitionException {
         try {
             int _type = T_GO;
-            // FortranLexer.g:531:17: ( 'GO' )
-            // FortranLexer.g:531:25: 'GO'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:530:17: ( 'GO' )
+            // FortranLexer.g:530:25: 'GO'
             {
             match("GO"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GO
+    // $ANTLR end "T_GO"
 
-    // $ANTLR start T_GOTO
+    // $ANTLR start "T_GOTO"
     public final void mT_GOTO() throws RecognitionException {
         try {
             int _type = T_GOTO;
-            // FortranLexer.g:532:17: ( 'GOTO' )
-            // FortranLexer.g:532:25: 'GOTO'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:531:17: ( 'GOTO' )
+            // FortranLexer.g:531:25: 'GOTO'
             {
             match("GOTO"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_GOTO
+    // $ANTLR end "T_GOTO"
 
-    // $ANTLR start T_IF
+    // $ANTLR start "T_IF"
     public final void mT_IF() throws RecognitionException {
         try {
             int _type = T_IF;
-            // FortranLexer.g:533:17: ( 'IF' )
-            // FortranLexer.g:533:25: 'IF'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:532:17: ( 'IF' )
+            // FortranLexer.g:532:25: 'IF'
             {
             match("IF"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_IF
+    // $ANTLR end "T_IF"
 
-    // $ANTLR start T_IMPLICIT
+    // $ANTLR start "T_IMPLICIT"
     public final void mT_IMPLICIT() throws RecognitionException {
         try {
             int _type = T_IMPLICIT;
-            // FortranLexer.g:534:17: ( 'IMPLICIT' )
-            // FortranLexer.g:534:25: 'IMPLICIT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:533:17: ( 'IMPLICIT' )
+            // FortranLexer.g:533:25: 'IMPLICIT'
             {
             match("IMPLICIT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_IMPLICIT
+    // $ANTLR end "T_IMPLICIT"
 
-    // $ANTLR start T_IMPORT
+    // $ANTLR start "T_IMPORT"
     public final void mT_IMPORT() throws RecognitionException {
         try {
             int _type = T_IMPORT;
-            // FortranLexer.g:535:17: ( 'IMPORT' )
-            // FortranLexer.g:535:25: 'IMPORT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:534:17: ( 'IMPORT' )
+            // FortranLexer.g:534:25: 'IMPORT'
             {
             match("IMPORT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_IMPORT
+    // $ANTLR end "T_IMPORT"
 
-    // $ANTLR start T_IN
+    // $ANTLR start "T_IN"
     public final void mT_IN() throws RecognitionException {
         try {
             int _type = T_IN;
-            // FortranLexer.g:536:17: ( 'IN' )
-            // FortranLexer.g:536:25: 'IN'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:535:17: ( 'IN' )
+            // FortranLexer.g:535:25: 'IN'
             {
             match("IN"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_IN
+    // $ANTLR end "T_IN"
 
-    // $ANTLR start T_INOUT
+    // $ANTLR start "T_INOUT"
     public final void mT_INOUT() throws RecognitionException {
         try {
             int _type = T_INOUT;
-            // FortranLexer.g:537:17: ( 'INOUT' )
-            // FortranLexer.g:537:25: 'INOUT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:536:17: ( 'INOUT' )
+            // FortranLexer.g:536:25: 'INOUT'
             {
             match("INOUT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INOUT
+    // $ANTLR end "T_INOUT"
 
-    // $ANTLR start T_INTENT
+    // $ANTLR start "T_INTENT"
     public final void mT_INTENT() throws RecognitionException {
         try {
             int _type = T_INTENT;
-            // FortranLexer.g:538:17: ( 'INTENT' )
-            // FortranLexer.g:538:25: 'INTENT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:537:17: ( 'INTENT' )
+            // FortranLexer.g:537:25: 'INTENT'
             {
             match("INTENT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INTENT
+    // $ANTLR end "T_INTENT"
 
-    // $ANTLR start T_INTERFACE
+    // $ANTLR start "T_INTERFACE"
     public final void mT_INTERFACE() throws RecognitionException {
         try {
             int _type = T_INTERFACE;
-            // FortranLexer.g:539:17: ( 'INTERFACE' )
-            // FortranLexer.g:539:25: 'INTERFACE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:538:17: ( 'INTERFACE' )
+            // FortranLexer.g:538:25: 'INTERFACE'
             {
             match("INTERFACE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INTERFACE
+    // $ANTLR end "T_INTERFACE"
 
-    // $ANTLR start T_INTRINSIC
+    // $ANTLR start "T_INTRINSIC"
     public final void mT_INTRINSIC() throws RecognitionException {
         try {
             int _type = T_INTRINSIC;
-            // FortranLexer.g:540:17: ( 'INTRINSIC' )
-            // FortranLexer.g:540:25: 'INTRINSIC'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:539:17: ( 'INTRINSIC' )
+            // FortranLexer.g:539:25: 'INTRINSIC'
             {
             match("INTRINSIC"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INTRINSIC
+    // $ANTLR end "T_INTRINSIC"
 
-    // $ANTLR start T_INQUIRE
+    // $ANTLR start "T_INQUIRE"
     public final void mT_INQUIRE() throws RecognitionException {
         try {
             int _type = T_INQUIRE;
-            // FortranLexer.g:541:17: ( 'INQUIRE' )
-            // FortranLexer.g:541:25: 'INQUIRE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:540:17: ( 'INQUIRE' )
+            // FortranLexer.g:540:25: 'INQUIRE'
             {
             match("INQUIRE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INQUIRE
+    // $ANTLR end "T_INQUIRE"
 
-    // $ANTLR start T_MODULE
+    // $ANTLR start "T_MODULE"
     public final void mT_MODULE() throws RecognitionException {
         try {
             int _type = T_MODULE;
-            // FortranLexer.g:542:17: ( 'MODULE' )
-            // FortranLexer.g:542:25: 'MODULE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:541:17: ( 'MODULE' )
+            // FortranLexer.g:541:25: 'MODULE'
             {
             match("MODULE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_MODULE
+    // $ANTLR end "T_MODULE"
 
-    // $ANTLR start T_NAMELIST
+    // $ANTLR start "T_NAMELIST"
     public final void mT_NAMELIST() throws RecognitionException {
         try {
             int _type = T_NAMELIST;
-            // FortranLexer.g:543:17: ( 'NAMELIST' )
-            // FortranLexer.g:543:25: 'NAMELIST'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:542:17: ( 'NAMELIST' )
+            // FortranLexer.g:542:25: 'NAMELIST'
             {
             match("NAMELIST"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NAMELIST
+    // $ANTLR end "T_NAMELIST"
 
-    // $ANTLR start T_NONE
+    // $ANTLR start "T_NONE"
     public final void mT_NONE() throws RecognitionException {
         try {
             int _type = T_NONE;
-            // FortranLexer.g:544:17: ( 'NONE' )
-            // FortranLexer.g:544:25: 'NONE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:543:17: ( 'NONE' )
+            // FortranLexer.g:543:25: 'NONE'
             {
             match("NONE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NONE
+    // $ANTLR end "T_NONE"
 
-    // $ANTLR start T_NON_INTRINSIC
+    // $ANTLR start "T_NON_INTRINSIC"
     public final void mT_NON_INTRINSIC() throws RecognitionException {
         try {
             int _type = T_NON_INTRINSIC;
-            // FortranLexer.g:545:17: ( 'NON_INTRINSIC' )
-            // FortranLexer.g:545:25: 'NON_INTRINSIC'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:544:17: ( 'NON_INTRINSIC' )
+            // FortranLexer.g:544:25: 'NON_INTRINSIC'
             {
             match("NON_INTRINSIC"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NON_INTRINSIC
+    // $ANTLR end "T_NON_INTRINSIC"
 
-    // $ANTLR start T_NON_OVERRIDABLE
+    // $ANTLR start "T_NON_OVERRIDABLE"
     public final void mT_NON_OVERRIDABLE() throws RecognitionException {
         try {
             int _type = T_NON_OVERRIDABLE;
-            // FortranLexer.g:546:18: ( 'NON_OVERRIDABLE' )
-            // FortranLexer.g:546:25: 'NON_OVERRIDABLE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:545:18: ( 'NON_OVERRIDABLE' )
+            // FortranLexer.g:545:25: 'NON_OVERRIDABLE'
             {
             match("NON_OVERRIDABLE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NON_OVERRIDABLE
+    // $ANTLR end "T_NON_OVERRIDABLE"
 
-    // $ANTLR start T_NOPASS
+    // $ANTLR start "T_NOPASS"
     public final void mT_NOPASS() throws RecognitionException {
         try {
             int _type = T_NOPASS;
-            // FortranLexer.g:547:17: ( 'NOPASS' )
-            // FortranLexer.g:547:25: 'NOPASS'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:546:17: ( 'NOPASS' )
+            // FortranLexer.g:546:25: 'NOPASS'
             {
             match("NOPASS"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NOPASS
+    // $ANTLR end "T_NOPASS"
 
-    // $ANTLR start T_NULLIFY
+    // $ANTLR start "T_NULLIFY"
     public final void mT_NULLIFY() throws RecognitionException {
         try {
             int _type = T_NULLIFY;
-            // FortranLexer.g:548:17: ( 'NULLIFY' )
-            // FortranLexer.g:548:25: 'NULLIFY'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:547:17: ( 'NULLIFY' )
+            // FortranLexer.g:547:25: 'NULLIFY'
             {
             match("NULLIFY"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_NULLIFY
+    // $ANTLR end "T_NULLIFY"
 
-    // $ANTLR start T_ONLY
+    // $ANTLR start "T_ONLY"
     public final void mT_ONLY() throws RecognitionException {
         try {
             int _type = T_ONLY;
-            // FortranLexer.g:549:17: ( 'ONLY' )
-            // FortranLexer.g:549:25: 'ONLY'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:548:17: ( 'ONLY' )
+            // FortranLexer.g:548:25: 'ONLY'
             {
             match("ONLY"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ONLY
+    // $ANTLR end "T_ONLY"
 
-    // $ANTLR start T_OPEN
+    // $ANTLR start "T_OPEN"
     public final void mT_OPEN() throws RecognitionException {
         try {
             int _type = T_OPEN;
-            // FortranLexer.g:550:17: ( 'OPEN' )
-            // FortranLexer.g:550:25: 'OPEN'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:549:17: ( 'OPEN' )
+            // FortranLexer.g:549:25: 'OPEN'
             {
             match("OPEN"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_OPEN
+    // $ANTLR end "T_OPEN"
 
-    // $ANTLR start T_OPERATOR
+    // $ANTLR start "T_OPERATOR"
     public final void mT_OPERATOR() throws RecognitionException {
         try {
             int _type = T_OPERATOR;
-            // FortranLexer.g:551:17: ( 'OPERATOR' )
-            // FortranLexer.g:551:25: 'OPERATOR'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:550:17: ( 'OPERATOR' )
+            // FortranLexer.g:550:25: 'OPERATOR'
             {
             match("OPERATOR"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_OPERATOR
+    // $ANTLR end "T_OPERATOR"
 
-    // $ANTLR start T_OPTIONAL
+    // $ANTLR start "T_OPTIONAL"
     public final void mT_OPTIONAL() throws RecognitionException {
         try {
             int _type = T_OPTIONAL;
-            // FortranLexer.g:552:17: ( 'OPTIONAL' )
-            // FortranLexer.g:552:25: 'OPTIONAL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:551:17: ( 'OPTIONAL' )
+            // FortranLexer.g:551:25: 'OPTIONAL'
             {
             match("OPTIONAL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_OPTIONAL
+    // $ANTLR end "T_OPTIONAL"
 
-    // $ANTLR start T_OUT
+    // $ANTLR start "T_OUT"
     public final void mT_OUT() throws RecognitionException {
         try {
             int _type = T_OUT;
-            // FortranLexer.g:553:17: ( 'OUT' )
-            // FortranLexer.g:553:25: 'OUT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:552:17: ( 'OUT' )
+            // FortranLexer.g:552:25: 'OUT'
             {
             match("OUT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_OUT
+    // $ANTLR end "T_OUT"
 
-    // $ANTLR start T_PARAMETER
+    // $ANTLR start "T_PARAMETER"
     public final void mT_PARAMETER() throws RecognitionException {
         try {
             int _type = T_PARAMETER;
-            // FortranLexer.g:554:17: ( 'PARAMETER' )
-            // FortranLexer.g:554:25: 'PARAMETER'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:553:17: ( 'PARAMETER' )
+            // FortranLexer.g:553:25: 'PARAMETER'
             {
             match("PARAMETER"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PARAMETER
+    // $ANTLR end "T_PARAMETER"
 
-    // $ANTLR start T_PASS
+    // $ANTLR start "T_PASS"
     public final void mT_PASS() throws RecognitionException {
         try {
             int _type = T_PASS;
-            // FortranLexer.g:555:17: ( 'PASS' )
-            // FortranLexer.g:555:25: 'PASS'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:554:17: ( 'PASS' )
+            // FortranLexer.g:554:25: 'PASS'
             {
             match("PASS"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PASS
+    // $ANTLR end "T_PASS"
 
-    // $ANTLR start T_PAUSE
+    // $ANTLR start "T_PAUSE"
     public final void mT_PAUSE() throws RecognitionException {
         try {
             int _type = T_PAUSE;
-            // FortranLexer.g:556:17: ( 'PAUSE' )
-            // FortranLexer.g:556:25: 'PAUSE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:555:17: ( 'PAUSE' )
+            // FortranLexer.g:555:25: 'PAUSE'
             {
             match("PAUSE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PAUSE
+    // $ANTLR end "T_PAUSE"
 
-    // $ANTLR start T_POINTER
+    // $ANTLR start "T_POINTER"
     public final void mT_POINTER() throws RecognitionException {
         try {
             int _type = T_POINTER;
-            // FortranLexer.g:557:17: ( 'POINTER' )
-            // FortranLexer.g:557:25: 'POINTER'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:556:17: ( 'POINTER' )
+            // FortranLexer.g:556:25: 'POINTER'
             {
             match("POINTER"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_POINTER
+    // $ANTLR end "T_POINTER"
 
-    // $ANTLR start T_PRINT
+    // $ANTLR start "T_PRINT"
     public final void mT_PRINT() throws RecognitionException {
         try {
             int _type = T_PRINT;
-            // FortranLexer.g:558:17: ( 'PRINT' )
-            // FortranLexer.g:558:25: 'PRINT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:557:17: ( 'PRINT' )
+            // FortranLexer.g:557:25: 'PRINT'
             {
             match("PRINT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PRINT
+    // $ANTLR end "T_PRINT"
 
-    // $ANTLR start T_PRECISION
+    // $ANTLR start "T_PRECISION"
     public final void mT_PRECISION() throws RecognitionException {
         try {
             int _type = T_PRECISION;
-            // FortranLexer.g:559:17: ( 'PRECISION' )
-            // FortranLexer.g:559:25: 'PRECISION'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:558:17: ( 'PRECISION' )
+            // FortranLexer.g:558:25: 'PRECISION'
             {
             match("PRECISION"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PRECISION
+    // $ANTLR end "T_PRECISION"
 
-    // $ANTLR start T_PRIVATE
+    // $ANTLR start "T_PRIVATE"
     public final void mT_PRIVATE() throws RecognitionException {
         try {
             int _type = T_PRIVATE;
-            // FortranLexer.g:560:17: ( 'PRIVATE' )
-            // FortranLexer.g:560:25: 'PRIVATE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:559:17: ( 'PRIVATE' )
+            // FortranLexer.g:559:25: 'PRIVATE'
             {
             match("PRIVATE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PRIVATE
+    // $ANTLR end "T_PRIVATE"
 
-    // $ANTLR start T_PROCEDURE
+    // $ANTLR start "T_PROCEDURE"
     public final void mT_PROCEDURE() throws RecognitionException {
         try {
             int _type = T_PROCEDURE;
-            // FortranLexer.g:561:17: ( 'PROCEDURE' )
-            // FortranLexer.g:561:25: 'PROCEDURE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:560:17: ( 'PROCEDURE' )
+            // FortranLexer.g:560:25: 'PROCEDURE'
             {
             match("PROCEDURE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PROCEDURE
+    // $ANTLR end "T_PROCEDURE"
 
-    // $ANTLR start T_PROGRAM
+    // $ANTLR start "T_PROGRAM"
     public final void mT_PROGRAM() throws RecognitionException {
         try {
             int _type = T_PROGRAM;
-            // FortranLexer.g:562:17: ( 'PROGRAM' )
-            // FortranLexer.g:562:25: 'PROGRAM'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:561:17: ( 'PROGRAM' )
+            // FortranLexer.g:561:25: 'PROGRAM'
             {
             match("PROGRAM"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PROGRAM
+    // $ANTLR end "T_PROGRAM"
 
-    // $ANTLR start T_PROTECTED
+    // $ANTLR start "T_PROTECTED"
     public final void mT_PROTECTED() throws RecognitionException {
         try {
             int _type = T_PROTECTED;
-            // FortranLexer.g:563:17: ( 'PROTECTED' )
-            // FortranLexer.g:563:25: 'PROTECTED'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:562:17: ( 'PROTECTED' )
+            // FortranLexer.g:562:25: 'PROTECTED'
             {
             match("PROTECTED"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PROTECTED
+    // $ANTLR end "T_PROTECTED"
 
-    // $ANTLR start T_PUBLIC
+    // $ANTLR start "T_PUBLIC"
     public final void mT_PUBLIC() throws RecognitionException {
         try {
             int _type = T_PUBLIC;
-            // FortranLexer.g:564:17: ( 'PUBLIC' )
-            // FortranLexer.g:564:25: 'PUBLIC'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:563:17: ( 'PUBLIC' )
+            // FortranLexer.g:563:25: 'PUBLIC'
             {
             match("PUBLIC"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PUBLIC
+    // $ANTLR end "T_PUBLIC"
 
-    // $ANTLR start T_PURE
+    // $ANTLR start "T_PURE"
     public final void mT_PURE() throws RecognitionException {
         try {
             int _type = T_PURE;
-            // FortranLexer.g:565:17: ( 'PURE' )
-            // FortranLexer.g:565:25: 'PURE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:564:17: ( 'PURE' )
+            // FortranLexer.g:564:25: 'PURE'
             {
             match("PURE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PURE
+    // $ANTLR end "T_PURE"
 
-    // $ANTLR start T_READ
+    // $ANTLR start "T_READ"
     public final void mT_READ() throws RecognitionException {
         try {
             int _type = T_READ;
-            // FortranLexer.g:566:17: ( 'READ' )
-            // FortranLexer.g:566:25: 'READ'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:565:17: ( 'READ' )
+            // FortranLexer.g:565:25: 'READ'
             {
             match("READ"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_READ
+    // $ANTLR end "T_READ"
 
-    // $ANTLR start T_RECURSIVE
+    // $ANTLR start "T_RECURSIVE"
     public final void mT_RECURSIVE() throws RecognitionException {
         try {
             int _type = T_RECURSIVE;
-            // FortranLexer.g:567:17: ( 'RECURSIVE' )
-            // FortranLexer.g:567:25: 'RECURSIVE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:566:17: ( 'RECURSIVE' )
+            // FortranLexer.g:566:25: 'RECURSIVE'
             {
             match("RECURSIVE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_RECURSIVE
+    // $ANTLR end "T_RECURSIVE"
 
-    // $ANTLR start T_RESULT
+    // $ANTLR start "T_RESULT"
     public final void mT_RESULT() throws RecognitionException {
         try {
             int _type = T_RESULT;
-            // FortranLexer.g:568:17: ( 'RESULT' )
-            // FortranLexer.g:568:25: 'RESULT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:567:17: ( 'RESULT' )
+            // FortranLexer.g:567:25: 'RESULT'
             {
             match("RESULT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_RESULT
+    // $ANTLR end "T_RESULT"
 
-    // $ANTLR start T_RETURN
+    // $ANTLR start "T_RETURN"
     public final void mT_RETURN() throws RecognitionException {
         try {
             int _type = T_RETURN;
-            // FortranLexer.g:569:17: ( 'RETURN' )
-            // FortranLexer.g:569:25: 'RETURN'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:568:17: ( 'RETURN' )
+            // FortranLexer.g:568:25: 'RETURN'
             {
             match("RETURN"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_RETURN
+    // $ANTLR end "T_RETURN"
 
-    // $ANTLR start T_REWIND
+    // $ANTLR start "T_REWIND"
     public final void mT_REWIND() throws RecognitionException {
         try {
             int _type = T_REWIND;
-            // FortranLexer.g:570:17: ( 'REWIND' )
-            // FortranLexer.g:570:25: 'REWIND'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:569:17: ( 'REWIND' )
+            // FortranLexer.g:569:25: 'REWIND'
             {
             match("REWIND"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_REWIND
+    // $ANTLR end "T_REWIND"
 
-    // $ANTLR start T_SAVE
+    // $ANTLR start "T_SAVE"
     public final void mT_SAVE() throws RecognitionException {
         try {
             int _type = T_SAVE;
-            // FortranLexer.g:571:17: ( 'SAVE' )
-            // FortranLexer.g:571:25: 'SAVE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:570:17: ( 'SAVE' )
+            // FortranLexer.g:570:25: 'SAVE'
             {
             match("SAVE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SAVE
+    // $ANTLR end "T_SAVE"
 
-    // $ANTLR start T_SELECT
+    // $ANTLR start "T_SELECT"
     public final void mT_SELECT() throws RecognitionException {
         try {
             int _type = T_SELECT;
-            // FortranLexer.g:572:17: ( 'SELECT' )
-            // FortranLexer.g:572:25: 'SELECT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:571:17: ( 'SELECT' )
+            // FortranLexer.g:571:25: 'SELECT'
             {
             match("SELECT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SELECT
+    // $ANTLR end "T_SELECT"
 
-    // $ANTLR start T_SELECTCASE
+    // $ANTLR start "T_SELECTCASE"
     public final void mT_SELECTCASE() throws RecognitionException {
         try {
             int _type = T_SELECTCASE;
-            // FortranLexer.g:573:17: ( 'SELECTCASE' )
-            // FortranLexer.g:573:25: 'SELECTCASE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:572:17: ( 'SELECTCASE' )
+            // FortranLexer.g:572:25: 'SELECTCASE'
             {
             match("SELECTCASE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SELECTCASE
+    // $ANTLR end "T_SELECTCASE"
 
-    // $ANTLR start T_SELECTTYPE
+    // $ANTLR start "T_SELECTTYPE"
     public final void mT_SELECTTYPE() throws RecognitionException {
         try {
             int _type = T_SELECTTYPE;
-            // FortranLexer.g:574:17: ( 'SELECTTYPE' )
-            // FortranLexer.g:574:25: 'SELECTTYPE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:573:17: ( 'SELECTTYPE' )
+            // FortranLexer.g:573:25: 'SELECTTYPE'
             {
             match("SELECTTYPE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SELECTTYPE
+    // $ANTLR end "T_SELECTTYPE"
 
-    // $ANTLR start T_SEQUENCE
+    // $ANTLR start "T_SEQUENCE"
     public final void mT_SEQUENCE() throws RecognitionException {
         try {
             int _type = T_SEQUENCE;
-            // FortranLexer.g:575:17: ( 'SEQUENCE' )
-            // FortranLexer.g:575:25: 'SEQUENCE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:574:17: ( 'SEQUENCE' )
+            // FortranLexer.g:574:25: 'SEQUENCE'
             {
             match("SEQUENCE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SEQUENCE
+    // $ANTLR end "T_SEQUENCE"
 
-    // $ANTLR start T_STOP
+    // $ANTLR start "T_STOP"
     public final void mT_STOP() throws RecognitionException {
         try {
             int _type = T_STOP;
-            // FortranLexer.g:576:17: ( 'STOP' )
-            // FortranLexer.g:576:25: 'STOP'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:575:17: ( 'STOP' )
+            // FortranLexer.g:575:25: 'STOP'
             {
             match("STOP"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_STOP
+    // $ANTLR end "T_STOP"
 
-    // $ANTLR start T_SUBROUTINE
+    // $ANTLR start "T_SUBROUTINE"
     public final void mT_SUBROUTINE() throws RecognitionException {
         try {
             int _type = T_SUBROUTINE;
-            // FortranLexer.g:577:17: ( 'SUBROUTINE' )
-            // FortranLexer.g:577:25: 'SUBROUTINE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:576:17: ( 'SUBROUTINE' )
+            // FortranLexer.g:576:25: 'SUBROUTINE'
             {
             match("SUBROUTINE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_SUBROUTINE
+    // $ANTLR end "T_SUBROUTINE"
 
-    // $ANTLR start T_TARGET
+    // $ANTLR start "T_TARGET"
     public final void mT_TARGET() throws RecognitionException {
         try {
             int _type = T_TARGET;
-            // FortranLexer.g:578:17: ( 'TARGET' )
-            // FortranLexer.g:578:25: 'TARGET'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:577:17: ( 'TARGET' )
+            // FortranLexer.g:577:25: 'TARGET'
             {
             match("TARGET"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_TARGET
+    // $ANTLR end "T_TARGET"
 
-    // $ANTLR start T_THEN
+    // $ANTLR start "T_THEN"
     public final void mT_THEN() throws RecognitionException {
         try {
             int _type = T_THEN;
-            // FortranLexer.g:579:17: ( 'THEN' )
-            // FortranLexer.g:579:25: 'THEN'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:578:17: ( 'THEN' )
+            // FortranLexer.g:578:25: 'THEN'
             {
             match("THEN"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_THEN
+    // $ANTLR end "T_THEN"
 
-    // $ANTLR start T_TO
+    // $ANTLR start "T_TO"
     public final void mT_TO() throws RecognitionException {
         try {
             int _type = T_TO;
-            // FortranLexer.g:580:17: ( 'TO' )
-            // FortranLexer.g:580:25: 'TO'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:579:17: ( 'TO' )
+            // FortranLexer.g:579:25: 'TO'
             {
             match("TO"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_TO
+    // $ANTLR end "T_TO"
 
-    // $ANTLR start T_TYPE
+    // $ANTLR start "T_TYPE"
     public final void mT_TYPE() throws RecognitionException {
         try {
             int _type = T_TYPE;
-            // FortranLexer.g:581:17: ( 'TYPE' )
-            // FortranLexer.g:581:25: 'TYPE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:580:17: ( 'TYPE' )
+            // FortranLexer.g:580:25: 'TYPE'
             {
             match("TYPE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_TYPE
+    // $ANTLR end "T_TYPE"
 
-    // $ANTLR start T_UNFORMATTED
+    // $ANTLR start "T_UNFORMATTED"
     public final void mT_UNFORMATTED() throws RecognitionException {
         try {
             int _type = T_UNFORMATTED;
-            // FortranLexer.g:582:17: ( 'UNFORMATTED' )
-            // FortranLexer.g:582:25: 'UNFORMATTED'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:581:17: ( 'UNFORMATTED' )
+            // FortranLexer.g:581:25: 'UNFORMATTED'
             {
             match("UNFORMATTED"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_UNFORMATTED
+    // $ANTLR end "T_UNFORMATTED"
 
-    // $ANTLR start T_USE
+    // $ANTLR start "T_USE"
     public final void mT_USE() throws RecognitionException {
         try {
             int _type = T_USE;
-            // FortranLexer.g:583:17: ( 'USE' )
-            // FortranLexer.g:583:25: 'USE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:582:17: ( 'USE' )
+            // FortranLexer.g:582:25: 'USE'
             {
             match("USE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_USE
+    // $ANTLR end "T_USE"
 
-    // $ANTLR start T_VALUE
+    // $ANTLR start "T_VALUE"
     public final void mT_VALUE() throws RecognitionException {
         try {
             int _type = T_VALUE;
-            // FortranLexer.g:584:17: ( 'VALUE' )
-            // FortranLexer.g:584:25: 'VALUE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:583:17: ( 'VALUE' )
+            // FortranLexer.g:583:25: 'VALUE'
             {
             match("VALUE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_VALUE
+    // $ANTLR end "T_VALUE"
 
-    // $ANTLR start T_VOLATILE
+    // $ANTLR start "T_VOLATILE"
     public final void mT_VOLATILE() throws RecognitionException {
         try {
             int _type = T_VOLATILE;
-            // FortranLexer.g:585:17: ( 'VOLATILE' )
-            // FortranLexer.g:585:25: 'VOLATILE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:584:17: ( 'VOLATILE' )
+            // FortranLexer.g:584:25: 'VOLATILE'
             {
             match("VOLATILE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_VOLATILE
+    // $ANTLR end "T_VOLATILE"
 
-    // $ANTLR start T_WAIT
+    // $ANTLR start "T_WAIT"
     public final void mT_WAIT() throws RecognitionException {
         try {
             int _type = T_WAIT;
-            // FortranLexer.g:586:17: ( 'WAIT' )
-            // FortranLexer.g:586:25: 'WAIT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:585:17: ( 'WAIT' )
+            // FortranLexer.g:585:25: 'WAIT'
             {
             match("WAIT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_WAIT
+    // $ANTLR end "T_WAIT"
 
-    // $ANTLR start T_WHERE
+    // $ANTLR start "T_WHERE"
     public final void mT_WHERE() throws RecognitionException {
         try {
             int _type = T_WHERE;
-            // FortranLexer.g:587:17: ( 'WHERE' )
-            // FortranLexer.g:587:25: 'WHERE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:586:17: ( 'WHERE' )
+            // FortranLexer.g:586:25: 'WHERE'
             {
             match("WHERE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_WHERE
+    // $ANTLR end "T_WHERE"
 
-    // $ANTLR start T_WHILE
+    // $ANTLR start "T_WHILE"
     public final void mT_WHILE() throws RecognitionException {
         try {
             int _type = T_WHILE;
-            // FortranLexer.g:588:17: ( 'WHILE' )
-            // FortranLexer.g:588:25: 'WHILE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:587:17: ( 'WHILE' )
+            // FortranLexer.g:587:25: 'WHILE'
             {
             match("WHILE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_WHILE
+    // $ANTLR end "T_WHILE"
 
-    // $ANTLR start T_WRITE
+    // $ANTLR start "T_WRITE"
     public final void mT_WRITE() throws RecognitionException {
         try {
             int _type = T_WRITE;
-            // FortranLexer.g:589:17: ( 'WRITE' )
-            // FortranLexer.g:589:25: 'WRITE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:588:17: ( 'WRITE' )
+            // FortranLexer.g:588:25: 'WRITE'
             {
             match("WRITE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_WRITE
+    // $ANTLR end "T_WRITE"
 
-    // $ANTLR start T_ENDASSOCIATE
+    // $ANTLR start "T_ENDASSOCIATE"
     public final void mT_ENDASSOCIATE() throws RecognitionException {
         try {
             int _type = T_ENDASSOCIATE;
-            // FortranLexer.g:591:17: ( 'ENDASSOCIATE' )
-            // FortranLexer.g:591:25: 'ENDASSOCIATE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:590:17: ( 'ENDASSOCIATE' )
+            // FortranLexer.g:590:25: 'ENDASSOCIATE'
             {
             match("ENDASSOCIATE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDASSOCIATE
+    // $ANTLR end "T_ENDASSOCIATE"
 
-    // $ANTLR start T_ENDBLOCK
+    // $ANTLR start "T_ENDBLOCK"
     public final void mT_ENDBLOCK() throws RecognitionException {
         try {
             int _type = T_ENDBLOCK;
-            // FortranLexer.g:592:17: ( 'ENDBLOCK' )
-            // FortranLexer.g:592:25: 'ENDBLOCK'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:591:17: ( 'ENDBLOCK' )
+            // FortranLexer.g:591:25: 'ENDBLOCK'
             {
             match("ENDBLOCK"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDBLOCK
+    // $ANTLR end "T_ENDBLOCK"
 
-    // $ANTLR start T_ENDBLOCKDATA
+    // $ANTLR start "T_ENDBLOCKDATA"
     public final void mT_ENDBLOCKDATA() throws RecognitionException {
         try {
             int _type = T_ENDBLOCKDATA;
-            // FortranLexer.g:593:17: ( 'ENDBLOCKDATA' )
-            // FortranLexer.g:593:25: 'ENDBLOCKDATA'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:592:17: ( 'ENDBLOCKDATA' )
+            // FortranLexer.g:592:25: 'ENDBLOCKDATA'
             {
             match("ENDBLOCKDATA"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDBLOCKDATA
+    // $ANTLR end "T_ENDBLOCKDATA"
 
-    // $ANTLR start T_ENDDO
+    // $ANTLR start "T_ENDDO"
     public final void mT_ENDDO() throws RecognitionException {
         try {
             int _type = T_ENDDO;
-            // FortranLexer.g:594:17: ( 'ENDDO' )
-            // FortranLexer.g:594:25: 'ENDDO'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:593:17: ( 'ENDDO' )
+            // FortranLexer.g:593:25: 'ENDDO'
             {
             match("ENDDO"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDDO
+    // $ANTLR end "T_ENDDO"
 
-    // $ANTLR start T_ENDENUM
+    // $ANTLR start "T_ENDENUM"
     public final void mT_ENDENUM() throws RecognitionException {
         try {
             int _type = T_ENDENUM;
-            // FortranLexer.g:595:17: ( 'ENDENUM' )
-            // FortranLexer.g:595:25: 'ENDENUM'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:594:17: ( 'ENDENUM' )
+            // FortranLexer.g:594:25: 'ENDENUM'
             {
             match("ENDENUM"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDENUM
+    // $ANTLR end "T_ENDENUM"
 
-    // $ANTLR start T_ENDFORALL
+    // $ANTLR start "T_ENDFORALL"
     public final void mT_ENDFORALL() throws RecognitionException {
         try {
             int _type = T_ENDFORALL;
-            // FortranLexer.g:596:17: ( 'ENDFORALL' )
-            // FortranLexer.g:596:25: 'ENDFORALL'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:595:17: ( 'ENDFORALL' )
+            // FortranLexer.g:595:25: 'ENDFORALL'
             {
             match("ENDFORALL"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDFORALL
+    // $ANTLR end "T_ENDFORALL"
 
-    // $ANTLR start T_ENDFILE
+    // $ANTLR start "T_ENDFILE"
     public final void mT_ENDFILE() throws RecognitionException {
         try {
             int _type = T_ENDFILE;
-            // FortranLexer.g:597:17: ( 'ENDFILE' )
-            // FortranLexer.g:597:25: 'ENDFILE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:596:17: ( 'ENDFILE' )
+            // FortranLexer.g:596:25: 'ENDFILE'
             {
             match("ENDFILE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDFILE
+    // $ANTLR end "T_ENDFILE"
 
-    // $ANTLR start T_ENDFUNCTION
+    // $ANTLR start "T_ENDFUNCTION"
     public final void mT_ENDFUNCTION() throws RecognitionException {
         try {
             int _type = T_ENDFUNCTION;
-            // FortranLexer.g:598:17: ( 'ENDFUNCTION' )
-            // FortranLexer.g:598:25: 'ENDFUNCTION'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:597:17: ( 'ENDFUNCTION' )
+            // FortranLexer.g:597:25: 'ENDFUNCTION'
             {
             match("ENDFUNCTION"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDFUNCTION
+    // $ANTLR end "T_ENDFUNCTION"
 
-    // $ANTLR start T_ENDIF
+    // $ANTLR start "T_ENDIF"
     public final void mT_ENDIF() throws RecognitionException {
         try {
             int _type = T_ENDIF;
-            // FortranLexer.g:599:17: ( 'ENDIF' )
-            // FortranLexer.g:599:25: 'ENDIF'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:598:17: ( 'ENDIF' )
+            // FortranLexer.g:598:25: 'ENDIF'
             {
             match("ENDIF"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDIF
+    // $ANTLR end "T_ENDIF"
 
-    // $ANTLR start T_ENDINTERFACE
+    // $ANTLR start "T_ENDINTERFACE"
     public final void mT_ENDINTERFACE() throws RecognitionException {
         try {
             int _type = T_ENDINTERFACE;
-            // FortranLexer.g:600:17: ( 'ENDINTERFACE' )
-            // FortranLexer.g:600:25: 'ENDINTERFACE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:599:17: ( 'ENDINTERFACE' )
+            // FortranLexer.g:599:25: 'ENDINTERFACE'
             {
             match("ENDINTERFACE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDINTERFACE
+    // $ANTLR end "T_ENDINTERFACE"
 
-    // $ANTLR start T_ENDMODULE
+    // $ANTLR start "T_ENDMODULE"
     public final void mT_ENDMODULE() throws RecognitionException {
         try {
             int _type = T_ENDMODULE;
-            // FortranLexer.g:601:17: ( 'ENDMODULE' )
-            // FortranLexer.g:601:25: 'ENDMODULE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:600:17: ( 'ENDMODULE' )
+            // FortranLexer.g:600:25: 'ENDMODULE'
             {
             match("ENDMODULE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDMODULE
+    // $ANTLR end "T_ENDMODULE"
 
-    // $ANTLR start T_ENDPROGRAM
+    // $ANTLR start "T_ENDPROGRAM"
     public final void mT_ENDPROGRAM() throws RecognitionException {
         try {
             int _type = T_ENDPROGRAM;
-            // FortranLexer.g:602:17: ( 'ENDPROGRAM' )
-            // FortranLexer.g:602:25: 'ENDPROGRAM'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:601:17: ( 'ENDPROGRAM' )
+            // FortranLexer.g:601:25: 'ENDPROGRAM'
             {
             match("ENDPROGRAM"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDPROGRAM
+    // $ANTLR end "T_ENDPROGRAM"
 
-    // $ANTLR start T_ENDSELECT
+    // $ANTLR start "T_ENDSELECT"
     public final void mT_ENDSELECT() throws RecognitionException {
         try {
             int _type = T_ENDSELECT;
-            // FortranLexer.g:603:17: ( 'ENDSELECT' )
-            // FortranLexer.g:603:25: 'ENDSELECT'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:602:17: ( 'ENDSELECT' )
+            // FortranLexer.g:602:25: 'ENDSELECT'
             {
             match("ENDSELECT"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDSELECT
+    // $ANTLR end "T_ENDSELECT"
 
-    // $ANTLR start T_ENDSUBROUTINE
+    // $ANTLR start "T_ENDSUBROUTINE"
     public final void mT_ENDSUBROUTINE() throws RecognitionException {
         try {
             int _type = T_ENDSUBROUTINE;
-            // FortranLexer.g:604:17: ( 'ENDSUBROUTINE' )
-            // FortranLexer.g:604:25: 'ENDSUBROUTINE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:603:17: ( 'ENDSUBROUTINE' )
+            // FortranLexer.g:603:25: 'ENDSUBROUTINE'
             {
             match("ENDSUBROUTINE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDSUBROUTINE
+    // $ANTLR end "T_ENDSUBROUTINE"
 
-    // $ANTLR start T_ENDTYPE
+    // $ANTLR start "T_ENDTYPE"
     public final void mT_ENDTYPE() throws RecognitionException {
         try {
             int _type = T_ENDTYPE;
-            // FortranLexer.g:605:17: ( 'ENDTYPE' )
-            // FortranLexer.g:605:25: 'ENDTYPE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:604:17: ( 'ENDTYPE' )
+            // FortranLexer.g:604:25: 'ENDTYPE'
             {
             match("ENDTYPE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDTYPE
+    // $ANTLR end "T_ENDTYPE"
 
-    // $ANTLR start T_ENDWHERE
+    // $ANTLR start "T_ENDWHERE"
     public final void mT_ENDWHERE() throws RecognitionException {
         try {
             int _type = T_ENDWHERE;
-            // FortranLexer.g:606:17: ( 'ENDWHERE' )
-            // FortranLexer.g:606:25: 'ENDWHERE'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:605:17: ( 'ENDWHERE' )
+            // FortranLexer.g:605:25: 'ENDWHERE'
             {
             match("ENDWHERE"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ENDWHERE
+    // $ANTLR end "T_ENDWHERE"
 
-    // $ANTLR start T_END
+    // $ANTLR start "T_END"
     public final void mT_END() throws RecognitionException {
         try {
             int _type = T_END;
-            // FortranLexer.g:608:9: ( 'END' )
-            // FortranLexer.g:608:11: 'END'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:607:9: ( 'END' )
+            // FortranLexer.g:607:11: 'END'
             {
             match("END"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_END
+    // $ANTLR end "T_END"
 
-    // $ANTLR start T_DIMENSION
+    // $ANTLR start "T_DIMENSION"
     public final void mT_DIMENSION() throws RecognitionException {
         try {
             int _type = T_DIMENSION;
-            // FortranLexer.g:611:17: ( 'DIMENSION' )
-            // FortranLexer.g:611:25: 'DIMENSION'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:610:17: ( 'DIMENSION' )
+            // FortranLexer.g:610:25: 'DIMENSION'
             {
             match("DIMENSION"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DIMENSION
+    // $ANTLR end "T_DIMENSION"
 
-    // $ANTLR start T_KIND
+    // $ANTLR start "T_KIND"
     public final void mT_KIND() throws RecognitionException {
         try {
             int _type = T_KIND;
-            // FortranLexer.g:613:8: ( 'KIND' )
-            // FortranLexer.g:613:10: 'KIND'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:612:8: ( 'KIND' )
+            // FortranLexer.g:612:10: 'KIND'
             {
             match("KIND"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_KIND
+    // $ANTLR end "T_KIND"
 
-    // $ANTLR start T_LEN
+    // $ANTLR start "T_LEN"
     public final void mT_LEN() throws RecognitionException {
         try {
             int _type = T_LEN;
-            // FortranLexer.g:614:7: ( 'LEN' )
-            // FortranLexer.g:614:9: 'LEN'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:613:7: ( 'LEN' )
+            // FortranLexer.g:613:9: 'LEN'
             {
             match("LEN"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LEN
+    // $ANTLR end "T_LEN"
 
-    // $ANTLR start T_BIND
+    // $ANTLR start "T_BIND"
     public final void mT_BIND() throws RecognitionException {
         try {
             int _type = T_BIND;
-            // FortranLexer.g:616:8: ( 'BIND' )
-            // FortranLexer.g:616:10: 'BIND'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:615:8: ( 'BIND' )
+            // FortranLexer.g:615:10: 'BIND'
             {
             match("BIND"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_BIND
+    // $ANTLR end "T_BIND"
 
-    // $ANTLR start T_HOLLERITH
+    // $ANTLR start "T_HOLLERITH"
     public final void mT_HOLLERITH() throws RecognitionException {
         try {
             int _type = T_HOLLERITH;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
             Token Digit_String1=null;
 
-            // FortranLexer.g:618:13: ( Digit_String 'H' )
-            // FortranLexer.g:618:15: Digit_String 'H'
+            // FortranLexer.g:617:13: ( Digit_String 'H' )
+            // FortranLexer.g:617:15: Digit_String 'H'
             {
-            int Digit_String1Start4794 = getCharIndex();
+            int Digit_String1Start4814 = getCharIndex();
             mDigit_String(); 
-            Digit_String1 = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, Digit_String1Start4794, getCharIndex()-1);
+            Digit_String1 = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, Digit_String1Start4814, getCharIndex()-1);
             match('H'); 
              
                     // If we're inside a format stmt we don't want to process it as 
@@ -5054,7 +5402,7 @@ public class FortranLexer extends Lexer {
                     // However, the H-edit descriptor needs processed the same way both 
                     // here and in the prepass.
                     StringBuffer hollConst = new StringBuffer();
-                    int count = Integer.parseInt(Digit_String1.getText());
+                    int count = Integer.parseInt((Digit_String1!=null?Digit_String1.getText():null));
 
                     for(int i = 0; i < count; i++) 
                        hollConst = hollConst.append((char)input.LA(i+1));
@@ -5065,22 +5413,24 @@ public class FortranLexer extends Lexer {
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_HOLLERITH
+    // $ANTLR end "T_HOLLERITH"
 
-    // $ANTLR start T_DEFINED_OP
+    // $ANTLR start "T_DEFINED_OP"
     public final void mT_DEFINED_OP() throws RecognitionException {
         try {
             int _type = T_DEFINED_OP;
-            // FortranLexer.g:638:5: ( '.' ( Letter )+ '.' )
-            // FortranLexer.g:638:10: '.' ( Letter )+ '.'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:637:5: ( '.' ( Letter )+ '.' )
+            // FortranLexer.g:637:10: '.' ( Letter )+ '.'
             {
             match('.'); 
-            // FortranLexer.g:638:14: ( Letter )+
+            // FortranLexer.g:637:14: ( Letter )+
             int cnt29=0;
             loop29:
             do {
@@ -5094,7 +5444,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt29) {
             	case 1 :
-            	    // FortranLexer.g:638:14: Letter
+            	    // FortranLexer.g:637:14: Letter
             	    {
             	    mLetter(); 
 
@@ -5114,345 +5464,381 @@ public class FortranLexer extends Lexer {
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DEFINED_OP
+    // $ANTLR end "T_DEFINED_OP"
 
-    // $ANTLR start T_LABEL_DO_TERMINAL
+    // $ANTLR start "T_LABEL_DO_TERMINAL"
     public final void mT_LABEL_DO_TERMINAL() throws RecognitionException {
         try {
             int _type = T_LABEL_DO_TERMINAL;
-            // FortranLexer.g:651:2: ( '__LABEL_DO_TERMINAL__' )
-            // FortranLexer.g:651:4: '__LABEL_DO_TERMINAL__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:650:9: ( '__LABEL_DO_TERMINAL__' )
+            // FortranLexer.g:650:17: '__LABEL_DO_TERMINAL__'
             {
             match("__LABEL_DO_TERMINAL__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_LABEL_DO_TERMINAL
+    // $ANTLR end "T_LABEL_DO_TERMINAL"
 
-    // $ANTLR start T_DATA_EDIT_DESC
+    // $ANTLR start "T_DATA_EDIT_DESC"
     public final void mT_DATA_EDIT_DESC() throws RecognitionException {
         try {
             int _type = T_DATA_EDIT_DESC;
-            // FortranLexer.g:654:18: ( '__T_DATA_EDIT_DESC__' )
-            // FortranLexer.g:654:20: '__T_DATA_EDIT_DESC__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:653:18: ( '__T_DATA_EDIT_DESC__' )
+            // FortranLexer.g:653:20: '__T_DATA_EDIT_DESC__'
             {
             match("__T_DATA_EDIT_DESC__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_DATA_EDIT_DESC
+    // $ANTLR end "T_DATA_EDIT_DESC"
 
-    // $ANTLR start T_CONTROL_EDIT_DESC
+    // $ANTLR start "T_CONTROL_EDIT_DESC"
     public final void mT_CONTROL_EDIT_DESC() throws RecognitionException {
         try {
             int _type = T_CONTROL_EDIT_DESC;
-            // FortranLexer.g:655:21: ( '__T_CONTROL_EDIT_DESC__' )
-            // FortranLexer.g:655:23: '__T_CONTROL_EDIT_DESC__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:654:21: ( '__T_CONTROL_EDIT_DESC__' )
+            // FortranLexer.g:654:23: '__T_CONTROL_EDIT_DESC__'
             {
             match("__T_CONTROL_EDIT_DESC__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CONTROL_EDIT_DESC
+    // $ANTLR end "T_CONTROL_EDIT_DESC"
 
-    // $ANTLR start T_CHAR_STRING_EDIT_DESC
+    // $ANTLR start "T_CHAR_STRING_EDIT_DESC"
     public final void mT_CHAR_STRING_EDIT_DESC() throws RecognitionException {
         try {
             int _type = T_CHAR_STRING_EDIT_DESC;
-            // FortranLexer.g:656:25: ( '__T_CHAR_STRING_EDIT_DESC__' )
-            // FortranLexer.g:656:27: '__T_CHAR_STRING_EDIT_DESC__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:655:25: ( '__T_CHAR_STRING_EDIT_DESC__' )
+            // FortranLexer.g:655:27: '__T_CHAR_STRING_EDIT_DESC__'
             {
             match("__T_CHAR_STRING_EDIT_DESC__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_CHAR_STRING_EDIT_DESC
+    // $ANTLR end "T_CHAR_STRING_EDIT_DESC"
 
-    // $ANTLR start T_STMT_FUNCTION
+    // $ANTLR start "T_STMT_FUNCTION"
     public final void mT_STMT_FUNCTION() throws RecognitionException {
         try {
             int _type = T_STMT_FUNCTION;
-            // FortranLexer.g:659:2: ( 'STMT_FUNCTION' )
-            // FortranLexer.g:659:4: 'STMT_FUNCTION'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:658:9: ( 'STMT_FUNCTION' )
+            // FortranLexer.g:658:17: 'STMT_FUNCTION'
             {
             match("STMT_FUNCTION"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_STMT_FUNCTION
+    // $ANTLR end "T_STMT_FUNCTION"
 
-    // $ANTLR start T_ASSIGNMENT_STMT
+    // $ANTLR start "T_ASSIGNMENT_STMT"
     public final void mT_ASSIGNMENT_STMT() throws RecognitionException {
         try {
             int _type = T_ASSIGNMENT_STMT;
-            // FortranLexer.g:662:19: ( '__T_ASSIGNMENT_STMT__' )
-            // FortranLexer.g:662:21: '__T_ASSIGNMENT_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:661:19: ( '__T_ASSIGNMENT_STMT__' )
+            // FortranLexer.g:661:21: '__T_ASSIGNMENT_STMT__'
             {
             match("__T_ASSIGNMENT_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ASSIGNMENT_STMT
+    // $ANTLR end "T_ASSIGNMENT_STMT"
 
-    // $ANTLR start T_PTR_ASSIGNMENT_STMT
+    // $ANTLR start "T_PTR_ASSIGNMENT_STMT"
     public final void mT_PTR_ASSIGNMENT_STMT() throws RecognitionException {
         try {
             int _type = T_PTR_ASSIGNMENT_STMT;
-            // FortranLexer.g:663:23: ( '__T_PTR_ASSIGNMENT_STMT__' )
-            // FortranLexer.g:663:25: '__T_PTR_ASSIGNMENT_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:662:23: ( '__T_PTR_ASSIGNMENT_STMT__' )
+            // FortranLexer.g:662:25: '__T_PTR_ASSIGNMENT_STMT__'
             {
             match("__T_PTR_ASSIGNMENT_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_PTR_ASSIGNMENT_STMT
+    // $ANTLR end "T_PTR_ASSIGNMENT_STMT"
 
-    // $ANTLR start T_ARITHMETIC_IF_STMT
+    // $ANTLR start "T_ARITHMETIC_IF_STMT"
     public final void mT_ARITHMETIC_IF_STMT() throws RecognitionException {
         try {
             int _type = T_ARITHMETIC_IF_STMT;
-            // FortranLexer.g:664:22: ( '__T_ARITHMETIC_IF_STMT__' )
-            // FortranLexer.g:664:24: '__T_ARITHMETIC_IF_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:663:22: ( '__T_ARITHMETIC_IF_STMT__' )
+            // FortranLexer.g:663:24: '__T_ARITHMETIC_IF_STMT__'
             {
             match("__T_ARITHMETIC_IF_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ARITHMETIC_IF_STMT
+    // $ANTLR end "T_ARITHMETIC_IF_STMT"
 
-    // $ANTLR start T_ALLOCATE_STMT_1
+    // $ANTLR start "T_ALLOCATE_STMT_1"
     public final void mT_ALLOCATE_STMT_1() throws RecognitionException {
         try {
             int _type = T_ALLOCATE_STMT_1;
-            // FortranLexer.g:665:19: ( '__T_ALLOCATE_STMT_1__' )
-            // FortranLexer.g:665:21: '__T_ALLOCATE_STMT_1__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:664:19: ( '__T_ALLOCATE_STMT_1__' )
+            // FortranLexer.g:664:21: '__T_ALLOCATE_STMT_1__'
             {
             match("__T_ALLOCATE_STMT_1__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_ALLOCATE_STMT_1
+    // $ANTLR end "T_ALLOCATE_STMT_1"
 
-    // $ANTLR start T_WHERE_STMT
+    // $ANTLR start "T_WHERE_STMT"
     public final void mT_WHERE_STMT() throws RecognitionException {
         try {
             int _type = T_WHERE_STMT;
-            // FortranLexer.g:666:14: ( '__T_WHERE_STMT__' )
-            // FortranLexer.g:666:16: '__T_WHERE_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:665:14: ( '__T_WHERE_STMT__' )
+            // FortranLexer.g:665:16: '__T_WHERE_STMT__'
             {
             match("__T_WHERE_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_WHERE_STMT
+    // $ANTLR end "T_WHERE_STMT"
 
-    // $ANTLR start T_IF_STMT
+    // $ANTLR start "T_IF_STMT"
     public final void mT_IF_STMT() throws RecognitionException {
         try {
             int _type = T_IF_STMT;
-            // FortranLexer.g:667:11: ( '__T_IF_STMT__' )
-            // FortranLexer.g:667:13: '__T_IF_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:666:11: ( '__T_IF_STMT__' )
+            // FortranLexer.g:666:13: '__T_IF_STMT__'
             {
             match("__T_IF_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_IF_STMT
+    // $ANTLR end "T_IF_STMT"
 
-    // $ANTLR start T_FORALL_STMT
+    // $ANTLR start "T_FORALL_STMT"
     public final void mT_FORALL_STMT() throws RecognitionException {
         try {
             int _type = T_FORALL_STMT;
-            // FortranLexer.g:668:15: ( '__T_FORALL_STMT__' )
-            // FortranLexer.g:668:17: '__T_FORALL_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:667:15: ( '__T_FORALL_STMT__' )
+            // FortranLexer.g:667:17: '__T_FORALL_STMT__'
             {
             match("__T_FORALL_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FORALL_STMT
+    // $ANTLR end "T_FORALL_STMT"
 
-    // $ANTLR start T_WHERE_CONSTRUCT_STMT
+    // $ANTLR start "T_WHERE_CONSTRUCT_STMT"
     public final void mT_WHERE_CONSTRUCT_STMT() throws RecognitionException {
         try {
             int _type = T_WHERE_CONSTRUCT_STMT;
-            // FortranLexer.g:669:24: ( '__T_WHERE_CONSTRUCT_STMT__' )
-            // FortranLexer.g:669:26: '__T_WHERE_CONSTRUCT_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:668:24: ( '__T_WHERE_CONSTRUCT_STMT__' )
+            // FortranLexer.g:668:26: '__T_WHERE_CONSTRUCT_STMT__'
             {
             match("__T_WHERE_CONSTRUCT_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_WHERE_CONSTRUCT_STMT
+    // $ANTLR end "T_WHERE_CONSTRUCT_STMT"
 
-    // $ANTLR start T_FORALL_CONSTRUCT_STMT
+    // $ANTLR start "T_FORALL_CONSTRUCT_STMT"
     public final void mT_FORALL_CONSTRUCT_STMT() throws RecognitionException {
         try {
             int _type = T_FORALL_CONSTRUCT_STMT;
-            // FortranLexer.g:670:25: ( '__T_FORALL_CONSTRUCT_STMT__' )
-            // FortranLexer.g:670:27: '__T_FORALL_CONSTRUCT_STMT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:669:25: ( '__T_FORALL_CONSTRUCT_STMT__' )
+            // FortranLexer.g:669:27: '__T_FORALL_CONSTRUCT_STMT__'
             {
             match("__T_FORALL_CONSTRUCT_STMT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_FORALL_CONSTRUCT_STMT
+    // $ANTLR end "T_FORALL_CONSTRUCT_STMT"
 
-    // $ANTLR start T_INQUIRE_STMT_2
+    // $ANTLR start "T_INQUIRE_STMT_2"
     public final void mT_INQUIRE_STMT_2() throws RecognitionException {
         try {
             int _type = T_INQUIRE_STMT_2;
-            // FortranLexer.g:671:18: ( '__T_INQUIRE_STMT_2__' )
-            // FortranLexer.g:671:20: '__T_INQUIRE_STMT_2__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:670:18: ( '__T_INQUIRE_STMT_2__' )
+            // FortranLexer.g:670:20: '__T_INQUIRE_STMT_2__'
             {
             match("__T_INQUIRE_STMT_2__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_INQUIRE_STMT_2
+    // $ANTLR end "T_INQUIRE_STMT_2"
 
-    // $ANTLR start T_REAL_CONSTANT
+    // $ANTLR start "T_REAL_CONSTANT"
     public final void mT_REAL_CONSTANT() throws RecognitionException {
         try {
             int _type = T_REAL_CONSTANT;
-            // FortranLexer.g:674:17: ( '__T_REAL_CONSTANT__' )
-            // FortranLexer.g:674:19: '__T_REAL_CONSTANT__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:673:17: ( '__T_REAL_CONSTANT__' )
+            // FortranLexer.g:673:19: '__T_REAL_CONSTANT__'
             {
             match("__T_REAL_CONSTANT__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_REAL_CONSTANT
+    // $ANTLR end "T_REAL_CONSTANT"
 
-    // $ANTLR start T_EOF
+    // $ANTLR start "T_EOF"
     public final void mT_EOF() throws RecognitionException {
         try {
             int _type = T_EOF;
-            // FortranLexer.g:676:6: ( '__T_EOF__' )
-            // FortranLexer.g:676:8: '__T_EOF__'
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:675:6: ( '__T_EOF__' )
+            // FortranLexer.g:675:8: '__T_EOF__'
             {
             match("__T_EOF__"); 
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_EOF
+    // $ANTLR end "T_EOF"
 
-    // $ANTLR start T_IDENT
+    // $ANTLR start "T_IDENT"
     public final void mT_IDENT() throws RecognitionException {
         try {
             int _type = T_IDENT;
-            // FortranLexer.g:681:2: ( Letter ( Alphanumeric_Character )* )
-            // FortranLexer.g:681:4: Letter ( Alphanumeric_Character )*
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:680:9: ( Letter ( Alphanumeric_Character )* )
+            // FortranLexer.g:680:17: Letter ( Alphanumeric_Character )*
             {
             mLetter(); 
-            // FortranLexer.g:681:11: ( Alphanumeric_Character )*
+            // FortranLexer.g:680:24: ( Alphanumeric_Character )*
             loop30:
             do {
                 int alt30=2;
@@ -5465,7 +5851,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt30) {
             	case 1 :
-            	    // FortranLexer.g:681:13: Alphanumeric_Character
+            	    // FortranLexer.g:680:26: Alphanumeric_Character
             	    {
             	    mAlphanumeric_Character(); 
 
@@ -5480,22 +5866,24 @@ public class FortranLexer extends Lexer {
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end T_IDENT
+    // $ANTLR end "T_IDENT"
 
-    // $ANTLR start LINE_COMMENT
+    // $ANTLR start "LINE_COMMENT"
     public final void mLINE_COMMENT() throws RecognitionException {
         try {
             int _type = LINE_COMMENT;
-            // FortranLexer.g:685:5: ( '!' (~ ( '\\n' | '\\r' ) )* )
-            // FortranLexer.g:685:7: '!' (~ ( '\\n' | '\\r' ) )*
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:684:5: ( '!' (~ ( '\\n' | '\\r' ) )* )
+            // FortranLexer.g:684:7: '!' (~ ( '\\n' | '\\r' ) )*
             {
             match('!'); 
-            // FortranLexer.g:685:12: (~ ( '\\n' | '\\r' ) )*
+            // FortranLexer.g:684:12: (~ ( '\\n' | '\\r' ) )*
             loop31:
             do {
                 int alt31=2;
@@ -5508,17 +5896,16 @@ public class FortranLexer extends Lexer {
 
                 switch (alt31) {
             	case 1 :
-            	    // FortranLexer.g:685:12: ~ ( '\\n' | '\\r' )
+            	    // FortranLexer.g:684:12: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
 
             	    }
             	    else {
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
 
 
             	    }
@@ -5530,45 +5917,47 @@ public class FortranLexer extends Lexer {
             } while (true);
 
             // _channel=99;
-                        channel=HIDDEN;
-            //             channel=99;
+                        _channel=HIDDEN;
+            //             _channel=99;
                     
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end LINE_COMMENT
+    // $ANTLR end "LINE_COMMENT"
 
-    // $ANTLR start MISC_CHAR
+    // $ANTLR start "MISC_CHAR"
     public final void mMISC_CHAR() throws RecognitionException {
         try {
             int _type = MISC_CHAR;
-            // FortranLexer.g:695:11: (~ ( '\\n' | '\\r' ) )
-            // FortranLexer.g:695:13: ~ ( '\\n' | '\\r' )
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // FortranLexer.g:694:11: (~ ( '\\n' | '\\r' ) )
+            // FortranLexer.g:694:13: ~ ( '\\n' | '\\r' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
 
             }
             else {
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
 
             }
 
-            this.type = _type;
+            state.type = _type;
+            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end MISC_CHAR
+    // $ANTLR end "MISC_CHAR"
 
     public void mTokens() throws RecognitionException {
         // FortranLexer.g:1:8: ( T_EOS | CONTINUE_CHAR | T_CHAR_CONSTANT | T_DIGIT_STRING | BINARY_CONSTANT | OCTAL_CONSTANT | HEX_CONSTANT | WS | PREPROCESS_LINE | T_INCLUDE | T_ASTERISK | T_COLON | T_COLON_COLON | T_COMMA | T_EQUALS | T_EQ_EQ | T_EQ_GT | T_GREATERTHAN | T_GREATERTHAN_EQ | T_LESSTHAN | T_LESSTHAN_EQ | T_LBRACKET | T_LPAREN | T_MINUS | T_PERCENT | T_PLUS | T_POWER | T_SLASH | T_SLASH_EQ | T_SLASH_SLASH | T_RBRACKET | T_RPAREN | T_UNDERSCORE | T_EQ | T_NE | T_LT | T_LE | T_GT | T_GE | T_TRUE | T_FALSE | T_NOT | T_AND | T_OR | T_EQV | T_NEQV | T_PERIOD_EXPONENT | T_PERIOD | T_XYZ | T_INTEGER | T_REAL | T_COMPLEX | T_CHARACTER | T_LOGICAL | T_ABSTRACT | T_ALLOCATABLE | T_ALLOCATE | T_ASSIGNMENT | T_ASSIGN | T_ASSOCIATE | T_ASYNCHRONOUS | T_BACKSPACE | T_BLOCK | T_BLOCKDATA | T_CALL | T_CASE | T_CLASS | T_CLOSE | T_COMMON | T_CONTAINS | T_CONTINUE | T_CYCLE | T_DATA | T_DEFAULT | T_DEALLOCATE | T_DEFERRED | T_DO | T_DOUBLE | T_DOUBLEPRECISION | T_DOUBLECOMPLEX | T_ELEMENTAL | T_ELSE | T_ELSEIF | T_ELSEWHERE | T_ENTRY | T_ENUM | T_ENUMERATOR | T_EQUIVALENCE | T_EXIT | T_EXTENDS | T_EXTERNAL | T_FILE | T_FINAL | T_FLUSH | T_FORALL | T_FORMAT | T_FORMATTED | T_FUNCTION | T_GENERIC | T_GO | T_GOTO | T_IF | T_IMPLICIT | T_IMPORT | T_IN | T_INOUT | T_INTENT | T_INTERFACE | T_INTRINSIC | T_INQUIRE | T_MODULE | T_NAMELIST | T_NONE | T_NON_INTRINSIC | T_NON_OVERRIDABLE | T_NOPASS | T_NULLIFY | T_ONLY | T_OPEN | T_OPERATOR | T_OPTIONAL | T_OUT | T_PARAMETER | T_PASS | T_PAUSE | T_POINTER | T_PRINT | T_PRECISION | T_PRIVATE | T_PROCEDURE | T_PROGRAM | T_PROTECTED | T_PUBLIC | T_PURE | T_READ | T_RECURSIVE | T_RESULT | T_RETURN | T_REWIND | T_SAVE | T_SELECT | T_SELECTCASE | T_SELECTTYPE | T_SEQUENCE | T_STOP | T_SUBROUTINE | T_TARGET | T_THEN | T_TO | T_TYPE | T_UNFORMATTED | T_USE | T_VALUE | T_VOLATILE | T_WAIT | T_WHERE | T_WHILE | T_WRITE | T_ENDASSOCIATE | T_ENDBLOCK | T_ENDBLOCKDATA | T_ENDDO | T_ENDENUM | T_ENDFORALL | T_ENDFILE | T_ENDFUNCTION | T_ENDIF | T_ENDINTERFACE | T_ENDMODULE | T_ENDPROGRAM | T_ENDSELECT | T_ENDSUBROUTINE | T_ENDTYPE | T_ENDWHERE | T_END | T_DIMENSION | T_KIND | T_LEN | T_BIND | T_HOLLERITH | T_DEFINED_OP | T_LABEL_DO_TERMINAL | T_DATA_EDIT_DESC | T_CONTROL_EDIT_DESC | T_CHAR_STRING_EDIT_DESC | T_STMT_FUNCTION | T_ASSIGNMENT_STMT | T_PTR_ASSIGNMENT_STMT | T_ARITHMETIC_IF_STMT | T_ALLOCATE_STMT_1 | T_WHERE_STMT | T_IF_STMT | T_FORALL_STMT | T_WHERE_CONSTRUCT_STMT | T_FORALL_CONSTRUCT_STMT | T_INQUIRE_STMT_2 | T_REAL_CONSTANT | T_EOF | T_IDENT | LINE_COMMENT | MISC_CHAR )
@@ -7042,248 +7431,242 @@ public class FortranLexer extends Lexer {
             this.transition = DFA28_transition;
         }
         public String getDescription() {
-            return "462:1: T_PERIOD_EXPONENT : ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ );";
+            return "461:1: T_PERIOD_EXPONENT : ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ );";
         }
     }
     static final String DFA32_eotS =
         "\2\uffff\1\64\2\uffff\2\63\1\67\3\77\2\uffff\1\77\1\112\1\114\1"+
-        "\uffff\1\120\1\122\1\124\5\uffff\1\134\2\uffff\1\140\1\152\23\77"+
-        "\10\uffff\1\67\1\uffff\3\77\2\uffff\1\77\1\uffff\2\77\2\uffff\1"+
-        "\u00a9\1\u00aa\1\77\43\uffff\16\77\1\u00d2\10\77\1\u00e1\17\77\1"+
-        "\u00f9\11\77\1\uffff\5\77\1\u010a\5\77\2\uffff\1\77\16\uffff\16"+
-        "\77\1\u0131\11\77\1\uffff\1\u0148\15\77\1\uffff\27\77\1\uffff\1"+
-        "\77\1\u0173\12\77\1\u017e\1\u017f\2\77\1\uffff\1\u0182\7\77\16\uffff"+
-        "\1\77\1\u01a3\1\u01a4\3\77\1\u01a8\1\u01a9\10\77\1\uffff\5\77\1"+
-        "\u01b8\20\77\1\uffff\1\u01ce\1\77\1\u01d2\2\77\1\u01d6\2\77\1\u01d9"+
-        "\4\77\1\u01de\4\77\1\u01e3\10\77\1\u01ed\2\77\1\u01f0\4\77\1\u01f5"+
-        "\1\77\1\u01f7\1\77\1\u01f9\1\u01fa\1\77\1\uffff\6\77\1\u0202\1\u0203"+
-        "\1\77\1\u0206\2\uffff\2\77\1\uffff\6\77\1\u020f\2\77\26\uffff\1"+
-        "\77\2\uffff\3\77\2\uffff\4\77\1\u0229\1\u022a\1\u022b\7\77\1\uffff"+
-        "\16\77\1\u0241\3\77\1\u0245\2\77\1\uffff\1\u0248\2\77\1\uffff\3"+
-        "\77\1\uffff\1\77\1\u024f\1\uffff\3\77\1\u0253\1\uffff\4\77\1\uffff"+
-        "\7\77\1\u025f\1\77\1\uffff\1\u0261\1\77\1\uffff\4\77\1\uffff\1\77"+
-        "\1\uffff\1\77\2\uffff\2\77\1\u026b\1\77\1\u026d\1\u026e\1\u026f"+
-        "\2\uffff\2\77\1\uffff\3\77\1\u0275\4\77\1\uffff\1\77\1\u027b\17"+
-        "\uffff\1\u0281\1\77\1\u0283\1\u0284\1\u0285\3\77\3\uffff\3\77\1"+
-        "\u028d\7\77\1\u0297\11\77\1\uffff\3\77\1\uffff\2\77\1\uffff\1\77"+
-        "\1\u02a7\4\77\1\uffff\1\77\1\u02ad\1\u02af\1\uffff\1\77\1\u02b1"+
-        "\1\77\1\u02b3\7\77\1\uffff\1\77\1\uffff\1\77\1\u02bd\1\77\1\u02c1"+
-        "\3\77\1\u02c5\1\77\1\uffff\1\77\3\uffff\4\77\1\u02cc\1\uffff\2\77"+
-        "\1\u02cf\1\u02d0\1\77\7\uffff\1\77\3\uffff\1\u02d6\3\77\1\u02da"+
-        "\2\77\1\uffff\6\77\1\u02e4\2\77\1\uffff\7\77\1\u02ee\3\77\1\u02f2"+
-        "\1\u02f3\2\77\1\uffff\1\77\1\u02f7\3\77\1\uffff\1\77\1\uffff\1\u02fc"+
-        "\1\uffff\1\u02fd\1\uffff\3\77\1\u0301\2\77\1\u0304\2\77\1\uffff"+
-        "\1\u0307\2\77\1\uffff\3\77\1\uffff\4\77\1\u0311\1\u0312\1\uffff"+
-        "\2\77\2\uffff\1\u0315\3\uffff\1\77\1\uffff\1\u0319\1\u031a\1\77"+
-        "\1\uffff\1\u031c\4\77\1\u0321\2\77\1\u0324\1\uffff\2\77\1\u0328"+
-        "\2\77\1\u032b\3\77\1\uffff\3\77\2\uffff\3\77\1\uffff\1\u0335\1\77"+
-        "\1\u0337\1\77\2\uffff\2\77\1\u033b\1\uffff\2\77\1\uffff\2\77\1\uffff"+
-        "\2\77\1\u0342\3\77\1\u0346\1\u0347\1\u0348\2\uffff\1\u0349\1\u034a"+
-        "\3\uffff\1\u034d\2\uffff\1\u034e\1\uffff\1\77\1\u0350\2\77\1\uffff"+
-        "\1\u0353\1\77\1\uffff\3\77\1\uffff\1\u0358\1\77\1\uffff\1\77\1\u035b"+
-        "\2\77\1\u035e\2\77\1\u0361\1\u0362\1\uffff\1\77\1\uffff\1\u0364"+
-        "\2\77\1\uffff\1\u0367\1\u0368\1\u0369\1\u036a\2\77\1\uffff\3\77"+
-        "\11\uffff\1\u0373\1\uffff\2\77\1\uffff\1\u0376\3\77\1\uffff\1\77"+
-        "\1\u037b\1\uffff\2\77\1\uffff\1\77\1\u037f\2\uffff\1\77\1\uffff"+
-        "\2\77\4\uffff\1\u0383\1\u0384\1\77\1\u0386\1\77\4\uffff\1\77\1\u038b"+
-        "\1\uffff\4\77\1\uffff\1\u0390\2\77\1\uffff\1\u0393\2\77\2\uffff"+
-        "\1\77\1\uffff\1\u0397\2\uffff\1\u0398\1\uffff\2\77\1\u039b\1\77"+
-        "\1\uffff\1\u039d\1\u039e\1\uffff\3\77\2\uffff\1\u03a2\1\77\1\uffff"+
-        "\1\u03a4\2\uffff\1\77\1\u03a6\1\u03a7\1\uffff\1\77\1\uffff\1\77"+
-        "\2\uffff\1\u03aa\1\u03ab\2\uffff";
+        "\uffff\1\120\1\122\1\124\5\uffff\1\134\2\uffff\1\140\1\153\23\77"+
+        "\7\uffff\1\67\3\uffff\3\77\2\uffff\3\77\2\uffff\1\u00a9\1\u00aa"+
+        "\1\77\43\uffff\15\77\1\u00d1\12\77\1\u00e2\16\77\1\u00f9\11\77\1"+
+        "\uffff\6\77\1\u010b\4\77\2\uffff\1\77\16\uffff\16\77\1\u0131\10"+
+        "\77\1\uffff\5\77\1\u014c\12\77\1\uffff\26\77\1\uffff\2\77\1\u0174"+
+        "\11\77\1\u017e\1\u017f\1\u0180\2\77\1\uffff\7\77\16\uffff\1\u01a2"+
+        "\1\u01a3\10\77\1\u01ad\1\u01ae\4\77\1\uffff\5\77\1\u01b8\6\77\1"+
+        "\u01c1\1\77\1\u01c4\13\77\1\uffff\1\77\1\u01d5\1\77\1\u01d8\6\77"+
+        "\1\u01df\2\77\1\u01e2\4\77\1\u01e8\11\77\1\u01f2\1\u01f3\2\77\1"+
+        "\u01f6\3\77\1\u01fa\1\u01fb\1\77\1\uffff\2\77\1\u01ff\3\77\1\u0203"+
+        "\1\77\1\u0206\3\uffff\7\77\1\u020e\3\77\30\uffff\11\77\2\uffff\1"+
+        "\u022a\1\u022b\1\u022c\6\77\1\uffff\10\77\1\uffff\1\u023b\1\77\1"+
+        "\uffff\2\77\1\u023f\4\77\1\u0244\10\77\1\uffff\2\77\1\uffff\1\u024f"+
+        "\1\u0250\4\77\1\uffff\2\77\1\uffff\5\77\1\uffff\1\u025c\1\77\1\u025e"+
+        "\6\77\2\uffff\2\77\1\uffff\3\77\2\uffff\1\77\1\u026b\1\77\1\uffff"+
+        "\1\u026d\1\u026e\1\u026f\1\uffff\2\77\1\uffff\4\77\1\u0276\2\77"+
+        "\1\uffff\2\77\1\u027b\17\uffff\1\77\1\u0282\1\u0283\1\u0284\1\77"+
+        "\1\u0286\3\77\3\uffff\3\77\1\u028e\5\77\1\u0296\2\77\1\u0299\1\77"+
+        "\1\uffff\3\77\1\uffff\4\77\1\uffff\12\77\2\uffff\1\u02ac\1\u02ae"+
+        "\2\77\1\u02b1\3\77\1\u02b5\2\77\1\uffff\1\77\1\uffff\5\77\1\u02be"+
+        "\1\u02c1\3\77\1\u02c5\1\77\1\uffff\1\77\3\uffff\4\77\1\u02cc\1\u02cd"+
+        "\1\uffff\2\77\1\u02d0\1\77\6\uffff\1\77\3\uffff\1\u02d6\1\uffff"+
+        "\3\77\1\u02da\3\77\1\uffff\2\77\1\u02e1\4\77\1\uffff\2\77\1\uffff"+
+        "\4\77\1\u02ec\1\77\1\u02ee\6\77\1\u02f5\2\77\1\u02f8\1\77\1\uffff"+
+        "\1\77\1\uffff\1\77\1\u02fc\1\uffff\3\77\1\uffff\1\u0300\1\77\1\u0302"+
+        "\1\u0303\2\77\1\u0306\1\77\1\uffff\2\77\1\uffff\3\77\1\uffff\4\77"+
+        "\1\u0311\1\u0312\2\uffff\2\77\1\uffff\1\u0315\3\uffff\1\77\1\uffff"+
+        "\1\u0319\1\u031a\1\77\1\uffff\1\u031c\1\77\1\u031e\3\77\1\uffff"+
+        "\1\u0322\10\77\1\u032c\1\uffff\1\77\1\uffff\6\77\1\uffff\1\u0334"+
+        "\1\77\1\uffff\1\u0336\1\77\1\u0338\1\uffff\1\u0339\2\77\1\uffff"+
+        "\1\77\2\uffff\2\77\1\uffff\3\77\1\u0342\3\77\1\u0346\1\u0347\1\u0348"+
+        "\2\uffff\1\u0349\1\u034a\3\uffff\1\u034d\2\uffff\1\u034e\1\uffff"+
+        "\1\77\1\uffff\1\77\1\u0351\1\77\1\uffff\3\77\1\u0356\1\u0357\1\u0358"+
+        "\3\77\1\uffff\1\u035c\2\77\1\u035f\1\77\1\u0361\1\77\1\uffff\1\77"+
+        "\1\uffff\1\u0364\2\uffff\2\77\1\u0367\1\u0368\1\u0369\1\u036a\2"+
+        "\77\1\uffff\3\77\11\uffff\1\77\1\u0374\1\uffff\1\77\1\u0376\2\77"+
+        "\3\uffff\1\u0379\2\77\1\uffff\2\77\1\uffff\1\u037e\1\uffff\2\77"+
+        "\1\uffff\2\77\4\uffff\1\u0383\1\u0384\1\77\1\u0386\1\77\3\uffff"+
+        "\1\u038a\1\uffff\1\77\1\uffff\2\77\1\uffff\2\77\1\u0390\1\77\1\uffff"+
+        "\1\77\1\u0393\2\77\2\uffff\1\77\1\uffff\1\u0397\3\uffff\1\u0398"+
+        "\2\77\1\u039b\1\u039c\1\uffff\1\u039d\1\77\1\uffff\3\77\2\uffff"+
+        "\1\77\1\u03a3\3\uffff\1\u03a4\1\u03a5\1\77\1\u03a7\1\77\3\uffff"+
+        "\1\77\1\uffff\1\u03aa\1\u03ab\2\uffff";
     static final String DFA32_eofS =
         "\u03ac\uffff";
     static final String DFA32_minS =
         "\1\0\1\uffff\1\12\2\uffff\2\0\1\60\3\42\2\uffff\1\106\1\52\1\72"+
         "\1\uffff\3\75\5\uffff\1\57\2\uffff\1\137\1\60\1\105\1\101\1\105"+
         "\1\102\1\42\1\101\1\114\1\111\1\105\1\117\1\101\1\42\3\101\1\116"+
-        "\2\101\1\111\10\uffff\1\60\1\uffff\1\103\1\117\1\116\2\uffff\1\105"+
-        "\1\uffff\1\124\1\114\2\uffff\2\60\1\120\26\uffff\1\114\1\uffff\2"+
-        "\56\1\53\1\56\1\53\4\56\2\uffff\1\101\1\114\1\115\1\101\1\103\1"+
-        "\101\1\107\1\116\2\123\1\114\1\124\1\115\1\101\1\60\1\104\1\105"+
-        "\1\111\1\125\1\114\1\116\1\122\1\125\1\60\1\116\1\104\1\114\1\116"+
-        "\1\115\1\105\1\122\1\102\1\111\1\114\1\126\1\115\1\102\1\120\1\105"+
-        "\1\60\1\122\1\105\1\106\2\114\1\105\2\111\1\116\1\uffff\1\113\1"+
-        "\103\1\104\1\116\1\111\1\60\1\131\1\105\1\114\2\125\2\uffff\1\114"+
-        "\1\137\2\uffff\13\56\1\125\1\104\1\125\1\111\1\125\1\105\1\114\1"+
-        "\115\1\124\2\123\1\114\1\122\1\111\1\60\1\124\1\111\1\116\1\117"+
-        "\1\101\1\105\1\114\1\101\1\102\1\uffff\1\60\1\115\1\122\1\105\1"+
-        "\115\1\105\1\124\1\111\1\101\1\105\1\103\1\101\1\123\1\117\1\uffff"+
-        "\1\105\1\125\1\114\1\101\2\105\1\103\1\116\1\103\2\123\1\101\1\105"+
-        "\1\114\1\116\1\105\1\125\1\105\1\124\1\120\1\122\1\105\1\116\1\uffff"+
-        "\1\107\1\60\1\117\1\125\1\101\1\114\1\122\2\124\1\104\1\123\1\113"+
-        "\2\60\1\101\1\117\1\uffff\1\60\1\107\1\111\1\125\1\111\1\124\1\111"+
-        "\1\122\1\101\1\uffff\2\56\1\uffff\1\56\1\uffff\1\56\2\uffff\2\56"+
-        "\2\uffff\1\122\2\60\1\122\1\116\1\114\2\60\1\117\1\114\1\101\1\105"+
-        "\1\123\1\105\1\101\1\103\1\uffff\1\122\1\107\3\103\1\60\1\116\1"+
-        "\114\1\122\1\125\2\114\1\105\1\110\1\122\1\111\1\106\1\117\1\123"+
-        "\1\116\1\117\1\131\1\uffff\1\60\1\131\1\60\1\105\1\116\1\60\1\126"+
-        "\1\114\1\60\1\124\1\114\1\101\1\110\1\60\1\122\1\114\1\111\1\123"+
-        "\1\60\1\111\1\114\1\122\2\105\1\101\1\124\1\111\1\60\1\105\1\115"+
-        "\1\60\1\111\1\124\1\103\1\105\1\60\1\137\1\60\1\117\2\60\1\105\1"+
-        "\uffff\1\122\1\105\1\124\3\105\2\60\1\120\1\60\2\uffff\1\124\1\116"+
-        "\1\uffff\1\105\1\124\1\106\1\116\1\104\1\122\1\60\1\103\1\124\1"+
-        "\117\1\110\1\106\1\114\1\110\6\uffff\1\56\3\uffff\1\56\3\uffff\1"+
-        "\56\2\uffff\1\116\2\uffff\1\123\1\104\1\124\2\uffff\1\116\1\105"+
-        "\1\116\1\111\3\60\1\103\2\101\1\116\1\111\1\110\1\101\1\uffff\1"+
-        "\123\1\117\1\122\1\114\1\105\1\117\1\114\1\102\1\105\1\117\1\122"+
-        "\1\116\1\114\1\124\1\60\1\104\1\123\1\125\1\60\1\120\1\122\1\uffff"+
-        "\1\60\1\110\1\106\1\uffff\1\116\1\104\1\116\1\uffff\1\101\1\60\1"+
-        "\uffff\1\111\1\114\1\124\1\60\1\uffff\1\111\1\105\1\106\1\123\1"+
-        "\uffff\1\126\1\116\1\111\1\101\1\103\1\104\1\124\1\60\1\123\1\uffff"+
-        "\1\60\1\105\1\uffff\1\103\1\105\1\124\1\116\1\uffff\1\106\1\uffff"+
-        "\1\125\2\uffff\1\124\1\115\1\60\1\111\3\60\2\uffff\2\101\1\uffff"+
-        "\1\117\1\101\1\122\1\60\1\101\1\123\2\105\1\uffff\1\111\1\60\1\122"+
-        "\7\uffff\1\105\5\uffff\1\56\1\60\1\111\3\60\1\130\1\125\1\116\3"+
-        "\uffff\1\124\1\114\1\103\1\60\1\101\1\122\1\124\1\111\1\103\1\105"+
-        "\1\124\1\60\1\103\1\105\2\122\1\107\1\101\1\103\2\105\1\uffff\1"+
-        "\125\1\117\1\115\1\uffff\1\105\1\101\1\uffff\1\105\1\60\1\124\1"+
-        "\123\1\101\1\114\1\uffff\1\117\2\60\1\uffff\1\103\1\60\1\131\1\60"+
-        "\1\105\1\124\1\123\1\115\1\124\1\125\1\105\1\uffff\1\111\1\uffff"+
-        "\1\124\1\60\1\122\1\60\1\103\1\125\1\124\1\60\1\101\1\uffff\1\114"+
-        "\3\uffff\1\103\1\124\1\122\1\114\1\60\1\uffff\1\103\1\111\2\60\1"+
-        "\124\1\uffff\1\101\1\122\4\uffff\1\126\3\uffff\1\60\1\105\1\123"+
-        "\1\105\1\60\1\124\1\105\1\uffff\1\124\1\117\1\101\1\117\1\101\1"+
-        "\104\1\60\1\117\1\122\1\uffff\1\113\1\103\1\117\1\105\1\122\1\114"+
-        "\1\124\1\60\1\122\1\114\1\103\2\60\1\124\1\122\1\uffff\1\101\1\60"+
-        "\1\114\1\105\1\116\1\uffff\1\105\1\uffff\1\60\1\uffff\1\60\1\uffff"+
-        "\2\122\1\124\1\60\1\105\1\122\1\60\1\117\1\105\1\uffff\1\60\1\131"+
-        "\1\101\1\uffff\1\105\1\116\1\111\1\uffff\1\124\2\105\1\101\2\60"+
-        "\1\uffff\1\105\1\103\2\uffff\1\60\1\114\1\105\1\uffff\1\105\1\uffff"+
-        "\2\60\1\122\1\uffff\1\60\1\116\1\105\1\116\1\102\1\60\1\116\1\124"+
-        "\1\60\1\uffff\1\115\1\105\1\60\1\124\1\125\1\60\1\101\1\114\1\111"+
-        "\1\uffff\1\106\1\105\1\111\2\uffff\1\117\1\105\1\114\1\uffff\1\60"+
-        "\1\116\1\60\1\104\2\uffff\1\122\1\111\1\60\1\uffff\1\104\1\105\1"+
-        "\uffff\1\116\1\122\1\uffff\1\120\1\123\1\60\1\103\1\116\1\124\3"+
-        "\60\2\uffff\2\60\1\uffff\1\114\1\137\1\60\2\uffff\1\60\1\uffff\1"+
-        "\124\1\60\1\117\1\114\1\uffff\1\60\1\105\1\uffff\1\120\1\103\1\101"+
-        "\1\uffff\1\60\1\124\1\uffff\1\115\1\60\1\117\1\101\1\60\1\101\1"+
-        "\122\2\60\1\uffff\1\103\1\uffff\1\60\1\111\1\116\1\uffff\4\60\2"+
-        "\105\1\uffff\1\124\2\105\5\uffff\1\137\1\103\2\uffff\1\60\1\uffff"+
-        "\1\125\1\105\1\uffff\1\60\1\114\1\111\1\124\1\uffff\1\111\1\60\1"+
-        "\uffff\1\116\1\103\1\uffff\1\124\1\60\2\uffff\1\105\1\uffff\1\104"+
-        "\1\123\4\uffff\2\60\1\111\1\60\1\104\1\103\3\uffff\1\123\1\60\1"+
-        "\uffff\1\105\1\123\1\101\1\116\1\uffff\1\60\2\105\1\uffff\1\60\1"+
-        "\101\1\111\2\uffff\1\117\1\uffff\1\60\2\uffff\1\60\1\uffff\1\130"+
-        "\1\111\1\60\1\105\1\uffff\2\60\1\uffff\1\102\1\103\1\116\2\uffff"+
-        "\1\60\1\117\1\uffff\1\60\2\uffff\1\114\2\60\1\uffff\1\116\1\uffff"+
-        "\1\105\2\uffff\2\60\2\uffff";
+        "\2\101\1\111\7\uffff\1\60\3\uffff\1\103\1\117\1\116\2\uffff\1\114"+
+        "\1\105\1\124\2\uffff\2\60\1\120\26\uffff\1\114\1\uffff\1\53\7\56"+
+        "\1\53\2\uffff\1\101\1\115\1\101\1\114\1\101\1\103\1\107\1\116\1"+
+        "\123\1\114\1\123\1\124\1\101\1\60\1\115\1\105\1\104\1\125\1\111"+
+        "\1\114\1\125\1\122\2\116\1\60\1\104\1\115\1\116\1\114\1\122\1\111"+
+        "\1\105\1\102\1\126\1\114\1\115\1\102\1\122\1\105\1\60\1\120\1\106"+
+        "\1\105\2\114\1\111\1\105\1\111\1\116\1\uffff\1\113\1\103\1\104\1"+
+        "\131\1\116\1\111\1\60\1\114\1\105\2\125\2\uffff\1\114\2\uffff\1"+
+        "\137\13\56\1\104\3\125\1\111\1\115\1\124\1\122\1\114\1\105\2\123"+
+        "\1\114\1\111\1\60\1\124\1\117\1\111\1\116\2\101\1\114\1\102\1\uffff"+
+        "\1\105\1\115\1\105\1\122\1\115\1\60\1\111\1\124\2\105\1\101\1\123"+
+        "\1\101\1\103\1\105\1\117\1\uffff\1\125\2\105\1\101\1\114\1\101\2"+
+        "\123\2\116\2\103\1\114\3\105\1\125\1\120\1\124\1\122\1\107\1\116"+
+        "\1\uffff\1\105\1\117\1\60\1\125\1\101\1\124\1\122\1\114\1\124\1"+
+        "\104\1\123\1\113\3\60\1\101\1\117\1\uffff\1\125\1\107\1\111\1\124"+
+        "\2\111\1\122\1\101\1\uffff\1\56\1\uffff\2\56\4\uffff\3\56\1\uffff"+
+        "\2\60\1\122\1\114\1\122\1\116\1\114\1\117\2\101\2\60\1\123\2\105"+
+        "\1\103\1\uffff\1\122\1\103\1\107\2\103\1\60\1\125\1\122\2\114\1"+
+        "\116\1\105\1\60\1\131\1\60\1\123\1\114\1\117\1\116\1\111\1\106\1"+
+        "\117\1\122\1\105\1\131\1\110\1\uffff\1\126\1\60\1\116\1\60\1\114"+
+        "\1\110\1\114\1\101\1\124\1\122\1\60\2\114\1\60\1\111\1\123\1\111"+
+        "\1\115\1\60\1\105\2\124\1\101\1\111\1\105\1\122\1\105\1\111\2\60"+
+        "\1\103\1\105\1\60\1\137\1\117\1\105\2\60\1\122\1\uffff\1\105\1\124"+
+        "\1\60\3\105\1\60\1\120\1\60\3\uffff\1\124\1\116\1\104\1\105\1\124"+
+        "\1\106\1\116\1\60\1\122\1\103\1\124\1\uffff\1\110\1\114\1\uffff"+
+        "\1\110\1\106\1\117\5\uffff\1\56\5\uffff\2\56\4\uffff\1\123\1\124"+
+        "\1\116\1\104\1\105\1\116\1\111\1\116\1\103\2\uffff\3\60\3\101\1"+
+        "\116\1\111\1\110\1\uffff\1\114\1\122\1\117\1\105\1\123\1\116\1\106"+
+        "\1\110\1\uffff\1\60\1\122\1\uffff\1\123\1\117\1\60\1\125\1\122\1"+
+        "\114\1\116\1\60\1\124\1\104\1\117\1\114\1\102\1\120\1\105\1\101"+
+        "\1\uffff\1\104\1\116\1\uffff\2\60\1\114\1\124\2\111\1\uffff\1\105"+
+        "\1\111\1\uffff\1\116\1\126\1\123\1\106\1\105\1\uffff\1\60\1\105"+
+        "\1\60\1\124\1\123\1\104\1\101\2\103\2\uffff\1\124\1\116\1\uffff"+
+        "\1\106\1\125\1\124\2\uffff\1\115\1\60\1\111\1\uffff\3\60\1\uffff"+
+        "\2\101\1\uffff\1\117\1\101\1\105\1\122\1\60\1\101\1\123\1\uffff"+
+        "\1\105\1\111\1\60\5\uffff\1\105\2\uffff\1\122\4\uffff\1\56\1\uffff"+
+        "\1\111\3\60\1\130\1\60\1\116\1\125\1\124\3\uffff\1\114\1\103\1\124"+
+        "\1\60\1\101\1\122\1\124\1\105\1\103\1\60\1\111\1\124\1\60\1\105"+
+        "\1\uffff\1\101\1\117\1\103\1\uffff\1\115\1\101\1\105\1\103\1\uffff"+
+        "\1\105\1\125\1\107\1\105\1\122\1\105\1\122\1\114\1\123\1\101\2\uffff"+
+        "\2\60\1\117\1\103\1\60\1\123\1\124\1\105\1\60\1\131\1\124\1\uffff"+
+        "\1\122\1\uffff\1\105\1\111\1\125\1\115\1\124\2\60\1\103\1\125\1"+
+        "\124\1\60\1\101\1\uffff\1\114\3\uffff\1\103\1\124\1\122\1\114\2"+
+        "\60\1\uffff\1\103\1\111\1\60\1\124\1\uffff\1\122\1\101\3\uffff\1"+
+        "\126\3\uffff\1\60\1\uffff\1\123\2\105\1\60\1\124\1\101\1\105\1\uffff"+
+        "\1\124\1\117\1\60\1\104\1\101\1\122\1\117\1\uffff\1\117\1\101\1"+
+        "\uffff\1\122\1\124\1\103\1\113\1\60\1\114\1\60\1\124\1\122\1\114"+
+        "\1\122\1\103\1\117\1\60\2\105\1\60\1\114\1\uffff\1\105\1\uffff\1"+
+        "\116\1\60\1\uffff\1\124\2\122\1\uffff\1\60\1\105\2\60\1\117\1\122"+
+        "\1\60\1\105\1\uffff\1\101\1\131\1\uffff\1\105\1\116\1\111\1\uffff"+
+        "\1\124\2\105\1\101\2\60\2\uffff\1\105\1\103\1\uffff\1\60\1\105\1"+
+        "\114\1\uffff\1\105\1\uffff\2\60\1\122\1\uffff\1\60\1\102\1\60\1"+
+        "\116\1\105\1\116\1\uffff\1\60\1\124\1\105\1\115\1\116\1\114\1\105"+
+        "\1\117\1\111\1\60\1\uffff\1\114\1\uffff\1\111\1\106\1\105\1\101"+
+        "\1\124\1\125\1\uffff\1\60\1\116\1\uffff\1\60\1\104\1\60\1\uffff"+
+        "\1\60\1\111\1\122\1\uffff\1\122\2\uffff\1\116\1\105\1\uffff\1\104"+
+        "\1\123\1\120\1\60\1\103\1\116\1\124\3\60\2\uffff\2\60\1\uffff\1"+
+        "\137\1\114\1\60\2\uffff\1\60\1\uffff\1\114\1\uffff\1\124\1\60\1"+
+        "\117\1\uffff\1\105\1\103\1\120\3\60\1\122\2\101\1\uffff\1\60\1\117"+
+        "\1\101\1\60\1\115\1\60\1\124\1\uffff\1\103\1\uffff\1\60\2\uffff"+
+        "\1\116\1\111\4\60\2\105\1\uffff\1\124\2\105\5\uffff\1\103\1\137"+
+        "\2\uffff\1\105\1\60\1\uffff\1\125\1\60\1\111\1\114\3\uffff\1\60"+
+        "\2\124\1\uffff\1\116\1\103\1\uffff\1\60\1\uffff\1\111\1\105\1\uffff"+
+        "\1\123\1\104\4\uffff\2\60\1\111\1\60\1\104\2\uffff\1\103\1\60\1"+
+        "\uffff\1\123\1\uffff\1\123\1\105\1\uffff\1\105\1\101\1\60\1\105"+
+        "\1\uffff\1\116\1\60\1\111\1\101\2\uffff\1\117\1\uffff\1\60\3\uffff"+
+        "\1\60\1\111\1\130\2\60\1\uffff\1\60\1\105\1\uffff\1\103\1\102\1"+
+        "\116\2\uffff\1\117\1\60\3\uffff\2\60\1\114\1\60\1\116\3\uffff\1"+
+        "\105\1\uffff\2\60\2\uffff";
     static final String DFA32_maxS =
         "\1\ufffe\1\uffff\1\12\2\uffff\2\ufffe\1\145\1\114\1\125\1\47\2\uffff"+
         "\1\116\1\52\1\72\1\uffff\1\76\2\75\5\uffff\1\75\2\uffff\1\137\1"+
         "\172\1\105\1\131\1\117\1\123\1\47\1\117\1\130\1\125\2\117\1\125"+
-        "\1\47\2\125\1\131\1\123\1\117\1\122\1\111\10\uffff\1\145\1\uffff"+
-        "\1\103\1\117\1\116\2\uffff\1\124\1\uffff\1\124\1\114\2\uffff\2\172"+
-        "\1\120\26\uffff\1\130\1\uffff\11\172\2\uffff\1\127\1\123\1\116\1"+
-        "\117\1\103\1\101\1\107\1\116\1\123\1\131\1\114\1\124\1\115\1\106"+
-        "\1\172\1\125\1\123\1\124\1\125\2\116\1\122\1\125\1\172\1\116\1\104"+
-        "\1\114\1\120\1\115\1\117\1\125\1\122\1\111\1\121\1\126\1\117\1\102"+
-        "\1\120\1\105\1\172\1\122\1\105\1\106\2\114\3\111\1\116\1\uffff\1"+
-        "\113\1\103\1\104\1\122\1\111\1\172\1\131\1\122\1\114\2\125\2\uffff"+
-        "\1\117\1\137\2\uffff\13\172\1\125\1\114\1\125\1\111\1\125\1\105"+
-        "\1\114\1\120\1\124\2\123\1\114\1\122\1\111\1\172\1\124\1\117\1\116"+
-        "\1\117\1\101\1\105\1\114\1\105\1\102\1\uffff\1\172\1\115\1\122\1"+
-        "\105\1\115\1\105\1\124\1\111\1\101\1\105\1\103\1\115\1\123\1\117"+
-        "\1\uffff\1\105\1\125\1\114\1\101\1\137\1\105\1\124\1\126\1\103\2"+
-        "\123\1\101\1\105\1\114\1\116\1\105\1\125\1\105\1\124\1\120\1\122"+
-        "\1\105\1\116\1\uffff\1\107\1\172\1\117\1\125\1\101\1\114\1\122\2"+
-        "\124\1\104\1\123\1\113\2\172\1\101\1\117\1\uffff\1\172\1\122\1\111"+
-        "\1\125\1\111\1\124\1\111\1\122\1\127\1\uffff\2\172\1\uffff\1\172"+
-        "\1\uffff\1\172\2\uffff\2\172\2\uffff\1\122\2\172\1\122\1\116\1\114"+
-        "\2\172\1\117\1\114\1\111\1\105\1\123\1\105\1\101\1\103\1\uffff\1"+
-        "\122\1\107\3\103\1\172\1\116\1\114\1\122\1\125\2\114\1\125\1\110"+
-        "\1\122\1\125\1\116\1\117\1\123\1\116\1\117\1\131\1\uffff\1\172\1"+
-        "\131\1\172\1\105\1\122\1\172\1\126\1\114\1\172\1\124\1\114\1\101"+
-        "\1\110\1\172\1\122\1\114\1\111\1\123\1\172\1\117\1\114\1\122\2\105"+
-        "\1\101\1\124\1\111\1\172\1\105\1\115\1\172\1\111\1\124\1\103\1\105"+
-        "\1\172\1\137\1\172\1\117\2\172\1\105\1\uffff\1\122\1\105\1\124\3"+
-        "\105\2\172\1\120\1\172\2\uffff\1\124\1\116\1\uffff\1\105\1\124\1"+
-        "\106\1\116\1\104\1\122\1\172\1\103\1\124\2\117\1\116\1\123\1\110"+
-        "\6\uffff\1\172\3\uffff\1\172\3\uffff\1\172\2\uffff\1\116\2\uffff"+
-        "\1\123\1\104\1\124\2\uffff\1\116\1\105\1\116\1\111\3\172\1\103\2"+
-        "\101\1\116\1\111\1\110\1\101\1\uffff\1\123\1\117\1\122\1\114\1\105"+
-        "\1\117\1\114\1\102\1\105\1\117\1\122\1\116\1\114\1\124\1\172\1\104"+
-        "\1\123\1\125\1\172\1\120\1\122\1\uffff\1\172\1\110\1\106\1\uffff"+
-        "\1\116\1\104\1\116\1\uffff\1\101\1\172\1\uffff\1\111\1\114\1\124"+
-        "\1\172\1\uffff\1\111\1\105\1\106\1\123\1\uffff\1\126\1\116\1\111"+
-        "\1\101\1\103\1\104\1\124\1\172\1\123\1\uffff\1\172\1\105\1\uffff"+
-        "\1\103\1\105\1\124\1\116\1\uffff\1\106\1\uffff\1\125\2\uffff\1\124"+
-        "\1\115\1\172\1\111\3\172\2\uffff\2\101\1\uffff\1\117\1\101\1\122"+
-        "\1\172\1\101\1\123\2\105\1\uffff\1\111\1\172\1\122\7\uffff\1\105"+
-        "\5\uffff\2\172\1\111\3\172\1\130\1\125\1\116\3\uffff\1\124\1\114"+
-        "\1\103\1\172\1\101\1\122\1\124\1\111\1\103\1\105\1\124\1\172\1\103"+
-        "\1\105\2\122\1\107\1\101\1\103\2\105\1\uffff\1\125\1\117\1\115\1"+
-        "\uffff\1\105\1\101\1\uffff\1\105\1\172\1\124\1\123\1\101\1\114\1"+
-        "\uffff\1\117\2\172\1\uffff\1\103\1\172\1\131\1\172\1\105\1\124\1"+
-        "\123\1\115\1\124\1\125\1\105\1\uffff\1\111\1\uffff\1\124\1\172\1"+
-        "\122\1\172\1\103\1\125\1\124\1\172\1\101\1\uffff\1\114\3\uffff\1"+
-        "\103\1\124\1\122\1\114\1\172\1\uffff\1\103\1\111\2\172\1\124\1\uffff"+
-        "\1\101\1\122\4\uffff\1\126\3\uffff\1\172\1\105\1\123\1\105\1\172"+
-        "\1\124\1\105\1\uffff\1\124\1\117\1\105\1\117\1\101\1\104\1\172\1"+
-        "\117\1\122\1\uffff\1\113\1\103\1\117\1\105\1\122\1\114\1\124\1\172"+
-        "\1\122\1\114\1\103\2\172\1\124\1\122\1\uffff\1\101\1\172\1\114\1"+
-        "\105\1\116\1\uffff\1\105\1\uffff\1\172\1\uffff\1\172\1\uffff\2\122"+
-        "\1\124\1\172\1\105\1\122\1\172\1\117\1\105\1\uffff\1\172\1\131\1"+
-        "\101\1\uffff\1\105\1\116\1\111\1\uffff\1\124\2\105\1\101\2\172\1"+
-        "\uffff\1\105\1\103\2\uffff\1\172\1\114\1\105\1\uffff\1\105\1\uffff"+
-        "\2\172\1\122\1\uffff\1\172\1\116\1\105\1\116\1\102\1\172\1\116\1"+
-        "\124\1\172\1\uffff\1\115\1\105\1\172\1\124\1\125\1\172\1\101\1\114"+
-        "\1\111\1\uffff\1\106\1\105\1\111\2\uffff\1\117\1\105\1\114\1\uffff"+
-        "\1\172\1\116\1\172\1\104\2\uffff\1\122\1\111\1\172\1\uffff\1\104"+
-        "\1\105\1\uffff\1\116\1\122\1\uffff\1\120\1\123\1\172\1\103\1\116"+
-        "\1\124\3\172\2\uffff\2\172\1\uffff\1\114\1\137\1\172\2\uffff\1\172"+
-        "\1\uffff\1\124\1\172\1\117\1\114\1\uffff\1\172\1\105\1\uffff\1\120"+
-        "\1\103\1\101\1\uffff\1\172\1\124\1\uffff\1\115\1\172\1\117\1\101"+
-        "\1\172\1\101\1\122\2\172\1\uffff\1\103\1\uffff\1\172\1\111\1\116"+
-        "\1\uffff\4\172\2\105\1\uffff\1\124\2\105\5\uffff\1\137\1\123\2\uffff"+
-        "\1\172\1\uffff\1\125\1\105\1\uffff\1\172\1\114\1\111\1\124\1\uffff"+
-        "\1\111\1\172\1\uffff\1\116\1\103\1\uffff\1\124\1\172\2\uffff\1\105"+
-        "\1\uffff\1\104\1\123\4\uffff\2\172\1\111\1\172\1\104\1\123\3\uffff"+
-        "\1\123\1\172\1\uffff\1\105\1\123\1\101\1\116\1\uffff\1\172\2\105"+
-        "\1\uffff\1\172\1\101\1\111\2\uffff\1\117\1\uffff\1\172\2\uffff\1"+
-        "\172\1\uffff\1\130\1\111\1\172\1\105\1\uffff\2\172\1\uffff\1\102"+
-        "\1\103\1\116\2\uffff\1\172\1\117\1\uffff\1\172\2\uffff\1\114\2\172"+
-        "\1\uffff\1\116\1\uffff\1\105\2\uffff\2\172\2\uffff";
+        "\1\47\2\125\1\131\1\123\1\117\1\122\1\111\7\uffff\1\145\3\uffff"+
+        "\1\103\1\117\1\116\2\uffff\1\114\2\124\2\uffff\2\172\1\120\26\uffff"+
+        "\1\130\1\uffff\11\172\2\uffff\1\127\1\116\1\101\1\123\1\117\1\103"+
+        "\1\107\1\116\1\123\1\114\1\131\1\124\1\106\1\172\1\115\1\123\2\125"+
+        "\1\124\1\116\1\125\1\122\2\116\1\172\1\104\1\115\1\120\1\114\1\125"+
+        "\1\111\1\117\1\122\1\126\1\121\1\117\1\102\1\122\1\105\1\172\1\120"+
+        "\1\106\1\105\2\114\3\111\1\116\1\uffff\1\113\1\103\1\104\1\131\1"+
+        "\122\1\111\1\172\1\114\1\122\2\125\2\uffff\1\117\2\uffff\1\137\13"+
+        "\172\1\114\3\125\1\111\1\120\1\124\1\122\1\114\1\105\2\123\1\114"+
+        "\1\111\1\172\1\124\2\117\1\116\1\101\1\105\1\114\1\102\1\uffff\1"+
+        "\105\1\115\1\105\1\122\1\115\1\172\1\111\1\124\2\105\1\101\1\123"+
+        "\1\115\1\103\1\105\1\117\1\uffff\1\125\1\105\1\137\1\101\1\114\1"+
+        "\101\2\123\1\116\1\126\1\103\1\124\1\114\3\105\1\125\1\120\1\124"+
+        "\1\122\1\107\1\116\1\uffff\1\105\1\117\1\172\1\125\1\101\1\124\1"+
+        "\122\1\114\1\124\1\104\1\123\1\113\3\172\1\101\1\117\1\uffff\1\125"+
+        "\1\122\1\111\1\124\2\111\1\122\1\127\1\uffff\1\172\1\uffff\2\172"+
+        "\4\uffff\3\172\1\uffff\2\172\1\122\1\114\1\122\1\116\1\114\1\117"+
+        "\1\111\1\101\2\172\1\123\2\105\1\103\1\uffff\1\122\1\103\1\107\2"+
+        "\103\1\172\1\125\1\122\2\114\1\116\1\105\1\172\1\131\1\172\1\123"+
+        "\1\114\1\117\1\116\1\125\1\116\1\117\1\122\1\125\1\131\1\110\1\uffff"+
+        "\1\126\1\172\1\122\1\172\1\114\1\110\1\114\1\101\1\124\1\122\1\172"+
+        "\2\114\1\172\1\117\1\123\1\111\1\115\1\172\1\105\2\124\1\101\1\111"+
+        "\1\105\1\122\1\105\1\111\2\172\1\103\1\105\1\172\1\137\1\117\1\105"+
+        "\2\172\1\122\1\uffff\1\105\1\124\1\172\3\105\1\172\1\120\1\172\3"+
+        "\uffff\1\124\1\116\1\104\1\105\1\124\1\106\1\116\1\172\1\122\1\103"+
+        "\1\124\1\uffff\1\117\1\123\1\uffff\1\110\1\116\1\117\5\uffff\1\172"+
+        "\5\uffff\2\172\4\uffff\1\123\1\124\1\116\1\104\1\105\1\116\1\111"+
+        "\1\116\1\103\2\uffff\3\172\3\101\1\116\1\111\1\110\1\uffff\1\114"+
+        "\1\122\1\117\1\105\1\123\1\116\1\106\1\110\1\uffff\1\172\1\122\1"+
+        "\uffff\1\123\1\117\1\172\1\125\1\122\1\114\1\116\1\172\1\124\1\104"+
+        "\1\117\1\114\1\102\1\120\1\105\1\101\1\uffff\1\104\1\116\1\uffff"+
+        "\2\172\1\114\1\124\2\111\1\uffff\1\105\1\111\1\uffff\1\116\1\126"+
+        "\1\123\1\106\1\105\1\uffff\1\172\1\105\1\172\1\124\1\123\1\104\1"+
+        "\101\2\103\2\uffff\1\124\1\116\1\uffff\1\106\1\125\1\124\2\uffff"+
+        "\1\115\1\172\1\111\1\uffff\3\172\1\uffff\2\101\1\uffff\1\117\1\101"+
+        "\1\105\1\122\1\172\1\101\1\123\1\uffff\1\105\1\111\1\172\5\uffff"+
+        "\1\105\2\uffff\1\122\4\uffff\1\172\1\uffff\1\111\3\172\1\130\1\172"+
+        "\1\116\1\125\1\124\3\uffff\1\114\1\103\1\124\1\172\1\101\1\122\1"+
+        "\124\1\105\1\103\1\172\1\111\1\124\1\172\1\105\1\uffff\1\101\1\117"+
+        "\1\103\1\uffff\1\115\1\101\1\105\1\103\1\uffff\1\105\1\125\1\107"+
+        "\1\105\1\122\1\105\1\122\1\114\1\123\1\101\2\uffff\2\172\1\117\1"+
+        "\103\1\172\1\123\1\124\1\105\1\172\1\131\1\124\1\uffff\1\122\1\uffff"+
+        "\1\105\1\111\1\125\1\115\1\124\2\172\1\103\1\125\1\124\1\172\1\101"+
+        "\1\uffff\1\114\3\uffff\1\103\1\124\1\122\1\114\2\172\1\uffff\1\103"+
+        "\1\111\1\172\1\124\1\uffff\1\122\1\101\3\uffff\1\126\3\uffff\1\172"+
+        "\1\uffff\1\123\2\105\1\172\1\124\2\105\1\uffff\1\124\1\117\1\172"+
+        "\1\104\1\101\1\122\1\117\1\uffff\1\117\1\101\1\uffff\1\122\1\124"+
+        "\1\103\1\113\1\172\1\114\1\172\1\124\1\122\1\114\1\122\1\103\1\117"+
+        "\1\172\2\105\1\172\1\114\1\uffff\1\105\1\uffff\1\116\1\172\1\uffff"+
+        "\1\124\2\122\1\uffff\1\172\1\105\2\172\1\117\1\122\1\172\1\105\1"+
+        "\uffff\1\101\1\131\1\uffff\1\105\1\116\1\111\1\uffff\1\124\2\105"+
+        "\1\101\2\172\2\uffff\1\105\1\103\1\uffff\1\172\1\105\1\114\1\uffff"+
+        "\1\105\1\uffff\2\172\1\122\1\uffff\1\172\1\102\1\172\1\116\1\105"+
+        "\1\116\1\uffff\1\172\1\124\1\105\1\115\1\116\1\114\1\105\1\117\1"+
+        "\111\1\172\1\uffff\1\114\1\uffff\1\111\1\106\1\105\1\101\1\124\1"+
+        "\125\1\uffff\1\172\1\116\1\uffff\1\172\1\104\1\172\1\uffff\1\172"+
+        "\1\111\1\122\1\uffff\1\122\2\uffff\1\116\1\105\1\uffff\1\104\1\123"+
+        "\1\120\1\172\1\103\1\116\1\124\3\172\2\uffff\2\172\1\uffff\1\137"+
+        "\1\114\1\172\2\uffff\1\172\1\uffff\1\114\1\uffff\1\124\1\172\1\117"+
+        "\1\uffff\1\105\1\103\1\120\3\172\1\122\2\101\1\uffff\1\172\1\117"+
+        "\1\101\1\172\1\115\1\172\1\124\1\uffff\1\103\1\uffff\1\172\2\uffff"+
+        "\1\116\1\111\4\172\2\105\1\uffff\1\124\2\105\5\uffff\1\123\1\137"+
+        "\2\uffff\1\105\1\172\1\uffff\1\125\1\172\1\111\1\114\3\uffff\1\172"+
+        "\2\124\1\uffff\1\116\1\103\1\uffff\1\172\1\uffff\1\111\1\105\1\uffff"+
+        "\1\123\1\104\4\uffff\2\172\1\111\1\172\1\104\2\uffff\1\123\1\172"+
+        "\1\uffff\1\123\1\uffff\1\123\1\105\1\uffff\1\105\1\101\1\172\1\105"+
+        "\1\uffff\1\116\1\172\1\111\1\101\2\uffff\1\117\1\uffff\1\172\3\uffff"+
+        "\1\172\1\111\1\130\2\172\1\uffff\1\172\1\105\1\uffff\1\103\1\102"+
+        "\1\116\2\uffff\1\117\1\172\3\uffff\2\172\1\114\1\172\1\116\3\uffff"+
+        "\1\105\1\uffff\2\172\2\uffff";
     static final String DFA32_acceptS =
         "\1\uffff\1\1\1\uffff\1\1\1\2\6\uffff\1\10\1\11\3\uffff\1\16\3\uffff"+
         "\1\26\1\27\1\30\1\31\1\32\1\uffff\1\37\1\40\25\uffff\1\u00c7\1\u00c8"+
-        "\1\u00c9\1\10\1\2\1\3\1\4\1\u00b4\1\uffff\1\57\3\uffff\1\5\1\u00c7"+
-        "\1\uffff\1\6\2\uffff\1\7\1\11\3\uffff\1\33\1\13\1\15\1\14\1\16\1"+
-        "\20\1\21\1\17\1\23\1\22\1\25\1\24\1\26\1\27\1\30\1\31\1\32\1\35"+
-        "\1\36\1\34\1\37\1\40\1\uffff\1\41\11\uffff\1\60\1\u00b5\61\uffff"+
-        "\1\u00c8\13\uffff\1\151\1\146\2\uffff\1\u00b6\1\61\43\uffff\1\115"+
-        "\16\uffff\1\144\27\uffff\1\u0095\20\uffff\1\172\11\uffff\1\54\2"+
-        "\uffff\1\43\1\uffff\1\42\1\uffff\1\46\1\47\2\uffff\1\45\1\44\20"+
-        "\uffff\1\u00b2\26\uffff\1\u00af\52\uffff\1\u0098\12\uffff\1\u00b3"+
-        "\1\167\2\uffff\1\166\16\uffff\1\u00b7\1\u00bc\1\u00c5\1\u00c6\1"+
-        "\54\1\52\1\uffff\1\43\1\55\1\42\1\uffff\1\46\1\47\1\53\1\uffff\1"+
-        "\45\1\44\1\uffff\1\63\1\u0087\3\uffff\1\102\1\101\16\uffff\1\111"+
-        "\25\uffff\1\126\3\uffff\1\122\3\uffff\1\131\2\uffff\1\134\4\uffff"+
-        "\1\145\4\uffff\1\161\11\uffff\1\174\2\uffff\1\u0086\4\uffff\1\u008c"+
-        "\1\uffff\1\u0091\1\uffff\1\u0096\1\u0094\7\uffff\1\u009b\1\u00b1"+
-        "\2\uffff\1\77\10\uffff\1\152\3\uffff\1\u00b9\1\u00b8\1\u00c0\1\u00c4"+
-        "\1\u00be\1\u00bd\1\u00bb\1\uffff\1\52\1\56\1\55\1\50\1\53\11\uffff"+
-        "\1\104\1\103\1\110\25\uffff\1\u00a7\3\uffff\1\u00a2\2\uffff\1\125"+
-        "\6\uffff\1\135\3\uffff\1\136\13\uffff\1\177\1\uffff\1\175\11\uffff"+
-        "\1\u0099\1\uffff\1\u009d\1\u009c\1\u009e\5\uffff\1\153\5\uffff\1"+
-        "\150\2\uffff\1\56\1\50\1\51\1\u008a\1\uffff\1\u008b\1\u0089\1\105"+
-        "\7\uffff\1\73\11\uffff\1\116\17\uffff\1\123\5\uffff\1\137\1\uffff"+
-        "\1\140\1\uffff\1\157\1\uffff\1\164\11\uffff\1\u0085\3\uffff\1\u008d"+
-        "\3\uffff\1\u0093\6\uffff\1\62\2\uffff\1\12\1\156\3\uffff\1\51\1"+
-        "\uffff\1\64\3\uffff\1\66\11\uffff\1\112\11\uffff\1\u00a5\3\uffff"+
-        "\1\u00a3\1\u00ad\3\uffff\1\132\4\uffff\1\143\1\165\3\uffff\1\u0083"+
-        "\2\uffff\1\u0081\2\uffff\1\176\11\uffff\1\170\1\171\2\uffff\1\147"+
-        "\3\uffff\1\107\1\106\1\uffff\1\67\4\uffff\1\71\2\uffff\1\114\3\uffff"+
-        "\1\u00a0\2\uffff\1\u00ae\11\uffff\1\133\1\uffff\1\142\3\uffff\1"+
-        "\160\6\uffff\1\u0090\3\uffff\1\u009a\1\76\1\100\1\154\1\155\2\uffff"+
-        "\1\u0088\1\65\1\uffff\1\74\2\uffff\1\u00b0\4\uffff\1\u00ab\2\uffff"+
-        "\1\u00a4\2\uffff\1\u00a9\2\uffff\1\124\1\121\1\uffff\1\141\2\uffff"+
-        "\1\u0084\1\u0082\1\u0080\1\173\6\uffff\1\u00bf\1\u00c2\1\72\2\uffff"+
-        "\1\113\4\uffff\1\u00aa\3\uffff\1\127\3\uffff\1\u008f\1\u008e\1\uffff"+
-        "\1\u0092\1\uffff\1\u00c1\1\u00c3\1\uffff\1\70\4\uffff\1\u00a6\2"+
-        "\uffff\1\130\3\uffff\1\u0097\1\75\2\uffff\1\u00a1\1\uffff\1\u00a8"+
-        "\1\u009f\3\uffff\1\120\1\uffff\1\u00ac\1\uffff\1\162\1\u00ba\2\uffff"+
-        "\1\117\1\163";
+        "\1\u00c9\1\10\1\2\1\3\1\4\1\uffff\1\57\1\u00b4\1\5\3\uffff\1\u00c7"+
+        "\1\6\3\uffff\1\7\1\11\3\uffff\1\33\1\13\1\15\1\14\1\16\1\20\1\21"+
+        "\1\17\1\23\1\22\1\25\1\24\1\26\1\27\1\30\1\31\1\32\1\35\1\36\1\34"+
+        "\1\37\1\40\1\uffff\1\41\11\uffff\1\u00b5\1\60\61\uffff\1\u00c8\13"+
+        "\uffff\1\151\1\146\1\uffff\1\61\1\u00b6\43\uffff\1\115\20\uffff"+
+        "\1\144\26\uffff\1\u0095\21\uffff\1\172\10\uffff\1\42\1\uffff\1\43"+
+        "\2\uffff\1\44\1\45\1\46\1\47\3\uffff\1\54\20\uffff\1\u00b2\32\uffff"+
+        "\1\u00af\47\uffff\1\u0098\11\uffff\1\u00b3\1\166\1\167\13\uffff"+
+        "\1\u00b7\2\uffff\1\u00bc\3\uffff\1\u00c5\1\u00c6\1\42\1\55\1\43"+
+        "\1\uffff\1\52\1\44\1\45\1\46\1\47\2\uffff\1\53\1\54\1\63\1\u0087"+
+        "\11\uffff\1\101\1\102\11\uffff\1\111\10\uffff\1\122\2\uffff\1\126"+
+        "\20\uffff\1\131\2\uffff\1\134\6\uffff\1\145\2\uffff\1\161\5\uffff"+
+        "\1\174\11\uffff\1\u0086\1\u008c\2\uffff\1\u0091\3\uffff\1\u0094"+
+        "\1\u0096\3\uffff\1\u009b\3\uffff\1\u00b1\2\uffff\1\77\7\uffff\1"+
+        "\152\3\uffff\1\u00b8\1\u00b9\1\u00bb\1\u00bd\1\u00be\1\uffff\1\u00c0"+
+        "\1\u00c4\1\uffff\1\55\1\56\1\52\1\50\1\uffff\1\53\11\uffff\1\103"+
+        "\1\104\1\110\16\uffff\1\125\3\uffff\1\u00a2\4\uffff\1\u00a7\12\uffff"+
+        "\1\135\1\136\13\uffff\1\175\1\uffff\1\177\14\uffff\1\u0099\1\uffff"+
+        "\1\u009c\1\u009d\1\u009e\6\uffff\1\153\4\uffff\1\150\2\uffff\1\56"+
+        "\1\50\1\51\1\uffff\1\u0089\1\u008a\1\u008b\1\uffff\1\105\7\uffff"+
+        "\1\73\7\uffff\1\116\2\uffff\1\123\22\uffff\1\137\1\uffff\1\140\2"+
+        "\uffff\1\157\3\uffff\1\164\10\uffff\1\u0085\2\uffff\1\u008d\3\uffff"+
+        "\1\u0093\6\uffff\1\12\1\62\2\uffff\1\156\3\uffff\1\51\1\uffff\1"+
+        "\64\3\uffff\1\66\6\uffff\1\112\12\uffff\1\u00a3\1\uffff\1\u00a5"+
+        "\6\uffff\1\u00ad\2\uffff\1\132\3\uffff\1\143\3\uffff\1\165\1\uffff"+
+        "\1\176\1\u0081\2\uffff\1\u0083\12\uffff\1\170\1\171\2\uffff\1\147"+
+        "\3\uffff\1\106\1\107\1\uffff\1\67\1\uffff\1\71\3\uffff\1\114\11"+
+        "\uffff\1\u00a0\7\uffff\1\u00ae\1\uffff\1\133\1\uffff\1\142\1\160"+
+        "\10\uffff\1\u0090\3\uffff\1\u009a\1\76\1\100\1\154\1\155\2\uffff"+
+        "\1\u0088\1\65\2\uffff\1\74\4\uffff\1\u00b0\1\121\1\124\3\uffff\1"+
+        "\u00a4\2\uffff\1\u00a9\1\uffff\1\u00ab\2\uffff\1\141\2\uffff\1\173"+
+        "\1\u0080\1\u0082\1\u0084\5\uffff\1\u00bf\1\u00c2\2\uffff\1\72\1"+
+        "\uffff\1\113\2\uffff\1\127\4\uffff\1\u00aa\4\uffff\1\u008e\1\u008f"+
+        "\1\uffff\1\u0092\1\uffff\1\u00c1\1\u00c3\1\70\5\uffff\1\u00a6\2"+
+        "\uffff\1\130\3\uffff\1\u0097\1\75\2\uffff\1\u009f\1\u00a1\1\u00a8"+
+        "\5\uffff\1\120\1\u00ac\1\162\1\uffff\1\u00ba\2\uffff\1\117\1\163";
     static final String DFA32_specialS =
         "\u03ac\uffff}>";
     static final String[] DFA32_transitionS = {
@@ -7299,10 +7682,10 @@ public class FortranLexer extends Lexer {
             "",
             "\uffff\66",
             "\uffff\66",
-            "\12\71\12\uffff\2\72\2\uffff\1\70\33\uffff\2\72",
-            "\1\76\4\uffff\1\76\31\uffff\1\73\7\uffff\1\75\2\uffff\1\74",
-            "\1\101\4\uffff\1\101\46\uffff\1\103\1\uffff\1\100\4\uffff\1"+
-            "\102",
+            "\12\70\12\uffff\2\71\2\uffff\1\72\33\uffff\2\71",
+            "\1\73\4\uffff\1\73\31\uffff\1\74\7\uffff\1\76\2\uffff\1\75",
+            "\1\100\4\uffff\1\100\46\uffff\1\101\1\uffff\1\102\4\uffff\1"+
+            "\103",
             "\1\104\4\uffff\1\104",
             "",
             "",
@@ -7322,28 +7705,28 @@ public class FortranLexer extends Lexer {
             "",
             "",
             "\1\137",
-            "\12\72\7\uffff\1\147\2\153\1\145\1\143\1\150\1\146\4\153\1\151"+
-            "\1\153\1\142\1\141\4\153\1\144\6\153\6\uffff\3\153\2\145\25"+
-            "\153",
+            "\12\71\7\uffff\1\147\2\152\1\151\1\141\1\146\1\144\4\152\1"+
+            "\143\1\152\1\142\1\150\4\152\1\145\6\152\6\uffff\3\152\2\151"+
+            "\25\152",
             "\1\154",
-            "\1\155\6\uffff\1\161\3\uffff\1\157\2\uffff\1\156\11\uffff\1"+
-            "\160",
+            "\1\157\6\uffff\1\156\3\uffff\1\160\2\uffff\1\155\11\uffff\1"+
+            "\161",
             "\1\163\11\uffff\1\162",
-            "\1\164\11\uffff\1\166\6\uffff\1\165",
-            "\1\76\4\uffff\1\76",
-            "\1\167\3\uffff\1\171\3\uffff\1\170\5\uffff\1\172",
-            "\1\174\1\uffff\1\173\2\uffff\1\176\6\uffff\1\175",
-            "\1\177\2\uffff\1\u0082\2\uffff\1\u0081\5\uffff\1\u0080",
-            "\1\u0084\11\uffff\1\u0083",
+            "\1\164\11\uffff\1\165\6\uffff\1\166",
+            "\1\73\4\uffff\1\73",
+            "\1\167\3\uffff\1\170\3\uffff\1\172\5\uffff\1\171",
+            "\1\173\1\uffff\1\174\2\uffff\1\175\6\uffff\1\176",
+            "\1\177\2\uffff\1\u0080\2\uffff\1\u0081\5\uffff\1\u0082",
+            "\1\u0083\11\uffff\1\u0084",
             "\1\u0085",
-            "\1\u0088\15\uffff\1\u0087\5\uffff\1\u0086",
-            "\1\101\4\uffff\1\101",
-            "\1\u008a\15\uffff\1\u008c\2\uffff\1\u0089\2\uffff\1\u008b",
-            "\1\u008e\3\uffff\1\u008d\16\uffff\1\u008f\1\u0090",
-            "\1\u0094\6\uffff\1\u0092\6\uffff\1\u0093\11\uffff\1\u0091",
-            "\1\u0096\4\uffff\1\u0095",
+            "\1\u0086\15\uffff\1\u0087\5\uffff\1\u0088",
+            "\1\100\4\uffff\1\100",
+            "\1\u0089\15\uffff\1\u008a\2\uffff\1\u008b\2\uffff\1\u008c",
+            "\1\u008d\3\uffff\1\u008e\16\uffff\1\u008f\1\u0090",
+            "\1\u0091\6\uffff\1\u0092\6\uffff\1\u0093\11\uffff\1\u0094",
+            "\1\u0095\4\uffff\1\u0096",
             "\1\u0097\15\uffff\1\u0098",
-            "\1\u009b\6\uffff\1\u0099\11\uffff\1\u009a",
+            "\1\u0099\6\uffff\1\u009a\11\uffff\1\u009b",
             "\1\u009c",
             "",
             "",
@@ -7352,22 +7735,22 @@ public class FortranLexer extends Lexer {
             "",
             "",
             "",
+            "\12\70\12\uffff\2\71\2\uffff\1\72\33\uffff\2\71",
             "",
-            "\12\71\12\uffff\2\72\2\uffff\1\70\33\uffff\2\72",
+            "",
             "",
             "\1\u009e",
             "\1\u009f",
             "\1\u00a0",
             "",
             "",
-            "\1\u00a1\16\uffff\1\u00a2",
-            "",
-            "\1\u00a3",
+            "\1\u00a1",
+            "\1\u00a2\16\uffff\1\u00a3",
             "\1\u00a4",
             "",
             "",
-            "\12\77\7\uffff\2\77\1\u00a6\13\77\1\u00a8\1\77\1\u00a7\2\77"+
-            "\1\u00a5\6\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\2\77\1\u00a5\13\77\1\u00a7\1\77\1\u00a8\2\77"+
+            "\1\u00a6\6\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u00ab",
             "",
@@ -7392,61 +7775,61 @@ public class FortranLexer extends Lexer {
             "",
             "",
             "",
-            "\1\u00ad\7\uffff\1\u00ac\3\uffff\1\u00ae",
+            "\1\u00ad\7\uffff\1\u00ae\3\uffff\1\u00ac",
             "",
-            "\1\153\22\uffff\21\153\1\u00af\10\153\6\uffff\32\153",
-            "\1\153\22\uffff\4\153\1\u00b1\11\153\1\u00b0\13\153\6\uffff"+
-            "\32\153",
-            "\1\72\1\uffff\1\72\1\153\1\uffff\12\72\7\uffff\20\153\1\u00b2"+
-            "\11\153\6\uffff\32\153",
-            "\1\153\22\uffff\21\153\1\u00b3\10\153\6\uffff\32\153",
-            "\1\72\1\uffff\1\72\1\153\1\uffff\12\72\7\uffff\32\153\6\uffff"+
-            "\32\153",
-            "\1\153\22\uffff\4\153\1\u00b5\16\153\1\u00b4\6\153\6\uffff\32"+
-            "\153",
-            "\1\153\22\uffff\15\153\1\u00b6\14\153\6\uffff\32\153",
-            "\1\153\22\uffff\1\u00b7\31\153\6\uffff\32\153",
-            "\1\153\22\uffff\4\153\1\u00b8\16\153\1\u00b9\6\153\6\uffff\32"+
-            "\153",
+            "\1\71\1\uffff\1\71\1\152\1\uffff\12\71\7\uffff\20\152\1\u00af"+
+            "\11\152\6\uffff\32\152",
+            "\1\152\22\uffff\4\152\1\u00b0\11\152\1\u00b1\13\152\6\uffff"+
+            "\32\152",
+            "\1\152\22\uffff\4\152\1\u00b3\16\152\1\u00b2\6\152\6\uffff"+
+            "\32\152",
+            "\1\152\22\uffff\4\152\1\u00b5\16\152\1\u00b4\6\152\6\uffff"+
+            "\32\152",
+            "\1\152\22\uffff\21\152\1\u00b6\10\152\6\uffff\32\152",
+            "\1\152\22\uffff\1\u00b7\31\152\6\uffff\32\152",
+            "\1\152\22\uffff\15\152\1\u00b8\14\152\6\uffff\32\152",
+            "\1\152\22\uffff\21\152\1\u00b9\10\152\6\uffff\32\152",
+            "\1\71\1\uffff\1\71\1\152\1\uffff\12\71\7\uffff\32\152\6\uffff"+
+            "\32\152",
             "",
             "",
-            "\1\u00bb\1\uffff\1\u00bc\17\uffff\1\u00be\1\u00ba\2\uffff\1"+
-            "\u00bd",
-            "\1\u00c0\6\uffff\1\u00bf",
-            "\1\u00c1\1\u00c2",
-            "\1\u00c4\15\uffff\1\u00c3",
-            "\1\u00c5",
+            "\1\u00ba\1\uffff\1\u00bb\17\uffff\1\u00bc\1\u00bd\2\uffff\1"+
+            "\u00be",
+            "\1\u00bf\1\u00c0",
+            "\1\u00c1",
+            "\1\u00c2\6\uffff\1\u00c3",
+            "\1\u00c4\15\uffff\1\u00c5",
             "\1\u00c6",
             "\1\u00c7",
             "\1\u00c8",
             "\1\u00c9",
-            "\1\u00ca\5\uffff\1\u00cb",
-            "\1\u00cc",
+            "\1\u00ca",
+            "\1\u00cb\5\uffff\1\u00cc",
             "\1\u00cd",
-            "\1\u00ce",
-            "\1\u00cf\4\uffff\1\u00d0",
-            "\12\77\7\uffff\24\77\1\u00d1\5\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u00d3\17\uffff\1\u00d5\1\u00d4",
-            "\1\u00d7\15\uffff\1\u00d6",
-            "\1\u00d9\12\uffff\1\u00d8",
-            "\1\u00da",
-            "\1\u00dc\1\uffff\1\u00db",
+            "\1\u00cf\4\uffff\1\u00ce",
+            "\12\77\7\uffff\24\77\1\u00d0\5\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u00d2",
+            "\1\u00d3\15\uffff\1\u00d4",
+            "\1\u00d7\17\uffff\1\u00d5\1\u00d6",
+            "\1\u00d8",
+            "\1\u00d9\12\uffff\1\u00da",
+            "\1\u00db\1\uffff\1\u00dc",
             "\1\u00dd",
             "\1\u00de",
             "\1\u00df",
-            "\12\77\7\uffff\23\77\1\u00e0\6\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u00e2",
+            "\1\u00e0",
+            "\12\77\7\uffff\23\77\1\u00e1\6\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u00e3",
             "\1\u00e4",
-            "\1\u00e6\1\uffff\1\u00e5",
+            "\1\u00e5\1\uffff\1\u00e6",
             "\1\u00e7",
-            "\1\u00ea\3\uffff\1\u00e9\5\uffff\1\u00e8",
-            "\1\u00ed\1\u00eb\1\uffff\1\u00ec",
-            "\1\u00ef\17\uffff\1\u00ee",
-            "\1\u00f0",
-            "\1\u00f1\4\uffff\1\u00f2",
-            "\1\u00f3",
-            "\1\u00f4\1\uffff\1\u00f5",
+            "\1\u00e8\1\u00e9\1\uffff\1\u00ea",
+            "\1\u00eb",
+            "\1\u00ed\3\uffff\1\u00ec\5\uffff\1\u00ee",
+            "\1\u00ef\17\uffff\1\u00f0",
+            "\1\u00f1",
+            "\1\u00f2\4\uffff\1\u00f3",
+            "\1\u00f5\1\uffff\1\u00f4",
             "\1\u00f6",
             "\1\u00f7",
             "\1\u00f8",
@@ -7456,47 +7839,47 @@ public class FortranLexer extends Lexer {
             "\1\u00fc",
             "\1\u00fd",
             "\1\u00fe",
-            "\1\u0100\3\uffff\1\u00ff",
-            "\1\u0101",
+            "\1\u00ff",
+            "\1\u0100\3\uffff\1\u0101",
             "\1\u0102",
             "\1\u0103",
             "",
             "\1\u0104",
             "\1\u0105",
             "\1\u0106",
-            "\1\u0107\3\uffff\1\u0108",
-            "\1\u0109",
+            "\1\u0107",
+            "\1\u0108\3\uffff\1\u0109",
+            "\1\u010a",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u010b",
-            "\1\u010c\14\uffff\1\u010d",
-            "\1\u010e",
+            "\1\u010c",
+            "\1\u010d\14\uffff\1\u010e",
             "\1\u010f",
             "\1\u0110",
             "",
             "",
             "\1\u0111\2\uffff\1\u0112",
+            "",
+            "",
             "\1\u0113",
-            "",
-            "",
-            "\1\u0114\22\uffff\32\153\6\uffff\32\153",
-            "\1\153\22\uffff\23\153\1\u0115\6\153\6\uffff\32\153",
-            "\1\u0117\22\uffff\20\153\1\u0116\11\153\6\uffff\32\153",
-            "\1\u0119\22\uffff\25\153\1\u0118\4\153\6\uffff\32\153",
-            "\1\153\22\uffff\24\153\1\u011a\5\153\6\uffff\32\153",
-            "\1\u011b\22\uffff\32\153\6\uffff\32\153",
-            "\1\u011c\22\uffff\32\153\6\uffff\32\153",
-            "\1\153\22\uffff\3\153\1\u011d\26\153\6\uffff\32\153",
-            "\1\153\22\uffff\13\153\1\u011e\16\153\6\uffff\32\153",
-            "\1\u011f\22\uffff\32\153\6\uffff\32\153",
-            "\1\u0120\22\uffff\32\153\6\uffff\32\153",
-            "\1\u0121",
-            "\1\u0123\7\uffff\1\u0122",
+            "\1\u0114\22\uffff\25\152\1\u0115\4\152\6\uffff\32\152",
+            "\1\u0116\22\uffff\20\152\1\u0117\11\152\6\uffff\32\152",
+            "\1\152\22\uffff\23\152\1\u0118\6\152\6\uffff\32\152",
+            "\1\u0119\22\uffff\32\152\6\uffff\32\152",
+            "\1\u011a\22\uffff\32\152\6\uffff\32\152",
+            "\1\u011b\22\uffff\32\152\6\uffff\32\152",
+            "\1\u011c\22\uffff\32\152\6\uffff\32\152",
+            "\1\152\22\uffff\24\152\1\u011d\5\152\6\uffff\32\152",
+            "\1\152\22\uffff\13\152\1\u011e\16\152\6\uffff\32\152",
+            "\1\152\22\uffff\3\152\1\u011f\26\152\6\uffff\32\152",
+            "\1\u0120\22\uffff\32\152\6\uffff\32\152",
+            "\1\u0122\7\uffff\1\u0121",
+            "\1\u0123",
             "\1\u0124",
             "\1\u0125",
             "\1\u0126",
-            "\1\u0127",
-            "\1\u0128",
-            "\1\u0129\2\uffff\1\u012a",
+            "\1\u0128\2\uffff\1\u0127",
+            "\1\u0129",
+            "\1\u012a",
             "\1\u012b",
             "\1\u012c",
             "\1\u012d",
@@ -7505,22 +7888,22 @@ public class FortranLexer extends Lexer {
             "\1\u0130",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0132",
-            "\1\u0133\5\uffff\1\u0134",
-            "\1\u0135",
+            "\1\u0133",
+            "\1\u0134\5\uffff\1\u0135",
             "\1\u0136",
             "\1\u0137",
-            "\1\u0138",
-            "\1\u0139",
-            "\1\u013b\3\uffff\1\u013a",
-            "\1\u013c",
+            "\1\u0138\3\uffff\1\u0139",
+            "\1\u013a",
+            "\1\u013b",
             "",
-            "\12\77\7\uffff\1\u0144\1\u013d\1\77\1\u0146\1\u0145\1\u0141"+
-            "\2\77\1\u0142\3\77\1\u0143\2\77\1\u0140\2\77\1\u013e\1\u0147"+
-            "\2\77\1\u013f\3\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0149",
-            "\1\u014a",
-            "\1\u014b",
-            "\1\u014c",
+            "\1\u013c",
+            "\1\u013d",
+            "\1\u013e",
+            "\1\u013f",
+            "\1\u0140",
+            "\12\77\7\uffff\1\u0141\1\u0142\1\77\1\u0143\1\u0144\1\u0145"+
+            "\2\77\1\u0146\3\77\1\u0147\2\77\1\u0148\2\77\1\u0149\1\u014a"+
+            "\2\77\1\u014b\3\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u014d",
             "\1\u014e",
             "\1\u014f",
@@ -7530,20 +7913,20 @@ public class FortranLexer extends Lexer {
             "\1\u0153\13\uffff\1\u0154",
             "\1\u0155",
             "\1\u0156",
-            "",
             "\1\u0157",
+            "",
             "\1\u0158",
             "\1\u0159",
-            "\1\u015a",
-            "\1\u015b\31\uffff\1\u015c",
+            "\1\u015a\31\uffff\1\u015b",
+            "\1\u015c",
             "\1\u015d",
-            "\1\u0160\3\uffff\1\u015e\14\uffff\1\u015f",
-            "\1\u0162\7\uffff\1\u0161",
-            "\1\u0163",
+            "\1\u015e",
+            "\1\u015f",
+            "\1\u0160",
+            "\1\u0161",
+            "\1\u0162\7\uffff\1\u0163",
             "\1\u0164",
-            "\1\u0165",
-            "\1\u0166",
-            "\1\u0167",
+            "\1\u0165\3\uffff\1\u0166\14\uffff\1\u0167",
             "\1\u0168",
             "\1\u0169",
             "\1\u016a",
@@ -7556,8 +7939,8 @@ public class FortranLexer extends Lexer {
             "\1\u0171",
             "",
             "\1\u0172",
+            "\1\u0173",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0174",
             "\1\u0175",
             "\1\u0176",
             "\1\u0177",
@@ -7569,44 +7952,44 @@ public class FortranLexer extends Lexer {
             "\1\u017d",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0180",
-            "\1\u0181",
-            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0183\6\uffff\1\u0184\3\uffff\1\u0185",
-            "\1\u0186",
+            "\1\u0181",
+            "\1\u0182",
+            "",
+            "\1\u0183",
+            "\1\u0184\6\uffff\1\u0185\3\uffff\1\u0186",
             "\1\u0187",
             "\1\u0188",
             "\1\u0189",
             "\1\u018a",
             "\1\u018b",
-            "\1\u018f\1\uffff\1\u018d\1\u0191\1\u0194\1\u018c\2\uffff\1\u018e"+
-            "\6\uffff\1\u0192\1\uffff\1\u0193\4\uffff\1\u0190",
+            "\1\u018e\1\uffff\1\u018d\1\u018c\1\u0194\1\u0192\2\uffff\1"+
+            "\u0191\6\uffff\1\u018f\1\uffff\1\u0193\4\uffff\1\u0190",
             "",
-            "\1\u0196\22\uffff\32\153\6\uffff\32\153",
-            "\1\153\22\uffff\25\153\1\u0197\4\153\6\uffff\32\153",
+            "\1\u0196\22\uffff\32\152\6\uffff\32\152",
             "",
-            "\1\u0199\22\uffff\32\153\6\uffff\32\153",
-            "",
-            "\1\153\22\uffff\4\153\1\u019b\25\153\6\uffff\32\153",
+            "\1\152\22\uffff\25\152\1\u0198\4\152\6\uffff\32\152",
+            "\1\u0199\22\uffff\32\152\6\uffff\32\152",
             "",
             "",
-            "\1\u019e\22\uffff\32\153\6\uffff\32\153",
-            "\1\153\22\uffff\22\153\1\u019f\7\153\6\uffff\32\153",
             "",
             "",
-            "\1\u01a2",
+            "\1\152\22\uffff\4\152\1\u019e\25\152\6\uffff\32\152",
+            "\1\152\22\uffff\22\152\1\u019f\7\152\6\uffff\32\152",
+            "\1\u01a0\22\uffff\32\152\6\uffff\32\152",
+            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u01a4",
             "\1\u01a5",
             "\1\u01a6",
             "\1\u01a7",
+            "\1\u01a8",
+            "\1\u01a9",
+            "\1\u01aa\7\uffff\1\u01ab",
+            "\1\u01ac",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01aa",
-            "\1\u01ab",
-            "\1\u01ad\7\uffff\1\u01ac",
-            "\1\u01ae",
             "\1\u01af",
             "\1\u01b0",
             "\1\u01b1",
@@ -7624,123 +8007,123 @@ public class FortranLexer extends Lexer {
             "\1\u01bc",
             "\1\u01bd",
             "\1\u01be",
-            "\1\u01bf\17\uffff\1\u01c0",
-            "\1\u01c1",
-            "\1\u01c2",
-            "\1\u01c5\5\uffff\1\u01c3\5\uffff\1\u01c4",
-            "\1\u01c7\7\uffff\1\u01c6",
-            "\1\u01c8",
-            "\1\u01c9",
-            "\1\u01ca",
-            "\1\u01cb",
-            "\1\u01cc",
-            "",
-            "\12\77\7\uffff\4\77\1\u01cd\25\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01cf",
-            "\12\77\7\uffff\10\77\1\u01d1\15\77\1\u01d0\3\77\4\uffff\1\77"+
+            "\12\77\7\uffff\10\77\1\u01bf\15\77\1\u01c0\3\77\4\uffff\1\77"+
             "\1\uffff\32\77",
+            "\1\u01c2",
+            "\12\77\7\uffff\4\77\1\u01c3\25\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u01c5",
+            "\1\u01c6",
+            "\1\u01c7",
+            "\1\u01c8",
+            "\1\u01ca\5\uffff\1\u01c9\5\uffff\1\u01cb",
+            "\1\u01cc\7\uffff\1\u01cd",
+            "\1\u01ce",
+            "\1\u01cf",
+            "\1\u01d0\17\uffff\1\u01d1",
+            "\1\u01d2",
             "\1\u01d3",
-            "\1\u01d4\3\uffff\1\u01d5",
+            "",
+            "\1\u01d4",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01d7",
-            "\1\u01d8",
+            "\1\u01d6\3\uffff\1\u01d7",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u01d9",
             "\1\u01da",
             "\1\u01db",
             "\1\u01dc",
             "\1\u01dd",
+            "\1\u01de",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01df",
             "\1\u01e0",
             "\1\u01e1",
-            "\1\u01e2",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01e5\5\uffff\1\u01e4",
+            "\1\u01e3\5\uffff\1\u01e4",
+            "\1\u01e5",
             "\1\u01e6",
             "\1\u01e7",
-            "\1\u01e8",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u01e9",
             "\1\u01ea",
             "\1\u01eb",
             "\1\u01ec",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u01ed",
             "\1\u01ee",
             "\1\u01ef",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u01f0",
             "\1\u01f1",
-            "\1\u01f2",
-            "\1\u01f3",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u01f4",
+            "\1\u01f5",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01f6",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u01f7",
             "\1\u01f8",
+            "\1\u01f9",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u01fb",
-            "",
             "\1\u01fc",
+            "",
             "\1\u01fd",
             "\1\u01fe",
-            "\1\u01ff",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0200",
             "\1\u0201",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0202",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0204",
             "\12\77\7\uffff\3\77\1\u0205\26\77\4\uffff\1\77\1\uffff\32\77",
             "",
             "",
+            "",
             "\1\u0207",
             "\1\u0208",
-            "",
             "\1\u0209",
             "\1\u020a",
             "\1\u020b",
             "\1\u020c",
             "\1\u020d",
-            "\1\u020e",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u020f",
             "\1\u0210",
             "\1\u0211",
-            "\1\u0212",
-            "\1\u0213\6\uffff\1\u0214",
-            "\1\u0215\7\uffff\1\u0216",
-            "\1\u0217\5\uffff\1\u0218\1\u0219",
+            "",
+            "\1\u0213\6\uffff\1\u0212",
+            "\1\u0216\5\uffff\1\u0215\1\u0214",
+            "",
+            "\1\u0217",
+            "\1\u0218\7\uffff\1\u0219",
             "\1\u021a",
             "",
             "",
             "",
             "",
             "",
-            "",
-            "\1\u021c\22\uffff\32\153\6\uffff\32\153",
-            "",
-            "",
-            "",
-            "\1\u021e\22\uffff\32\153\6\uffff\32\153",
+            "\1\u021c\22\uffff\32\152\6\uffff\32\152",
             "",
             "",
             "",
-            "\1\153\22\uffff\4\153\1\u0220\25\153\6\uffff\32\153",
+            "",
+            "",
+            "\1\u021e\22\uffff\32\152\6\uffff\32\152",
+            "\1\152\22\uffff\4\152\1\u021f\25\152\6\uffff\32\152",
+            "",
+            "",
             "",
             "",
             "\1\u0221",
-            "",
-            "",
             "\1\u0222",
             "\1\u0223",
             "\1\u0224",
-            "",
-            "",
             "\1\u0225",
             "\1\u0226",
             "\1\u0227",
             "\1\u0228",
+            "\1\u0229",
+            "",
+            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u022c",
             "\1\u022d",
             "\1\u022e",
             "\1\u022f",
@@ -7756,72 +8139,72 @@ public class FortranLexer extends Lexer {
             "\1\u0238",
             "\1\u0239",
             "\1\u023a",
-            "\1\u023b",
+            "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u023c",
+            "",
             "\1\u023d",
             "\1\u023e",
-            "\1\u023f",
-            "\1\u0240",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0240",
+            "\1\u0241",
             "\1\u0242",
             "\1\u0243",
-            "\1\u0244",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0245",
             "\1\u0246",
             "\1\u0247",
-            "",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0248",
             "\1\u0249",
             "\1\u024a",
-            "",
             "\1\u024b",
             "\1\u024c",
+            "",
             "\1\u024d",
-            "",
             "\1\u024e",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
-            "\1\u0250",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0251",
             "\1\u0252",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "",
+            "\1\u0253",
             "\1\u0254",
+            "",
             "\1\u0255",
             "\1\u0256",
-            "\1\u0257",
             "",
+            "\1\u0257",
             "\1\u0258",
             "\1\u0259",
             "\1\u025a",
             "\1\u025b",
-            "\1\u025c",
+            "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u025d",
-            "\1\u025e",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u025f",
             "\1\u0260",
-            "",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0261",
             "\1\u0262",
-            "",
             "\1\u0263",
             "\1\u0264",
+            "",
+            "",
             "\1\u0265",
             "\1\u0266",
             "",
             "\1\u0267",
-            "",
             "\1\u0268",
-            "",
-            "",
             "\1\u0269",
+            "",
+            "",
             "\1\u026a",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u026c",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
             "\1\u0270",
             "\1\u0271",
@@ -7829,20 +8212,20 @@ public class FortranLexer extends Lexer {
             "\1\u0272",
             "\1\u0273",
             "\1\u0274",
+            "\1\u0275",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0276",
             "\1\u0277",
             "\1\u0278",
-            "\1\u0279",
             "",
+            "\1\u0279",
             "\1\u027a",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\u027c",
-            "",
-            "",
-            "",
-            "",
-            "",
             "",
             "",
             "\1\u027d",
@@ -7850,78 +8233,79 @@ public class FortranLexer extends Lexer {
             "",
             "",
             "",
+            "\1\u0280\22\uffff\32\152\6\uffff\32\152",
             "",
-            "\1\u0280\22\uffff\32\153\6\uffff\32\153",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0282",
+            "\1\u0281",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0286",
+            "\1\u0285",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0287",
             "\1\u0288",
-            "",
-            "",
-            "",
             "\1\u0289",
+            "",
+            "",
+            "",
             "\1\u028a",
             "\1\u028b",
-            "\12\77\7\uffff\14\77\1\u028c\15\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u028e",
+            "\1\u028c",
+            "\12\77\7\uffff\14\77\1\u028d\15\77\4\uffff\1\77\1\uffff\32"+
+            "\77",
             "\1\u028f",
             "\1\u0290",
             "\1\u0291",
             "\1\u0292",
             "\1\u0293",
-            "\1\u0294",
-            "\12\77\7\uffff\2\77\1\u0295\14\77\1\u0296\12\77\4\uffff\1\77"+
+            "\12\77\7\uffff\2\77\1\u0295\14\77\1\u0294\12\77\4\uffff\1\77"+
             "\1\uffff\32\77",
+            "\1\u0297",
             "\1\u0298",
-            "\1\u0299",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u029a",
+            "",
             "\1\u029b",
             "\1\u029c",
             "\1\u029d",
+            "",
             "\1\u029e",
             "\1\u029f",
             "\1\u02a0",
-            "",
             "\1\u02a1",
+            "",
             "\1\u02a2",
             "\1\u02a3",
-            "",
             "\1\u02a4",
             "\1\u02a5",
-            "",
             "\1\u02a6",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u02a7",
             "\1\u02a8",
             "\1\u02a9",
             "\1\u02aa",
             "\1\u02ab",
             "",
-            "\1\u02ac",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\23\77\1\u02ae\6\77\4\uffff\1\77\1\uffff\32\77",
             "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\23\77\1\u02ad\6\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u02af",
             "\1\u02b0",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02b2",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u02b3",
             "\1\u02b4",
-            "\1\u02b5",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02b6",
             "\1\u02b7",
+            "",
             "\1\u02b8",
+            "",
             "\1\u02b9",
             "\1\u02ba",
-            "",
             "\1\u02bb",
-            "",
             "\1\u02bc",
+            "\1\u02bd",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u02be",
-            "\12\77\7\uffff\2\77\1\u02c0\20\77\1\u02bf\6\77\4\uffff\1\77"+
+            "\12\77\7\uffff\2\77\1\u02bf\20\77\1\u02c0\6\77\4\uffff\1\77"+
             "\1\uffff\32\77",
             "\1\u02c2",
             "\1\u02c3",
@@ -7938,10 +8322,10 @@ public class FortranLexer extends Lexer {
             "\1\u02ca",
             "\1\u02cb",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "",
-            "\1\u02cd",
-            "\1\u02ce",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "",
+            "\1\u02ce",
+            "\1\u02cf",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02d1",
             "",
@@ -7950,68 +8334,68 @@ public class FortranLexer extends Lexer {
             "",
             "",
             "",
-            "",
             "\1\u02d5",
             "",
             "",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "",
             "\1\u02d7",
             "\1\u02d8",
             "\1\u02d9",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02db",
-            "\1\u02dc",
-            "",
-            "\1\u02dd",
+            "\1\u02dc\3\uffff\1\u02dd",
             "\1\u02de",
-            "\1\u02df\3\uffff\1\u02e0",
-            "\1\u02e1",
+            "",
+            "\1\u02df",
+            "\1\u02e0",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02e2",
             "\1\u02e3",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u02e4",
             "\1\u02e5",
-            "\1\u02e6",
             "",
+            "\1\u02e6",
             "\1\u02e7",
+            "",
             "\1\u02e8",
             "\1\u02e9",
             "\1\u02ea",
             "\1\u02eb",
-            "\1\u02ec",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02ed",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02ef",
             "\1\u02f0",
             "\1\u02f1",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u02f2",
+            "\1\u02f3",
             "\1\u02f4",
-            "\1\u02f5",
-            "",
-            "\1\u02f6",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u02f8",
+            "\1\u02f6",
+            "\1\u02f7",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u02f9",
+            "",
             "\1\u02fa",
             "",
             "\1\u02fb",
-            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "",
+            "\1\u02fd",
             "\1\u02fe",
             "\1\u02ff",
-            "\1\u0300",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0302",
-            "\1\u0303",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0305",
-            "\1\u0306",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0301",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0304",
+            "\1\u0305",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0307",
+            "",
             "\1\u0308",
             "\1\u0309",
             "",
@@ -8026,9 +8410,9 @@ public class FortranLexer extends Lexer {
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
+            "",
             "\1\u0313",
             "\1\u0314",
-            "",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0316",
@@ -8042,49 +8426,49 @@ public class FortranLexer extends Lexer {
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u031d",
-            "\1\u031e",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u031f",
             "\1\u0320",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0322",
-            "\1\u0323",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0321",
             "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0323",
+            "\1\u0324",
             "\1\u0325",
             "\1\u0326",
-            "\12\77\7\uffff\3\77\1\u0327\26\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0327",
+            "\1\u0328",
             "\1\u0329",
             "\1\u032a",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u032c",
-            "\1\u032d",
-            "\1\u032e",
+            "\12\77\7\uffff\3\77\1\u032b\26\77\4\uffff\1\77\1\uffff\32\77",
             "",
+            "\1\u032d",
+            "",
+            "\1\u032e",
             "\1\u032f",
             "\1\u0330",
             "\1\u0331",
-            "",
-            "",
             "\1\u0332",
             "\1\u0333",
-            "\1\u0334",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0336",
+            "\1\u0335",
+            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0338",
+            "\1\u0337",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
-            "",
-            "\1\u0339",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u033a",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u033b",
             "",
             "\1\u033c",
+            "",
+            "",
             "\1\u033d",
-            "",
             "\1\u033e",
-            "\1\u033f",
             "",
+            "\1\u033f",
             "\1\u0340",
             "\1\u0341",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
@@ -8107,36 +8491,36 @@ public class FortranLexer extends Lexer {
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
             "\1\u034f",
+            "",
+            "\1\u0350",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u0351",
             "\1\u0352",
             "",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0353",
             "\1\u0354",
-            "",
             "\1\u0355",
-            "\1\u0356",
-            "\1\u0357",
-            "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0359",
-            "",
             "\1\u035a",
+            "\1\u035b",
+            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u035c",
             "\1\u035d",
+            "\1\u035e",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u035f",
             "\1\u0360",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u0362",
             "",
             "\1\u0363",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "",
+            "",
             "\1\u0365",
             "\1\u0366",
-            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
@@ -8152,30 +8536,30 @@ public class FortranLexer extends Lexer {
             "",
             "",
             "",
-            "\1\u0370",
-            "\1\u0372\17\uffff\1\u0371",
+            "\1\u0371\17\uffff\1\u0370",
+            "\1\u0372",
             "",
             "",
+            "\1\u0373",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
-            "\1\u0374",
             "\1\u0375",
-            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0377",
             "\1\u0378",
-            "\1\u0379",
             "",
-            "\1\u037a",
+            "",
+            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u037a",
+            "\1\u037b",
             "",
             "\1\u037c",
             "\1\u037d",
             "",
-            "\1\u037e",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
-            "",
+            "\1\u037f",
             "\1\u0380",
             "",
             "\1\u0381",
@@ -8189,22 +8573,22 @@ public class FortranLexer extends Lexer {
             "\1\u0385",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0387",
+            "",
+            "",
             "\1\u0389\17\uffff\1\u0388",
-            "",
-            "",
-            "",
-            "\1\u038a",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "",
+            "\1\u038b",
             "",
             "\1\u038c",
             "\1\u038d",
+            "",
             "\1\u038e",
             "\1\u038f",
-            "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0391",
-            "\1\u0392",
             "",
+            "\1\u0392",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0394",
             "\1\u0395",
@@ -8215,35 +8599,35 @@ public class FortranLexer extends Lexer {
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
             "",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u0399",
             "\1\u039a",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u039c",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u039e",
             "",
             "\1\u039f",
             "\1\u03a0",
             "\1\u03a1",
             "",
             "",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\1\u03a3",
-            "",
+            "\1\u03a2",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
             "",
-            "\1\u03a5",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
-            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
+            "\1\u03a6",
+            "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\1\u03a8",
             "",
-            "\1\u03a9",
             "",
+            "",
+            "\1\u03a9",
             "",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
             "\12\77\7\uffff\32\77\4\uffff\1\77\1\uffff\32\77",
