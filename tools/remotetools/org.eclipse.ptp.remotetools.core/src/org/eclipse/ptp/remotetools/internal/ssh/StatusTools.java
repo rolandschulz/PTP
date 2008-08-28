@@ -11,12 +11,15 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
+import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
+import org.eclipse.ptp.remotetools.core.IRemoteDownloadExecution;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteStatusTools;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -314,6 +317,64 @@ public class StatusTools implements IRemoteStatusTools {
 	}
 
 	/**
+	 * A method designed to parse the /etc/group file to find the list
+	 * of groups that a user is enrolled in. 
+	 * 
+	 * @param username The name of the user that we are searching for enrollments.
+	 * @return A list of groups that username belongs to.
+	 * @throws RemoteConnectionException 
+	 * @throws RemoteOperationException 
+	 */
+	private Set<Integer> readGroupList(String username) throws RemoteConnectionException, RemoteOperationException {
+		Set<Integer> groupList = new HashSet<Integer>();
+		IRemoteDownloadExecution downloadExecution = null;
+		
+		try {
+			IRemoteCopyTools ct = manager.getRemoteCopyTools();
+			downloadExecution = ct.executeDownload("/etc/group");
+			BufferedReader etcGroupFile = new BufferedReader(new InputStreamReader(downloadExecution.getInputStreamFromProcessRemoteFile() ));
+			
+			String line = etcGroupFile.readLine();
+
+			while (line != null) {
+				String[] fields = line.split(":");
+
+				if (fields[0].trim().compareTo(username) == 0) {
+					groupList.add(new Integer(fields[2]));
+				} else if (fields.length == 4) {
+
+					String[] users = fields[3].split(",");
+					for (int i = 0; i < users.length; i++) {
+
+						if (users[i].trim().compareTo(username) == 0) {
+							groupList.add(new Integer(fields[2]));
+						}
+					}
+				}
+
+				line = etcGroupFile.readLine();
+			}
+			
+			etcGroupFile.close();
+		} catch (IOException ioe) {
+			throw new RemoteOperationException(ioe);
+		} catch (NumberFormatException nfe) {
+			//Maybe the format of this /etc/group file put the fields in a
+			//different order.
+			throw new RemoteOperationException(nfe);
+		} catch (ArrayIndexOutOfBoundsException aioobe) {
+			//This case is going to happen if the format is not the expected one.
+			throw new RemoteOperationException(aioobe);
+		} finally {
+			if (downloadExecution != null) {
+				downloadExecution.close();
+			}
+		}
+
+		return groupList;
+	}
+	
+	/**
 	 * Return all the user information from the remote machine.
 	 * This operation is a bit slow and should be used only once per RemoteStatusTools object.
 	 * 
@@ -325,17 +386,28 @@ public class StatusTools implements IRemoteStatusTools {
 	private UserInformation fetchRemoteUserInfo() throws RemoteConnectionException, RemoteOperationException,
 		CancelException {
 		try {
+			//Set of groups that this user belongs to.
+			Set<Integer> groupList;
+			
 			IRemoteExecutionTools remExecTools = manager.getExecutionTools();
 			// Execute command to return the username, uid and the group list
 			String rawUserInfo = remExecTools.executeWithOutput("echo `id -un`:`id -u`:`id -G`");
 			
 			String [] userInfoFields = rawUserInfo.trim().split(":", -1); // 1st username, 2nd UID, 3rd list of groups
-			String [] groupFields = userInfoFields[2].split(" ", -1);
-				
-			// Convert groups to Integer and put into the Set
-			Set groupList = new HashSet();
-			for(int i=0; i < groupFields.length; i++) {
-				groupList.add(new Integer(groupFields[i]));
+			
+			//With systems using BusyBox, id has no argument -G
+			//so we must parse /etc/group in this case
+			if (userInfoFields[2].trim().equalsIgnoreCase("")) {
+				groupList = readGroupList(userInfoFields[0]);
+			} else {
+				String[] groupFields = userInfoFields[2].split(" ", -1);
+
+				groupList = new HashSet<Integer>();
+
+				for (int i = 0; i < groupFields.length; i++) {
+					// Convert groups to Integer and put into the Set
+					groupList.add(new Integer(groupFields[i]));
+				}
 			}
 			
 			return new UserInformation(new Integer(userInfoFields[1]), groupList, userInfoFields[0]);
