@@ -1,13 +1,13 @@
 !!
-!! Sample Jacobi iteration computing heat transfer across a 2-D surface
+!! Liebmann's method to compute heat transfer across a 2-D surface
 !! J. Overbey 8/27/08
 !!
-!! Use jacobi-viz.sh in the main project directory to visualize the resulting
+!! Use liebmann-viz.sh in the main project directory to visualize the resulting
 !! table using gnuplot
 !!
 !! This version looks the nicest and uses the eoshift intrinsic
 !!
-program jacobi_example
+program liebmann_example
     implicit none
 
     integer, parameter :: SIZE = 200

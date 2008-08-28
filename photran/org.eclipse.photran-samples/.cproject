@@ -64,6 +64,7 @@
 
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+
 <storageModule moduleId="org.eclipse.cdt.core.pathentry">
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
@@ -79,9 +80,6 @@
 <pathentry kind="src" path="src-implicits-2"/>
 <pathentry kind="src" path="src-implicits-3"/>
 <pathentry kind="src" path="src-common"/>
-<pathentry kind="src" path="src-jacobi-1-eoshift"/>
-<pathentry kind="src" path="src-jacobi-2-arrays"/>
-<pathentry kind="src" path="src-jacobi-3-loops"/>
 <pathentry kind="src" path="src-cray-pointers"/>
 </storageModule>
 </cconfiguration>

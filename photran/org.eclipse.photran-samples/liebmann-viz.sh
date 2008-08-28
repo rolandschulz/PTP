@@ -1,18 +1,18 @@
 #!/bin/sh
 #
-# Runs src-jacobi-3-loops/a.exe, which outputs a 2-D matrix of real numbers,
+# Runs src-liebmann-3-loops/a.exe, which outputs a 2-D matrix of real numbers,
 # and then feeds this matrix to gnuplot to generate a visualization, which
-# is saved as jacobi-viz.gif.
+# is saved as liebmann-viz.gif.
 #
 # J. Overbey 8/27/08
 #
 
-src-jacobi-3*/a.exe >data
+src-liebmann-3*/a.exe >data
 
 cat <<EOF | gnuplot
 #==GNUPLOT INPUT=================================================================
 set term gif
-set output "jacobi-viz.gif"
+set output "liebmann-viz.gif"
 
 #set pm3d       # 1a. Normal
  set pm3d map   # 1b. Display a 2-D color gradient rather than the 3-D visualization
@@ -34,10 +34,10 @@ EOF
 
 rm -f data
 
-echo "Visualization saved as jacobi-viz.gif"
+echo "Visualization saved as liebmann-viz.gif"
 
 if [ `uname -s` == "Darwin" ]; then
-	open jacobi-viz.gif
+	open liebmann-viz.gif
 elif [ `which eog` != "" ]; then
-	eog jacobi-viz.gif
+	eog liebmann-viz.gif
 fi
