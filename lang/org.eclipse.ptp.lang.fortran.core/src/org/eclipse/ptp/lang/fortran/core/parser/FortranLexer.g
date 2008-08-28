@@ -49,13 +49,13 @@ import fortran.ofp.parser.java.FortranToken;
     protected StringBuilder whiteText = new StringBuilder();
 
     public Token emit() {
-        FortranToken t = new FortranToken(input, type, channel,
-            tokenStartCharIndex, getCharIndex()-1);
-        t.setLine(tokenStartLine);
-        t.setText(text);
-        t.setCharPositionInLine(tokenStartCharPositionInLine);
+        FortranToken t = new FortranToken(input, state.type, state.channel,
+                                      state.tokenStartCharIndex, getCharIndex()-1);
+        t.setLine(state.tokenStartLine);
+        t.setText(state.text);
+        t.setCharPositionInLine(state.tokenStartCharPositionInLine);
 
-        if(channel == HIDDEN) {
+        if (state.channel == HIDDEN) {
             whiteText.append(getText());
         } else {
             t.setWhiteText(whiteText.toString());
@@ -90,11 +90,11 @@ import fortran.ofp.parser.java.FortranToken;
      * values are.  This is done when we switch streams for including files.
      */    
     private void resetLexerState() {
-        tokenStartCharIndex = input.index();
-        tokenStartCharPositionInLine = input.getCharPositionInLine();
-        tokenStartLine = input.getLine();
-        token = null;
-        text = null;
+        state.tokenStartCharIndex = input.index();
+        state.tokenStartCharPositionInLine = input.getCharPositionInLine();
+        state.tokenStartLine = input.getLine();
+        state.token = null;
+        state.text = null;
     }// end resetLexerState()
 
 
@@ -338,8 +338,8 @@ T_CHAR_CONSTANT
         ;
 
 T_DIGIT_STRING
-	:	Digit_String 
-	;
+        :       Digit_String 
+        ;
 
 // R412
 BINARY_CONSTANT
@@ -640,24 +640,24 @@ T_DEFINED_OP
 
 // // used to catch edit descriptors and other situations
 // T_ID_OR_OTHER
-// 	:	'ID_OR_OTHER'
-// 	;
+//      :       'ID_OR_OTHER'
+//      ;
 
 // extra, context-sensitive terminals that require communication between parser and scanner
 // added the underscores so there is no way this could overlap w/ any valid
 // idents in Fortran.  we just need this token to be defined so we can 
 // create one of them while we're fixing up labeled do stmts.
 T_LABEL_DO_TERMINAL
-	:	'__LABEL_DO_TERMINAL__'
-	;
+        :       '__LABEL_DO_TERMINAL__'
+        ;
 
 T_DATA_EDIT_DESC : '__T_DATA_EDIT_DESC__' ;
 T_CONTROL_EDIT_DESC : '__T_CONTROL_EDIT_DESC__' ;
 T_CHAR_STRING_EDIT_DESC : '__T_CHAR_STRING_EDIT_DESC__' ;
 
 T_STMT_FUNCTION 
-	:	'STMT_FUNCTION'
-	;
+        :       'STMT_FUNCTION'
+        ;
 
 T_ASSIGNMENT_STMT : '__T_ASSIGNMENT_STMT__' ;
 T_PTR_ASSIGNMENT_STMT : '__T_PTR_ASSIGNMENT_STMT__' ;
@@ -678,8 +678,8 @@ T_EOF: '__T_EOF__' ;
 // R304
 T_IDENT
 options {k=1;}
-	:	Letter ( Alphanumeric_Character )*
-	;
+        :       Letter ( Alphanumeric_Character )*
+        ;
 
 LINE_COMMENT
     : '!'  ~('\n'|'\r')*  
