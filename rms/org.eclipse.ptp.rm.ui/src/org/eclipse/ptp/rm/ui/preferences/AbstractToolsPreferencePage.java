@@ -11,14 +11,12 @@
 package org.eclipse.ptp.rm.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -38,11 +36,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage implements IWorkbenchPreferencePage {
 
 	class WidgetListener extends PreferenceWidgetListener implements ModifyListener {
-
-
-		public void modifyText(ModifyEvent evt) {
-			if (! isEnabled()) return;
-
+		@Override
+		public void doModifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
 			if(source == launchCmdText ||
 					source == debugCmdText ||
@@ -52,19 +47,15 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 					source == periodicMonitorTimeSpinner ||
 					source == remoteInstallPathText) {
 				resetErrorMessages();
-				dataSource.validate();
+				dataSource.justValidate();
 			} else {
 				assert false;
 			}
 		}
-
-		public void widgetDefaultSelected(SelectionEvent e) {
-			// Empty.
-		}
 	}
 
 	class DataSource extends PreferenceDataSource {
-		DataSource(PreferencePage page) {
+		DataSource(AbstractPreferencePage page) {
 			super(page);
 		}
 
@@ -76,6 +67,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		String continuousMonitorCmd = null;
 		String remoteInstallPath = null;
 
+		@Override
 		protected void copyFromFields() throws ValidationException {
 			if (launchCmdText != null)
 				launchCmd = extractText(launchCmdText);
@@ -93,6 +85,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 				remoteInstallPath = extractText(remoteInstallPathText);
 		}
 
+		@Override
 		protected void validateLocal() throws ValidationException {
 			if (launchCmdText != null && launchCmd == null) {
 				throw new ValidationException("Launch command is missing");
@@ -115,7 +108,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			}
 		}
 
-		protected void storeConfig() {
+		@Override
+		protected void copyToStorage() {
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
@@ -134,7 +128,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			savePreferences();
 		}
 
-		protected void loadConfig() {
+		@Override
+		protected void loadFromStorage() {
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				launchCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
@@ -152,7 +147,8 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 				remoteInstallPath = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		}
 
-		protected void loadDefaultConfig() {
+		@Override
+		protected void loadDefault() {
 			Preferences config = getPreferences();
 			if (launchCmdText != null)
 				launchCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
@@ -170,6 +166,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 				remoteInstallPath = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		}
 
+		@Override
 		protected void copyToFields() {
 			if (launchCmdText != null)
 				applyText(launchCmdText, launchCmd);
@@ -222,12 +219,12 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 	protected PreferenceDataSource createDataSource() {
 		return new DataSource(this);
 	}
-	
+
 	@Override
 	protected PreferenceWidgetListener createListener() {
 		return new WidgetListener();
 	}
-	
+
 	private DataSource getDataSource() {
 		return (DataSource) this.dataSource;
 	}
@@ -240,6 +237,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		// Nothing to do.
 	}
 
+	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -322,5 +320,10 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			remoteInstallPathText.addModifyListener(getListener());
 		}
 		return contents;
+	}
+
+	@Override
+	protected void updateControls() {
+		// Nothing to do.
 	}
 }

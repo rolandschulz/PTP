@@ -14,7 +14,10 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.wizards.WizardPageDataSource;
+import org.eclipse.ptp.rm.ui.wizards.WizardPageWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.swt.SWT;
@@ -26,7 +29,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-public class OpenMPIToolConfigurationWizardPage extends
+public class OpenMPIConfigurationWizardPage extends
 		AbstractToolRMConfigurationWizardPage {
 
 	String versionIds[] = new String[] { OpenMPIResourceManagerConfiguration.VERSION_12, OpenMPIResourceManagerConfiguration.VERSION_13 };
@@ -46,7 +49,7 @@ public class OpenMPIToolConfigurationWizardPage extends
 			if (source == versionCombo) {
 				handleVersionSelected();
 				updateControls();
-				dataSource.updateAndStore();
+				dataSource.storeAndValidate();
 			} else {
 				super.doWidgetSelected(e);
 			}
@@ -54,6 +57,10 @@ public class OpenMPIToolConfigurationWizardPage extends
 	}
 
 	protected class DataSource extends AbstractToolRMConfigurationWizardPage.DataSource {
+		protected DataSource(AbstractConfigurationWizardPage page) {
+			super(page);
+		}
+
 		private OpenMPIResourceManagerConfiguration config;
 		private String versionId = null;
 
@@ -86,15 +93,15 @@ public class OpenMPIToolConfigurationWizardPage extends
 		}
 
 		@Override
-		protected void loadConfig() {
+		protected void loadFromStorage() {
 			versionId = config.getVersionId();
-			super.loadConfig();
+			super.loadFromStorage();
 		}
 
 		@Override
-		protected void storeConfig() {
+		protected void copyToStorage() {
 			config.setVersionId(versionId);
-			super.storeConfig();
+			super.copyToStorage();
 		}
 
 		@Override
@@ -114,16 +121,16 @@ public class OpenMPIToolConfigurationWizardPage extends
 	}
 
 	@Override
-	protected WizardListener createListener() {
+	protected WizardPageWidgetListener createListener() {
 		return new WidgetListener();
 	}
 
 	@Override
-	protected DataSource createDataSource() {
-		return new DataSource();
+	protected WizardPageDataSource createDataSource() {
+		return new DataSource(this);
 	}
 
-	public OpenMPIToolConfigurationWizardPage(RMConfigurationWizard wizard) {
+	public OpenMPIConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , "Open MPI", "Open MPI tool configuration", "Enter information to configure the Open MPI tool");
 	}
 
@@ -159,7 +166,7 @@ public class OpenMPIToolConfigurationWizardPage extends
 	public void handleVersionSelected() {
 		listenerEnabled = false;
 		DataSource dataSource = (DataSource) this.dataSource;
-		dataSource.getFromFields();
+		dataSource.justValidate();
 		String launchCmd = null;
 		String debugCmd = null;
 		String discoverCmd = null;
@@ -176,9 +183,9 @@ public class OpenMPIToolConfigurationWizardPage extends
 		} else {
 			assert false;
 		}
-		resetErrorStatus();
+		resetErrorMessages();
 		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
-		dataSource.putToFields();
+		dataSource.copyToFields();
 		listenerEnabled = true;
 	}
 

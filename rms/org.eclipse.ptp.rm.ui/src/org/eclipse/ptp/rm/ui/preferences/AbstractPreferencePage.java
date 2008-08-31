@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -62,7 +62,7 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 	 * @return the listener
 	 */
 	protected abstract PreferenceDataSource createDataSource();
-	
+
 	@Override
 	public boolean performOk() {
 			resetErrorMessages();
@@ -75,7 +75,7 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 	protected void performDefaults() {
 			resetErrorMessages();
 			listener.disable();
-			dataSource.loadDefaultsAndValidate();
+			dataSource.loadDefaultsAndUpdate();
 			listener.enable();
 	//		super.performDefaults();
 		}
@@ -100,8 +100,11 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 		listener.disable();
 		dataSource.loadAndUpdate();
 		listener.enable();
+		updateControls();
 		return contents;
 	}
+
+	abstract protected void updateControls();
 
 	/**
 	 * Create contents for the preference page.
