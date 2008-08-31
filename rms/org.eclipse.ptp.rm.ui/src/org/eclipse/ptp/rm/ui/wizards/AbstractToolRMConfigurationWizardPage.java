@@ -32,12 +32,9 @@ import org.eclipse.ptp.rm.ui.Activator;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -53,7 +50,7 @@ import org.eclipse.swt.widgets.Text;
  * - Make data source extensible
  * - Make createContents extensible
  */
-public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizardPage {
+public class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
 
 	protected boolean listenerEnabled = false;
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
@@ -71,20 +68,10 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	protected Button browseButton = null;
 	protected Button defaultButton = null;
 
-	protected WizardListener listener = createListener();
-	protected DataSource dataSource = createDataSource();
-
 	protected int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
 
-	protected interface WizardListener extends ModifyListener, SelectionListener {
-	}
-
-	protected class WidgetListener implements WizardListener {
-		final public void modifyText(ModifyEvent evt) {
-			if (! listenerEnabled) return;
-			doModifyText(evt);
-		}
-
+	protected class WidgetListener extends WizardPageWidgetListener {
+		@Override
 		protected void doModifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
 			if(source == launchCmdText ||
@@ -94,52 +81,31 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 					source == continuousMonitorCmdText ||
 					source == periodicMonitorTimeSpinner ||
 					source == remoteInstallPathText) {
-				resetErrorStatus();
-				dataSource.updateAndStore();
+				resetErrorMessages();
+				dataSource.storeAndValidate();
 			} else {
 				assert false;
 			}
 		}
 
-		final public void widgetSelected(SelectionEvent e) {
-			if (! listenerEnabled) return;
-
-			doWidgetSelected(e);
-		}
-
+		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
 			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
 			} else if (source == defaultButton)  {
-				resetErrorStatus();
-				dataSource.updateAndStore();
+				resetErrorMessages();
+				dataSource.storeAndValidate();
 				updateControls();
 			} else {
 				assert false;
 			}
 		}
-
-		final public void widgetDefaultSelected(SelectionEvent e) {
-			// Empty.
-		}
 	}
 
-	protected WizardListener createListener() {
-		return new WidgetListener();
-	}
-
-	protected DataSource createDataSource() {
-		return new DataSource();
-	}
-
-	protected  class DataSource {
-		protected class ValidationException extends Exception {
-			private static final long serialVersionUID = 1L;
-
-			public ValidationException(String message) {
-				super(message);
-			}
+	protected  class DataSource extends WizardPageDataSource {
+		protected DataSource(AbstractConfigurationWizardPage page) {
+			super(page);
 		}
 
 		private AbstractToolRMConfiguration config = null;
@@ -170,7 +136,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		public String getLaunchCmd() {
 			return launchCmd;
 		}
-		
+
 		public String getDebugCmd() {
 			return debugCmd;
 		}
@@ -195,16 +161,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			return remoteInstallPath;
 		}
 
-		protected String extractText(Text text) {
-			String s = text.getText().trim();
-			return (s.length() == 0 ? null : s);
-		}
-
-		protected void applyText(Text t, String s) {
-			if (s == null) t.setText(EMPTY_STRING);
-			else t.setText(s);
-		}
-
+		@Override
 		protected void copyFromFields() throws ValidationException {
 			useDefaults = defaultButton.getSelection();
 
@@ -224,6 +181,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 				remoteInstallPath = extractText(remoteInstallPathText);
 		}
 
+		@Override
 		protected void validateLocal() throws ValidationException {
 			if (! useDefaults) {
 				if (launchCmdText != null && launchCmd == null) {
@@ -243,7 +201,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			}
 		}
 
-		protected void storeConfig() {
+		@Override
+		protected void copyToStorage() {
 			if (launchCmdText != null)
 				config.setLaunchCmd(launchCmd);
 			if (debugCmdText != null)
@@ -261,7 +220,8 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			config.setUseDefaults(useDefaults);
 		}
 
-		protected void loadConfig() {
+		@Override
+		protected void loadFromStorage() {
 			if (launchCmdText != null)
 				launchCmd = config.getLaunchCmd();
 			if (debugCmdText != null)
@@ -281,6 +241,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			useDefaults = true;
 		}
 
+		@Override
 		protected void copyToFields() {
 			if (launchCmdText != null)
 				applyText(launchCmdText, launchCmd);
@@ -299,60 +260,24 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 			defaultButton.setSelection(useDefaults);
 		}
 
+		@Override
 		protected void validateGlobal() throws ValidationException {
 			// Nothing yet. Would validate the entire GenericMPIResourceManagerConfiguration.
-		}
-
-		public void getFromFields() {
-			try {
-				copyFromFields();
-				validateLocal();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setPageComplete(false);
-			}
-		}
-
-		public void putToFields() {
-			copyToFields();
-			try {
-				validateLocal();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setPageComplete(false);
-			}
-		}
-
-		public void updateAndStore() {
-			try {
-				copyFromFields();
-				validateLocal();
-				validateGlobal();
-				storeConfig();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setPageComplete(false);
-			}
-		}
-
-		public void loadAndUpdate() {
-			loadConfig();
-			copyToFields();
-			try {
-				validateLocal();
-				validateGlobal();
-			} catch (ValidationException e) {
-				setErrorMessage(e.getLocalizedMessage());
-				setPageComplete(false);
-			}
 		}
 
 		public void setConfig(IResourceManagerConfiguration configuration) {
 			config = (AbstractToolRMConfiguration) configuration;
 		}
 
+		@Override
 		public AbstractToolRMConfiguration getConfig() {
 			return config;
+		}
+
+		@Override
+		protected void loadDefault() {
+			// TODO Auto-generated method stub
+
 		}
 	}
 
@@ -364,26 +289,23 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	}
 
 	@Override
+	protected WizardPageWidgetListener createListener() {
+		return new WidgetListener();
+	}
+
+	@Override
+	protected WizardPageDataSource createDataSource() {
+		return new DataSource(this);
+	}
+
+
+	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
 	    composite.setLayout(topLayout);
 		createContents(composite);
 		setControl(composite);
-	}
-
-	@Override
-	public void setVisible(boolean visible) {
-		if (visible) {
-			resetErrorStatus();
-
-			listenerEnabled = false;
-			dataSource.setConfig(getConfigurationWizard().getConfiguration());
-			dataSource.loadAndUpdate();
-			listenerEnabled = true;
-			updateControls();
-		}
-		super.setVisible(visible);
 	}
 
 	protected void createContents(Composite parent) {
@@ -487,61 +409,6 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 	}
 
 	/**
-	 * Update wizard UI selections from settings. This should be called whenever any
-	 * settings are changed.
-	 */
-	protected void updateControls() {
-		// Hack, since "Use default" is not yet implement, always leave it disabled.
-		defaultButton.setEnabled(false);
-
-		boolean enabled = ! defaultButton.getSelection();
-
-		if (launchCmdText != null)
-			launchCmdText.setEnabled(enabled);
-		if (debugCmdText != null)
-			debugCmdText.setEnabled(enabled);
-		if (discoverCmdText != null)
-			discoverCmdText.setEnabled(enabled);
-		if (periodicMonitorCmdText != null)
-			periodicMonitorCmdText.setEnabled(enabled);
-		if (periodicMonitorTimeSpinner != null)
-			periodicMonitorTimeSpinner.setEnabled(enabled);
-		if (continuousMonitorCmdText != null)
-			continuousMonitorCmdText.setEnabled(enabled);
-		if (remoteInstallPathText != null)
-			remoteInstallPathText.setEnabled(enabled);
-		if (browseButton != null)
-			browseButton.setEnabled(enabled);
-	}
-
-	/**
-	 * Convenience method for creating a button widget.
-	 *
-	 * @param parent
-	 * @param label
-	 * @param type
-	 * @return the button widget
-	 */
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-
-	/**
-	 * Convenience method for creating a check button widget.
-	 *
-	 * @param parent
-	 * @param label
-	 * @return the check button widget
-	 */
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-
-	/**
 	 * Show a dialog that lets the user select a file.
 	 */
 	protected void handlePathBrowseButtonSelected() {
@@ -549,7 +416,7 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		 * Need to do this here because the connection may have been changed
 		 * by the previous wizard page
 		 */
-		
+
 		IRemoteUIServices remUIServices = null;
 		AbstractRemoteResourceManagerConfiguration config = (AbstractRemoteResourceManagerConfiguration)dataSource.getConfig();
 		String rmID = config.getRemoteServicesId();
@@ -601,9 +468,32 @@ public class AbstractToolRMConfigurationWizardPage extends RMConfigurationWizard
 		}
 	}
 
-	protected void resetErrorStatus() {
-		setPageComplete(true);
-		setErrorMessage(null);
-		setMessage(null);
+	/**
+	 * Update wizard UI selections from settings. This should be called whenever any
+	 * settings are changed.
+	 */
+	@Override
+	protected void updateControls() {
+		// Hack, since "Use default" is not yet implement, always leave it disabled.
+		defaultButton.setEnabled(false);
+
+		boolean enabled = ! defaultButton.getSelection();
+
+		if (launchCmdText != null)
+			launchCmdText.setEnabled(enabled);
+		if (debugCmdText != null)
+			debugCmdText.setEnabled(enabled);
+		if (discoverCmdText != null)
+			discoverCmdText.setEnabled(enabled);
+		if (periodicMonitorCmdText != null)
+			periodicMonitorCmdText.setEnabled(enabled);
+		if (periodicMonitorTimeSpinner != null)
+			periodicMonitorTimeSpinner.setEnabled(enabled);
+		if (continuousMonitorCmdText != null)
+			continuousMonitorCmdText.setEnabled(enabled);
+		if (remoteInstallPathText != null)
+			remoteInstallPathText.setEnabled(enabled);
+		if (browseButton != null)
+			browseButton.setEnabled(enabled);
 	}
 }

@@ -19,3 +19,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rm.remote,
  org.eclipse.search
 Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.rm.mpi.openmpi.ui.wizards
