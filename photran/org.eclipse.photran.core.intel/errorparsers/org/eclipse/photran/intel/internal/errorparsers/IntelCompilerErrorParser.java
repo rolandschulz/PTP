@@ -101,7 +101,7 @@ public class IntelCompilerErrorParser  implements IErrorParser {
 		    filestr = tokenizer.nextToken(",").substring(2).trim();
 		    linestr = tokenizer.nextToken(":").substring(2).trim();
 		    message = tokenizer.nextToken("\r\n").substring(2).trim();
-		    IFile file = eoParser.findFilePath(filestr);
+		    IFile file = eoParser.findFileName(filestr);
 
 		    int severity = -1;          
 		    if (severitystr.equals("Info")) {
