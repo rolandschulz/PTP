@@ -122,6 +122,23 @@
             name="%wizard.name.0"
             project="true">
       </wizard>
+      
+      <wizard
+            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+            class="org.eclipse.ptp.rdt.ui.wizards.ConvertToRemoteWizard"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            hasPages="true"
+            icon="icons/obj16/convert-normal.gif"
+            id="org.eclipse.ptp.rdt.ui.wizards.ConvertToMakeWizard"
+            name="%WizardConvertRemoteProject.name"
+            >
+         <description>
+            %WizardConvertRemoteProject.description
+         </description>
+         <selection
+            class="org.eclipse.core.resources.IProject">
+         </selection>
+      </wizard>      
    </extension>
    <extension
          point="org.eclipse.cdt.ui.IndexerPage">
