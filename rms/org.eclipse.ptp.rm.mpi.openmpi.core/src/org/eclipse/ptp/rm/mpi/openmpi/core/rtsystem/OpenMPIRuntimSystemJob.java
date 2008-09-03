@@ -16,7 +16,9 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -25,7 +27,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -38,7 +39,7 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
-import org.eclipse.ptp.rm.core.rtsystem.DefaultToolRuntimeSystemJob;
+import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
@@ -47,7 +48,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfig
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
 
-public class OpenMPIRuntimSystemJob extends DefaultToolRuntimeSystemJob {
+public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 	Object lock1 = new Object();
 
 	private InputStreamObserver stderrObserver;
@@ -55,12 +56,6 @@ public class OpenMPIRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 
 	/** Information parsed from launch command. */
 	OpenMPIProcessMap map;
-
-	/** Mapping of processes created by this job. */
-//	private Map<String,String> processMap = new HashMap<String, String>();
-
-	/** Process with rank 0 (zero) that prints all output. */
-//	private String rankZeroProcessID;
 
 	/**
 	 * Process IDs created by this job. The first process (zero index) is special,
@@ -366,14 +361,6 @@ public class OpenMPIRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 
 	@Override
 	protected void doTerminateJob() {
-//		if (stderrObserver != null) {
-//			stderrObserver.kill();
-//			stderrObserver = null;
-//		}
-//		if (stdoutObserver != null) {
-//			stdoutObserver.kill();
-//			stdoutObserver = null;
-//		}
 	}
 
 	@Override
@@ -429,7 +416,7 @@ public class OpenMPIRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected IAttribute<?, ?, ?>[] getExtraSubstitutionVariables() throws CoreException {
+	protected IAttribute<?, ?, ?>[] retrieveToolBaseSubstitutionAttributes() throws CoreException {
 		List<IAttribute<?, ?, ?>> newAttributes = new ArrayList<IAttribute<?,?,?>>();
 		ArrayAttribute<String> environmentAttribute = getAttrMgr().getAttribute(JobAttributes.getEnvironmentAttributeDefinition());
 
@@ -450,15 +437,34 @@ public class OpenMPIRuntimSystemJob extends DefaultToolRuntimeSystemJob {
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
 	}
 
+//	@Override
+//	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
+//		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
+//		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
+//				OpenMPILaunchAttributes.getEnvironmentKeysDefinition(), OpenMPILaunchAttributes.getEnvironmentArgsDefinition()
+//			};
+//		IAttributeDefinition<?, ?, ?>[]  allAttributes = new IAttributeDefinition[attributesFromSuper.length+moreAttributes.length];
+//	   System.arraycopy(attributesFromSuper, 0, allAttributes, 0, attributesFromSuper.length);
+//	   System.arraycopy(moreAttributes, 0, allAttributes, attributesFromSuper.length, moreAttributes.length);
+//	   return allAttributes;
+//	}
+
 	@Override
-	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
-		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
-		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
-				OpenMPILaunchAttributes.getEnvironmentKeysDefinition(), OpenMPILaunchAttributes.getEnvironmentArgsDefinition()
-			};
-		IAttributeDefinition<?, ?, ?>[]  allAttributes = new IAttributeDefinition[attributesFromSuper.length+moreAttributes.length];
-	   System.arraycopy(attributesFromSuper, 0, allAttributes, 0, attributesFromSuper.length);
-	   System.arraycopy(moreAttributes, 0, allAttributes, attributesFromSuper.length, moreAttributes.length);
-	   return allAttributes;
+	protected void doBeforeExecution() throws CoreException {
+	}
+
+	@Override
+	protected HashMap<String, String> doRetrieveToolEnvironment()
+			throws CoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected IAttribute<?, ?, ?>[] retrieveToolCommandSubstitutionAttributes(
+			AttributeManager baseSubstitutionAttributeManager,
+			String directory, Map<String, String> environment) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
