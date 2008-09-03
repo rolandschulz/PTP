@@ -21,6 +21,8 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.ptp.rdt.services.core.IService;
@@ -44,16 +46,16 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-public class ServiceModelWidget {
+public class ServiceModelWidget{
 	
-	private static final String PROVIDER_KEY = "provider-id"; //$NON-NLS-1$
-	private static final String SERVICE_KEY = "service-id"; //$NON-NLS-1$
+	protected static final String PROVIDER_KEY = "provider-id"; //$NON-NLS-1$
+	protected static final String SERVICE_KEY = "service-id"; //$NON-NLS-1$
 	
-	private Map<String, String> fServiceIDToSelectedProviderID;
-	private Map<String, IServiceProvider> fProviderIDToProviderMap;
+	protected Map<String, String> fServiceIDToSelectedProviderID;
+	protected Map<String, IServiceProvider> fProviderIDToProviderMap;
 
-	private Table fTable;
-	private Button fConfigureButton;
+	protected Table fTable;
+	protected Button fConfigureButton;
 	
 	public ServiceModelWidget() {
 		fServiceIDToSelectedProviderID = new HashMap<String, String>();
@@ -83,33 +85,7 @@ public class ServiceModelWidget {
 		tableParent.setLayout(layout);
 		fTable.setLayout(new FillLayout());
 		
-		// get the contributed services... we need one row for each
-		ServiceModelManager modelManager = ServiceModelManager.getInstance();
-		
-		Set<IService> cppServices = modelManager.getServices(CCProjectNature.CC_NATURE_ID);
-		Set<IService> cServices = modelManager.getServices(CProjectNature.C_NATURE_ID);
-		
-		Set<IService> allApplicableServices = new LinkedHashSet<IService>(cppServices);
-		allApplicableServices.addAll(cServices);
-		
-		Iterator<IService> iterator = allApplicableServices.iterator();
-
-		while(iterator.hasNext()) {
-			final IService service = iterator.next();			
-			
-			TableItem item = new TableItem (fTable, SWT.NONE);
-
-			// column 0 lists the name of the service
-			item.setText (0, service.getName());
-			item.setData(SERVICE_KEY, service);
-			
-			// column 1 holds a dropdown with a list of providers
-			IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
-			item.setText(1, descriptor.getName());
-			item.setData(PROVIDER_KEY, descriptor);
-			
-			fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
-		}
+		getContributedServices(null);
 		
 		fTable.setVisible(true);
 		
@@ -179,25 +155,89 @@ public class ServiceModelWidget {
 		fConfigureButton.setEnabled(false);
 		fConfigureButton.setText(Messages.getString("ServiceModelWizardPage.2")); //$NON-NLS-1$
 		fConfigureButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		Listener configureListener = new Listener() {
-			public void handleEvent(Event event) {
-				// launch the configuration UI for the service provider
-				TableItem[] selection = fTable.getSelection();
-				if (selection.length == 0) {
-					return;
-				}
-				TableItem item = selection[0];
-				ServiceModelManager manager = ServiceModelManager.getInstance();
-				IServiceProviderDescriptor descriptor = (IServiceProviderDescriptor) item.getData(PROVIDER_KEY);
-				IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
-				fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);
-
-				IServiceProviderConfiguration configUI = manager.getServiceProviderConfigurationUI(serviceProvider);
-				configUI.configureServiceProvider(serviceProvider, fConfigureButton.getShell());
-			}
-		};
+		Listener configureListener = getConfigureListener();
 		fConfigureButton.addListener(SWT.Selection, configureListener);
 		return canvas;
+	}
+	
+	public class ConfigureListener implements Listener {
+		public void handleEvent(Event event) {
+			// launch the configuration UI for the service provider
+			TableItem[] selection = fTable.getSelection();
+			if (selection.length == 0) {
+				return;
+			}
+			TableItem item = selection[0];
+			ServiceModelManager manager = ServiceModelManager.getInstance();
+			IServiceProviderDescriptor descriptor = (IServiceProviderDescriptor) item.getData(PROVIDER_KEY);
+			IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+			fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);
+
+			IServiceProviderConfiguration configUI = manager.getServiceProviderConfigurationUI(serviceProvider);
+			configUI.configureServiceProvider(serviceProvider, fConfigureButton.getShell());
+		}
+	}
+	
+	//sub class may override to change behaviour
+	protected Listener getConfigureListener() {
+		return new ConfigureListener();		
+	}
+	
+	/**
+	 * Find available remote services and service providers for a given project and
+	 * add them to the table
+	 * 
+	 * If project is null, the C and C++ natures are used to determine which services
+	 * are available
+	 */
+	protected void getContributedServices(IProject project) {		
+		ServiceModelManager modelManager = ServiceModelManager.getInstance();
+		Set<IService> allApplicableServices = new LinkedHashSet<IService>();
+		
+		if (project != null) {
+		
+			String[] natureIds = new String[] {};			
+			try {
+				//get the project natures of the project
+				natureIds = project.getDescription().getNatureIds();			
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}		
+	
+			for (int i = 0; i < natureIds.length; i++) {
+				String natureId = natureIds[i];
+				Set<IService> services = modelManager.getServices(natureId);
+				if (services != null)
+					allApplicableServices.addAll(services);
+			}
+		}
+		else {		
+			Set<IService> cppServices = modelManager.getServices(CCProjectNature.CC_NATURE_ID);
+			Set<IService> cServices = modelManager.getServices(CProjectNature.C_NATURE_ID);
+			
+			allApplicableServices.addAll(cppServices);
+			allApplicableServices.addAll(cServices);
+		}
+		
+		Iterator<IService> iterator = allApplicableServices.iterator();
+
+		// get the contributed services... we need one row for each
+		while(iterator.hasNext()) {
+			final IService service = iterator.next();			
+			
+			TableItem item = new TableItem (fTable, SWT.NONE);
+
+			// column 0 lists the name of the service
+			item.setText (0, service.getName());
+			item.setData(SERVICE_KEY, service);
+			
+			// column 1 holds a dropdown with a list of providers
+			IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
+			item.setText(1, descriptor.getName());
+			item.setData(PROVIDER_KEY, descriptor);
+			
+			fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
+		}
 	}
 
 	public Map<String, String> getServiceIDToSelectedProviderID() {
