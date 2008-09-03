@@ -73,4 +73,8 @@
          id="org.eclipse.ptp.rm"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.external"
+         version="0.0.0"/>
+
 </feature>
