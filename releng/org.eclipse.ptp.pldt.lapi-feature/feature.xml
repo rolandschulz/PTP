@@ -23,6 +23,14 @@
 
    <requires>
       <import feature="org.eclipse.ptp.pldt" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.ptp.pldt.common"/>
+      <import plugin="org.eclipse.help"/>
+      <import plugin="org.eclipse.cdt.doc.user"/>
    </requires>
 
    <plugin

@@ -30,7 +30,6 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.ui.console"/>
@@ -41,12 +40,15 @@
       <import plugin="org.eclipse.cdt.debug.core"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.ptp.remote.core"/>
+      <import plugin="org.eclipse.ptp.remote.ui"/>
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.help"/>
       <import plugin="org.eclipse.ui.intro"/>
       <import plugin="org.eclipse.ui.intro.universal"/>
+      <import plugin="org.eclipse.ptp.rm.remote"/>
    </requires>
 
    <plugin
@@ -91,27 +93,6 @@
 
    <plugin
          id="org.eclipse.ptp.proxy.protocol"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.remote"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
