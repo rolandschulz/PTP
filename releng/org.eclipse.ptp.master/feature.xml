@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.master"
+      label="PTP Master Feature"
+      version="2.1.0"
+      provider-name="Eclipse.org">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="org.eclipse.ptp"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.core"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.debug.sdm"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.pldt"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.pldt.lapi"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rdt"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote.rse"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.ibm.ll"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.ibm.pe"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.openmpi"
+         version="0.0.0"/>
+
+</feature>
