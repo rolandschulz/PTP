@@ -25,22 +25,23 @@
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="com.jcraft.jsch"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.cdt.debug.core"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.core.variables"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.jface"/>
-      <import plugin="com.jcraft.jsch"/>
-      <import plugin="org.eclipse.cdt.launch"/>
-      <import plugin="org.eclipse.swt"/>
-      <import plugin="org.eclipse.core.variables"/>
+      <import plugin="org.eclipse.ptp.ui"/>
    </requires>
 
    <plugin
