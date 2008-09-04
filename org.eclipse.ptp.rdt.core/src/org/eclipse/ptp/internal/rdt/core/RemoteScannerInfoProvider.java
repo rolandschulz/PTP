@@ -28,28 +28,35 @@ import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 class RemoteScannerInfoProvider implements IStandaloneScannerInfoProvider, Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private final Map<String,RemoteScannerInfo> scannerInfoMap;
+	private final Map<String,RemoteScannerInfo> pathMap;
+	private final Map<Integer,RemoteScannerInfo> linkageMap; // used by the "parse up front" feature
 	
 
-	RemoteScannerInfoProvider(Map<String,RemoteScannerInfo> map) {
-		if(map == null)
-			throw new NullPointerException();
-		this.scannerInfoMap = map;
+	RemoteScannerInfoProvider(Map<String,RemoteScannerInfo> pathMap, Map<Integer,RemoteScannerInfo> linkageMap) {
+		this.pathMap = pathMap == null ? Collections.<String,RemoteScannerInfo>emptyMap() : pathMap;
+		this.linkageMap = linkageMap == null ? Collections.<Integer,RemoteScannerInfo>emptyMap() : linkageMap;
 	}
 	
 	RemoteScannerInfoProvider() {
-		scannerInfoMap = Collections.emptyMap();
+		pathMap = Collections.emptyMap();
+		linkageMap = Collections.emptyMap();
 	}
 
 	public IScannerInfo getScannerInformation(String path) {
-		IScannerInfo scannerInfo = scannerInfoMap.get(path);
-		if(scannerInfo == null)
-			return new RemoteScannerInfo();
-		return scannerInfo;
+		return getScannerInfo(pathMap, path);
+	}
+	
+	public IScannerInfo getDefaultScannerInformation(int linkageId) {
+		return getScannerInfo(linkageMap, linkageId);
+	}
+	
+	private static <T> IScannerInfo getScannerInfo(Map<T,RemoteScannerInfo> map, T key) {
+		IScannerInfo si = map.get(key);
+		return si == null ? new RemoteScannerInfo() : si;
 	}
 	
 	public String toString() {
-		return scannerInfoMap.toString();
+		return pathMap.toString();
 	}
 }
 
