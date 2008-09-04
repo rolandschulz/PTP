@@ -185,10 +185,8 @@ public class SDMDebugger implements IPDebugger {
 			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
 		}
 
-		int numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
+		int numProcs = 5;//attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
 		dbgArgs.add("--numprocs=" + numProcs); //$NON-NLS-1$
-
-
 
 		// remote setting
 		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);;

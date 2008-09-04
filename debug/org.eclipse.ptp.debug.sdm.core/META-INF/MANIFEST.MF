@@ -30,16 +30,12 @@ Export-Package: org.eclipse.ptp.debug.sdm.core;
  org.eclipse.ptp.debug.sdm.core.proxy;uses:="org.eclipse.ptp.core.util,org.eclipse.core.runtime,org.eclipse.ptp.proxy.debug.client"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
- org.eclipse.ui,
- org.eclipse.jface,
  org.eclipse.ptp.proxy.protocol,
  org.eclipse.ptp.core,
  org.eclipse.ptp.debug.core,
- org.eclipse.ptp.debug.ui,
  org.eclipse.ptp.launch,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.rm.remote,
- org.eclipse.core.filesystem;bundle-version="1.2.0",
- org.eclipse.search;bundle-version="3.4.0"
+ org.eclipse.core.filesystem;bundle-version="1.2.0"
 Eclipse-LazyStart: true
 Bundle-Vendor: Eclipse.org

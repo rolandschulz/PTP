@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 /**
  * This is the generic parallel element class which all the specific classes
@@ -30,7 +29,7 @@ import org.eclipse.search.ui.ISearchPageScoreComputer;
  * 
  * @author Nathan DeBardeleben
  */
-public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
+public interface IPElementControl extends IPElement {
 	// public String NAME_TAG = "";
 
 	/**

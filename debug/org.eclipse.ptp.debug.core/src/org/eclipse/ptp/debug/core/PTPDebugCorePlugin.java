@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -42,10 +43,9 @@ import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-public class PTPDebugCorePlugin extends AbstractUIPlugin {
+public class PTPDebugCorePlugin extends Plugin {
 	class EventDispatchJob extends Job {
 		private EventNotifier fNotifier = new EventNotifier();
 
