@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP UI Utilities Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.utils.ui
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.utils.ui.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.utils.ui,
+ org.eclipse.ptp.utils.ui.swt
