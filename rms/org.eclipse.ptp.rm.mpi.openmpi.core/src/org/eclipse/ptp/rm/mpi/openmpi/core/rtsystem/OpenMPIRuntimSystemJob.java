@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -34,7 +33,6 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.rm.core.Activator;
@@ -194,7 +192,7 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 		Thread parserThread = new Thread() {
 			@Override
 			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", jobID); //$NON-NLS-1$				
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", jobID); //$NON-NLS-1$
 				OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 				try {
 					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
@@ -345,7 +343,7 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 		} catch (InterruptedException e1) {
 			// Ignore
 		}
-		
+
 		/*
 		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
@@ -355,7 +353,7 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 		} catch (InterruptedException e) {
 			// Ignore
 		}
-		
+
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", jobID); //$NON-NLS-1$
 	}
 
@@ -371,7 +369,7 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 	private void changeAllProcessesStatus(State newState) {
 		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
-		
+
 		/*
 		 * Mark all running and starting processes as finished.
 		 */
@@ -390,7 +388,7 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 				break;
 			}
 		}
-		
+
 		AttributeManager attrMrg = new AttributeManager();
 		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
 		for (String processId : ids) {
@@ -416,47 +414,13 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected IAttribute<?, ?, ?>[] retrieveToolBaseSubstitutionAttributes() throws CoreException {
-		List<IAttribute<?, ?, ?>> newAttributes = new ArrayList<IAttribute<?,?,?>>();
-		ArrayAttribute<String> environmentAttribute = getAttrMgr().getAttribute(JobAttributes.getEnvironmentAttributeDefinition());
-
-		if (environmentAttribute != null) {
-			List<String> environment = environmentAttribute.getValue();
-			int p = 0;
-			String keys[] = new String[environment.size()];
-			for (String var : environment) {
-				int i = var.indexOf('=');
-				String key = var.substring(0, i);
-				keys[p++] = key;
-			}
-			newAttributes.add(OpenMPILaunchAttributes.getEnvironmentKeysDefinition().create(keys));
-		}
-
-		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentArgsDefinition().create());
-
-		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
-	}
-
-//	@Override
-//	protected IAttributeDefinition<?, ?, ?>[] getDefaultSubstitutionAttributes() {
-//		IAttributeDefinition<?, ?, ?>[] attributesFromSuper = super.getDefaultSubstitutionAttributes();
-//		IAttributeDefinition<?, ?, ?>[] moreAttributes = new IAttributeDefinition[] {
-//				OpenMPILaunchAttributes.getEnvironmentKeysDefinition(), OpenMPILaunchAttributes.getEnvironmentArgsDefinition()
-//			};
-//		IAttributeDefinition<?, ?, ?>[]  allAttributes = new IAttributeDefinition[attributesFromSuper.length+moreAttributes.length];
-//	   System.arraycopy(attributesFromSuper, 0, allAttributes, 0, attributesFromSuper.length);
-//	   System.arraycopy(moreAttributes, 0, allAttributes, attributesFromSuper.length, moreAttributes.length);
-//	   return allAttributes;
-//	}
-
-	@Override
 	protected void doBeforeExecution() throws CoreException {
+		// Nothing to do
 	}
 
 	@Override
-	protected HashMap<String, String> doRetrieveToolEnvironment()
-			throws CoreException {
-		// TODO Auto-generated method stub
+	protected IAttribute<?, ?, ?>[] retrieveToolBaseSubstitutionAttributes() throws CoreException {
+		// TODO make macros available for environment variables and work directory.
 		return null;
 	}
 
@@ -464,7 +428,32 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 	protected IAttribute<?, ?, ?>[] retrieveToolCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment) {
-		// TODO Auto-generated method stub
+
+		List<IAttribute<?, ?, ?>> newAttributes = new ArrayList<IAttribute<?,?,?>>();
+
+		/*
+		 * An OpenMPI specific attribute.
+		 * Attribute that contains a list of names of environment variables.
+		 */
+		int p = 0;
+		String keys[] = new String[environment.size()];
+		for (String key : environment.keySet()) {
+			keys[p++] = key;
+		}
+		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentKeysDefinition().create(keys));
+
+		/*
+		 * An OpenMPI specific attribute.
+		 * A shortcut that generates arguments for the OpenMPI run command.
+		 */
+		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentArgsDefinition().create());
+		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
+}
+
+	@Override
+	protected HashMap<String, String> doRetrieveToolEnvironment()
+			throws CoreException {
+		// No extra environment variables needs to be set for OpenMPI.
 		return null;
 	}
 }
