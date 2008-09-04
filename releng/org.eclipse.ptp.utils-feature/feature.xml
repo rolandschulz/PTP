@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.utils_feature"
+      id="org.eclipse.ptp.utils"
       label="PTP Utilities Feature"
       version="1.0.0">
 
