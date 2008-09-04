@@ -11,21 +11,51 @@
 
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
-import org.eclipse.ptp.rdt.ui.wizards.ServiceModelWidget;
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.rdt.ui.wizards.ConfigureRemoteServices;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 public class ServiceModelPropertyPage extends PropertyPage{
 	
-	ServiceModelWidget fModelWidget;
+	PropertyPageServiceModelWidget fModelWidget;
 	
 	public ServiceModelPropertyPage() {
-		fModelWidget = new ServiceModelWidget();
+		fModelWidget = new PropertyPageServiceModelWidget();
 	}
 
 	@Override
 	protected Control createContents(Composite parent) {
-		return fModelWidget.createContents(parent);
+		Control table = fModelWidget.createContents(parent);
+		fModelWidget.updateServicesTable((IProject) getElement());
+		return table;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
+	@Override
+	public boolean performOk() {
+		IProject project = (IProject) getElement();
+		try {
+			ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap());
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
+	@Override
+	protected void performDefaults() {
+		// TODO restore default using configuration strings
+		super.performDefaults();
 	}
 }
