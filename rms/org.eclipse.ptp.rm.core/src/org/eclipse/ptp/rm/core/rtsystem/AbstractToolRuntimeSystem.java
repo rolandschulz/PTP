@@ -41,7 +41,6 @@ import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
-import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -59,6 +58,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeEventFactory;
+import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
  * Implements the Runtime System to support calling command line tools to discover, monitor and launch parallel applications.

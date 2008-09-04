@@ -30,7 +30,7 @@ import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.ptp.ui.utils.ImageImageDescriptor;
+import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 import org.eclipse.ui.model.WorkbenchAdapter;

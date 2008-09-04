@@ -50,7 +50,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters.Parameter;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
-import org.eclipse.ptp.ui.utils.PixelConverter;
+import org.eclipse.ptp.utils.ui.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;

@@ -11,7 +11,7 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.utils.core.RangeSet;
 
 public abstract class AbstractRuntimeRemoveEvent implements IRuntimeRemoveEvent {
 	private RangeSet elementIds;

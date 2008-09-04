@@ -88,7 +88,6 @@ import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
-import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -111,6 +110,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  *

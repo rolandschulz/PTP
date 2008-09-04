@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
  * An ElementAttributeManager maintains a mapping between ranges of element ID's and

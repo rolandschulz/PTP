@@ -27,16 +27,26 @@ package org.eclipse.ptp.rm.ibm.ll.ui.preferences;
 import java.io.File;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;
-import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
-import org.eclipse.ptp.ui.utils.SWTUtil;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 
 public class IBMLLPreferencePage extends AbstractRemotePreferencePage {
 

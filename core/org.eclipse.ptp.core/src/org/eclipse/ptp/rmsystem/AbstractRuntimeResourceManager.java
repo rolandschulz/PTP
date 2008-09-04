@@ -49,7 +49,6 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
@@ -77,6 +76,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
+import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
  * @author greg

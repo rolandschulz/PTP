@@ -24,7 +24,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
  org.eclipse.ptp.remotetools.utils,
- org.eclipse.ptp.ui
+ org.eclipse.ptp.utils.ui;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.remotetools.environment.launcher,
  org.eclipse.ptp.remotetools.environment.launcher.core,
