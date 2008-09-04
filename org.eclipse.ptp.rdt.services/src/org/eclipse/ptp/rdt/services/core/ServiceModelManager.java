@@ -343,16 +343,18 @@ public class ServiceModelManager implements IServiceModelManager {
 					
 					Set<IService> services = config.getServices();
 					for (IService service : services) {
-						String serviceId = service.getId();
 						IServiceProvider provider = config.getServiceProvider(service);
-						String providerId = provider.getId();
+						if(provider.isConfigured()) {
+							String serviceId = service.getId();
+							String providerId = provider.getId();
+							
+							IMemento serviceMemento = configMemento.createChild(SERVICE_ELEMENT_NAME);
+							serviceMemento.putString(ATTR_ID, serviceId);
+							serviceMemento.putString(ATTR_PROVIDER_ID, providerId);
 						
-						IMemento serviceMemento = configMemento.createChild(SERVICE_ELEMENT_NAME);
-						serviceMemento.putString(ATTR_ID, serviceId);
-						serviceMemento.putString(ATTR_PROVIDER_ID, providerId);
-						
-						IMemento providerMemento = serviceMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-						provider.saveState(providerMemento);
+							IMemento providerMemento = serviceMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+							provider.saveState(providerMemento);
+						}
 					}
 				}
 			}
@@ -406,7 +408,7 @@ public class ServiceModelManager implements IServiceModelManager {
 					}
 					addConfiguration(project, config);
 				}
-			}
+			} 
 		} finally {
 			reader.close();
 		}
