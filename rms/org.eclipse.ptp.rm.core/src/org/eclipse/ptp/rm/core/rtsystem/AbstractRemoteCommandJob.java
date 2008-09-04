@@ -30,9 +30,9 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 /**
  * Abstract implementation of a job that executes a command on the remote host and parses its output.
  * The job might be automatically rescheduled if created with the proper constructor.
+ * Use this class a useful starting point to implement discover and monitor jobs.
  *
- * @author dfferber
- *
+ * @author Daniel Felix Ferber
  */
 abstract public class AbstractRemoteCommandJob extends Job {
 	static final String EMPTY_STRING = ""; //$NON-NLS-1$

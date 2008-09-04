@@ -44,7 +44,16 @@ import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.utils.ArgumentParser;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
+/**
+ * Implements a job that controls the parallel application launched with a command line tool.
+ * This class is different from {@link AbstractRemoteCommandJob} because it is not aimed towards parsing output of the
+ * tool called by command line, but to prepare a whole launch environment for the command line tool, also supporting
+ * semantings of the parallel application launcher.
+ *
+ * @author Daniel Felix Ferber
+ */
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {
+
 	protected String jobID;
 	protected String queueID;
 	protected IRemoteProcess process = null;
@@ -102,7 +111,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				AttributeManager baseSubstitutionAttributeManager = retrieveBaseSubstitutionAttributes();
 				environment = retrieveEnvironment(baseSubstitutionAttributeManager);
 				directory = retrieveWorkingDirectory(baseSubstitutionAttributeManager);
-				
+
 				AttributeManager commandSubstitutionAttributeManager = retrieveCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
 				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 				if (debugAttr != null && debugAttr.getValue()) {
@@ -111,20 +120,24 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 					command = retrieveCreateLaunchCommand(commandSubstitutionAttributeManager);
 				}
 				if (DebugUtil.RTS_JOB_TRACING) {
-					System.out.println("Available substitution macros:"); //$NON-NLS-1$
+					System.out.println("Available macros for environment and work directory:"); //$NON-NLS-1$
 					for (IAttribute<?, ?, ?> attr : baseSubstitutionAttributeManager.getAttributes()) {
+						System.out.println(MessageFormat.format("  {0}={1}", attr.getDefinition().getId(), attr.getValueAsString())); //$NON-NLS-1$
+					}
+					System.out.println("Available macros for command:"); //$NON-NLS-1$
+					for (IAttribute<?, ?, ?> attr : commandSubstitutionAttributeManager.getAttributes()) {
 						System.out.println(MessageFormat.format("  {0}={1}", attr.getDefinition().getId(), attr.getValueAsString())); //$NON-NLS-1$
 					}
 					System.out.println("Environment variables:"); //$NON-NLS-1$
 					for (Entry<String, String> env : environment.entrySet()) {
 						System.out.println(MessageFormat.format("  {0}={1}", env.getKey(), env.getValue())); //$NON-NLS-1$
 					}
-					System.out.println(MessageFormat.format("Workdir: {0}", directory)); //$NON-NLS-1$
+					System.out.println(MessageFormat.format("Work directory: {0}", directory)); //$NON-NLS-1$
 					System.out.println(MessageFormat.format("Command: {0}", command.toString())); //$NON-NLS-1$
 				}
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to caculate command line for launch.", e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to caculate work directory, environment or command line to launch parallel application.", e);
 			}
 
 			try {
@@ -132,7 +145,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doBeforeExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed before launch.", e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
 			}
 
 			/*
@@ -145,7 +158,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				process = processBuilder.start();
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to execute command.", e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to execute command to  launch parallel application.", e);
 			}
 
 			try {
@@ -153,7 +166,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionStarted();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after launch.", e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after executing command to launch parallel application.", e);
 			}
 
 			changeJobState(JobAttributes.State.RUNNING);
@@ -163,14 +176,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doWaitExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while waiting execution of command.", e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while executing parallel application.", e);
 			}
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
 			if (process.exitValue() != 0) {
 				changeJobState(JobAttributes.State.ERROR);
 				if (! terminateJobFlag) {
-					return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command, return exit value {0}.", process.exitValue()));
+					return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command to launch parallel application, return exit value {0}.", process.exitValue()));
 				} else {
 					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
 					return Status.CANCEL_STATUS;
@@ -190,7 +203,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionFinished();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after command finished.", e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after finishing execution of parallel application.", e);
 			}
 
 			changeJobState(JobAttributes.State.TERMINATED);
@@ -215,7 +228,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			doExecutionCleanUp();
 		}
 	}
-	
+
 	abstract protected void doExecutionCleanUp();
 
 	abstract protected void doWaitExecution() throws CoreException;
@@ -229,7 +242,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	abstract protected void doTerminateJob();
 
 	/**
-	 * Change the state of the job state. 
+	 * Change the state of the job state.
 	 * @param newState
 	 */
 	protected void changeJobState(JobAttributes.State newState) {
@@ -241,19 +254,20 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 	/**
 	 * Retrieve the working directory for the launch.
-	 * @param baseSubstitutionAttributeManager 
+	 * @param baseSubstitutionAttributeManager
 	 * @return
 	 */
 	protected String retrieveWorkingDirectory(AttributeManager baseSubstitutionAttributeManager) {
 		/*
 		 * TODO Add substitution variables.
+		 * TODO Return IPath instead of string
 		 */
 		return attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 	}
-	
+
 	/**
 	 * Retrieve the environment variables.
-	 * @param baseSubstitutionAttributeManager 
+	 * @param baseSubstitutionAttributeManager
 	 */
 	protected Map<String,String> retrieveEnvironment(AttributeManager baseSubstitutionAttributeManager) throws CoreException {
 		HashMap<String, String> environmentMap = new HashMap<String, String>();
@@ -303,10 +317,10 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected AttributeManager retrieveBaseSubstitutionAttributes() throws CoreException {
 		AttributeManager newAttributeManager = new AttributeManager(getAttrMgr().getAttributes());
-		
+
 		/*
 		 * First, add all default attributes that are default attributes for the launch.
-		 * If they are not present in the launch attributes, then use default value. 
+		 * If they are not present in the launch attributes, then use default value.
 		 */
 		for (IAttributeDefinition<?, ?, ?> attributeDefinition : getDefaultSubstitutionAttributes()) {
 			IAttribute<?, ?, ?> attribute = newAttributeManager.getAttribute(attributeDefinition.getId());
@@ -319,15 +333,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				}
 			}
 		}
-		
+
 		/*
 		 * Then, add attributes that are specific for the tool.
 		 */
-		IAttribute<?,?,?> extrAttributes[] = retrieveToolBaseSubstitutionAttributes();
-		if (extrAttributes != null) {
-			newAttributeManager.addAttributes(extrAttributes);
+		IAttribute<?,?,?> extraAttributes[] = retrieveToolBaseSubstitutionAttributes();
+		if (extraAttributes != null) {
+			newAttributeManager.addAttributes(extraAttributes);
 		}
-		
+
 		return newAttributeManager;
 	}
 
@@ -354,24 +368,24 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				JobAttributes.getWorkingDirectoryAttributeDefinition()
 			};
 	}
-	
+
 	protected AttributeManager retrieveCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment) {
 		AttributeManager newAttributeManager = new AttributeManager(baseSubstitutionAttributeManager.getAttributes());
-		
+
 		/*
 		 * Add attributes that are specific for the tool.
 		 */
-		IAttribute<?,?,?> extrAttributes[] = retrieveToolCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
-		if (extrAttributes != null) {
-			newAttributeManager.addAttributes(extrAttributes);
+		IAttribute<?,?,?> extraAttributes[] = retrieveToolCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
+		if (extraAttributes != null) {
+			newAttributeManager.addAttributes(extraAttributes);
 		}
-		
+
 		return baseSubstitutionAttributeManager;
 	}
 
-	
+
 	abstract protected IAttribute<?, ?, ?>[] retrieveToolCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment);
@@ -427,6 +441,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * Starts with "${" and ends with "}"
 	 * The content is a name and a set of parameters separated by ":"
 	 * In the parameters, "\" may be used to quote following chars: '\', '}' and ':'
+	 *
+	 * TODO move this patter substitution code into the attribute manager
+	 * TODO enable the attribute manager to do substitution -> have this feature available on entire PTP.
 	 */
 	static final Pattern variablePattern = Pattern.compile(("/$/{(/w+)("+"(?:(?:////)|(?:///})|[^/}])*"+")/}").replace('/','\\'));
 	static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\'));
@@ -528,7 +545,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		String result = output.toString();
 		return result;
 	}
-	
+
 	public void terminate() {
 		terminateJobFlag = true;
 		if (process != null) {

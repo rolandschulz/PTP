@@ -60,9 +60,12 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeEventFactory;
 
-/*
+/**
+ * Implements the Runtime System to support calling command line tools to discover, monitor and launch parallel applications.
  * TODO: Synchronize methods to avoid race conditions
  * TODO: Split this class into two: the tools RTS and a command tools RTS.
+ *
+ * @author Daniel Felix Ferber
  */
 public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/**
