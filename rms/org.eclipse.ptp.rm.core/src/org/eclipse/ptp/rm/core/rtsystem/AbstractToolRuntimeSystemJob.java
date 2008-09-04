@@ -369,7 +369,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			};
 	}
 
-	protected AttributeManager retrieveCommandSubstitutionAttributes(
+	final protected AttributeManager retrieveCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment) {
 		AttributeManager newAttributeManager = new AttributeManager(baseSubstitutionAttributeManager.getAttributes());
@@ -382,7 +382,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			newAttributeManager.addAttributes(extraAttributes);
 		}
 
-		return baseSubstitutionAttributeManager;
+		return newAttributeManager;
 	}
 
 
