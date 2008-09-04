@@ -45,24 +45,16 @@ public class ServiceModelSaveParticipant implements ISaveParticipant {
 	}
 
 	public void saving(ISaveContext context) throws CoreException {
-		switch (context.getKind()) {
-		case ISaveContext.FULL_SAVE:
-			int saveNumber = context.getSaveNumber();
-			IPath path = Activator.getServiceModelStateFilePath(saveNumber);
-			File file = path.toFile();
-			ServiceModelManager manager = ServiceModelManager.getInstance();
-			try {
-					manager.saveModelConfiguration(file);
-				} catch (IOException e) {
-					throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
-				}
-			context.map(Activator.getServiceModelStateFilePath(), path);
-			context.needSaveNumber();
-			break;
-		case ISaveContext.PROJECT_SAVE:
-			break;
-		case ISaveContext.SNAPSHOT:
-			break;
+		int saveNumber = context.getSaveNumber();
+		IPath path = Activator.getServiceModelStateFilePath(saveNumber);
+		File file = path.toFile();
+		ServiceModelManager manager = ServiceModelManager.getInstance();
+		try {
+			manager.saveModelConfiguration(file);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 		}
+		context.map(Activator.getServiceModelStateFilePath(), path);
+		context.needSaveNumber();
 	}
 }
