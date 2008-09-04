@@ -14,15 +14,21 @@ package org.eclipse.ptp.internal.rdt.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.dom.ICodeReaderFactory;
+import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
+import org.eclipse.cdt.core.parser.ScannerInfo;
+import org.eclipse.cdt.internal.core.pdom.indexer.PDOMIndexerTask;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -50,8 +56,6 @@ public class RemoteScannerInfoProviderFactory {
 	 */
 	public static RemoteScannerInfoProvider getProvider(String scopeName) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(scopeName);
-		if(project == null)
-			return new RemoteScannerInfoProvider();
 		return getProvider(project);
 	}
 	
@@ -59,8 +63,12 @@ public class RemoteScannerInfoProviderFactory {
 	/**
 	 * Returns a RemoteScannerInfoProvider that contains all the IScannerInfos
 	 * for all the translation units in the given project.
+	 * Returns an empty provider if the project is null.
 	 */
 	public static RemoteScannerInfoProvider getProvider(IProject project) {
+		if(project == null)
+			return new RemoteScannerInfoProvider();
+		
 		final List<ICElement> elements = new ArrayList<ICElement>();
 		IResourceVisitor resourceVisitor = new IResourceVisitor() {
 			public boolean visit(IResource resource) throws CoreException {
@@ -92,7 +100,7 @@ public class RemoteScannerInfoProviderFactory {
 		private IScannerInfo scannerInfo;
 		private int hashCode = 0;
 
-		public ScannerInfoKey(IScannerInfo scannerInfo) {
+		ScannerInfoKey(IScannerInfo scannerInfo) {
 			this.scannerInfo = scannerInfo;
 		}
 
@@ -113,42 +121,93 @@ public class RemoteScannerInfoProviderFactory {
 	}
 	
 	
+	/**
+	 * Maintains a cache of shared instances of RemoteScannerInfo.
+	 */
+	private static class RemoteScannerInfoCache {
+		Map<ScannerInfoKey,RemoteScannerInfo> cache = new HashMap<ScannerInfoKey,RemoteScannerInfo>();
+		
+		RemoteScannerInfo get(IScannerInfo localScannerInfo) {
+			// If we have already seen a IScannerInfo that is identical then just reuse the
+			// existing remote version of it.
+			ScannerInfoKey key = new ScannerInfoKey(localScannerInfo);
+			RemoteScannerInfo remoteScannerInfo = cache.get(key);
+			if(remoteScannerInfo == null) {
+				remoteScannerInfo = new RemoteScannerInfo(localScannerInfo);
+				cache.put(key, remoteScannerInfo);
+			}
+			return remoteScannerInfo;
+		}
+	}
+	
+	
 
 	/**
 	 * Returns a RemoteScannerInfoProvider that contains IScannerInfos for every
 	 * translation unit in the given list of ICElements. The returned RemoteScannerInfoProvider
 	 * is optimized to not contain any duplicate scanner infos.
+	 * 
+	 * It is assumed that all the elements are from the same project.
+	 * 
+	 * @throws NullPointerException if the given list is null or contains a null element
 	 */
 	public static RemoteScannerInfoProvider getProvider(List<ICElement> elements) {
-		// this map is used to build the RemoteScannerInfo
-		Map<String,RemoteScannerInfo> scannerInfoMap = new HashMap<String,RemoteScannerInfo>();
+		if(elements.isEmpty())
+			return new RemoteScannerInfoProvider();
 		
-		// the cache of shared instances of RemoteScannerInfo
-		Map<ScannerInfoKey,RemoteScannerInfo> cache = new HashMap<ScannerInfoKey,RemoteScannerInfo>();
+		Map<String,RemoteScannerInfo> scannerInfoMap = new HashMap<String,RemoteScannerInfo>();
+		Map<Integer,RemoteScannerInfo> linkageMap = new HashMap<Integer, RemoteScannerInfo>();
+		
+		// we assume all the elements are from the same project
+		IProject project = elements.get(0).getCProject().getProject(); 
+		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		
+		RemoteScannerInfoCache cache = new RemoteScannerInfoCache();
+		Set<Integer> linkageIDs = new HashSet<Integer>();
 		
 		for(ICElement element : elements) {
 			if(element instanceof ITranslationUnit) {
-				IProject project = element.getCProject().getProject();
-				IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
-				
 				IScannerInfo localScannerInfo = provider.getScannerInformation(element.getResource());
-				ScannerInfoKey key = new ScannerInfoKey(localScannerInfo);
-				
-				// If we have already seen a IScannerInfo that is identical then just reuse the
-				// existing remote version of it.
-				RemoteScannerInfo remoteScannerInfo = cache.get(key);
-
-				if(remoteScannerInfo == null) {
-					remoteScannerInfo = new RemoteScannerInfo(localScannerInfo);
-					cache.put(key, remoteScannerInfo);
-				}
-				
+				RemoteScannerInfo remoteScannerInfo = cache.get(localScannerInfo);
 				String path = element.getLocationURI().getPath();
 				scannerInfoMap.put(path, remoteScannerInfo);
+				
+				try {
+					linkageIDs.add(((ITranslationUnit)element).getLanguage().getLinkageID());
+				} catch(CoreException e) { } // do nothing, worst thing is we don't provide a scanner info for that linkage
 			}
 		}
 		
-		return new RemoteScannerInfoProvider(scannerInfoMap);
+		for(int id : linkageIDs) {
+			IScannerInfo defaultScannerInfo = getDefaultScannerInfo(project, id);
+			RemoteScannerInfo remoteScannerInfo = cache.get(defaultScannerInfo);
+			linkageMap.put(id, remoteScannerInfo);
+		}
+		
+		return new RemoteScannerInfoProvider(scannerInfoMap, linkageMap);
+	}
+	
+	
+	/*
+	 * This code was copied from PDOMIndexerTask.createDefaultScannerConfig(int)
+	 */
+	private static IScannerInfo getDefaultScannerInfo(IProject project, int linkageID) {
+		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		if(provider == null)
+			return null;
+		
+		String filename = linkageID == ILinkage.C_LINKAGE_ID ? "__cdt__.c" : "__cdt__.cpp"; //$NON-NLS-1$//$NON-NLS-2$
+		IFile file = project.getFile(filename);
+		IScannerInfo scanInfo = provider.getScannerInformation(file);
+		if(scanInfo == null || scanInfo.getDefinedSymbols().isEmpty()) {
+			scanInfo = provider.getScannerInformation(project);
+			if(linkageID == ILinkage.C_LINKAGE_ID) {
+				final Map<String, String> definedSymbols = scanInfo.getDefinedSymbols();
+				definedSymbols.remove("__cplusplus__"); //$NON-NLS-1$
+				definedSymbols.remove("__cplusplus"); //$NON-NLS-1$
+			}
+		}
+		return scanInfo;
 	}
 	
 
