@@ -21,6 +21,12 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.rm.core.utils.ITextInputStreamListener;
 import org.eclipse.ptp.rm.core.utils.TextInputStreamObserver;
 
+/**
+ * Sample implementation of {@link AbstractToolRuntimeSystemJob}. Not used anymore.
+ * @deprecated
+ * @author Daniel Felix Ferber
+ */
+@Deprecated
 public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	private TextInputStreamObserver stderrObserver;
