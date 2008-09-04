@@ -17,9 +17,7 @@ Export-Package: org.eclipse.ptp.debug.core,
  org.eclipse.ptp.debug.core.pdi.request,
  org.eclipse.ptp.debug.core.sourcelookup,
  org.eclipse.ptp.debug.internal.core.sourcelookup
-require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.search,
+require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.ptp.core
 Eclipse-LazyStart: true

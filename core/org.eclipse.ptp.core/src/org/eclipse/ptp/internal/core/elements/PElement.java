@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable<IPElementControl> {
 
@@ -67,20 +66,6 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public int compareTo(IPElementControl obj) {
 		return getName().compareTo(obj.getName());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.search.ui.ISearchPageScoreComputer#computeScore(java.lang.String, java.lang.Object)
-	 */
-	public int computeScore(String pageId, Object element) {
-		//FIXME
-		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
-			//return ISearchPageScoreComputer.UNKNOWN;
-
-		if (element instanceof IPElementControl)
-			return 90;
-
-		return ISearchPageScoreComputer.LOWEST;
 	}
 	
 	/* (non-Javadoc)
