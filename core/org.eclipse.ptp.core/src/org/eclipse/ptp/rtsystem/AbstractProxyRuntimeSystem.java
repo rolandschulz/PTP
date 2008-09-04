@@ -46,7 +46,6 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
-import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeConnectedStateEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeErrorStateEvent;
@@ -99,6 +98,7 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeShutdownStateEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeTerminateJobErrorEvent;
+import org.eclipse.ptp.utils.core.RangeSet;
 
 /*
  * ProxyAttributeDefEvents are formatted as follows:

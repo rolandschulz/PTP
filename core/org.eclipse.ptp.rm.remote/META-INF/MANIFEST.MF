@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.proxy.protocol,
  org.eclipse.ptp.ui,
- org.eclipse.ptp.remote.ui
+ org.eclipse.ptp.remote.ui,
+ org.eclipse.ptp.utils.ui
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.remote.core,
  org.eclipse.ptp.rm.remote.ui,

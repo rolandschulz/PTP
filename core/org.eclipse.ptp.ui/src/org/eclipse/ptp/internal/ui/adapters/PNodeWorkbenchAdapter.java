@@ -21,7 +21,7 @@ package org.eclipse.ptp.internal.ui.adapters;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.ui.utils.ImageImageDescriptor;
+import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 

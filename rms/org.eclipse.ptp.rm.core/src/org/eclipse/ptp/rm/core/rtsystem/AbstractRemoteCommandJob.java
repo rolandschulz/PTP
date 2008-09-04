@@ -21,11 +21,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.Activator;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * Abstract implementation of a job that executes a command on the remote host and parses its output.

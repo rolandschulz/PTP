@@ -14,13 +14,25 @@ import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.ibm.ll.ui.preferences.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 
 public class IBMLLResourceManagerOptionWizardPage extends
 		RMConfigurationWizardPage {

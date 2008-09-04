@@ -15,7 +15,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
-import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeConnectedStateEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeDisconnectedEvent;
@@ -41,6 +40,7 @@ import org.eclipse.ptp.internal.rtsystem.events.RuntimeShutdownStateEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeStartupErrorEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeTerminateJobErrorEvent;
+import org.eclipse.ptp.utils.core.RangeSet;
 
 public class RuntimeEventFactory implements IRuntimeEventFactory {
 	/* (non-Javadoc)

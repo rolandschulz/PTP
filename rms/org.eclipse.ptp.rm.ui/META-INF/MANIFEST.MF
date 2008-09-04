@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
- org.eclipse.ptp.rm.core
+ org.eclipse.ptp.rm.core,
+ org.eclipse.ptp.utils.ui;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.ui,
  org.eclipse.ptp.rm.ui.preferences,
