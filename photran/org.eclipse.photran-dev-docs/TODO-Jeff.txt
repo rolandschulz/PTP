@@ -2,3 +2,13 @@
 - Open Decl error message
 - Persist project properties
 - New Fortran file wizard and menu item
+
+
+I'm having trouble getting content assist and declaration view working.  I've enabled them per the directions, but still no luck.  My vpg error log has many exceptions, one of which pointed to a line of my code: include 'constants.h'   My code compiles, but there are additional files that vpg is picking up that aren't part of my makefile, which may be causing problems.  Hence, I would like to specify directories to be excluded from analysis.
+
+If I click on new source file, I can choose between a C and a C++
+template or <no template>. However, there's no FORTRAN-template. This is
+ a usability feature, I hope this is not too hard to add.
+
+It is possible to get have source tarball releases as well?
+
