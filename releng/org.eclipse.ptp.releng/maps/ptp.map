@@ -3,6 +3,7 @@ feature@org.eclipse.ptp.master=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsr
 
 ! PTP features
 feature@org.eclipse.ptp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp-feature
+feature@org.eclipse.ptp.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.utils-feature
 feature@org.eclipse.ptp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.core-feature
 feature@org.eclipse.ptp.remote=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.remote-feature
 feature@org.eclipse.ptp.remote.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.remote.remotetools-feature
@@ -21,6 +22,8 @@ feature@org.eclipse.ptp.rdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot
 ! Plugins
 plugin@org.eclipse.ptp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp
 plugin@org.eclipse.ptp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.core
+plugin@org.eclipse.ptp.utils.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.utils.core
+plugin@org.eclipse.ptp.utils.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.utils.ui
 plugin@org.eclipse.ptp.proxy.protocol=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.proxy.protocol
 plugin@org.eclipse.ptp.remote.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.remote.core
 plugin@org.eclipse.ptp.remote.remotetools.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.remote.remotetools.core
