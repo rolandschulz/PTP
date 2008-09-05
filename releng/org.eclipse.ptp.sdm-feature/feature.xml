@@ -28,20 +28,18 @@
       <import plugin="org.eclipse.ptp.utils"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.ptp.proxy.protocol"/>
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.debug.core"/>
-      <import plugin="org.eclipse.ptp.debug.ui"/>
       <import plugin="org.eclipse.ptp.launch"/>
-      <import plugin="org.eclipse.ptp.rm.remote"/>
-      <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.ptp.ui"/>
       <import plugin="org.eclipse.ptp.remote.core"/>
+      <import plugin="org.eclipse.ptp.rm.remote"/>
       <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.search" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.ptp.debug.ui"/>
+      <import plugin="org.eclipse.ptp.ui"/>
       <import plugin="org.eclipse.ptp.remote.ui"/>
+      <import plugin="org.eclipse.ui"/>
    </requires>
 
    <plugin

@@ -41,7 +41,8 @@
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.ptp.ui"/>
+      <import plugin="org.eclipse.ptp.utils.ui"/>
+      <import plugin="org.eclipse.ptp.utils.ui" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
