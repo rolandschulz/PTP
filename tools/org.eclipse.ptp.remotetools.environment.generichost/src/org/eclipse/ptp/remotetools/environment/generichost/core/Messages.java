@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS
 {
-	private static final String BUNDLE_ID = "org.eclipse.ptp.remotetools.environment.generichost.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_ID = "org.eclipse.ptp.remotetools.environment.generichost.core.messages.messages"; //$NON-NLS-1$
 
 	public static String TargetControl_create_MonitorConnecting;
 	public static String TargetControl_resume_CannotResume;
