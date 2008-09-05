@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,15 +16,15 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #ifndef _PROXY_EVENT_H_
 #define _PROXY_EVENT_H_
 
 /*
  * Event code definitions.
- * 
+ *
  * These are the events used by the proxy runtime system.
- * 
+ *
  * Event codes that are marked 'LOCAL EVENT' are *not* sent across the wire. They
  * are used for internal communication only (mainly on the Java side, but can
  * be used by a C client if desired). All other events are sent across
@@ -103,7 +103,7 @@ proxy_msg *	proxy_terminatejob_error_event(int trans_id, char *job_id, int code,
 proxy_msg *	proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int disp, int def);
 proxy_msg *	proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, int disp, char *def);
 proxy_msg *	proxy_new_machine_event(int trans_id, char *rm_id, char *machine_id_range, char *name, char *state);
-proxy_msg *	proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId);
+proxy_msg *	proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId, int nprocs);
 proxy_msg *	proxy_new_node_event(int trans_id, char *mach_id, int num_nodes);
 void		proxy_add_node(proxy_msg *m, char *node_id, char *name, char *state, int extra_attrs);
 proxy_msg *	proxy_new_process_event(int trans_id, char *job_id, int num_procs);
