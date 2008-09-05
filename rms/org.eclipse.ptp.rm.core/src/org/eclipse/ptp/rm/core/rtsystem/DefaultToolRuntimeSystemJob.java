@@ -122,7 +122,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected IAttribute<?, ?, ?>[] retrieveToolBaseSubstitutionAttributes() throws CoreException {
+	protected IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException {
 		return new IAttribute<?, ?, ?>[0];
 	}
 
@@ -134,7 +134,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected IAttribute<?, ?, ?>[] retrieveToolCommandSubstitutionAttributes(
+	protected IAttribute<?, ?, ?>[] doRetrieveToolCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment) {
 		// TODO Auto-generated method stub

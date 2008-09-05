@@ -419,13 +419,13 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected IAttribute<?, ?, ?>[] retrieveToolBaseSubstitutionAttributes() throws CoreException {
+	protected IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException {
 		// TODO make macros available for environment variables and work directory.
 		return null;
 	}
 
 	@Override
-	protected IAttribute<?, ?, ?>[] retrieveToolCommandSubstitutionAttributes(
+	protected IAttribute<?, ?, ?>[] doRetrieveToolCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment) {
 
