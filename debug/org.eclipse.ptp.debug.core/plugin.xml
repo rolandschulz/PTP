@@ -127,7 +127,7 @@
             id="pFunctionBreakpoint">
       </breakpoint>
       <breakpoint
-            markerType="org.eclipse.ptp.debug.core.pWatchBreakpointMarker"
+            markerType="org.eclipse.ptp.debug.core.pWatchpointMarker"
             class="org.eclipse.ptp.debug.internal.core.breakpoint.PWatchpoint"
             name="%PWatchBreakpoint.name"
             id="pWatchpoint">
