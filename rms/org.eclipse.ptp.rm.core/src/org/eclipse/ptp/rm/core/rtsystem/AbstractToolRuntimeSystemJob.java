@@ -337,7 +337,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		/*
 		 * Then, add attributes that are specific for the tool.
 		 */
-		IAttribute<?,?,?> extraAttributes[] = retrieveToolBaseSubstitutionAttributes();
+		IAttribute<?,?,?> extraAttributes[] = doRetrieveToolBaseSubstitutionAttributes();
 		if (extraAttributes != null) {
 			newAttributeManager.addAttributes(extraAttributes);
 		}
@@ -348,7 +348,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	/**
 	 * Retrieve additional attributes to expand macros that are specific for the tool.
 	 */
-	abstract protected IAttribute<?, ?, ?>[] retrieveToolBaseSubstitutionAttributes() throws CoreException;
+	abstract protected IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException;
 
 	/**
 	 * A list of all attributes definitions from the launch configuration that can be used to expand macros.
@@ -377,7 +377,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		/*
 		 * Add attributes that are specific for the tool.
 		 */
-		IAttribute<?,?,?> extraAttributes[] = retrieveToolCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
+		IAttribute<?,?,?> extraAttributes[] = doRetrieveToolCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
 		if (extraAttributes != null) {
 			newAttributeManager.addAttributes(extraAttributes);
 		}
@@ -386,7 +386,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	}
 
 
-	abstract protected IAttribute<?, ?, ?>[] retrieveToolCommandSubstitutionAttributes(
+	abstract protected IAttribute<?, ?, ?>[] doRetrieveToolCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
 			String directory, Map<String, String> environment);
 
