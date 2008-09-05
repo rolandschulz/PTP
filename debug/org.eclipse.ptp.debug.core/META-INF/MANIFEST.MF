@@ -17,8 +17,8 @@ Export-Package: org.eclipse.ptp.debug.core,
  org.eclipse.ptp.debug.core.pdi.request,
  org.eclipse.ptp.debug.core.sourcelookup,
  org.eclipse.ptp.debug.internal.core.sourcelookup
-require-Bundle: org.eclipse.core.runtime,
- org.eclipse.debug.core,
- org.eclipse.ptp.core
+require-Bundle: org.eclipse.core.runtime;bundle-version="[3.2.0,4.0.0)",
+ org.eclipse.debug.core;bundle-version="[3.2.0,4.0.0)",
+ org.eclipse.ptp.core;bundle-version="[2.1.0,3.0.0)"
 Eclipse-LazyStart: true
 Bundle-Vendor: Eclipse.org
