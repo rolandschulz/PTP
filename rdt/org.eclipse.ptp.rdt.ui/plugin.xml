@@ -9,7 +9,7 @@
       </category>
       <view
             category="org.eclipse.cdt.ui.views"
-            class="org.eclipse.ptp.internal.ui.includebrowser.IBViewPart"
+            class="org.eclipse.ptp.internal.rdt.ui.includebrowser.IBViewPart"
             icon="icons/view16/includeBrowser.gif"
             id="org.eclipse.cdt.ui.includeBrowser"
             name="%includeBrowser.name"/>
