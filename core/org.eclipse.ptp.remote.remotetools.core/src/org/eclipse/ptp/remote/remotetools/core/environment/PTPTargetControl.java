@@ -63,8 +63,8 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 	 */
 	private int state;
 	
-	private IRemoteConnectionManager conMgr;
-	private IRemoteConnection connection;
+	private IRemoteConnectionManager conMgr = null;
+	private IRemoteConnection connection = null;
 
 	/**
 	 * Creates a target control. If some attribute related to the environment has an invalid
@@ -136,16 +136,18 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 			super.create(monitor);
 			setState(CONNECTED);
 			
-			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-				public IRemoteConnection getConnection() {
-					return connection;
-				}
-	
-				public int getType() {
-					return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
-				}
-				
-			});
+			if (conMgr != null) {
+				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+					public IRemoteConnection getConnection() {
+						return connection;
+					}
+		
+					public int getType() {
+						return IRemoteConnectionChangeEvent.CONNECTION_OPENED;
+					}
+					
+				});
+			}
 			
 			monitor.worked(1);
 		} catch (CoreException e) {
@@ -237,16 +239,18 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 		} finally {
 			setState(NOT_OPERATIONAL);
 			
-			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-				public IRemoteConnection getConnection() {
-					return connection;
-				}
-	
-				public int getType() {
-					return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
-				}
-				
-			});	
+			if (conMgr != null) {
+				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+					public IRemoteConnection getConnection() {
+						return connection;
+					}
+		
+					public int getType() {
+						return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
+					}
+					
+				});	
+			}
 		}
 		return true;
 	}
