@@ -9,7 +9,6 @@ feature@org.eclipse.ptp.remote=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsr
 feature@org.eclipse.ptp.remote.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.remote.remotetools-feature
 feature@org.eclipse.ptp.remote.rse=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.remote.rse-feature
 feature@org.eclipse.ptp.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.remotetools-feature
-feature@org.eclipse.ptp.rm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm-feature
 feature@org.eclipse.ptp.rm.ibm.ll=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll-feature
 feature@org.eclipse.ptp.rm.ibm.pe=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe-feature
 feature@org.eclipse.ptp.rm.openmpi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.openmpi-feature
