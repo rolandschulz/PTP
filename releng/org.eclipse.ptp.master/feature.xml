@@ -16,13 +16,25 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+         
+   <includes
+         id="org.eclipse.ptp.utils"
+         version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp"
+         id="org.eclipse.ptp.remote"
          version="0.0.0"/>
 
    <includes
          id="org.eclipse.ptp.core"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp"
+         version="0.0.0"/>         
+
+   <includes
+         id="org.eclipse.ptp.external"
          version="0.0.0"/>
 
    <includes
@@ -42,19 +54,15 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.remote"
+         id="org.eclipse.ptp.remotetools"
          version="0.0.0"/>
-
+         
    <includes
          id="org.eclipse.ptp.remote.remotetools"
          version="0.0.0"/>
 
    <includes
          id="org.eclipse.ptp.remote.rse"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.remotetools"
          version="0.0.0"/>
 
    <includes
@@ -67,14 +75,6 @@
 
    <includes
          id="org.eclipse.ptp.rm.openmpi"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.external"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.utils"
          version="0.0.0"/>
 
 </feature>
