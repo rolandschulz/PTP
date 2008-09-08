@@ -73,12 +73,20 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
 
     // --VISITOR METHODS-------------------------------------------------
 
-    private String methodName = "";
+    private String methodNameDescPrefix = "";
     
-    @SuppressWarnings("unchecked")
     @Override public void visitASTNode(IASTNode node)
     {
-        String description = methodName + node.getClass().getSimpleName();
+        FortranElement element = addElementForNode(node);
+        
+        beginAddingChildrenFor(node, element);
+        addMethodDescriptions(node);
+        doneAddingChildrenFor(node);
+    }
+
+    private FortranElement addElementForNode(IASTNode node)
+    {
+        String description = methodNameDescPrefix + node.getClass().getSimpleName();
         FortranElement element = new FortranElement.UnknownNode(getCurrentParent(), description);
 
 //        Token firstToken = ParseTreeSearcher.findFirstTokenIn(node);
@@ -99,69 +107,90 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
         {
             ;
         }
+        return element;
+    }
 
-        beginAddingChildrenFor(node, element);
-
+    @SuppressWarnings("unchecked")
+    private void addMethodDescriptions(IASTNode node)
+    {
         if (node instanceof IASTListNode<?>)
-        {
-            IASTListNode<? extends IASTNode> list = (IASTListNode<? extends IASTNode>)node;
-            
-            for (int i = 0; i < list.size(); i++)
-            {
-                methodName = "get(" + i + "): ";
-                list.get(i).accept(this);
-            }
-        }
+            addListEltDescriptions((IASTListNode<? extends IASTNode>)node);
         else
-        {
             for (java.lang.reflect.Method m : node.getClass().getMethods())
+                if (shouldIncludeMethodDesc(node, m))
+                    addMethodDesc(node, m);
+    }
+
+    private void addListEltDescriptions(IASTListNode< ? extends IASTNode> list)
+    {
+        for (int i = 0; i < list.size(); i++)
+        {
+            methodNameDescPrefix = "get(" + i + "): ";
+            list.get(i).accept(this);
+        }
+    }
+
+    private boolean shouldIncludeMethodDesc(IASTNode node, java.lang.reflect.Method m)
+    {
+        return m.getDeclaringClass() == node.getClass()
+                && m.getReturnType() != null
+                && m.getParameterTypes().length == 0
+                && !m.getName().equals("getParent")
+                && !m.getName().equals("getChildren")
+                && !m.getName().equals("findFirstToken")
+                && !m.getName().equals("findLastToken");
+    }
+
+    private void addMethodDesc(IASTNode node, java.lang.reflect.Method m)
+    {
+        try
+        {
+            methodNameDescPrefix = m.getName() + "(): ";
+            
+            if (IASTNode.class.isAssignableFrom(m.getReturnType()))
             {
-                if (m.getDeclaringClass() == node.getClass()
-                        && m.getReturnType() != null
-                        && m.getParameterTypes().length == 0
-                        && !m.getName().equals("getParent")
-                        && !m.getName().equals("getChildren")
-                        && !m.getName().equals("findFirstToken")
-                        && !m.getName().equals("findLastToken")
-                        && IASTNode.class.isAssignableFrom(m.getReturnType()))
-                {
-                    try
-                    {
-                        methodName = m.getName() + "(): ";
-                        IASTNode n = ((IASTNode)m.invoke(node, (Object[])null));
-                        if (n == null)
-                            modelBuilder.addF90Element(
-                                new FortranElement.UnknownNode(getCurrentParent(),
-                                    methodName + "null"));
-                        else
-                            n.accept(this);
-                    }
-                    catch (IllegalArgumentException e)
-                    {
-                        ;
-                    }
-                    catch (IllegalAccessException e)
-                    {
-                        ;
-                    }
-                    catch (InvocationTargetException e)
-                    {
-                        ;
-                    }
-                    catch (CModelException e)
-                    {
-                        ;
-                    }
-                }
+                describeASTGetterMethod(node, m);
+            }
+            else if (m.getReturnType() != null)
+            {
+                describeOtherMethod(node, m);
             }
         }
-        
-        doneAddingChildrenFor(node);
+        catch (IllegalArgumentException e) {;}
+        catch (IllegalAccessException e) {;}
+        catch (InvocationTargetException e) {;}
+        catch (CModelException e) {;}
+    }
+
+    private void describeASTGetterMethod(IASTNode node, java.lang.reflect.Method m)
+        throws IllegalAccessException, InvocationTargetException, CModelException
+    {
+        IASTNode n = ((IASTNode)m.invoke(node, (Object[])null));
+        if (n == null)
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    methodNameDescPrefix + "null"));
+        else
+            n.accept(this);
+    }
+
+    private void describeOtherMethod(IASTNode node, java.lang.reflect.Method m)
+        throws IllegalAccessException, InvocationTargetException, CModelException
+    {
+        Object n = m.invoke(node, (Object[])null);
+        if (n == null)
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    methodNameDescPrefix + "null"));
+        else
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    methodNameDescPrefix + n));
     }
 
     @Override public void visitToken(Token token)
     {
-        String description = methodName + token.getClass().getSimpleName();
+        String description = methodNameDescPrefix + token.getClass().getSimpleName();
         FortranElement element = new FortranElement.UnknownNode(getCurrentParent(), description);
         element.setIdentifier(token);
         try
