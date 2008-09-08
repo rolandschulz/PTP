@@ -1,8 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-	<category-def name="RDT Features" label="RDT Features"/>
-	
-	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
-		<category name="RDT Features"/>
+	<description url="http://download.eclipse.org/tools/ptp/releases/2.1">
+		Parallel Tools Platform update site - Release 2.1
+	</description>
+	<feature url="features/org.eclipse.ptp.core_@buildVersion@.jar" id="org.eclipse.ptp.core" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
+	<feature url="features/org.eclipse.ptp.remotetools_@buildVersion@.jar" id="org.eclipse.ptp.remotetools" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.rm.ibm.ll_@buildVersion@.jar" id="org.eclipse.ptp.rm.ibm.ll" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.rm.ibm.pe_@buildVersion@.jar" id="org.eclipse.ptp.rm.ibm.pe" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.rm.mpich2_@buildVersion@.jar" id="org.eclipse.ptp.rm.mpich2" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.remote.remotetools_@buildVersion@.jar" id="org.eclipse.ptp.remote.remotetools" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.remote.rse_@buildVersion@.jar" id="org.eclipse.ptp.remote.rse" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp_@buildVersion@.jar" id="org.eclipse.ptp" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.debug.sdm_@buildVersion@.jar" id="org.eclipse.ptp.debug.sdm" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.external_@buildVersion@.jar" id="org.eclipse.ptp.external" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" id="org.eclipse.ptp.rdt" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.remote_@buildVersion@.jar" id="org.eclipse.ptp.remote" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.rm.openmpi_@buildVersion@.jar" id="org.eclipse.ptp.rm.openmpi" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.pldt_@buildVersion@.jar" id="org.eclipse.ptp.pldt" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.pldt.lapi_@buildVersion@.jar" id="org.eclipse.ptp.pldt.lapi" version="@buildVersion@">
+      <category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
+		<category name="Remote Development Tools"/>
+	</feature>
+	<category-def name="Parallel Tools Platform 2.1" label="Parallel Tools Platform 2.1"/>
+	<category-def name="Remote Development Tools" label="Remote Development Tools"/>
 </site>
