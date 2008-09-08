@@ -28,7 +28,7 @@ public class ASTAssumedShapeSpecListNode extends ASTNode
 {
     IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList; // in ASTAssumedShapeSpecListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTAssumedShapeSpecListNode
-    ASTExprNode lb; // in ASTAssumedShapeSpecListNode
+    IExpr lb; // in ASTAssumedShapeSpecListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTAssumedShapeSpecListNode
 
     public IASTListNode<ASTDeferredShapeSpecListNode> getDeferredShapeSpecList()
@@ -42,12 +42,12 @@ public class ASTAssumedShapeSpecListNode extends ASTNode
     }
 
 
-    public ASTExprNode getLb()
+    public IExpr getLb()
     {
         return this.lb;
     }
 
-    public void setLb(ASTExprNode newValue)
+    public void setLb(IExpr newValue)
     {
         this.lb = newValue;
     }
@@ -82,7 +82,7 @@ public class ASTAssumedShapeSpecListNode extends ASTNode
         {
         case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
         case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.lb = (ASTExprNode)value; return;
+        case 2:  this.lb = (IExpr)value; return;
         case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

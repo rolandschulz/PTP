@@ -374,8 +374,8 @@ ASTOperatorNode:<EquivOp> ::=
   | hasNeqvOp(bool):T_NEQV
 
 # R311
-<DefinedOperator> ::=
-  | customDefinedOp:T_XDOP
+(superclass):<DefinedOperator> ::=
+  | [ASTOperatorNode] customDefinedOp:T_XDOP
   | <ConcatOp>
   | <PowerOp>
   | <MultOp>
@@ -411,14 +411,14 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 # R403 chain rule deleted see R305
 
 # R404
-<UnsignedArithmeticConstant> ::=
-  |     intConst:T_ICON
-  |    realConst:T_RCON
-  |     dblConst:T_DCON
-  | complexConst:<ComplexConst>
-  |     intConst:T_ICON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
-  |    realConst:T_RCON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
-  |     dblConst:T_DCON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
+IUnsignedArithmeticConst(superclass):<UnsignedArithmeticConstant> ::=
+  | [ASTIntConstNode]      intConst:T_ICON
+  | [ASTRealConstNode]    realConst:T_RCON
+  | [ASTDblConstNode]      dblConst:T_DCON
+  |                    complexConst:<ComplexConst>
+  | [ASTIntConstNode]      intConst:T_ICON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
+  | [ASTRealConstNode]    realConst:T_RCON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
+  | [ASTDblConstNode]      dblConst:T_DCON -:T_UNDERSCORE UnsignedArithConst(inline):<KindParam>
 
 # R405
 <KindParam> ::=
@@ -428,7 +428,7 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 # R406 see R305
 
 # R407
-<BozLiteralConstant> ::=
+ASTBozLiteralConstNode:<BozLiteralConstant> ::=
   | binaryConst:T_BCON
   |  octalConst:T_OCON
   |    hexConst:T_ZCON
@@ -457,7 +457,7 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 # R420 chain rule deleted see R305
 
 # R421
-<LogicalConstant> ::=
+ASTLogicalConstNode:<LogicalConstant> ::=
   |  isTrue(bool):T_TRUE
   | isFalse(bool):T_FALSE
   |  isTrue(bool):T_TRUE  -:T_UNDERSCORE (inline):<KindParam>
@@ -1388,27 +1388,27 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 
 # R701
 # JO -- Added substring of constant strings
-<Primary> ::=
-  | logicalConst:<LogicalConstant>
-  | stringConst:T_SCON
-  | (inline):<UnsignedArithmeticConstant>
-  | <ArrayConstructor>
-  | <Name>
-  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN
-  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN <SubstringRange>
-  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef>
-  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
-  | <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
-  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>
-  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
-  | <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
-  | (inline):<FunctionReference>
-  | (inline):<FunctionReference> <SubstringRange>
-  | (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef>
-  | (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
-  | (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
-  | -:T_LPAREN nestedExpression:<Expr> -:T_RPAREN
-  | (inline):<SubstrConst>
+IExpr(superclass):<Primary> ::=
+  |                      logicalConst:<LogicalConstant>
+  | [ASTStringConstNode] stringConst:T_SCON
+  |                      <UnsignedArithmeticConstant>
+  |                      <ArrayConstructor>
+  | [ASTVarOrFnRefNode]  <Name>
+  | [ASTVarOrFnRefNode]  <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN
+  | [ASTVarOrFnRefNode]  <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN <SubstringRange>
+  | [ASTVarOrFnRefNode]  <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | [ASTVarOrFnRefNode]  <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | [ASTVarOrFnRefNode]  <Name>                                                                          -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | [ASTVarOrFnRefNode]  <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | [ASTVarOrFnRefNode]  <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | [ASTVarOrFnRefNode]  <Name> -:T_LPAREN primarySectionSubscriptList:<SectionSubscriptList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | [ASTVarOrFnRefNode]  (inline):<FunctionReference>
+  | [ASTVarOrFnRefNode]  (inline):<FunctionReference> <SubstringRange>
+  | [ASTVarOrFnRefNode]  (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef>
+  | [ASTVarOrFnRefNode]  (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN
+  | [ASTVarOrFnRefNode]  (inline):<FunctionReference>                                                              -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange>
+  | [ASTNestedExprNode]  -:T_LPAREN <Expr> -:T_RPAREN
+  | [ASTStringConstNode] (inline):<SubstrConst>
 
 <CPrimary> ::=
   | (inline):<COperand>
@@ -1443,25 +1443,25 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 # R702 chain rule deleted
 
 # R703
-<Level1Expr> ::=
-  |                  rhsPrimary:<Primary>
-  | <DefinedUnaryOp> rhsPrimary:<Primary>
+IExpr(superclass):<Level1Expr> ::=
+  |                                                      <Primary>
+  | [ASTUnaryExprNode] operator:<DefinedUnaryOp> operand:<Primary>
 
 # R704 defined in source form
 
 # R705
-<MultOperand> ::=
-  | <Level1Expr>
-  | lhsExpr:<Level1Expr> <PowerOp> rhsExpr:<MultOperand>
+IExpr(superclass):<MultOperand> ::=
+  |                             <Level1Expr>
+  | [ASTBinaryExprNode] lhsExpr:<Level1Expr> operator:<PowerOp> rhsExpr:<MultOperand>
 
 <UFFactor> ::=
-  | rhsPrimary:<UFPrimary>
+  |            <UFPrimary>
   | lhsPrimary:<UFPrimary> <PowerOp> rhsExpr:<UFFactor>
 
 # R706
-<AddOperand> ::=
-  | <MultOperand>
-  | lhsExpr:<AddOperand> <MultOp> rhsExpr:<MultOperand>
+IExpr(superclass):<AddOperand> ::=
+  |                                                           <MultOperand>
+  | [ASTBinaryExprNode] lhsExpr:<AddOperand> operator:<MultOp> rhsExpr:<MultOperand>
 
 <UFTerm> ::=
   | <UFFactor>
@@ -1469,22 +1469,22 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
   | lhsExpr:<UFTerm> <ConcatOp> rhsPrimary:<UFPrimary>
 
 # R707
-<Level2Expr> ::=
-  | <AddOperand>
-  |                    rhs:<Sign>  rhsExpr:<AddOperand>
-  | lhsExpr:<Level2Expr> <AddOp> rhsExpr:<AddOperand>
+IExpr(superclass):<Level2Expr> ::=
+  |                                                                   <AddOperand>
+  | [ASTUnaryExprNode]                           sign:<Sign>  operand:<AddOperand>
+  | [ASTBinaryExprNode] lhsExpr:<Level2Expr> operator:<AddOp> rhsExpr:<AddOperand>
 # We need to distinguish unary operators
 <UFExpr> ::=
   | <UFTerm>
-  |               rhs2:<Sign>  rhsExpr:<UFTerm>
+  |              rhs2:<Sign>  rhsExpr:<UFTerm>
   | lhsExpr:<UFExpr> <AddOp> rhsExpr:<UFTerm>
 
 # R708-710 defined in source form
 
 # R711 
-<Level3Expr> ::=
-  | <Level2Expr>
-  | lhsExpr:<Level3Expr> <ConcatOp> rhsExpr:<Level2Expr>
+IExpr(superclass):<Level3Expr> ::=
+  |                                                                      <Level2Expr>
+  | [ASTBinaryExprNode] lhsExpr:<Level3Expr> operator:<ConcatOp> rhsExpr:<Level2Expr>
 
 <CExpr> ::=
   | rhsPrimary:<CPrimary>
@@ -1493,38 +1493,38 @@ ASTOperatorNode:<DefinedBinaryOp> ::=
 # R712 defined in source form
 
 # R713
-<Level4Expr> ::=
-  | <Level3Expr>
-  | lhsExpr:<Level3Expr> <RelOp> rhsExpr:<Level3Expr>
+IExpr(superclass):<Level4Expr> ::=
+  |                                                                   <Level3Expr>
+  | [ASTBinaryExprNode] lhsExpr:<Level3Expr> operator:<RelOp> rhsExpr:<Level3Expr>
 
 # R714 defined in source form
 
 # R715
-<AndOperand> ::=
-  | <Level4Expr>
-  | <NotOp> rhsExpr:<Level4Expr>
+IExpr(superclass):<AndOperand> ::=
+  |                                             <Level4Expr>
+  | [ASTUnaryExprNode] operator:<NotOp> operand:<Level4Expr>
 
 # R716
-<OrOperand> ::=
-  | <AndOperand>
-  | lhsExpr:<OrOperand> <AndOp> rhsExpr:<AndOperand>
+IExpr(superclass):<OrOperand> ::=
+  |                                                                  <AndOperand>
+  | [ASTBinaryExprNode] lhsExpr:<OrOperand> operator:<AndOp> rhsExpr:<AndOperand>
 
 # R717
-<EquivOperand> ::=
-  | <OrOperand>
-  | lhsExpr:<EquivOperand> <OrOp> rhsExpr:<OrOperand>
+IExpr(superclass):<EquivOperand> ::=
+  |                                                                    <OrOperand>
+  | [ASTBinaryExprNode] lhsExpr:<EquivOperand> operator:<OrOp> rhsExpr:<OrOperand>
 
 # R718
-<Level5Expr> ::=
-  | <EquivOperand>
-  | lhsExpr:<Level5Expr> <EquivOp> rhsExpr:<EquivOperand>
+IExpr(superclass):<Level5Expr> ::=
+  |                                                                     <EquivOperand>
+  | [ASTBinaryExprNode] lhsExpr:<Level5Expr> operator:<EquivOp> rhsExpr:<EquivOperand>
 
 # R719-722 defined in source form
 
 # R723
-<Expr> ::=
-  | <Level5Expr>
-  | lhsExpr:<Expr> <DefinedBinaryOp> rhsExpr:<Level5Expr>
+IExpr(superclass):<Expr> ::=
+  |                                                                       <Level5Expr>
+  | [ASTBinaryExprNode] lhsExpr:<Expr> operator:<DefinedBinaryOp> rhsExpr:<Level5Expr>
 
 (list):<SFExprList> ::=
   | lb:<SFExpr> -:T_COLON ub:<Expr> -:T_COLON step:<Expr>
@@ -1589,7 +1589,7 @@ ASTAssignmentStmtNode:<AssignmentStmt> ::=
   | <SFVarName>
   | <SFDataRef>
   | <FunctionReference>
-  | -:T_LPAREN nestedExpression:<Expr> -:T_RPAREN
+  | -:T_LPAREN <Expr> -:T_RPAREN
 
 #<AssignmentStmt> ::=
 #  (inline):<LblDef> <Name> T_PERCENT <DataRef> 

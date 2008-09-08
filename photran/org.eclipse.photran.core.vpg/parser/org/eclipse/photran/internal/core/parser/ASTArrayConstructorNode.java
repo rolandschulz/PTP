@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTArrayConstructorNode extends ASTNode
+public class ASTArrayConstructorNode extends ASTNode implements IExpr
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparenslash; // in ASTArrayConstructorNode
     IASTListNode<ASTAcValueNode> acValueList; // in ASTArrayConstructorNode
@@ -44,6 +44,7 @@ public class ASTArrayConstructorNode extends ASTNode
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTArrayConstructorNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 

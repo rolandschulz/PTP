@@ -28,7 +28,7 @@ public class ASTNamedConstantDefNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token namedConstant; // in ASTNamedConstantDefNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTNamedConstantDefNode
-    ASTExprNode initializationExpr; // in ASTNamedConstantDefNode
+    IExpr initializationExpr; // in ASTNamedConstantDefNode
 
     public org.eclipse.photran.internal.core.lexer.Token getNamedConstant()
     {
@@ -41,12 +41,12 @@ public class ASTNamedConstantDefNode extends ASTNode
     }
 
 
-    public ASTExprNode getInitializationExpr()
+    public IExpr getInitializationExpr()
     {
         return this.initializationExpr;
     }
 
-    public void setInitializationExpr(ASTExprNode newValue)
+    public void setInitializationExpr(IExpr newValue)
     {
         this.initializationExpr = newValue;
     }
@@ -80,7 +80,7 @@ public class ASTNamedConstantDefNode extends ASTNode
         {
         case 0:  this.namedConstant = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.initializationExpr = (ASTExprNode)value; return;
+        case 2:  this.initializationExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -31,9 +31,9 @@ public class ASTSFExprListNode extends ASTNode
     ASTSectionSubscriptNode sectionSubscript; // in ASTSFExprListNode
     ASTSFExprNode lb; // in ASTSFExprListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTSFExprListNode
-    ASTExprNode ub; // in ASTSFExprListNode
+    IExpr ub; // in ASTSFExprListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTSFExprListNode
-    ASTExprNode step; // in ASTSFExprListNode
+    IExpr step; // in ASTSFExprListNode
 
     public IASTListNode<ASTSFDummyArgNameListNode> getSFDummyArgNameList()
     {
@@ -68,23 +68,23 @@ public class ASTSFExprListNode extends ASTNode
     }
 
 
-    public ASTExprNode getUb()
+    public IExpr getUb()
     {
         return this.ub;
     }
 
-    public void setUb(ASTExprNode newValue)
+    public void setUb(IExpr newValue)
     {
         this.ub = newValue;
     }
 
 
-    public ASTExprNode getStep()
+    public IExpr getStep()
     {
         return this.step;
     }
 
-    public void setStep(ASTExprNode newValue)
+    public void setStep(IExpr newValue)
     {
         this.step = newValue;
     }
@@ -126,9 +126,9 @@ public class ASTSFExprListNode extends ASTNode
         case 2:  this.sectionSubscript = (ASTSectionSubscriptNode)value; return;
         case 3:  this.lb = (ASTSFExprNode)value; return;
         case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.ub = (ASTExprNode)value; return;
+        case 5:  this.ub = (IExpr)value; return;
         case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.step = (ASTExprNode)value; return;
+        case 7:  this.step = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

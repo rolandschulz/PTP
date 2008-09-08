@@ -24,48 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTUpperBoundNode extends ASTNode
+public interface IDefinedOperator extends IASTNode
 {
-    IExpr ub; // in ASTUpperBoundNode
-
-    public IExpr getUb()
-    {
-        return this.ub;
-    }
-
-    public void setUb(IExpr newValue)
-    {
-        this.ub = newValue;
-    }
-
-
-    public void accept(IASTVisitor visitor)
-    {
-        visitor.visitASTUpperBoundNode(this);
-        visitor.visitASTNode(this);
-    }
-
-    @Override protected int getNumASTFields()
-    {
-        return 1;
-    }
-
-    @Override protected IASTNode getASTField(int index)
-    {
-        switch (index)
-        {
-        case 0:  return this.ub;
-        default: return null;
-        }
-    }
-
-    @Override protected void setASTField(int index, IASTNode value)
-    {
-        switch (index)
-        {
-        case 0:  this.ub = (IExpr)value; return;
-        default: throw new IllegalArgumentException("Invalid index");
-        }
-    }
 }
 

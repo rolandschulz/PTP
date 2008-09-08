@@ -24,76 +24,51 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTMultOperandNode extends ASTNode
+public class ASTStringConstNode extends ASTNode implements IExpr
 {
-    ASTLevel1ExprNode lhsExpr; // in ASTMultOperandNode
-    ASTOperatorNode powerOp; // in ASTMultOperandNode
-    ASTMultOperandNode rhsExpr; // in ASTMultOperandNode
-    ASTLevel1ExprNode level1Expr; // in ASTMultOperandNode
+    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTStringConstNode
+    ASTSubstringRangeNode substringRange; // in ASTStringConstNode
 
-    public ASTLevel1ExprNode getLhsExpr()
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
     {
-        return this.lhsExpr;
+        return this.stringConst;
     }
 
-    public void setLhsExpr(ASTLevel1ExprNode newValue)
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.lhsExpr = newValue;
-    }
-
-
-    public ASTOperatorNode getPowerOp()
-    {
-        return this.powerOp;
-    }
-
-    public void setPowerOp(ASTOperatorNode newValue)
-    {
-        this.powerOp = newValue;
+        this.stringConst = newValue;
     }
 
 
-    public ASTMultOperandNode getRhsExpr()
+    public ASTSubstringRangeNode getSubstringRange()
     {
-        return this.rhsExpr;
+        return this.substringRange;
     }
 
-    public void setRhsExpr(ASTMultOperandNode newValue)
+    public void setSubstringRange(ASTSubstringRangeNode newValue)
     {
-        this.rhsExpr = newValue;
-    }
-
-
-    public ASTLevel1ExprNode getLevel1Expr()
-    {
-        return this.level1Expr;
-    }
-
-    public void setLevel1Expr(ASTLevel1ExprNode newValue)
-    {
-        this.level1Expr = newValue;
+        this.substringRange = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTMultOperandNode(this);
+        visitor.visitASTStringConstNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 2;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.lhsExpr;
-        case 1:  return this.powerOp;
-        case 2:  return this.rhsExpr;
-        case 3:  return this.level1Expr;
+        case 0:  return this.stringConst;
+        case 1:  return this.substringRange;
         default: return null;
         }
     }
@@ -102,10 +77,8 @@ public class ASTMultOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTLevel1ExprNode)value; return;
-        case 1:  this.powerOp = (ASTOperatorNode)value; return;
-        case 2:  this.rhsExpr = (ASTMultOperandNode)value; return;
-        case 3:  this.level1Expr = (ASTLevel1ExprNode)value; return;
+        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.substringRange = (ASTSubstringRangeNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

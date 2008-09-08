@@ -47,7 +47,7 @@ public class ASTInquireSpecNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTBlankeq; // in ASTInquireSpecNode
     ASTScalarVariableNode unformattedVar; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRecleq; // in ASTInquireSpecNode
-    ASTExprNode reclExpr; // in ASTInquireSpecNode
+    IExpr reclExpr; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTNameeq; // in ASTInquireSpecNode
     ASTScalarVariableNode nameVar; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSequentialeq; // in ASTInquireSpecNode
@@ -143,12 +143,12 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
-    public ASTExprNode getReclExpr()
+    public IExpr getReclExpr()
     {
         return this.reclExpr;
     }
 
-    public void setReclExpr(ASTExprNode newValue)
+    public void setReclExpr(IExpr newValue)
     {
         this.reclExpr = newValue;
     }
@@ -446,7 +446,7 @@ public class ASTInquireSpecNode extends ASTNode
         case 18: this.hiddenTBlankeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 19: this.unformattedVar = (ASTScalarVariableNode)value; return;
         case 20: this.hiddenTRecleq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 21: this.reclExpr = (ASTExprNode)value; return;
+        case 21: this.reclExpr = (IExpr)value; return;
         case 22: this.hiddenTNameeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 23: this.nameVar = (ASTScalarVariableNode)value; return;
         case 24: this.hiddenTSequentialeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;

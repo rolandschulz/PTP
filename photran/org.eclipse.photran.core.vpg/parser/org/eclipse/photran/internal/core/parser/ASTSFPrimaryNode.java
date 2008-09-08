@@ -31,7 +31,7 @@ public class ASTSFPrimaryNode extends ASTNode
     ASTArrayConstructorNode arrayConstructor; // in ASTSFPrimaryNode
     ASTFunctionReferenceNode functionReference; // in ASTSFPrimaryNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSFPrimaryNode
-    ASTExprNode nestedExpression; // in ASTSFPrimaryNode
+    IExpr expr; // in ASTSFPrimaryNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSFPrimaryNode
     ASTSFVarNameNode SFVarName; // in ASTSFPrimaryNode
 
@@ -79,14 +79,14 @@ public class ASTSFPrimaryNode extends ASTNode
     }
 
 
-    public ASTExprNode getNestedExpression()
+    public IExpr getExpr()
     {
-        return this.nestedExpression;
+        return this.expr;
     }
 
-    public void setNestedExpression(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
-        this.nestedExpression = newValue;
+        this.expr = newValue;
     }
 
 
@@ -121,7 +121,7 @@ public class ASTSFPrimaryNode extends ASTNode
         case 2:  return this.arrayConstructor;
         case 3:  return this.functionReference;
         case 4:  return this.hiddenTLparen;
-        case 5:  return this.nestedExpression;
+        case 5:  return this.expr;
         case 6:  return this.hiddenTRparen;
         case 7:  return this.SFVarName;
         default: return null;
@@ -137,7 +137,7 @@ public class ASTSFPrimaryNode extends ASTNode
         case 2:  this.arrayConstructor = (ASTArrayConstructorNode)value; return;
         case 3:  this.functionReference = (ASTFunctionReferenceNode)value; return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.nestedExpression = (ASTExprNode)value; return;
+        case 5:  this.expr = (IExpr)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.SFVarName = (ASTSFVarNameNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");

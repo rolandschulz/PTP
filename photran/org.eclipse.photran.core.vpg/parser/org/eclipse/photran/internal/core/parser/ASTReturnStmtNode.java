@@ -28,7 +28,7 @@ public class ASTReturnStmtNode extends ASTNode implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTReturnStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTReturn; // in ASTReturnStmtNode
-    ASTExprNode expr; // in ASTReturnStmtNode
+    IExpr expr; // in ASTReturnStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTReturnStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -42,12 +42,12 @@ public class ASTReturnStmtNode extends ASTNode implements IActionStmt
     }
 
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -83,7 +83,7 @@ public class ASTReturnStmtNode extends ASTNode implements IActionStmt
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTReturn = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.expr = (ASTExprNode)value; return;
+        case 2:  this.expr = (IExpr)value; return;
         case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

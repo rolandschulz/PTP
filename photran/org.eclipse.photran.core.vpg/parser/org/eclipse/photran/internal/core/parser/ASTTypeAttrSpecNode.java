@@ -26,23 +26,23 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTTypeAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isAbstract; // in ASTTypeAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isExtends; // in ASTTypeAttrSpecNode
-    ASTAccessSpecNode accessSpec; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isBind; // in ASTTypeAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isExtends; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token language; // in ASTTypeAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isAbstract; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token parentTypeName; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeAttrSpecNode
+    ASTAccessSpecNode accessSpec; // in ASTTypeAttrSpecNode
 
-    public boolean isAbstract()
+    public boolean isBind()
     {
-        return this.isAbstract != null;
+        return this.isBind != null;
     }
 
-    public void setIsAbstract(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsBind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isAbstract = newValue;
+        this.isBind = newValue;
     }
 
 
@@ -57,28 +57,6 @@ public class ASTTypeAttrSpecNode extends ASTNode
     }
 
 
-    public ASTAccessSpecNode getAccessSpec()
-    {
-        return this.accessSpec;
-    }
-
-    public void setAccessSpec(ASTAccessSpecNode newValue)
-    {
-        this.accessSpec = newValue;
-    }
-
-
-    public boolean isBind()
-    {
-        return this.isBind != null;
-    }
-
-    public void setIsBind(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isBind = newValue;
-    }
-
-
     public org.eclipse.photran.internal.core.lexer.Token getLanguage()
     {
         return this.language;
@@ -90,6 +68,17 @@ public class ASTTypeAttrSpecNode extends ASTNode
     }
 
 
+    public boolean isAbstract()
+    {
+        return this.isAbstract != null;
+    }
+
+    public void setIsAbstract(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAbstract = newValue;
+    }
+
+
     public org.eclipse.photran.internal.core.lexer.Token getParentTypeName()
     {
         return this.parentTypeName;
@@ -98,6 +87,17 @@ public class ASTTypeAttrSpecNode extends ASTNode
     public void setParentTypeName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.parentTypeName = newValue;
+    }
+
+
+    public ASTAccessSpecNode getAccessSpec()
+    {
+        return this.accessSpec;
+    }
+
+    public void setAccessSpec(ASTAccessSpecNode newValue)
+    {
+        this.accessSpec = newValue;
     }
 
 
@@ -116,14 +116,14 @@ public class ASTTypeAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isAbstract;
+        case 0:  return this.isBind;
         case 1:  return this.isExtends;
-        case 2:  return this.accessSpec;
-        case 3:  return this.isBind;
-        case 4:  return this.hiddenTLparen;
-        case 5:  return this.language;
-        case 6:  return this.parentTypeName;
-        case 7:  return this.hiddenTRparen;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.language;
+        case 4:  return this.isAbstract;
+        case 5:  return this.parentTypeName;
+        case 6:  return this.hiddenTRparen;
+        case 7:  return this.accessSpec;
         default: return null;
         }
     }
@@ -132,14 +132,14 @@ public class ASTTypeAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.isExtends = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.accessSpec = (ASTAccessSpecNode)value; return;
-        case 3:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.language = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.parentTypeName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.language = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.parentTypeName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.accessSpec = (ASTAccessSpecNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

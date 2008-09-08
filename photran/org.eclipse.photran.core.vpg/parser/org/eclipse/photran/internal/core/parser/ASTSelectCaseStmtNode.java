@@ -33,7 +33,7 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
     org.eclipse.photran.internal.core.lexer.Token hiddenTSelect; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTCase; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSelectCaseStmtNode
-    ASTExprNode selectionExpression; // in ASTSelectCaseStmtNode
+    IExpr selectionExpression; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTSelectCaseStmtNode
 
@@ -59,12 +59,12 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
     }
 
 
-    public ASTExprNode getSelectionExpression()
+    public IExpr getSelectionExpression()
     {
         return this.selectionExpression;
     }
 
-    public void setSelectionExpression(ASTExprNode newValue)
+    public void setSelectionExpression(IExpr newValue)
     {
         this.selectionExpression = newValue;
     }
@@ -110,7 +110,7 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 4:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.selectionExpression = (ASTExprNode)value; return;
+        case 7:  this.selectionExpression = (IExpr)value; return;
         case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

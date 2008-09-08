@@ -29,7 +29,7 @@ public class ASTSFFactorNode extends ASTNode
     ASTSFPrimaryNode rhsPrimary; // in ASTSFFactorNode
     ASTSFPrimaryNode lhsPrimary; // in ASTSFFactorNode
     ASTOperatorNode powerOp; // in ASTSFFactorNode
-    ASTMultOperandNode rhsExpr; // in ASTSFFactorNode
+    IExpr rhsExpr; // in ASTSFFactorNode
 
     public ASTSFPrimaryNode getRhsPrimary()
     {
@@ -64,12 +64,12 @@ public class ASTSFFactorNode extends ASTNode
     }
 
 
-    public ASTMultOperandNode getRhsExpr()
+    public IExpr getRhsExpr()
     {
         return this.rhsExpr;
     }
 
-    public void setRhsExpr(ASTMultOperandNode newValue)
+    public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
     }
@@ -105,7 +105,7 @@ public class ASTSFFactorNode extends ASTNode
         case 0:  this.rhsPrimary = (ASTSFPrimaryNode)value; return;
         case 1:  this.lhsPrimary = (ASTSFPrimaryNode)value; return;
         case 2:  this.powerOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (ASTMultOperandNode)value; return;
+        case 3:  this.rhsExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

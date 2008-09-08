@@ -27,20 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTFmtSpecNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTFmtSpecNode
-    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFmtSpecNode
     org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFmtSpecNode
+    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFmtSpecNode
     ASTFormatEditNode formatEdit; // in ASTFmtSpecNode
-
-    public boolean colonFormatSep()
-    {
-        return this.colonFormatSep != null;
-    }
-
-    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.colonFormatSep = newValue;
-    }
-
 
     public boolean slashFormatSep()
     {
@@ -50,6 +39,17 @@ public class ASTFmtSpecNode extends ASTNode
     public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.slashFormatSep = newValue;
+    }
+
+
+    public boolean colonFormatSep()
+    {
+        return this.colonFormatSep != null;
+    }
+
+    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.colonFormatSep = newValue;
     }
 
 
@@ -80,8 +80,8 @@ public class ASTFmtSpecNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTComma;
-        case 1:  return this.colonFormatSep;
-        case 2:  return this.slashFormatSep;
+        case 1:  return this.slashFormatSep;
+        case 2:  return this.colonFormatSep;
         case 3:  return this.formatEdit;
         default: return null;
         }
@@ -92,8 +92,8 @@ public class ASTFmtSpecNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.formatEdit = (ASTFormatEditNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

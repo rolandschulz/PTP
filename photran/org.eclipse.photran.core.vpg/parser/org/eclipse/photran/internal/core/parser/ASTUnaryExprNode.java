@@ -24,76 +24,64 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTLevel3ExprNode extends ASTNode
+public class ASTUnaryExprNode extends ASTNode implements IExpr
 {
-    ASTLevel2ExprNode level2Expr; // in ASTLevel3ExprNode
-    ASTLevel3ExprNode lhsExpr; // in ASTLevel3ExprNode
-    ASTOperatorNode concatOp; // in ASTLevel3ExprNode
-    ASTLevel2ExprNode rhsExpr; // in ASTLevel3ExprNode
+    ASTSignNode sign; // in ASTUnaryExprNode
+    ASTOperatorNode operator; // in ASTUnaryExprNode
+    IExpr operand; // in ASTUnaryExprNode
 
-    public ASTLevel2ExprNode getLevel2Expr()
+    public ASTSignNode getSign()
     {
-        return this.level2Expr;
+        return this.sign;
     }
 
-    public void setLevel2Expr(ASTLevel2ExprNode newValue)
+    public void setSign(ASTSignNode newValue)
     {
-        this.level2Expr = newValue;
-    }
-
-
-    public ASTLevel3ExprNode getLhsExpr()
-    {
-        return this.lhsExpr;
-    }
-
-    public void setLhsExpr(ASTLevel3ExprNode newValue)
-    {
-        this.lhsExpr = newValue;
+        this.sign = newValue;
     }
 
 
-    public ASTOperatorNode getConcatOp()
+    public ASTOperatorNode getOperator()
     {
-        return this.concatOp;
+        return this.operator;
     }
 
-    public void setConcatOp(ASTOperatorNode newValue)
+    public void setOperator(ASTOperatorNode newValue)
     {
-        this.concatOp = newValue;
+        this.operator = newValue;
     }
 
 
-    public ASTLevel2ExprNode getRhsExpr()
+    public IExpr getOperand()
     {
-        return this.rhsExpr;
+        return this.operand;
     }
 
-    public void setRhsExpr(ASTLevel2ExprNode newValue)
+    public void setOperand(IExpr newValue)
     {
-        this.rhsExpr = newValue;
+        this.operand = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTLevel3ExprNode(this);
+        visitor.visitASTUnaryExprNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 3;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.level2Expr;
-        case 1:  return this.lhsExpr;
-        case 2:  return this.concatOp;
-        case 3:  return this.rhsExpr;
+        case 0:  return this.sign;
+        case 1:  return this.operator;
+        case 2:  return this.operand;
         default: return null;
         }
     }
@@ -102,10 +90,9 @@ public class ASTLevel3ExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.level2Expr = (ASTLevel2ExprNode)value; return;
-        case 1:  this.lhsExpr = (ASTLevel3ExprNode)value; return;
-        case 2:  this.concatOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (ASTLevel2ExprNode)value; return;
+        case 0:  this.sign = (ASTSignNode)value; return;
+        case 1:  this.operator = (ASTOperatorNode)value; return;
+        case 2:  this.operand = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

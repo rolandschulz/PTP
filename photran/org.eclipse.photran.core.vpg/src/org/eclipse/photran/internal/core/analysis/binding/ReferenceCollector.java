@@ -60,7 +60,6 @@ import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTOutputImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerFieldNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerObjectNode;
-import org.eclipse.photran.internal.core.parser.ASTPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
@@ -71,6 +70,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineArgNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineParNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.ASTVariableNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
@@ -380,7 +380,7 @@ class ReferenceCollector extends BindingCollector
     // | <SubstrConst>
     // # JO -- Added substring of constant strings
 
-    @Override public void visitASTPrimaryNode(ASTPrimaryNode node)
+    @Override public void visitASTVarOrFnRefNode(ASTVarOrFnRefNode node)
     {
         super.traverseChildren(node);
         

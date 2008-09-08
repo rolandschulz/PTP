@@ -15,7 +15,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 
 import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
-import org.eclipse.photran.internal.core.parser.ASTExprNode;
+import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
@@ -37,8 +37,8 @@ public class Dimension implements Serializable
 
     public Dimension(ASTExplicitShapeSpecNode node)
     {
-        ASTExprNode lbound = node.getLb();
-        ASTExprNode ubound = node.getUb();
+        IExpr lbound = node.getLb();
+        IExpr ubound = node.getUb();
         
         lboundAsString = lbound == null ? null : getSourceCodeFromASTNode(lbound);
         uboundAsString = ubound == null ? null : getSourceCodeFromASTNode(ubound);

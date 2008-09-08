@@ -31,7 +31,7 @@ public class ASTMaskedElseWhereStmtNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTElsewhere; // in ASTMaskedElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTMaskedElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTMaskedElseWhereStmtNode
-    ASTExprNode maskExpr; // in ASTMaskedElseWhereStmtNode
+    IExpr maskExpr; // in ASTMaskedElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTMaskedElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTMaskedElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTMaskedElseWhereStmtNode
@@ -47,12 +47,12 @@ public class ASTMaskedElseWhereStmtNode extends ASTNode
     }
 
 
-    public ASTExprNode getMaskExpr()
+    public IExpr getMaskExpr()
     {
         return this.maskExpr;
     }
 
-    public void setMaskExpr(ASTExprNode newValue)
+    public void setMaskExpr(IExpr newValue)
     {
         this.maskExpr = newValue;
     }
@@ -106,7 +106,7 @@ public class ASTMaskedElseWhereStmtNode extends ASTNode
         case 2:  this.hiddenTElsewhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.maskExpr = (ASTExprNode)value; return;
+        case 5:  this.maskExpr = (IExpr)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;

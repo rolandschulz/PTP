@@ -24,76 +24,63 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTAddOperandNode extends ASTNode
+public class ASTBozLiteralConstNode extends ASTNode
 {
-    ASTAddOperandNode lhsExpr; // in ASTAddOperandNode
-    ASTOperatorNode multOp; // in ASTAddOperandNode
-    ASTMultOperandNode multOperand; // in ASTAddOperandNode
-    ASTMultOperandNode rhsExpr; // in ASTAddOperandNode
+    org.eclipse.photran.internal.core.lexer.Token binaryConst; // in ASTBozLiteralConstNode
+    org.eclipse.photran.internal.core.lexer.Token octalConst; // in ASTBozLiteralConstNode
+    org.eclipse.photran.internal.core.lexer.Token hexConst; // in ASTBozLiteralConstNode
 
-    public ASTAddOperandNode getLhsExpr()
+    public org.eclipse.photran.internal.core.lexer.Token getBinaryConst()
     {
-        return this.lhsExpr;
+        return this.binaryConst;
     }
 
-    public void setLhsExpr(ASTAddOperandNode newValue)
+    public void setBinaryConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.lhsExpr = newValue;
-    }
-
-
-    public ASTOperatorNode getMultOp()
-    {
-        return this.multOp;
-    }
-
-    public void setMultOp(ASTOperatorNode newValue)
-    {
-        this.multOp = newValue;
+        this.binaryConst = newValue;
     }
 
 
-    public ASTMultOperandNode getMultOperand()
+    public org.eclipse.photran.internal.core.lexer.Token getOctalConst()
     {
-        return this.multOperand;
+        return this.octalConst;
     }
 
-    public void setMultOperand(ASTMultOperandNode newValue)
+    public void setOctalConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.multOperand = newValue;
+        this.octalConst = newValue;
     }
 
 
-    public ASTMultOperandNode getRhsExpr()
+    public org.eclipse.photran.internal.core.lexer.Token getHexConst()
     {
-        return this.rhsExpr;
+        return this.hexConst;
     }
 
-    public void setRhsExpr(ASTMultOperandNode newValue)
+    public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.rhsExpr = newValue;
+        this.hexConst = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTAddOperandNode(this);
+        visitor.visitASTBozLiteralConstNode(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 3;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.lhsExpr;
-        case 1:  return this.multOp;
-        case 2:  return this.multOperand;
-        case 3:  return this.rhsExpr;
+        case 0:  return this.binaryConst;
+        case 1:  return this.octalConst;
+        case 2:  return this.hexConst;
         default: return null;
         }
     }
@@ -102,10 +89,9 @@ public class ASTAddOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTAddOperandNode)value; return;
-        case 1:  this.multOp = (ASTOperatorNode)value; return;
-        case 2:  this.multOperand = (ASTMultOperandNode)value; return;
-        case 3:  this.rhsExpr = (ASTMultOperandNode)value; return;
+        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -24,50 +24,67 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTLevel1ExprNode extends ASTNode
+public class ASTDblConstNode extends ASTNode implements IExpr, IUnsignedArithmeticConst
 {
-    ASTOperatorNode definedUnaryOp; // in ASTLevel1ExprNode
-    ASTPrimaryNode rhsPrimary; // in ASTLevel1ExprNode
+    org.eclipse.photran.internal.core.lexer.Token dblConst; // in ASTDblConstNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTDblConstNode
+    ASTNamedConstantUseNode namedConstKind; // in ASTDblConstNode
+    org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTDblConstNode
 
-    public ASTOperatorNode getDefinedUnaryOp()
+    public org.eclipse.photran.internal.core.lexer.Token getDblConst()
     {
-        return this.definedUnaryOp;
+        return this.dblConst;
     }
 
-    public void setDefinedUnaryOp(ASTOperatorNode newValue)
+    public void setDblConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.definedUnaryOp = newValue;
+        this.dblConst = newValue;
     }
 
 
-    public ASTPrimaryNode getRhsPrimary()
+    public ASTNamedConstantUseNode getNamedConstKind()
     {
-        return this.rhsPrimary;
+        return this.namedConstKind;
     }
 
-    public void setRhsPrimary(ASTPrimaryNode newValue)
+    public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
-        this.rhsPrimary = newValue;
+        this.namedConstKind = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getIntKind()
+    {
+        return this.intKind;
+    }
+
+    public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.intKind = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTLevel1ExprNode(this);
+        visitor.visitASTDblConstNode(this);
+        visitor.visitIExpr(this);
+        visitor.visitIUnsignedArithmeticConst(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 2;
+        return 4;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.definedUnaryOp;
-        case 1:  return this.rhsPrimary;
+        case 0:  return this.dblConst;
+        case 1:  return this.hiddenTUnderscore;
+        case 2:  return this.namedConstKind;
+        case 3:  return this.intKind;
         default: return null;
         }
     }
@@ -76,8 +93,10 @@ public class ASTLevel1ExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.definedUnaryOp = (ASTOperatorNode)value; return;
-        case 1:  this.rhsPrimary = (ASTPrimaryNode)value; return;
+        case 0:  this.dblConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
+        case 3:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

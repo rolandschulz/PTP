@@ -34,7 +34,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     IASTListNode<ASTLblRefListNode> lblRefList; // in ASTComputedGotoStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTComputedGotoStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTComputedGotoStmtNode
-    ASTExprNode expr; // in ASTComputedGotoStmtNode
+    IExpr expr; // in ASTComputedGotoStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTComputedGotoStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -59,12 +59,12 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     }
 
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -112,7 +112,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
         case 5:  this.lblRefList = (IASTListNode<ASTLblRefListNode>)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.expr = (ASTExprNode)value; return;
+        case 8:  this.expr = (IExpr)value; return;
         case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

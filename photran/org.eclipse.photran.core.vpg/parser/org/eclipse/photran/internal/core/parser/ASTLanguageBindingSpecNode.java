@@ -32,7 +32,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTLanguageBindingSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIdent; // in ASTLanguageBindingSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTLanguageBindingSpecNode
-    ASTExprNode expr; // in ASTLanguageBindingSpecNode
+    IExpr expr; // in ASTLanguageBindingSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTLanguageBindingSpecNode
 
     public boolean isBind()
@@ -57,12 +57,12 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     }
 
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -105,7 +105,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
         case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTIdent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.expr = (ASTExprNode)value; return;
+        case 6:  this.expr = (IExpr)value; return;
         case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

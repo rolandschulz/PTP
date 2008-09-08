@@ -26,27 +26,27 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTCaseValueRangeNode extends ASTNode
 {
-    ASTExprNode lb; // in ASTCaseValueRangeNode
+    IExpr lb; // in ASTCaseValueRangeNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTCaseValueRangeNode
-    ASTExprNode ub; // in ASTCaseValueRangeNode
+    IExpr ub; // in ASTCaseValueRangeNode
 
-    public ASTExprNode getLb()
+    public IExpr getLb()
     {
         return this.lb;
     }
 
-    public void setLb(ASTExprNode newValue)
+    public void setLb(IExpr newValue)
     {
         this.lb = newValue;
     }
 
 
-    public ASTExprNode getUb()
+    public IExpr getUb()
     {
         return this.ub;
     }
 
-    public void setUb(ASTExprNode newValue)
+    public void setUb(IExpr newValue)
     {
         this.ub = newValue;
     }
@@ -78,9 +78,9 @@ public class ASTCaseValueRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (ASTExprNode)value; return;
+        case 0:  this.lb = (IExpr)value; return;
         case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.ub = (ASTExprNode)value; return;
+        case 2:  this.ub = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

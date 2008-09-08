@@ -24,13 +24,13 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTLogicalConstantNode extends ASTNode
+public class ASTLogicalConstNode extends ASTNode implements IExpr
 {
-    org.eclipse.photran.internal.core.lexer.Token isTrue; // in ASTLogicalConstantNode
-    org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstantNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTLogicalConstantNode
-    org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTLogicalConstantNode
-    ASTNamedConstantUseNode namedConstKind; // in ASTLogicalConstantNode
+    org.eclipse.photran.internal.core.lexer.Token isTrue; // in ASTLogicalConstNode
+    org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTLogicalConstNode
+    ASTNamedConstantUseNode namedConstKind; // in ASTLogicalConstNode
+    org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTLogicalConstNode
 
     public boolean isTrue()
     {
@@ -54,17 +54,6 @@ public class ASTLogicalConstantNode extends ASTNode
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getIntKind()
-    {
-        return this.intKind;
-    }
-
-    public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.intKind = newValue;
-    }
-
-
     public ASTNamedConstantUseNode getNamedConstKind()
     {
         return this.namedConstKind;
@@ -76,9 +65,21 @@ public class ASTLogicalConstantNode extends ASTNode
     }
 
 
+    public org.eclipse.photran.internal.core.lexer.Token getIntKind()
+    {
+        return this.intKind;
+    }
+
+    public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.intKind = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTLogicalConstantNode(this);
+        visitor.visitASTLogicalConstNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 
@@ -94,8 +95,8 @@ public class ASTLogicalConstantNode extends ASTNode
         case 0:  return this.isTrue;
         case 1:  return this.isFalse;
         case 2:  return this.hiddenTUnderscore;
-        case 3:  return this.intKind;
-        case 4:  return this.namedConstKind;
+        case 3:  return this.namedConstKind;
+        case 4:  return this.intKind;
         default: return null;
         }
     }
@@ -107,8 +108,8 @@ public class ASTLogicalConstantNode extends ASTNode
         case 0:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
+        case 3:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
+        case 4:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

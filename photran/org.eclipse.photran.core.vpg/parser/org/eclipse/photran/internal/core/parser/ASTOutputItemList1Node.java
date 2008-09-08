@@ -27,10 +27,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTOutputItemList1Node extends ASTNode
 {
     ASTOutputItemList1Node outputItemList1; // in ASTOutputItemList1Node
-    ASTExprNode expr1; // in ASTOutputItemList1Node
+    IExpr expr1; // in ASTOutputItemList1Node
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTOutputItemList1Node
+    IExpr expr2; // in ASTOutputItemList1Node
     ASTOutputImpliedDoNode outputImpliedDo; // in ASTOutputItemList1Node
-    ASTExprNode expr2; // in ASTOutputItemList1Node
 
     public ASTOutputItemList1Node getOutputItemList1()
     {
@@ -43,14 +43,25 @@ public class ASTOutputItemList1Node extends ASTNode
     }
 
 
-    public ASTExprNode getExpr1()
+    public IExpr getExpr1()
     {
         return this.expr1;
     }
 
-    public void setExpr1(ASTExprNode newValue)
+    public void setExpr1(IExpr newValue)
     {
         this.expr1 = newValue;
+    }
+
+
+    public IExpr getExpr2()
+    {
+        return this.expr2;
+    }
+
+    public void setExpr2(IExpr newValue)
+    {
+        this.expr2 = newValue;
     }
 
 
@@ -62,17 +73,6 @@ public class ASTOutputItemList1Node extends ASTNode
     public void setOutputImpliedDo(ASTOutputImpliedDoNode newValue)
     {
         this.outputImpliedDo = newValue;
-    }
-
-
-    public ASTExprNode getExpr2()
-    {
-        return this.expr2;
-    }
-
-    public void setExpr2(ASTExprNode newValue)
-    {
-        this.expr2 = newValue;
     }
 
 
@@ -94,8 +94,8 @@ public class ASTOutputItemList1Node extends ASTNode
         case 0:  return this.outputItemList1;
         case 1:  return this.expr1;
         case 2:  return this.hiddenTComma;
-        case 3:  return this.outputImpliedDo;
-        case 4:  return this.expr2;
+        case 3:  return this.expr2;
+        case 4:  return this.outputImpliedDo;
         default: return null;
         }
     }
@@ -105,10 +105,10 @@ public class ASTOutputItemList1Node extends ASTNode
         switch (index)
         {
         case 0:  this.outputItemList1 = (ASTOutputItemList1Node)value; return;
-        case 1:  this.expr1 = (ASTExprNode)value; return;
+        case 1:  this.expr1 = (IExpr)value; return;
         case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value; return;
-        case 4:  this.expr2 = (ASTExprNode)value; return;
+        case 3:  this.expr2 = (IExpr)value; return;
+        case 4:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -28,15 +28,15 @@ public class ASTKindSelectorNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTKindSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTKindeq; // in ASTKindSelectorNode
-    ASTExprNode kindExpr; // in ASTKindSelectorNode
+    IExpr kindExpr; // in ASTKindSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTKindSelectorNode
 
-    public ASTExprNode getKindExpr()
+    public IExpr getKindExpr()
     {
         return this.kindExpr;
     }
 
-    public void setKindExpr(ASTExprNode newValue)
+    public void setKindExpr(IExpr newValue)
     {
         this.kindExpr = newValue;
     }
@@ -71,7 +71,7 @@ public class ASTKindSelectorNode extends ASTNode
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.kindExpr = (ASTExprNode)value; return;
+        case 2:  this.kindExpr = (IExpr)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

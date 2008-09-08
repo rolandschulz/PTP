@@ -51,7 +51,7 @@ public class ASTConnectSpecNode extends ASTNode
     ASTUnitIdentifierNode unitIdentifier; // in ASTConnectSpecNode
     ASTLblRefNode errLbl; // in ASTConnectSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRecleq; // in ASTConnectSpecNode
-    ASTExprNode reclExpr; // in ASTConnectSpecNode
+    IExpr reclExpr; // in ASTConnectSpecNode
 
     public ASTCExprNode getDelimExpr()
     {
@@ -185,12 +185,12 @@ public class ASTConnectSpecNode extends ASTNode
     }
 
 
-    public ASTExprNode getReclExpr()
+    public IExpr getReclExpr()
     {
         return this.reclExpr;
     }
 
-    public void setReclExpr(ASTExprNode newValue)
+    public void setReclExpr(IExpr newValue)
     {
         this.reclExpr = newValue;
     }
@@ -270,7 +270,7 @@ public class ASTConnectSpecNode extends ASTNode
         case 22: this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
         case 23: this.errLbl = (ASTLblRefNode)value; return;
         case 24: this.hiddenTRecleq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 25: this.reclExpr = (ASTExprNode)value; return;
+        case 25: this.reclExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

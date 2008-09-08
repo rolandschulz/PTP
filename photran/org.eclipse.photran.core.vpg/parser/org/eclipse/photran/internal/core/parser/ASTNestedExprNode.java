@@ -24,48 +24,27 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTAndOperandNode extends ASTNode
+public class ASTNestedExprNode extends ASTNode implements IExpr
 {
-    ASTOperatorNode notOp; // in ASTAndOperandNode
-    ASTLevel4ExprNode level4Expr; // in ASTAndOperandNode
-    ASTLevel4ExprNode rhsExpr; // in ASTAndOperandNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTNestedExprNode
+    IExpr expr; // in ASTNestedExprNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTNestedExprNode
 
-    public ASTOperatorNode getNotOp()
+    public IExpr getExpr()
     {
-        return this.notOp;
+        return this.expr;
     }
 
-    public void setNotOp(ASTOperatorNode newValue)
+    public void setExpr(IExpr newValue)
     {
-        this.notOp = newValue;
-    }
-
-
-    public ASTLevel4ExprNode getLevel4Expr()
-    {
-        return this.level4Expr;
-    }
-
-    public void setLevel4Expr(ASTLevel4ExprNode newValue)
-    {
-        this.level4Expr = newValue;
-    }
-
-
-    public ASTLevel4ExprNode getRhsExpr()
-    {
-        return this.rhsExpr;
-    }
-
-    public void setRhsExpr(ASTLevel4ExprNode newValue)
-    {
-        this.rhsExpr = newValue;
+        this.expr = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTAndOperandNode(this);
+        visitor.visitASTNestedExprNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 
@@ -78,9 +57,9 @@ public class ASTAndOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.notOp;
-        case 1:  return this.level4Expr;
-        case 2:  return this.rhsExpr;
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.expr;
+        case 2:  return this.hiddenTRparen;
         default: return null;
         }
     }
@@ -89,9 +68,9 @@ public class ASTAndOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.notOp = (ASTOperatorNode)value; return;
-        case 1:  this.level4Expr = (ASTLevel4ExprNode)value; return;
-        case 2:  this.rhsExpr = (ASTLevel4ExprNode)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.expr = (IExpr)value; return;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTSectionSubscriptNode extends ASTNode
 {
-    ASTExprNode expr; // in ASTSectionSubscriptNode
     ASTSubscriptTripletNode subscriptTriplet; // in ASTSectionSubscriptNode
-
-    public ASTExprNode getExpr()
-    {
-        return this.expr;
-    }
-
-    public void setExpr(ASTExprNode newValue)
-    {
-        this.expr = newValue;
-    }
-
+    IExpr expr; // in ASTSectionSubscriptNode
 
     public ASTSubscriptTripletNode getSubscriptTriplet()
     {
@@ -48,6 +37,17 @@ public class ASTSectionSubscriptNode extends ASTNode
     public void setSubscriptTriplet(ASTSubscriptTripletNode newValue)
     {
         this.subscriptTriplet = newValue;
+    }
+
+
+    public IExpr getExpr()
+    {
+        return this.expr;
+    }
+
+    public void setExpr(IExpr newValue)
+    {
+        this.expr = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTSectionSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.expr;
-        case 1:  return this.subscriptTriplet;
+        case 0:  return this.subscriptTriplet;
+        case 1:  return this.expr;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTSectionSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.expr = (ASTExprNode)value; return;
-        case 1:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; return;
+        case 0:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; return;
+        case 1:  this.expr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

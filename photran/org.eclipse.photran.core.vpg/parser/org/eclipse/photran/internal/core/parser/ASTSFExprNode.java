@@ -30,7 +30,7 @@ public class ASTSFExprNode extends ASTNode
     ASTSFExprNode lhsExpr; // in ASTSFExprNode
     ASTSignNode rhs; // in ASTSFExprNode
     ASTOperatorNode addOp; // in ASTSFExprNode
-    ASTAddOperandNode rhsExpr; // in ASTSFExprNode
+    IExpr rhsExpr; // in ASTSFExprNode
 
     public ASTSFTermNode getSFTerm()
     {
@@ -76,12 +76,12 @@ public class ASTSFExprNode extends ASTNode
     }
 
 
-    public ASTAddOperandNode getRhsExpr()
+    public IExpr getRhsExpr()
     {
         return this.rhsExpr;
     }
 
-    public void setRhsExpr(ASTAddOperandNode newValue)
+    public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
     }
@@ -119,7 +119,7 @@ public class ASTSFExprNode extends ASTNode
         case 1:  this.lhsExpr = (ASTSFExprNode)value; return;
         case 2:  this.rhs = (ASTSignNode)value; return;
         case 3:  this.addOp = (ASTOperatorNode)value; return;
-        case 4:  this.rhsExpr = (ASTAddOperandNode)value; return;
+        case 4:  this.rhsExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

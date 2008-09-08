@@ -28,7 +28,7 @@ public class ASTStructureConstructorNode extends ASTNode
 {
     ASTTypeNameNode typeName; // in ASTStructureConstructorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTStructureConstructorNode
-    IASTListNode<ASTExprNode> exprList; // in ASTStructureConstructorNode
+    IASTListNode<IExpr> exprList; // in ASTStructureConstructorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTStructureConstructorNode
 
     public ASTTypeNameNode getTypeName()
@@ -42,12 +42,12 @@ public class ASTStructureConstructorNode extends ASTNode
     }
 
 
-    public IASTListNode<ASTExprNode> getExprList()
+    public IASTListNode<IExpr> getExprList()
     {
         return this.exprList;
     }
 
-    public void setExprList(IASTListNode<ASTExprNode> newValue)
+    public void setExprList(IASTListNode<IExpr> newValue)
     {
         this.exprList = newValue;
     }
@@ -82,7 +82,7 @@ public class ASTStructureConstructorNode extends ASTNode
         {
         case 0:  this.typeName = (ASTTypeNameNode)value; return;
         case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.exprList = (IASTListNode<ASTExprNode>)value; return;
+        case 2:  this.exprList = (IASTListNode<IExpr>)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

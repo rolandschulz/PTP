@@ -24,48 +24,49 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTBozLiteralConstantNode extends ASTNode
+public class ASTBinaryExprNode extends ASTNode implements IExpr
 {
-    org.eclipse.photran.internal.core.lexer.Token binaryConst; // in ASTBozLiteralConstantNode
-    org.eclipse.photran.internal.core.lexer.Token octalConst; // in ASTBozLiteralConstantNode
-    org.eclipse.photran.internal.core.lexer.Token hexConst; // in ASTBozLiteralConstantNode
+    IExpr lhsExpr; // in ASTBinaryExprNode
+    ASTOperatorNode operator; // in ASTBinaryExprNode
+    IExpr rhsExpr; // in ASTBinaryExprNode
 
-    public org.eclipse.photran.internal.core.lexer.Token getBinaryConst()
+    public IExpr getLhsExpr()
     {
-        return this.binaryConst;
+        return this.lhsExpr;
     }
 
-    public void setBinaryConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setLhsExpr(IExpr newValue)
     {
-        this.binaryConst = newValue;
-    }
-
-
-    public org.eclipse.photran.internal.core.lexer.Token getOctalConst()
-    {
-        return this.octalConst;
-    }
-
-    public void setOctalConst(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.octalConst = newValue;
+        this.lhsExpr = newValue;
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getHexConst()
+    public ASTOperatorNode getOperator()
     {
-        return this.hexConst;
+        return this.operator;
     }
 
-    public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setOperator(ASTOperatorNode newValue)
     {
-        this.hexConst = newValue;
+        this.operator = newValue;
+    }
+
+
+    public IExpr getRhsExpr()
+    {
+        return this.rhsExpr;
+    }
+
+    public void setRhsExpr(IExpr newValue)
+    {
+        this.rhsExpr = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTBozLiteralConstantNode(this);
+        visitor.visitASTBinaryExprNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 
@@ -78,9 +79,9 @@ public class ASTBozLiteralConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.binaryConst;
-        case 1:  return this.octalConst;
-        case 2:  return this.hexConst;
+        case 0:  return this.lhsExpr;
+        case 1:  return this.operator;
+        case 2:  return this.rhsExpr;
         default: return null;
         }
     }
@@ -89,9 +90,9 @@ public class ASTBozLiteralConstantNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.lhsExpr = (IExpr)value; return;
+        case 1:  this.operator = (ASTOperatorNode)value; return;
+        case 2:  this.rhsExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

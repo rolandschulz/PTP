@@ -24,60 +24,51 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTExprNode extends ASTNode
+public class ASTIntConstNode extends ASTNode implements IExpr, IUnsignedArithmeticConst
 {
-    ASTLevel5ExprNode level5Expr; // in ASTExprNode
-    ASTExprNode lhsExpr; // in ASTExprNode
-    ASTOperatorNode definedBinaryOp; // in ASTExprNode
-    ASTLevel5ExprNode rhsExpr; // in ASTExprNode
+    org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTIntConstNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTIntConstNode
+    ASTNamedConstantUseNode namedConstKind; // in ASTIntConstNode
+    org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTIntConstNode
 
-    public ASTLevel5ExprNode getLevel5Expr()
+    public org.eclipse.photran.internal.core.lexer.Token getIntConst()
     {
-        return this.level5Expr;
+        return this.intConst;
     }
 
-    public void setLevel5Expr(ASTLevel5ExprNode newValue)
+    public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.level5Expr = newValue;
-    }
-
-
-    public ASTExprNode getLhsExpr()
-    {
-        return this.lhsExpr;
-    }
-
-    public void setLhsExpr(ASTExprNode newValue)
-    {
-        this.lhsExpr = newValue;
+        this.intConst = newValue;
     }
 
 
-    public ASTOperatorNode getDefinedBinaryOp()
+    public ASTNamedConstantUseNode getNamedConstKind()
     {
-        return this.definedBinaryOp;
+        return this.namedConstKind;
     }
 
-    public void setDefinedBinaryOp(ASTOperatorNode newValue)
+    public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
-        this.definedBinaryOp = newValue;
+        this.namedConstKind = newValue;
     }
 
 
-    public ASTLevel5ExprNode getRhsExpr()
+    public org.eclipse.photran.internal.core.lexer.Token getIntKind()
     {
-        return this.rhsExpr;
+        return this.intKind;
     }
 
-    public void setRhsExpr(ASTLevel5ExprNode newValue)
+    public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.rhsExpr = newValue;
+        this.intKind = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTExprNode(this);
+        visitor.visitASTIntConstNode(this);
+        visitor.visitIExpr(this);
+        visitor.visitIUnsignedArithmeticConst(this);
         visitor.visitASTNode(this);
     }
 
@@ -90,10 +81,10 @@ public class ASTExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.level5Expr;
-        case 1:  return this.lhsExpr;
-        case 2:  return this.definedBinaryOp;
-        case 3:  return this.rhsExpr;
+        case 0:  return this.intConst;
+        case 1:  return this.hiddenTUnderscore;
+        case 2:  return this.namedConstKind;
+        case 3:  return this.intKind;
         default: return null;
         }
     }
@@ -102,10 +93,10 @@ public class ASTExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.level5Expr = (ASTLevel5ExprNode)value; return;
-        case 1:  this.lhsExpr = (ASTExprNode)value; return;
-        case 2:  this.definedBinaryOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (ASTLevel5ExprNode)value; return;
+        case 0:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
+        case 3:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

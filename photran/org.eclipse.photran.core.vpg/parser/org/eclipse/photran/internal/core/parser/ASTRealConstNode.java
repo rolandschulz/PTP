@@ -24,60 +24,51 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTOrOperandNode extends ASTNode
+public class ASTRealConstNode extends ASTNode implements IExpr, IUnsignedArithmeticConst
 {
-    ASTOrOperandNode lhsExpr; // in ASTOrOperandNode
-    ASTOperatorNode andOp; // in ASTOrOperandNode
-    ASTAndOperandNode rhsExpr; // in ASTOrOperandNode
-    ASTAndOperandNode andOperand; // in ASTOrOperandNode
+    org.eclipse.photran.internal.core.lexer.Token realConst; // in ASTRealConstNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTRealConstNode
+    org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTRealConstNode
+    ASTNamedConstantUseNode namedConstKind; // in ASTRealConstNode
 
-    public ASTOrOperandNode getLhsExpr()
+    public org.eclipse.photran.internal.core.lexer.Token getRealConst()
     {
-        return this.lhsExpr;
+        return this.realConst;
     }
 
-    public void setLhsExpr(ASTOrOperandNode newValue)
+    public void setRealConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.lhsExpr = newValue;
-    }
-
-
-    public ASTOperatorNode getAndOp()
-    {
-        return this.andOp;
-    }
-
-    public void setAndOp(ASTOperatorNode newValue)
-    {
-        this.andOp = newValue;
+        this.realConst = newValue;
     }
 
 
-    public ASTAndOperandNode getRhsExpr()
+    public org.eclipse.photran.internal.core.lexer.Token getIntKind()
     {
-        return this.rhsExpr;
+        return this.intKind;
     }
 
-    public void setRhsExpr(ASTAndOperandNode newValue)
+    public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.rhsExpr = newValue;
+        this.intKind = newValue;
     }
 
 
-    public ASTAndOperandNode getAndOperand()
+    public ASTNamedConstantUseNode getNamedConstKind()
     {
-        return this.andOperand;
+        return this.namedConstKind;
     }
 
-    public void setAndOperand(ASTAndOperandNode newValue)
+    public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
-        this.andOperand = newValue;
+        this.namedConstKind = newValue;
     }
 
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTOrOperandNode(this);
+        visitor.visitASTRealConstNode(this);
+        visitor.visitIExpr(this);
+        visitor.visitIUnsignedArithmeticConst(this);
         visitor.visitASTNode(this);
     }
 
@@ -90,10 +81,10 @@ public class ASTOrOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.lhsExpr;
-        case 1:  return this.andOp;
-        case 2:  return this.rhsExpr;
-        case 3:  return this.andOperand;
+        case 0:  return this.realConst;
+        case 1:  return this.hiddenTUnderscore;
+        case 2:  return this.intKind;
+        case 3:  return this.namedConstKind;
         default: return null;
         }
     }
@@ -102,10 +93,10 @@ public class ASTOrOperandNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTOrOperandNode)value; return;
-        case 1:  this.andOp = (ASTOperatorNode)value; return;
-        case 2:  this.rhsExpr = (ASTAndOperandNode)value; return;
-        case 3:  this.andOperand = (ASTAndOperandNode)value; return;
+        case 0:  this.realConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

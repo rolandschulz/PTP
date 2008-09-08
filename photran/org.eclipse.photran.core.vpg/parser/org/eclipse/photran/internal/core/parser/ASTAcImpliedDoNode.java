@@ -27,17 +27,28 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTAcImpliedDoNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTAcImpliedDoNode
+    IExpr expr; // in ASTAcImpliedDoNode
     ASTAcImpliedDoNode nestedImpliedDo; // in ASTAcImpliedDoNode
-    ASTExprNode expr; // in ASTAcImpliedDoNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTAcImpliedDoNode
     ASTImpliedDoVariableNode impliedDoVariable; // in ASTAcImpliedDoNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTAcImpliedDoNode
-    ASTExprNode lb; // in ASTAcImpliedDoNode
+    IExpr lb; // in ASTAcImpliedDoNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma2; // in ASTAcImpliedDoNode
-    ASTExprNode ub; // in ASTAcImpliedDoNode
+    IExpr ub; // in ASTAcImpliedDoNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma3; // in ASTAcImpliedDoNode
-    ASTExprNode step; // in ASTAcImpliedDoNode
+    IExpr step; // in ASTAcImpliedDoNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAcImpliedDoNode
+
+    public IExpr getExpr()
+    {
+        return this.expr;
+    }
+
+    public void setExpr(IExpr newValue)
+    {
+        this.expr = newValue;
+    }
+
 
     public ASTAcImpliedDoNode getNestedImpliedDo()
     {
@@ -47,17 +58,6 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setNestedImpliedDo(ASTAcImpliedDoNode newValue)
     {
         this.nestedImpliedDo = newValue;
-    }
-
-
-    public ASTExprNode getExpr()
-    {
-        return this.expr;
-    }
-
-    public void setExpr(ASTExprNode newValue)
-    {
-        this.expr = newValue;
     }
 
 
@@ -72,34 +72,34 @@ public class ASTAcImpliedDoNode extends ASTNode
     }
 
 
-    public ASTExprNode getLb()
+    public IExpr getLb()
     {
         return this.lb;
     }
 
-    public void setLb(ASTExprNode newValue)
+    public void setLb(IExpr newValue)
     {
         this.lb = newValue;
     }
 
 
-    public ASTExprNode getUb()
+    public IExpr getUb()
     {
         return this.ub;
     }
 
-    public void setUb(ASTExprNode newValue)
+    public void setUb(IExpr newValue)
     {
         this.ub = newValue;
     }
 
 
-    public ASTExprNode getStep()
+    public IExpr getStep()
     {
         return this.step;
     }
 
-    public void setStep(ASTExprNode newValue)
+    public void setStep(IExpr newValue)
     {
         this.step = newValue;
     }
@@ -121,8 +121,8 @@ public class ASTAcImpliedDoNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTLparen;
-        case 1:  return this.nestedImpliedDo;
-        case 2:  return this.expr;
+        case 1:  return this.expr;
+        case 2:  return this.nestedImpliedDo;
         case 3:  return this.hiddenTComma;
         case 4:  return this.impliedDoVariable;
         case 5:  return this.hiddenTEquals;
@@ -141,16 +141,16 @@ public class ASTAcImpliedDoNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.nestedImpliedDo = (ASTAcImpliedDoNode)value; return;
-        case 2:  this.expr = (ASTExprNode)value; return;
+        case 1:  this.expr = (IExpr)value; return;
+        case 2:  this.nestedImpliedDo = (ASTAcImpliedDoNode)value; return;
         case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.impliedDoVariable = (ASTImpliedDoVariableNode)value; return;
         case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.lb = (ASTExprNode)value; return;
+        case 6:  this.lb = (IExpr)value; return;
         case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.ub = (ASTExprNode)value; return;
+        case 8:  this.ub = (IExpr)value; return;
         case 9:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.step = (ASTExprNode)value; return;
+        case 10: this.step = (IExpr)value; return;
         case 11: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

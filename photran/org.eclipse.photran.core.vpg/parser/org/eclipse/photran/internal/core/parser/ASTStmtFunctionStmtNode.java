@@ -32,7 +32,7 @@ public class ASTStmtFunctionStmtNode extends ASTNode implements IObsoleteActionS
     IASTListNode<ASTSFDummyArgNameListNode> SFDummyArgNameList; // in ASTStmtFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTStmtFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTStmtFunctionStmtNode
-    ASTExprNode expr; // in ASTStmtFunctionStmtNode
+    IExpr expr; // in ASTStmtFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTStmtFunctionStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -68,12 +68,12 @@ public class ASTStmtFunctionStmtNode extends ASTNode implements IObsoleteActionS
     }
 
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -117,7 +117,7 @@ public class ASTStmtFunctionStmtNode extends ASTNode implements IObsoleteActionS
         case 3:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.expr = (ASTExprNode)value; return;
+        case 6:  this.expr = (IExpr)value; return;
         case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
