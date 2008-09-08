@@ -21,7 +21,6 @@
 
    <url>
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
-      <discovery label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.0"/>
    </url>
 
    <requires>
