@@ -15,7 +15,7 @@
 		<property name="cdtDist" value="common/dist/cdt-master-5.0.1-I200808080802.zip"/>
 		<property name="mylynDist" value="common/dist/mylyn-3.0.1-e3.4.zip"/>
 		<property name="rseDist" value="common/dist/RSE-SDK-3.0.zip"/>
-		<property name="branchVersion" value="1.0"/>
+		<property name="branchVersion" value="2.1.0"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
