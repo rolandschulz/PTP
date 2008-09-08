@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.ptp.utils"
-      label="PTP Utilities Feature"
+      label="%featureName"
       version="2.1.0.qualifier"
-      provider-name="Eclipse.org">
+      provider-name="%providerName">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
