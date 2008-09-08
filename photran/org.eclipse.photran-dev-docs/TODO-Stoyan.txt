@@ -1,0 +1,17 @@
+TYPE CHECKER
+- Read: Fortran types, kinds, array forms; specification stmts
+- Type check constants
+- Expressions formed from constants
+- User-defined functions
+  - Optional arguments
+  - Keyword arguments
+- Intrinsic functions
+- Derived type components
+- Arrays
+- Structure constructors
+- Kinds?
+- Character length?
+
+CONTROL FLOW?
+
+CONSTANT (PARAMETER) EVALUATION?
