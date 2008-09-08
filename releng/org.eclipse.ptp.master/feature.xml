@@ -16,7 +16,7 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
-         
+
    <includes
          id="org.eclipse.ptp.utils"
          version="0.0.0"/>
@@ -28,10 +28,6 @@
    <includes
          id="org.eclipse.ptp.core"
          version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp"
-         version="0.0.0"/>         
 
    <includes
          id="org.eclipse.ptp.external"
@@ -56,7 +52,7 @@
    <includes
          id="org.eclipse.ptp.remotetools"
          version="0.0.0"/>
-         
+
    <includes
          id="org.eclipse.ptp.remote.remotetools"
          version="0.0.0"/>
