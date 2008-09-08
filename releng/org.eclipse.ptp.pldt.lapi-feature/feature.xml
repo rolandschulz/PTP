@@ -17,10 +17,6 @@
       %license
    </license>
 
-   <url>
-      <discovery label="%updateSiteName" url="http://update.eclipse.org/technology/ptp/releases"/>
-   </url>
-
    <requires>
       <import feature="org.eclipse.ptp.pldt" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
