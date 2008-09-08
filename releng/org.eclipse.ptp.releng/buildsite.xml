@@ -6,47 +6,41 @@
 	<feature url="features/org.eclipse.ptp.core_@buildVersion@.jar" id="org.eclipse.ptp.core" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
+	<feature url="features/org.eclipse.ptp.utils_@buildVersion@.jar" id="org.eclipse.ptp.utils" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
+	</feature>
 	<feature url="features/org.eclipse.ptp.remotetools_@buildVersion@.jar" id="org.eclipse.ptp.remotetools" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.rm.ibm.ll_@buildVersion@.jar" id="org.eclipse.ptp.rm.ibm.ll" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.rm.ibm.pe_@buildVersion@.jar" id="org.eclipse.ptp.rm.ibm.pe" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
-	</feature>
-	<feature url="features/org.eclipse.ptp.rm.mpich2_@buildVersion@.jar" id="org.eclipse.ptp.rm.mpich2" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.remote.remotetools_@buildVersion@.jar" id="org.eclipse.ptp.remote.remotetools" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.remote.rse_@buildVersion@.jar" id="org.eclipse.ptp.remote.rse" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
-	</feature>
-	<feature url="features/org.eclipse.ptp_@buildVersion@.jar" id="org.eclipse.ptp" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.debug.sdm_@buildVersion@.jar" id="org.eclipse.ptp.debug.sdm" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.external_@buildVersion@.jar" id="org.eclipse.ptp.external" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
-	</feature>
-	<feature url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" id="org.eclipse.ptp.rdt" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.remote_@buildVersion@.jar" id="org.eclipse.ptp.remote" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.rm.openmpi_@buildVersion@.jar" id="org.eclipse.ptp.rm.openmpi" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.pldt_@buildVersion@.jar" id="org.eclipse.ptp.pldt" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature url="features/org.eclipse.ptp.pldt.lapi_@buildVersion@.jar" id="org.eclipse.ptp.pldt.lapi" version="@buildVersion@">
-      <category name="Parallel Tools Platform 2.1"/>
+		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
 	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
 		<category name="Remote Development Tools"/>
