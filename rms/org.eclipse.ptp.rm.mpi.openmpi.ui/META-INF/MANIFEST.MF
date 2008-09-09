@@ -17,4 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.rm.core
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.rm.mpi.openmpi.ui.wizards
+Export-Package: org.eclipse.ptp.rm.mpi.openmpi.ui,
+ org.eclipse.ptp.rm.mpi.openmpi.ui.launch,
+ org.eclipse.ptp.rm.mpi.openmpi.ui.preferences,
+ org.eclipse.ptp.rm.mpi.openmpi.ui.wizards
