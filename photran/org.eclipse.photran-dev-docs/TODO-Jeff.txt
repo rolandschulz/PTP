@@ -1,6 +1,7 @@
 GRANT/SUPPORT REQUIREMENTS
 - 2003 syntax (10/08 or 11/08)
 + Fix AST for expressions (for Stoyan 9/8/08)
+- Include intent, etc. in definition
 - Make a Type object for arrays which includes dimensions (for Stoyan)
 - Parse kinds and character lengths and include in Type
 
