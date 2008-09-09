@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -109,10 +110,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			String directory = null;
 			try {
 				AttributeManager baseSubstitutionAttributeManager = retrieveBaseSubstitutionAttributes();
+				//System.out.println(baseSubstitutionAttributeManager);
 				environment = retrieveEnvironment(baseSubstitutionAttributeManager);
 				directory = retrieveWorkingDirectory(baseSubstitutionAttributeManager);
 
 				AttributeManager commandSubstitutionAttributeManager = retrieveCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
+				//System.out.println(commandSubstitutionAttributeManager);
 				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 				if (debugAttr != null && debugAttr.getValue()) {
 					command = retrieveCreateDebugCommand(commandSubstitutionAttributeManager);
@@ -259,10 +262,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected String retrieveWorkingDirectory(AttributeManager baseSubstitutionAttributeManager) {
 		/*
-		 * TODO Add substitution variables.
 		 * TODO Return IPath instead of string
 		 */
-		return attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
+		String workdir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
+		String newWorkdir = replaceVariables(workdir, baseSubstitutionAttributeManager);
+		if (! workdir.equals(newWorkdir)) {
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "Changed work directory from {0} to {1}", workdir, newWorkdir);
+			workdir = newWorkdir;
+		}
+		return workdir;
 	}
 
 	/**
@@ -286,8 +294,18 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		}
 
 		/*
-		 * TODO Add substitution variables.
+		 * Do substitution on each environment variable.
 		 */
+		for (Iterator<Entry<String, String>> iterator = environmentMap.entrySet().iterator(); iterator.hasNext();) {
+			Entry<String, String> env = iterator.next();
+			String value = env.getValue();
+			String newValue = replaceVariables(value, baseSubstitutionAttributeManager);
+			if (! value.equals(newValue)) {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "Changed environment '{0}={1}' to '{0}={2}", env.getKey(), value, newValue);
+				env.setValue(newValue);
+			}
+		}
+		
 		return environmentMap;
 	}
 
