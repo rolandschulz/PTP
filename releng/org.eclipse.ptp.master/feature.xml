@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.ptp.master"
-      label="PTP Master Feature"
+      label="%featureName"
       version="2.1.0"
-      provider-name="Eclipse.org">
+      provider-name="%providerName">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description>
+      %description
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright>
+      %copyright
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="%licenseURL">
+      %license
    </license>
 
    <includes
