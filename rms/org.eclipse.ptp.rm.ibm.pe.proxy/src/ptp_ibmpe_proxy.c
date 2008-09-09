@@ -921,7 +921,6 @@ run(int trans_id, int nargs, char *args[])
     char *cwd;
     jobinfo *job;
     int i;
-    int nprocs;
     int label_io;
     int split_io;
     int status;
@@ -1015,9 +1014,6 @@ run(int trans_id, int nargs, char *args[])
 		    if (n < (sizeof mp_infolevel_labels / sizeof(char *))) {
 			sprintf(cp + 1, "%d", n);
 		    }
-		}
-		else if (strcmp(args[i], "MP_PROCS") == 0) {
-			nprocs = strtod(cp + 1, 10);
 		}
 		/*
 		 * Restore the '=' in the environment variable setting
@@ -1294,7 +1290,7 @@ run(int trans_id, int nargs, char *args[])
 	    jobname[sizeof jobname - 1] = '\0';
 	    enqueue_event(proxy_new_job_event(start_events_transid,
 					      queue_id_str, jobid_str, jobname, JOB_STATE_INIT,
-					      job->submit_jobid, nprocs));
+					      job->submit_jobid));
 	}
     }
     send_ok_event(trans_id);
