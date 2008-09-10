@@ -20,7 +20,7 @@
 	<property name="remoteServerTempDir" value="${basedir}/rdt-server"/>
 	<property name="platformTempDir" value="${basedir}/platform.temp"/>
 	
-	<property name="platformBaseUrl" value="http://ganymede-mirror2.eclipse.org/eclipse/downloads/drops"/>
+	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
 	<property name="platformVersion" value="R-3.4-200806172000"/>
 	<property name="platformBaseName" value="eclipse-platform-3.4"/>
 	
@@ -33,11 +33,11 @@
 	<property name="filesystemVersion" value="1.2.0.v20080604-1400"/>
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
-	<property name="rseBaseUrl" value="http://ganymede-mirror2.eclipse.org/dsdp/tm/downloads/drops"/>
+	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
 	<property name="rseVersion" value="R-3.0-200806202130"/>
 	<property name="dStoreBaseName" value="rseserver-3.0"/>
 	
-	<target name="fetch" depends="fetch.platform, fetch.rse"/>
+	<target name="fetch" depends="fetch.platform, fetch.rse" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="jar" depends="generate.build.scripts">
