@@ -154,6 +154,9 @@
 			
 		<delete dir="${remoteServerTempDir}"/>
 		<untar src="${downloads}/${dStoreBaseName}-${platform}.tar" dest="${remoteServerTempDir}"/>
+		
+		<!-- Add CDTMiner to minerFile.dat -->
+		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.rdt.core.miners.CDTMiner</concat>
 
 		<!-- Add RDT JARs to the server script's classpath -->
 		<antcall target="prepare.script.${platform}"/>
@@ -180,6 +183,9 @@
 		<delete dir="${remoteServerTempDir}"/>
 		<unzip src="${downloads}/${dStoreBaseName}-${platform}.zip" dest="${remoteServerTempDir}"/>
 
+		<!-- Add CDTMiner to minerFile.dat -->
+		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.rdt.core.miners.CDTMiner</concat>
+		
 		<!-- Add RDT JARs to the server script's classpath -->
 		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\stubs.jar"/>
 		<replace token=";%CLASSPATH%" value=";${rdtClassPath};%CLASSPATH%" file="${remoteServerTempDir}/setup.bat"/>
