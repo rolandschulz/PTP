@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
+import org.eclipse.ptp.remotetools.environment.core.ChildrenProviderManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
@@ -42,18 +43,19 @@ public class EnvironmentPlugin extends Plugin {
 	final public static String FILENAME = "environments.xml"; //$NON-NLS-1$
 	final public static String EXT_CONTROLS_ID = "org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate"; //$NON-NLS-1$
 	final private static String ID = "org.eclipse.ptp.remotetools.environment.core"; //$NON-NLS-1$
-	
+
 	//The shared instance.
 	private static EnvironmentPlugin plugin;
 	private TargetEnvironmentManager manager;
-	
+	private ChildrenProviderManager childrenProviderMgr;
+
 	/**
 	 * The constructor.
 	 */
 	public EnvironmentPlugin() {
 		plugin = this;
 	}
-	
+
 	public Map getControls() {
 		final Map controls = new HashMap();
 		ProcessExtensions.process(EXT_CONTROLS_ID, new IProcessMemberVisitor() {
@@ -76,13 +78,20 @@ public class EnvironmentPlugin extends Plugin {
 		});
 		return controls;
 	}
-	
+
 	public TargetEnvironmentManager getTargetsManager() {
 		if (manager == null)
 			manager = new TargetEnvironmentManager();
 		return manager;
 	}
-		
+	
+	public ChildrenProviderManager getChildrenProviderManager() {
+		if (childrenProviderMgr == null) {
+			childrenProviderMgr = new ChildrenProviderManager();
+		}
+		return childrenProviderMgr;
+	}
+	
 	/**
 	 * This method is called upon plug-in activation
 	 */
@@ -98,7 +107,7 @@ public class EnvironmentPlugin extends Plugin {
 		manager.writeToFile();
 		plugin = null;
 	}
-	
+
 	/**
 	 * Notifies all target elements of the plugin that includes
 	 * the parameter class. This parameter class must implement the
@@ -150,7 +159,7 @@ public class EnvironmentPlugin extends Plugin {
 		long envID = System.currentTimeMillis();
 		return String.valueOf(envID);
 	}
-	
+
 //	 Key that address the unique identifier of a given environment instance
 	public static final String ATTR_CORE_ENVIRONMENTID = "core-environmentid";
 	

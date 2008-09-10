@@ -12,4 +12,5 @@ Require-Bundle: org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ui
 Eclipse-AutoStart: true
 Export-Package: org.eclipse.ptp.remotetools.environment.ui,
+ org.eclipse.ptp.remotetools.environment.ui.extension,
  org.eclipse.ptp.remotetools.environment.ui.views
