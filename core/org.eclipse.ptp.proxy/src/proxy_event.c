@@ -222,7 +222,7 @@ proxy_new_machine_event(int trans_id, char *rm_id, char *machine_id_range, char 
  * New jobs created in response to a submitJob event *MUST* provide the job submission ID.
  */
 proxy_msg *
-proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId, int nprocs)
+proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_JOB, trans_id);
 
@@ -239,7 +239,6 @@ proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name
 
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
-	proxy_msg_add_keyval_int(m, JOB_NUM_PROCS_ATTR, nprocs);
 
 	return m;
 }
