@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 public abstract class DocumentBackedElementHandler implements IElementHandler {
 
 	private Element fFiles;
+	private Element fProperties;
 	private Document fDocument;
 	private String fBasePath;
 
@@ -47,8 +48,10 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 		fDocument.appendChild(root);
 		
 		fFiles = fDocument.createElement("files"); //$NON-NLS-1$
+		fProperties = fDocument.createElement("properties"); //$NON-NLS-1$
 		
 		root.appendChild(fFiles);
+		root.appendChild(fProperties);
 	}
 	
 	/**
@@ -72,7 +75,11 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 		
 		String basePath = fBasePath + "/" + folder + "/" + path;  //$NON-NLS-1$//$NON-NLS-2$
 		for (String name : collectTopLevelClasses(basePath, fileName)) {
-			Element element = fDocument.createElement("file"); //$NON-NLS-1$
+			Element element;
+			if (fileName.endsWith(".properties"))
+				element = fDocument.createElement("properties_file"); //$NON-NLS-1$
+			else
+				element = fDocument.createElement("file"); //$NON-NLS-1$
 			element.setAttribute("folder", project); //$NON-NLS-1$
 			
 			// Strip off ".java" from the end.
@@ -84,7 +91,11 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 			className.append(name.replaceAll("\\.java$", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			element.setTextContent(className.toString());
-			fFiles.appendChild(element);
+			
+			if (fileName.endsWith(".properties"))
+				fProperties.appendChild(element);
+			else
+				fFiles.appendChild(element);			
 		}
 	}
 
@@ -112,6 +123,8 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 				String basePath = path.length() == 0 ? file.getName() : path + "/" + file.getName(); //$NON-NLS-1$
 				expandFolders(file, project, basePath, sourceFolder, expandSubFolders);
 			} else if (file.getName().endsWith(".java")) { //$NON-NLS-1$
+				addFile(project, path, file.getName(), sourceFolder);
+			} else if (file.getName().endsWith(".properties")) { //$NON-NLS-1$
 				addFile(project, path, file.getName(), sourceFolder);
 			}
 		}
