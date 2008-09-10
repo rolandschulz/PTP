@@ -69,13 +69,13 @@
          id="org.eclipse.ptp.rdt.ui.remoteceditor"
          point="org.eclipse.ui.editors">
       <editor
-            default="true"
-            name="%remoteEditor.name"
-            icon="icons/obj16/c_file_obj.gif"
             class="org.eclipse.ptp.internal.rdt.ui.editor.CEditor"
             contributorClass="org.eclipse.ptp.internal.rdt.ui.editor.CEditorActionContributor"
-            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
-            id="org.eclipse.pdt.rdt.ui.editor.CEditor">
+            default="true"
+            icon="icons/obj16/c_file_obj.gif"
+            id="org.eclipse.pdt.rdt.ui.editor.CEditor"
+            name="%remoteEditor.name"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont">
             <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
             <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxSource"/>
             <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxHeader"/>
@@ -253,6 +253,55 @@
             name="Symbols"
             parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage">
       </tab>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.ptp.rdt.ui.perspectives.RemoteCPerspectiveFactory"
+            id="org.eclipse.ptp.rdt.ui.remoteCPerspective"
+            name="%perspective.name.0">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+         <newWizardShortcut
+               id="org.eclipse.ptp.rdt.ui.newRemoteProjectWizard">
+         </newWizardShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.debug.ui.DebugPerspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         name="RSE extensions to Remote C/C++ Development Perspective"
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+         <view
+               id="org.eclipse.rse.ui.view.systemView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer">
+         </view>
+         <view
+               id="org.eclipse.rse.shells.ui.view.commandsView"
+               minimized="false"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ptp.rdt.ui.callHierarchy">
+         </view>
+         <viewShortcut
+               id="org.eclipse.rse.ui.view.systemView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.rse.shells.ui.view.commandsView">
+         </viewShortcut>
+         <newWizardShortcut
+               id="org.eclipse.rse.ui.newWizards.connection">
+         </newWizardShortcut>
+      </perspectiveExtension>
    </extension>
    
 </plugin>
