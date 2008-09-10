@@ -15,6 +15,9 @@ feature@org.eclipse.ptp.external=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cv
 feature@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature
 feature@org.eclipse.ptp.pldt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.pldt-feature
 feature@org.eclipse.ptp.pldt.lapi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.pldt.lapi-feature
+feature@org.eclipse.ptp.perf=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.perf-feature
+feature@org.eclipse.ptp.perf.tau=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.perf.tau-feature
+feature@org.eclipse.ptp.perf.tau.fortran=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.perf.tau.fortran-feature
 feature@org.eclipse.ptp.rdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt-feature
 
 ! Plugins
@@ -70,6 +73,14 @@ plugin@org.eclipse.ptp.pldt.openmp.analysis=@ptpTag@,:pserver:anonymous@dev.ecli
 plugin@org.eclipse.ptp.pldt.openmp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.core
 plugin@org.eclipse.ptp.pldt.openmp.ui.pv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv
 plugin@org.eclipse.ptp.pldt.wizards=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards
+plugin@org.eclipse.ptp.perf=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf
+plugin@org.eclipse.ptp.perf.tau=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau
+plugin@org.eclipse.ptp.perf.tau.jars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.jars
+plugin@org.eclipse.ptp.perf.tau.papiselect=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.papiselect
+plugin@org.eclipse.ptp.perf.tau.perfdmf=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.perfdmf
+plugin@org.eclipse.ptp.perf.tau.selinst=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.selinst
+plugin@org.eclipse.ptp.perf.tau.selinstfort=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.selinstfort
+plugin@org.eclipse.ptp.perf.toolopts=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.toolopts
 plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core
 plugin@org.eclipse.ptp.rdt.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui
 plugin@org.eclipse.ptp.rdt.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.services
@@ -81,7 +92,9 @@ fragment@org.eclipse.ptp.linux.x86=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/
 fragment@org.eclipse.ptp.linux.x86_64=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.linux.x86_64
 fragment@org.eclipse.ptp.macosx.ppc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.macosx.ppc
 fragment@org.eclipse.ptp.macosx.x86=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.macosx.x86
+fragment@org.eclipse.ptp.perf.parallel=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.parallel
 
 ! Tests
+plugin@org.eclipse.ptp.perf.tau.papitest=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.papitest
 plugin@org.eclipse.ptp.rdt.core.tests=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests
 

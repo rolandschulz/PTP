@@ -87,6 +87,7 @@
 	<replace dir="${buildDirectory}/plugins" value="${timestamp}" token="@build@">
 		<include name="**/about.mappings" />
 	</replace>
+	<unzip src="${tauJars}" dest="${buildDirectory}/eclipse"/>
 </target>
 
 <!-- ===================================================================== -->
