@@ -103,7 +103,7 @@ proxy_msg *	proxy_terminatejob_error_event(int trans_id, char *job_id, int code,
 proxy_msg *	proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int disp, int def);
 proxy_msg *	proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, int disp, char *def);
 proxy_msg *	proxy_new_machine_event(int trans_id, char *rm_id, char *machine_id_range, char *name, char *state);
-proxy_msg *	proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId, int nprocs);
+proxy_msg *	proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId);
 proxy_msg *	proxy_new_node_event(int trans_id, char *mach_id, int num_nodes);
 void		proxy_add_node(proxy_msg *m, char *node_id, char *name, char *state, int extra_attrs);
 proxy_msg *	proxy_new_process_event(int trans_id, char *job_id, int num_procs);
