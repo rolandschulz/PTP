@@ -13,10 +13,18 @@ package org.eclipse.ptp.remotetools.environment.ui.views;
 
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
@@ -38,7 +46,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TableTreeViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -50,6 +58,7 @@ import org.eclipse.ptp.remotetools.environment.core.ITargetEventListener;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
+import org.eclipse.ptp.remotetools.environment.extension.INode;
 import org.eclipse.ptp.remotetools.environment.ui.UIEnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
 import org.eclipse.swt.SWT;
@@ -58,8 +67,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -84,7 +93,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionChangedListener,ITargetEventListener {
 	
-	private TableTreeViewer viewer;
+	private TreeViewer viewer;
 	private Action startAction;
 	private Action stopAction;
 	private Action resumeAction;
@@ -94,6 +103,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	private Action removeAction;
 	private Action doubleClickAction;
 	
+	private List<Action> workloadControllers = new ArrayList<Action>();
 	// Set the table column property names
 	private final String ENVIRONMENT_CONTROL_NAME		= "Target Environment";
 	private final String ENVIRONMENT_CONTROL_STATUS		= "Status";
@@ -120,8 +130,8 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	 */
 	
 	class ViewContentProvider implements ITreeContentProvider {
-		  private final Object[] EMPTY = new Object[] {};
-
+	      private final Object[] EMPTY = new Object[] {};
+	      
 		  /**
 		   * Gets the children for a TargetEnvironmentTypeElement or TargetEnvironmentConfigElement
 		   * 
@@ -130,9 +140,14 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		   * @return Object[]
 		   */
 		  public Object[] getChildren(Object arg0) {
-		    if (arg0 instanceof TargetTypeElement)
-		      return ((TargetTypeElement) arg0).getElements().toArray();
-		   
+		    if (arg0 instanceof TargetTypeElement) {
+		    	return ((TargetTypeElement) arg0).getElements().toArray();	
+		    }else if (arg0 instanceof ITargetElement){
+		        // gets the children of ITargetElement
+		    	return EnvironmentPlugin.getDefault().getChildrenProviderManager().getChildren((ITargetElement)arg0);		    	
+		    }else if (arg0 instanceof INode) {
+		        return ((INode) arg0).getChildren();
+		    }
 		    return EMPTY;
 		  }
 
@@ -144,7 +159,12 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		   * @return Object
 		   */
 		  public Object getParent(Object arg0) {
-		    return ((ITargetElement) arg0).getType();
+			if (arg0 instanceof ITargetElement) {
+				return ((ITargetElement) arg0).getType();
+			}else if (arg0 instanceof INode) {
+			    return ((INode) arg0).getParent();
+			}
+			return null;
 		  }
 
 		  /**
@@ -166,13 +186,15 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		   * @return Object[]
 		   */
 		  public Object[] getElements(Object arg0) {
-		    // Returns all the teams in the model
-		    return model.getTypeElements().toArray();
-		  }
+			if (arg0 instanceof Object[]) {
+				return (Object[]) arg0;
+			}
+			return getChildren(arg0);
+		}
 
 		  /**
-		   * Disposes any resources
-		   */
+			 * Disposes any resources
+			 */
 		  public void dispose() {
 		  }
 
@@ -199,7 +221,11 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 			
 	        switch (index) {
 	            case 0:
-	            	result = obj.toString();
+	                if (obj instanceof INode) {
+	                    result = ((INode) obj).getDisplayText();
+	                }else {
+	                    result = obj.toString();
+	                }
 	                break;
 	            case 1 :
 	            	if (TargetElement.class.isAssignableFrom(obj.getClass())) {
@@ -227,17 +253,25 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		}
 		
 		public Image getColumnImage(Object obj, int index) {
-			if (index == 0 &&
-					TargetElement.class.isAssignableFrom(obj.getClass()) )
-				return getImage(obj);
+			if (index == 0 ) {
+			   if (obj instanceof INode) {
+			       return ((INode) obj).getIcon();
+			   }else {
+			       return getImage(obj);
+			   }
+			}
 			return null;
 		}
 		
 		public Image getImage(Object obj) {
-			if (viewIcon == null) {
-				URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/monitor_obj.gif");
-			    ImageDescriptor imageMonitorDescriptor = ImageDescriptor.createFromURL(url);
-			    viewIcon = imageMonitorDescriptor.createImage();
+			if (TargetTypeElement.class.isAssignableFrom(obj.getClass())) {
+                URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/connect_create.gif");
+                ImageDescriptor imageMonitorDescriptor = ImageDescriptor.createFromURL(url);
+                viewIcon = imageMonitorDescriptor.createImage();
+			} else if (TargetElement.class.isAssignableFrom(obj.getClass())) {
+			    URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/monitor_obj.gif");
+                ImageDescriptor imageMonitorDescriptor = ImageDescriptor.createFromURL(url);
+                viewIcon = imageMonitorDescriptor.createImage();
 			}
 			return viewIcon;
 		}
@@ -265,15 +299,23 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	 */
 	public void createPartControl(Composite parent) {
 		
-		viewer = new TableTreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(new ViewContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setSorter(new NameSorter());
 		defineTable(viewer);
 		viewer.setColumnProperties(columnNames);
-		viewer.setInput(getViewSite());
+		// viewer.setInput(getViewSite());
+		viewer.setInput(model.getTypeElements().toArray());
+		viewer.refresh();
 		getSite().setSelectionProvider(viewer);
 		viewer.addSelectionChangedListener(this);
+		workloadControllers = getWorkloadControllers();
+		for (Action controller : workloadControllers) {
+			if(controller instanceof ISelectionChangedListener) {
+				viewer.addSelectionChangedListener((ISelectionChangedListener) controller);
+			}
+		}
 		model.addModelEventListener(this);
 		makeActions();
 		hookContextMenu();
@@ -284,20 +326,20 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	    parent.pack();
 
 	    // Scroll to top
-	    viewer.reveal(viewer.getElementAt(0));
+	    viewer.reveal(viewer.getTree().getItem(0));
 	}
 
-	private void defineTable(TableTreeViewer viewer) {
-		Table t = viewer.getTableTree().getTable();
+	private void defineTable(TreeViewer viewer) {
+		Tree t = viewer.getTree();
 		t.setHeaderVisible(true);
 		
 		// 1st column with image/checkboxes - NOTE: The SWT.CENTER has no effect!!
-		TableColumn column = new TableColumn(t, SWT.LEFT, 0);		
+		TreeColumn column = new TreeColumn(t, SWT.LEFT, 0);		
 		column.setText(ENVIRONMENT_CONTROL_NAME);
 		column.setWidth(650);
 		
 		// 2nd column with task Description
-		column = new TableColumn(t, SWT.RIGHT, 1);
+		column = new TreeColumn(t, SWT.RIGHT, 1);
 		column.setText(ENVIRONMENT_CONTROL_STATUS);
 		column.setWidth(50);
 		
@@ -337,13 +379,14 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 							editAction.setEnabled(false);
 							removeAction.setEnabled(false);
 						}
+						RemoteToolsEnvironmentView.this.fillContextMenu(manager);
 					} else if (TargetTypeElement.class.isAssignableFrom(obj.getClass())) {
 						//Create
 						createAction.setEnabled(true);
 						editAction.setEnabled(false);
 						removeAction.setEnabled(false);
+						RemoteToolsEnvironmentView.this.fillContextMenu(manager);
 					}
-					RemoteToolsEnvironmentView.this.fillContextMenu(manager);
 				}
 			}
 		});
@@ -373,13 +416,45 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	}
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
+		// Other plug-ins can contribute there actions here
+		for (Action controller : workloadControllers) {
+			manager.add(controller);
+		}
+		
 		manager.add(startAction);
 		manager.add(stopAction);
 		manager.add(resumeAction);
 		manager.add(pauseAction);
 	}
 	
-	private void refresh() {
+	private List<Action> getWorkloadControllers() {
+
+		List<Action> actions = new ArrayList<Action>();
+		
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry
+				.getExtensionPoint("org.eclipse.ptp.remotetools.environment.ui.workloadController");
+		IExtension[] extensions = extensionPoint.getExtensions();
+
+		try {
+			for (int i = 0; i < extensions.length; i++) {
+				IExtension extension = extensions[i];
+				IConfigurationElement[] elements = extension
+						.getConfigurationElements();
+				for (int j = 0; j < elements.length; j++) {
+				    IConfigurationElement element = elements[j];
+	                if ("controllerDelegate".equals(element.getName())) {
+	                    actions.add((Action) element.createExecutableExtension("class"));
+	                }
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return actions.isEmpty() ? Collections.EMPTY_LIST : actions;
+	}
+	
+	public void refresh() {
 		final Display display = viewer.getControl().getDisplay();
 		display.asyncExec(new Runnable() {
 		      public void run () {
@@ -685,9 +760,13 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 						e.printStackTrace();
 					}					
 				}
-				
-				
-				//showMessage("Double-click detected on "+obj.toString(),viewer);
+
+                if (INode.class.isAssignableFrom(obj.getClass())) {
+                    INode node = (INode) obj;
+                    UIEnvironmentPlugin.getDefault().getDoubleClickHandlerManager().doubleClickExecute(node);
+                }
+
+               //showMessage("Double-click detected on "+obj.toString(),viewer);
 			}
 		};		
 		
@@ -699,7 +778,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		removeAction.setEnabled(false);
 		
 	}
-
+	
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
@@ -708,14 +787,14 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		});
 	}
 	
-	private void showMessage(String message,TableTreeViewer viewer) {
+	private void showMessage(String message,TreeViewer viewer) {
 		MessageDialog.openInformation(
 			viewer.getControl().getShell(),
 			"Environments",
 			message);
 	}
 
-	private boolean showConfirm(String message,TableTreeViewer viewer) {
+	private boolean showConfirm(String message,TreeViewer viewer) {
 		return MessageDialog.openConfirm(
 			viewer.getControl().getShell(),
 			"Environments",

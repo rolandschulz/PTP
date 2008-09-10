@@ -11,8 +11,9 @@
  */
 package org.eclipse.ptp.remotetools.environment.ui;
 
-import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.remotetools.environment.ui.extension.DoubleClickHandlerManager;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -25,6 +26,8 @@ public class UIEnvironmentPlugin extends AbstractUIPlugin {
 
 	//The shared instance.
 	private static UIEnvironmentPlugin plugin;
+	
+	private DoubleClickHandlerManager doubleClickHandlerMgr;
 	
 	/**
 	 * The constructor.
@@ -64,5 +67,12 @@ public class UIEnvironmentPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.remotetools.environment", path);
+	}
+	
+	public DoubleClickHandlerManager getDoubleClickHandlerManager() {
+	    if (doubleClickHandlerMgr == null) {
+	        doubleClickHandlerMgr = new DoubleClickHandlerManager();
+	    }
+	    return doubleClickHandlerMgr;
 	}
 }
