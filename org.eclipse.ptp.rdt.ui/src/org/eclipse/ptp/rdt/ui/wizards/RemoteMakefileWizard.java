@@ -27,7 +27,7 @@ public class RemoteMakefileWizard extends AbstractCWizard {
 
 	private static final String ID = "org.eclipse.ptp.rdt.ui.wizards.RemoteMakefileWizard"; //$NON-NLS-1$
 	private static final String NAME = Messages.getString("RemoteMakefileWizard.0"); //$NON-NLS-1$
-
+	public static final String EMPTY_PROJECT = Messages.getString("RemoteMakefileWizard.1"); //$NON-NLS-1$
 
 	public RemoteMakefileWizard() {
 	}
@@ -44,7 +44,11 @@ public class RemoteMakefileWizard extends AbstractCWizard {
 			if (isValid(tcs[i], supportedOnly, wizard)) 
 				handler.addTc(tcs[i]);
 		EntryDescriptor ed = new EntryDescriptor(ID, null, NAME, true, handler, null); 
-		return new EntryDescriptor[] {ed};
+		// A default project type for that category -- not using any template.
+		EntryDescriptor entryDescriptor = new EntryDescriptor(ID + ".default", ID, //$NON-NLS-1$
+				EMPTY_PROJECT, false, handler, null);
+		entryDescriptor.setDefaultForCategory(true);
+		return new EntryDescriptor[] {ed, entryDescriptor};
 	}
 
 }
