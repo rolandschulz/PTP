@@ -1,0 +1,18 @@
+# ptpbuild wrapper script
+# set up anything environment specific that needs to be done before
+# launching the build script in the releng project
+
+# create the releng staging directory and go there
+mkdir -p /opt/public/download-staging.priv/tools/ptp/releng
+cd /opt/public/download-staging.priv/tools/ptp/releng
+
+# remove the old build
+rm -fr org.eclipse.ptp
+
+# Check out the releng project
+export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
+cvs co org.eclipse.ptp/releng/org.eclipse.ptp.releng
+
+# run the main script
+cd org.eclipse.ptp/releng/org.eclipse.ptp.releng
+sh build.sh $* 2>&1 | tee ../../../build.log
