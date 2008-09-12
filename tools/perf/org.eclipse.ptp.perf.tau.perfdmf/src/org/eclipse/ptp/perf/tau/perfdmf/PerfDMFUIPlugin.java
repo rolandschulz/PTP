@@ -93,7 +93,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
      * @param location The location of the profile data
      * @return True on success, false on failure to upload
      */
-    public static boolean addPerformanceData(String projectName, String projectType, String location, String dbname) {
+    public static boolean displayPerformanceData(String projectName, String projectType, String trialName) {//, String location, String dbname
         try {
             PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow()
@@ -101,7 +101,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
             .showView("org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView");
 
             // when that class is initialized, it will call registerPerfDMFView so we can get a handle on it
-            return theView.addProfile(projectName, projectType, location, dbname);
+            return theView.showProfile(projectName, projectType, trialName); // location,dbname
             
             //return true;
 

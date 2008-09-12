@@ -93,6 +93,11 @@ public interface ITAULaunchConfigurationConstants {
 	 */
 	public static final String NODB="No databases available";
 	
+	//public static final String PARA_PERF_SCRIPT="path to the perfexplorer script to use in parametric study";
+	//public static final String PARA_VAR_VALUES="env-var values to use in parametric study";
+	
+	//public static final String PERF_LAUNCH_PERFEX="launch perfexplorer along with other tau profile management activity";
+	
 //	/**
 //	 * Constant for tracking the global TAU arch directory path preference
 //	 */

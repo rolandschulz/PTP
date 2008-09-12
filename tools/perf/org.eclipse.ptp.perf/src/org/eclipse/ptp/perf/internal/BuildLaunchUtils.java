@@ -219,7 +219,7 @@ public class BuildLaunchUtils {
 	 * @param env A list of environment variables to associate with the tool
 	 * @param directory The directory where the tool is invoked
 	 */
-	public static void runTool(String tool, String[] env, File directory)
+	public static boolean runTool(String tool, String[] env, File directory)
 	{
 		String s = new String();
 		try {
@@ -240,11 +240,16 @@ public class BuildLaunchUtils {
 				//read the output from the command
 				while ((s = stdErr.readLine()) != null) 
 				{
-					System.out.println(s);
+					System.err.println(s);
 				}
+				return false;
 			}
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+			}
+		return true;
 	}
 	
 }

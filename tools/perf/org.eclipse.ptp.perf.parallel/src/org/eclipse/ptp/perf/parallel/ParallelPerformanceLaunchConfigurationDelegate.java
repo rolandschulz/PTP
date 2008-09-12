@@ -50,8 +50,16 @@ public class ParallelPerformanceLaunchConfigurationDelegate extends ParallelLaun
 		wc.setAttribute(PERF_PROJECT_NAME, projName);
 		wc.doSave();
 		
-		
-		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new ParallelLaunchConfigurationDelegate(),IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
-		plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
+		boolean useParam=configuration.getAttribute(PARA_USE_PARAMETRIC, false);
+		if(useParam)
+		{
+			PerformanceParametricLaunchManager plaunch=new PerformanceParametricLaunchManager(new ParallelLaunchConfigurationDelegate(),IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
+			plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
+		}
+		else
+		{
+			PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new ParallelLaunchConfigurationDelegate(),IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
+			plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
+		}
 	}
 }

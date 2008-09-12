@@ -99,4 +99,31 @@ public interface IPerformanceLaunchConfigurationConstants {
 	public static final String PERF_EXECUTABLE_NAME= "perf_executable_name";
 	public static final String PERF_PROJECT_NAME= "perf_project_name";
 	
+	//The following are for parametric test values
+	
+	public static final String PARA_NUM_PROCESSORS="processors to use in parametric study";
+	public static final String PARA_OPT_LEVELS="compiler optimization levels to use in parametric study";
+	
+	public static final String PARA_ALL_COMBO="use simple weak scaling in perf parametric tests";
+	
+	public static final String PARA_ARG_NAMES="argument names use in parametric study";
+	public static final String PARA_ARG_BOOLS="tells which para args are checked";
+	
+	public static final String PARA_ARG_VALUES="argument values use in parametric study";
+	
+	
+	public static final String PARA_VAR_NAMES="env-var names to use in parametric study";
+	public static final String PARA_VAR_BOOLS="tells which para vars are checked";
+	
+	public static final String PARA_VAR_VALUES="env-var values to use in parametric study";
+	
+	public static final String PARA_PERF_SCRIPT="path to the perfexplorer script to use in parametric study";
+	//public static final String PARA_VAR_VALUES="env-var values to use in parametric study";
+	
+	public static final String PARA_USE_PARAMETRIC="use the parametric analysis system";
+	
+	public static final String PERF_LAUNCH_PERFEX="launch perfexplorer along with other tau profile management activity";
+	public static final String PERF_EXPERIMENT_APPEND="string that will override the default experiment identifier used in perfdmf storage";
+	public static final String PERF_XML_METADATA="string representation of xml metadata file for perfexplorer";
+	
 }

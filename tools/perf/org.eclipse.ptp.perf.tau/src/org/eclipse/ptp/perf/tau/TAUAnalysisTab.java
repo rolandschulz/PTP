@@ -1060,10 +1060,12 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PORTAL,
 				portalCheck.getSelection());
 
+		/*
+		 * If varmap is null and avm is not... or vm is not null and avm is null... or neither are null and they're equal
+		 */
 		if (((varmap == null) && (archvarmap != null))
 				|| ((varmap != null) && (archvarmap == null))
-				|| ((varmap != null) && (archvarmap != null) && !varmap
-						.equals(archvarmap))) {
+				|| ((varmap != null) && (archvarmap != null) && !varmap.equals(archvarmap))) {
 			Map<String, Object> envvars = null;
 
 			try {

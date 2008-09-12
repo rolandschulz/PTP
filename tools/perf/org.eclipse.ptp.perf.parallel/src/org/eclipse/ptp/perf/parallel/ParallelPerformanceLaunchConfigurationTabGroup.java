@@ -41,8 +41,11 @@ public class ParallelPerformanceLaunchConfigurationTabGroup extends AbstractLaun
 	 * Creates the tabs used by the performance launch configuration system
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
+		
+		int numStatTabs=9;
+		
 		ArrayList<AbstractPerformanceConfigurationTab> perfTabs=Activator.getPerfTabs();
-		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[8+perfTabs.size()];
+		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[numStatTabs+perfTabs.size()];
 		tabs[1]=new ResourcesTab();
 		tabs[0]=new ParallelPerfRecompMainTab();
 		tabs[2]=new DebuggerTab(false);
@@ -51,9 +54,10 @@ public class ParallelPerformanceLaunchConfigurationTabGroup extends AbstractLaun
 		tabs[5]=new EnvironmentTab();
 		tabs[6]=new CommonTab();
 		tabs[7]=new PerformanceAnalysisTab(true);
+		tabs[8]=new ParametricParameterTab();
 		
 		Iterator<AbstractPerformanceConfigurationTab> perfIt=perfTabs.iterator();
-		int tabDex=8;
+		int tabDex=numStatTabs;
 		while(perfIt.hasNext())
 		{
 			tabs[tabDex]=perfIt.next();

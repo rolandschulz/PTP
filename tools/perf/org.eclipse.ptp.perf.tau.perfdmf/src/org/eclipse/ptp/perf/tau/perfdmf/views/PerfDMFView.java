@@ -18,13 +18,10 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.tau.perfdmf.views;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -81,15 +78,12 @@ import edu.uoregon.tau.paraprof.ParaProfTrial;
 import edu.uoregon.tau.paraprof.interfaces.EclipseHandler;
 import edu.uoregon.tau.perfdmf.Application;
 import edu.uoregon.tau.perfdmf.DBDataSource;
-import edu.uoregon.tau.perfdmf.DataSource;
 import edu.uoregon.tau.perfdmf.Database;
 import edu.uoregon.tau.perfdmf.DatabaseAPI;
-import edu.uoregon.tau.perfdmf.DatabaseException;
 import edu.uoregon.tau.perfdmf.Experiment;
 import edu.uoregon.tau.perfdmf.Function;
 import edu.uoregon.tau.perfdmf.SourceRegion;
 import edu.uoregon.tau.perfdmf.Trial;
-import edu.uoregon.tau.perfdmf.UtilFncs;
 /**
  * Defines a perfdmf database browser view and associated operations
  * @author wspear
@@ -468,19 +462,19 @@ public class PerfDMFView extends ViewPart {
                 for (Iterator<Application> it = dbApi.getApplicationList().iterator(); it.hasNext();) {
                     Application app = (Application) it.next();
                     dbApi.setApplication(app);
-                    System.out.println("> " + app.getName());
+                    //System.out.println("> " + app.getName());
 
                     TreeNode root = new TreeNode(app.getName(), app);
                     for (Iterator<Experiment> it2 = dbApi.getExperimentList().iterator(); it2.hasNext();) {
                         Experiment exp = (Experiment) it2.next();
                         dbApi.setExperiment(exp);
-                        System.out.println("-> " + exp.getName());
+                        //System.out.println("-> " + exp.getName());
 
                         TreeNode tp = new TreeNode(exp.getName(), exp);
 
                         for (Iterator<Trial> it3 = dbApi.getTrialList().iterator(); it3.hasNext();) {
                             Trial trial = (Trial) it3.next();
-                            System.out.println("--> " + trial.getName());
+                            //System.out.println("--> " + trial.getName());
                             TreeNode to = new TreeNode(trial.getName(), trial);
                             tp.addChild(to);
                         }
@@ -489,9 +483,11 @@ public class PerfDMFView extends ViewPart {
                     invisibleRoot.addChild(root);
 
                 }
+                dbApi.terminate();
             } catch (Exception e) {
                 //e.printStackTrace();
             }
+            
             return true;
         }
     }
@@ -606,6 +602,8 @@ public class PerfDMFView extends ViewPart {
 
             GlobalDataWindow gdw = new GlobalDataWindow(ppTrial, null);
             gdw.setVisible(true);
+            dbApi.terminate();
+            
 
         } catch (Throwable e) {
             e.printStackTrace();
@@ -726,20 +724,62 @@ public class PerfDMFView extends ViewPart {
         viewer.getControl().setFocus();
     }
     
-    public boolean addProfile(String project, String projectType, String directory, String dbname) {
-        try {
+    
+    public boolean showProfile(String project, String projectType, String trialName){//,String dbname
+    
+    	ViewContentProvider vcp = (ViewContentProvider) viewer.getContentProvider();
+
+        // reloads the tree
+        vcp.refresh(viewer);
+
+        Object[] objs;
+        objs = vcp.getChildren(vcp.getRoot());
+
+        for (int i = 0; i < objs.length; i++) {
+            TreeNode node = (TreeNode) objs[i];
+            if (((Application) node.getUserObject()).getName().equals(project)) {
+                viewer.setExpandedState(node, true);
+                Object[] expObjs = node.getChildren();
+                for (int j = 0; j < expObjs.length; j++) {
+                    TreeNode expNode = (TreeNode) expObjs[j];
+                    if (((Experiment) expNode.getUserObject()).getName().equals(projectType)) {
+                        viewer.setExpandedState(expNode, true);
+
+                        Object[] trialObjs = expNode.getChildren();
+                        for (int k = 0; k < trialObjs.length; k++) {
+                            TreeNode trialNode = (TreeNode) trialObjs[k];
+                            if (((Trial) trialNode.getUserObject()).getName().equals(trialName)) {
+                                StructuredSelection selection = new StructuredSelection(trialNode);
+                                viewer.setSelection(selection);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    	
+    	return true;
+    }
+    /*
+    public boolean addProfile(String project, String projectType, String trialName, String directory, String dbname) {
+    	DatabaseAPI dbApi=null;
+    	try {
             File[] dirs = new File[1];
             dirs[0] = new File(directory);
 
             //TODO: This is a kludge.  Find out how to make this work across systems.
-            if(System.getProperty("os.name").toLowerCase().trim().indexOf("aix")<0)
+            if(System.getProperty("os.name").toLowerCase().trim().indexOf("aix")<0){
+            	//System.setProperty("jaxp.debug", "1");
             	System.setProperty("javax.xml.transform.TransformerFactory", "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+            											//	org.apache.xalan.processor.TransformerFactoryImpl
+            	//System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
+            }
             
-            DataSource dataSource = UtilFncs.initializeDataSource(dirs, 0, false);
-            dataSource.load();
-
+            DataSource dataSource = UtilFncs.initializeDataSource(dirs, DataSource.TAUPROFILE, false);
+            
+            
             // initialize database
-            DatabaseAPI dbApi = new DatabaseAPI();
+            dbApi = new DatabaseAPI();
             //String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
             //dbApi.initialize(perfdmf, false);
 
@@ -754,18 +794,25 @@ public class PerfDMFView extends ViewPart {
             // create the trial
             Trial trial = new Trial();
             trial.setDataSource(dataSource);
+            dataSource.load();
+            trial.setMetaData(dataSource.getMetaData());
 
-            Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-            String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
-            sdf.setTimeZone(TimeZone.getDefault());
+//            Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+//            String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+//            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
+//            sdf.setTimeZone(TimeZone.getDefault());
 
-            trial.setName(sdf.format(cal.getTime()));
+            trial.setName(trialName);///sdf.format(cal.getTime()));
             Experiment exp = dbApi.getExperiment(project, projectType, true);//"Experiment"
             trial.setExperimentID(exp.getID());
 
+            //System.out.println("METADATA COUNT: "+dataSource.getMetaData().size());
+            
+            
+            
             // upload the trial
             dbApi.uploadTrial(trial);
+            
             dbApi.terminate();
 
             ViewContentProvider vcp = (ViewContentProvider) viewer.getContentProvider();
@@ -794,13 +841,13 @@ public class PerfDMFView extends ViewPart {
                                     viewer.setSelection(selection);
                                 }
                             }
-
                         }
                     }
                 }
             }
 
         } catch (Throwable t) {
+        	dbApi.terminate();
             if (t instanceof DatabaseException) {
                 ((DatabaseException) t).getException().printStackTrace();
             }
@@ -809,5 +856,5 @@ public class PerfDMFView extends ViewPart {
         }
 
         return true;
-    }
+    }*/
 }

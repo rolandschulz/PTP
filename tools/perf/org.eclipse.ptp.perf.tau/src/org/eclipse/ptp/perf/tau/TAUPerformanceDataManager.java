@@ -19,12 +19,16 @@ package org.eclipse.ptp.perf.tau;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.PrintStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.perf.AbstractPerformanceDataManager;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
 import org.eclipse.ptp.perf.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView;
@@ -102,7 +106,18 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			boolean runtauinc = configuration.getAttribute(ITAULaunchConfigurationConstants.TAUINC, false);
 			boolean keepprofs = configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false);
 			boolean useportal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
-			manageProfiles(directory, projname, projtype, tbpath, PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null)), now, keepprofs,useportal, runtauinc);
+			boolean useperfex=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_LAUNCH_PERFEX, false);
+			String expAppend=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_EXPERIMENT_APPEND, (String)null);
+			String perfexScript=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_PERF_SCRIPT,(String)null);
+			boolean useP=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_USE_PARAMETRIC,false);
+			String xMD=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_XML_METADATA, (String)null);
+			
+			if(expAppend!=null&&expAppend.length()>0)
+			{
+				projtype+="_"+expAppend;
+			}
+			
+			manageProfiles(directory, projname, projtype, tbpath, PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null)), now, keepprofs,useportal, runtauinc,useperfex,perfexScript,useP,xMD);
 			
 		}
 		
@@ -131,7 +146,7 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 	 * @param now The current time
 	 * @throws CoreException
 	 */
-	private static void manageProfiles(final String directory, final String projname, final String projtype, final String tbpath, final String database, final String now, final boolean keepprofs, final boolean useportal, final boolean runtauinc) throws CoreException	{
+	private static void manageProfiles(final String directory, final String projname, final String projtype, final String tbpath, final String database, final String now, final boolean keepprofs, final boolean useportal, final boolean runtauinc,final boolean usePerfEx, final String perfExScript, final boolean usingParameters, final String xmlMD) throws CoreException	{
 
 		class Profilefilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
@@ -176,7 +191,7 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 		final File[] remprofs = rem;
 
 		if (rem.length > 0)
-			Display.getDefault().asyncExec(new Runnable() {
+			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					
 					/*
@@ -197,35 +212,75 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 						catch (Exception e) {e.printStackTrace();}
 					}
 					
-					String ppkname = projname + "_" + projtype + "_" + now
-							+ ".ppk";
+					String ppkname = projname + "_" + projtype + "_" + now+ ".ppk";
 					String paraprof = tbpath + File.separator
 							+ "paraprof --pack " + ppkname;
 					System.out.println(paraprof);
 
 					String ppk = directory + File.separator + ppkname;
 
-					BuildLaunchUtils.runTool(paraprof, null,
-							new File(directory));
+					BuildLaunchUtils.runTool(paraprof, null,new File(directory));
 
 					File ppkFile = new File(ppk);
 
 					boolean hasdb = false;
 
 					try {
+						//if(usingParameters)
+						//{
 						if(database!=null&&!database.equals(ITAULaunchConfigurationConstants.NODB))
-							hasdb = PerfDMFUIPlugin.addPerformanceData(projname,projtype, directory, database);
-						else
-							hasdb=false;
-						if (!hasdb) {
-							MessageDialog
-									.openInformation(
-											PlatformUI.getWorkbench()
-													.getDisplay()
-													.getActiveShell(),
-											"TAU Warning",
-											"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+						{
+							String metaSpec=" ";
+							File xmlFi=null;
+							if(xmlMD!=null&&xmlMD.length()>0){
+								String xmlLoc=directory+File.separator+"perfMetadata.xml";
+								xmlFi=new File(xmlLoc);
+								FileOutputStream o;
+								PrintStream p;
+								try {
+									o=new FileOutputStream(xmlFi);
+									p=new PrintStream(o);
+
+									p.println(xmlMD);
+									p.close();
+									if(xmlFi.exists()&&xmlFi.canRead()){
+										metaSpec=" -m "+xmlLoc+" ";
+									}
+								} catch (FileNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+
+							String db="";
+							if(!database.equals("Default")){
+								db=" -c "+database;
+							}
+
+							String ex = tbpath+File.separator+"perfdmf_loadtrial -a "+projname+" -x "+projtype+" -n "+now+db+metaSpec+ directory;//-m metaDataFile
+							hasdb=BuildLaunchUtils.runTool(ex, null,new File(directory));
+							//hasdb=true;
+							if(xmlFi!=null){
+								xmlFi.delete();
+							}
+						
+						//}
+						//else{
+						//if(database!=null&&!database.equals(ITAULaunchConfigurationConstants.NODB))
+						//{
+						PerfDMFUIPlugin.displayPerformanceData(projname,projtype,now);//,directory, database
+						//}
 						}
+						if (!hasdb&&!usingParameters) {
+							MessageDialog
+							.openInformation(
+									PlatformUI.getWorkbench()
+									.getDisplay()
+									.getActiveShell(),
+									"TAU Warning",
+							"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+						}
+						//}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -259,6 +314,8 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 						}
 					}
 
+					
+					
 					for (int i = 0; i < remprofs.length; i++) {
 						if (multipapi) {
 							File[] profs = remprofs[i].listFiles();
@@ -282,6 +339,25 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 				}
 			});
 
+		/*
+		 * Invoke perfexplorer if necessary and proper
+		 */
+		if(usePerfEx){
+			
+			//Display.getDefault().asyncExec(new Runnable() {
+				//public void run() {
+			
+			String script=perfExScript+" -c "+database+" -p app="+projname+",exp="+projtype;
+//			if(perfExScript!=null&&perfExScript.length()>0){
+//				script = " -i "+perfExScript+" ";
+//				String pexPars=" -p \""+projname+" "+projtype+"\"";
+//				script+=pexPars;
+//			}
+//			String perfExCmd=tbpath + File.separator+"perfexplorer"+" -c "+database+script;
+			BuildLaunchUtils.runTool(script, null,new File(directory));
+				//}});
+		}
+		
 		if (rem.length <= 0) {
 			System.out
 					.println("No profile data generated!  Check for build and runtime errors!");
