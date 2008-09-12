@@ -11,51 +11,40 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.rulesengine;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.IFileSystem;
-import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
-import org.eclipse.ptp.launch.data.ExecutionConfiguration;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
 import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.ptp.launch.internal.LinuxPath;
-//import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-//import org.eclipse.ptp.remotetools.utils.file.FileRecursiveEnumeration;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 
 public class UploadRuleAction implements IRuleAction {
 	
-	private ILaunchProcessCallback process;
-	private UploadRule rule;
+	private final ILaunchProcessCallback process;
+	private final UploadRule rule;
 	//private ExecutionConfiguration configuration;
 	//private PrintWriter outputWriter;
 	//private PrintWriter errorWriter;
 	//private IRemoteExecutionManager manager;
-	private ILaunchConfiguration configuration;
+	private final ILaunchConfiguration configuration;
 	//private IRemoteFileManager remoteFileManager;
 	//private IRemoteFileManager localFileManager;
 	private DownloadBackRule downloadBackRule;
-	private IProgressMonitor monitor;
+	private final IProgressMonitor monitor;
 	
 	public UploadRuleAction(ILaunchProcessCallback process, ILaunchConfiguration configuration, 
 			UploadRule uploadRule, IProgressMonitor monitor) {
@@ -130,8 +119,9 @@ public class UploadRuleAction implements IRuleAction {
 			throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving remote resource", e1));
 		}*/
 		
-		// Retrieve the working dir
-		IPath workingDir = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, ""));		
+		// Retrieve the local working dir (workspace path)
+		IPath workingDir = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		//IPath workingDir = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, ""));		
 		
 		/*
 		 * Determine list of local paths. Make them absolute.

@@ -11,14 +11,11 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.rulesengine;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -27,26 +24,21 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
 import org.eclipse.ptp.launch.data.DownloadRule;
-import org.eclipse.ptp.launch.data.ExecutionConfiguration;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
-import org.eclipse.ptp.launch.data.UploadRule;
-import org.eclipse.ptp.launch.internal.LinuxPath;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 
 public class DownloadRuleAction implements IRuleAction {
 
-	private ILaunchProcessCallback process;
-	private DownloadRule rule;
-	private ILaunchConfiguration configuration;
+	private final ILaunchProcessCallback process;
+	private final DownloadRule rule;
+	private final ILaunchConfiguration configuration;
 	private DownloadBackRule downloadBackRule;
-	private IProgressMonitor monitor;
+	private final IProgressMonitor monitor;
 
 	public DownloadRuleAction(ILaunchProcessCallback process, ILaunchConfiguration configuration, 
 			DownloadRule rule, IProgressMonitor monitor) {
@@ -91,8 +83,7 @@ public class DownloadRuleAction implements IRuleAction {
 		 */
 		IPath localParentPath = new Path(rule.getLocalDirectory());
 		if (! localParentPath.isAbsolute()) {
-			IPath defaultPath = new Path(configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, ""));
+			IPath defaultPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			localParentPath = defaultPath.append(localParentPath);
 			/*IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			localPath = workspace.append(localPath);*/
