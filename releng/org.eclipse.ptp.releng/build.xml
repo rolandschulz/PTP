@@ -1,4 +1,4 @@
-<project name="PTP" default="nightly">
+<project name="PTP" default="build">
 	<target name="hi">
 		<echo message="${eclipse.home}"/>
 	</target>
