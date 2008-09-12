@@ -265,19 +265,16 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			// Nothing yet. Would validate the entire GenericMPIResourceManagerConfiguration.
 		}
 
-		public void setConfig(IResourceManagerConfiguration configuration) {
-			config = (AbstractToolRMConfiguration) configuration;
-		}
-
 		@Override
-		public AbstractToolRMConfiguration getConfig() {
-			return config;
+		public void setConfig(IResourceManagerConfiguration configuration) {
+			super.setConfig(config);
+			// Store a local reference to the configuration
+			this.config = (AbstractToolRMConfiguration) configuration;
 		}
 
 		@Override
 		protected void loadDefault() {
-			// TODO Auto-generated method stub
-
+			// not available
 		}
 	}
 
@@ -300,16 +297,21 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 
 	@Override
-	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout topLayout = new GridLayout();
-	    composite.setLayout(topLayout);
-		createContents(composite);
-		setControl(composite);
-	}
-
-	protected void createContents(Composite parent) {
-		createOpenMpiContests(parent);
+	protected Composite doCreateContents(Composite parent) {
+		Composite contents = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		layout.marginBottom = 0;
+		layout.marginTop = 0;
+		layout.marginRight = 0;
+		layout.marginLeft = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		contents.setLayout(layout);
+		
+		createOpenMpiContests(contents);
+		
+		return contents;
 	}
 
 	protected void createOpenMpiContests(Composite parent) {

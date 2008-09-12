@@ -79,4 +79,13 @@ public abstract class AbstractConfigurationWizardPage extends
 		setMessage(null);
 	}
 
+	@Override
+	public void createControl(Composite parent) {
+		Composite composite = doCreateContents(parent);
+//		doCreateContents(composite);
+		setControl(composite);
+	}
+
+	abstract protected Composite doCreateContents(Composite composite);
+
 }

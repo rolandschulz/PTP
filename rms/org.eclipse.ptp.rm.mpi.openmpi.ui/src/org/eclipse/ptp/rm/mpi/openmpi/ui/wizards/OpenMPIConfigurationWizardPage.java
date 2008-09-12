@@ -135,9 +135,22 @@ public class OpenMPIConfigurationWizardPage extends
 	}
 
 	@Override
-	protected void createContents(Composite parent) {
-		createVersionContents(parent);
-		createOpenMpiContests(parent);
+	protected Composite doCreateContents(Composite parent) {
+		Composite contents = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		layout.marginBottom = 0;
+		layout.marginTop = 0;
+		layout.marginRight = 0;
+		layout.marginLeft = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		contents.setLayout(layout);
+		
+		createVersionContents(contents);
+		createOpenMpiContests(contents);
+		
+		return contents;
 	}
 
 	protected void createVersionContents(Composite parent) {
