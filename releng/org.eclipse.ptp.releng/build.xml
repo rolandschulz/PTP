@@ -1,4 +1,4 @@
-<project name="PTP" default="build">
+<project name="PTP" default="nightly">
 	<target name="hi">
 		<echo message="${eclipse.home}"/>
 	</target>
@@ -37,7 +37,7 @@
 		<property name="baseos" value="${osgi.os}"/>
 		<property name="basews" value="${osgi.ws}"/>
 		<property name="basearch" value="${osgi.arch}"/>
-		<property name="tagbranch" value="-r HEAD"/>
+		<property name="tagbranch" value=""/>
 		<property name="tagname" value="v${timestamp}"/>
 		<property name="testReports" value="${zipsdir}/testReports"/>
 		<property name="junit-report-output" value="${testReports}"/>
