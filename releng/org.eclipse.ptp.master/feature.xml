@@ -77,4 +77,8 @@
          id="org.eclipse.ptp.perf"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.perf.tau"
+         version="0.0.0"/>
+
 </feature>
