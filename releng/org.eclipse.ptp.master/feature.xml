@@ -81,8 +81,4 @@
          id="org.eclipse.ptp.perf.tau"
          version="0.0.0"/>
 
-   <includes
-         id="org.eclipse.ptp.perf.tau.fortran"
-         version="0.0.0"/>
-
 </feature>
