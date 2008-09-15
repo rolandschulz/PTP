@@ -42,12 +42,6 @@
 	<feature url="features/org.eclipse.ptp.pldt.lapi_@buildVersion@.jar" id="org.eclipse.ptp.pldt.lapi" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.perf.tau_@buildVersion@.jar" id="org.eclipse.ptp.perf.tau" version="@buildVersion@">
-		<category name="Parallel Tools Platform 2.1"/>
-	</feature>
-	<feature url="features/org.eclipse.ptp.perf.tau.fortran_@buildVersion@.jar" id="org.eclipse.ptp.perf.tau.fortran" version="@buildVersion@">
-		<category name="Parallel Tools Platform 2.1"/>
-	</feature>
 	<feature url="features/org.eclipse.ptp.perf_@buildVersion@.jar" id="org.eclipse.ptp.perf" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
