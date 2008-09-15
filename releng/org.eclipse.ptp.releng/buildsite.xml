@@ -45,6 +45,12 @@
 	<feature url="features/org.eclipse.ptp.perf_@buildVersion@.jar" id="org.eclipse.ptp.perf" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
+	<feature url="features/org.eclipse.ptp.perf.tau_@buildVersion@.jar" id="org.eclipse.ptp.perf.tau" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
+	</feature>
+	<feature url="features/org.eclipse.ptp.perf.tau.fortran_@buildVersion@.jar" id="org.eclipse.ptp.perf.tau.fortran" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
+	</feature>
 	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
 		<category name="Remote Development Tools"/>
 	</feature>
