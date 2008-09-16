@@ -5,6 +5,9 @@
 # create the releng staging directory and go there
 mkdir -p /opt/public/download-staging.priv/tools/ptp/releng
 cd /opt/public/download-staging.priv/tools/ptp/releng
+if [ ! -L results ]; then
+	ln -s org.eclipse.ptp/releng/org.eclipse.ptp.releng/results results
+fi
 
 # remove the old build
 rm -fr org.eclipse.ptp
