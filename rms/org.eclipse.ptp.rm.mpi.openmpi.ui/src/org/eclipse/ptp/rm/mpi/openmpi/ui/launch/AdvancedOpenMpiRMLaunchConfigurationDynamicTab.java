@@ -171,7 +171,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (useDefArgs && args == null) {
+			if (!useDefArgs && args == null) {
 				throw new ValidationException("Arguments cannot be empty");
 			}
 			if (!useDefParams) {
