@@ -12,7 +12,7 @@ public abstract class WizardPageDataSource extends DataSource {
 	}
 
 	@Override
-	protected void setError(ValidationException e) {
+	protected void setErrorMessage(ValidationException e) {
 		page.setErrorMessage(e.getLocalizedMessage());
 		page.setPageComplete(false);
 	}

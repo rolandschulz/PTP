@@ -76,7 +76,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
 public class OpenMPIRMLaunchConfigurationDynamicTab extends
-		AbstractRMLaunchConfigurationDynamicTab {
+	AbstractRMLaunchConfigurationDynamicTab {
 	
 	private class DataSource {
 		private int numProcs;
@@ -552,6 +552,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			}
 		});
 		paramsViewer.setSorter(new ViewerSorter() {
+			@Override
 			public int compare(Viewer viewer, Object j1, Object j2) {
 				return ((Parameter)j1).getName().compareTo(((Parameter)j2).getName());
 			}
@@ -563,6 +564,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(paramsViewer, 
 				new FocusCellOwnerDrawHighlighter(paramsViewer));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(paramsViewer) {
+			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
@@ -734,6 +736,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		column2.getColumn().setText("Value");
 		
 		paramsTable.addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				Rectangle area = paramsTable.getClientArea();
 				//Point size = paramsTable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -820,7 +823,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 	/**
 	 * Update state of controls based on current selections
 	 */
-	private void updateControls() {
+	public void updateControls() {
 		prefixText.setEnabled(usePrefixButton.getSelection());
 		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
 		paramsTable.setEnabled(!useParamsDefaultsButton.getSelection());

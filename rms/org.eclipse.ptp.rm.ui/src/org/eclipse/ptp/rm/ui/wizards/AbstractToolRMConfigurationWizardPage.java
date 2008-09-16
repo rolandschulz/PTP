@@ -82,7 +82,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 					source == periodicMonitorTimeSpinner ||
 					source == remoteInstallPathText) {
 				resetErrorMessages();
-				dataSource.storeAndValidate();
+				getDataSource().storeAndValidate();
 			} else {
 				assert false;
 			}
@@ -95,7 +95,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 				handlePathBrowseButtonSelected();
 			} else if (source == defaultButton)  {
 				resetErrorMessages();
-				dataSource.storeAndValidate();
+				getDataSource().storeAndValidate();
 				updateControls();
 			} else {
 				assert false;
@@ -327,7 +327,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		 * Default button
 		 */
 		defaultButton = createCheckButton(contents, "Use default settings");
-		defaultButton.addSelectionListener(listener);
+		defaultButton.addSelectionListener(getWidgetListener());
 		defaultButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
 
 		/*
@@ -339,14 +339,14 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			launchCmdText.addModifyListener(listener);
+			launchCmdText.addModifyListener(getWidgetListener());
 
 			label = new Label(contents, SWT.NONE);
 			label.setText("Debug command:");
 
 			debugCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			debugCmdText.addModifyListener(listener);
+			debugCmdText.addModifyListener(getWidgetListener());
 		}
 
 		/*
@@ -358,7 +358,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 			discoverCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			discoverCmdText.addModifyListener(listener);
+			discoverCmdText.addModifyListener(getWidgetListener());
 		}
 
 		/*
@@ -370,13 +370,13 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 1, 1));
-			periodicMonitorCmdText.addModifyListener(listener);
+			periodicMonitorCmdText.addModifyListener(getWidgetListener());
 
 			label = new Label(contents, SWT.NONE);
 			label.setText("Period:");
 			periodicMonitorTimeSpinner = new Spinner(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false, 1, 1));
-			periodicMonitorTimeSpinner.addModifyListener(listener);
+			periodicMonitorTimeSpinner.addModifyListener(getWidgetListener());
 		}
 
 		/*
@@ -388,7 +388,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 			continuousMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			continuousMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			continuousMonitorCmdText.addModifyListener(listener);
+			continuousMonitorCmdText.addModifyListener(getWidgetListener());
 		}
 
 		/*
@@ -403,10 +403,10 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			gd.horizontalSpan = 2;
 			gd.widthHint = 60;
 			remoteInstallPathText.setLayoutData(gd);
-			remoteInstallPathText.addModifyListener(listener);
+			remoteInstallPathText.addModifyListener(getWidgetListener());
 
 			browseButton = SWTUtil.createPushButton(contents, "Browse", null); //$NON-NLS-1$
-			browseButton.addSelectionListener(listener);
+			browseButton.addSelectionListener(getWidgetListener());
 		}
 	}
 
@@ -420,7 +420,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		 */
 
 		IRemoteUIServices remUIServices = null;
-		AbstractRemoteResourceManagerConfiguration config = (AbstractRemoteResourceManagerConfiguration)dataSource.getConfig();
+		AbstractRemoteResourceManagerConfiguration config = (AbstractRemoteResourceManagerConfiguration)getDataSource().getConfig();
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
 			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);

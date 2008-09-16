@@ -40,7 +40,7 @@ public abstract class PreferenceDataSource extends DataSource {
 	}
 
 	@Override
-	protected void setError(ValidationException e) {
+	protected void setErrorMessage(ValidationException e) {
 		page.setErrorMessage(e.getLocalizedMessage());
 		page.setValid(false);
 	}

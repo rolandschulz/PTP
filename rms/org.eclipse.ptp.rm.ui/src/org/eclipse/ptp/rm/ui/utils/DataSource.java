@@ -40,11 +40,34 @@ public abstract class DataSource {
 	 */
 	public class ValidationException extends Exception {
 		private static final long serialVersionUID = 1L;
+		private boolean canSave = false;
+		private boolean canAccept = false;
 
 		public ValidationException(String message) {
 			super(message);
+			canSave = false;
+			canAccept = false;
+		}
+
+		public ValidationException(String message, boolean canAccept,
+				boolean canSave) {
+			super(message);
+			this.canAccept = canAccept;
+			this.canSave = canSave;
+		}
+
+		public boolean canAccept() {
+			return canAccept;
+		}
+
+		public boolean canSave() {
+			return canSave;
 		}
 	}
+
+	private ValidationException firstException = null;
+	private boolean canSave = false;
+	private boolean canAccept = false;
 
 	protected static final String EMPTY_STRING = "";
 
@@ -54,7 +77,7 @@ public abstract class DataSource {
 	 * @param e
 	 *            Exception raised while validating the intermediate storage.
 	 */
-	abstract protected void setError(ValidationException e);
+	abstract protected void setErrorMessage(ValidationException e);
 
 	/**
 	 * Facility to get string value of a {@link Text} widget, or null if the
@@ -78,10 +101,11 @@ public abstract class DataSource {
 	 *            The new string value.
 	 */
 	protected void applyText(Text t, String s) {
-		if (s == null)
+		if (s == null) {
 			t.setText(EMPTY_STRING);
-		else
+		} else {
 			t.setText(s);
+		}
 	}
 
 	/**
@@ -142,16 +166,63 @@ public abstract class DataSource {
 	 */
 	abstract protected void update();
 
+	protected void addException(ValidationException e) {
+		if (firstException == null) {
+			firstException = e;
+			canAccept = e.canAccept();
+			canSave = e.canSave();
+		} else {
+			if (canSave && ! e.canSave()) {
+				firstException = e;
+			}
+			canAccept = canAccept && e.canAccept();
+			canSave = canSave && e.canSave();
+		}
+	}
+
+	protected void resetExceptions() {
+		firstException = null;
+		canAccept = true;
+		canSave = true;
+	}
+
+	public boolean canAccept() {
+		return canAccept;
+	}
+
+	public boolean canSave() {
+		return canSave;
+	}
+
+	public boolean summarizeExceptions() {
+		if (! canAccept || ! canSave) {
+			setErrorMessage(firstException);
+			return false;
+		}
+		return true;
+	}
+
+	public String getErrorMessage() {
+		if (firstException == null) {
+			return null;
+		} else {
+			return firstException.getMessage();
+		}
+	}
+
 	/**
 	 * Get values from widgets into intermediary storage and validate them.
 	 */
-	final public void justValidate() {
+	final public boolean justValidate() {
 		try {
+			resetExceptions();
 			copyFromFields();
 			validateLocal();
 		} catch (ValidationException e) {
-			setError(e);
+			addException(e);
 		}
+		update();
+		return summarizeExceptions();
 	}
 
 	/**
@@ -160,9 +231,13 @@ public abstract class DataSource {
 	final public void justUpdate() {
 		copyToFields();
 		try {
+			resetExceptions();
 			validateLocal();
+			validateGlobal();
+			summarizeExceptions();
 		} catch (ValidationException e) {
-			setError(e);
+			addException(e);
+			summarizeExceptions();
 		}
 		update();
 	}
@@ -175,15 +250,16 @@ public abstract class DataSource {
 	 */
 	final public boolean storeAndValidate() {
 		try {
+			resetExceptions();
 			copyFromFields();
 			validateLocal();
 			validateGlobal();
 			copyToStorage();
-			return true;
 		} catch (ValidationException e) {
-			setError(e);
-			return false;
+			addException(e);
 		}
+		update();
+		return summarizeExceptions();
 	}
 
 	/**
@@ -194,10 +270,13 @@ public abstract class DataSource {
 		loadFromStorage();
 		copyToFields();
 		try {
+			resetExceptions();
 			validateLocal();
 			validateGlobal();
+			summarizeExceptions();
 		} catch (ValidationException e) {
-			setError(e);
+			addException(e);
+			summarizeExceptions();
 		}
 		update();
 	}
@@ -210,11 +289,24 @@ public abstract class DataSource {
 		loadDefault();
 		copyToFields();
 		try {
+			resetExceptions();
 			validateLocal();
 			validateGlobal();
+			summarizeExceptions();
 		} catch (ValidationException e) {
-			setError(e);
+			addException(e);
+			summarizeExceptions();
 		}
 		update();
 	}
+
+	/**
+	 * Copy the defaults to storage, without updating GUI.
+	 * Use this to initialize the storage before even having GUI available.
+	 */
+//	final public void storeDefaults() {
+//		resetExceptions();
+//		loadDefault();
+//		copyToStorage();
+//	}
 }

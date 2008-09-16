@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Control;
  */
 public abstract class AbstractPreferencePage extends PreferencePage {
 
-	protected PreferenceWidgetListener listener = createListener();
-	protected PreferenceDataSource dataSource = createDataSource();
+	private final PreferenceWidgetListener listener = createListener();
+	private final PreferenceDataSource dataSource = createDataSource();
 
 	public AbstractPreferencePage() {
 		super();
@@ -36,6 +36,14 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 
 	public AbstractPreferencePage(String title, ImageDescriptor image) {
 		super(title, image);
+	}
+	
+	protected PreferenceWidgetListener getListener() {
+		return listener;
+	}
+	
+	protected PreferenceDataSource getDataSource() {
+		return dataSource;
 	}
 
 	/**

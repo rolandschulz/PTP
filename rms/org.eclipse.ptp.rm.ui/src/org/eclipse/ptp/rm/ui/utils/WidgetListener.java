@@ -45,7 +45,7 @@ public abstract class WidgetListener implements SelectionListener,
 		return listenerEnabled;
 	}
 
-	final public void widgetDefaultSelected(SelectionEvent e) {
+	public void widgetDefaultSelected(SelectionEvent e) {
 		if (isEnabled())
 			doWidgetDefaultSelected(e);
 	}
@@ -54,7 +54,7 @@ public abstract class WidgetListener implements SelectionListener,
 		// Default empty implementation.
 	}
 
-	final public void widgetSelected(SelectionEvent e) {
+	public void widgetSelected(SelectionEvent e) {
 		if (isEnabled())
 			doWidgetSelected(e);
 	}
@@ -63,7 +63,7 @@ public abstract class WidgetListener implements SelectionListener,
 		// Default empty implementation.
 	}
 
-	final public void modifyText(ModifyEvent e) {
+	public void modifyText(ModifyEvent e) {
 		if (isEnabled())
 			doModifyText(e);
 	}

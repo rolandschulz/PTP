@@ -49,7 +49,7 @@ public class OpenMPIConfigurationWizardPage extends
 			if (source == versionCombo) {
 				handleVersionSelected();
 				updateControls();
-				dataSource.storeAndValidate();
+				getDataSource().storeAndValidate();
 			} else {
 				super.doWidgetSelected(e);
 			}
@@ -173,12 +173,12 @@ public class OpenMPIConfigurationWizardPage extends
 		for (int i = 0; i < versionsNames.length; i++) {
 			versionCombo.add(versionsNames[i]);
 		}
-		versionCombo.addSelectionListener(listener);
+		versionCombo.addSelectionListener(getWidgetListener());
 	}
 
 	public void handleVersionSelected() {
 		listenerEnabled = false;
-		DataSource dataSource = (DataSource) this.dataSource;
+		DataSource dataSource = (DataSource) this.getDataSource();
 		dataSource.justValidate();
 		String launchCmd = null;
 		String debugCmd = null;
