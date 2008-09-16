@@ -32,7 +32,6 @@ public class FortranTokenStream extends CommonTokenStream {
    private List currLine;
    private int lineLength;
    private ArrayList<Token> packedList;
-   private int packedListSize;
    private ArrayList<Token> newTokensList;
 
    public FortranTokenStream(FortranLexer lexer) {
@@ -44,7 +43,6 @@ public class FortranTokenStream extends CommonTokenStream {
       this.currLine = null;
       this.lineLength = 0;
       this.packedList = null;
-      this.packedListSize = 0;
       this.newTokensList = new ArrayList<Token>();
    }// end constructor
 
@@ -206,31 +204,28 @@ public class FortranTokenStream extends CommonTokenStream {
       boolean success;
 
       this.packedList = new ArrayList<Token>(this.lineLength+1);
-      this.packedListSize = 0;
 
       for(i = 0; i < currLine.size(); i++) {
          tmpToken = getTokenFromCurrLine(i);
          // get all tokens, including channel 99'ed ones, so we can fixup
          // continued lines.  we'll drop ignored tokens after that.
          try {
-            packedList.add(this.packedListSize, tmpToken);
+            packedList.add(tmpToken);
          } catch(Exception e) {
             e.printStackTrace();
             System.exit(1);
          }
-         this.packedListSize++;
       }// end for(each item in buffered line)
 
       // need to make sure the line was terminated with a T_EOS.  this may 
       // not happen if we're working on a file that ended w/o a newline
-      if(packedList.get(packedListSize-1).getType() != lexer.T_EOS) {
+      if (packedList.get(packedList.size()-1).getType() != lexer.T_EOS) {
          FortranToken eos = new FortranToken(lexer.getInput(), lexer.T_EOS, 
-															Token.DEFAULT_CHANNEL, 
-															lexer.getInput().index(), 
-															lexer.getInput().index()+1);
-			eos.setText("\n");
-         packedList.add(this.packedListSize, eos);
-         packedListSize++;
+                                             Token.DEFAULT_CHANNEL, 
+                                             lexer.getInput().index(), 
+                                             lexer.getInput().index()+1);
+         eos.setText("\n");
+         packedList.add(eos);
       }
 
       fixupContinuedLine(packedList);
@@ -365,28 +360,17 @@ public class FortranTokenStream extends CommonTokenStream {
       int i;
 
       this.packedList = new ArrayList<Token>(this.packedList.size());
-      // reset this
-      this.packedListSize = 0;
 
-      for(i = 0; i < tmpList.size(); i++) {
+      for (i = 0; i < tmpList.size(); i++) {
          tmpToken = tmpList.get(i);
-         if(tmpToken != null && tmpToken.getChannel() != 
+         if (tmpToken != null && tmpToken.getChannel() != 
             lexer.getIgnoreChannelNumber()) {
             try {
-               this.packedList.add(this.packedListSize, tmpToken);
+               this.packedList.add(tmpToken);
             } catch(Exception e) {
                e.printStackTrace();
                System.exit(1);
             }
-
-            this.packedListSize++;
-         }
-
-         // shouldn't be necessary; was here because there was a bug..
-         // TODO: remove.
-         if(this.packedListSize > tmpList.size()) {
-            System.err.println("reached end of list w/o stopping!");
-            System.exit(1);
          }
       }
 
@@ -398,8 +382,8 @@ public class FortranTokenStream extends CommonTokenStream {
       int i = 0;
       StringBuffer lineText = new StringBuffer();
 
-      for(i = lineStart; i < this.packedListSize-1; i++) {
-         lineText.append(this.packedList.get(i).getText());
+      for(i = lineStart; i < packedList.size()-1; i++) {
+         lineText.append(packedList.get(i).getText());
       }
       
       return lineText.toString();
@@ -412,7 +396,7 @@ public class FortranTokenStream extends CommonTokenStream {
 
 
    public int getCurrLineLength() {
-      return this.packedListSize;
+      return this.packedList.size();
    }
 
    public int getRawLineLength() {
@@ -443,13 +427,14 @@ public class FortranTokenStream extends CommonTokenStream {
    public int findTokenInPackedList(int start, int desiredToken) {
       Token tmpToken;
 
-      if(start >= this.packedListSize)
+      if(start >= this.packedList.size()) {
          return -1;
+      }
       
       do {
          tmpToken = (Token)(packedList.get(start));
          start++;
-      } while(start < this.packedListSize &&
+      } while(start < this.packedList.size() &&
               tmpToken.getType() != desiredToken);
 
       if(tmpToken.getType() == desiredToken)
@@ -461,10 +446,10 @@ public class FortranTokenStream extends CommonTokenStream {
 
 
    public Token getToken(int pos) {
-      if(pos >= this.packedListSize || pos < 0) {
+      if (pos >= this.packedList.size() || pos < 0) {
          System.out.println("pos is out of range!");
          System.out.println("pos: " + pos + 
-                            " packedListSize: " + this.packedListSize);
+                            " packedListSize: " + this.packedList.size());
          return null;
       }
       else
@@ -486,17 +471,17 @@ public class FortranTokenStream extends CommonTokenStream {
    public int findToken(int start, int desiredToken) {
       Token tmpToken;
 
-      if(start >= this.packedListSize) {
+      if(start >= this.packedList.size()) {
          System.out.println("start is out of range!");
          System.out.println("start: " + start + 
-                            " packedListSize: " + this.packedListSize);
+                            " packedListSize: " + this.packedList.size());
          return -1;
       }
       
       do {
          tmpToken = (Token)(packedList.get(start));
          start++;
-      } while(start < this.packedListSize &&
+      } while (start < this.packedList.size() &&
               tmpToken.getType() != desiredToken);
 
       if(tmpToken.getType() == desiredToken)
@@ -639,7 +624,7 @@ public class FortranTokenStream extends CommonTokenStream {
    public void printPackedList() {
 
       System.out.println("*********************************");
-      System.out.println("packedListSize is: " + this.packedListSize);
+      System.out.println("packedListSize is: " + this.packedList.size());
       System.out.println(this.packedList.toString());
       System.out.println("*********************************");
 
@@ -749,11 +734,6 @@ public class FortranTokenStream extends CommonTokenStream {
    public int getTokensListSize() {
       return this.packedList.size();
    }// end getTokensListSize()
-
-
-   public void updatePackedListSize() {
-      this.packedListSize = this.packedList.size();
-   }
 
 
    public FortranToken createToken(int type, String text, int line, int col) {

@@ -1,4 +1,4 @@
-// $ANTLR 3.1 FortranLexer.g 2008-08-28 10:52:36
+// $ANTLR 3.1 FortranLexer.g 2008-09-16 08:53:58
 
 /**
  * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
@@ -41,18 +41,18 @@ public class FortranLexer extends Lexer {
     public static final int T_COLON_COLON=24;
     public static final int T_ENDBLOCKDATA=172;
     public static final int T_ENDSUBROUTINE=183;
-    public static final int T_ENDFILE=176;
     public static final int T_BIND=190;
+    public static final int T_ENDFILE=176;
     public static final int Special_Character=18;
     public static final int T_GREATERTHAN_EQ=30;
-    public static final int T_FORALL=106;
     public static final int T_LABEL_DO_TERMINAL=193;
+    public static final int T_FORALL=106;
     public static final int T_NON_OVERRIDABLE=126;
-    public static final int T_WRITE=169;
     public static final int T_NONE=124;
+    public static final int T_WRITE=169;
     public static final int T_COMMON=80;
-    public static final int SQ_Rep_Char=6;
     public static final int T_CYCLE=83;
+    public static final int SQ_Rep_Char=6;
     public static final int T_ASTERISK=22;
     public static final int Letter=16;
     public static final int T_UNFORMATTED=162;
@@ -80,38 +80,38 @@ public class FortranLexer extends Lexer {
     public static final int T_FORALL_CONSTRUCT_STMT=206;
     public static final int T_NE=46;
     public static final int T_ENDPROGRAM=181;
-    public static final int T_DIMENSION=187;
     public static final int T_THEN=159;
+    public static final int T_DIMENSION=187;
     public static final int T_OPEN=130;
     public static final int T_ASSIGNMENT=69;
-    public static final int T_REAL=62;
     public static final int T_ABSTRACT=66;
-    public static final int T_FINAL=104;
+    public static final int T_REAL=62;
     public static final int T_STMT_FUNCTION=197;
+    public static final int T_FINAL=104;
     public static final int T_FORMAT=107;
     public static final int BINARY_CONSTANT=11;
     public static final int Digit=13;
     public static final int T_PRECISION=139;
     public static final int T_INTEGER=61;
     public static final int T_EXTENDS=101;
-    public static final int T_TYPE=161;
     public static final int T_RETURN=149;
+    public static final int T_TYPE=161;
     public static final int T_SELECT=152;
-    public static final int T_GE=50;
     public static final int T_IDENT=210;
-    public static final int T_PARAMETER=134;
+    public static final int T_GE=50;
     public static final int T_PERIOD_EXPONENT=58;
+    public static final int T_PARAMETER=134;
     public static final int MISC_CHAR=212;
-    public static final int T_NOPASS=127;
     public static final int T_INTENT=118;
+    public static final int T_NOPASS=127;
     public static final int T_ENDASSOCIATE=170;
     public static final int T_INQUIRE_STMT_2=207;
     public static final int T_PRINT=138;
     public static final int T_FORMATTED=108;
-    public static final int T_IMPORT=115;
     public static final int T_EXTERNAL=102;
-    public static final int T_PRIVATE=140;
+    public static final int T_IMPORT=115;
     public static final int DQ_Rep_Char=7;
+    public static final int T_PRIVATE=140;
     public static final int T_DIGIT_STRING=10;
     public static final int T_PLUS=37;
     public static final int T_POWER=38;
@@ -122,10 +122,10 @@ public class FortranLexer extends Lexer {
     public static final int T_SLASH_SLASH=41;
     public static final int T_EQ_GT=28;
     public static final int T_LE=48;
-    public static final int T_IN=116;
     public static final int T_GOTO=112;
-    public static final int T_COLON=23;
+    public static final int T_IN=116;
     public static final int T_PERIOD=59;
+    public static final int T_COLON=23;
     public static final int T_ALLOCATE=68;
     public static final int T_TRUE=51;
     public static final int T_UNDERSCORE=44;
@@ -228,21 +228,21 @@ public class FortranLexer extends Lexer {
     public static final int HEX_CONSTANT=14;
     public static final int T_GENERIC=110;
     public static final int T_ENDDO=173;
-    public static final int T_READ=146;
     public static final int Digit_String=9;
+    public static final int T_READ=146;
     public static final int T_NOT=53;
-    public static final int T_ENDIF=178;
     public static final int T_EQUALS=26;
+    public static final int T_ENDIF=178;
     public static final int T_WAIT=166;
     public static final int T_ENDBLOCK=171;
-    public static final int T_ONLY=129;
     public static final int T_COMPLEX=63;
+    public static final int T_ONLY=129;
     public static final int T_PROCEDURE=141;
     public static final int T_INTRINSIC=120;
     public static final int T_ELSEWHERE=95;
     public static final int T_ENDENUM=174;
-    public static final int T_SAVE=151;
     public static final int T_PROGRAM=142;
+    public static final int T_SAVE=151;
     public static final int EOF=-1;
     public static final int T_HOLLERITH=191;
     public static final int T_INTERFACE=119;
@@ -563,11 +563,11 @@ public class FortranLexer extends Lexer {
                 // we need to ignore it.  
                 if(prevToken == null || 
                     (prevToken != null && prevToken.getType() == T_EOS)) {
-                    _channel=HIDDEN;
+                    state.channel = HIDDEN;
                 } 
 
                 if(includeLine) {
-                    _channel=HIDDEN;
+                    state.channel = HIDDEN;
                     // Part of include file handling..
                     includeFile();
                     includeLine = false;
@@ -590,10 +590,9 @@ public class FortranLexer extends Lexer {
             // FortranLexer.g:315:17: '&'
             {
             match('&'); 
-             continueFlag = !continueFlag;
-            //                       _channel = 99;
-                                _channel=HIDDEN;
-            //                     _channel=99;
+
+                        continueFlag = !continueFlag;
+                        _channel = HIDDEN;
                     
 
             }
@@ -611,7 +610,7 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CHAR_CONSTANT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:325:9: ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ )
+            // FortranLexer.g:324:9: ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ )
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -629,9 +628,9 @@ public class FortranLexer extends Lexer {
             }
             switch (alt7) {
                 case 1 :
-                    // FortranLexer.g:325:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
+                    // FortranLexer.g:324:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
                     {
-                    // FortranLexer.g:325:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
+                    // FortranLexer.g:324:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -645,10 +644,10 @@ public class FortranLexer extends Lexer {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // FortranLexer.g:325:12: '\\'' ( SQ_Rep_Char )* '\\''
+                    	    // FortranLexer.g:324:12: '\\'' ( SQ_Rep_Char )* '\\''
                     	    {
                     	    match('\''); 
-                    	    // FortranLexer.g:325:17: ( SQ_Rep_Char )*
+                    	    // FortranLexer.g:324:17: ( SQ_Rep_Char )*
                     	    loop3:
                     	    do {
                     	        int alt3=2;
@@ -661,7 +660,7 @@ public class FortranLexer extends Lexer {
 
                     	        switch (alt3) {
                     	    	case 1 :
-                    	    	    // FortranLexer.g:325:19: SQ_Rep_Char
+                    	    	    // FortranLexer.g:324:19: SQ_Rep_Char
                     	    	    {
                     	    	    mSQ_Rep_Char(); 
 
@@ -688,18 +687,16 @@ public class FortranLexer extends Lexer {
                     } while (true);
 
                      
-                                if(includeLine) 
-                    //                 _channel=99;
-                                    _channel=HIDDEN;
-                    //             _channel=99;
+                                if (includeLine) 
+                                    _channel = HIDDEN;
                             
 
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:331:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
+                    // FortranLexer.g:328:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
                     {
-                    // FortranLexer.g:331:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
+                    // FortranLexer.g:328:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
                     int cnt6=0;
                     loop6:
                     do {
@@ -713,10 +710,10 @@ public class FortranLexer extends Lexer {
 
                         switch (alt6) {
                     	case 1 :
-                    	    // FortranLexer.g:331:12: '\\\"' ( DQ_Rep_Char )* '\\\"'
+                    	    // FortranLexer.g:328:12: '\\\"' ( DQ_Rep_Char )* '\\\"'
                     	    {
                     	    match('\"'); 
-                    	    // FortranLexer.g:331:17: ( DQ_Rep_Char )*
+                    	    // FortranLexer.g:328:17: ( DQ_Rep_Char )*
                     	    loop5:
                     	    do {
                     	        int alt5=2;
@@ -729,7 +726,7 @@ public class FortranLexer extends Lexer {
 
                     	        switch (alt5) {
                     	    	case 1 :
-                    	    	    // FortranLexer.g:331:19: DQ_Rep_Char
+                    	    	    // FortranLexer.g:328:19: DQ_Rep_Char
                     	    	    {
                     	    	    mDQ_Rep_Char(); 
 
@@ -756,10 +753,8 @@ public class FortranLexer extends Lexer {
                     } while (true);
 
                      
-                                if(includeLine) 
-                    //                _channel=99;
-                                    _channel=HIDDEN;
-                    //             _channel=99;
+                                if (includeLine) 
+                                    _channel = HIDDEN;
                             
 
                     }
@@ -779,8 +774,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DIGIT_STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:340:9: ( Digit_String )
-            // FortranLexer.g:340:17: Digit_String
+            // FortranLexer.g:335:2: ( Digit_String )
+            // FortranLexer.g:335:4: Digit_String
             {
             mDigit_String(); 
 
@@ -799,7 +794,7 @@ public class FortranLexer extends Lexer {
         try {
             int _type = BINARY_CONSTANT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:345:5: ( ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\'' | ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"' )
+            // FortranLexer.g:340:5: ( ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\'' | ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"' )
             int alt10=2;
             int LA10_0 = input.LA(1);
 
@@ -827,7 +822,7 @@ public class FortranLexer extends Lexer {
             }
             switch (alt10) {
                 case 1 :
-                    // FortranLexer.g:345:7: ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\''
+                    // FortranLexer.g:340:7: ( 'b' | 'B' ) '\\'' ( '0' .. '1' )+ '\\''
                     {
                     if ( input.LA(1)=='B'||input.LA(1)=='b' ) {
                         input.consume();
@@ -839,7 +834,7 @@ public class FortranLexer extends Lexer {
                         throw mse;}
 
                     match('\''); 
-                    // FortranLexer.g:345:22: ( '0' .. '1' )+
+                    // FortranLexer.g:340:22: ( '0' .. '1' )+
                     int cnt8=0;
                     loop8:
                     do {
@@ -853,7 +848,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt8) {
                     	case 1 :
-                    	    // FortranLexer.g:345:23: '0' .. '1'
+                    	    // FortranLexer.g:340:23: '0' .. '1'
                     	    {
                     	    matchRange('0','1'); 
 
@@ -874,7 +869,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:346:7: ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"'
+                    // FortranLexer.g:341:7: ( 'b' | 'B' ) '\\\"' ( '0' .. '1' )+ '\\\"'
                     {
                     if ( input.LA(1)=='B'||input.LA(1)=='b' ) {
                         input.consume();
@@ -886,7 +881,7 @@ public class FortranLexer extends Lexer {
                         throw mse;}
 
                     match('\"'); 
-                    // FortranLexer.g:346:22: ( '0' .. '1' )+
+                    // FortranLexer.g:341:22: ( '0' .. '1' )+
                     int cnt9=0;
                     loop9:
                     do {
@@ -900,7 +895,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // FortranLexer.g:346:23: '0' .. '1'
+                    	    // FortranLexer.g:341:23: '0' .. '1'
                     	    {
                     	    matchRange('0','1'); 
 
@@ -935,7 +930,7 @@ public class FortranLexer extends Lexer {
         try {
             int _type = OCTAL_CONSTANT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:351:5: ( ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\'' | ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"' )
+            // FortranLexer.g:346:5: ( ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\'' | ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"' )
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -963,7 +958,7 @@ public class FortranLexer extends Lexer {
             }
             switch (alt13) {
                 case 1 :
-                    // FortranLexer.g:351:7: ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\''
+                    // FortranLexer.g:346:7: ( 'o' | 'O' ) '\\'' ( '0' .. '7' )+ '\\''
                     {
                     if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
                         input.consume();
@@ -975,7 +970,7 @@ public class FortranLexer extends Lexer {
                         throw mse;}
 
                     match('\''); 
-                    // FortranLexer.g:351:22: ( '0' .. '7' )+
+                    // FortranLexer.g:346:22: ( '0' .. '7' )+
                     int cnt11=0;
                     loop11:
                     do {
@@ -989,7 +984,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // FortranLexer.g:351:23: '0' .. '7'
+                    	    // FortranLexer.g:346:23: '0' .. '7'
                     	    {
                     	    matchRange('0','7'); 
 
@@ -1010,7 +1005,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:352:7: ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"'
+                    // FortranLexer.g:347:7: ( 'o' | 'O' ) '\\\"' ( '0' .. '7' )+ '\\\"'
                     {
                     if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
                         input.consume();
@@ -1022,7 +1017,7 @@ public class FortranLexer extends Lexer {
                         throw mse;}
 
                     match('\"'); 
-                    // FortranLexer.g:352:22: ( '0' .. '7' )+
+                    // FortranLexer.g:347:22: ( '0' .. '7' )+
                     int cnt12=0;
                     loop12:
                     do {
@@ -1036,7 +1031,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt12) {
                     	case 1 :
-                    	    // FortranLexer.g:352:23: '0' .. '7'
+                    	    // FortranLexer.g:347:23: '0' .. '7'
                     	    {
                     	    matchRange('0','7'); 
 
@@ -1071,7 +1066,7 @@ public class FortranLexer extends Lexer {
         try {
             int _type = HEX_CONSTANT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:357:5: ( ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' )
+            // FortranLexer.g:352:5: ( ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' )
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -1099,7 +1094,7 @@ public class FortranLexer extends Lexer {
             }
             switch (alt16) {
                 case 1 :
-                    // FortranLexer.g:357:7: ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\''
+                    // FortranLexer.g:352:7: ( 'z' | 'Z' ) '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\''
                     {
                     if ( input.LA(1)=='Z'||input.LA(1)=='z' ) {
                         input.consume();
@@ -1111,7 +1106,7 @@ public class FortranLexer extends Lexer {
                         throw mse;}
 
                     match('\''); 
-                    // FortranLexer.g:357:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
+                    // FortranLexer.g:352:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
                     int cnt14=0;
                     loop14:
                     do {
@@ -1154,7 +1149,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:358:7: ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"'
+                    // FortranLexer.g:353:7: ( 'z' | 'Z' ) '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"'
                     {
                     if ( input.LA(1)=='Z'||input.LA(1)=='z' ) {
                         input.consume();
@@ -1166,7 +1161,7 @@ public class FortranLexer extends Lexer {
                         throw mse;}
 
                     match('\"'); 
-                    // FortranLexer.g:358:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
+                    // FortranLexer.g:353:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
                     int cnt15=0;
                     loop15:
                     do {
@@ -1223,8 +1218,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:362:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' ) )
-            // FortranLexer.g:362:8: ( ' ' | '\\r' | '\\t' | '\\u000C' )
+            // FortranLexer.g:357:5: ( ( ' ' | '\\r' | '\\t' | '\\u000C' ) )
+            // FortranLexer.g:357:8: ( ' ' | '\\r' | '\\t' | '\\u000C' )
             {
             if ( input.LA(1)=='\t'||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1235,11 +1230,9 @@ public class FortranLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // _channel=99;
-                        _channel=HIDDEN;
-            //             _channel=99;
-            //             _channel=99;
-                    
+
+                        _channel = HIDDEN;
+                   
 
             }
 
@@ -1254,10 +1247,10 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "Digit_String"
     public final void mDigit_String() throws RecognitionException {
         try {
-            // FortranLexer.g:375:14: ( ( Digit )+ )
-            // FortranLexer.g:375:16: ( Digit )+
+            // FortranLexer.g:368:14: ( ( Digit )+ )
+            // FortranLexer.g:368:16: ( Digit )+
             {
-            // FortranLexer.g:375:16: ( Digit )+
+            // FortranLexer.g:368:16: ( Digit )+
             int cnt17=0;
             loop17:
             do {
@@ -1271,7 +1264,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt17) {
             	case 1 :
-            	    // FortranLexer.g:375:16: Digit
+            	    // FortranLexer.g:368:16: Digit
             	    {
             	    mDigit(); 
 
@@ -1299,7 +1292,7 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "Alphanumeric_Character"
     public final void mAlphanumeric_Character() throws RecognitionException {
         try {
-            // FortranLexer.g:380:24: ( Letter | Digit | '_' )
+            // FortranLexer.g:373:24: ( Letter | Digit | '_' )
             // FortranLexer.g:
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
@@ -1323,7 +1316,7 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "Special_Character"
     public final void mSpecial_Character() throws RecognitionException {
         try {
-            // FortranLexer.g:384:5: ( ' ' .. '/' | ':' .. '@' | '[' .. '^' | '`' | '{' .. '~' )
+            // FortranLexer.g:377:5: ( ' ' .. '/' | ':' .. '@' | '[' .. '^' | '`' | '{' .. '~' )
             // FortranLexer.g:
             {
             if ( (input.LA(1)>=' ' && input.LA(1)<='/')||(input.LA(1)>=':' && input.LA(1)<='@')||(input.LA(1)>='[' && input.LA(1)<='^')||input.LA(1)=='`'||(input.LA(1)>='{' && input.LA(1)<='~') ) {
@@ -1347,8 +1340,8 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "Rep_Char"
     public final void mRep_Char() throws RecognitionException {
         try {
-            // FortranLexer.g:392:10: (~ ( '\\'' | '\\\"' ) )
-            // FortranLexer.g:392:12: ~ ( '\\'' | '\\\"' )
+            // FortranLexer.g:385:10: (~ ( '\\'' | '\\\"' ) )
+            // FortranLexer.g:385:12: ~ ( '\\'' | '\\\"' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1371,8 +1364,8 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "SQ_Rep_Char"
     public final void mSQ_Rep_Char() throws RecognitionException {
         try {
-            // FortranLexer.g:395:13: (~ ( '\\'' ) )
-            // FortranLexer.g:395:15: ~ ( '\\'' )
+            // FortranLexer.g:388:13: (~ ( '\\'' ) )
+            // FortranLexer.g:388:15: ~ ( '\\'' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1395,8 +1388,8 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "DQ_Rep_Char"
     public final void mDQ_Rep_Char() throws RecognitionException {
         try {
-            // FortranLexer.g:397:13: (~ ( '\\\"' ) )
-            // FortranLexer.g:397:15: ~ ( '\\\"' )
+            // FortranLexer.g:390:13: (~ ( '\\\"' ) )
+            // FortranLexer.g:390:15: ~ ( '\\\"' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1419,8 +1412,8 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "Letter"
     public final void mLetter() throws RecognitionException {
         try {
-            // FortranLexer.g:400:8: ( ( 'a' .. 'z' | 'A' .. 'Z' ) )
-            // FortranLexer.g:400:10: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // FortranLexer.g:393:8: ( ( 'a' .. 'z' | 'A' .. 'Z' ) )
+            // FortranLexer.g:393:10: ( 'a' .. 'z' | 'A' .. 'Z' )
             {
             if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -1443,8 +1436,8 @@ public class FortranLexer extends Lexer {
     // $ANTLR start "Digit"
     public final void mDigit() throws RecognitionException {
         try {
-            // FortranLexer.g:403:7: ( '0' .. '9' )
-            // FortranLexer.g:403:9: '0' .. '9'
+            // FortranLexer.g:396:7: ( '0' .. '9' )
+            // FortranLexer.g:396:9: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -1461,11 +1454,11 @@ public class FortranLexer extends Lexer {
         try {
             int _type = PREPROCESS_LINE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:405:17: ( '#' (~ ( '\\n' | '\\r' ) )* )
-            // FortranLexer.g:405:19: '#' (~ ( '\\n' | '\\r' ) )*
+            // FortranLexer.g:398:17: ( '#' (~ ( '\\n' | '\\r' ) )* )
+            // FortranLexer.g:398:19: '#' (~ ( '\\n' | '\\r' ) )*
             {
             match('#'); 
-            // FortranLexer.g:405:23: (~ ( '\\n' | '\\r' ) )*
+            // FortranLexer.g:398:23: (~ ( '\\n' | '\\r' ) )*
             loop18:
             do {
                 int alt18=2;
@@ -1478,7 +1471,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt18) {
             	case 1 :
-            	    // FortranLexer.g:405:23: ~ ( '\\n' | '\\r' )
+            	    // FortranLexer.g:398:23: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -1498,9 +1491,8 @@ public class FortranLexer extends Lexer {
                 }
             } while (true);
 
-             // _channel=99;
-                        _channel=HIDDEN;
-            //             _channel=99;
+
+                        _channel = HIDDEN;
                     
 
             }
@@ -1518,14 +1510,14 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INCLUDE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:411:16: ( 'INCLUDE' )
-            // FortranLexer.g:411:18: 'INCLUDE'
+            // FortranLexer.g:403:16: ( 'INCLUDE' )
+            // FortranLexer.g:403:18: 'INCLUDE'
             {
             match("INCLUDE"); 
 
-             includeLine = true; // _channel=99;
-                        _channel=HIDDEN;
-            //             _channel=99;
+
+                        includeLine = true;
+                        _channel = HIDDEN;
                     
 
             }
@@ -1543,8 +1535,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ASTERISK;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:421:17: ( '*' )
-            // FortranLexer.g:421:19: '*'
+            // FortranLexer.g:413:17: ( '*' )
+            // FortranLexer.g:413:19: '*'
             {
             match('*'); 
 
@@ -1563,8 +1555,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_COLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:422:17: ( ':' )
-            // FortranLexer.g:422:19: ':'
+            // FortranLexer.g:414:17: ( ':' )
+            // FortranLexer.g:414:19: ':'
             {
             match(':'); 
 
@@ -1583,8 +1575,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_COLON_COLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:423:17: ( '::' )
-            // FortranLexer.g:423:19: '::'
+            // FortranLexer.g:415:17: ( '::' )
+            // FortranLexer.g:415:19: '::'
             {
             match("::"); 
 
@@ -1604,8 +1596,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_COMMA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:424:17: ( ',' )
-            // FortranLexer.g:424:19: ','
+            // FortranLexer.g:416:17: ( ',' )
+            // FortranLexer.g:416:19: ','
             {
             match(','); 
 
@@ -1624,8 +1616,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EQUALS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:425:17: ( '=' )
-            // FortranLexer.g:425:19: '='
+            // FortranLexer.g:417:17: ( '=' )
+            // FortranLexer.g:417:19: '='
             {
             match('='); 
 
@@ -1644,8 +1636,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EQ_EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:426:17: ( '==' )
-            // FortranLexer.g:426:19: '=='
+            // FortranLexer.g:418:17: ( '==' )
+            // FortranLexer.g:418:19: '=='
             {
             match("=="); 
 
@@ -1665,8 +1657,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EQ_GT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:427:17: ( '=>' )
-            // FortranLexer.g:427:19: '=>'
+            // FortranLexer.g:419:17: ( '=>' )
+            // FortranLexer.g:419:19: '=>'
             {
             match("=>"); 
 
@@ -1686,8 +1678,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GREATERTHAN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:428:17: ( '>' )
-            // FortranLexer.g:428:19: '>'
+            // FortranLexer.g:420:17: ( '>' )
+            // FortranLexer.g:420:19: '>'
             {
             match('>'); 
 
@@ -1706,8 +1698,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GREATERTHAN_EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:429:17: ( '>=' )
-            // FortranLexer.g:429:19: '>='
+            // FortranLexer.g:421:17: ( '>=' )
+            // FortranLexer.g:421:19: '>='
             {
             match(">="); 
 
@@ -1727,8 +1719,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LESSTHAN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:430:17: ( '<' )
-            // FortranLexer.g:430:19: '<'
+            // FortranLexer.g:422:17: ( '<' )
+            // FortranLexer.g:422:19: '<'
             {
             match('<'); 
 
@@ -1747,8 +1739,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LESSTHAN_EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:431:17: ( '<=' )
-            // FortranLexer.g:431:19: '<='
+            // FortranLexer.g:423:17: ( '<=' )
+            // FortranLexer.g:423:19: '<='
             {
             match("<="); 
 
@@ -1768,8 +1760,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LBRACKET;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:432:17: ( '[' )
-            // FortranLexer.g:432:19: '['
+            // FortranLexer.g:424:17: ( '[' )
+            // FortranLexer.g:424:19: '['
             {
             match('['); 
 
@@ -1788,8 +1780,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:433:17: ( '(' )
-            // FortranLexer.g:433:19: '('
+            // FortranLexer.g:425:17: ( '(' )
+            // FortranLexer.g:425:19: '('
             {
             match('('); 
 
@@ -1808,8 +1800,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_MINUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:434:17: ( '-' )
-            // FortranLexer.g:434:19: '-'
+            // FortranLexer.g:426:17: ( '-' )
+            // FortranLexer.g:426:19: '-'
             {
             match('-'); 
 
@@ -1828,8 +1820,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PERCENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:435:17: ( '%' )
-            // FortranLexer.g:435:19: '%'
+            // FortranLexer.g:427:17: ( '%' )
+            // FortranLexer.g:427:19: '%'
             {
             match('%'); 
 
@@ -1848,8 +1840,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:436:17: ( '+' )
-            // FortranLexer.g:436:19: '+'
+            // FortranLexer.g:428:17: ( '+' )
+            // FortranLexer.g:428:19: '+'
             {
             match('+'); 
 
@@ -1868,8 +1860,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_POWER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:437:17: ( '**' )
-            // FortranLexer.g:437:19: '**'
+            // FortranLexer.g:429:17: ( '**' )
+            // FortranLexer.g:429:19: '**'
             {
             match("**"); 
 
@@ -1889,8 +1881,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SLASH;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:438:17: ( '/' )
-            // FortranLexer.g:438:19: '/'
+            // FortranLexer.g:430:17: ( '/' )
+            // FortranLexer.g:430:19: '/'
             {
             match('/'); 
 
@@ -1909,8 +1901,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SLASH_EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:439:17: ( '/=' )
-            // FortranLexer.g:439:19: '/='
+            // FortranLexer.g:431:17: ( '/=' )
+            // FortranLexer.g:431:19: '/='
             {
             match("/="); 
 
@@ -1930,8 +1922,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SLASH_SLASH;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:440:17: ( '//' )
-            // FortranLexer.g:440:19: '//'
+            // FortranLexer.g:432:17: ( '//' )
+            // FortranLexer.g:432:19: '//'
             {
             match("//"); 
 
@@ -1951,8 +1943,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_RBRACKET;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:441:17: ( ']' )
-            // FortranLexer.g:441:19: ']'
+            // FortranLexer.g:433:17: ( ']' )
+            // FortranLexer.g:433:19: ']'
             {
             match(']'); 
 
@@ -1971,8 +1963,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_RPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:442:17: ( ')' )
-            // FortranLexer.g:442:19: ')'
+            // FortranLexer.g:434:17: ( ')' )
+            // FortranLexer.g:434:19: ')'
             {
             match(')'); 
 
@@ -1991,8 +1983,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_UNDERSCORE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:443:17: ( '_' )
-            // FortranLexer.g:443:19: '_'
+            // FortranLexer.g:435:17: ( '_' )
+            // FortranLexer.g:435:19: '_'
             {
             match('_'); 
 
@@ -2011,8 +2003,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:445:17: ( '.EQ.' )
-            // FortranLexer.g:445:19: '.EQ.'
+            // FortranLexer.g:437:17: ( '.EQ.' )
+            // FortranLexer.g:437:19: '.EQ.'
             {
             match(".EQ."); 
 
@@ -2032,8 +2024,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:446:17: ( '.NE.' )
-            // FortranLexer.g:446:19: '.NE.'
+            // FortranLexer.g:438:17: ( '.NE.' )
+            // FortranLexer.g:438:19: '.NE.'
             {
             match(".NE."); 
 
@@ -2053,8 +2045,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:447:17: ( '.LT.' )
-            // FortranLexer.g:447:19: '.LT.'
+            // FortranLexer.g:439:17: ( '.LT.' )
+            // FortranLexer.g:439:19: '.LT.'
             {
             match(".LT."); 
 
@@ -2074,8 +2066,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:448:17: ( '.LE.' )
-            // FortranLexer.g:448:19: '.LE.'
+            // FortranLexer.g:440:17: ( '.LE.' )
+            // FortranLexer.g:440:19: '.LE.'
             {
             match(".LE."); 
 
@@ -2095,8 +2087,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:449:17: ( '.GT.' )
-            // FortranLexer.g:449:19: '.GT.'
+            // FortranLexer.g:441:17: ( '.GT.' )
+            // FortranLexer.g:441:19: '.GT.'
             {
             match(".GT."); 
 
@@ -2116,8 +2108,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:450:17: ( '.GE.' )
-            // FortranLexer.g:450:19: '.GE.'
+            // FortranLexer.g:442:17: ( '.GE.' )
+            // FortranLexer.g:442:19: '.GE.'
             {
             match(".GE."); 
 
@@ -2137,8 +2129,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_TRUE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:452:17: ( '.TRUE.' )
-            // FortranLexer.g:452:19: '.TRUE.'
+            // FortranLexer.g:444:17: ( '.TRUE.' )
+            // FortranLexer.g:444:19: '.TRUE.'
             {
             match(".TRUE."); 
 
@@ -2158,8 +2150,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FALSE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:453:17: ( '.FALSE.' )
-            // FortranLexer.g:453:19: '.FALSE.'
+            // FortranLexer.g:445:17: ( '.FALSE.' )
+            // FortranLexer.g:445:19: '.FALSE.'
             {
             match(".FALSE."); 
 
@@ -2179,8 +2171,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:455:17: ( '.NOT.' )
-            // FortranLexer.g:455:19: '.NOT.'
+            // FortranLexer.g:447:17: ( '.NOT.' )
+            // FortranLexer.g:447:19: '.NOT.'
             {
             match(".NOT."); 
 
@@ -2200,8 +2192,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_AND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:456:17: ( '.AND.' )
-            // FortranLexer.g:456:19: '.AND.'
+            // FortranLexer.g:448:17: ( '.AND.' )
+            // FortranLexer.g:448:19: '.AND.'
             {
             match(".AND."); 
 
@@ -2221,8 +2213,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_OR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:457:17: ( '.OR.' )
-            // FortranLexer.g:457:19: '.OR.'
+            // FortranLexer.g:449:17: ( '.OR.' )
+            // FortranLexer.g:449:19: '.OR.'
             {
             match(".OR."); 
 
@@ -2242,8 +2234,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EQV;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:458:17: ( '.EQV.' )
-            // FortranLexer.g:458:19: '.EQV.'
+            // FortranLexer.g:450:17: ( '.EQV.' )
+            // FortranLexer.g:450:19: '.EQV.'
             {
             match(".EQV."); 
 
@@ -2263,8 +2255,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NEQV;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:459:17: ( '.NEQV.' )
-            // FortranLexer.g:459:19: '.NEQV.'
+            // FortranLexer.g:451:17: ( '.NEQV.' )
+            // FortranLexer.g:451:19: '.NEQV.'
             {
             match(".NEQV."); 
 
@@ -2284,15 +2276,15 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PERIOD_EXPONENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:462:5: ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // FortranLexer.g:454:5: ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ )
             int alt28=4;
             alt28 = dfa28.predict(input);
             switch (alt28) {
                 case 1 :
-                    // FortranLexer.g:462:7: '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // FortranLexer.g:454:7: '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
                     match('.'); 
-                    // FortranLexer.g:462:11: ( '0' .. '9' )+
+                    // FortranLexer.g:454:11: ( '0' .. '9' )+
                     int cnt19=0;
                     loop19:
                     do {
@@ -2306,7 +2298,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt19) {
                     	case 1 :
-                    	    // FortranLexer.g:462:12: '0' .. '9'
+                    	    // FortranLexer.g:454:12: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2331,7 +2323,7 @@ public class FortranLexer extends Lexer {
                         recover(mse);
                         throw mse;}
 
-                    // FortranLexer.g:462:47: ( '+' | '-' )?
+                    // FortranLexer.g:454:47: ( '+' | '-' )?
                     int alt20=2;
                     int LA20_0 = input.LA(1);
 
@@ -2357,7 +2349,7 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:462:60: ( '0' .. '9' )+
+                    // FortranLexer.g:454:60: ( '0' .. '9' )+
                     int cnt21=0;
                     loop21:
                     do {
@@ -2371,7 +2363,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt21) {
                     	case 1 :
-                    	    // FortranLexer.g:462:61: '0' .. '9'
+                    	    // FortranLexer.g:454:61: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2391,7 +2383,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:463:7: '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // FortranLexer.g:455:7: '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
                     match('.'); 
                     if ( (input.LA(1)>='D' && input.LA(1)<='E')||(input.LA(1)>='d' && input.LA(1)<='e') ) {
@@ -2403,7 +2395,7 @@ public class FortranLexer extends Lexer {
                         recover(mse);
                         throw mse;}
 
-                    // FortranLexer.g:463:35: ( '+' | '-' )?
+                    // FortranLexer.g:455:35: ( '+' | '-' )?
                     int alt22=2;
                     int LA22_0 = input.LA(1);
 
@@ -2429,7 +2421,7 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:463:48: ( '0' .. '9' )+
+                    // FortranLexer.g:455:48: ( '0' .. '9' )+
                     int cnt23=0;
                     loop23:
                     do {
@@ -2443,7 +2435,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt23) {
                     	case 1 :
-                    	    // FortranLexer.g:463:49: '0' .. '9'
+                    	    // FortranLexer.g:455:49: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2463,10 +2455,10 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // FortranLexer.g:464:7: '.' ( '0' .. '9' )+
+                    // FortranLexer.g:456:7: '.' ( '0' .. '9' )+
                     {
                     match('.'); 
-                    // FortranLexer.g:464:11: ( '0' .. '9' )+
+                    // FortranLexer.g:456:11: ( '0' .. '9' )+
                     int cnt24=0;
                     loop24:
                     do {
@@ -2480,7 +2472,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt24) {
                     	case 1 :
-                    	    // FortranLexer.g:464:12: '0' .. '9'
+                    	    // FortranLexer.g:456:12: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2500,9 +2492,9 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // FortranLexer.g:465:7: ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // FortranLexer.g:457:7: ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
-                    // FortranLexer.g:465:7: ( '0' .. '9' )+
+                    // FortranLexer.g:457:7: ( '0' .. '9' )+
                     int cnt25=0;
                     loop25:
                     do {
@@ -2516,7 +2508,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt25) {
                     	case 1 :
-                    	    // FortranLexer.g:465:8: '0' .. '9'
+                    	    // FortranLexer.g:457:8: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2541,7 +2533,7 @@ public class FortranLexer extends Lexer {
                         recover(mse);
                         throw mse;}
 
-                    // FortranLexer.g:465:43: ( '+' | '-' )?
+                    // FortranLexer.g:457:43: ( '+' | '-' )?
                     int alt26=2;
                     int LA26_0 = input.LA(1);
 
@@ -2567,7 +2559,7 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:465:56: ( '0' .. '9' )+
+                    // FortranLexer.g:457:56: ( '0' .. '9' )+
                     int cnt27=0;
                     loop27:
                     do {
@@ -2581,7 +2573,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt27) {
                     	case 1 :
-                    	    // FortranLexer.g:465:57: '0' .. '9'
+                    	    // FortranLexer.g:457:57: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -2615,8 +2607,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PERIOD;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:468:17: ( '.' )
-            // FortranLexer.g:468:19: '.'
+            // FortranLexer.g:460:17: ( '.' )
+            // FortranLexer.g:460:19: '.'
             {
             match('.'); 
 
@@ -2635,8 +2627,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_XYZ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:476:17: ( '__XYZ__' )
-            // FortranLexer.g:476:19: '__XYZ__'
+            // FortranLexer.g:468:17: ( '__XYZ__' )
+            // FortranLexer.g:468:19: '__XYZ__'
             {
             match("__XYZ__"); 
 
@@ -2656,8 +2648,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INTEGER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:478:17: ( 'INTEGER' )
-            // FortranLexer.g:478:25: 'INTEGER'
+            // FortranLexer.g:470:17: ( 'INTEGER' )
+            // FortranLexer.g:470:25: 'INTEGER'
             {
             match("INTEGER"); 
 
@@ -2677,8 +2669,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_REAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:479:17: ( 'REAL' )
-            // FortranLexer.g:479:25: 'REAL'
+            // FortranLexer.g:471:17: ( 'REAL' )
+            // FortranLexer.g:471:25: 'REAL'
             {
             match("REAL"); 
 
@@ -2698,8 +2690,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_COMPLEX;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:480:17: ( 'COMPLEX' )
-            // FortranLexer.g:480:25: 'COMPLEX'
+            // FortranLexer.g:472:17: ( 'COMPLEX' )
+            // FortranLexer.g:472:25: 'COMPLEX'
             {
             match("COMPLEX"); 
 
@@ -2719,8 +2711,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CHARACTER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:481:17: ( 'CHARACTER' )
-            // FortranLexer.g:481:25: 'CHARACTER'
+            // FortranLexer.g:473:17: ( 'CHARACTER' )
+            // FortranLexer.g:473:25: 'CHARACTER'
             {
             match("CHARACTER"); 
 
@@ -2740,8 +2732,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LOGICAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:482:17: ( 'LOGICAL' )
-            // FortranLexer.g:482:25: 'LOGICAL'
+            // FortranLexer.g:474:17: ( 'LOGICAL' )
+            // FortranLexer.g:474:25: 'LOGICAL'
             {
             match("LOGICAL"); 
 
@@ -2761,8 +2753,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ABSTRACT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:484:17: ( 'ABSTRACT' )
-            // FortranLexer.g:484:25: 'ABSTRACT'
+            // FortranLexer.g:476:17: ( 'ABSTRACT' )
+            // FortranLexer.g:476:25: 'ABSTRACT'
             {
             match("ABSTRACT"); 
 
@@ -2782,8 +2774,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ALLOCATABLE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:485:17: ( 'ALLOCATABLE' )
-            // FortranLexer.g:485:25: 'ALLOCATABLE'
+            // FortranLexer.g:477:17: ( 'ALLOCATABLE' )
+            // FortranLexer.g:477:25: 'ALLOCATABLE'
             {
             match("ALLOCATABLE"); 
 
@@ -2803,8 +2795,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ALLOCATE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:486:17: ( 'ALLOCATE' )
-            // FortranLexer.g:486:25: 'ALLOCATE'
+            // FortranLexer.g:478:17: ( 'ALLOCATE' )
+            // FortranLexer.g:478:25: 'ALLOCATE'
             {
             match("ALLOCATE"); 
 
@@ -2824,8 +2816,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ASSIGNMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:487:17: ( 'ASSIGNMENT' )
-            // FortranLexer.g:487:25: 'ASSIGNMENT'
+            // FortranLexer.g:479:17: ( 'ASSIGNMENT' )
+            // FortranLexer.g:479:25: 'ASSIGNMENT'
             {
             match("ASSIGNMENT"); 
 
@@ -2845,8 +2837,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ASSIGN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:489:17: ( 'ASSIGN' )
-            // FortranLexer.g:489:25: 'ASSIGN'
+            // FortranLexer.g:481:17: ( 'ASSIGN' )
+            // FortranLexer.g:481:25: 'ASSIGN'
             {
             match("ASSIGN"); 
 
@@ -2866,8 +2858,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ASSOCIATE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:490:17: ( 'ASSOCIATE' )
-            // FortranLexer.g:490:25: 'ASSOCIATE'
+            // FortranLexer.g:482:17: ( 'ASSOCIATE' )
+            // FortranLexer.g:482:25: 'ASSOCIATE'
             {
             match("ASSOCIATE"); 
 
@@ -2887,8 +2879,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ASYNCHRONOUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:491:17: ( 'ASYNCHRONOUS' )
-            // FortranLexer.g:491:25: 'ASYNCHRONOUS'
+            // FortranLexer.g:483:17: ( 'ASYNCHRONOUS' )
+            // FortranLexer.g:483:25: 'ASYNCHRONOUS'
             {
             match("ASYNCHRONOUS"); 
 
@@ -2908,8 +2900,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_BACKSPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:492:17: ( 'BACKSPACE' )
-            // FortranLexer.g:492:25: 'BACKSPACE'
+            // FortranLexer.g:484:17: ( 'BACKSPACE' )
+            // FortranLexer.g:484:25: 'BACKSPACE'
             {
             match("BACKSPACE"); 
 
@@ -2929,8 +2921,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_BLOCK;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:493:17: ( 'BLOCK' )
-            // FortranLexer.g:493:25: 'BLOCK'
+            // FortranLexer.g:485:17: ( 'BLOCK' )
+            // FortranLexer.g:485:25: 'BLOCK'
             {
             match("BLOCK"); 
 
@@ -2950,8 +2942,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_BLOCKDATA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:494:17: ( 'BLOCKDATA' )
-            // FortranLexer.g:494:25: 'BLOCKDATA'
+            // FortranLexer.g:486:17: ( 'BLOCKDATA' )
+            // FortranLexer.g:486:25: 'BLOCKDATA'
             {
             match("BLOCKDATA"); 
 
@@ -2971,8 +2963,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CALL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:495:17: ( 'CALL' )
-            // FortranLexer.g:495:25: 'CALL'
+            // FortranLexer.g:487:17: ( 'CALL' )
+            // FortranLexer.g:487:25: 'CALL'
             {
             match("CALL"); 
 
@@ -2992,8 +2984,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CASE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:496:17: ( 'CASE' )
-            // FortranLexer.g:496:25: 'CASE'
+            // FortranLexer.g:488:17: ( 'CASE' )
+            // FortranLexer.g:488:25: 'CASE'
             {
             match("CASE"); 
 
@@ -3013,8 +3005,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CLASS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:497:17: ( 'CLASS' )
-            // FortranLexer.g:497:25: 'CLASS'
+            // FortranLexer.g:489:17: ( 'CLASS' )
+            // FortranLexer.g:489:25: 'CLASS'
             {
             match("CLASS"); 
 
@@ -3034,8 +3026,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CLOSE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:498:17: ( 'CLOSE' )
-            // FortranLexer.g:498:25: 'CLOSE'
+            // FortranLexer.g:490:17: ( 'CLOSE' )
+            // FortranLexer.g:490:25: 'CLOSE'
             {
             match("CLOSE"); 
 
@@ -3055,8 +3047,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_COMMON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:499:17: ( 'COMMON' )
-            // FortranLexer.g:499:25: 'COMMON'
+            // FortranLexer.g:491:17: ( 'COMMON' )
+            // FortranLexer.g:491:25: 'COMMON'
             {
             match("COMMON"); 
 
@@ -3076,8 +3068,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CONTAINS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:500:17: ( 'CONTAINS' )
-            // FortranLexer.g:500:25: 'CONTAINS'
+            // FortranLexer.g:492:17: ( 'CONTAINS' )
+            // FortranLexer.g:492:25: 'CONTAINS'
             {
             match("CONTAINS"); 
 
@@ -3097,8 +3089,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CONTINUE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:501:17: ( 'CONTINUE' )
-            // FortranLexer.g:501:25: 'CONTINUE'
+            // FortranLexer.g:493:17: ( 'CONTINUE' )
+            // FortranLexer.g:493:25: 'CONTINUE'
             {
             match("CONTINUE"); 
 
@@ -3118,8 +3110,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CYCLE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:502:17: ( 'CYCLE' )
-            // FortranLexer.g:502:25: 'CYCLE'
+            // FortranLexer.g:494:17: ( 'CYCLE' )
+            // FortranLexer.g:494:25: 'CYCLE'
             {
             match("CYCLE"); 
 
@@ -3139,8 +3131,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DATA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:503:17: ( 'DATA' )
-            // FortranLexer.g:503:25: 'DATA'
+            // FortranLexer.g:495:17: ( 'DATA' )
+            // FortranLexer.g:495:25: 'DATA'
             {
             match("DATA"); 
 
@@ -3160,8 +3152,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DEFAULT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:504:17: ( 'DEFAULT' )
-            // FortranLexer.g:504:25: 'DEFAULT'
+            // FortranLexer.g:496:17: ( 'DEFAULT' )
+            // FortranLexer.g:496:25: 'DEFAULT'
             {
             match("DEFAULT"); 
 
@@ -3181,8 +3173,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DEALLOCATE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:505:17: ( 'DEALLOCATE' )
-            // FortranLexer.g:505:25: 'DEALLOCATE'
+            // FortranLexer.g:497:17: ( 'DEALLOCATE' )
+            // FortranLexer.g:497:25: 'DEALLOCATE'
             {
             match("DEALLOCATE"); 
 
@@ -3202,8 +3194,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DEFERRED;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:506:17: ( 'DEFERRED' )
-            // FortranLexer.g:506:25: 'DEFERRED'
+            // FortranLexer.g:498:17: ( 'DEFERRED' )
+            // FortranLexer.g:498:25: 'DEFERRED'
             {
             match("DEFERRED"); 
 
@@ -3223,8 +3215,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DO;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:507:17: ( 'DO' )
-            // FortranLexer.g:507:25: 'DO'
+            // FortranLexer.g:499:17: ( 'DO' )
+            // FortranLexer.g:499:25: 'DO'
             {
             match("DO"); 
 
@@ -3244,8 +3236,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DOUBLE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:508:17: ( 'DOUBLE' )
-            // FortranLexer.g:508:25: 'DOUBLE'
+            // FortranLexer.g:500:17: ( 'DOUBLE' )
+            // FortranLexer.g:500:25: 'DOUBLE'
             {
             match("DOUBLE"); 
 
@@ -3265,8 +3257,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DOUBLEPRECISION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:509:18: ( 'DOUBLEPRECISION' )
-            // FortranLexer.g:509:25: 'DOUBLEPRECISION'
+            // FortranLexer.g:501:18: ( 'DOUBLEPRECISION' )
+            // FortranLexer.g:501:25: 'DOUBLEPRECISION'
             {
             match("DOUBLEPRECISION"); 
 
@@ -3286,8 +3278,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DOUBLECOMPLEX;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:510:16: ( 'DOUBLECOMPLEX' )
-            // FortranLexer.g:510:25: 'DOUBLECOMPLEX'
+            // FortranLexer.g:502:16: ( 'DOUBLECOMPLEX' )
+            // FortranLexer.g:502:25: 'DOUBLECOMPLEX'
             {
             match("DOUBLECOMPLEX"); 
 
@@ -3307,8 +3299,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ELEMENTAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:511:17: ( 'ELEMENTAL' )
-            // FortranLexer.g:511:25: 'ELEMENTAL'
+            // FortranLexer.g:503:17: ( 'ELEMENTAL' )
+            // FortranLexer.g:503:25: 'ELEMENTAL'
             {
             match("ELEMENTAL"); 
 
@@ -3328,8 +3320,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ELSE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:512:17: ( 'ELSE' )
-            // FortranLexer.g:512:25: 'ELSE'
+            // FortranLexer.g:504:17: ( 'ELSE' )
+            // FortranLexer.g:504:25: 'ELSE'
             {
             match("ELSE"); 
 
@@ -3349,8 +3341,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ELSEIF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:513:17: ( 'ELSEIF' )
-            // FortranLexer.g:513:25: 'ELSEIF'
+            // FortranLexer.g:505:17: ( 'ELSEIF' )
+            // FortranLexer.g:505:25: 'ELSEIF'
             {
             match("ELSEIF"); 
 
@@ -3370,8 +3362,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ELSEWHERE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:514:17: ( 'ELSEWHERE' )
-            // FortranLexer.g:514:25: 'ELSEWHERE'
+            // FortranLexer.g:506:17: ( 'ELSEWHERE' )
+            // FortranLexer.g:506:25: 'ELSEWHERE'
             {
             match("ELSEWHERE"); 
 
@@ -3391,8 +3383,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENTRY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:515:17: ( 'ENTRY' )
-            // FortranLexer.g:515:25: 'ENTRY'
+            // FortranLexer.g:507:17: ( 'ENTRY' )
+            // FortranLexer.g:507:25: 'ENTRY'
             {
             match("ENTRY"); 
 
@@ -3412,8 +3404,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENUM;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:516:17: ( 'ENUM' )
-            // FortranLexer.g:516:25: 'ENUM'
+            // FortranLexer.g:508:17: ( 'ENUM' )
+            // FortranLexer.g:508:25: 'ENUM'
             {
             match("ENUM"); 
 
@@ -3433,8 +3425,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENUMERATOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:517:17: ( 'ENUMERATOR' )
-            // FortranLexer.g:517:25: 'ENUMERATOR'
+            // FortranLexer.g:509:17: ( 'ENUMERATOR' )
+            // FortranLexer.g:509:25: 'ENUMERATOR'
             {
             match("ENUMERATOR"); 
 
@@ -3454,8 +3446,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EQUIVALENCE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:518:17: ( 'EQUIVALENCE' )
-            // FortranLexer.g:518:25: 'EQUIVALENCE'
+            // FortranLexer.g:510:17: ( 'EQUIVALENCE' )
+            // FortranLexer.g:510:25: 'EQUIVALENCE'
             {
             match("EQUIVALENCE"); 
 
@@ -3475,8 +3467,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EXIT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:519:17: ( 'EXIT' )
-            // FortranLexer.g:519:25: 'EXIT'
+            // FortranLexer.g:511:17: ( 'EXIT' )
+            // FortranLexer.g:511:25: 'EXIT'
             {
             match("EXIT"); 
 
@@ -3496,8 +3488,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EXTENDS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:520:17: ( 'EXTENDS' )
-            // FortranLexer.g:520:25: 'EXTENDS'
+            // FortranLexer.g:512:17: ( 'EXTENDS' )
+            // FortranLexer.g:512:25: 'EXTENDS'
             {
             match("EXTENDS"); 
 
@@ -3517,8 +3509,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EXTERNAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:521:17: ( 'EXTERNAL' )
-            // FortranLexer.g:521:25: 'EXTERNAL'
+            // FortranLexer.g:513:17: ( 'EXTERNAL' )
+            // FortranLexer.g:513:25: 'EXTERNAL'
             {
             match("EXTERNAL"); 
 
@@ -3538,8 +3530,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FILE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:522:17: ( 'FILE' )
-            // FortranLexer.g:522:25: 'FILE'
+            // FortranLexer.g:514:17: ( 'FILE' )
+            // FortranLexer.g:514:25: 'FILE'
             {
             match("FILE"); 
 
@@ -3559,8 +3551,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FINAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:523:17: ( 'FINAL' )
-            // FortranLexer.g:523:25: 'FINAL'
+            // FortranLexer.g:515:17: ( 'FINAL' )
+            // FortranLexer.g:515:25: 'FINAL'
             {
             match("FINAL"); 
 
@@ -3580,8 +3572,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FLUSH;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:524:17: ( 'FLUSH' )
-            // FortranLexer.g:524:25: 'FLUSH'
+            // FortranLexer.g:516:17: ( 'FLUSH' )
+            // FortranLexer.g:516:25: 'FLUSH'
             {
             match("FLUSH"); 
 
@@ -3601,8 +3593,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FORALL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:525:17: ( 'FORALL' )
-            // FortranLexer.g:525:25: 'FORALL'
+            // FortranLexer.g:517:17: ( 'FORALL' )
+            // FortranLexer.g:517:25: 'FORALL'
             {
             match("FORALL"); 
 
@@ -3622,8 +3614,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FORMAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:526:17: ( 'FORMAT' )
-            // FortranLexer.g:526:25: 'FORMAT'
+            // FortranLexer.g:518:17: ( 'FORMAT' )
+            // FortranLexer.g:518:25: 'FORMAT'
             {
             match("FORMAT"); 
 
@@ -3644,8 +3636,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FORMATTED;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:527:17: ( 'FORMATTED' )
-            // FortranLexer.g:527:25: 'FORMATTED'
+            // FortranLexer.g:519:17: ( 'FORMATTED' )
+            // FortranLexer.g:519:25: 'FORMATTED'
             {
             match("FORMATTED"); 
 
@@ -3665,8 +3657,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FUNCTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:528:17: ( 'FUNCTION' )
-            // FortranLexer.g:528:25: 'FUNCTION'
+            // FortranLexer.g:520:17: ( 'FUNCTION' )
+            // FortranLexer.g:520:25: 'FUNCTION'
             {
             match("FUNCTION"); 
 
@@ -3686,8 +3678,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GENERIC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:529:17: ( 'GENERIC' )
-            // FortranLexer.g:529:25: 'GENERIC'
+            // FortranLexer.g:521:17: ( 'GENERIC' )
+            // FortranLexer.g:521:25: 'GENERIC'
             {
             match("GENERIC"); 
 
@@ -3707,8 +3699,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GO;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:530:17: ( 'GO' )
-            // FortranLexer.g:530:25: 'GO'
+            // FortranLexer.g:522:17: ( 'GO' )
+            // FortranLexer.g:522:25: 'GO'
             {
             match("GO"); 
 
@@ -3728,8 +3720,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_GOTO;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:531:17: ( 'GOTO' )
-            // FortranLexer.g:531:25: 'GOTO'
+            // FortranLexer.g:523:17: ( 'GOTO' )
+            // FortranLexer.g:523:25: 'GOTO'
             {
             match("GOTO"); 
 
@@ -3749,8 +3741,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_IF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:532:17: ( 'IF' )
-            // FortranLexer.g:532:25: 'IF'
+            // FortranLexer.g:524:17: ( 'IF' )
+            // FortranLexer.g:524:25: 'IF'
             {
             match("IF"); 
 
@@ -3770,8 +3762,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_IMPLICIT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:533:17: ( 'IMPLICIT' )
-            // FortranLexer.g:533:25: 'IMPLICIT'
+            // FortranLexer.g:525:17: ( 'IMPLICIT' )
+            // FortranLexer.g:525:25: 'IMPLICIT'
             {
             match("IMPLICIT"); 
 
@@ -3791,8 +3783,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_IMPORT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:534:17: ( 'IMPORT' )
-            // FortranLexer.g:534:25: 'IMPORT'
+            // FortranLexer.g:526:17: ( 'IMPORT' )
+            // FortranLexer.g:526:25: 'IMPORT'
             {
             match("IMPORT"); 
 
@@ -3812,8 +3804,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_IN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:535:17: ( 'IN' )
-            // FortranLexer.g:535:25: 'IN'
+            // FortranLexer.g:527:17: ( 'IN' )
+            // FortranLexer.g:527:25: 'IN'
             {
             match("IN"); 
 
@@ -3833,8 +3825,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INOUT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:536:17: ( 'INOUT' )
-            // FortranLexer.g:536:25: 'INOUT'
+            // FortranLexer.g:528:17: ( 'INOUT' )
+            // FortranLexer.g:528:25: 'INOUT'
             {
             match("INOUT"); 
 
@@ -3854,8 +3846,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INTENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:537:17: ( 'INTENT' )
-            // FortranLexer.g:537:25: 'INTENT'
+            // FortranLexer.g:529:17: ( 'INTENT' )
+            // FortranLexer.g:529:25: 'INTENT'
             {
             match("INTENT"); 
 
@@ -3875,8 +3867,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INTERFACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:538:17: ( 'INTERFACE' )
-            // FortranLexer.g:538:25: 'INTERFACE'
+            // FortranLexer.g:530:17: ( 'INTERFACE' )
+            // FortranLexer.g:530:25: 'INTERFACE'
             {
             match("INTERFACE"); 
 
@@ -3896,8 +3888,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INTRINSIC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:539:17: ( 'INTRINSIC' )
-            // FortranLexer.g:539:25: 'INTRINSIC'
+            // FortranLexer.g:531:17: ( 'INTRINSIC' )
+            // FortranLexer.g:531:25: 'INTRINSIC'
             {
             match("INTRINSIC"); 
 
@@ -3917,8 +3909,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INQUIRE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:540:17: ( 'INQUIRE' )
-            // FortranLexer.g:540:25: 'INQUIRE'
+            // FortranLexer.g:532:17: ( 'INQUIRE' )
+            // FortranLexer.g:532:25: 'INQUIRE'
             {
             match("INQUIRE"); 
 
@@ -3938,8 +3930,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_MODULE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:541:17: ( 'MODULE' )
-            // FortranLexer.g:541:25: 'MODULE'
+            // FortranLexer.g:533:17: ( 'MODULE' )
+            // FortranLexer.g:533:25: 'MODULE'
             {
             match("MODULE"); 
 
@@ -3959,8 +3951,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NAMELIST;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:542:17: ( 'NAMELIST' )
-            // FortranLexer.g:542:25: 'NAMELIST'
+            // FortranLexer.g:534:17: ( 'NAMELIST' )
+            // FortranLexer.g:534:25: 'NAMELIST'
             {
             match("NAMELIST"); 
 
@@ -3980,8 +3972,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NONE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:543:17: ( 'NONE' )
-            // FortranLexer.g:543:25: 'NONE'
+            // FortranLexer.g:535:17: ( 'NONE' )
+            // FortranLexer.g:535:25: 'NONE'
             {
             match("NONE"); 
 
@@ -4001,8 +3993,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NON_INTRINSIC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:544:17: ( 'NON_INTRINSIC' )
-            // FortranLexer.g:544:25: 'NON_INTRINSIC'
+            // FortranLexer.g:536:17: ( 'NON_INTRINSIC' )
+            // FortranLexer.g:536:25: 'NON_INTRINSIC'
             {
             match("NON_INTRINSIC"); 
 
@@ -4022,8 +4014,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NON_OVERRIDABLE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:545:18: ( 'NON_OVERRIDABLE' )
-            // FortranLexer.g:545:25: 'NON_OVERRIDABLE'
+            // FortranLexer.g:537:18: ( 'NON_OVERRIDABLE' )
+            // FortranLexer.g:537:25: 'NON_OVERRIDABLE'
             {
             match("NON_OVERRIDABLE"); 
 
@@ -4043,8 +4035,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NOPASS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:546:17: ( 'NOPASS' )
-            // FortranLexer.g:546:25: 'NOPASS'
+            // FortranLexer.g:538:17: ( 'NOPASS' )
+            // FortranLexer.g:538:25: 'NOPASS'
             {
             match("NOPASS"); 
 
@@ -4064,8 +4056,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_NULLIFY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:547:17: ( 'NULLIFY' )
-            // FortranLexer.g:547:25: 'NULLIFY'
+            // FortranLexer.g:539:17: ( 'NULLIFY' )
+            // FortranLexer.g:539:25: 'NULLIFY'
             {
             match("NULLIFY"); 
 
@@ -4085,8 +4077,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ONLY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:548:17: ( 'ONLY' )
-            // FortranLexer.g:548:25: 'ONLY'
+            // FortranLexer.g:540:17: ( 'ONLY' )
+            // FortranLexer.g:540:25: 'ONLY'
             {
             match("ONLY"); 
 
@@ -4106,8 +4098,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_OPEN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:549:17: ( 'OPEN' )
-            // FortranLexer.g:549:25: 'OPEN'
+            // FortranLexer.g:541:17: ( 'OPEN' )
+            // FortranLexer.g:541:25: 'OPEN'
             {
             match("OPEN"); 
 
@@ -4127,8 +4119,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_OPERATOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:550:17: ( 'OPERATOR' )
-            // FortranLexer.g:550:25: 'OPERATOR'
+            // FortranLexer.g:542:17: ( 'OPERATOR' )
+            // FortranLexer.g:542:25: 'OPERATOR'
             {
             match("OPERATOR"); 
 
@@ -4148,8 +4140,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_OPTIONAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:551:17: ( 'OPTIONAL' )
-            // FortranLexer.g:551:25: 'OPTIONAL'
+            // FortranLexer.g:543:17: ( 'OPTIONAL' )
+            // FortranLexer.g:543:25: 'OPTIONAL'
             {
             match("OPTIONAL"); 
 
@@ -4169,8 +4161,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_OUT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:552:17: ( 'OUT' )
-            // FortranLexer.g:552:25: 'OUT'
+            // FortranLexer.g:544:17: ( 'OUT' )
+            // FortranLexer.g:544:25: 'OUT'
             {
             match("OUT"); 
 
@@ -4190,8 +4182,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PARAMETER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:553:17: ( 'PARAMETER' )
-            // FortranLexer.g:553:25: 'PARAMETER'
+            // FortranLexer.g:545:17: ( 'PARAMETER' )
+            // FortranLexer.g:545:25: 'PARAMETER'
             {
             match("PARAMETER"); 
 
@@ -4211,8 +4203,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PASS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:554:17: ( 'PASS' )
-            // FortranLexer.g:554:25: 'PASS'
+            // FortranLexer.g:546:17: ( 'PASS' )
+            // FortranLexer.g:546:25: 'PASS'
             {
             match("PASS"); 
 
@@ -4232,8 +4224,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PAUSE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:555:17: ( 'PAUSE' )
-            // FortranLexer.g:555:25: 'PAUSE'
+            // FortranLexer.g:547:17: ( 'PAUSE' )
+            // FortranLexer.g:547:25: 'PAUSE'
             {
             match("PAUSE"); 
 
@@ -4253,8 +4245,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_POINTER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:556:17: ( 'POINTER' )
-            // FortranLexer.g:556:25: 'POINTER'
+            // FortranLexer.g:548:17: ( 'POINTER' )
+            // FortranLexer.g:548:25: 'POINTER'
             {
             match("POINTER"); 
 
@@ -4274,8 +4266,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PRINT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:557:17: ( 'PRINT' )
-            // FortranLexer.g:557:25: 'PRINT'
+            // FortranLexer.g:549:17: ( 'PRINT' )
+            // FortranLexer.g:549:25: 'PRINT'
             {
             match("PRINT"); 
 
@@ -4295,8 +4287,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PRECISION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:558:17: ( 'PRECISION' )
-            // FortranLexer.g:558:25: 'PRECISION'
+            // FortranLexer.g:550:17: ( 'PRECISION' )
+            // FortranLexer.g:550:25: 'PRECISION'
             {
             match("PRECISION"); 
 
@@ -4316,8 +4308,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PRIVATE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:559:17: ( 'PRIVATE' )
-            // FortranLexer.g:559:25: 'PRIVATE'
+            // FortranLexer.g:551:17: ( 'PRIVATE' )
+            // FortranLexer.g:551:25: 'PRIVATE'
             {
             match("PRIVATE"); 
 
@@ -4337,8 +4329,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PROCEDURE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:560:17: ( 'PROCEDURE' )
-            // FortranLexer.g:560:25: 'PROCEDURE'
+            // FortranLexer.g:552:17: ( 'PROCEDURE' )
+            // FortranLexer.g:552:25: 'PROCEDURE'
             {
             match("PROCEDURE"); 
 
@@ -4358,8 +4350,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PROGRAM;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:561:17: ( 'PROGRAM' )
-            // FortranLexer.g:561:25: 'PROGRAM'
+            // FortranLexer.g:553:17: ( 'PROGRAM' )
+            // FortranLexer.g:553:25: 'PROGRAM'
             {
             match("PROGRAM"); 
 
@@ -4379,8 +4371,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PROTECTED;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:562:17: ( 'PROTECTED' )
-            // FortranLexer.g:562:25: 'PROTECTED'
+            // FortranLexer.g:554:17: ( 'PROTECTED' )
+            // FortranLexer.g:554:25: 'PROTECTED'
             {
             match("PROTECTED"); 
 
@@ -4400,8 +4392,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PUBLIC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:563:17: ( 'PUBLIC' )
-            // FortranLexer.g:563:25: 'PUBLIC'
+            // FortranLexer.g:555:17: ( 'PUBLIC' )
+            // FortranLexer.g:555:25: 'PUBLIC'
             {
             match("PUBLIC"); 
 
@@ -4421,8 +4413,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PURE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:564:17: ( 'PURE' )
-            // FortranLexer.g:564:25: 'PURE'
+            // FortranLexer.g:556:17: ( 'PURE' )
+            // FortranLexer.g:556:25: 'PURE'
             {
             match("PURE"); 
 
@@ -4442,8 +4434,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_READ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:565:17: ( 'READ' )
-            // FortranLexer.g:565:25: 'READ'
+            // FortranLexer.g:557:17: ( 'READ' )
+            // FortranLexer.g:557:25: 'READ'
             {
             match("READ"); 
 
@@ -4463,8 +4455,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_RECURSIVE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:566:17: ( 'RECURSIVE' )
-            // FortranLexer.g:566:25: 'RECURSIVE'
+            // FortranLexer.g:558:17: ( 'RECURSIVE' )
+            // FortranLexer.g:558:25: 'RECURSIVE'
             {
             match("RECURSIVE"); 
 
@@ -4484,8 +4476,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_RESULT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:567:17: ( 'RESULT' )
-            // FortranLexer.g:567:25: 'RESULT'
+            // FortranLexer.g:559:17: ( 'RESULT' )
+            // FortranLexer.g:559:25: 'RESULT'
             {
             match("RESULT"); 
 
@@ -4505,8 +4497,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_RETURN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:568:17: ( 'RETURN' )
-            // FortranLexer.g:568:25: 'RETURN'
+            // FortranLexer.g:560:17: ( 'RETURN' )
+            // FortranLexer.g:560:25: 'RETURN'
             {
             match("RETURN"); 
 
@@ -4526,8 +4518,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_REWIND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:569:17: ( 'REWIND' )
-            // FortranLexer.g:569:25: 'REWIND'
+            // FortranLexer.g:561:17: ( 'REWIND' )
+            // FortranLexer.g:561:25: 'REWIND'
             {
             match("REWIND"); 
 
@@ -4547,8 +4539,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SAVE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:570:17: ( 'SAVE' )
-            // FortranLexer.g:570:25: 'SAVE'
+            // FortranLexer.g:562:17: ( 'SAVE' )
+            // FortranLexer.g:562:25: 'SAVE'
             {
             match("SAVE"); 
 
@@ -4568,8 +4560,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SELECT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:571:17: ( 'SELECT' )
-            // FortranLexer.g:571:25: 'SELECT'
+            // FortranLexer.g:563:17: ( 'SELECT' )
+            // FortranLexer.g:563:25: 'SELECT'
             {
             match("SELECT"); 
 
@@ -4589,8 +4581,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SELECTCASE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:572:17: ( 'SELECTCASE' )
-            // FortranLexer.g:572:25: 'SELECTCASE'
+            // FortranLexer.g:564:17: ( 'SELECTCASE' )
+            // FortranLexer.g:564:25: 'SELECTCASE'
             {
             match("SELECTCASE"); 
 
@@ -4610,8 +4602,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SELECTTYPE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:573:17: ( 'SELECTTYPE' )
-            // FortranLexer.g:573:25: 'SELECTTYPE'
+            // FortranLexer.g:565:17: ( 'SELECTTYPE' )
+            // FortranLexer.g:565:25: 'SELECTTYPE'
             {
             match("SELECTTYPE"); 
 
@@ -4631,8 +4623,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SEQUENCE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:574:17: ( 'SEQUENCE' )
-            // FortranLexer.g:574:25: 'SEQUENCE'
+            // FortranLexer.g:566:17: ( 'SEQUENCE' )
+            // FortranLexer.g:566:25: 'SEQUENCE'
             {
             match("SEQUENCE"); 
 
@@ -4652,8 +4644,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_STOP;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:575:17: ( 'STOP' )
-            // FortranLexer.g:575:25: 'STOP'
+            // FortranLexer.g:567:17: ( 'STOP' )
+            // FortranLexer.g:567:25: 'STOP'
             {
             match("STOP"); 
 
@@ -4673,8 +4665,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_SUBROUTINE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:576:17: ( 'SUBROUTINE' )
-            // FortranLexer.g:576:25: 'SUBROUTINE'
+            // FortranLexer.g:568:17: ( 'SUBROUTINE' )
+            // FortranLexer.g:568:25: 'SUBROUTINE'
             {
             match("SUBROUTINE"); 
 
@@ -4694,8 +4686,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_TARGET;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:577:17: ( 'TARGET' )
-            // FortranLexer.g:577:25: 'TARGET'
+            // FortranLexer.g:569:17: ( 'TARGET' )
+            // FortranLexer.g:569:25: 'TARGET'
             {
             match("TARGET"); 
 
@@ -4715,8 +4707,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_THEN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:578:17: ( 'THEN' )
-            // FortranLexer.g:578:25: 'THEN'
+            // FortranLexer.g:570:17: ( 'THEN' )
+            // FortranLexer.g:570:25: 'THEN'
             {
             match("THEN"); 
 
@@ -4736,8 +4728,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_TO;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:579:17: ( 'TO' )
-            // FortranLexer.g:579:25: 'TO'
+            // FortranLexer.g:571:17: ( 'TO' )
+            // FortranLexer.g:571:25: 'TO'
             {
             match("TO"); 
 
@@ -4757,8 +4749,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_TYPE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:580:17: ( 'TYPE' )
-            // FortranLexer.g:580:25: 'TYPE'
+            // FortranLexer.g:572:17: ( 'TYPE' )
+            // FortranLexer.g:572:25: 'TYPE'
             {
             match("TYPE"); 
 
@@ -4778,8 +4770,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_UNFORMATTED;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:581:17: ( 'UNFORMATTED' )
-            // FortranLexer.g:581:25: 'UNFORMATTED'
+            // FortranLexer.g:573:17: ( 'UNFORMATTED' )
+            // FortranLexer.g:573:25: 'UNFORMATTED'
             {
             match("UNFORMATTED"); 
 
@@ -4799,8 +4791,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_USE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:582:17: ( 'USE' )
-            // FortranLexer.g:582:25: 'USE'
+            // FortranLexer.g:574:17: ( 'USE' )
+            // FortranLexer.g:574:25: 'USE'
             {
             match("USE"); 
 
@@ -4820,8 +4812,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_VALUE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:583:17: ( 'VALUE' )
-            // FortranLexer.g:583:25: 'VALUE'
+            // FortranLexer.g:575:17: ( 'VALUE' )
+            // FortranLexer.g:575:25: 'VALUE'
             {
             match("VALUE"); 
 
@@ -4841,8 +4833,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_VOLATILE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:584:17: ( 'VOLATILE' )
-            // FortranLexer.g:584:25: 'VOLATILE'
+            // FortranLexer.g:576:17: ( 'VOLATILE' )
+            // FortranLexer.g:576:25: 'VOLATILE'
             {
             match("VOLATILE"); 
 
@@ -4862,8 +4854,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_WAIT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:585:17: ( 'WAIT' )
-            // FortranLexer.g:585:25: 'WAIT'
+            // FortranLexer.g:577:17: ( 'WAIT' )
+            // FortranLexer.g:577:25: 'WAIT'
             {
             match("WAIT"); 
 
@@ -4883,8 +4875,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_WHERE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:586:17: ( 'WHERE' )
-            // FortranLexer.g:586:25: 'WHERE'
+            // FortranLexer.g:578:17: ( 'WHERE' )
+            // FortranLexer.g:578:25: 'WHERE'
             {
             match("WHERE"); 
 
@@ -4904,8 +4896,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_WHILE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:587:17: ( 'WHILE' )
-            // FortranLexer.g:587:25: 'WHILE'
+            // FortranLexer.g:579:17: ( 'WHILE' )
+            // FortranLexer.g:579:25: 'WHILE'
             {
             match("WHILE"); 
 
@@ -4925,8 +4917,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_WRITE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:588:17: ( 'WRITE' )
-            // FortranLexer.g:588:25: 'WRITE'
+            // FortranLexer.g:580:17: ( 'WRITE' )
+            // FortranLexer.g:580:25: 'WRITE'
             {
             match("WRITE"); 
 
@@ -4946,8 +4938,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDASSOCIATE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:590:17: ( 'ENDASSOCIATE' )
-            // FortranLexer.g:590:25: 'ENDASSOCIATE'
+            // FortranLexer.g:582:17: ( 'ENDASSOCIATE' )
+            // FortranLexer.g:582:25: 'ENDASSOCIATE'
             {
             match("ENDASSOCIATE"); 
 
@@ -4967,8 +4959,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDBLOCK;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:591:17: ( 'ENDBLOCK' )
-            // FortranLexer.g:591:25: 'ENDBLOCK'
+            // FortranLexer.g:583:17: ( 'ENDBLOCK' )
+            // FortranLexer.g:583:25: 'ENDBLOCK'
             {
             match("ENDBLOCK"); 
 
@@ -4988,8 +4980,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDBLOCKDATA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:592:17: ( 'ENDBLOCKDATA' )
-            // FortranLexer.g:592:25: 'ENDBLOCKDATA'
+            // FortranLexer.g:584:17: ( 'ENDBLOCKDATA' )
+            // FortranLexer.g:584:25: 'ENDBLOCKDATA'
             {
             match("ENDBLOCKDATA"); 
 
@@ -5009,8 +5001,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDDO;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:593:17: ( 'ENDDO' )
-            // FortranLexer.g:593:25: 'ENDDO'
+            // FortranLexer.g:585:17: ( 'ENDDO' )
+            // FortranLexer.g:585:25: 'ENDDO'
             {
             match("ENDDO"); 
 
@@ -5030,8 +5022,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDENUM;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:594:17: ( 'ENDENUM' )
-            // FortranLexer.g:594:25: 'ENDENUM'
+            // FortranLexer.g:586:17: ( 'ENDENUM' )
+            // FortranLexer.g:586:25: 'ENDENUM'
             {
             match("ENDENUM"); 
 
@@ -5051,8 +5043,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDFORALL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:595:17: ( 'ENDFORALL' )
-            // FortranLexer.g:595:25: 'ENDFORALL'
+            // FortranLexer.g:587:17: ( 'ENDFORALL' )
+            // FortranLexer.g:587:25: 'ENDFORALL'
             {
             match("ENDFORALL"); 
 
@@ -5072,8 +5064,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDFILE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:596:17: ( 'ENDFILE' )
-            // FortranLexer.g:596:25: 'ENDFILE'
+            // FortranLexer.g:588:17: ( 'ENDFILE' )
+            // FortranLexer.g:588:25: 'ENDFILE'
             {
             match("ENDFILE"); 
 
@@ -5093,8 +5085,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDFUNCTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:597:17: ( 'ENDFUNCTION' )
-            // FortranLexer.g:597:25: 'ENDFUNCTION'
+            // FortranLexer.g:589:17: ( 'ENDFUNCTION' )
+            // FortranLexer.g:589:25: 'ENDFUNCTION'
             {
             match("ENDFUNCTION"); 
 
@@ -5114,8 +5106,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDIF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:598:17: ( 'ENDIF' )
-            // FortranLexer.g:598:25: 'ENDIF'
+            // FortranLexer.g:590:17: ( 'ENDIF' )
+            // FortranLexer.g:590:25: 'ENDIF'
             {
             match("ENDIF"); 
 
@@ -5135,8 +5127,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDINTERFACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:599:17: ( 'ENDINTERFACE' )
-            // FortranLexer.g:599:25: 'ENDINTERFACE'
+            // FortranLexer.g:591:17: ( 'ENDINTERFACE' )
+            // FortranLexer.g:591:25: 'ENDINTERFACE'
             {
             match("ENDINTERFACE"); 
 
@@ -5156,8 +5148,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDMODULE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:600:17: ( 'ENDMODULE' )
-            // FortranLexer.g:600:25: 'ENDMODULE'
+            // FortranLexer.g:592:17: ( 'ENDMODULE' )
+            // FortranLexer.g:592:25: 'ENDMODULE'
             {
             match("ENDMODULE"); 
 
@@ -5177,8 +5169,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDPROGRAM;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:601:17: ( 'ENDPROGRAM' )
-            // FortranLexer.g:601:25: 'ENDPROGRAM'
+            // FortranLexer.g:593:17: ( 'ENDPROGRAM' )
+            // FortranLexer.g:593:25: 'ENDPROGRAM'
             {
             match("ENDPROGRAM"); 
 
@@ -5198,8 +5190,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDSELECT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:602:17: ( 'ENDSELECT' )
-            // FortranLexer.g:602:25: 'ENDSELECT'
+            // FortranLexer.g:594:17: ( 'ENDSELECT' )
+            // FortranLexer.g:594:25: 'ENDSELECT'
             {
             match("ENDSELECT"); 
 
@@ -5219,8 +5211,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDSUBROUTINE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:603:17: ( 'ENDSUBROUTINE' )
-            // FortranLexer.g:603:25: 'ENDSUBROUTINE'
+            // FortranLexer.g:595:17: ( 'ENDSUBROUTINE' )
+            // FortranLexer.g:595:25: 'ENDSUBROUTINE'
             {
             match("ENDSUBROUTINE"); 
 
@@ -5240,8 +5232,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDTYPE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:604:17: ( 'ENDTYPE' )
-            // FortranLexer.g:604:25: 'ENDTYPE'
+            // FortranLexer.g:596:17: ( 'ENDTYPE' )
+            // FortranLexer.g:596:25: 'ENDTYPE'
             {
             match("ENDTYPE"); 
 
@@ -5261,8 +5253,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ENDWHERE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:605:17: ( 'ENDWHERE' )
-            // FortranLexer.g:605:25: 'ENDWHERE'
+            // FortranLexer.g:597:17: ( 'ENDWHERE' )
+            // FortranLexer.g:597:25: 'ENDWHERE'
             {
             match("ENDWHERE"); 
 
@@ -5282,8 +5274,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_END;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:607:9: ( 'END' )
-            // FortranLexer.g:607:11: 'END'
+            // FortranLexer.g:599:9: ( 'END' )
+            // FortranLexer.g:599:11: 'END'
             {
             match("END"); 
 
@@ -5303,8 +5295,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DIMENSION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:610:17: ( 'DIMENSION' )
-            // FortranLexer.g:610:25: 'DIMENSION'
+            // FortranLexer.g:602:17: ( 'DIMENSION' )
+            // FortranLexer.g:602:25: 'DIMENSION'
             {
             match("DIMENSION"); 
 
@@ -5324,8 +5316,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_KIND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:612:8: ( 'KIND' )
-            // FortranLexer.g:612:10: 'KIND'
+            // FortranLexer.g:604:8: ( 'KIND' )
+            // FortranLexer.g:604:10: 'KIND'
             {
             match("KIND"); 
 
@@ -5345,8 +5337,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LEN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:613:7: ( 'LEN' )
-            // FortranLexer.g:613:9: 'LEN'
+            // FortranLexer.g:605:7: ( 'LEN' )
+            // FortranLexer.g:605:9: 'LEN'
             {
             match("LEN"); 
 
@@ -5366,8 +5358,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_BIND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:615:8: ( 'BIND' )
-            // FortranLexer.g:615:10: 'BIND'
+            // FortranLexer.g:607:8: ( 'BIND' )
+            // FortranLexer.g:607:10: 'BIND'
             {
             match("BIND"); 
 
@@ -5389,12 +5381,12 @@ public class FortranLexer extends Lexer {
             int _channel = DEFAULT_TOKEN_CHANNEL;
             Token Digit_String1=null;
 
-            // FortranLexer.g:617:13: ( Digit_String 'H' )
-            // FortranLexer.g:617:15: Digit_String 'H'
+            // FortranLexer.g:609:13: ( Digit_String 'H' )
+            // FortranLexer.g:609:15: Digit_String 'H'
             {
-            int Digit_String1Start4814 = getCharIndex();
+            int Digit_String1Start4794 = getCharIndex();
             mDigit_String(); 
-            Digit_String1 = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, Digit_String1Start4814, getCharIndex()-1);
+            Digit_String1 = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, Digit_String1Start4794, getCharIndex()-1);
             match('H'); 
              
                     // If we're inside a format stmt we don't want to process it as 
@@ -5426,11 +5418,11 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DEFINED_OP;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:637:5: ( '.' ( Letter )+ '.' )
-            // FortranLexer.g:637:10: '.' ( Letter )+ '.'
+            // FortranLexer.g:629:5: ( '.' ( Letter )+ '.' )
+            // FortranLexer.g:629:10: '.' ( Letter )+ '.'
             {
             match('.'); 
-            // FortranLexer.g:637:14: ( Letter )+
+            // FortranLexer.g:629:14: ( Letter )+
             int cnt29=0;
             loop29:
             do {
@@ -5444,7 +5436,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt29) {
             	case 1 :
-            	    // FortranLexer.g:637:14: Letter
+            	    // FortranLexer.g:629:14: Letter
             	    {
             	    mLetter(); 
 
@@ -5477,8 +5469,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_LABEL_DO_TERMINAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:650:9: ( '__LABEL_DO_TERMINAL__' )
-            // FortranLexer.g:650:17: '__LABEL_DO_TERMINAL__'
+            // FortranLexer.g:642:2: ( '__LABEL_DO_TERMINAL__' )
+            // FortranLexer.g:642:4: '__LABEL_DO_TERMINAL__'
             {
             match("__LABEL_DO_TERMINAL__"); 
 
@@ -5498,8 +5490,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_DATA_EDIT_DESC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:653:18: ( '__T_DATA_EDIT_DESC__' )
-            // FortranLexer.g:653:20: '__T_DATA_EDIT_DESC__'
+            // FortranLexer.g:645:18: ( '__T_DATA_EDIT_DESC__' )
+            // FortranLexer.g:645:20: '__T_DATA_EDIT_DESC__'
             {
             match("__T_DATA_EDIT_DESC__"); 
 
@@ -5519,8 +5511,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CONTROL_EDIT_DESC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:654:21: ( '__T_CONTROL_EDIT_DESC__' )
-            // FortranLexer.g:654:23: '__T_CONTROL_EDIT_DESC__'
+            // FortranLexer.g:646:21: ( '__T_CONTROL_EDIT_DESC__' )
+            // FortranLexer.g:646:23: '__T_CONTROL_EDIT_DESC__'
             {
             match("__T_CONTROL_EDIT_DESC__"); 
 
@@ -5540,8 +5532,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_CHAR_STRING_EDIT_DESC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:655:25: ( '__T_CHAR_STRING_EDIT_DESC__' )
-            // FortranLexer.g:655:27: '__T_CHAR_STRING_EDIT_DESC__'
+            // FortranLexer.g:647:25: ( '__T_CHAR_STRING_EDIT_DESC__' )
+            // FortranLexer.g:647:27: '__T_CHAR_STRING_EDIT_DESC__'
             {
             match("__T_CHAR_STRING_EDIT_DESC__"); 
 
@@ -5561,8 +5553,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_STMT_FUNCTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:658:9: ( 'STMT_FUNCTION' )
-            // FortranLexer.g:658:17: 'STMT_FUNCTION'
+            // FortranLexer.g:650:2: ( 'STMT_FUNCTION' )
+            // FortranLexer.g:650:4: 'STMT_FUNCTION'
             {
             match("STMT_FUNCTION"); 
 
@@ -5582,8 +5574,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ASSIGNMENT_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:661:19: ( '__T_ASSIGNMENT_STMT__' )
-            // FortranLexer.g:661:21: '__T_ASSIGNMENT_STMT__'
+            // FortranLexer.g:653:19: ( '__T_ASSIGNMENT_STMT__' )
+            // FortranLexer.g:653:21: '__T_ASSIGNMENT_STMT__'
             {
             match("__T_ASSIGNMENT_STMT__"); 
 
@@ -5603,8 +5595,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_PTR_ASSIGNMENT_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:662:23: ( '__T_PTR_ASSIGNMENT_STMT__' )
-            // FortranLexer.g:662:25: '__T_PTR_ASSIGNMENT_STMT__'
+            // FortranLexer.g:654:23: ( '__T_PTR_ASSIGNMENT_STMT__' )
+            // FortranLexer.g:654:25: '__T_PTR_ASSIGNMENT_STMT__'
             {
             match("__T_PTR_ASSIGNMENT_STMT__"); 
 
@@ -5624,8 +5616,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ARITHMETIC_IF_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:663:22: ( '__T_ARITHMETIC_IF_STMT__' )
-            // FortranLexer.g:663:24: '__T_ARITHMETIC_IF_STMT__'
+            // FortranLexer.g:655:22: ( '__T_ARITHMETIC_IF_STMT__' )
+            // FortranLexer.g:655:24: '__T_ARITHMETIC_IF_STMT__'
             {
             match("__T_ARITHMETIC_IF_STMT__"); 
 
@@ -5645,8 +5637,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_ALLOCATE_STMT_1;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:664:19: ( '__T_ALLOCATE_STMT_1__' )
-            // FortranLexer.g:664:21: '__T_ALLOCATE_STMT_1__'
+            // FortranLexer.g:656:19: ( '__T_ALLOCATE_STMT_1__' )
+            // FortranLexer.g:656:21: '__T_ALLOCATE_STMT_1__'
             {
             match("__T_ALLOCATE_STMT_1__"); 
 
@@ -5666,8 +5658,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_WHERE_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:665:14: ( '__T_WHERE_STMT__' )
-            // FortranLexer.g:665:16: '__T_WHERE_STMT__'
+            // FortranLexer.g:657:14: ( '__T_WHERE_STMT__' )
+            // FortranLexer.g:657:16: '__T_WHERE_STMT__'
             {
             match("__T_WHERE_STMT__"); 
 
@@ -5687,8 +5679,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_IF_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:666:11: ( '__T_IF_STMT__' )
-            // FortranLexer.g:666:13: '__T_IF_STMT__'
+            // FortranLexer.g:658:11: ( '__T_IF_STMT__' )
+            // FortranLexer.g:658:13: '__T_IF_STMT__'
             {
             match("__T_IF_STMT__"); 
 
@@ -5708,8 +5700,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FORALL_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:667:15: ( '__T_FORALL_STMT__' )
-            // FortranLexer.g:667:17: '__T_FORALL_STMT__'
+            // FortranLexer.g:659:15: ( '__T_FORALL_STMT__' )
+            // FortranLexer.g:659:17: '__T_FORALL_STMT__'
             {
             match("__T_FORALL_STMT__"); 
 
@@ -5729,8 +5721,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_WHERE_CONSTRUCT_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:668:24: ( '__T_WHERE_CONSTRUCT_STMT__' )
-            // FortranLexer.g:668:26: '__T_WHERE_CONSTRUCT_STMT__'
+            // FortranLexer.g:660:24: ( '__T_WHERE_CONSTRUCT_STMT__' )
+            // FortranLexer.g:660:26: '__T_WHERE_CONSTRUCT_STMT__'
             {
             match("__T_WHERE_CONSTRUCT_STMT__"); 
 
@@ -5750,8 +5742,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_FORALL_CONSTRUCT_STMT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:669:25: ( '__T_FORALL_CONSTRUCT_STMT__' )
-            // FortranLexer.g:669:27: '__T_FORALL_CONSTRUCT_STMT__'
+            // FortranLexer.g:661:25: ( '__T_FORALL_CONSTRUCT_STMT__' )
+            // FortranLexer.g:661:27: '__T_FORALL_CONSTRUCT_STMT__'
             {
             match("__T_FORALL_CONSTRUCT_STMT__"); 
 
@@ -5771,8 +5763,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_INQUIRE_STMT_2;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:670:18: ( '__T_INQUIRE_STMT_2__' )
-            // FortranLexer.g:670:20: '__T_INQUIRE_STMT_2__'
+            // FortranLexer.g:662:18: ( '__T_INQUIRE_STMT_2__' )
+            // FortranLexer.g:662:20: '__T_INQUIRE_STMT_2__'
             {
             match("__T_INQUIRE_STMT_2__"); 
 
@@ -5792,8 +5784,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_REAL_CONSTANT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:673:17: ( '__T_REAL_CONSTANT__' )
-            // FortranLexer.g:673:19: '__T_REAL_CONSTANT__'
+            // FortranLexer.g:665:17: ( '__T_REAL_CONSTANT__' )
+            // FortranLexer.g:665:19: '__T_REAL_CONSTANT__'
             {
             match("__T_REAL_CONSTANT__"); 
 
@@ -5813,8 +5805,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_EOF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:675:6: ( '__T_EOF__' )
-            // FortranLexer.g:675:8: '__T_EOF__'
+            // FortranLexer.g:667:6: ( '__T_EOF__' )
+            // FortranLexer.g:667:8: '__T_EOF__'
             {
             match("__T_EOF__"); 
 
@@ -5834,11 +5826,11 @@ public class FortranLexer extends Lexer {
         try {
             int _type = T_IDENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:680:9: ( Letter ( Alphanumeric_Character )* )
-            // FortranLexer.g:680:17: Letter ( Alphanumeric_Character )*
+            // FortranLexer.g:672:2: ( Letter ( Alphanumeric_Character )* )
+            // FortranLexer.g:672:4: Letter ( Alphanumeric_Character )*
             {
             mLetter(); 
-            // FortranLexer.g:680:24: ( Alphanumeric_Character )*
+            // FortranLexer.g:672:11: ( Alphanumeric_Character )*
             loop30:
             do {
                 int alt30=2;
@@ -5851,7 +5843,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt30) {
             	case 1 :
-            	    // FortranLexer.g:680:26: Alphanumeric_Character
+            	    // FortranLexer.g:672:13: Alphanumeric_Character
             	    {
             	    mAlphanumeric_Character(); 
 
@@ -5879,11 +5871,11 @@ public class FortranLexer extends Lexer {
         try {
             int _type = LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:684:5: ( '!' (~ ( '\\n' | '\\r' ) )* )
-            // FortranLexer.g:684:7: '!' (~ ( '\\n' | '\\r' ) )*
+            // FortranLexer.g:676:5: ( '!' (~ ( '\\n' | '\\r' ) )* )
+            // FortranLexer.g:676:7: '!' (~ ( '\\n' | '\\r' ) )*
             {
             match('!'); 
-            // FortranLexer.g:684:12: (~ ( '\\n' | '\\r' ) )*
+            // FortranLexer.g:676:12: (~ ( '\\n' | '\\r' ) )*
             loop31:
             do {
                 int alt31=2;
@@ -5896,7 +5888,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt31) {
             	case 1 :
-            	    // FortranLexer.g:684:12: ~ ( '\\n' | '\\r' )
+            	    // FortranLexer.g:676:12: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -5916,9 +5908,8 @@ public class FortranLexer extends Lexer {
                 }
             } while (true);
 
-            // _channel=99;
-                        _channel=HIDDEN;
-            //             _channel=99;
+
+                        _channel = HIDDEN;
                     
 
             }
@@ -5936,8 +5927,8 @@ public class FortranLexer extends Lexer {
         try {
             int _type = MISC_CHAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // FortranLexer.g:694:11: (~ ( '\\n' | '\\r' ) )
-            // FortranLexer.g:694:13: ~ ( '\\n' | '\\r' )
+            // FortranLexer.g:684:11: (~ ( '\\n' | '\\r' ) )
+            // FortranLexer.g:684:13: ~ ( '\\n' | '\\r' )
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -7431,7 +7422,7 @@ public class FortranLexer extends Lexer {
             this.transition = DFA28_transition;
         }
         public String getDescription() {
-            return "461:1: T_PERIOD_EXPONENT : ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ );";
+            return "453:1: T_PERIOD_EXPONENT : ( '.' ( '0' .. '9' )+ ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( 'E' | 'e' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ | '.' ( '0' .. '9' )+ | ( '0' .. '9' )+ ( 'e' | 'E' | 'd' | 'D' ) ( '+' | '-' )? ( '0' .. '9' )+ );";
         }
     }
     static final String DFA32_eotS =

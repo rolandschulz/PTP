@@ -2264,7 +2264,7 @@ public class FortranLexicalPrepass {
    }// end fixupFixedFormatLine()
 
 
-   public int scanForRealConsts(int lineStart, int lineEnd) {
+   private int scanForRealConsts(int lineStart, int lineEnd) {
       int i;
 
       for(i = lineStart; i < lineEnd; i++) {
@@ -2314,7 +2314,61 @@ public class FortranLexicalPrepass {
    }
 
 
-   public void performPrepass() {
+    private int scanForRelationalOp(int lineStart, int lineEnd) {
+
+	for (int i = lineStart; i < lineEnd; i++) {
+	    // make sure there are 3 more tokens in the line
+	    if (i+2 >= lineEnd) {
+		return lineEnd;
+	    }
+	    if (tokens.currLineLA(i+1) == FortranLexer.T_PERIOD) {
+		// check for an ident and trailing T_PERIOD
+		if (tokens.currLineLA(i+2) == FortranLexer.T_IDENT &&
+		    tokens.currLineLA(i+3) == FortranLexer.T_PERIOD) {
+		    
+		    int type;
+		    int line = tokens.getToken(i).getLine();
+		    int col  = tokens.getToken(i).getCharPositionInLine();
+		    String text = tokens.getToken(i+1).getText();
+		       
+		    // intrinsic relational operators are:
+		    // .EQ., .NE., .GT., .GE., .LT., .LE.
+		    if        (text.compareToIgnoreCase("EQ") == 0) {
+			type = FortranLexer.T_EQ;
+		    } else if (text.compareToIgnoreCase("NE") == 0) {
+			type = FortranLexer.T_NE;
+		    } else if (text.compareToIgnoreCase("GT") == 0) {
+			type = FortranLexer.T_GT;
+		    } else if (text.compareToIgnoreCase("GE") == 0) {
+			type = FortranLexer.T_GE;
+		    } else if (text.compareToIgnoreCase("LT") == 0) {
+			type = FortranLexer.T_LT;
+		    } else if (text.compareToIgnoreCase("LE") == 0) {
+			type = FortranLexer.T_LE;
+		    } else {
+			continue;
+		    }
+		       
+		    // remove three old tokens, T_PERIOD, T_IDENT and T_PERIOD
+		    tokens.removeToken(i);
+		    tokens.removeToken(i);
+		    tokens.removeToken(i);
+		                   
+		    // replace with new token so that character position in buffer
+		    // reflects new token
+		    tokens.add(i, tokens.createToken(type, "." + text + ".", line, col));
+
+		    // we've just removed two tokens (and replaced one) so line is shorter
+		    lineEnd -= 2;
+		}
+	    }
+	}
+
+	return lineEnd;
+    } // end scanForRelationalOp(int, int)
+
+
+public void performPrepass() {
       int commaIndex = -1;
       int equalsIndex = -1;
       int i;  
@@ -2390,9 +2444,21 @@ public class FortranLexicalPrepass {
          // the stored size of tokens.packedListSize (probably safer to not 
          // have the variable and simply use packedList.size() calls).
          newLineLength = scanForRealConsts(lineStart, lineLength);
-         if(newLineLength != lineLength) {
-            tokens.updatePackedListSize();
+         if (newLineLength != lineLength) {
             lineLength = newLineLength;
+         }
+
+         // Scan for relational operators, e.g., .EQ., this is done hear
+         // to let the T_PERIOD tokens in reals be fixed first.
+         // This method could shorten the line if it combines tokens into 
+         // T_EQ, ..., tokens so we need to update our lineLength and 
+         // the stored size of tokens.packedListSize (probably safer to not 
+         // have the variable and simply use packedList.size() calls).
+         if (this.sourceForm == FrontEnd.FIXED_FORM) {
+             newLineLength = scanForRelationalOp(lineStart, lineLength);
+             if (newLineLength != lineLength) {
+                lineLength = newLineLength;
+             }
          }
 
          // see if there is a comma in the stmt

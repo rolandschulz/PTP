@@ -289,11 +289,11 @@ T_EOS
     // we need to ignore it.  
     if(prevToken == null || 
         (prevToken != null && prevToken.getType() == T_EOS)) {
-        $channel=HIDDEN;
+        state.channel = HIDDEN;
     } 
 
     if(includeLine) {
-        $channel=HIDDEN;
+        state.channel = HIDDEN;
         // Part of include file handling..
         includeFile();
         includeLine = false;
@@ -309,13 +309,12 @@ T_EOS
 
 /* if this is a fragment, the generated code never seems to execute the
  * action.  the action needs to set the flag so T_EOS knows whether it should
- * be channel 99'ed or not (ignor T_EOS if continuation is true, which is the
+ * be channel 99'ed or not (ignore T_EOS if continuation is true, which is the
  * case of the & at the end of a line).
  */
-CONTINUE_CHAR : '&' { continueFlag = !continueFlag;
-//                       _channel = 99;
-                    $channel=HIDDEN;
-//                     $channel=99;
+CONTINUE_CHAR : '&' {
+            continueFlag = !continueFlag;
+            $channel = HIDDEN;
         }
               ;
 
@@ -323,22 +322,18 @@ CONTINUE_CHAR : '&' { continueFlag = !continueFlag;
 // R427 from char-literal-constant
 T_CHAR_CONSTANT
         : ('\'' ( SQ_Rep_Char )* '\'')+ { 
-            if(includeLine) 
-//                 _channel=99;
-                $channel=HIDDEN;
-//             $channel=99;
+            if (includeLine) 
+                $channel = HIDDEN;
         }
         | ('\"' ( DQ_Rep_Char )* '\"')+ { 
-            if(includeLine) 
-//                _channel=99;
-                $channel=HIDDEN;
-//             $channel=99;
+            if (includeLine) 
+                $channel = HIDDEN;
         }
         ;
 
 T_DIGIT_STRING
-        :       Digit_String 
-        ;
+	:	Digit_String 
+	;
 
 // R412
 BINARY_CONSTANT
@@ -359,11 +354,9 @@ HEX_CONSTANT
     ;
 
 
-WS  :  (' '|'\r'|'\t'|'\u000C') {// _channel=99;
-            $channel=HIDDEN;
-//             $channel=99;
-//             _channel=99;
-        }
+WS  :  (' '|'\r'|'\t'|'\u000C') {
+            $channel = HIDDEN;
+       }
     ;
 
 /*
@@ -402,15 +395,14 @@ Letter : ('a'..'z' | 'A'..'Z') ;
 fragment
 Digit : '0'..'9'  ;
 
-PREPROCESS_LINE : '#' ~('\n'|'\r')*  { // _channel=99;
-            $channel=HIDDEN;
-//             $channel=99;
+PREPROCESS_LINE : '#' ~('\n'|'\r')*  {
+            $channel = HIDDEN;
         } ;
 
 T_INCLUDE 
-options {k=1;} : 'INCLUDE' { includeLine = true; // _channel=99;
-            $channel=HIDDEN;
-//             $channel=99;
+options {k=1;} : 'INCLUDE' {
+            includeLine = true;
+            $channel = HIDDEN;
         };
 
 
@@ -639,24 +631,24 @@ T_DEFINED_OP
 
 // // used to catch edit descriptors and other situations
 // T_ID_OR_OTHER
-//      :       'ID_OR_OTHER'
-//      ;
+// 	:	'ID_OR_OTHER'
+// 	;
 
 // extra, context-sensitive terminals that require communication between parser and scanner
 // added the underscores so there is no way this could overlap w/ any valid
 // idents in Fortran.  we just need this token to be defined so we can 
 // create one of them while we're fixing up labeled do stmts.
 T_LABEL_DO_TERMINAL
-        :       '__LABEL_DO_TERMINAL__'
-        ;
+	:	'__LABEL_DO_TERMINAL__'
+	;
 
 T_DATA_EDIT_DESC : '__T_DATA_EDIT_DESC__' ;
 T_CONTROL_EDIT_DESC : '__T_CONTROL_EDIT_DESC__' ;
 T_CHAR_STRING_EDIT_DESC : '__T_CHAR_STRING_EDIT_DESC__' ;
 
 T_STMT_FUNCTION 
-        :       'STMT_FUNCTION'
-        ;
+	:	'STMT_FUNCTION'
+	;
 
 T_ASSIGNMENT_STMT : '__T_ASSIGNMENT_STMT__' ;
 T_PTR_ASSIGNMENT_STMT : '__T_PTR_ASSIGNMENT_STMT__' ;
@@ -677,15 +669,13 @@ T_EOF: '__T_EOF__' ;
 // R304
 T_IDENT
 options {k=1;}
-        :       Letter ( Alphanumeric_Character )*
-        ;
+	:	Letter ( Alphanumeric_Character )*
+	;
 
 LINE_COMMENT
     : '!'  ~('\n'|'\r')*  
-
-        {// _channel=99;
-            $channel=HIDDEN;
-//             $channel=99;
+        {
+            $channel = HIDDEN;
         }
     ;
 
