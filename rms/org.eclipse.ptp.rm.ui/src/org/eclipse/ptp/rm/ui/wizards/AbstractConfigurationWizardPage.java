@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class AbstractConfigurationWizardPage extends
 		RMConfigurationWizardPage {
 
-	protected WizardPageWidgetListener listener = createListener();
-	protected WizardPageDataSource dataSource = createDataSource();
+	private final WizardPageWidgetListener listener = createListener();
+	private final WizardPageDataSource dataSource = createDataSource();
 
 	public AbstractConfigurationWizardPage(RMConfigurationWizard wizard, String pageName) {
 		super(wizard, pageName);
@@ -30,6 +30,14 @@ public abstract class AbstractConfigurationWizardPage extends
 	 * @return the listener
 	 */
 	protected abstract WizardPageDataSource createDataSource();
+	
+	protected WizardPageWidgetListener getWidgetListener() {
+		return listener;
+	}
+	
+	protected WizardPageDataSource getDataSource() {
+		return dataSource;
+	}
 
 	@Override
 	public void setVisible(boolean visible) {

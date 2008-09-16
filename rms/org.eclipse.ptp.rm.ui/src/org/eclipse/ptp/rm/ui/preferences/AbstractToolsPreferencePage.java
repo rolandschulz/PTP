@@ -47,7 +47,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 					source == periodicMonitorTimeSpinner ||
 					source == remoteInstallPathText) {
 				resetErrorMessages();
-				dataSource.justValidate();
+				getDataSource().justValidate();
 			} else {
 				assert false;
 			}
@@ -195,7 +195,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 	private Text remoteInstallPathText = null;
 
 	private int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
-	private String prefix; // to get preferences
+	private final String prefix; // to get preferences
 
    public AbstractToolsPreferencePage(String prefix, int capabilities) {
 		super();
@@ -225,14 +225,6 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		return new WidgetListener();
 	}
 
-	private DataSource getDataSource() {
-		return (DataSource) this.dataSource;
-	}
-
-	private WidgetListener getListener() {
-		return (WidgetListener) this.listener;
-	}
-
 	public void init(IWorkbench workbench) {
 		// Nothing to do.
 	}
@@ -253,7 +245,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			launchCmdText.addModifyListener(getListener() );
+			launchCmdText.addModifyListener(getListener());
 
 			label = new Label(contents, SWT.NONE);
 			label.setText("Debug command:");
