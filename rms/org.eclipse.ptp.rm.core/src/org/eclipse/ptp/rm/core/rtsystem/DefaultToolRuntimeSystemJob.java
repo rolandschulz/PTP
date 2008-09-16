@@ -141,4 +141,9 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		return null;
 	}
 
+	@Override
+	protected void doPrepareExecution() throws CoreException {
+		// Nothing to do
+	}
+
 }

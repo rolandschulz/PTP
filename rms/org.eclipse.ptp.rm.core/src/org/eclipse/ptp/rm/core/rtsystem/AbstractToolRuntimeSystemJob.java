@@ -101,6 +101,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		changeJobState(JobAttributes.State.STARTED);
 
 		try {
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
+			doPrepareExecution();
+		} catch (CoreException e) {
+			changeJobState(JobAttributes.State.ERROR);
+			return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
+		}
+
+		try {
 			/*
 			 * Calculate command and environment.
 			 */
@@ -144,7 +152,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			try {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle before execution", jobID); //$NON-NLS-1$
 				doBeforeExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
@@ -232,6 +240,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		}
 	}
 
+	abstract protected void doPrepareExecution() throws CoreException;
+
 	abstract protected void doExecutionCleanUp();
 
 	abstract protected void doWaitExecution() throws CoreException;
@@ -305,7 +315,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				env.setValue(newValue);
 			}
 		}
-		
+
 		return environmentMap;
 	}
 

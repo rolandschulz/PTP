@@ -456,4 +456,9 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 		// No extra environment variables needs to be set for OpenMPI.
 		return null;
 	}
+
+	@Override
+	protected void doPrepareExecution() throws CoreException {
+		// Nothing to do
+	}
 }
