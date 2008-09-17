@@ -30,11 +30,11 @@ public abstract class AbstractConfigurationWizardPage extends
 	 * @return the listener
 	 */
 	protected abstract WizardPageDataSource createDataSource();
-	
+
 	protected WizardPageWidgetListener getWidgetListener() {
 		return listener;
 	}
-	
+
 	protected WizardPageDataSource getDataSource() {
 		return dataSource;
 	}
@@ -89,9 +89,11 @@ public abstract class AbstractConfigurationWizardPage extends
 
 	@Override
 	public void createControl(Composite parent) {
+		listener.disable();
 		Composite composite = doCreateContents(parent);
 //		doCreateContents(composite);
 		setControl(composite);
+		listener.enable();
 	}
 
 	abstract protected Composite doCreateContents(Composite composite);
