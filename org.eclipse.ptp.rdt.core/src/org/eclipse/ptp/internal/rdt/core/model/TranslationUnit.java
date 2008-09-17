@@ -54,6 +54,10 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		if (projectName != null) {
 			setCProject(new CProject(projectName));
 		}
+		
+		else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public TranslationUnit(Parent parent, ITranslationUnit element) {
@@ -63,6 +67,9 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			setCProject(project);
 		} else if (project != null) {
 			setCProject(new CProject(project.getElementName()));
+		}
+		else {
+			throw new IllegalArgumentException();
 		}
 		try {
 			setLanguage(element.getLanguage());
