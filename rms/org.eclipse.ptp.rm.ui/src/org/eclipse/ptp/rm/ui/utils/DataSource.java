@@ -88,6 +88,7 @@ public abstract class DataSource {
 	 * @return The string value of widget or null widget is empty.
 	 */
 	protected String extractText(Text text) {
+		assert text != null;
 		String s = text.getText().trim();
 		return (s.length() == 0 ? null : s);
 	}
@@ -101,6 +102,7 @@ public abstract class DataSource {
 	 *            The new string value.
 	 */
 	protected void applyText(Text t, String s) {
+		assert t != null;
 		if (s == null) {
 			t.setText(EMPTY_STRING);
 		} else {
@@ -167,6 +169,7 @@ public abstract class DataSource {
 	abstract protected void update();
 
 	protected void addException(ValidationException e) {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Add Exception: {0}", e.getMessage());
 		if (firstException == null) {
 			firstException = e;
 			canAccept = e.canAccept();
@@ -181,16 +184,19 @@ public abstract class DataSource {
 	}
 
 	protected void resetExceptions() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Reset exceptions");
 		firstException = null;
 		canAccept = true;
 		canSave = true;
 	}
 
 	public boolean canAccept() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canAccept={0}", canAccept);
 		return canAccept;
 	}
 
 	public boolean canSave() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canSave={0}", canSave);
 		return canSave;
 	}
 
@@ -214,6 +220,7 @@ public abstract class DataSource {
 	 * Get values from widgets into intermediary storage and validate them.
 	 */
 	final public boolean justValidate() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justValidate()");
 		try {
 			resetExceptions();
 			copyFromFields();
@@ -229,6 +236,7 @@ public abstract class DataSource {
 	 * Put values from intermediary storage into widgets and update visibility and 'enablebility' of widgets.
 	 */
 	final public void justUpdate() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justUpdate()");
 		copyToFields();
 		try {
 			resetExceptions();
@@ -249,6 +257,7 @@ public abstract class DataSource {
 	 * @return true if could store to preferences, false otherwise.
 	 */
 	final public boolean storeAndValidate() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: storeAndValidate()");
 		try {
 			resetExceptions();
 			copyFromFields();
@@ -267,6 +276,7 @@ public abstract class DataSource {
 	 * preferences.
 	 */
 	final public void loadAndUpdate() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: loadAndUpdate()");
 		loadFromStorage();
 		copyToFields();
 		try {
@@ -286,6 +296,7 @@ public abstract class DataSource {
 	 * Values are also validated.
 	 */
 	final public void loadDefaultsAndUpdate() {
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: loadDefaultsAndUpdate()");
 		loadDefault();
 		copyToFields();
 		try {
@@ -299,14 +310,4 @@ public abstract class DataSource {
 		}
 		update();
 	}
-
-	/**
-	 * Copy the defaults to storage, without updating GUI.
-	 * Use this to initialize the storage before even having GUI available.
-	 */
-//	final public void storeDefaults() {
-//		resetExceptions();
-//		loadDefault();
-//		copyToStorage();
-//	}
 }

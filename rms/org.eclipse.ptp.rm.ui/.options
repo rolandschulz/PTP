@@ -1,0 +1,5 @@
+# Trace events on data source of GUI
+org.eclipse.ptp.rm.ui/debug/dataSource=true
+
+# Trace events on widget listener of GUI
+org.eclipse.ptp.rm.ui/debug/widgetListener=true

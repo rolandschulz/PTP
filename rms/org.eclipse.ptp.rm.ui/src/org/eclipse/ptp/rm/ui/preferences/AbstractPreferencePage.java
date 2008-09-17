@@ -37,11 +37,11 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 	public AbstractPreferencePage(String title, ImageDescriptor image) {
 		super(title, image);
 	}
-	
+
 	protected PreferenceWidgetListener getListener() {
 		return listener;
 	}
-	
+
 	protected PreferenceDataSource getDataSource() {
 		return dataSource;
 	}
@@ -103,9 +103,9 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 
 	@Override
 	protected Control createContents(Composite parent) {
+		listener.disable();
 		Composite contents = doCreateContents(parent);
 		resetErrorMessages();
-		listener.disable();
 		dataSource.loadAndUpdate();
 		listener.enable();
 		updateControls();
