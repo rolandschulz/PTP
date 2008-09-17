@@ -103,7 +103,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 				IIndexName name = refs[i];
 				IBinding binding= index.findBinding(name);
 				if (isRelevantForCallHierarchy(binding)) {
-					ICElement[] defs = IndexQueries.findRepresentative(index, binding, null);
+					ICElement[] defs = IndexQueries.findRepresentative(index, binding, null, null);
 					if (defs != null && defs.length > 0) {
 						result.add(defs, name);
 					}
@@ -125,7 +125,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 					if (needToFindDefinition(input)) {
 						IBinding binding= IndexQueries.elementToBinding(index, input);
 						if (binding != null) {
-							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null);
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null, project);
 							if (result.length > 0) {
 								return result;
 							}
@@ -170,7 +170,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 							}
 						}
 						else {
-							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null);
+							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project);
 							if (elems.length == 0) {
 								ICElement elem= null;
 								if (name.isDeclaration()) {

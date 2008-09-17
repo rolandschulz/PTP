@@ -506,7 +506,7 @@ public class CDTMiner extends Miner {
 				ICElement[] result = null;
 				ICProject project = new CProject(projectName);
 				ICElement member = input;
-				IIndexName name= IndexQueries.elementToName(index, member);
+				IIndexName name= IndexQueries.remoteElementToName(index, member);
 				if (name != null) {
 					member= IndexQueries.getCElementForName(project, index, name, converter);
 					IBinding binding= index.findBinding(name);
@@ -767,14 +767,14 @@ public class CDTMiner extends Miner {
 					if (needToFindDefinition(subject)) {
 						IBinding binding= IndexQueries.elementToBinding(index, subject);
 						if (binding != null) {
-							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null);
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null, subject.getCProject());
 							if (result.length > 0) {
 								definitions = result;
 							}
 						}
 					}
 					if (definitions == null) {
-						IIndexName name= IndexQueries.elementToName(index, subject);
+						IIndexName name= IndexQueries.remoteElementToName(index, subject);
 						if (name != null) {
 							ICElement handle= IndexQueries.getCElementForName(tu, index, name);
 							definitions = new ICElement[] {handle};
@@ -827,7 +827,7 @@ public class CDTMiner extends Miner {
 							}
 						}
 						else {
-							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null);
+							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project);
 							if (elems.length == 0) {
 								ICElement elem= null;
 								if (name.isDeclaration()) {
@@ -983,14 +983,14 @@ public class CDTMiner extends Miner {
 				System.out.flush();
 				index.acquireReadLock();
 
-				IIndexName callerName= IndexQueries.elementToName(index, subject);
+				IIndexName callerName= IndexQueries.remoteElementToName(index, subject);
 				if (callerName != null) {
 					IIndexName[] refs= callerName.getEnclosedNames();
 					for (int i = 0; i < refs.length; i++) {
 						IIndexName name = refs[i];
 						IBinding binding= index.findBinding(name);
 						if (isRelevantForCallHierarchy(binding)) {
-							ICElement[] defs = IndexQueries.findRepresentative(index, binding, converter);
+							ICElement[] defs = IndexQueries.findRepresentative(index, binding, converter, subject.getCProject());
 							if (defs != null && defs.length > 0) {
 								IIndexFileLocation indexLocation = createLocation(hostName, name.getFile().getLocation());
 								IIndexName reference = new DummyName(name, name.getFileLocation(), indexLocation);

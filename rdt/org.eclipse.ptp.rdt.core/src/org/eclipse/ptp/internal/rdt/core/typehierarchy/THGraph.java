@@ -181,7 +181,7 @@ public class THGraph implements Serializable {
 						ICPPBase base= bases[i];
 						IName name= base.getBaseClassSpecifierName();
 						IBinding basecl= name != null ? index.findBinding(name) : base.getBaseClass();
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null);
 						for (int j = 0; j < baseElems.length; j++) {
 							ICElement baseElem = baseElems[j];
 							THGraphNode baseGraphNode= addNode(baseElem);
@@ -198,7 +198,7 @@ public class THGraph implements Serializable {
 					IType type= ct.getType();
 					if (type instanceof IBinding) {
 						IBinding basecl= (IBinding) type;
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null);
 						if (baseElems.length > 0) {
 							ICElement baseElem= baseElems[0];
 							THGraphNode baseGraphNode= addNode(baseElem);
@@ -247,7 +247,7 @@ public class THGraph implements Serializable {
 							IIndexName subClassDef= indexName.getEnclosingDefinition();
 							if (subClassDef != null) {
 								IBinding subClass= index.findBinding(subClassDef);
-								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter);
+								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter, null);
 								if (subClassElems.length > 0) {
 									ICElement subClassElem= subClassElems[0];
 									THGraphNode subGraphNode= addNode(subClassElem);
@@ -304,7 +304,7 @@ public class THGraph implements Serializable {
 			throws CoreException {
 		for (int i = 0; i < members.length; i++) {
 			IBinding binding = members[i];
-			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter);
+			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter, null);
 			if (elems.length > 0) {
 				memberList.add(elems[0]);
 			}
