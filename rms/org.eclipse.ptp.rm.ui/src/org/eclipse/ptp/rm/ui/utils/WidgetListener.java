@@ -14,6 +14,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TypedEvent;
 
 /**
  * Common features useful for widget event listeners on PreferencePages.
@@ -46,8 +47,12 @@ public abstract class WidgetListener implements SelectionListener,
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e) {
-		if (isEnabled())
+		if (isEnabled()) {
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: widgetDefaultSelected on {0}", calculareSource(e));
 			doWidgetDefaultSelected(e);
+		} else {
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored widgetDefaultSelected on {0}", calculareSource(e));
+		}
 	}
 
 	protected void doWidgetDefaultSelected(SelectionEvent e) {
@@ -55,8 +60,12 @@ public abstract class WidgetListener implements SelectionListener,
 	}
 
 	public void widgetSelected(SelectionEvent e) {
-		if (isEnabled())
+		if (isEnabled()) {
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: widgetSelected on {0}", calculareSource(e));
 			doWidgetSelected(e);
+		} else {
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored widgetSelected on {0}", calculareSource(e));
+		}
 	}
 
 	protected void doWidgetSelected(SelectionEvent e) {
@@ -64,11 +73,20 @@ public abstract class WidgetListener implements SelectionListener,
 	}
 
 	public void modifyText(ModifyEvent e) {
-		if (isEnabled())
+		if (isEnabled()) {
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: modifyText on {0}", calculareSource(e));
 			doModifyText(e);
+		} else {
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored modifyText on {0}", calculareSource(e));
+		}
 	}
 
 	protected void doModifyText(ModifyEvent e) {
 		// Default empty implementation.
+	}
+
+	static private String calculareSource(TypedEvent e) {
+		Object source = e.getSource();
+		return source.getClass().getName();
 	}
 }
