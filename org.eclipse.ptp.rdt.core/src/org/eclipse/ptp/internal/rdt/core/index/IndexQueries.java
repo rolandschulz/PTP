@@ -18,6 +18,8 @@
  */
 package org.eclipse.ptp.internal.rdt.core.index;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.eclipse.cdt.core.dom.IName;
@@ -54,12 +56,14 @@ import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.index.IndexFileLocation;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.internal.rdt.core.miners.RemoteIndexFileLocation;
 import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.CElement;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
@@ -178,6 +182,54 @@ public class IndexQueries {
 		}
 		return null;
 	}
+	
+	public static IIndexName remoteElementToName(IIndex index, ICElement element) throws CoreException {
+		if (element instanceof ISourceReference) {
+			ISourceReference sf = ((ISourceReference)element);
+			ITranslationUnit tu= sf.getTranslationUnit();
+			if (tu != null) {
+				
+				URI uri = null;
+				try {
+					uri = convertRemoteURIToLocal(tu.getLocationURI());
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				IIndexFileLocation location = null;
+				
+				if(uri != null)
+					location = new IndexFileLocation(uri, uri.getPath());
+
+				if (location != null) {
+					IIndexFile[] files= index.getFiles(location);
+					for (int i = 0; i < files.length; i++) {
+						IIndexFile file = files[i];
+						String elementName= element.getElementName();
+						int idx= elementName.lastIndexOf(":")+1; //$NON-NLS-1$
+						ISourceRange pos= sf.getSourceRange();
+//						IRegion region = getConvertedRegion(tu, file, pos.getIdStartPos()+idx, pos.getIdLength()-idx);
+						int offset = pos.getIdStartPos()+idx;
+						int length = pos.getIdLength()-idx;
+						IIndexName[] names= file.findNames(offset, length);
+						for (int j = 0; j < names.length; j++) {
+							IIndexName name = names[j];
+							if (!name.isReference() && elementName.endsWith(new String(name.toCharArray()))) {
+								return name;
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private static URI convertRemoteURIToLocal(URI locationURI) throws URISyntaxException {
+		URI uri = new URI("file", null, locationURI.getPath(), null); //$NON-NLS-1$
+		return uri;
+	}
 
 	public static boolean isIndexed(IIndex index, ICElement element) throws CoreException {
 		if (element instanceof ISourceReference) {
@@ -232,8 +284,8 @@ public class IndexQueries {
 	}
 
 
-	public static ICElement[] findRepresentative(IIndex index, IBinding binding, IIndexLocationConverter converter) throws CoreException {
-		ICElement[] defs = findAllDefinitions(index, binding, converter);
+	public static ICElement[] findRepresentative(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject) throws CoreException {
+		ICElement[] defs = findAllDefinitions(index, binding, converter, preferProject);
 		if (defs.length == 0) {
 			ICElement elem = findAnyDeclaration(index, null, binding, converter);
 			if (elem != null) {
@@ -243,14 +295,14 @@ public class IndexQueries {
 		return defs;
 	}
 
-	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding, IIndexLocationConverter converter) throws CoreException {
+	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject) throws CoreException {
 		if (binding != null) {
 			IIndexName[] defs= index.findNames(binding, IIndex.FIND_DEFINITIONS | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
 
 			ArrayList<ICElement> result= new ArrayList<ICElement>();
 			for (int i = 0; i < defs.length; i++) {
 				IIndexName in = defs[i];
-				ICElement definition= getCElementForName((ICProject) null, index, in, converter);
+				ICElement definition= getCElementForName(preferProject, index, in, converter);
 				if (definition != null) {
 					result.add(definition);
 				}

@@ -64,7 +64,7 @@ public class TypeHierarchyUtil {
 			return IndexQueries.getCElementForName(project, index, name, converter);
 		}
 	
-		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter);
+		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project);
 		if (elems.length > 0) {
 			return elems[0];
 		}
@@ -77,7 +77,7 @@ public class TypeHierarchyUtil {
 			return IndexQueries.getCElementForName(project, index, name, converter);
 		}
 	
-		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter);
+		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project);
 		if (elems.length > 0) {
 			return elems[0];
 		}
