@@ -9,7 +9,14 @@
  Contributors:
    IBM - Initial API and implementation
 -->
+
+<!--
+ Script for generating the RDT remote server packages.  To be run with
+ PTP master build and not standalone.
+-->
+
 <project name="RDT Remote JARs" default="server.all" basedir=".">
+	<property name="ptpVersion" value="2.1.0"/>
 	
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
@@ -24,6 +31,9 @@
 	<property name="platformVersion" value="R-3.4-200806172000"/>
 	<property name="platformBaseName" value="eclipse-platform-3.4"/>
 	
+	<property name="cdtCoreVersion" value="5.0.1.200807250801"/>
+	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+
 	<property name="coreRuntimeVersion" value="3.4.0.v20080512"/>
 	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
 	
@@ -37,7 +47,7 @@
 	<property name="rseVersion" value="R-3.0-200806202130"/>
 	<property name="dStoreBaseName" value="rseserver-3.0"/>
 	
-	<target name="fetch" depends="fetch.platform, fetch.rse" unless="nofetch"/>
+	<target name="fetch" depends="fetch.rse" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="jar" depends="generate.build.scripts">
@@ -57,19 +67,50 @@
 			<property name="basedir" value="${basedir}/.."/>
 			<property name="jarfile" value="${basedir}/stubs.jar"/>
 		</ant>
+	
 		<antcall target="clean.except.jars"></antcall>
+
 	</target>
 	
 	<target name="generate.build.scripts" depends="generate.file.lists">
 		<xslt style="${stylesheet}" in="${basedir}/cdtminer.files.xml" out="${basedir}/build.cdtminer.xml">
+			<param name="bindir" expression="@dot"/>
+		</xslt>
+		<xslt style="${stylesheet}" in="${basedir}/cdtmodel.files.xml" out="${basedir}/build.cdtmodel.xml">
 			<param name="bindir" expression="build"/>
 		</xslt>
-		<xslt style="${stylesheet}" in="${basedir}/cdtmodel.files.xml" out="${basedir}/build.cdtmodel.xml"/>
-		<xslt style="${stylesheet}" in="${basedir}/cdtparser.files.xml" out="${basedir}/build.cdtparser.xml"/>
-		<xslt style="${stylesheet}" in="${basedir}/stubs.files.xml" out="${basedir}/build.stubs.xml"/>
+		<xslt style="${stylesheet}" in="${basedir}/cdtparser.files.xml" out="${basedir}/build.cdtparser.xml">
+			<param name="bindir" expression="build"/>
+		</xslt>
+		<xslt style="${stylesheet}" in="${basedir}/stubs.files.xml" out="${basedir}/build.stubs.xml">
+			<param name="bindir" expression="build"/>
+		</xslt>
 	</target>
 	
-	<target name="generate.file.lists">
+	<target name="compile.all">
+		<!--Compile rdt.core.remotejars and rdt.core.stubs-->
+		<mkdir dir="${basedir}/build"/>
+		<javac srcdir="src/org/eclipse/ptp/internal/rdt/core/jardesc"
+				destdir="${basedir}/build"
+				source="1.5"
+				target="1.5"
+	  	/>		
+		<mkdir dir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/build"/>
+		<javac srcdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/src"
+				destdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/build"
+				source="1.5"
+				target="1.5"
+	  	/>
+	</target>
+	
+	<target name="get.cdt.bin">
+		<!--Get cdt.core from PTP build-->
+		<unzip src="${basedir}/../../eclipse/plugins/${cdtCoreJar}"
+			dest="${basedir}/../org.eclipse.cdt.core/build"
+		/>
+	</target>
+	
+	<target name="generate.file.lists" depends="compile.all, get.cdt.bin">
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
@@ -146,7 +187,10 @@
 	</target>
 	
 	<target name="unpack.platform">
-		<unzip src="${downloads}/${platformBaseName}-win32.zip" dest="${platformTempDir}"/>
+		<!--Get platform jars from PTP build-->
+		<copy file="${basedir}/../../eclipse/plugins/${coreRuntimeJar}" todir="${platformTempDir}/eclipse/plugins"/>
+		<copy file="${basedir}/../../eclipse/plugins/${equinoxJar}" todir="${platformTempDir}/eclipse/plugins"/>
+		<copy file="${basedir}/../../eclipse/plugins/${filesystemJar}" todir="${platformTempDir}/eclipse/plugins"/>
 	</target>
 			
 	<target name="prepare.remote.tar">
@@ -220,6 +264,9 @@
 			</fileset>
 		</tar>
 		
+		<copy file="${serverJar}-${platform}-${serverVersion}.tar" 
+			todir="${basedir}/../../../builds/${ptpVersion}/latest"/>
+				
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
 
@@ -231,6 +278,9 @@
 				<include name="rdt-server/**/*"/>
 			</fileset>
 		</zip>
+		
+		<copy file="${serverJar}-${platform}-${serverVersion}.zip" 
+			todir="${basedir}/../../../builds/${ptpVersion}/latest"/>
 		
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
