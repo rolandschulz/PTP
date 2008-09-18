@@ -69,23 +69,41 @@ public class ServiceModelWidget{
 		
 		Composite tableParent = new Composite(canvas, SWT.NONE);
 		tableParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
 		
-		fTable = new Table (tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+		fTable = new Table (tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL);
 		fTable.setLinesVisible (true);
 		fTable.setHeaderVisible (true);
 		
 		TableColumnLayout layout = new TableColumnLayout();
-		// create the columns and headers... note third column holds "Configure..." buttons and hence has no title.
-		String[] titles = {Messages.getString("ServiceModelWizardPage.0"), Messages.getString("ServiceModelWizardPage.1")}; //$NON-NLS-1$ //$NON-NLS-2$
+		// create the columns and headers... note fourth column holds "Configure..." buttons and hence has no title.
+		String[] titles = {Messages.getString("ServiceModelWidget.0"), Messages.getString("ServiceModelWidget.1"), Messages.getString("ServiceModelWidget.3")}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		for (int i=0; i<titles.length; i++) {
 			TableColumn column = new TableColumn (fTable, SWT.NONE);
 			column.setText (titles [i]);
-			layout.setColumnData(column, new ColumnWeightData(1, true));
+			int width = ColumnWeightData.MINIMUM_WIDTH;
+			
+			// set the column widths
+			switch (i) {
+			case 0: // Service name... usually short
+				width = 100;
+				break;
+
+			case 1: // provider name... typically long
+			case 2: // configuration string... typically long
+				width = 250;
+				break;
+
+			}
+			
+			layout.setColumnData(column, new ColumnWeightData(1, width, true));
+			
+
 		}
 		tableParent.setLayout(layout);
 		fTable.setLayout(new FillLayout());
 		
-		getContributedServices(null);
+		createTableContent(null);
 		
 		fTable.setVisible(true);
 		
@@ -138,6 +156,20 @@ public class ServiceModelWidget{
 							IService service = (IService) item.getData(SERVICE_KEY);
 							item.setData(PROVIDER_KEY, descriptor);
 							
+							IServiceProvider serviceProvider = fProviderIDToProviderMap.get(descriptor.getId());
+							
+							if (serviceProvider == null) {
+								ServiceModelManager manager = ServiceModelManager.getInstance();
+								serviceProvider = manager.getServiceProvider(descriptor);
+							}
+							
+							// column 2 holds the configuration string of the provider's current configuration 
+							String configString = serviceProvider.getConfigurationString();
+							if (configString == null) {
+								configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+							}
+							item.setText(2, configString);
+							
 							fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
 							combo.dispose();
 							break;
@@ -153,7 +185,7 @@ public class ServiceModelWidget{
 		
 		fConfigureButton = new Button(canvas, SWT.PUSH);
 		fConfigureButton.setEnabled(false);
-		fConfigureButton.setText(Messages.getString("ServiceModelWizardPage.2")); //$NON-NLS-1$
+		fConfigureButton.setText(Messages.getString("ServiceModelWidget.2")); //$NON-NLS-1$
 		fConfigureButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 		Listener configureListener = getConfigureListener();
 		fConfigureButton.addListener(SWT.Selection, configureListener);
@@ -175,6 +207,13 @@ public class ServiceModelWidget{
 
 			IServiceProviderConfiguration configUI = manager.getServiceProviderConfigurationUI(serviceProvider);
 			configUI.configureServiceProvider(serviceProvider, fConfigureButton.getShell());
+			
+			String configString = serviceProvider.getConfigurationString();
+			// column 2 holds the configuration string of the provider's current configuration 
+			if (configString == null) {
+				configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+			}
+			item.setText(2, configString);
 		}
 	}
 	
@@ -184,13 +223,53 @@ public class ServiceModelWidget{
 	}
 	
 	/**
-	 * Find available remote services and service providers for a given project and
-	 * add them to the table
+	 * Generate the services, providers and provider configuration available for
+	 * the given project in the table
+	 * 
+	 * Sub-classes may override its behaviour
+	 * @param project
+	 */
+	protected void createTableContent(IProject project) {
+		Set<IService> allApplicableServices = getContributedServices(project);
+		
+		Iterator<IService> iterator = allApplicableServices.iterator();
+
+		// get the contributed services... we need one row for each
+		while(iterator.hasNext()) {
+			final IService service = iterator.next();			
+			
+			TableItem item = new TableItem (fTable, SWT.NONE);
+
+			// column 0 lists the name of the service
+			item.setText (0, service.getName());
+			item.setData(SERVICE_KEY, service);
+			
+			// column 1 holds a dropdown with a list of providers
+			IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
+			item.setText(1, descriptor.getName());
+			item.setData(PROVIDER_KEY, descriptor);
+			
+			ServiceModelManager manager = ServiceModelManager.getInstance();
+			IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+			
+			String configString = serviceProvider.getConfigurationString();
+			// column 2 holds the configuration string of the provider's current configuration 
+			if (configString == null) {
+				configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+			}
+			item.setText(2, configString);
+			
+			fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
+		}
+	}
+	
+	/**
+	 * Find available remote services and service providers for a given project
 	 * 
 	 * If project is null, the C and C++ natures are used to determine which services
 	 * are available
 	 */
-	protected void getContributedServices(IProject project) {		
+	protected Set<IService> getContributedServices(IProject project) {		
 		ServiceModelManager modelManager = ServiceModelManager.getInstance();
 		Set<IService> allApplicableServices = new LinkedHashSet<IService>();
 		
@@ -218,26 +297,7 @@ public class ServiceModelWidget{
 			allApplicableServices.addAll(cppServices);
 			allApplicableServices.addAll(cServices);
 		}
-		
-		Iterator<IService> iterator = allApplicableServices.iterator();
-
-		// get the contributed services... we need one row for each
-		while(iterator.hasNext()) {
-			final IService service = iterator.next();			
-			
-			TableItem item = new TableItem (fTable, SWT.NONE);
-
-			// column 0 lists the name of the service
-			item.setText (0, service.getName());
-			item.setData(SERVICE_KEY, service);
-			
-			// column 1 holds a dropdown with a list of providers
-			IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
-			item.setText(1, descriptor.getName());
-			item.setData(PROVIDER_KEY, descriptor);
-			
-			fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
-		}
+		return allApplicableServices;
 	}
 
 	public Map<String, String> getServiceIDToSelectedProviderID() {

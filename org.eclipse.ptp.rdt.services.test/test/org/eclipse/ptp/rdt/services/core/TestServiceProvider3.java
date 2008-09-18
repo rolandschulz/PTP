@@ -40,4 +40,8 @@ public class TestServiceProvider3 implements IServiceProvider, IServiceProviderC
 
 	public void saveState(IMemento providerMemento) {
 	}
+
+	public String getConfigurationString() {
+		return null;
+	}
 }

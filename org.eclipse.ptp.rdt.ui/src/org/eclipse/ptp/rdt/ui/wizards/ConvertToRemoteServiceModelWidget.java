@@ -12,12 +12,20 @@
 package org.eclipse.ptp.rdt.ui.wizards;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
+import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * A table widget listing remote services and service providers.  This widget is used in 
@@ -53,9 +61,68 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 		fProviderIDToProviderMap = new HashMap<String, IServiceProvider>();
 		fServiceIDToSelectedProviderID = new HashMap<String, String>();
 		currentProject = project;
-		getContributedServices(project);		
+		createTableContent(project);		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.ui.wizards.ServiceModelWidget#createTableContent(org.eclipse.core.resources.IProject)
+	 */
+	@Override
+	protected void createTableContent(IProject project) {
+		if (project == null) {
+			super.createTableContent(project);
+		} else if (projectToServices.get(currentProject) == null && projectToProviders.get(currentProject) == null) {
+				super.createTableContent(project);
+		} else {
+			Set<IService> services = getContributedServices(project);
+			Iterator<IService> iterator = services.iterator();
+			
+			Map<String, String> serviceIDToSelectedProviderID = projectToServices.get(currentProject);
+			Map<String, IServiceProvider> providerIDToProviderMap = projectToProviders.get(currentProject);
+			
+			while(iterator.hasNext()) {
+				final IService service = iterator.next();			
+				
+				TableItem item = new TableItem (fTable, SWT.NONE);
+
+				// column 0 lists the name of the service
+				item.setText (0, service.getName());
+				item.setData(SERVICE_KEY, service);
+				
+				String providerID = serviceIDToSelectedProviderID.get(service.getId());
+				IServiceProvider provider= providerIDToProviderMap.get(providerID);
+				String configString;
+				
+				//remember user's selection and restore
+				if (provider != null) {				
+					// column 1 holds a dropdown with a list of providers
+					item.setText(1, provider.getName());
+					item.setData(PROVIDER_KEY, provider);
+					
+					configString = provider.getConfigurationString();					
+				} else { //no previous user selection
+					IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
+					item.setText(1, descriptor.getName());
+					item.setData(PROVIDER_KEY, descriptor);
+					
+					ServiceModelManager manager = ServiceModelManager.getInstance();
+					IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+					
+					configString = serviceProvider.getConfigurationString();
+				}
+				
+				// column 2 holds the configuration string of the provider's current configuration 
+				if (configString == null) {
+					configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+				}
+				item.setText(2, configString);
+			}
+			
+			fServiceIDToSelectedProviderID.putAll(serviceIDToSelectedProviderID);
+			fProviderIDToProviderMap.putAll(providerIDToProviderMap);
+		}
+	}
+
 	public void emptyTable() {
 		fTable.removeAll();	
 	}

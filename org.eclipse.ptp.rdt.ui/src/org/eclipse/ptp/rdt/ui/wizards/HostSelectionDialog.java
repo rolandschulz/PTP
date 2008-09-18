@@ -82,17 +82,25 @@ public class HostSelectionDialog extends Dialog {
         // set layout to grab horizontal space
         hostCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         
+        //attempt to restore settings from saved state
+        IHost hostSelected = fProvider.getHost();
+        
         // populate the combo with a list of hosts
         IHost[] hosts = SystemStartHere.getConnections();
+        int toSelect = 0;
         
         for(int k = 0; k < hosts.length; k++) {
         	hostCombo.add(hosts[k].getAliasName(), k);
         	fHostComboIndexToHostMap.put(k, hosts[k]);
+        	
+        	if (hostSelected != null && hostSelected.getAliasName().compareTo(hosts[k].getAliasName()) == 0) {
+        		toSelect = k;
+        	}
         }
         
-        // set selected host to be the first one
-        hostCombo.select(0);
-        fSelectedHost = fHostComboIndexToHostMap.get(0);
+        // set selected host to be the first one if we're not restoring from settings
+        hostCombo.select(toSelect);
+        fSelectedHost = fHostComboIndexToHostMap.get(toSelect);
         
         
         hostCombo.addSelectionListener(new SelectionListener() {
