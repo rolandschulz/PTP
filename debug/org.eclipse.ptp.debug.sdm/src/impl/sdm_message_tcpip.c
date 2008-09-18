@@ -29,7 +29,6 @@
 #include "list.h"
 #include "serdes.h"
 #include "sdm.h"
-#include "routetable.h"
 #include "helloproto.h"
 
 #define MESSAGE_LENGTH_SIZE	8
@@ -263,25 +262,10 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 int
 sdm_tcpip_init()
 {
-	FILE *rt_file;
-	int rv, i;
-	int tbl_size;
-	struct routing_tbl_struct table_entry;
-	sdm_id_sockd_map_p mapp;
-
+	routing_table_entry *	entry;
+	sdm_id_sockd_map_p		mapp;
 
 	sdm_create_sockd_map();
-
-	// Master and servers wait for the routing file to appear
-	rv = wait_for_routing_file("routing_file", &rt_file, 10); //TODO: Get filename from the environment
-	if(rv == -1) { // No need to close, since wait_for_routing_file does it when error
-		// Error!
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error opening the routing file\n", sdm_route_get_id());
-		return -1;
-	} else if(rv == -2){
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Timeout while waiting for routing file\n", sdm_route_get_id());
-		return -1;
-	}
 
 	// If it isn't the master node bind to the port provided
 	if(sdm_route_get_id() != SDM_MASTER) {
@@ -289,28 +273,10 @@ sdm_tcpip_init()
 
 		//printf("This node is a server!\n");
 
-		rv = read_routing_table_size(rt_file, &tbl_size);
-		if(rv < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table size\n", sdm_route_get_id());
-			goto error;
-		}
-
-		// For each entry, verify against the parent structure to see if the ID matches
-		for(i = 0; i < tbl_size; i++) {
-			int numericId;
-			rv = read_routing_table_entry(rt_file, &table_entry);
-
-			if(rv < 0) {
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
-				goto error;
-				/*close_routing_file(rt_file);
-				return -1;*/
-			}
-			//printf("NodeIdTable: %s\n", table_entry.nodeID);
-			numericId = strtol(table_entry.nodeID, NULL, 10);
+		for (sdm_routing_table_set(); (entry = sdm_routing_table_next()) != NULL; ) {
 			//printf("numId: %d, parentId: %d, myid: %d\n", numericId, parent_sockd_map->id, sdm_route_get_id());
-			if(numericId == sdm_route_get_id()) {
-				parentsockd = sdm_parent_port_bind(table_entry.port);
+			if(entry->nodeID == sdm_route_get_id()) {
+				parentsockd = sdm_parent_port_bind(entry->port);
 				break;
 			}
 		}
@@ -318,7 +284,7 @@ sdm_tcpip_init()
 		//parentsockd = sdm_parent_port_bind(parentport);
 		//printf("parentsockd returns from bind: %d\n", parentsockd);
 		if(parentsockd < 0) {
-			goto error;
+			return -1;
 		}
 		//printf("Parent %d successfully connected\n", parent_sockd_map->id);
 
@@ -329,38 +295,24 @@ sdm_tcpip_init()
 	// If node is leaf, initialization is done
 	if(children_sockd_map == NULL) {
 		//printf("This node is a leaf\n");
-		close_routing_file(rt_file);
 		return 0;
 	}
 
 	// Otherwise, open connections to the children
 
-	rv = read_routing_table_size(rt_file, &tbl_size);
-	if(rv < 0) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table size\n", sdm_route_get_id());
-		goto error;
-	}
-	// For each entry, scan the children structure to see if the ID matches
-	for(i = 0; i < tbl_size; i++) {
+	for (sdm_routing_table_set(); (entry = sdm_routing_table_next()) != NULL; ) {
 		int childsockd;
-		rv = read_routing_table_entry(rt_file, &table_entry);
-
-		if(rv < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
-			goto error;
-		}
 
 		mapp = children_sockd_map;
 		while(mapp != NULL) {
-			int numericId = strtol(table_entry.nodeID, NULL, 10);
 			//printf("read id: %d\n", mapp->id);
-			if(mapp->id == numericId) {
+			if(mapp->id == entry->nodeID) {
 				//printf("Childrenid found! Start connection!\n");
 				// ID found! Connect to the children and generate a socket descriptor
-				childsockd = sdm_connect_to_child(table_entry.hostname, table_entry.port);
+				childsockd = sdm_connect_to_child(entry->hostname, entry->port);
 
 				if(childsockd < 0) {
-					goto error;
+					return -1;
 				}
 				//printf("Connection to child %d successful\n", mapp->id);
 
@@ -374,13 +326,7 @@ sdm_tcpip_init()
 		//printf("ID: %s, host: %s, port: %d\n", table_entry.nodeID, table_entry.hostname, table_entry.port);
 	}
 
-	close_routing_file(rt_file);
-
 	return 0;
-
-error:
-	close_routing_file(rt_file);
-	return -1;
 }
 
 /**

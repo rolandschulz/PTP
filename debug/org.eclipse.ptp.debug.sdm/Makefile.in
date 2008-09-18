@@ -114,9 +114,9 @@ am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/impl/sdm-sdm.$(OBJEXT) \
 	src/impl/sdm-sdm_aggregate_hash.$(OBJEXT) \
 	src/impl/sdm-sdm_hello_proto.$(OBJEXT) \
-	src/impl/sdm-sdm_routetable_reader.$(OBJEXT) \
 	src/impl/sdm-sdm_message_tcpip.$(OBJEXT) \
 	src/impl/sdm-sdm_route_tree.$(OBJEXT) \
+	src/impl/sdm-sdm_routing_table_file.$(OBJEXT) \
 	src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
 sdm_DEPENDENCIES = libdbgutils.a libmi.a libaif/libaif.a
@@ -282,9 +282,9 @@ sdm_SOURCES = src/client/startup.c\
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
-							src/impl/sdm_routetable_reader.c \
 							src/impl/sdm_message_tcpip.c \
-							src/impl/sdm_route_tree.c \
+							src/impl/sdm_route_tree.c \ \
+							src/impl/sdm_routing_table_file.c \
 							src/impl/sdm_set_bitset.c
 
 sdm_CFLAGS = -I./include -I./libaif -I./src/mi $(AM_CFLAGS)
@@ -305,12 +305,22 @@ test_mi_SOURCES = src/mi/test_mi.c
 test_mi_CFLAGS = -I./include -I./src/mi $(AM_CFLAGS) -g
 test_mi_LDFLAGS = -g
 test_mi_LDADD = libmi.a
-noinst_HEADERS = include/breakpoint.h \
+noinst_HEADERS = include/backend.h \
+							include/breakpoint.h \
+							include/dbg_client.h \
+							include/dbg_error.h \
+							include/dbg_event.h \
+							include/dbg_proxy.h \
 							include/dbg.h \
+							include/helloproto.h \
+							include/itimer.h \
 							include/location.h \
-							include/stackframe.h \
 							include/memoryinfo.h \
-							include/signalinfo.h
+							include/routing_table.h \
+							include/sdm.h \
+							include/session.h \
+							include/signalinfo.h \
+							include/stackframe.h
 
 noinst_LIBRARIES = libdbgclnt.a libdbgutils.a libmi.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
@@ -572,12 +582,12 @@ src/impl/sdm-sdm_aggregate_hash.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_hello_proto.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_routetable_reader.$(OBJEXT):  \
-	src/impl/$(am__dirstamp) src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_message_tcpip.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_route_tree.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/sdm-sdm_routing_table_file.$(OBJEXT):  \
+	src/impl/$(am__dirstamp) src/impl/$(DEPDIR)/$(am__dirstamp)
 src/impl/sdm-sdm_set_bitset.$(OBJEXT): src/impl/$(am__dirstamp) \
 	src/impl/$(DEPDIR)/$(am__dirstamp)
 sdm$(EXEEXT): $(sdm_OBJECTS) $(sdm_DEPENDENCIES) 
@@ -620,7 +630,7 @@ mostlyclean-compile:
 	-rm -f src/impl/sdm-sdm_hello_proto.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_message_tcpip.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_route_tree.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_routetable_reader.$(OBJEXT)
+	-rm -f src/impl/sdm-sdm_routing_table_file.$(OBJEXT)
 	-rm -f src/impl/sdm-sdm_set_bitset.$(OBJEXT)
 	-rm -f src/mi/libmi_a-CLICommand.$(OBJEXT)
 	-rm -f src/mi/libmi_a-CLIOutput.$(OBJEXT)
@@ -679,7 +689,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLICommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLIOutput.Po@am__quote@
@@ -1386,20 +1396,6 @@ src/impl/sdm-sdm_hello_proto.obj: src/impl/sdm_hello_proto.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_hello_proto.obj `if test -f 'src/impl/sdm_hello_proto.c'; then $(CYGPATH_W) 'src/impl/sdm_hello_proto.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_hello_proto.c'; fi`
 
-src/impl/sdm-sdm_routetable_reader.o: src/impl/sdm_routetable_reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_routetable_reader.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Tpo -c -o src/impl/sdm-sdm_routetable_reader.o `test -f 'src/impl/sdm_routetable_reader.c' || echo '$(srcdir)/'`src/impl/sdm_routetable_reader.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Tpo src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routetable_reader.c' object='src/impl/sdm-sdm_routetable_reader.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_routetable_reader.o `test -f 'src/impl/sdm_routetable_reader.c' || echo '$(srcdir)/'`src/impl/sdm_routetable_reader.c
-
-src/impl/sdm-sdm_routetable_reader.obj: src/impl/sdm_routetable_reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_routetable_reader.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Tpo -c -o src/impl/sdm-sdm_routetable_reader.obj `if test -f 'src/impl/sdm_routetable_reader.c'; then $(CYGPATH_W) 'src/impl/sdm_routetable_reader.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routetable_reader.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Tpo src/impl/$(DEPDIR)/sdm-sdm_routetable_reader.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routetable_reader.c' object='src/impl/sdm-sdm_routetable_reader.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_routetable_reader.obj `if test -f 'src/impl/sdm_routetable_reader.c'; then $(CYGPATH_W) 'src/impl/sdm_routetable_reader.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routetable_reader.c'; fi`
-
 src/impl/sdm-sdm_message_tcpip.o: src/impl/sdm_message_tcpip.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_tcpip.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Tpo -c -o src/impl/sdm-sdm_message_tcpip.o `test -f 'src/impl/sdm_message_tcpip.c' || echo '$(srcdir)/'`src/impl/sdm_message_tcpip.c
 @am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Tpo src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Po
@@ -1427,6 +1423,20 @@ src/impl/sdm-sdm_route_tree.obj: src/impl/sdm_route_tree.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/sdm-sdm_route_tree.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`
+
+src/impl/sdm-sdm_routing_table_file.o: src/impl/sdm_routing_table_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_routing_table_file.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo -c -o src/impl/sdm-sdm_routing_table_file.o `test -f 'src/impl/sdm_routing_table_file.c' || echo '$(srcdir)/'`src/impl/sdm_routing_table_file.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routing_table_file.c' object='src/impl/sdm-sdm_routing_table_file.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_routing_table_file.o `test -f 'src/impl/sdm_routing_table_file.c' || echo '$(srcdir)/'`src/impl/sdm_routing_table_file.c
+
+src/impl/sdm-sdm_routing_table_file.obj: src/impl/sdm_routing_table_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_routing_table_file.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo -c -o src/impl/sdm-sdm_routing_table_file.obj `if test -f 'src/impl/sdm_routing_table_file.c'; then $(CYGPATH_W) 'src/impl/sdm_routing_table_file.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routing_table_file.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routing_table_file.c' object='src/impl/sdm-sdm_routing_table_file.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_routing_table_file.obj `if test -f 'src/impl/sdm_routing_table_file.c'; then $(CYGPATH_W) 'src/impl/sdm_routing_table_file.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routing_table_file.c'; fi`
 
 src/impl/sdm-sdm_set_bitset.o: src/impl/sdm_set_bitset.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_set_bitset.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Tpo -c -o src/impl/sdm-sdm_set_bitset.o `test -f 'src/impl/sdm_set_bitset.c' || echo '$(srcdir)/'`src/impl/sdm_set_bitset.c
