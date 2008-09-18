@@ -42,7 +42,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -185,9 +184,6 @@ public class SDMDebugger implements IPDebugger {
 			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
 		}
 
-		int numProcs = 5;//attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
-		dbgArgs.add("--numprocs=" + numProcs); //$NON-NLS-1$
-
 		// remote setting
 		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);;
 		if (dbgExePath == null) {
@@ -216,6 +212,7 @@ public class SDMDebugger implements IPDebugger {
 		 */
 		List<String> sdmCommand = new ArrayList<String>();
 		sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue());
+		sdmCommand.add("--master");
 		sdmCommand.addAll(dbgArgs);
 		sdmRunner.setCommand(sdmCommand);
 		sdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
@@ -269,11 +266,11 @@ public class SDMDebugger implements IPDebugger {
 	 * @return number of processes
 	 */
 	private int getJobSize(IPJob job) {
-		IntegerAttribute numProcAttr = job.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
-		if (numProcAttr != null) {
-			return numProcAttr.getValue();
+		int nprocs = job.getProcesses().length;
+		if (nprocs == 0) {
+			nprocs = 1;
 		}
-		return 1;
+		return nprocs;
 	}
 
 	/**

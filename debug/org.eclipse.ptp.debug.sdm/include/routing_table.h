@@ -9,18 +9,18 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-#ifndef ROUTETABLE_H_
-#define ROUTETABLE_H_
+#ifndef ROUTING_TABLE_H_
+#define ROUTING_TABLE_H_
 
-struct routing_tbl_struct {
-	char nodeID[255];
-	char hostname[255]; // See RFC1034 for maximum size of a domain name
-	int port;
+struct routing_table_entry {
+	sdm_id 	nodeID;
+	char 	hostname[255]; // See RFC1034 for maximum size of a domain name
+	int		port;
 };
+typedef struct routing_table_entry	routing_table_entry;
 
-int wait_for_routing_file(char *filename, FILE **routing_file, unsigned sec);
-int close_routing_file(FILE *routing_file);
-int read_routing_table_size(FILE *routing_file, int *table_size);
-int read_routing_table_entry(FILE *routing_file, struct routing_tbl_struct *table);
+extern int						sdm_routing_table_init(int argc, char *argv[]);
+extern void						sdm_routing_table_set(void);
+extern routing_table_entry *	sdm_routing_table_next(void);
 
-#endif /*ROUTETABLE_H_*/
+#endif /* ROUTING_TABLE_H_ */

@@ -14,9 +14,9 @@ sdm_SOURCES =				src/client/startup.c\
 							src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
-							src/impl/sdm_routetable_reader.c \
 							src/impl/sdm_message_tcpip.c \
-							src/impl/sdm_route_tree.c \
+							src/impl/sdm_route_tree.c \ \
+							src/impl/sdm_routing_table_file.c \
 							src/impl/sdm_set_bitset.c
 					
 sdm_CFLAGS =				-I./include -I./libaif -I./src/mi $(AM_CFLAGS)
@@ -39,12 +39,22 @@ test_mi_CFLAGS =			-I./include -I./src/mi $(AM_CFLAGS) -g
 test_mi_LDFLAGS = 			-g
 test_mi_LDADD =				libmi.a
 
-noinst_HEADERS =			include/breakpoint.h \
+noinst_HEADERS =			include/backend.h \
+							include/breakpoint.h \
+							include/dbg_client.h \
+							include/dbg_error.h \
+							include/dbg_event.h \
+							include/dbg_proxy.h \
 							include/dbg.h \
+							include/helloproto.h \
+							include/itimer.h \
 							include/location.h \
-							include/stackframe.h \
 							include/memoryinfo.h \
-							include/signalinfo.h
+							include/routing_table.h \
+							include/sdm.h \
+							include/session.h \
+							include/signalinfo.h \
+							include/stackframe.h
 
 noinst_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
 

@@ -28,6 +28,8 @@ typedef struct sdm_aggregate *	sdm_aggregate;
 
 extern sdm_id	SDM_MASTER;
 
+#include "routing_table.h"
+
 /*
  * Startup/Initialization
  */

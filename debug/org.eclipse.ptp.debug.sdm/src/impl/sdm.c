@@ -17,89 +17,17 @@
 
 #include "sdm.h"
 
-static char * MPIRankVars[] = {
-	"OMPI_MCA_orte_ess_vpid", 	/* Open MPI 1.3 */
-	"OMPI_MCA_ns_nds_vpid", 	/* Open MPI 1.2 */
-	"PMI_RANK", 				/* MPICH2 */
-	"MP_CHILD",					/* IBM PE */
-	NULL
-};
-
 static int	shutting_down = 0;
 
 static void	recv_callback(sdm_message msg);
 
 /*
- * Set node id and the number of machines executing (including master)
- */
-int
-sdm_setup(int argc, char *argv[])
-{
-	int		ch;
-	int		size;
-	char *	envval;
-	char **	rank;
-
-	/*
-	 * Get the number of processes
-	 */
-	size = -1;
-	for (ch = 0; ch < argc; ch++) {
-		char * arg = argv[ch];
-		if (strncmp(arg, "--numprocs", 10) == 0) {
-			size = (int)strtol(arg+11, NULL, 10);
-			break;
-		}
-	}
-
-	if(size == -1) {
-		return -1;
-	}
-
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] size %d\n", sdm_route_get_id(), size);
-
-	sdm_route_set_size(size+1);
-
-	/*
-	 * Set the ID of the master to one greater than the last process [0 ... size-1]
-	 */
-	SDM_MASTER = size;
-
-	/*
-	 * Since the SDM servers will be started by the mpirun, get
-	 * the ID from the environment var.
-	 * Important! If the variable is not declared, then
-	 * this sdm is the master.
-	 */
-
-	for (rank = MPIRankVars; *rank != NULL; rank++) {
-		envval = getenv(*rank);
-		if (envval != NULL) {
-			break;
-		}
-	}
-
-	if (envval != NULL) {
-		int id = strtol(envval, NULL, 10);
-		sdm_route_set_id(id);
-	} else {
-		sdm_route_set_id(SDM_MASTER);
-	}
-
-	return 0;
-}
-
-/*
- * Initialize the abstraction layers
+ * Initialize the abstraction layers. ORDER IS IMPORTANT!
  */
 int
 sdm_init(int argc, char *argv[])
 {
-	if (sdm_setup(argc, argv) < 0) {
-		return -1;
-	}
-
-	if (sdm_route_init(argc, argv) < 0) {
+	if (sdm_routing_table_init(argc, argv) < 0) {
 		return -1;
 	}
 

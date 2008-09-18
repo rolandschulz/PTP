@@ -40,8 +40,7 @@ static struct option longopts[] = {
 	{"proxy",			required_argument,	NULL, 	'P'},
 	{"port",			required_argument,	NULL, 	'p'},
 	{"host",			required_argument,	NULL, 	'h'},
-	{"jobid",			required_argument,	NULL, 	'j'},
-	{"numprocs",		required_argument, 	NULL,	'n'},
+	{"master",			no_argument,	 	NULL,	'm'},
 #ifdef DEBUG
 	{"debug",			optional_argument,	NULL, 	'd'},
 #endif /* DEBUG */
@@ -49,9 +48,9 @@ static struct option longopts[] = {
 };
 
 #ifdef DEBUG
-static char * shortopts = "b:e:P:p:h:j:d:n::";
+static char * shortopts = "b:e:P:p:h:d:m";
 #else /* DEBUG */
-static char * shortopts = "b:e:P:p:h:j:n:";
+static char * shortopts = "b:e:P:p:h:m";
 #endif /* DEBUG */
 
 static int	fatal_error = 0;
@@ -117,9 +116,7 @@ main(int argc, char *argv[])
 		case 'h':
 			host = optarg;
 			break;
-		case 'n':
-			break;
-		case 'j':
+		case 'm':
 			break;
 	#ifdef DEBUG
 		case 'd':
@@ -130,23 +127,22 @@ main(int argc, char *argv[])
 			break;
 	#endif /* DEBUG */
 		default:
-			error_msg(
+			fprintf(stderr,
 				"sdm [--debugger=value] [--debugger_path=path]\n"
 				"    [--proxy=proxy]\n"
 				"    [--host=host_name] [--port=port]\n"
-				"    [--jobid=jobid]\n"
-				"	 [--numnodes=numnodes]\n"
+				"	 [--master]\n"
 	#ifdef DEBUG
 				"    [--debug[=level]]\n"
 	#endif /* DEBUG */
 			);
-			goto error_out;
+			return 1;
 		}
 	}
 
 	if (find_dbg_backend(debugger_str, &d) < 0) {
-		error_msg("No such backend: \"%s\"\n", debugger_str);
-		goto error_out;
+		fprintf(stderr, "No such backend: \"%s\"\n", debugger_str);
+		return 1;
 	}
 
 	if (path != NULL) {
@@ -154,8 +150,8 @@ main(int argc, char *argv[])
 	}
 
 	if (find_proxy(proxy_str, &p) < 0) {
-		error_msg("No such proxy: \"%s\"\n", proxy_str);
-		goto error_out;
+		fprintf(stderr,"No such proxy: \"%s\"\n", proxy_str);
+		return 1;
 	}
 
 	if (sdm_init(argc, argv) < 0) {
@@ -176,7 +172,4 @@ main(int argc, char *argv[])
 	sdm_finalize();
 
 	return 0;
-
-error_out:
-	return 1;
 }
