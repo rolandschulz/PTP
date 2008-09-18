@@ -69,7 +69,6 @@ public class ServiceModelWidget{
 		
 		Composite tableParent = new Composite(canvas, SWT.NONE);
 		tableParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
 		
 		fTable = new Table (tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL);
 		fTable.setLinesVisible (true);
@@ -156,6 +155,7 @@ public class ServiceModelWidget{
 							IService service = (IService) item.getData(SERVICE_KEY);
 							item.setData(PROVIDER_KEY, descriptor);
 							
+							//look in cache first
 							IServiceProvider serviceProvider = fProviderIDToProviderMap.get(descriptor.getId());
 							
 							if (serviceProvider == null) {
@@ -202,8 +202,14 @@ public class ServiceModelWidget{
 			TableItem item = selection[0];
 			ServiceModelManager manager = ServiceModelManager.getInstance();
 			IServiceProviderDescriptor descriptor = (IServiceProviderDescriptor) item.getData(PROVIDER_KEY);
-			IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
-			fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);
+			
+			//look in cache first
+			IServiceProvider serviceProvider = fProviderIDToProviderMap.get(descriptor.getId());
+			
+			if (serviceProvider == null) {
+				serviceProvider = manager.getServiceProvider(descriptor);
+				fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);
+			}
 
 			IServiceProviderConfiguration configUI = manager.getServiceProviderConfigurationUI(serviceProvider);
 			configUI.configureServiceProvider(serviceProvider, fConfigureButton.getShell());
