@@ -47,7 +47,7 @@ public class RemoteCPerspectiveFactory implements IPerspectiveFactory {
 		folder2.addView(IPageLayout.ID_PROP_SHEET);
 		folder2.addView(UIPlugin.CALL_HIERARCHY_VIEW_ID);
 		folder2.addView(UIPlugin.TYPE_HIERARCHY_VIEW_ID);
-		folder2.addView(UIPlugin.INCLUDE_BROWSER_VIEW_ID);
+		//folder2.addView(UIPlugin.INCLUDE_BROWSER_VIEW_ID);
 		
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea); //$NON-NLS-1$
 		folder3.addView(IPageLayout.ID_OUTLINE);
