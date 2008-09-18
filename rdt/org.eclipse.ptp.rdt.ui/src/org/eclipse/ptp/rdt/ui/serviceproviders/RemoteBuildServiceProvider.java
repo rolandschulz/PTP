@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
+import java.text.MessageFormat;
+
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
+import org.eclipse.ptp.rdt.services.core.ServiceProviderDescriptor;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
-import org.eclipse.ptp.rdt.services.core.ServiceProviderDescriptor;
-import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -106,6 +107,16 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	 */
 	public IRemoteConnection getConnection() {
 		return fRemoteConnection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#getConfigurationString()
+	 */
+	public String getConfigurationString() {
+		if (isConfigured()) {
+			return getRemoteServices().getName() + ": " + fRemoteConnection.getName(); //$NON-NLS-1$
+		}
+		return null;
 	}
 	
 	
