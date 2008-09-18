@@ -40,17 +40,18 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		try {
 			String[] env = shellService.getHostEnvironment();
-			populateEnvironmentMap(env, remoteEnv);
+			populateEnvironmentMap(env);
 			
 		} catch (SystemMessageException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
-		
 	}
 
-	private void populateEnvironmentMap(String[] env, Map<String, String> envMap) {
+	/**
+	 * Convert environment strings into a map
+	 * 
+	 * @param env array containing environment variables
+	 */
+	private void populateEnvironmentMap(String[] env) {
 		// env is of the form "var=value"
 		
 		for(int k = 0; k < env.length; k++) {
@@ -59,10 +60,23 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			int pos = env[k].indexOf("="); //$NON-NLS-1$
 			assert(pos != -1);
 			
-			
-			envMap.put(env[k].substring(0, pos - 1), env[k].substring(pos + 1));
+			remoteEnv.put(env[k].substring(0, pos), env[k].substring(pos + 1));
 		}
 		
+	}
+	
+	/**
+	 * Convert environment map back to environment strings.
+	 * 
+	 * @return array of environment variables
+	 */
+	private String[] getEnvironment() {
+		String[] env = new String[remoteEnv.size()];
+		int pos = 0;
+		for (Map.Entry<String, String> entry: remoteEnv.entrySet()) {
+			env[pos++] = entry.getKey() + "=" + entry.getValue();
+		}
+		return env;
 	}
 
 	public RSEProcessBuilder(IRemoteConnection conn, String... command) {
@@ -106,14 +120,13 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		}
 		
 		// This is necessary because runCommand does not actually run the command right now.
-		String env[] = new String[0];
 		IHostShell hostShell = null;
 		try {
 			String initialDir = "";
 			if (directory() != null) {
 				initialDir = directory().toURI().getPath();
 			}
-			hostShell = shellService.runCommand(initialDir, remoteCmd, env,new NullProgressMonitor());  //$NON-NLS-1$
+			hostShell = shellService.runCommand(initialDir, remoteCmd, getEnvironment(), new NullProgressMonitor());  //$NON-NLS-1$
 		} catch (SystemMessageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
