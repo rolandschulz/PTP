@@ -87,17 +87,25 @@ public class RemoteServicesProviderSelectionDialog extends Dialog {
         // set layout to grab horizontal space
         providerCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
         
+        //attempt to restore settings from saved state
+        IRemoteServices providerSelected = fProvider.getRemoteServices(); 
+        
         // populate the combo with a list of providers
         IRemoteServices[] providers = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+        int toSelect = 0;
         
         for(int k = 0; k < providers.length; k++) {
         	providerCombo.add(providers[k].getName(), k);
         	fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
+        	
+        	if (providerSelected != null && providerSelected.getName().compareTo(providers[k].getName()) == 0) {
+        		toSelect = k;
+        	}
         }
         
-        // set selected host to be the first one
-        providerCombo.select(0);
-        fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(0);
+        // set selected host to be the first one if we're not restoring from settings
+        providerCombo.select(toSelect);
+        fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
             
         // connection combo
         // Label for "Connection:"
@@ -196,16 +204,25 @@ public class RemoteServicesProviderSelectionDialog extends Dialog {
 	 */
 	private void populateConnectionCombo(final Combo connectionCombo) {
 		connectionCombo.removeAll();
+		
+		//attempt to restore settings from saved state
+        IRemoteConnection connectionSelected = fProvider.getConnection();
+		
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
+		int toSelect = 0;
         
         for(int k = 0; k < connections.length; k++) {
         	connectionCombo.add(connections[k].getName(), k);
         	fComboIndexToRemoteConnectionMap .put(k, connections[k]);
+        	
+        	if (connectionSelected != null && connectionSelected.getName().compareTo(connections[k].getName()) == 0) {
+        		toSelect = k;
+        	}
         }
         
-        // set selected connection to be the first one
-        connectionCombo.select(0);
-        fSelectedConnection = fComboIndexToRemoteConnectionMap.get(0);
+        // set selected connection to be the first one if we're not restoring from settings
+        connectionCombo.select(toSelect);
+        fSelectedConnection = fComboIndexToRemoteConnectionMap.get(toSelect);
 	}
     
     /* (non-Javadoc)

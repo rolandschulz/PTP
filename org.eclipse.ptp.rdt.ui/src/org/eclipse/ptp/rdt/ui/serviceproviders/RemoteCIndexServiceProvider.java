@@ -10,11 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
+import java.text.MessageFormat;
+
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.SystemStartHere;
@@ -100,6 +103,16 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 				return connectorServices[k];
 		}
 		
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#getConfigurationString()
+	 */
+	public String getConfigurationString() {
+		if (isConfigured()) {
+			return fHost.getName();
+		}			
 		return null;
 	}
 }
