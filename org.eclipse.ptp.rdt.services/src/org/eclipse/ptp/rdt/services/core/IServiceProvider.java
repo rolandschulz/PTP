@@ -35,4 +35,10 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	 * @param memento for restoring the provider's state.
 	 */
 	public void restoreState(IMemento memento);
+	
+	/**
+	 * Returns provider specific information for the current configuration.
+	 * @return information on current configuration for this provider
+	 */
+	public String getConfigurationString();
 }
