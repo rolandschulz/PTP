@@ -1,10 +1,33 @@
+#!/bin/sh
+#
 # ptpbuild wrapper script
+#
+# Usage: ptpbuild version
+#
+# where version is the current PTP version being built
+#
 # set up anything environment specific that needs to be done before
 # launching the build script in the releng project
 
+if [ $# -lt 1 ]; then
+	echo "usage: ptpbuild version"
+	exit 1
+fi
+
+# Version of PTP we're building
+export VERSION=$1
+
+# main staging directory
+export STAGING_DIR = /opt/public/download-staging.priv/tools/ptp/releng
+
+# download location for builds
+export BUILDS_DIR = /home/www/tools/ptp/builds/$VERSION
+
 # create the releng staging directory and go there
-mkdir -p /opt/public/download-staging.priv/tools/ptp/releng
-cd /opt/public/download-staging.priv/tools/ptp/releng
+mkdir -p $STAGING_DIR
+cd $STAGING_DIR
+
+# make a link to the results
 if [ ! -L results ]; then
 	ln -s org.eclipse.ptp/releng/org.eclipse.ptp.releng/results results
 fi
@@ -18,4 +41,7 @@ cvs co org.eclipse.ptp/releng/org.eclipse.ptp.releng
 
 # run the main script
 cd org.eclipse.ptp/releng/org.eclipse.ptp.releng
-sh build.sh $* 2>&1 | tee ../../../build.log
+sh build.sh $* 2>&1 | tee $STAGING_DIR/build.log
+
+# Copy the build.log to where the latest build is
+cp $STAGING_DIR/build.log $BUILDS/latest
