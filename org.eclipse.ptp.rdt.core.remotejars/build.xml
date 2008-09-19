@@ -17,6 +17,7 @@
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
 	<property name="ptpVersion" value="2.1.0"/>
+	<property name="copyToDir" value="/home/www/tools/ptp/builds/${ptpVersion}/latest"/>
 	
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
@@ -265,7 +266,7 @@
 		</tar>
 		
 		<copy file="${serverJar}-${platform}-${serverVersion}.tar" 
-			todir="${basedir}/../../../builds/${ptpVersion}/latest"/>
+			todir="${copyToDir}"/>
 				
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
@@ -280,7 +281,7 @@
 		</zip>
 		
 		<copy file="${serverJar}-${platform}-${serverVersion}.zip" 
-			todir="${basedir}/../../../builds/${ptpVersion}/latest"/>
+			todir="${copyToDir}"/>
 		
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
