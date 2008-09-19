@@ -47,8 +47,3 @@ export PATH=/opt/public/common/ibm-java2-ppc-50/bin:$PATH
 echo `java -version`
 java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar \
 	-ws gtk -arch ppc -os linux -application org.eclipse.ant.core.antRunner
-
-cd ../../../
-
-# Copy the build.log to where the latest build is
-cp build.log /home/www/tools/ptp/builds/2.1.0/latest
