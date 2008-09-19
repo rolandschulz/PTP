@@ -2,20 +2,22 @@
 #
 # ptpbuild wrapper script
 #
-# Usage: ptpbuild version
+# Usage: ptpbuild version [build_args]
 #
-# where version is the current PTP version being built
+# where version is the current PTP version being built and
+# build_args are any other arguments you want to pass to the
+# build script.
 #
 # set up anything environment specific that needs to be done before
 # launching the build script in the releng project
 
 if [ $# -lt 1 ]; then
-	echo "usage: ptpbuild version"
+	echo "usage: ptpbuild version [build_args]"
 	exit 1
 fi
 
 # Version of PTP we're building
-PTP_VERSION=$1
+PTP_VERSION=$1; shift
 
 # main staging directory
 STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
