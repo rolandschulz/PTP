@@ -18,10 +18,10 @@ fi
 export VERSION=$1
 
 # main staging directory
-export STAGING_DIR = /opt/public/download-staging.priv/tools/ptp/releng
+export STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
 
 # download location for builds
-export BUILDS_DIR = /home/www/tools/ptp/builds/$VERSION
+export BUILDS_DIR=/home/www/tools/ptp/builds/$VERSION
 
 # create the releng staging directory and go there
 mkdir -p $STAGING_DIR
