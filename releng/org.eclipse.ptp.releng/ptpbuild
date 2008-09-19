@@ -15,13 +15,13 @@ if [ $# -lt 1 ]; then
 fi
 
 # Version of PTP we're building
-export VERSION=$1
+PTP_VERSION=$1
 
 # main staging directory
-export STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
+STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
 
 # download location for builds
-export BUILDS_DIR=/home/www/tools/ptp/builds/$VERSION
+BUILDS_DIR=/home/www/tools/ptp/builds/$PTP_VERSION
 
 # create the releng staging directory and go there
 mkdir -p $STAGING_DIR
@@ -43,5 +43,9 @@ cvs co org.eclipse.ptp/releng/org.eclipse.ptp.releng
 cd org.eclipse.ptp/releng/org.eclipse.ptp.releng
 sh build.sh $* 2>&1 | tee $STAGING_DIR/build.log
 
-# Copy the build.log to where the latest build is
-cp $STAGING_DIR/build.log $BUILDS_DIR/latest
+# Copy the build.log to where the latest build is. Only copy
+# if a build.log doesn't exist, otherwise the build failed and
+# we would copy over an old log file.
+if [ ! -f $BUILDS_DIR/latest/build.log ]; then
+	cp $STAGING_DIR/build.log $BUILDS_DIR/latest
+fi
