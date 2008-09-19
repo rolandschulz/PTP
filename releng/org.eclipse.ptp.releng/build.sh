@@ -51,4 +51,4 @@ java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equi
 cd ../../../
 
 # Copy the build.log to where the latest build is
-cp build.log builds/2.1.0/latest
+cp build.log /home/www/tools/ptp/builds/2.1.0/latest
