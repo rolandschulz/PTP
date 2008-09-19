@@ -44,4 +44,4 @@ cd org.eclipse.ptp/releng/org.eclipse.ptp.releng
 sh build.sh $* 2>&1 | tee $STAGING_DIR/build.log
 
 # Copy the build.log to where the latest build is
-cp $STAGING_DIR/build.log $BUILDS/latest
+cp $STAGING_DIR/build.log $BUILDS_DIR/latest
