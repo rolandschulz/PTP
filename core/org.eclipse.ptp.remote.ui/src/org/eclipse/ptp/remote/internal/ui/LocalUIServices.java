@@ -17,7 +17,6 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
 
 public class LocalUIServices implements IRemoteUIServicesDelegate {
 	private static LocalUIServices instance = new LocalUIServices();
-	private static LocalUIConnectionManager connMgr = null;
 	private static LocalUIFileManager fileMgr = null;
 
 	/**
@@ -26,7 +25,6 @@ public class LocalUIServices implements IRemoteUIServicesDelegate {
 	 * @return instance
 	 */
 	public static LocalUIServices getInstance(IRemoteServices services) {
-		connMgr = new LocalUIConnectionManager(services);
 		fileMgr = new LocalUIFileManager();
 		return instance;
 	}
@@ -35,7 +33,7 @@ public class LocalUIServices implements IRemoteUIServicesDelegate {
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager() {
-		return connMgr;
+		return null;
 	}
 
 	/* (non-Javadoc)
