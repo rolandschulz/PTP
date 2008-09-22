@@ -19,6 +19,6 @@ public class Messages {
 	public static String RSEConnection_noShellService;
 	
 	static {
-		NLS.initializeMessages("org.eclipse.ptp.remote.rse.core.messages", Messages.class);
+		NLS.initializeMessages("org.eclipse.ptp.remote.rse.core.messages.messages", Messages.class);
 	}
 }
