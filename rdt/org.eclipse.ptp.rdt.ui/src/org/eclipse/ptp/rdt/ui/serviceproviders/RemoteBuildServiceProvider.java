@@ -37,6 +37,7 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 
 	private String fRemoteToolsProviderID;
 	private IRemoteConnection fRemoteConnection;
+	private String fConnectionName;
 
 	public RemoteBuildServiceProvider(String id, String name, String serviceId) {
 		super(id, name, serviceId);
@@ -50,7 +51,7 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#isConfigured()
 	 */
 	public boolean isConfigured() {
-		return (fRemoteToolsProviderID != null && fRemoteConnection != null);
+		return (fRemoteToolsProviderID != null && fConnectionName != null);
 	}
 		
 	/**
@@ -68,10 +69,9 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	public void restoreState(IMemento memento) {
 		/// restore the tools provider
 		fRemoteToolsProviderID = memento.getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID);
-		
-		// restore the connection
-		String connectionName = memento.getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME);
-		fRemoteConnection = getRemoteServices().getConnectionManager().getConnection(connectionName);
+	
+		// restore the connection name
+		fConnectionName = memento.getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME);
 	}
 
 	/* (non-Javadoc)
@@ -82,7 +82,7 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 		memento.putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, fRemoteToolsProviderID);
 		
 		// store the connection name
-		memento.putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, fRemoteConnection.getName());
+		memento.putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, fConnectionName);
 	}
 
 	/* (non-Javadoc)
@@ -99,6 +99,7 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		fRemoteConnection = connection;
+		fConnectionName = connection.getName();
 		
 	}
 
@@ -106,6 +107,9 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
+		if(fRemoteConnection == null && fConnectionName != null) {
+			fRemoteConnection = getRemoteServices().getConnectionManager().getConnection(fConnectionName);
+		}
 		return fRemoteConnection;
 	}
 
@@ -114,12 +118,14 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	 */
 	public String getConfigurationString() {
 		if (isConfigured()) {
-			return getRemoteServices().getName() + ": " + fRemoteConnection.getName(); //$NON-NLS-1$
+			return getRemoteServices().getName() + ": " + fConnectionName; //$NON-NLS-1$
 		}
 		return null;
 	}
 	
 	
-
+	public String toString() {
+		return "RemoteBuildServiceProvider(" + fConnectionName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 }
