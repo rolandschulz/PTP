@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -27,6 +26,7 @@ import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.services.core.ServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
+import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
  * Configure remote services for a project with the available services and service providers
@@ -34,35 +34,35 @@ import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
  *
  */
 public class ConfigureRemoteServices {
+	
+	/**
+	 * @throws NullPointerException if any of the parameters are null
+	 */
 	public static void configure(IProject project, Map<String, String> serviceIDToProviderIDMap, 
-			Map<String, IServiceProvider> providerIDToProviderMap) throws InvocationTargetException,
-			InterruptedException {
+			Map<String, IServiceProvider> providerIDToProviderMap) {
 		
+		if(project == null)
+			throw new NullPointerException();
+				
 		final ServiceModelManager serviceModelManager = ServiceModelManager.getInstance();
 
-		if(project == null)
-			throw new RuntimeException();
-		
 		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project);
-		
 		ServiceConfiguration config = new ServiceConfiguration(info.getConfigurationName());
 		
-		Iterator<String> iterator = serviceIDToProviderIDMap.keySet().iterator();
-		
-		while(iterator.hasNext()) {
-			String serviceID = iterator.next();
-			
+		for(String serviceID : serviceIDToProviderIDMap.keySet()) {
 			IService service = serviceModelManager.getService(serviceID);
-			
 			String serviceProviderID = serviceIDToProviderIDMap.get(serviceID);
-
 			IServiceProvider provider = providerIDToProviderMap.get(serviceProviderID);
-
 			config.setServiceProvider(service, provider);
 
-			// note: we only have one config at this point so it will be
-			// active by default
-			serviceModelManager.addConfiguration(project, config);
+			// note: we only have one config at this point so it will be active by default
+			serviceModelManager.putConfiguration(project, config);
+		}
+		
+		try {
+			serviceModelManager.saveModelConfiguration();
+		} catch (IOException e) {
+			Activator.logError(e.toString(), e);
 		}
 		
 		ICProject cProject = CModelManager.getDefault().getCModel().getCProject(project);

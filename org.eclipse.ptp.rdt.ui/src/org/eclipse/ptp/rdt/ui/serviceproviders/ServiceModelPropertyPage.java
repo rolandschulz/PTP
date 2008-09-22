@@ -11,15 +11,13 @@
 
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.rdt.ui.wizards.ConfigureRemoteServices;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-public class ServiceModelPropertyPage extends PropertyPage{
+public class ServiceModelPropertyPage extends PropertyPage {
 	
 	PropertyPageServiceModelWidget fModelWidget;
 	
@@ -39,14 +37,9 @@ public class ServiceModelPropertyPage extends PropertyPage{
 	 */
 	@Override
 	public boolean performOk() {
+		// called when OK or Apply is pressed
 		IProject project = (IProject) getElement();
-		try {
-			ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap());
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap());
 		return true;
 	}
 
@@ -58,4 +51,5 @@ public class ServiceModelPropertyPage extends PropertyPage{
 		// TODO restore default using configuration strings
 		super.performDefaults();
 	}
+
 }

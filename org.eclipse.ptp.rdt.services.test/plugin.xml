@@ -43,4 +43,20 @@
       </provider>
    </extension>
 
+
+	<extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="RDT Services Test"
+            visible="true"
+            id="org.eclipse.ptp.rdt.services.test.actionSet">
+         <action
+               label="&amp;Print Service Model"
+               class="org.eclipse.ptp.rdt.services.core.actions.PrintServiceModelAction"
+               tooltip="Print Service Model"
+               toolbarPath="sampleGroup"
+               id="org.eclipse.ptp.rdt.services.test.actionSet.PrintServiceModelAction">
+         </action>
+      </actionSet>
+   </extension>
 </plugin>

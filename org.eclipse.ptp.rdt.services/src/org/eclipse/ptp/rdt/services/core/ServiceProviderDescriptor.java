@@ -59,4 +59,8 @@ public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
 	public int hashCode() {
 		return id.hashCode();
 	}
+	
+	public String toString() {
+		return "ServiceProviderDescriptor(" + id + ")";
+	}
 }
