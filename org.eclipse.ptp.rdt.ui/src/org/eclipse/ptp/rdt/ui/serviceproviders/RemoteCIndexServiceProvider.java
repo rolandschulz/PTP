@@ -35,7 +35,6 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	private RemoteSearchService fSearchService;
 	private IContentAssistService fContentAssistService;
 	
-	private String fHostName;
 	
 	/**
 	 * @param id
@@ -58,7 +57,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	}
 
 	public void saveState(IMemento providerMemento) {
-		providerMemento.putString(HOST_NAME_KEY, fHost.getAliasName());
+		providerMemento.putString(HOST_NAME_KEY, fHostName);
 	}
 
 	public ISearchService getSearchService() {
@@ -90,7 +89,6 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 					setConnection(host, getDStoreConnectorService(host));
 				}
 			}
-			fHostName = null;
 		}
 		return super.isConfigured();
 	}
@@ -114,5 +112,9 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 			return fHost.getName();
 		}			
 		return null;
+	}
+	
+	public String toString() {
+		return "RemoteCIndexServiceProvider(" + fHostName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
