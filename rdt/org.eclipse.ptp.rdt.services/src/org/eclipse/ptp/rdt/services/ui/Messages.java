@@ -20,6 +20,7 @@ public class Messages {
 	private static final String RESOURCE_BUNDLE= "org.eclipse.ptp.rdt.services.ui.messages";//$NON-NLS-1$
 	
 	public static final String Services_invalidServiceId = "Services_invalidServiceId"; //$NON-NLS-1$
+	public static final String Services_saveServiceError = "Services_saveServiceError"; //$NON-NLS-1$
 
 	private static ResourceBundle fgResourceBundle;
 	static {
@@ -43,12 +44,9 @@ public class Messages {
 		}
 	}
 	
-	public static String getFormattedString(String key, String arg) {
-		return getFormattedString(key, new String[] { arg });
-	}
 	
-	public static String getFormattedString(String key, String[] args) {
-		return MessageFormat.format(getString(key), (Object)args);	
+	public static String getFormattedString(String key, String... args) {
+		return MessageFormat.format(getString(key), (Object[])args);	
 	}	
 
 }

@@ -98,4 +98,8 @@ public class Service implements IService {
 	public int hashCode() {
 		return serviceId.hashCode();
 	}
+	
+	public String toString() {
+		return "Service(" + serviceId + ")"; //$NON-NLS-1$
+	}
 }
