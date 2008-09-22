@@ -34,6 +34,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 
 	protected boolean fIsConfigured;
 	protected IHost fHost;
+	protected String fHostName;
 	protected IConnectorService fConnectorService;
 	protected IIndexLifecycleService fIndexLifecycleService;
 	protected INavigationService fNavigationService;
@@ -50,6 +51,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 	
 	public void setConnection(IHost host, IConnectorService connectorService) {
 		fHost = host;
+		fHostName = host.getAliasName();
 		fConnectorService = connectorService;
 		setConfigured(true);
 	}

@@ -20,8 +20,10 @@ public interface IServiceModelManager {
 	 * 
 	 * @param project the project
 	 * @param conf the configuration
+	 * 
+	 * @throws NullPointerException if project or conf is null
 	 */
-	public void addConfiguration(IProject project, IServiceConfiguration conf);
+	public void putConfiguration(IProject project, IServiceConfiguration conf);
 	
 	/**
 	 * Get the configuration that is currently active for the project. Each project has
@@ -31,6 +33,9 @@ public interface IServiceModelManager {
 	 * 
 	 * @param project project for which the configuration will be obtained
 	 * @return the service configuration for this project
+	 * 
+	 * @throws NullPointerException if project is null
+	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public IServiceConfiguration getActiveConfiguration(IProject project);
 	
@@ -40,6 +45,9 @@ public interface IServiceModelManager {
 	 * @param project project for which the configuration will be obtained
 	 * @param name name of the configuration
 	 * @return the service configuration or null if no configurations with the supplied name exist
+	 * 
+	 * @throws NullPointerException if project is null
+	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public IServiceConfiguration getConfiguration(IProject project, String name);
 	
@@ -48,6 +56,9 @@ public interface IServiceModelManager {
 	 * 
 	 * @param project project containing the configurations
 	 * @return set of configurations known by the project
+	 * 
+	 * @throws NullPointerException if project is null
+	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
 	
@@ -63,6 +74,9 @@ public interface IServiceModelManager {
 	 * 
 	 * @param project project using the services
 	 * @return set of services
+	 * 
+	 * @throws NullPointerException if project is null
+	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public Set<IService> getServices(IProject project);
 	
@@ -70,23 +84,28 @@ public interface IServiceModelManager {
 	 * Get all the services that are associated with a project nature.
 	 * 
 	 * @param nature project nature
-	 * @return set of services
+	 * @return set of services or null
 	 */
-	public Set<IService> getServices(String nature);
+	public Set<IService> getServices(String natureID);
 	
 	/**
 	 * Retrieves the service corresponding to a given id.
 	 * 
 	 * @param id The unique id of the service to retrieve.
-	 * @return IService
+	 * @return IService or null
 	 */
 	public IService getService(String id);
 	
 	/**
-	 * Remove the service configuration from a project
+	 * Remove the service configuration from a project.
+	 * If the configuration was not set up on the project then this method
+	 * does nothing.
 	 * 
 	 * @param project the project
 	 * @param conf the configuration
+	 * 
+	 * @throws NullPointerException if project or conf is null
+	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public void removeConfiguration(IProject project, IServiceConfiguration conf);
 	
@@ -96,6 +115,10 @@ public interface IServiceModelManager {
 	 * 
 	 * @param project project for which the configuration will be obtained
 	 * @param configuration configuration to set as active for this project
+	 * 
+	 * @throws NullPointerException if project or configuration is null
+	 * @throws ProjectNotConfiguredException if the project has not been configured yet
+	 * @throws IllegalArgumentException if the configuration was not part of the project
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
 
