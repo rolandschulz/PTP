@@ -17,6 +17,8 @@ import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * @author crecoskie
@@ -48,6 +50,11 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 	public ServiceModelWizardPage(String pageID) {
 		super(pageID);
 		fModelWidget = new ServiceModelWidget();
+		fModelWidget.setConfigChangeListener(new Listener() {
+			public void handleEvent(Event event) {
+				getWizard().getContainer().updateButtons();				
+			}			
+		});
 		MBSCustomPageManager.addPageProperty(pageID, SELECTED_PROVIDERS_MAP_PROPERTY, fModelWidget.getServiceIDToSelectedProviderID());
 		MBSCustomPageManager.addPageProperty(pageID, ID_TO_PROVIDERS_MAP_PROPERTY, fModelWidget.getProviderIDToProviderMap());
 	}
@@ -63,7 +70,7 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete()
 	 */
 	protected boolean isCustomPageComplete() {
-		return fbVisited;
+		return fbVisited && fModelWidget.isConfigured();
 	}
 
 	/* (non-Javadoc)
@@ -183,5 +190,6 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 		}
 		fCanvas.setVisible(visible);
 	}
+
 
 }

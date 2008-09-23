@@ -29,16 +29,18 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class PropertyPageServiceModelWidget extends ServiceModelWidget {
 	
+	IProject fProject;
+	
 	/**
 	 * Find available remote services and service providers for the given project and
 	 * add them to the table
 	 * @param project
 	 */
 	public void updateServicesTable(IProject project) {
-		fTable.removeAll();
 		fProviderIDToProviderMap = new HashMap<String, IServiceProvider>();
 		fServiceIDToSelectedProviderID = new HashMap<String, String>();
-		createTableContent(project);		
+		fProject = project;
+		createTableContent(project);	
 	}
 
 	/* (non-Javadoc)
@@ -46,6 +48,7 @@ public class PropertyPageServiceModelWidget extends ServiceModelWidget {
 	 */
 	@Override
 	protected void createTableContent(IProject project) {
+		fTable.removeAll();
 		if(project == null) {
 			super.createTableContent(project);
 		} else {		
@@ -83,4 +86,13 @@ public class PropertyPageServiceModelWidget extends ServiceModelWidget {
 			}
 		}		
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.ui.wizards.ServiceModelWidget#isConfigured()
+	 */
+	@Override
+	public boolean isConfigured() {
+		return isConfigured(fProject, fServiceIDToSelectedProviderID, fProviderIDToProviderMap);
+	}
+	
 }
