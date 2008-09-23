@@ -56,6 +56,7 @@ public class ServiceModelWidget{
 
 	protected Table fTable;
 	protected Button fConfigureButton;
+	protected Listener fConfigChangeListener = null;
 	
 	public ServiceModelWidget() {
 		fServiceIDToSelectedProviderID = new HashMap<String, String>();
@@ -109,7 +110,7 @@ public class ServiceModelWidget{
 		final TableEditor editor = new TableEditor(fTable);
 		editor.horizontalAlignment = SWT.BEGINNING;
 		editor.grabHorizontal = true;
-		fTable.addListener(SWT.MouseDown, new Listener() {
+		fTable.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				int selectionIndex = fTable.getSelectionIndex();
 				if (selectionIndex == -1) {
@@ -220,6 +221,9 @@ public class ServiceModelWidget{
 				configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
 			}
 			item.setText(2, configString);
+			
+			if (fConfigChangeListener != null)
+				fConfigChangeListener.handleEvent(null);
 		}
 	}
 	
@@ -236,6 +240,7 @@ public class ServiceModelWidget{
 	 * @param project
 	 */
 	protected void createTableContent(IProject project) {
+		fTable.removeAll();
 		Set<IService> allApplicableServices = getContributedServices(project);
 		
 		Iterator<IService> iterator = allApplicableServices.iterator();
@@ -330,5 +335,63 @@ public class ServiceModelWidget{
 	public void setProviderIDToProviderMap(
 			Map<String, IServiceProvider> providerIDToProviderMap) {
 		fProviderIDToProviderMap = providerIDToProviderMap;
+	}
+
+	/**
+	 * Sub-class may override behaviour
+	 * @return true if all available services have been configured
+	 */
+	public boolean isConfigured() {
+		return isConfigured(null, fServiceIDToSelectedProviderID, fProviderIDToProviderMap);
+	}
+	
+	/**
+	 * Determine if all service providers have been configured
+	 * @param project
+	 * @param serviceIDToSelectedProviderID
+	 * @param providerIDToProviderMap
+	 * @return true if all service providers have been configured
+	 */
+	protected boolean isConfigured(IProject project, Map<String, String> serviceIDToSelectedProviderID, Map<String, IServiceProvider> providerIDToProviderMap) {
+		Set<IService> allApplicableServices = getContributedServices(project);
+		Iterator<IService> iterator = allApplicableServices.iterator();
+		boolean configured = true;
+		while (iterator.hasNext()) {
+			String providerID = serviceIDToSelectedProviderID.get(iterator.next().getId());
+			if (providerID == null)
+				return false;
+			else {
+				IServiceProvider provider = providerIDToProviderMap.get(providerID);
+				if (provider == null)
+					return false;
+				else
+					configured = configured && provider.isConfigured();
+			}
+		}
+		return configured;
+	}
+
+
+	/**
+	 * @return the configuration change listener
+	 */
+	public Listener getConfigChangeListener() {
+		return fConfigChangeListener;
+	}
+
+	/**
+	 * Listens for changes in service provider configuration
+	 * @param configChangeListener the configuration change listener to set
+	 */
+	public void setConfigChangeListener(Listener configChangeListener) {
+		fConfigChangeListener = configChangeListener;
+	}
+		
+	/**
+	 * Enable/disable the configure button in this widget
+	 * @param enabled
+	 */
+	public void updateConfigureButton(boolean enabled) {
+		fConfigureButton.setEnabled(enabled);
 	}
 }

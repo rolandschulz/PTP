@@ -52,4 +52,13 @@ public class ServiceModelPropertyPage extends PropertyPage {
 		super.performDefaults();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#isValid()
+	 */
+	@Override
+	public boolean isValid() {
+		return fModelWidget.isConfigured();
+	}
+	
+
 }
