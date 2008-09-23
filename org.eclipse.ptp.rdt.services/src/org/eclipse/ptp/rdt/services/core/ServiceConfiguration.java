@@ -16,6 +16,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * A named configuration which consists of a mapping of services to providers.
+ *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ *
+ * @see IService
+ * @see IServiceProvider 
  * @author crecoskie
  *
  */

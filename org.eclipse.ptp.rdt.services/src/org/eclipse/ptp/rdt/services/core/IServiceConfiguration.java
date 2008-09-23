@@ -13,9 +13,15 @@ package org.eclipse.ptp.rdt.services.core;
 import java.util.Set;
 
 /**
+ *
  * An IServiceProviderConfiguration represents a particular set of service providers
  * for each known service. A project can have multiple configurations, each with
  * a different set of service providers.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
  * 
  * @author greg
  *

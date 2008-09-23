@@ -12,6 +12,16 @@ package org.eclipse.ptp.rdt.services.core;
 
 import org.eclipse.ui.IMemento;
 
+/**
+ * An interface that represents the provider of a service.
+ *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ *
+ * @see IService
+ */
 public interface IServiceProvider extends IServiceProviderDescriptor {
 	/**
 	 * Test if this service provider has been configured.

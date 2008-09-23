@@ -37,7 +37,13 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * Converts existing CDT projects to RDT projects
+ * Converts existing CDT projects to RDT projects.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author vkong
  */
 public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
