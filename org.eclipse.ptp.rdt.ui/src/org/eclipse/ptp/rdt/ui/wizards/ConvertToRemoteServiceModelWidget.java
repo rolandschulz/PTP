@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 	
-	IProject currentProject;
+	IProject fCurrentProject;
 	
 	Map<IProject, Map<String,String>> projectToServices = new HashMap<IProject, Map<String,String>>();
 	Map<IProject, Map<String,IServiceProvider>> projectToProviders = new HashMap<IProject, Map<String,IServiceProvider>>();
@@ -46,8 +46,8 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 			super.handleEvent(event);
 			//users have to configure the services manually by clicking the configure button, not done automatically
 			//once the services have been configured, they will be saved
-			projectToServices.put(currentProject, fServiceIDToSelectedProviderID);
-			projectToProviders.put(currentProject, fProviderIDToProviderMap);			
+			projectToServices.put(fCurrentProject, fServiceIDToSelectedProviderID);
+			projectToProviders.put(fCurrentProject, fProviderIDToProviderMap);			
 		}
 	}
 	
@@ -57,10 +57,9 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 	 * @param project
 	 */
 	public void addServicesToTable(IProject project) {
-		fTable.removeAll();
 		fProviderIDToProviderMap = new HashMap<String, IServiceProvider>();
 		fServiceIDToSelectedProviderID = new HashMap<String, String>();
-		currentProject = project;
+		fCurrentProject = project;
 		createTableContent(project);		
 	}
 	
@@ -69,16 +68,17 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 	 */
 	@Override
 	protected void createTableContent(IProject project) {
+		fTable.removeAll();
 		if (project == null) {
 			super.createTableContent(project);
-		} else if (projectToServices.get(currentProject) == null && projectToProviders.get(currentProject) == null) {
+		} else if (projectToServices.get(fCurrentProject) == null && projectToProviders.get(fCurrentProject) == null) {
 				super.createTableContent(project);
 		} else {
 			Set<IService> services = getContributedServices(project);
 			Iterator<IService> iterator = services.iterator();
 			
-			Map<String, String> serviceIDToSelectedProviderID = projectToServices.get(currentProject);
-			Map<String, IServiceProvider> providerIDToProviderMap = projectToProviders.get(currentProject);
+			Map<String, String> serviceIDToSelectedProviderID = projectToServices.get(fCurrentProject);
+			Map<String, IServiceProvider> providerIDToProviderMap = projectToProviders.get(fCurrentProject);
 			
 			while(iterator.hasNext()) {
 				final IService service = iterator.next();			
@@ -143,6 +143,23 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 	 */
 	public Map<IProject, Map<String, IServiceProvider>> getProjectToProviders() {
 		return projectToProviders;
+	}
+	
+	public boolean isConfigured(Object[] selectedProjects) {
+		boolean configured = true;
+		if (selectedProjects == null || selectedProjects.length < 1)
+			return false;
+		for (int i = 0; i < selectedProjects.length; i++) {
+			IProject project = (IProject) selectedProjects[i];
+			Map<String, String> serviceIDToSelectedProviderID = projectToServices.get(project);
+			Map<String, IServiceProvider> providerIDToProviderMap = projectToProviders.get(project);
+			if (serviceIDToSelectedProviderID == null || providerIDToProviderMap == null)
+				return false;
+			configured = configured && isConfigured(project, serviceIDToSelectedProviderID, providerIDToProviderMap);
+		}
+		
+		return configured;
+		
 	}
 
 }
