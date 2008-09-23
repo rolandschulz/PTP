@@ -41,6 +41,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * Provides a dialog which allows you to select an RSE host for the RemoteCIndexServiceProvider.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author crecoskie
  *
  */

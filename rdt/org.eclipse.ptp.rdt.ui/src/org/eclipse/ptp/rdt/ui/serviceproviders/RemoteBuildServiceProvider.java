@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
-import java.text.MessageFormat;
-
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.services.core.ServiceProviderDescriptor;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
@@ -21,10 +19,14 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ui.IMemento;
 
 /**
- * @author crecoskie
- * 
  * A build service provider that uses the Remote Tools API to provide execution services.
- *
+ *  
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
+ * @author crecoskie
  */
 public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implements IRemoteExecutionServiceProvider {
 	
