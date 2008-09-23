@@ -72,17 +72,22 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
        
     /**
      * Returns true for:
-     * - non-remote projects
-     * So projects with remote nature will be refused.
+     * - non-hidden projects
+     * - non-RDT projects 
+     * - projects that does not have remote systems temporary nature
      */
     public boolean isCandidate(IProject project) {
+    	boolean a = false;
     	boolean b = false;
+    	boolean c = false;
+    	a = !project.isHidden();    	
 		try {
 			b = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
+			c = !project.hasNature("org.eclipse.rse.ui.remoteSystemsTempNature"); //$NON-NLS-1$
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		return b; 
+		return a && b && c; 
     }
     
     /**
