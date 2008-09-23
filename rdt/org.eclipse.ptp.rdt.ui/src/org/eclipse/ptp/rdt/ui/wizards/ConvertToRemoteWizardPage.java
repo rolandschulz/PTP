@@ -32,7 +32,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * Converts existing CDT projects to RDT projects
@@ -52,6 +54,11 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	public ConvertToRemoteWizardPage(String pageName) {
 		super(pageName);
 		fServiceModelWidget = new ConvertToRemoteServiceModelWidget();
+		fServiceModelWidget.setConfigChangeListener(new Listener() {
+			public void handleEvent(Event event) {
+				setPageComplete(validatePage());				
+			}			
+		});
 	}
     
     /**
@@ -152,6 +159,7 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	            	fServiceModelWidget.addServicesToTable(project);
 	            	remoteServices.setText(MessageFormat.format(Messages.getString("WizardProjectConversion.servicesTableForProjectLabel"), new Object[] {project.getName()}));  //$NON-NLS-1$
                 }
+                fServiceModelWidget.updateConfigureButton(false);
             }
         });		
 		tableViewer.addCheckStateListener(new ICheckStateListener() {
@@ -175,5 +183,13 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 		Map<String, IServiceProvider> providerIDToProviderMap = projectToProviders.get(project);
 		
 		ConfigureRemoteServices.configure(project, serviceIDToProviderIDMap, providerIDToProviderMap);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#validatePage()
+	 */
+	@Override
+	protected boolean validatePage() {
+		return super.validatePage() && fServiceModelWidget.isConfigured(getCheckedElements());
 	}
 }
