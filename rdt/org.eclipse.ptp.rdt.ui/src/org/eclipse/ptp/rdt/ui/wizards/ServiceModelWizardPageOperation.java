@@ -22,6 +22,13 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 
 /**
+ * An operation which handles configuring the remote portions of the Remote C/C++ Project
+ * when the project is actually being created.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author crecoskie
  *
  */

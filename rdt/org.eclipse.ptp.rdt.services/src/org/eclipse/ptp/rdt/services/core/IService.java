@@ -12,6 +12,17 @@ package org.eclipse.ptp.rdt.services.core;
 
 import java.util.Set;
 
+/**
+ * An interface for arbitrary services.  Services can be implemented by one or more
+ * providers.
+ *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ *
+ * @see IServiceProvider
+ */
 public interface IService {
 	/**
 	 * Add service provider to list of providers for this service.

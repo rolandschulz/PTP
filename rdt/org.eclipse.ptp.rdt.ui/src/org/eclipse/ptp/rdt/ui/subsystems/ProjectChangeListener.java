@@ -26,6 +26,12 @@ import org.eclipse.ptp.rdt.core.RDTLog;
 /**
  * Synchronizes state of remote indices by responding to changes to
  * <code>IProject</code>s in the workspace.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  */
 public class ProjectChangeListener implements IResourceChangeListener {
 

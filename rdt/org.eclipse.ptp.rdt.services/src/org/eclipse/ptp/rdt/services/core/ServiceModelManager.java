@@ -39,6 +39,19 @@ import org.eclipse.ptp.rdt.services.ui.Messages;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
+/**
+ * A singleton class which is the entry point to a service model which represents:
+ * - the set of contributed services
+ * - the set of providers which provide those services
+ * - the service configurations for each project which specify which services are
+ * 		mapped to which providers.
+ *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
+ */
 public class ServiceModelManager implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "services"; //$NON-NLS-1$
 	private final static String PROVIDER_EXTENSION_ID = "providers"; //$NON-NLS-1$

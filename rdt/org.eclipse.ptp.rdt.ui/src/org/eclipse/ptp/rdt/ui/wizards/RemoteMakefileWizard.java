@@ -18,10 +18,16 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 
 /**
+ * This class is responsible for populating the project type/template selection
+ * page with a "Remote Makefile Project" entry.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author crecoskie
  * 
- * This class is responsible for populating the project type/template selection page with a "Remote Makefile Project" entry.
- *
  */
 public class RemoteMakefileWizard extends AbstractCWizard {
 

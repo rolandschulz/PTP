@@ -31,6 +31,12 @@ import org.eclipse.swt.widgets.TableItem;
  * A table widget listing remote services and service providers.  This widget is used in 
  * ConvertToRemoteWizardPage and it stores information on the remote service model for the
  * projects to be converted.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author vkong
  *
  */

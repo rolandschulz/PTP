@@ -30,6 +30,12 @@ import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
  * Configure remote services for a project with the available services and service providers
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author vkong
  *
  */

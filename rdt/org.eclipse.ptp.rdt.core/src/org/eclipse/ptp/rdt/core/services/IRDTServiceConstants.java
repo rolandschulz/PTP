@@ -11,10 +11,14 @@
 package org.eclipse.ptp.rdt.core.services;
 
 /**
+ * Constants for access to well known services.
+ *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author crecoskie
- *
- *	Constants for access to well known services.
- *
  */
 public interface IRDTServiceConstants {
 	public static final String SERVICE_C_INDEX = "org.eclipse.ptp.rdt.core.CIndexingService"; //$NON-NLS-1$

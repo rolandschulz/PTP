@@ -16,6 +16,13 @@ import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * Provides configuration UI for the RemoteCIndexServiceProvider by allowing an RSE
+ * host to be selected.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
  * @author crecoskie
  *
  */

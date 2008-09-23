@@ -12,8 +12,14 @@ package org.eclipse.ptp.rdt.services.core;
 
 
 /**
- * @author greg
+ * A description (but not an instance) of a service provider.
  *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
+ * @author greg
  */
 public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
 	private String id;

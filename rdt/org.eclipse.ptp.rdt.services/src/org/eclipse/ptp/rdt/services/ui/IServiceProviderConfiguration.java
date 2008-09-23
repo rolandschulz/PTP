@@ -13,6 +13,16 @@ package org.eclipse.ptp.rdt.services.ui;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Interface that supplies a UI which can be launched to configure a service provider.
+ *
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
+ * part of a work in progress. There is no guarantee that this API will work or
+ * that it will remain the same. Please do not use this API without consulting
+ * with the RDT team.
+ * 
+ * @see IServiceProvider
+ */
 public interface IServiceProviderConfiguration {
 	/**
 	 * Configure the service provider, which typically launches a dialog/wizard to allow the 
