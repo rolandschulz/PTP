@@ -1056,7 +1056,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				IMarker m2 = (IMarker) e2;
 				String file1 = (String) m1.getAttribute(FILENAME);
 				String file2 = (String) m2.getAttribute(FILENAME);
-				System.out.println("ascending=" + ascending);
+				if(traceOn)System.out.println("ascending=" + ascending);
 				if (ascending)
 					res = collator.compare(file1, file2);
 				else
