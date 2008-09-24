@@ -116,7 +116,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab
 		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			IAttribute<?, ?, ?> attributeArray[] = tabControl.getAttributes(rm, queue, configuration, mode);
 			if (attributeArray != null) {
-				List<IAttribute<?, ?, ?>> attributesList = Arrays.asList();
+				List<IAttribute<?, ?, ?>> attributesList = Arrays.asList(attributeArray);
 				attributes.addAll(attributesList);
 			}
 		}
