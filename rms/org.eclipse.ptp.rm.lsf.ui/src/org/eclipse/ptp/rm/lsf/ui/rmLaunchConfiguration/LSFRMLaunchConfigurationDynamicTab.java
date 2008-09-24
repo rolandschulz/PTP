@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class LSFRMLaunchConfigurationDynamicTab extends
 		AbstractRMLaunchConfigurationDynamicTab {
-	
+
 	private static final int MIN_TEXT_WIDTH = 50;
 	private static final String NUMBER_OF_PROCESSES_LABEL = "Number of Processes: ";
 	private static final String ATTR_PREFIX = Activator.PLUGIN_ID + ".launchAttributes";
@@ -77,10 +77,10 @@ public class LSFRMLaunchConfigurationDynamicTab extends
 		control.setLayout(new GridLayout(1, true));
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		control.setLayoutData(gd);
-		
+
 		Label label = new Label(control, SWT.NONE);
 		label.setText("LSF Specific info goes here");
-		
+
 		final Composite comp = new Composite(control, SWT.NONE);
 		GridLayout launchConfigLayout = new GridLayout();
 		launchConfigLayout.marginHeight = 0;
@@ -99,7 +99,7 @@ public class LSFRMLaunchConfigurationDynamicTab extends
 		numProcsText.setTextLimit(10);
 		numProcsText.setLayoutData(gd);
 		numProcsText.setText("1000");
-		
+
 		// Tell the client of this dynamic tab that the
 		// contents of this tab are affected by the contents
 		// of this widget.
@@ -114,7 +114,7 @@ public class LSFRMLaunchConfigurationDynamicTab extends
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getAttributes(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) throws CoreException {
+			ILaunchConfiguration configuration, String mode) throws CoreException {
 		int numProcs = configuration.getAttribute(ATTR_NUMPROCS, -1);
 		IntegerAttribute iattr = null;
 		try {
@@ -204,7 +204,7 @@ public class LSFRMLaunchConfigurationDynamicTab extends
 
 	/**
 	 * Get the attribute definition for the number of processes job launch attribute
-	 * 
+	 *
 	 * @param rm
 	 * @param queue
 	 * @return

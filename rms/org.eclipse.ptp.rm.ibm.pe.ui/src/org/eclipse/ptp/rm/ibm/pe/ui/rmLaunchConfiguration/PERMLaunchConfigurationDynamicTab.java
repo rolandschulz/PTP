@@ -13,7 +13,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *  
+ *
  * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -213,7 +213,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     private static final int MBYTE = 1024 * 1024;
     private static final int GBYTE = 1024 * 1024 * 1024;
     /*
-     * List of valid PE Environment variables. This list must be kept 
+     * List of valid PE Environment variables. This list must be kept
      * in sorted ascending order. MP_FENCE and MP_NOARGLIST must not
      * appear in this list since they are allowed to be used to
      * control command line parsing.
@@ -301,7 +301,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      * List of valid Parallel Environment options. This list must be kept
      * in sorted ascending order.
      */
-    private static final String PEOptions[] = {       
+    private static final String PEOptions[] = {
 	"-ack_thresh",
         "-adapter_use",
         "-buffer_mem",
@@ -370,7 +370,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
         "-use_bulk_xfer",
         "-wait_mode"
     };
-    
+
     private boolean ignoreModifyEvents = false;
     private EventMonitor eventMonitor;
     private Composite mainPanel;
@@ -535,7 +535,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
 
 
- 
+
 
     /**
      * Exception class intended for use in validating fields within this panel. When a validation error occurs, the
@@ -545,7 +545,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     private class ValidationException extends Exception
     {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -557,7 +557,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
 	/**
 	 * Create a ValidationException with error message
-	 * 
+	 *
 	 * @param message The error message
 	 */
 	public ValidationException(String message)
@@ -698,7 +698,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#canSave(org.eclipse.swt.widgets.Control,
      *      org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
      */
@@ -712,7 +712,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Get the directory path from the launch configuration
-     * 
+     *
      * @param attrName Launch configuration attribute name for this directory
      * @return Directory path
      */
@@ -734,7 +734,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Save directory path in the launch configuration
-     * 
+     *
      * @param attrName Launch configuration attribute name for this directory
      * @param path Directory path
      */
@@ -748,7 +748,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Display a file selector dialog prompting the user for the path of an input file. If the user clicks 'open', then
      * set the pathname into the text field of the specified FileSelector object.
-     * 
+     *
      * @param selector The FileSelector object to hold path name
      * @param titleID Title for the dialog
      * @param pathAttrID Launch configuration attribute id for saving path info
@@ -773,7 +773,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Display a file selector dialog prompting the user for the path of an output file. If the user clicks 'save', then
      * set the pathname into the text field of the specified FileSelector object.
-     * 
+     *
      * @param selector The FileSelector object to hold path name
      * @param titleID Title for the dialog
      * @param pathAttrID Launch configuration attribute id for saving path info
@@ -798,7 +798,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Display a directory selector dialog prompting the user for the pathname of a directory. If the user clocks 'ok',
      * then set the pathname into the text field of the specified FileSelector.
-     * 
+     *
      * @param selector FileSelector object to be updated
      * @param titleID Title for the dialog
      * @param pathAttrID Launch configuration attribute id for saving path info
@@ -815,7 +815,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	}
 	if (selectedFile != null) {
 	    String parentDir;
-	    
+
 	    parentDir = new File(selectedFile).getParent();
 	    if (parentDir == null) {
 		saveFileDialogPath(pathAttrID, "/");
@@ -832,18 +832,18 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      * Mark the validation state for the specified widget to indicate that the widget value must be validated.
      * @param source The widget to validate.
      */
-    protected void setFieldValidationRequired(Widget source) 
+    protected void setFieldValidationRequired(Widget source)
     {
 	// Iterate thru the list of widgets looking for the widget which needs to be validated. When found, set
 	// that widget's validation state to indicate validation is needed. Widget class needs
 	// to be checked since although these widgets perform similar functions, they do not comprise a set of
 	// logically related widgets that can be easily organized in a class hierarchy.
 	Iterator<Object> i;
-	
+
 	i = activeWidgets.iterator();
 	while (i.hasNext()) {
 	    Object widget;
-	    
+
 	    widget = i.next();
 	    if (widget instanceof BooleanRowWidget) {
 		if (((BooleanRowWidget) widget).isMatchingWidget(source)) {
@@ -883,7 +883,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    }
 	}
     }
-    
+
     /**
      * Mark all widget's validation state to indicate that the widget value has changed, meaning validation is
      * required.
@@ -891,11 +891,11 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     private void markAllFieldsChanged()
     {
 	Iterator<Object> i;
-	
+
 	i = activeWidgets.iterator();
 	while (i.hasNext()) {
 	    Object widget;
-	    
+
 	    widget = i.next();
 	    if (widget instanceof BooleanRowWidget) {
 		((BooleanRowWidget) widget).setValidationRequired();
@@ -922,7 +922,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      * Disable the tab pane widget and all children of the tab pane. Calling setEnabled(false) on the tab pane widget
      * disables the tab pane and prevents interaction with child widgets, but does not change the visible state of the
      * child widget. This method changes the state of all widgets to correctly indicate they are disabled.
-     * 
+     *
      * @param widget The widget to be disabled.
      */
     private void disableTabPaneWidget(Control widget)
@@ -945,7 +945,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Restore widget back to its previous enable/disable state
-     * 
+     *
      * @param widget The widget whose state is to be restored.
      */
     private void restoreTabPaneWidgetState(Control widget)
@@ -991,11 +991,11 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	}
     }
 
-    
+
     /**
      * Create a text widget in the tabbed view. The text field spans columns 2 and 3 of the tabbed pane. The label and
      * tooltip text are obtained from the attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id Attribute id for rm attribute this widget represents
@@ -1019,7 +1019,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Create a text widget in the tabbed view. The text field spans columns 2 and 3 of the tabbed pane. The label and
      * tooltip text are obtained from the attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id1 Attribute id for first rm attribute this widget represents
@@ -1047,7 +1047,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      * Create a checkbox widget in the tabbed view. The checkbox is in column 2 and column 3 is a filler (Label) widget.
      * To ensure consistent alignment, this method allocates extra horizontal space to the 2nd column. The label and
      * tooltip text are obtained from the attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id Attribute id for rm attribute this widget represents
@@ -1070,7 +1070,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Create a radio button pair in the tabbed view. The label, button labels, and tooltip text are obtained from the
      * attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id Attribute id for rm attribute this widget represents
@@ -1096,7 +1096,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      * user either fills in the text field with a pathname, or clicks the button to pop up a file selector dialog that
      * then fills in the text field. To ensure consistent alignment, this method allocates extra horizontal space to the
      * 2nd column. The label and tooltip text are obtained from the attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id Attribute id for rm attribute this widget represents
@@ -1123,7 +1123,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Create a combobox widget in the tabbed view. The widget spans columns 2 and 3 of the tabbed pane. The label and
      * tooltip text are obtained from the attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id Attribute id for rm attribute this widget represents
@@ -1147,7 +1147,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Create an editable combobox in the tabbed view. The widget spans columns 2 and 3 of the tabbed pane. The label
      * and tooltip text are obtained from the attribute definition object.
-     * 
+     *
      * @param parent Parent widget (the pane in the tabbed view)
      * @param rm Resource manager used by this launch config
      * @param id Attribute id for rm attribute this widget represents
@@ -1257,13 +1257,13 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	mpCkptDirPerTask = null;
 	mpPmdLogDir = null;
     }
-    
+
     /**
      * Set enable state for widgets which are dependent on the setting for mpPriority.
      */
     private void setPriorityDependentsState()
     {
-	if ((mpPriority.getValue().length() == 0) || 
+	if ((mpPriority.getValue().length() == 0) ||
 		(mpPriority.getValue().equals(getDefaultAttributeValue(currentRM, MP_PRIORITY)))) {
 	    if (mpPriorityLog != null) {
 		mpPriorityLog.setEnabled(false);
@@ -1296,7 +1296,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Set enable state for widgets which are dependent on the setting for mpMsgApi
      */
-    private void setMsgApiDependentsState() 
+    private void setMsgApiDependentsState()
     {
 	if (mpMsgApi.getValue().equals("MPI,LAPI")) {
 	    if (peRDMACount != null) {
@@ -1309,7 +1309,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    }
 	}
     }
-    
+
     /**
      * Set enable state for MP_RETRY_COUNT, where it is not enabled if MP_RETRY = 'wait' and
      * enabled otherwise.
@@ -1325,7 +1325,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    }
 	}
     }
-    
+
     /**
      * Set enable state for widgets dependent on MP_LLFILE setting
      */
@@ -1390,7 +1390,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     }
    /**
      * Create the layout object for a pane in the TabFolder
-     * 
+     *
      * @return Layout for use in the tabbed pane
      */
     private Layout createTabPaneLayout()
@@ -1406,7 +1406,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the tasks tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createTasksTab(IResourceManager rm)
@@ -1425,7 +1425,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     }
     /**
      * Create the I/O tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createIOTab(IResourceManager rm)
@@ -1445,7 +1445,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the diagnostics tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createDiagnosticTab(IResourceManager rm)
@@ -1467,7 +1467,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the debug tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createDebugTab(IResourceManager rm)
@@ -1490,7 +1490,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the system resources tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createSystemTab(IResourceManager rm)
@@ -1511,7 +1511,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the node allocation tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createNodeAllocationTab(IResourceManager rm)
@@ -1539,7 +1539,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Create the first performance tab of the attributes pane. Due to the number of performance related attributes,
      * there are two performance tabs.
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createPerformanceTab1(IResourceManager rm)
@@ -1566,7 +1566,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the second performance tab for the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createPerformanceTab2(IResourceManager rm)
@@ -1591,7 +1591,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the miscellaneous tab of the attributes pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createMiscellaneousTab(IResourceManager rm)
@@ -1627,7 +1627,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create the alternate resource manager tab of the resources pane
-     * 
+     *
      * @param rm resource manager associated with this launch configuration
      */
     private void createOtherRMTab(IResourceManager rm)
@@ -1644,7 +1644,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create a pane containing the advanced mode checkbox and PE setup script name
-     * 
+     *
      * @param rm The resource manager associated with this launch configuration
      */
     private void createModeBox(IResourceManager rm)
@@ -1672,7 +1672,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Create a pane containing the file selectors for stdio redirection
-     * 
+     *
      * @param rm The resource manager associated with this launch configuration
      */
     private void createRedirectBox(IResourceManager rm)
@@ -1698,7 +1698,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * This method creates all of the GUI elements of the resource-manager specific pane within the parallel tab of the
      * launch configuration dialog.
-     * 
+     *
      * @param parent This control's parent
      * @param rm The resource manager associated with this launch configuration
      * @param queue Currently selected queue
@@ -1740,7 +1740,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Add an attribute to the set of launch attributes if its value is not equal to the default value and the attribute
      * is known to the specified resource manager.
-     * 
+     *
      * @param rm The resource manager associated with the current launch configuration
      * @param config The current launch configuration
      * @param attrs The attributes vector containing the set of launch attributes
@@ -1774,13 +1774,13 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Get the set of attributes to be used as launch attributes
-     * 
+     *
      * @param rm The resource manager associated with the current launch configuration
      * @param queue The current queue (not used for PE since there is only a single queue)
      * @param configuration The current launch configuration
      */
-    public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManager rm, 
-	    			IPQueue queue, ILaunchConfiguration configuration)
+    public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManager rm,
+	    			IPQueue queue, ILaunchConfiguration configuration, String mode)
 	    			throws CoreException
     {
 	Vector<StringAttribute> attrs;
@@ -1791,7 +1791,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	if (configuration.getAttribute(PE_ADVANCED_MODE, "").equals("yes")) {
 	    BufferedReader rdr;
 	    String setupScriptPath;
-	    
+
 	    setupScriptPath = configuration.getAttribute(PE_ENV_SCRIPT, "");
 	    try {
 		String envData;
@@ -1843,7 +1843,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getControl()
      */
     public Control getControl()
@@ -1856,8 +1856,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      * preference to a user override of the default value (which the user does by setting of the
      * corresponding environment variable before starting the proxy.) The user's override
      * is passed to the front end by the proxy as a string attribute where the leading 'MP_' of
-     * the attribute name is replaced with 'EN_' 
-     * 
+     * the attribute name is replaced with 'EN_'
+     *
      * @param rm The resource manager currently associated with the launch configuration
      * @param attrName The name of the attribute
      * @return The value of the attribute
@@ -1867,7 +1867,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	IAttributeDefinition<?, ?, ?> attrDef;
 	String localDefaultEnv;
 
-	localDefaultEnv = attrName.replaceFirst("^MP_", "EN_"); 
+	localDefaultEnv = attrName.replaceFirst("^MP_", "EN_");
 	attrDef = rm.getAttributeDefinition(localDefaultEnv);
 	if (attrDef != null) {
 	    try {
@@ -1887,10 +1887,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	}
 	return "";
     }
-    
+
     /**
      * Get the default value for an attribute from the resource manager
-     * 
+     *
      * @param rm The resource manager currently associated with the launch configuration
      * @param attrName The name of the attribute
      * @return The value of the attribute
@@ -1914,7 +1914,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Get the attribute value for the specified attribute. If the value is stored in the launch configuration, that
      * value is used. Otherwise the default value from the resource manager is used.
-     * 
+     *
      * @param config The current launch configuration
      * @param rm The resource manager currently associated with the launch configuration
      * @param attrName The name of the attribute
@@ -1933,7 +1933,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	}
 	if (value.equals("_no_value_")) {
 	    	// Get the default attribute value, where that default may be the value
-	    	// specified by the user as an override to the PE default value. 
+	    	// specified by the user as an override to the PE default value.
 	    value = getAttrLocalDefaultValue(rm, attrName);
 	}
 		// If an attribute is defined as an integer attribute, then determine if
@@ -1946,7 +1946,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	rmAttrDef = rm.getAttributeDefinition(attrName);
 	if (rmAttrDef instanceof IntegerAttributeDefinition || rmAttrDef instanceof BigIntegerAttributeDefinition) {
 	    long intVal;
-	    
+
 	    try {
 	    intVal = Long.valueOf(value);
 	    	if (intVal != 0) {
@@ -1974,7 +1974,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Set checkbox to checked state if attribute has value equal to checkValue otherwise set it unchecked
-     * 
+     *
      * @param checkbox The checkbox to set
      * @param attrValue The attribute value to check
      * @param checkValue The value corresponding to a checked checkbox
@@ -1999,7 +1999,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Set the text value for a Text widget to the specified value if the widget is not null.
-     * 
+     *
      * @param widget The widget to set
      * @param value The value to be set
      */
@@ -2012,7 +2012,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Set the text value for a DualField widget to the specified value if the widget is not null.
-     * 
+     *
      * @param widget The widget to set
      * @param value1 The value to be set in field 1
      * @param value2 The value to be set in field 2
@@ -2023,10 +2023,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    widget.setValue(value1, value2);
 	}
     }
-    
+
     /**
      * Set the text value for a ComboRowWidget to the specified value if the widget is not null.
-     * 
+     *
      * @param widget The widget to set
      * @param value The value to be set
      */
@@ -2039,7 +2039,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Set the pathname for a file selector if the file selector is not null
-     * 
+     *
      * @param selector File selector to be updated
      * @param path Pathname
      */
@@ -2049,10 +2049,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    selector.setPath(path);
 	}
     }
- 
+
     /**
      * Set initial values for all widgets
-     * 
+     *
      * @param configuration The current launch configuration
      * @param rm The resource manager currently associated with the launch configuration
      */
@@ -2060,7 +2060,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     {
 	Object widget;
 	Iterator<Object> i;
-	
+
 	// All Text and Combo widgets have ModifyListeners registered on them in order to invoke field validation
 	// when contents of the widget's text field change. The ModifyListener is invoked for each widget as a
 	// result of calling the setText() method for the widget. The resulting ModifyEvent results in calling
@@ -2074,31 +2074,31 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	i = activeWidgets.iterator();
 	while (i.hasNext()) {
 	    widget = i.next();if (widget instanceof FileSelectorRowWidget) {
-		setValue((FileSelectorRowWidget) widget, getAttrInitialValue(config, rm, 
+		setValue((FileSelectorRowWidget) widget, getAttrInitialValue(config, rm,
 			 (String) ((FileSelectorRowWidget) widget).getData()));
 	    } else if (widget instanceof DualFieldRowWidget) {
-		setValue((DualFieldRowWidget) widget, 
+		setValue((DualFieldRowWidget) widget,
 			getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData1()),
 			getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData2()));
 	    }
 	    else if (widget instanceof TextRowWidget) {
-		setValue((TextRowWidget) widget, 
+		setValue((TextRowWidget) widget,
 			 getAttrInitialValue(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 	    }
 	    else if (widget instanceof ComboRowWidget) {
-		setValue((ComboRowWidget) widget, 
+		setValue((ComboRowWidget) widget,
 			 getAttrInitialValue(config, rm, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 	    }
 	    else if (widget instanceof BooleanRowWidget) {
-		setValue((BooleanRowWidget) widget, 
+		setValue((BooleanRowWidget) widget,
 			 getAttrInitialValue(config, rm, ((BooleanRowWidget) widget).getData()));
 	    }
 	    else if (widget instanceof CheckboxRowWidget) {
-		setValue((CheckboxRowWidget) widget, 
+		setValue((CheckboxRowWidget) widget,
 			 getAttrInitialValue(config, rm, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)),
 			 "yes");
 	    }
-		
+
 	}
 	setLaunchPanelMode();
 	// Setup complete, re-enable ModifyListener
@@ -2117,7 +2117,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     {
 	String mpPriorityDefaultValue;
 	boolean enableState;
-	
+
 	mpPriorityDefaultValue = getDefaultAttributeValue(rm, MP_PRIORITY);
 	if ((mpPriority != null)
 		&& ((mpPriority.getValue().length() == 0) || mpPriority.getValue().equals(mpPriorityDefaultValue))) {
@@ -2148,7 +2148,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	}
 	setLLFileDependentState();
     }
-    
+
     /**
      * Get the default value for an attribute
      * @param rm The current resource manager
@@ -2158,10 +2158,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     private String getDefaultAttributeValue(IResourceManager rm, String attributeName)
     {
 	String defaultValue;
-	
+
 	try {
 	    IAttributeDefinition<?, ?, ?> def;
-	    
+
 	    def = rm.getAttributeDefinition(attributeName);
 	    if (def != null) {
 		defaultValue = def.create().getValueAsString();
@@ -2175,10 +2175,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	}
 	return defaultValue;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#initializeFrom(org.eclipse.swt.widgets.Control,
      *      org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
      *      org.eclipse.debug.core.ILaunchConfiguration)
@@ -2196,7 +2196,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#isValid(org.eclipse.debug.core.ILaunchConfiguration,
      *      org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
      */
@@ -2204,7 +2204,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     {
 		// If running in basic mode, then any PE command line options and
 		// environment variables are disallowed since those settings may
-		// conflict with what is specified in the resources tab panel. 
+		// conflict with what is specified in the resources tab panel.
 	if ((peAdvancedMode != null) && (! peAdvancedMode.getSelection())) {
 	    Map<String, String> environment;
 	    String optionsFence;
@@ -2234,7 +2234,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		    tokenizedOptions = new StringTokenizer(commandOptions, " ");
 		    while (tokenizedOptions.hasMoreTokens()) {
 			String option;
-			
+
 			option = tokenizedOptions.nextToken();
 			if (option.equals(optionsFence)) {
 			    break;
@@ -2256,7 +2256,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Store the value from a Text widget into the specified launch configuration if the widget is not null
-     * 
+     *
      * @param config The launch configuration
      * @param rm The resource manager currently used by the launch configuration
      * @param attr The name of the attribute
@@ -2266,10 +2266,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    		       TextRowWidget control)
     {
 	IAttributeDefinition<?, ?, ?> attrDef;
-	
+
 	if (control != null) {
 	    String attrValue;
-	    
+
 	    attrDef = rm.getAttributeDefinition(attr);
 	    try {
 		if ((attrDef instanceof IntegerAttributeDefinition) || (attrDef instanceof BigIntegerAttributeDefinition)) {
@@ -2288,12 +2288,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Store the value from a DialField widget into the specified launch configuration if the widget is not null
-     * 
+     *
      * @param config The launch configuration
      * @param attr The name of the attribute
      * @param control The widget to obtain the value from
      */
-    private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr1, String attr2, 
+    private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr1, String attr2,
 	    		       DualFieldRowWidget control)
     {
 	if (control != null) {
@@ -2304,7 +2304,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    config.setAttribute(attr2, value[1].trim());
 	}
     }
-    
+
     /**
      * Store the value from a ComboRowWidget into the specified launch configuration if the widget is not null
      * @param config The launch configuration
@@ -2320,7 +2320,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Store the value from a file selector into the specified launch configuration if the file selector is not null
-     * 
+     *
      * @param config The launch configuration
      * @param attr The name of the attribute
      * @param control The widget to obtain the value from
@@ -2334,13 +2334,13 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Store the value from a Button widget into the specified launch configuration if the widget is not null
-     * 
+     *
      * @param config The launch configuration
      * @param attr The name of the attribute
      * @param control The widget to obtain the value from
      * @param trueVal The value to set if the button is selected
      */
-    private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, CheckboxRowWidget control, 
+    private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, CheckboxRowWidget control,
 	    String trueVal, String falseVal)
     {
 	if (control != null) {
@@ -2357,7 +2357,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Save the values entered in this panel in the launch configuration
-     * 
+     *
      * @param config
      */
     private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IResourceManager rm)
@@ -2393,7 +2393,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
      *      org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
      */
@@ -2407,7 +2407,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
      *      org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
      */
@@ -2415,12 +2415,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    IPQueue queue)
     {
 	IAttribute<?, ?, ?> rmAttrs[];
-	
+
 	currentLaunchConfig = config;
 	rmAttrs = rm.getAttributes();
 	for (int i = 0; i < rmAttrs.length; i++) {
 	    try {
-		config.setAttribute(rmAttrs[i].getDefinition().getId(), 
+		config.setAttribute(rmAttrs[i].getDefinition().getId(),
 		    		    rmAttrs[i].getDefinition().create().getValueAsString());
 	    }
 	    catch (IllegalValueException e) {
@@ -2478,7 +2478,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that an integer value is within the range allowed for the attribute.
-     * 
+     *
      * @param value The value to be verified
      * @param attrName The name of the attribute
      * @param errorID The id of the error message used if validation fails
@@ -2489,7 +2489,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
         int testValue;
         int len;
         char suffix;
-        
+
         len = value.length();
         suffix = value.charAt(len - 1);
         if (Character.isDigit(suffix)) {
@@ -2525,7 +2525,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate file selectors used to specify stdio redirection
-     * 
+     *
      * @throws ValidationException
      */
     private void validateRedirectBox() throws ValidationException
@@ -2546,10 +2546,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	validateNumericRange(mpNodes, MP_NODES, "Invalid.mpNodes");
 	validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE, "Invalid.mpTasksPerNode");
     }
-    
+
     /**
      * Validate all text and editable combobox fields in the I/O tab, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validateIOTab() throws ValidationException
@@ -2560,7 +2560,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in diagnostic tab, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validateDiagnosticTab() throws ValidationException
@@ -2569,7 +2569,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in the debug tab, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validateDebugTab() throws ValidationException
@@ -2581,7 +2581,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in the system resources tab, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validateSystemTab() throws ValidationException
@@ -2591,7 +2591,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in the node allocation tab, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validateNodeTab() throws ValidationException
@@ -2606,7 +2606,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in performance tab 1, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validatePerformanceTab1() throws ValidationException
@@ -2620,7 +2620,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in performance tab 2, top to bottom
-     * 
+     *
      * @throws ValidationException
      */
     private void validatePerformanceTab2() throws ValidationException
@@ -2635,7 +2635,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text and editable combobox fields in the alternate resource manager tab
-     * 
+     *
      * @throws ValidationException
      */
     private void validateRMTab() throws ValidationException
@@ -2645,7 +2645,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate all text fields and editable combo boxes in the miscellaneous tab
-     * 
+     *
      * @throws ValidationException
      */
     private void validateMiscTab() throws ValidationException
@@ -2664,7 +2664,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that an input file is accessible
-     * 
+     *
      * @param selector The file selector containing the pathname
      * @param errorID id of the error string used if file is inaccessible
      * @throws ValidationException
@@ -2692,7 +2692,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that an output file is accessible
-     * 
+     *
      * @param selector The file selector containing the pathname
      * @param errorID id of the error string used if the file is inaccessible
      * @throws ValidationException
@@ -2720,7 +2720,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that in input file is accessible
-     * 
+     *
      * @param path Pathname of the input file
      * @param errorID id of the error string used if the file is inaccessible
      * @throws ValidationException
@@ -2730,7 +2730,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	IPath testPath;
 	IFileStore remoteResource;
 	IFileInfo fileInfo;
-	
+
 	testPath = new Path(path);
 	if (! testPath.isValidPath(path)) {
 	    throw new ValidationException(Messages.getString(errorID));
@@ -2749,7 +2749,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that an output file is accessible
-     * 
+     *
      * @param path Pathname of the output file
      * @param errorID id of the error string used if the file is not accessible
      * @throws ValidationException
@@ -2759,7 +2759,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	IPath testPath;
 	IFileStore remoteResource;
 	IFileInfo fileInfo;
-	
+
 	testPath = new Path(path);
 	if (! testPath.isValidPath(path)) {
 	    throw new ValidationException(Messages.getString(errorID));
@@ -2778,7 +2778,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that the directory pathname is valid
-     * 
+     *
      * @param selector File selector containing the directory name
      * @param errorID id of the error string used if the directory is invalid
      * @throws ValidationException
@@ -2797,7 +2797,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		    selector.resetValidationState();
 		    return;
 		}
-		
+
 		testPath = new Path(path);
 		if (! testPath.isValidPath(path)) {
 		    throw new ValidationException(Messages.getString(errorID));
@@ -2823,7 +2823,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate the MP_STDINMODE setting
-     * 
+     *
      * @throws ValidationException
      */
     private void validateStdinMode() throws ValidationException
@@ -2851,7 +2851,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate the MP_STDOUTMODE setting
-     * 
+     *
      * @throws ValidationException
      */
     private void validateStdoutMode() throws ValidationException
@@ -2876,7 +2876,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    validateNumericRange(widgetValue, 0, numProcs - 1, "Invalid.mpStdoutMode");
 	}
     }
-    
+
     private void validateCorefileFormat() throws ValidationException
     {
 
@@ -2902,7 +2902,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate the MP_INSTANCES setting
-     * 
+     *
      * @throws ValidationException
      */
     private void validateInstances() throws ValidationException
@@ -2923,7 +2923,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate the MP_RETRY setting
-     * 
+     *
      * @throws ValidationException
      */
     private void validateRetry() throws ValidationException
@@ -2944,7 +2944,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate the MP_RDMA_COUNT setting
-     * 
+     *
      * @throws ValidationException
      */
     private void validateRDMACount() throws ValidationException
@@ -2967,7 +2967,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate the MP_BUFFER_MEM setting
-     * 
+     *
      * @throws ValidationException
      */
     private void validateBufferMem() throws ValidationException
@@ -2995,7 +2995,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     /**
      * Verify that the value selected or entered in an editable combobox is a valid value, as determined by checking the
      * attribute definition for the attribute.
-     * 
+     *
      * @param widget The combobox to be checked
      * @param attrName The attribute name
      * @return true if the value is a valid selection, false otherwise
@@ -3021,7 +3021,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that an integer value is within the range allowed for the attribute.
-     * 
+     *
      * @param control The Text widget to be verified
      * @param attrName The name of the attribute
      * @param errorID The id of the error message used if validation fails
@@ -3050,7 +3050,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate that an integer value is within the range allowed for the attribute.
-     * 
+     *
      * @param value The value to be verified
      * @param attrName The name of the attribute
      * @param errorID The id of the error message used if validation fails
@@ -3070,19 +3070,19 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    throw new ValidationException(Messages.getString(errorID));
 	}
     }
-    
+
     /**
      * Convert a string which may have a suffix 'k', 'm' or 'g' to it's actual numeric value, multiplying by the
      * appropriate multiplier
      * @param value The number to be converted
      * @return The converted number
      */
-    private String getIntegerValue(String value) 
+    private String getIntegerValue(String value)
     {
 	int testValue;
 	int len;
 	char suffix;
-	
+
 	testValue = 0;
 	len = value.length();
 	if (len == 0) {
@@ -3113,10 +3113,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	    return String.valueOf(testValue);
 	}
     }
-    
+
     /**
      * Validate that a BigInteger value is within the range allowed for the attribute.
-     * 
+     *
      * @param value The value to be verified
      * @param attrName The name of the attribute
      * @param errorID The id of the error message used if validation fails
@@ -3139,7 +3139,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 
     /**
      * Validate a String's value to verify it is within the allowed range
-     * 
+     *
      * @param value String to be verified
      * @param lowLimit Low limit of range
      * @param highLimit High limit of range

@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class BGRMLaunchConfigurationDynamicTab extends
 		AbstractRMLaunchConfigurationDynamicTab {
-	
+
 	private static final int MIN_TEXT_WIDTH = 50;
 	private static final String NUMBER_OF_PROCESSES_LABEL = "Number of Processes: ";
 	private static final String ATTR_PREFIX = Activator.PLUGIN_ID + ".launchAttributes";
@@ -76,9 +76,9 @@ public class BGRMLaunchConfigurationDynamicTab extends
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
-		
+
 		final int numColumns = 2;
-		
+
 		final Composite comp = new Composite(control, SWT.NONE);
 		GridLayout launchConfigLayout = new GridLayout(numColumns, true);
 		launchConfigLayout.marginHeight = 0;
@@ -88,15 +88,15 @@ public class BGRMLaunchConfigurationDynamicTab extends
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = numColumns;
 		comp.setLayoutData(gd);
-		
-		
+
+
 		Label label = new Label(comp, SWT.NONE);
 		label.setText(NUMBER_OF_PROCESSES_LABEL);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd.minimumWidth = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 		label.setLayoutData(gd);
-		
-		
+
+
 		numProcsText = new Text(comp, SWT.NONE);
 		numProcsText.setTextLimit(10);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false, numColumns-1, 1);
@@ -113,14 +113,14 @@ public class BGRMLaunchConfigurationDynamicTab extends
 				numProcsString = numProcsText.getText();
 				fireContentsChanged();
 			}});
-		
+
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getAttributes(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) throws CoreException {
+			ILaunchConfiguration configuration, String mode) throws CoreException {
 		int numProcs = configuration.getAttribute(ATTR_NUMPROCS, -1);
 		IntegerAttribute iattr = null;
 		try {
@@ -208,7 +208,7 @@ public class BGRMLaunchConfigurationDynamicTab extends
 
 	/**
 	 * Get the attribute definition for the number of processes job launch attribute
-	 * 
+	 *
 	 * @param rm
 	 * @param queue
 	 * @return

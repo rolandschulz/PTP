@@ -46,7 +46,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfig
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
 
-public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
+public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	Object lock1 = new Object();
 
 	private InputStreamObserver stderrObserver;
@@ -64,7 +64,7 @@ public class OpenMPIRuntimSystemJob extends AbstractToolRuntimeSystemJob {
 	/** Exception raised while parsing mpi map information. */
 	IOException parserException = null;
 
-	public OpenMPIRuntimSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
+	public OpenMPIRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
 

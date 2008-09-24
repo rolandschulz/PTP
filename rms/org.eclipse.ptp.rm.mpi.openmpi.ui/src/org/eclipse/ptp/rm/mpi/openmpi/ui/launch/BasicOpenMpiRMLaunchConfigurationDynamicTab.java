@@ -229,7 +229,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 
 	@Override
 	public String getText() {
-		return "Basic";
+		return "Basic Open MPI";
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -311,7 +311,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 	}
 
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
-			IPQueue queue, ILaunchConfiguration configuration)
+			IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 
 		List<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();

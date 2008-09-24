@@ -33,7 +33,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * a Text widget should have its ModifyListener's
 	 * modifyText method set up to notify all of the contents
 	 * changed listeners.
-	 * 
+	 *
 	 * @param launchContentsChangedListener
 	 */
 	public abstract void addContentsChangedListener(
@@ -45,12 +45,12 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * determines if this tab prevents the current launch configuration from being saved, whereas
 	 * <code>isValid()</code> determines if this tab prevents the current launch configuration from
 	 * being launched.
-	 * 
+	 *
 	 * <p>
 	 * This information is typically used by the launch configuration
 	 * dialog to decide when it is okay to save a launch configuration.
 	 * </p>
-	 * 
+	 *
 	 * @param control
 	 * @param rm
 	 * @param queue
@@ -71,15 +71,16 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 *
 	 * @param parent the parent composite
 	 * @param rm
-	 * @param queue 
-	 * @throws CoreException 
+	 * @param queue
+	 * @throws CoreException
 	 */
 	public abstract void createControl(Composite parent,
 			IResourceManager rm, IPQueue queue) throws CoreException;
 
 	/**
-	 * Get the set of resource manager attributes to be used as launch attributes
-	 * 
+	 * Get the set of resource manager attributes to be used as launch
+	 * attributes
+	 *
 	 * @param rm
 	 *            The resource manager associated with the current launch
 	 *            configuration
@@ -87,11 +88,13 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 *            The current queue
 	 * @param configuration
 	 *            The current launch configuration
+	 * @param mode
+	 *            The current launch mode
 	 * @return array of attributes
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public abstract IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) throws CoreException;
+			ILaunchConfiguration configuration, String mode) throws CoreException;
 
 	/**
 	 * Returns the top level control for the dynamic portion of the parallel tab.
@@ -102,7 +105,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 *
 	 * @return the top level control or <code>null</code>
 	 */
-	public Control getControl();	
+	public Control getControl();
 
 	/**
 	 * Initializes this dynamic tab's controls with values from the given
@@ -112,10 +115,10 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * It is also called every time the user selects a new resource manager
 	 * or queue.  In this case the configuration that is passed in has
 	 * been cached by the parallel tab.
-	 * 
-	 * @param queue 
-	 * @param rm 
-	 * @param control 
+	 *
+	 * @param queue
+	 * @param rm
+	 * @param control
 	 * @param configuration launch configuration
 	 * @return
 	 */
@@ -143,9 +146,9 @@ public interface IRMLaunchConfigurationDynamicTab {
 			IPQueue queue);
 
 	/**
-	 * Copies values from this tab into the given 
+	 * Copies values from this tab into the given
 	 * launch configuration.
-	 * 
+	 *
 	 * @param configuration launch configuration
 	 * @param rm
 	 * @param queue
@@ -168,7 +171,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * such that the configuration can be initialized with
 	 * meaningful values. This method may be called before this
 	 * tab's control is created.
-	 * 
+	 *
 	 * @param configuration launch configuration
 	 * @param rm
 	 * @param queue

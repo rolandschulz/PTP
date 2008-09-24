@@ -177,7 +177,7 @@ public class ParallelLaunchConfigurationDelegate
 
 		//switch perspective
 		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
-		AttributeManager attrManager = getAttributeManager(configuration);
+		AttributeManager attrManager = getAttributeManager(configuration, mode);
 		try {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view

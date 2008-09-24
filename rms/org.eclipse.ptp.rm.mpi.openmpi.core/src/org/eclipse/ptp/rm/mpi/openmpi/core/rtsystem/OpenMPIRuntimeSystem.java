@@ -185,6 +185,6 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new OpenMPIRuntimSystemJob(jobID, queueID, "Open Mpi Job", this, attrMgr);
+		return new OpenMPIRuntimeSystemJob(jobID, queueID, "Open Mpi Job", this, attrMgr);
 	}
 }

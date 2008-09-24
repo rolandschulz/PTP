@@ -227,7 +227,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 
 	@Override
 	public String getText() {
-		return "Advanced";
+		return "Advanced Open MPI";
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -416,7 +416,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 	}
 
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
-			IPQueue queue, ILaunchConfiguration configuration)
+			IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 		return null;
 	}
