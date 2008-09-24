@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -77,7 +77,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class OpenMPIRMLaunchConfigurationDynamicTab extends
 	AbstractRMLaunchConfigurationDynamicTab {
-	
+
 	private class DataSource {
 		private int numProcs;
 		private boolean bySlot;
@@ -112,7 +112,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 
 		public DataSource() {
 		}
-		
+
 		public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 			resetValidation();
 			loadConfig(configuration);
@@ -121,7 +121,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			copyToFields();
 			return validation;
 		}
-		
+
 		public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 			resetValidation();
 			copyFromFields();
@@ -130,7 +130,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			storeConfig(configuration);
 			return validation;
 		}
-		
+
 		public RMLaunchValidation validateFields() {
 			resetValidation();
 			copyFromFields();
@@ -145,7 +145,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		}
 
 		private void copyFromFields() {
-			numProcs = numProcsSpinner.getSelection(); 
+			numProcs = numProcsSpinner.getSelection();
 			bySlot = bySlotButton.getSelection();
 			noOversubscribe = noOversubscribeButton.getSelection();
 			noLocal = noLocalButton.getSelection();
@@ -158,7 +158,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			useDefArgs = useArgsDefaultsButton.getSelection();
 			args = extractText(argsText);
 			useDefParams = useParamsDefaultsButton.getSelection();
-			
+
 			params.clear();
 			for (Object object : paramsViewer.getCheckedElements()) {
 				if (object instanceof Parameter) {
@@ -182,7 +182,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			applyText(argsText, args);
 			useArgsDefaultsButton.setSelection(useDefArgs);
 			useParamsDefaultsButton.setSelection(useDefParams);
-			
+
 			if (ompiParameters != null) {
 				for (Entry<String, String>param : params.entrySet()) {
 					Parameter p = ompiParameters.getParameter(param.getKey());
@@ -194,7 +194,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 				}
 			}
 		}
-		
+
 		private String extractText(Text text) {
 			String s = text.getText().trim();
 			return (s.length() == 0 ? null : s);
@@ -241,7 +241,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		private void resetValidation() {
 			validation = new RMLaunchValidation(true, "");
 		}
-		
+
 		private void storeConfig(ILaunchConfigurationWorkingCopy configuration) {
 			configuration.setAttribute(ATTR_NUMPROCS, numProcs);
 			configuration.setAttribute(ATTR_BYSLOT, bySlot);
@@ -284,14 +284,14 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 					if (object instanceof Parameter) {
 						Parameter param = (Parameter)object;
 						if (param.getValue().equals("")) {
-							validation = new RMLaunchValidation(false, "Parameter value cannot be empty");						
+							validation = new RMLaunchValidation(false, "Parameter value cannot be empty");
 						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	private class WidgetListener implements ModifyListener, SelectionListener, ICheckStateListener {
 		private boolean listenerEnabled = true;
 
@@ -307,14 +307,14 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 				}
 			}
 		}
-		
+
 		public void disable() { listenerEnabled = false; }
 		public void enable() { listenerEnabled = true; }
 
 		public void modifyText(ModifyEvent evt) {
 			if (! listenerEnabled) return;
 			Object source = evt.getSource();
-			if (source == prefixText || 
+			if (source == prefixText ||
 					source == numProcsSpinner ||
 					source == hostFileText ||
 					source == hostListText) {
@@ -324,17 +324,17 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 				assert false;
 			}
 		}
-		
+
 		public void widgetDefaultSelected(SelectionEvent e) {
 			// Empty.
 		}
-		
+
 		public void widgetSelected(SelectionEvent e) {
 			if (! listenerEnabled) return;
 			Object source = e.getSource();
-			if (source == bySlotButton || 
-					source == noOversubscribeButton || 
-					source == noLocalButton || 
+			if (source == bySlotButton ||
+					source == noOversubscribeButton ||
+					source == noLocalButton ||
 					source == usePrefixButton ||
 					source == hostFileButton ||
 					source == hostListButton ||
@@ -347,7 +347,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			}
 		}
 	}
-	
+
 	private static final String ATTR_BASE = OpenMPIUIPlugin.PLUGIN_ID + ".launchAttributes";
 	private static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs";
 	private static final String ATTR_BYSLOT = ATTR_BASE + ".bySlot";
@@ -361,7 +361,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 	private static final String ATTR_USEHOSTLIST = ATTR_BASE + ".useHostList";
 	private static final String ATTR_ARGUMENTS = ATTR_BASE + ".arguments";
 	private static final String ATTR_USEDEFAULTARGUMENTS = ATTR_BASE + ".useDefaultArguments";
-	
+
 	private static final String ATTR_PARAMETERS = ATTR_BASE + ".parameters";
 	private static final String ATTR_USEDEFAULTPARAMETERS = ATTR_BASE + ".useDefaultParameters";
 	private Composite control;
@@ -381,11 +381,11 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 	private CheckboxTableViewer paramsViewer;
 	private Table paramsTable;
 	private String launchArgs = EMPTY_STRING;
-	
+
 	Parameters ompiParameters;
-	
+
 	WidgetListener widgetListener = new WidgetListener();
-		
+
 	DataSource dataSource = new DataSource();
 
 	public OpenMPIRMLaunchConfigurationDynamicTab(IResourceManager rm) {
@@ -398,7 +398,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		return dataSource.validateFields();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite, org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
@@ -561,7 +561,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		paramsViewer.setAllChecked(false);
 
 		// Enable cursor keys in table
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(paramsViewer, 
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(paramsViewer,
 				new FocusCellOwnerDrawHighlighter(paramsViewer));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(paramsViewer) {
 			@Override
@@ -576,7 +576,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		TableViewerEditor.create(paramsViewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
 				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
 				| ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
-		
+
 		paramsTable = paramsViewer.getTable();
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.heightHint = 100;
@@ -595,18 +595,18 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		});
 
 		addColumns();
-		
+
 		if (ompiParameters != null) {
 			paramsViewer.setInput(ompiParameters);
 		}
 	}
-	
+
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getAttributes(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) throws CoreException {
+			ILaunchConfiguration configuration, String mode) throws CoreException {
 		dataSource.loadConfig(configuration);
 
 		List<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();
@@ -615,19 +615,19 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		} catch (IllegalValueException e) {
 			// TODO: Handle this exception?
 			Assert.isTrue(false);
-		} 
+		}
 		attrs.add(OpenMPILaunchAttributes.getLaunchArgumentsAttributeDefinition().create(dataSource.args));
-		
+
 		return attrs.toArray(new IAttribute<?,?,?>[attrs.size()]);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getControl()
 	 */
 	public Control getControl() {
 		return control;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#initializeFrom(org.eclipse.swt.widgets.Control, org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
@@ -638,7 +638,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		widgetListener.enable();
 		return validation;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
@@ -689,11 +689,11 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 				}
 				return null;
 			}
-			
+
 		});
 		column1.getColumn().setResizable(true);
 		column1.getColumn().setText("Name");
-	
+
 		/*
 		 * Value column
 		 */
@@ -709,7 +709,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 				}
 				return null;
 			}
-			
+
 		});
 		column2.setEditingSupport(new EditingSupport(paramsViewer) {
 			@Override
@@ -734,7 +734,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		});
 		column2.getColumn().setResizable(true);
 		column2.getColumn().setText("Value");
-		
+
 		paramsTable.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
@@ -751,7 +751,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 
    /**
 	 * Convert a comma separated list into one host per line
-	 * 
+	 *
 	 * @param list
 	 * @return
 	 */
@@ -768,10 +768,10 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Make string suitable for passing as an argument
-	 * 
+	 *
 	 * @param s
 	 * @return
 	 */
@@ -781,7 +781,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		}
 		return "\"" + s + "\"";
 	}
-	
+
 	/**
 	 * If we're using default arguments, compute what they
 	 * should be.
@@ -791,7 +791,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			launchArgs = "-np " + dataSource.numProcs;
 			if (dataSource.bySlot) {
 				launchArgs += " -byslot";
-			} 
+			}
 			if (dataSource.noOversubscribe) {
 				launchArgs += " -nooversubscribe";
 			}
@@ -807,7 +807,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			if (dataSource.useHostList) {
 				launchArgs += " -host " + fixString(dataSource.hostList);
 			}
-			
+
 			if (!dataSource.useDefParams) {
 				for (Entry<String, String> param : dataSource.params.entrySet()) {
 					launchArgs += " -mca " + param.getKey() + " " + fixString(param.getValue());

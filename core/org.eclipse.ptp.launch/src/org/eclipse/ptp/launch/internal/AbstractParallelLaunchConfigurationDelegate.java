@@ -593,10 +593,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * Get the attributes from the resource manager specific launch page.
 	 *
 	 * @param configuration
+	 * @param mode
 	 * @return IAttribute[]
 	 * @throws CoreException
 	 */
-	private IAttribute<?,?,?>[] getResourceAttributes(ILaunchConfiguration configuration)
+	private IAttribute<?,?,?>[] getResourceAttributes(ILaunchConfiguration configuration, String mode)
 		throws CoreException {
 
 		IResourceManager rm = getResourceManager(configuration);
@@ -607,7 +608,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			return new IAttribute[0];
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm);
-		return rmDynamicTab.getAttributes(rm, null, configuration);
+		return rmDynamicTab.getAttributes(rm, null, configuration, mode);
 	}
 
 	/**
@@ -652,10 +653,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * Get all the attributes specified in the launch configuration.
 	 *
 	 * @param configuration
+	 * @param mode
 	 * @return AttributeManager
 	 * @throws CoreException
 	 */
-	protected AttributeManager getAttributeManager(ILaunchConfiguration configuration) throws CoreException {
+	protected AttributeManager getAttributeManager(ILaunchConfiguration configuration, String mode) throws CoreException {
 		IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
 			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0); //$NON-NLS-1$
@@ -666,7 +668,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		/*
 		 * Collect attributes from Resources tab
 		 */
-		attrMgr.addAttributes(getResourceAttributes(configuration));
+		attrMgr.addAttributes(getResourceAttributes(configuration, mode));
 
 		/*
 		 * Make sure there is a queue, even if the resources tab doesn't require
@@ -1306,7 +1308,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		}
 		return null;
 	}
-	
+
 	protected static String [] getEnvironmentToAppend(ILaunchConfiguration configuration) throws CoreException {
 		Map<?,?> defaultEnv = null;
 		Map<?,?> configEnv = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, defaultEnv);
@@ -1314,7 +1316,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			return null;
 		}
 		if (! configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true)) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Parallel launcher does not support replacing all environment variables on remote environment."));			
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Parallel launcher does not support replacing all environment variables on remote environment."));
 		}
 
 		List<String> strings = new ArrayList<String>(configEnv.size());
@@ -1324,7 +1326,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			String key = (String) entry.getKey();
             String value = (String) entry.getValue();
             strings.add(key+"="+value);
-            
+
 		}
 		return (String[]) strings.toArray(new String[strings.size()]);
 	}

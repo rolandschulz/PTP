@@ -31,13 +31,13 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 /**
  * Abstract class that is the extension point for contributing
  * ConfigurationWizardPages to this plug-in.
- * 
+ *
  * @author rsqrd
  *
  */
 public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaunchConfigurationDynamicTab {
 	public static final String EMPTY_STRING = "";
-	
+
 	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
 	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
 
@@ -50,9 +50,9 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 				Status.ERROR, string, null);
 		return new CoreException(status);
 	}
-	
+
 	private final ListenerList listenerList = new ListenerList();
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#addContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener)
 	 */
@@ -82,7 +82,7 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 
 	/**
 	 * Get the queue with the corresponding name
-	 * 
+	 *
 	 * @param rm resource manager
 	 * @param queueName queue name
 	 * @return queue
@@ -91,23 +91,23 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		if (rm == null) {
 			return null;
 		}
-		
+
 		IPQueue[] queues = rm.getQueues();
-		
+
 		for (IPQueue queue : queues) {
 			if (queue.getName().equals(queueName))
 				return queue;
 		}
 		return null;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public void clearQueues() {
 		queues.clear();
 	}
-	
+
 	/**
 	 * @param queue
 	 * @param index
@@ -116,7 +116,7 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		queues.put(index, queue);
 		queueIndices.put(queue, index);
 	}
-	
+
 	/**
 	 * @param index
 	 * @return
@@ -124,7 +124,7 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 	public IPQueue getQueue(int index) {
 		return queues.get(index);
 	}
-	
+
 	/**
 	 * @param queue
 	 * @return
