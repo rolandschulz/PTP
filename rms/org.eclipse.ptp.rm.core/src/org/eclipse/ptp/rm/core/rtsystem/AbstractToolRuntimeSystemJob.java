@@ -41,7 +41,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.rm.core.Activator;
+import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.utils.ArgumentParser;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
@@ -105,7 +105,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			doPrepareExecution();
 		} catch (CoreException e) {
 			changeJobState(JobAttributes.State.ERROR);
-			return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
+			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
 		}
 
 		try {
@@ -149,7 +149,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				}
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to caculate work directory, environment or command line to launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed to caculate work directory, environment or command line to launch parallel application.", e);
 			}
 
 			try {
@@ -157,7 +157,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doBeforeExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
 			}
 
 			/*
@@ -170,7 +170,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				process = processBuilder.start();
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed to execute command to  launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed to execute command to  launch parallel application.", e);
 			}
 
 			try {
@@ -178,7 +178,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionStarted();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after executing command to launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed after executing command to launch parallel application.", e);
 			}
 
 			changeJobState(JobAttributes.State.RUNNING);
@@ -188,14 +188,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doWaitExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while executing parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed while executing parallel application.", e);
 			}
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
 			if (process.exitValue() != 0) {
 				changeJobState(JobAttributes.State.ERROR);
 				if (! terminateJobFlag) {
-					return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command to launch parallel application, return exit value {0}.", process.exitValue()));
+					return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command to launch parallel application, return exit value {0}.", process.exitValue()));
 				} else {
 					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
 					return Status.CANCEL_STATUS;
@@ -215,12 +215,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionFinished();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed after finishing execution of parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed after finishing execution of parallel application.", e);
 			}
 
 			changeJobState(JobAttributes.State.TERMINATED);
 
-			return new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Command successfull, return exit value {0}.", process.exitValue()));
+			return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind("Command successfull, return exit value {0}.", process.exitValue()));
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", jobID); //$NON-NLS-1$
@@ -358,7 +358,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				try {
 					newAttributeManager.addAttribute(attributeDefinition.create());
 				} catch (IllegalValueException e) {
-					throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to create default attribute for {0}.", attributeDefinition.getName()), e));
+					throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to create default attribute for {0}.", attributeDefinition.getName()), e));
 				}
 			}
 		}

@@ -14,7 +14,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rm.core.Activator;
+import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 
 public class DebugUtil {
 	private static final String COMMAND_TRACING_OPTION = "org.eclipse.ptp.rm.core/debug/command"; //$NON-NLS-1$
@@ -38,7 +38,7 @@ public class DebugUtil {
 	public static boolean RTS_JOB_OUTPUT_TRACING = false;
 
 	public static void configurePluginDebugOptions() {
-		if (Activator.getDefault().isDebugging()) {
+		if (ToolsRMPlugin.getDefault().isDebugging()) {
 //			org.eclipse.ptp.core.util.DebugUtil.configurePluginDebugOptions();
 //			if (org.eclipse.ptp.core.util.DebugUtil.RM_TRACING) {
 				String option = Platform.getDebugOption(COMMAND_TRACING_OPTION);

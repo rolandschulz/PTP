@@ -10,25 +10,30 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core;
 
+import javax.print.attribute.HashDocAttributeSet;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin {
+public class ToolsRMPlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.core";
 
 	// The shared instance
-	private static Activator plugin;
+	private static ToolsRMPlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public ToolsRMPlugin() {
 		
 	}
 
@@ -58,8 +63,16 @@ public class Activator extends Plugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static ToolsRMPlugin getDefault() {
 		return plugin;
+	}
+
+	public static CoreException coreErrorException(String message) {
+		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message));
+	}
+
+	public static CoreException coreErrorException(String message, Throwable t) {
+		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message, t));
 	}
 
 }

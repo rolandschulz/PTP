@@ -48,7 +48,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.core.Activator;
+import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
@@ -156,21 +156,21 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: startup", rmConfiguration.getName()); //$NON-NLS-1$
 		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
 		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not find remote services for resource manager"));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Could not find remote services for resource manager"));
 		}
 		IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
 		Assert.isNotNull(connectionManager);
 
 		connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
 		if (connection == null) {
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not find connection for resource manager"));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Could not find connection for resource manager"));
 		}
 
 		if (!connection.isOpen()) {
 			try {
 				connection.open(monitor);
 			} catch (RemoteConnectionException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
 
@@ -343,7 +343,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
 		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Resource manager has not be initialized"));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Resource manager has not be initialized"));
 		}
 
 		/*
@@ -368,7 +368,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			pendingJobQueue.put(job);
 		} catch (InterruptedException e) {
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, e.getMessage()));
 		}
 	}
 
