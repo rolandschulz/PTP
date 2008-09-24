@@ -112,15 +112,16 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab
 
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration,
 			String mode) throws CoreException {
-				List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
-				for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-					List<IAttribute<?, ?, ?>> attributesList = Arrays.asList(tabControl.getAttributes(rm, queue, configuration, mode));
-					if (attributesList != null) {
-						attributes.addAll(attributesList);
-					}
-				}
-				return attributes.toArray(new IAttribute<?, ?, ?>[attributes.size()]);
+		List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
+		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			IAttribute<?, ?, ?> attributeArray[] = tabControl.getAttributes(rm, queue, configuration, mode);
+			if (attributeArray != null) {
+				List<IAttribute<?, ?, ?>> attributesList = Arrays.asList();
+				attributes.addAll(attributesList);
 			}
+		}
+		return attributes.toArray(new IAttribute<?, ?, ?>[attributes.size()]);
+	}
 
 	public void updateControls() {
 		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
