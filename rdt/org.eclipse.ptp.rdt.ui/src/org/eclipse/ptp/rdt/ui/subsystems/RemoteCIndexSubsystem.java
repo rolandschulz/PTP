@@ -523,7 +523,6 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		// if it's a translation unit, we can just add it
 		if(element instanceof ITranslationUnit) {
 			filePath = convertURIToRemotePath(element.getLocationURI());
-			return;
 		}
 		
 		else {
