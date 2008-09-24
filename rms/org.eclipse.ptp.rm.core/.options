@@ -1,3 +1,6 @@
+# Tracing
+org.eclipse.ptp.rm.core/debug=true
+
 # Trace jobs that execute remote commands (discover, monitor, etc)
 org.eclipse.ptp.rm.core/debug/command=true
 
