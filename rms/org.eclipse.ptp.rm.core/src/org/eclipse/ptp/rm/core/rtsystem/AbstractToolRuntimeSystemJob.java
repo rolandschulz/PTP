@@ -141,10 +141,11 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 					}
 					System.out.println("Environment variables:"); //$NON-NLS-1$
 					for (Entry<String, String> env : environment.entrySet()) {
-						System.out.println(MessageFormat.format("  {0}={1}", env.getKey(), env.getValue())); //$NON-NLS-1$
+						System.out.println(MessageFormat.format("  export {0}={1}", env.getKey(), env.getValue())); //$NON-NLS-1$
 					}
 					System.out.println(MessageFormat.format("Work directory: {0}", directory)); //$NON-NLS-1$
-					System.out.println(MessageFormat.format("Command: {0}", command.toString())); //$NON-NLS-1$
+					ArgumentParser argumentParser = new ArgumentParser(command);
+					System.out.println(MessageFormat.format("Command: {0}", argumentParser.getCommandLine(false))); //$NON-NLS-1$
 				}
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
