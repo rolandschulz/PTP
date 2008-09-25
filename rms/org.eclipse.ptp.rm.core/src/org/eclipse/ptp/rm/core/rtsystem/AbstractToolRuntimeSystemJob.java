@@ -100,6 +100,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected IStatus run(IProgressMonitor monitor) {
 		changeJobState(JobAttributes.State.STARTED);
 
+		if (DebugUtil.RTS_JOB_TRACING_MORE) {
+			System.out.println("Launch attributes:"); //$NON-NLS-1$
+			String array[] = getAttrMgr().toStringArray();
+			for (int i = 0; i < array.length; i++) {
+				System.out.println(array[i]);
+			}
+		}
+		
 		try {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
 			doPrepareExecution();
