@@ -19,11 +19,14 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
+ * Wizard that enables the conversion of existing projects to RDT projects
+ *
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is no guarantee that this API will work or
  * that it will remain the same. Please do not use this API without consulting
  * with the RDT team.
  * 
+ * @author vkong
  */
 public class ConvertToRemoteWizard extends ConversionWizard {
 
