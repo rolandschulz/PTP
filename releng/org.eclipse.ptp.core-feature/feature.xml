@@ -54,8 +54,7 @@
          id="org.eclipse.ptp.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.debug.core"
@@ -75,8 +74,7 @@
          id="org.eclipse.ptp.rm.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.rm.remote"
@@ -89,8 +87,7 @@
          id="org.eclipse.ptp.rm.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.launch"
