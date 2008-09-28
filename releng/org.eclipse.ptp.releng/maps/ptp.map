@@ -72,6 +72,7 @@ plugin@org.eclipse.ptp.pldt.mpi.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org
 plugin@org.eclipse.ptp.pldt.openmp.analysis=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.analysis
 plugin@org.eclipse.ptp.pldt.openmp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.core
 plugin@org.eclipse.ptp.pldt.openmp.ui.pv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv
+plugin@org.eclipse.ptp.pldt.upc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.upc
 plugin@org.eclipse.ptp.pldt.wizards=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards
 plugin@org.eclipse.ptp.perf=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf
 plugin@org.eclipse.ptp.perf.tau=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau
