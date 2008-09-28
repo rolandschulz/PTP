@@ -2,28 +2,28 @@
 org.eclipse.ptp.rm.core/debug=true
 
 # Trace jobs that execute remote commands (discover, monitor, etc)
-org.eclipse.ptp.rm.core/debug/command=true
+org.eclipse.ptp.rm.core/debug/command=false
 
 # Trace more details about jobs that execute remote commands (discover, monitor, etc)
-org.eclipse.ptp.rm.core/debug/command/more=true
+org.eclipse.ptp.rm.core/debug/command/more=false
 
 # Trace job submission on the Runtime System
-org.eclipse.ptp.rm.core/debug/job=true
+org.eclipse.ptp.rm.core/debug/job=false
 
 # Trace status of the Runtime System
-org.eclipse.ptp.rm.core/debug/rts=true
+org.eclipse.ptp.rm.core/debug/rts=false
 
 # Trace discover procedure on the Runtime System 
-org.eclipse.ptp.rm.core/debug/rts/discover=true
+org.eclipse.ptp.rm.core/debug/rts/discover=false
 
 # Trace monitor procedure on the Runtime System 
-org.eclipse.ptp.rm.core/debug/rts/monitor=true
+org.eclipse.ptp.rm.core/debug/rts/monitor=false
 
 # Trace status of IPJobs on the Runtime System
-org.eclipse.ptp.rm.core/debug/rts/job=true
+org.eclipse.ptp.rm.core/debug/rts/job=false
 
 # Trace more details of IPJobs on the Runtime System
-org.eclipse.ptp.rm.core/debug/rts/job/more=true
+org.eclipse.ptp.rm.core/debug/rts/job/more=false
 
 # Redirect output of parallel application to terminal that is running eclipse 
-org.eclipse.ptp.rm.core/debug/rts/job/output=true
+org.eclipse.ptp.rm.core/debug/rts/job/output=false
