@@ -1,5 +1,5 @@
 # Trace job that executes SDM master
 org.eclipse.ptp.debug.sdm.core/debug=true
-org.eclipse.ptp.debug.sdm.core/debug/SDMmaster=true
-org.eclipse.ptp.debug.sdm.core/debug/SDMmaster/more=true
-org.eclipse.ptp.debug.sdm.core/debug/SDMmaster/output=true
+org.eclipse.ptp.debug.sdm.core/debug/SDMmaster=false
+org.eclipse.ptp.debug.sdm.core/debug/SDMmaster/more=false
+org.eclipse.ptp.debug.sdm.core/debug/SDMmaster/output=false
