@@ -58,9 +58,9 @@ public class ToolKit {
 			String valueString,
 			int numberOfChars) {
 		Label label = new Label(parent, SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		Text text = new Text(parent, SWT.SINGLE | SWT.BORDER);
-		if (valueString == null) valueString = "";
+		if (valueString == null) valueString = ""; //$NON-NLS-1$
 		text.setText(valueString);
 		if (numberOfChars <= 0) {
 			text.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
@@ -197,7 +197,7 @@ public class ToolKit {
 		row.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label label = new Label(row, SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -211,7 +211,7 @@ public class ToolKit {
 		text.setText(valueString);
 		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Button button = new Button(item, SWT.PUSH);
-		button.setText("Browse");
+		button.setText(Messages.BrowseButtonText);
 		button.addSelectionListener(new FileButtonSelectionListener(text, title));
 		
 		return text;
@@ -233,7 +233,7 @@ public class ToolKit {
 		row.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label label = new Label(row, SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -243,11 +243,11 @@ public class ToolKit {
 		item.setLayout(layout);
 		item.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Text text = new Text(item, SWT.SINGLE | SWT.BORDER);
-		if (valueString == null) valueString = "";
+		if (valueString == null) valueString = ""; //$NON-NLS-1$
 		text.setText(valueString);
 		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Button button = new Button(item, SWT.PUSH);
-		button.setText("Browse");
+		button.setText(Messages.BrowseButtonText);
 		button.addSelectionListener(new DirectoryButtonSelectionListener(text, title, message));
 		
 		return text;
@@ -303,7 +303,7 @@ public class ToolKit {
 		row.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label label = new Label(row, SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		
 		List combo = new List(row, SWT.SINGLE);
 		//combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -322,7 +322,7 @@ public class ToolKit {
 		row.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label label = new Label(row, SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		
 		Combo combo = new Combo(row, SWT.DROP_DOWN | SWT.READ_ONLY);
 		combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

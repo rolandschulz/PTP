@@ -48,7 +48,7 @@ public class FileGroup extends TextGroup {
 		if (s != null) {
 			text.setText(s);
 		} else {
-			text.setText("");
+			text.setText(""); //$NON-NLS-1$
 		}
 	}
 }

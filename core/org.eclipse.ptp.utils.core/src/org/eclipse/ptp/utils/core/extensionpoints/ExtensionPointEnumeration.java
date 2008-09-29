@@ -9,9 +9,10 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.remotetools.utils.extensionpoints;
+package org.eclipse.ptp.utils.core.extensionpoints;
 
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -70,6 +71,9 @@ public class ExtensionPointEnumeration implements Enumeration {
 	public Object nextElement() {
 		IConfigurationElement element = currentConfigurationElement;
 		currentConfigurationElement = getNextConfigurationElement();
+		if (element == null) {
+			throw new NoSuchElementException();
+		}
 		return element;
 	}
 

@@ -375,7 +375,7 @@ public class Frame extends Composite {
 		if (newLabel != null) {
 			expandButton.setText(newLabel);
 		} else {
-			expandButton.setText("");
+			expandButton.setText(""); //$NON-NLS-1$
 		}
 	}
 
@@ -437,7 +437,7 @@ public class Frame extends Composite {
 
 	public void setExpandButtonLabel(String expandButtonLabel) {
 		if (expandButton == null) {
-			throw new IllegalArgumentException("Frame has not expand button to set label");
+			throw new IllegalArgumentException(Messages.Frame_NoExpandButton);
 		}
 		this.expandButtonLabel = expandButtonLabel;
 		updateExpandButton();
@@ -449,7 +449,7 @@ public class Frame extends Composite {
 
 	public void setShrinkButtonLabel(String shrinkButtonLabel) {
 		if (expandButton == null) {
-			throw new IllegalArgumentException("Frame has not expand button to set label");
+			throw new IllegalArgumentException(Messages.Frame_NoExpandButton);
 		}
 		this.shrinkButtonLabel = shrinkButtonLabel;
 		updateExpandButton();
@@ -467,7 +467,7 @@ public class Frame extends Composite {
 		if (enclosingGroup != null) {
 			enclosingGroup.setText(label);
 		} else {
-			throw new IllegalArgumentException("Frame has not enclosing group to set title");
+			throw new IllegalArgumentException(Messages.Frame_NoEnclosingGroup);
 		}
 	}
 	
@@ -483,7 +483,7 @@ public class Frame extends Composite {
 		if (descriptionLabel != null) {
 			descriptionLabel.setText(description);
 		} else {
-			throw new IllegalArgumentException("Frame has no description to be set");
+			throw new IllegalArgumentException(Messages.Frame_NoDescriptionSet);
 		}
 	}
 	
@@ -495,7 +495,7 @@ public class Frame extends Composite {
 		fillLayout.marginWidth = 10;
 		shell.setLayout(fillLayout);
 		
-		FrameMold mold = new FrameMold("Frame 1", true);
+		FrameMold mold = new FrameMold("Frame 1", true); //$NON-NLS-1$
 //		mold.setDescription("This frame illustrates a frame with some random stuff and a long description.");
 		Frame frame = new Frame(shell, mold);
 		

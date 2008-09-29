@@ -128,7 +128,7 @@ public class ComboGroup extends GenericControlGroup {
 	 */
 	public ComboGroupItem getItemUsingIndex(int index) {
 		if(index < 0 || comboItems.get(index) == null)
-			return new ComboGroupItem("", "");
+			return new ComboGroupItem("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		return (ComboGroupItem)comboItems.get(index);
 	}
 	

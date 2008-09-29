@@ -32,18 +32,18 @@ public class IllegalAttributeException extends Exception {
 	}
 
 	public IllegalAttributeException(String message, String name) {
-		super(name + ": " + message);
+		super(name + ": " + message); //$NON-NLS-1$
 		this.name = name;
 	}
 
 	public IllegalAttributeException(String message, String name, String value) {
-		super(name + ": " + message + "( " + value + ")");
+		super(name + ": " + message + "( " + value + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.value = value;
 		this.name = name;
 	}
 
 	public IllegalAttributeException(Exception e, String name, String message, String value) {
-		super(name + ": " + message + "( " + value + ")", e);
+		super(name + ": " + message + "( " + value + ")", e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.value = value;
 		this.name = name;
 	}

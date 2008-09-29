@@ -68,7 +68,7 @@ public class TextGroup extends GenericControlGroup {
 	
 	public void setString(String s) {
 		if (s == null) {
-			text.setText("");
+			text.setText(""); //$NON-NLS-1$
 		} else {
 			text.setText(s);
 		}

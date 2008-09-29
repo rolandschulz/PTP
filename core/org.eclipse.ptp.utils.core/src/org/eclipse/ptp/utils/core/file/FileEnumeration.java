@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.remotetools.utils.file;
+package org.eclipse.ptp.utils.core.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;

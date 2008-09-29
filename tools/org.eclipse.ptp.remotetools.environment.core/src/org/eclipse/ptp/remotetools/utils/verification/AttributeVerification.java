@@ -40,9 +40,9 @@ public class AttributeVerification {
 	public static IStatus createStatus(String pluginID, Throwable e, int severity,
 			String attributeName, String message, String value) {
 		if (value == null) {
-			value = "no value";
+			value = Messages.AttributeVerification_NoValue;
 		}
-		String errorMessage = NLS.bind("{0}: {1} ({2})", new String[] { attributeName, message, value});
+		String errorMessage = NLS.bind(Messages.AttributeVerification_ErrorMessage, new String[] { attributeName, message, value});
 		return new Status(IStatus.ERROR, pluginID, 0,
 				errorMessage, e);
 	}
@@ -114,9 +114,9 @@ public class AttributeVerification {
 			String attributeName, String message, String value)
 			throws CoreException {
 		if (value == null) {
-			value = "no value";
+			value = Messages.AttributeVerification_NoValue;
 		}
-		String errorMessage = NLS.bind("{0}: {1} ({2})", new String[] { attributeName, message, value});
+		String errorMessage = NLS.bind(Messages.AttributeVerification_ErrorMessage, new String[] { attributeName, message, value});
 		throw new CoreException(new Status(IStatus.ERROR, pluginID, 0,
 				errorMessage, e));
 	}
@@ -152,7 +152,7 @@ public class AttributeVerification {
 		// Verify path
 		// Very strange design for IPath interface for testing validity.
 		if (! path.isValidPath(stringValue)) {
-			throwAttributeException(attributeName, "is not a valid path", stringValue);
+			throwAttributeException(attributeName, Messages.AttributeVerification_InvalidPath, stringValue);
 		}
 		
 		return path;
@@ -181,7 +181,7 @@ public class AttributeVerification {
 		 * some unknown current working directory.
 		 */
 		if (! path.isAbsolute()) {
-			return createStatus(pluginID, null, severity, attributeName, "is not an absolute path", path.toOSString());
+			return createStatus(pluginID, null, severity, attributeName, Messages.AttributeVerification_NotAnAbsolutePath, path.toOSString());
 		}
 
 		URI uri = URIUtil.toURI(path);
@@ -196,13 +196,13 @@ public class AttributeVerification {
 		
 		if ((options & EXIST) != 0) {
 			if (! info.exists()) {
-				return createStatus(pluginID, null, severity, attributeName, "Path does not exist", path.toOSString());
+				return createStatus(pluginID, null, severity, attributeName, Messages.AttributeVerification_PathDoesNotExist, path.toOSString());
 			}
 		}
 		
 		if ((options & DIRECTORY) != 0) {
 			if (! info.isDirectory()) {
-				return createStatus(pluginID, null, severity, attributeName, "Path is not a directory", path.toOSString());			
+				return createStatus(pluginID, null, severity, attributeName, Messages.AttributeVerification_PathIsNotDir, path.toOSString());			
 			}
 		}
 
@@ -211,24 +211,24 @@ public class AttributeVerification {
 			 * On PPC, it is known that the EFS.ATTRIBUTE_EXECUTABLE is never set,
 			 * event if the path is an executable fiel.
 			 */
-			if (Platform.getOSArch().equals("ppc64") || Platform.getOSArch().equals("ppc")) {
+			if (Platform.getOSArch().equals(Platform.ARCH_PPC)) {
 				// Simple ignore and assume it is an executable.
 			} else {
 				if (! info.getAttribute(EFS.ATTRIBUTE_EXECUTABLE)) {
-					return createStatus(pluginID, null, severity, attributeName, "Path is not an executable file", path.toOSString());
+					return createStatus(pluginID, null, severity, attributeName, Messages.AttributeVerification_PathIsNotExecutableFile, path.toOSString());
 				}
 			}
 		}
 
 		if ((options & WRITEABLE) != 0) {
 			if (info.getAttribute(EFS.ATTRIBUTE_READ_ONLY)) {
-				return createStatus(pluginID, null, severity, attributeName, "Path is not writable", path.toOSString());
+				return createStatus(pluginID, null, severity, attributeName, Messages.AttributeVerification_PathIsNotWritable, path.toOSString());
 			}
 		}
 		
 		if ((options & FILE) != 0) {
 			if (info.isDirectory()) {
-				return createStatus(pluginID, null, severity, attributeName, "Path is not a file", path.toOSString());
+				return createStatus(pluginID, null, severity, attributeName, Messages.AttributeVerification_PathIsNotFile, path.toOSString());
 			}
 		}
 		
@@ -241,7 +241,7 @@ public class AttributeVerification {
 		} else {
 			URL url = FileLocator.find(plugin.getBundle(), path, null);
 			if (url == null) {
-				throwAttributeException(attributeName, "Path not found in plug-in", path.toOSString());
+				throwAttributeException(attributeName, Messages.AttributeVerification_PathNotFound, path.toOSString());
 			}
 			try {
 				url = FileLocator.resolve(url);
@@ -249,9 +249,9 @@ public class AttributeVerification {
 				File file = new File(uri);
 				return new Path(file.getAbsolutePath());
 			} catch (IOException e1) {
-				throwAttributeException(attributeName, "Path not found in plugin", path.toOSString());
+				throwAttributeException(attributeName, Messages.AttributeVerification_PathNotFound, path.toOSString());
 			} catch (URISyntaxException e) {
-				throwAttributeException(attributeName, "Must be a local file", path.toOSString());
+				throwAttributeException(attributeName, Messages.AttributeVerification_MustBeLocalFile, path.toOSString());
 			}
 		}
 		return null;
@@ -277,12 +277,12 @@ public class AttributeVerification {
 		}
 	
 		if (errors.isEmpty()) {
-			return new Status(IStatus.OK, pluginID, 0, "Configuration is OK", null);
+			return new Status(IStatus.OK, pluginID, 0, Messages.AttributeVerification_ConfigurationOK, null);
 		} else {
 			/*
 			 * TODO: make code better, without iterator
 			 */ 
-			MultiStatus result = new MultiStatus(pluginID, 0, "Configuration contains invalid values", null);
+			MultiStatus result = new MultiStatus(pluginID, 0, Messages.AttributeVerification_InvalidConfiguration, null);
 			Iterator iterator2 = errors.iterator(); 
 			while (iterator2.hasNext()) {
 				IStatus object = (IStatus) iterator2.next();

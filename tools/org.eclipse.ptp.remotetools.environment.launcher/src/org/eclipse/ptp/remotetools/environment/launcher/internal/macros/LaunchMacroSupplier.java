@@ -22,9 +22,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.ptp.remotetools.environment.launcher.macros.ILaunchConfigurationVariableSupplier;
 import org.eclipse.ptp.remotetools.environment.launcher.macros.ILaunchVariableContextInfo;
-import org.eclipse.ptp.remotetools.utils.extensionpoints.IProcessMemberVisitor;
-import org.eclipse.ptp.remotetools.utils.extensionpoints.ProcessExtensions;
-
+import org.eclipse.ptp.utils.core.extensionpoints.IProcessMemberVisitor;
+import org.eclipse.ptp.utils.core.extensionpoints.ProcessExtensions;
 
 /**
  * @author laggarcia

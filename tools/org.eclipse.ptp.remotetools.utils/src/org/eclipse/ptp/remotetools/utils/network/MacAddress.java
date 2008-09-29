@@ -78,13 +78,13 @@ public class MacAddress {
 
 	private static BigInteger convertStringToInternalRepresentation(String macString) throws MacAddressFormatException {
 		String trimmedMacString = macString.trim(); 
-		boolean isValidMac = trimmedMacString.matches("^(\\p{XDigit}{2}:){5}\\p{XDigit}{2}$");
+		boolean isValidMac = trimmedMacString.matches("^(\\p{XDigit}{2}:){5}\\p{XDigit}{2}$"); //$NON-NLS-1$
 		
 		if(!isValidMac) {
-			throw new MacAddressFormatException("Invalid Mac Address format!");
+			throw new MacAddressFormatException(Messages.MacAddress_InvalidMACAddressFormat);
 		}
 		// Remove all ':' from the String
-		String validMacString = trimmedMacString.replaceAll(":", ""); //replace(':', '\0');
+		String validMacString = trimmedMacString.replaceAll(":", ""); //replace(':', '\0');  //$NON-NLS-1$//$NON-NLS-2$
 		
 		// Convert to the internal representation
 		return new BigInteger(validMacString, HEXBASE);
@@ -117,7 +117,7 @@ public class MacAddress {
 			StringBuffer zeroStr =  new StringBuffer();
 			
 			for(int i=0; i < (HEXDIGITS - strRep.length()); i++) {
-				zeroStr.append("0");
+				zeroStr.append("0"); //$NON-NLS-1$
 			}
 			strRep = new String(zeroStr + strRep);
 		}
@@ -125,7 +125,7 @@ public class MacAddress {
 		// For each pair of character, add a : character, except for the last one
 		StringBuffer hexRep = new StringBuffer();
 		for(int i=0; i < HEXDIGITS - 2; i = i + 2) {
-			hexRep.append(strRep.substring(i, i+2) + ":");
+			hexRep.append(strRep.substring(i, i+2) + ":"); //$NON-NLS-1$
 		}
 		hexRep.append(strRep.substring(HEXDIGITS-2, HEXDIGITS));
 		
