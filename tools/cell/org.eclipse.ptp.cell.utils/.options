@@ -1,0 +1,50 @@
+# Debugging options for the org.eclipse.ptp.cell.utils
+
+# Turn on general debugging for the org.eclipse.ptp.cell.utils plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.utils/debug = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.platform package
+org.eclipse.ptp.cell.utils/debug/utils/platform = false
+org.eclipse.ptp.cell.utils/debug/utils/platform/more = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.process package
+org.eclipse.ptp.cell.utils/debug/utils/process = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.vt100 package
+org.eclipse.ptp.cell.utils/debug/utils/vt100 = false
+org.eclipse.ptp.cell.utils/debug/utils/vt100/more = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.stream package
+org.eclipse.ptp.cell.utils/debug/utils/stream = false
+org.eclipse.ptp.cell.utils/debug/utils/stream/more = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.terminal package
+org.eclipse.ptp.cell.utils/debug/utils/terminal = false
+
+# Turn on debugging of all org.eclipse.ptp.cell.utils.linux.* packages
+org.eclipse.ptp.cell.utils/debug/utils/linux = false
+org.eclipse.ptp.cell.utils/debug/utils/linux/more = false
+org.eclipse.ptp.cell.utils/debug/utils/linux/argument = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.file package
+org.eclipse.ptp.cell.utils/debug/utils/file = false
+
+# Turn on debugging of org.eclipse.ptp.cell.utils.extension package
+org.eclipse.ptp.cell.utils/debug/utils/extension = false
+
+# Turn on debugging of org.eclipse.ptp.cell.ui.progress package
+org.eclipse.ptp.cell.utils/debug/ui/progress = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.utils/trace/id = utils
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.utils/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.utils/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.utils/trace/dynamic = False

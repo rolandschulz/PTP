@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+###############################################################################
+# Copyright (c) 2007 IBM Corporation.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#     IBM Corporation - initial implementation
+###############################################################################
+
+-->
+
+<!-- NOTE TO TRANSLATOR:
+* This file should remain English as it produces compilable code. 
+-->
+
+<templates>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.spe_context_create"
+			name="spe_context_create"
+			description="%spe_context_create_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Create context */
+if ((${context} = spe_context_create(${flags}, ${gang})) == NULL) {
+	%spe_context_create_failed
+	exit (${exit_code});
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.spe_program_load"
+			name="spe_program_load"
+			description="%spe_program_load_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Load program into context */
+if (spe_program_load(${context}, ${spe_program_handle})) {
+	%spe_program_load_failed
+	exit (${exit_code});
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.spe_context_run"
+			name="spe_context_run"
+			description="%spe_context_run_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Run context */
+if (spe_context_run(${context}, ${entry}, ${runflags}, ${argp}, ${envp}, ${stopinfo}) &lt; 0) {
+	%spe_context_run_failed
+	exit (1);
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.spe_context_destroy"
+			name="spe_context_destroy"
+			description="%spe_context_destroy_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Destroy context */
+if (spe_context_destroy(${context}) != 0) {
+	%spe_context_destroy_failed
+	exit (1);
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.pthread_join"
+			name="pthread_join"
+			description="%pthread_join_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Thread join */
+if (pthread_join(${thread}, ${value_ptr})) {
+	%pthread_join_failed
+	exit (1);
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.pthread_create"
+			name="pthread_create"
+			description="%pthread_create_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Create thread */
+if (pthread_create(${thread}, ${attributes}, ${pthread_function}, ${arg}))  {
+	%pthread_create_failed
+	exit (1);
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.pthread_create_run_spe"
+			name="pthread_create_run_spe"
+			description="%pthread_create_run_spe_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+/* Create thread for SPE context */
+if (pthread_create(${thread}, NULL, ${ppu_pthread_function}, ${context}))  {
+	%pthread_create_failed
+	exit (1);
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.ppu.ppu_thread_function"
+			name="ppu_pthread_function"
+			description="%ppu_pthread_function_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+void *ppu_pthread_function(void *arg) {
+	spe_context_ptr_t ctx;
+	unsigned int entry = ${SPE_DEFAULT_ENTRY};
+
+	ctx = *((spe_context_ptr_t *)arg);
+	/* Run context */
+	if (spe_context_run(ctx, &amp;entry, ${runflags}, ${argp}, ${envp}, ${stopinfo}) &lt; 0) {
+		%spe_context_run_failed
+		exit (1);
+	}
+	pthread_exit(${value_ptr});
+}
+${cursor}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.spu.main_spu_simple"
+			name="main_spu_simple"
+			description="%main_spu_simple_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+int main(unsigned long long id) {
+	${cursor}
+}
+	</template>
+
+	<template
+			id="org.eclipse.ptp.cell.ui.text.templates.spu.main_spu_complete"
+			name="main_spu_complete"
+			description="%main_spu_complete_description"
+			context="org.eclipse.cdt.ui.text.templates.c">
+int main(unsigned long long speid, unsigned long long argp, unsigned long long envp) {
+	${cursor}
+}
+	</template>
+
+</templates>

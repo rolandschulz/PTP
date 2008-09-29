@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+
+<!--- Template extension for the editor -->
+	<extension
+			point="org.eclipse.ui.editors.templates">
+		<include
+				file="templates/templates.xml"
+				translations="$nl$/templates/templates.properties">
+		</include>
+	</extension>
+
+</plugin>
