@@ -30,7 +30,7 @@ import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
  */
 public class MPIProjectProcessCPP extends MPIProjectProcess {
 	
-	private static final boolean traceOn=true;
+	private static final boolean traceOn=false;
 
 	/**
 	 * Need to set both C and C++ build commands; the C++ build command is passed in as an arg.
