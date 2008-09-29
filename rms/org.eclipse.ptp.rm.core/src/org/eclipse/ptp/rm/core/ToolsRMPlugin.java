@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core;
 
-import javax.print.attribute.HashDocAttributeSet;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -34,7 +32,8 @@ public class ToolsRMPlugin extends Plugin {
 	 * The constructor
 	 */
 	public ToolsRMPlugin() {
-		
+		super();
+		plugin = this;
 	}
 
 	/*
@@ -44,7 +43,6 @@ public class ToolsRMPlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
 		DebugUtil.configurePluginDebugOptions();
 	}
 
@@ -54,7 +52,6 @@ public class ToolsRMPlugin extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
 		super.stop(context);
 	}
 
