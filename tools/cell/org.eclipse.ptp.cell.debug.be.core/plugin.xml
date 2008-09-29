@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+	<extension
+			point="org.eclipse.cdt.debug.core.CDebugger">
+		<debugger
+				class="org.eclipse.ptp.cell.debug.be.cdi.CellCombinedGDBServerCDIDebugger"
+				cpu="*"
+				id="org.eclipse.ptp.cell.debug.be.cdi.combinedGDBServerCDIDebugger"
+				modes="run"
+				name="Cell BE gdbserver gdb/mi"
+				platform="*">
+		</debugger>
+	</extension>
+	<extension
+			point="org.eclipse.cdt.debug.mi.core.commandFactories">
+		<commandFactory
+				class="org.eclipse.ptp.cell.debug.be.cdi.command.factories.StandardCellCommandFactory"
+				debuggerID="org.eclipse.ptp.cell.debug.be.cdi.combinedGDBServerCDIDebugger"
+				id="org.eclipse.ptp.cell.debug.be.cdi.combinedStandardCellCommandFactory"
+				miVersions="mi,mi1,mi2"
+				name="%StandardCellCommandFactory.name"
+				platforms="*">
+		</commandFactory>
+		<commandFactory
+				class="org.eclipse.ptp.cell.debug.be.cdi.command.factories.StandardCellCommandFactory"
+				debuggerID="org.eclipse.ptp.cell.debug.cdi.spuGDBServerCDIDebugger"
+				id="org.eclipse.ptp.cell.debug.cdi.spuEnhancedStandardCommandFactory"
+				miVersions="mi,mi1,mi2"
+				name="%StandardCellCommandFactory.name"
+				platforms="*">
+		</commandFactory>
+		<commandFactory
+				id="org.eclipse.ptp.cell.debug.be.cdi.combinedStandardCellCommandFactoryForLocalDebug"
+				name="%StandardCellCommandFactory.name"
+				debuggerID="org.eclipse.cdt.debug.mi.core.CDebuggerNew"
+				class="org.eclipse.ptp.cell.debug.be.cdi.command.factories.StandardCellCommandFactory"
+				miVersions="mi,mi1,mi2"
+				platforms="linux">
+		</commandFactory>
+	</extension>
+   
+</plugin>

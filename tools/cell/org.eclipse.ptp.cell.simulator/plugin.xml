@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="profile" name="%CellSimulatorLaunchConfigurationProfileName" schema="schema/profile.exsd"/>
+   <extension-point id="architecture" name="%ProcessorArchitectureForCellSimulatorName" schema="schema/architecture.exsd"/>
+
+</plugin>

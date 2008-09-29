@@ -1,0 +1,382 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title> Cell IDE Tutorial </title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+
+<script language="JavaScript">
+
+function getUrlParameter( name )
+{
+	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regex = new RegExp( regexS );
+	var results = regex.exec( window.location.href );
+	if( results == null )
+		return "";
+	else
+		return results[1];
+}
+
+var pagePosition = 0;
+var begPage = 0;
+var endPage = 72;
+
+var  cell_1_images= new Array(73)
+cell_1_images[0]='images/cell_01.jpg';
+cell_1_images[1]='images/cell_02.jpg';
+cell_1_images[2]='images/cell_03.jpg';
+cell_1_images[3]='images/cell_04.jpg';
+cell_1_images[4]='images/cell_05.jpg';
+cell_1_images[5]='images/cell_06.jpg';
+cell_1_images[6]='images/cell_07.jpg';
+cell_1_images[7]='images/cell_08.jpg';
+cell_1_images[8]='images/cell_09.jpg';
+cell_1_images[9]='images/cell_10.jpg';
+cell_1_images[10]='images/cell_11.jpg';
+cell_1_images[11]='images/cell_12.jpg';
+cell_1_images[12]='images/cell_13.jpg';
+cell_1_images[13]='images/cell_14.jpg';
+cell_1_images[14]='images/cell_15.jpg';
+cell_1_images[15]='images/cell_16.jpg';
+cell_1_images[16]='images/cell_17.jpg';
+cell_1_images[17]='images/cell_18.jpg';
+cell_1_images[18]='images/cell_19.jpg';
+cell_1_images[19]='images/cell_20.jpg';
+cell_1_images[20]='images/cell_21.jpg';
+cell_1_images[21]='images/cell_22.jpg';
+cell_1_images[22]='images/cell_23.jpg';
+cell_1_images[23]='images/cell_24.jpg';
+cell_1_images[24]='images/cell_25.jpg';
+cell_1_images[25]='images/cell_26.jpg';
+cell_1_images[26]='images/cell_27.jpg';
+cell_1_images[27]='images/cell_28.jpg';
+cell_1_images[28]='images/cell_29.jpg';
+cell_1_images[29]='images/cell_30.jpg';
+cell_1_images[30]='images/cell_31.jpg';
+cell_1_images[31]='images/cell_32.jpg';
+cell_1_images[32]='images/cell_33.jpg';
+cell_1_images[33]='images/cell_34.jpg';
+cell_1_images[34]='images/cell_35.jpg';
+cell_1_images[35]='images/cell_36.jpg';
+cell_1_images[36]='images/cell_37.jpg';
+cell_1_images[37]='images/cell_38.jpg';
+cell_1_images[38]='images/cell_39.jpg';
+cell_1_images[39]='images/cell_40.jpg';
+cell_1_images[40]='images/cell_41.jpg';
+cell_1_images[41]='images/cell_42.jpg';
+cell_1_images[42]='images/cell_43.jpg';
+cell_1_images[43]='images/cell_44.jpg';
+cell_1_images[44]='images/cell_45.jpg';
+cell_1_images[45]='images/cell_46.jpg';
+cell_1_images[46]='images/cell_47.jpg';
+cell_1_images[47]='images/cell_48.jpg';
+cell_1_images[48]='images/cell_49.jpg';
+cell_1_images[49]='images/cell_50.jpg';
+cell_1_images[50]='images/cell_51.jpg';
+cell_1_images[51]='images/cell_52.jpg';
+cell_1_images[52]='images/cell_53.jpg';
+cell_1_images[53]='images/cell_54.jpg';
+cell_1_images[54]='images/cell_55.jpg';
+cell_1_images[55]='images/cell_56.jpg';
+cell_1_images[56]='images/cell_57.jpg';
+cell_1_images[57]='images/cell_58.jpg';
+cell_1_images[58]='images/cell_59.jpg';
+cell_1_images[59]='images/cell_60.jpg';
+cell_1_images[60]='images/cell_61.jpg';
+cell_1_images[61]='images/cell_62.jpg';
+cell_1_images[62]='images/cell_63.jpg';
+cell_1_images[63]='images/cell_64.jpg';
+cell_1_images[64]='images/cell_65.jpg';
+cell_1_images[65]='images/cell_66.jpg';
+cell_1_images[66]='images/cell_67.jpg';
+cell_1_images[67]='images/cell_68.jpg';
+cell_1_images[68]='images/cell_69.jpg';
+cell_1_images[69]='images/cell_70.jpg';
+cell_1_images[70]='images/cell_71.jpg';
+cell_1_images[71]='images/cell_72.jpg';
+cell_1_images[72]='images/clear.gif';
+
+var cell_1_text= new Array(73) 
+cell_1_text[0]='text/cell_01.htm';
+cell_1_text[1]='text/cell_02.htm';
+cell_1_text[2]='text/cell_03.htm';
+cell_1_text[3]='text/cell_04.htm';
+cell_1_text[4]='text/cell_05.htm';
+cell_1_text[5]='text/cell_06.htm';
+cell_1_text[6]='text/cell_07.htm';
+cell_1_text[7]='text/cell_08.htm';
+cell_1_text[8]='text/cell_09.htm';
+cell_1_text[9]='text/cell_10.htm';
+cell_1_text[10]='text/cell_11.htm';
+cell_1_text[11]='text/cell_12.htm';
+cell_1_text[12]='text/cell_13.htm';
+cell_1_text[13]='text/cell_14.htm';
+cell_1_text[14]='text/cell_15.htm';
+cell_1_text[15]='text/cell_16.htm';
+cell_1_text[16]='text/cell_17.htm';
+cell_1_text[17]='text/cell_18.htm';
+cell_1_text[18]='text/cell_19.htm';
+cell_1_text[19]='text/cell_20.htm';
+cell_1_text[20]='text/cell_21.htm';
+cell_1_text[21]='text/cell_22.htm';
+cell_1_text[22]='text/cell_23.htm';
+cell_1_text[23]='text/cell_24.htm';
+cell_1_text[24]='text/cell_25.htm';
+cell_1_text[25]='text/cell_26.htm';
+cell_1_text[26]='text/cell_27.htm';
+cell_1_text[27]='text/cell_28.htm';
+cell_1_text[28]='text/cell_29.htm';
+cell_1_text[29]='text/cell_30.htm';
+cell_1_text[30]='text/cell_31.htm';
+cell_1_text[31]='text/cell_32.htm';
+cell_1_text[32]='text/cell_33.htm';
+cell_1_text[33]='text/cell_34.htm';
+cell_1_text[34]='text/cell_35.htm';
+cell_1_text[35]='text/cell_36.htm';
+cell_1_text[36]='text/cell_37.htm';
+cell_1_text[37]='text/cell_38.htm';
+cell_1_text[38]='text/cell_39.htm';
+cell_1_text[39]='text/cell_40.htm';
+cell_1_text[40]='text/cell_41.htm';
+cell_1_text[41]='text/cell_42.htm';
+cell_1_text[42]='text/cell_43.htm';
+cell_1_text[43]='text/cell_44.htm';
+cell_1_text[44]='text/cell_45.htm';
+cell_1_text[45]='text/cell_46.htm';
+cell_1_text[46]='text/cell_47.htm';
+cell_1_text[47]='text/cell_48.htm';
+cell_1_text[48]='text/cell_49.htm';
+cell_1_text[49]='text/cell_50.htm';
+cell_1_text[50]='text/cell_51.htm';
+cell_1_text[51]='text/cell_52.htm';
+cell_1_text[52]='text/cell_53.htm';
+cell_1_text[53]='text/cell_54.htm';
+cell_1_text[54]='text/cell_55.htm';
+cell_1_text[55]='text/cell_56.htm';
+cell_1_text[56]='text/cell_57.htm';
+cell_1_text[57]='text/cell_58.htm';
+cell_1_text[58]='text/cell_59.htm';
+cell_1_text[59]='text/cell_60.htm';
+cell_1_text[60]='text/cell_61.htm';
+cell_1_text[61]='text/cell_62.htm';
+cell_1_text[62]='text/cell_63.htm';
+cell_1_text[63]='text/cell_64.htm';
+cell_1_text[64]='text/cell_65.htm';
+cell_1_text[65]='text/cell_66.htm';
+cell_1_text[66]='text/cell_67.htm';
+cell_1_text[67]='text/cell_68.htm';
+cell_1_text[68]='text/cell_69.htm';
+cell_1_text[69]='text/cell_70.htm';
+cell_1_text[70]='text/cell_71.htm';
+cell_1_text[71]='text/cell_72.htm';
+cell_1_text[72]='text/cell_73.htm';
+
+var cell_1_title= new Array(73)
+cell_1_title[0]='Open Perspective';
+cell_1_title[1]='Open C/C++ Perspective';
+cell_1_title[2]='Create New Project';
+cell_1_title[3]='New Project Wizard';
+cell_1_title[4]='SPU Project Name';
+cell_1_title[5]='SPU Project Type';
+cell_1_title[6]='SPU Properties';
+cell_1_title[7]='Directories';
+cell_1_title[8]='Add Directory';
+cell_1_title[9]='Create New Source File';
+cell_1_title[10]='New Source Files Name';
+cell_1_title[11]='Enter Source Code';
+cell_1_title[12]='Source Code Compiled';
+cell_1_title[13]='Create PPU Project';
+cell_1_title[14]='Type project name';
+cell_1_title[15]='Select Project Type';
+cell_1_title[16]='Select Project References';
+cell_1_title[17]='Configure PPU Project Properties';
+cell_1_title[18]='C/C++ Build Option Page';
+cell_1_title[19]='Manage Configurations Page';
+cell_1_title[20]='PPU Linker Libraries';
+cell_1_title[21]='Add Library';
+cell_1_title[22]='Add Embed SPU Input';
+cell_1_title[23]='Select Workspace';
+cell_1_title[24]='Select File';
+cell_1_title[25]='Other Settings';
+cell_1_title[26]='Create Source File';
+cell_1_title[27]='Source File Name';
+cell_1_title[28]='Enter Source Code';
+cell_1_title[29]='Create Sim';
+cell_1_title[30]='Sim Config';
+cell_1_title[31]='Simulator Tab Config';
+cell_1_title[32]='Start Sim';
+cell_1_title[33]='Sim Starting';
+cell_1_title[34]='Debug...';
+cell_1_title[35]='Create New Configuration';
+cell_1_title[36]='Main Tab';
+cell_1_title[37]='C/C++ Application';
+cell_1_title[38]='Target Selection Tab';
+cell_1_title[39]='Launch Tab';
+cell_1_title[40]='Synchronize Tab';
+cell_1_title[41]='Debugger Tab';
+cell_1_title[42]='The Debug Perspective';
+cell_1_title[43]='C/C++ Perspective';
+cell_1_title[44]='spu.c Source Code';
+cell_1_title[45]='SUP Modes';
+cell_1_title[46]='Set Pipeline Mode';
+cell_1_title[47]='Run Application';
+cell_1_title[48]='View SPU Stats';
+cell_1_title[49]='Using SPU Timing';
+cell_1_title[50]='SPU Timing Output';
+cell_1_title[51]='Switch Console';
+cell_1_title[52]='Select Simulator TCL Console';
+cell_1_title[53]='TCL Console';
+cell_1_title[54]='Linux Console';
+cell_1_title[55]='ALF API Wizard - New Project';
+cell_1_title[56]='ALF API Wizard cont.';
+cell_1_title[57]='Project Name';
+cell_1_title[58]='General Parameters';
+cell_1_title[59]='Add Buffer';
+cell_1_title[60]='mat_a';
+cell_1_title[61]='mat_b';
+cell_1_title[62]='mat_c';
+cell_1_title[63]='Finish Wizard';
+cell_1_title[64]='New Projects Created';
+cell_1_title[65]='Create New Launcher';
+cell_1_title[66]='Synchronize Tab';
+cell_1_title[67]='Browse Workspace';
+cell_1_title[68]='Select SO File';
+cell_1_title[69]='Run Application';
+cell_1_title[70]='Eclipse Preferences';
+cell_1_title[71]='Cell IDE Preferences';
+cell_1_title[72]='Finished';
+
+function mid() {	
+					document.back.src='images/icon_back.png';
+					document.back.title='Back';
+					
+					document.home.src='images/icon_first.png';
+					document.home.title='Start Over';
+					
+					document.next.src='images/icon_forward.png';
+					document.next.title='Next';
+
+					document.back2.src='images/icon_back.png';
+					document.back2.title='Back';
+					
+					document.home2.src='images/icon_first.png';
+					document.home2.title='Start Over';
+					
+					document.next2.src='images/icon_forward.png';
+					document.next2.title='Next';
+				 };
+				 
+function beg() {
+					document.back.src='images/clear.gif';
+					document.back.title='';
+					
+					document.home.src='images/clear.gif';
+					document.home.title='';
+					
+					document.next.src='images/icon_forward.png';
+					document.next.title='Next';
+
+					document.back2.src='images/clear.gif';
+					document.back2.title='';
+					
+					document.home2.src='images/clear.gif';
+					document.home2.title='';
+					
+					document.next2.src='images/icon_forward.png';
+					document.next2.title='Next';
+				 };
+				 
+function end() {	
+					document.back.src='images/icon_back.png';
+					document.back.title='Back';
+					
+					document.home.src='images/icon_first.png';
+					document.home.title='Start Over';
+					
+					document.next.src='images/clear.gif';
+					document.next.title='';
+
+					document.back2.src='images/icon_back.png';
+					document.back2.title='Back';
+					
+					document.home2.src='images/icon_first.png';
+					document.home2.title='Start Over';
+					
+					document.next2.src='images/clear.gif';
+					document.next2.title='';
+				 };
+
+function disp() {
+	
+	textFrame.location.href = cell_1_text[pagePosition];
+
+	document.screen.alt = cell_1_title[pagePosition];
+	document.screen.src = cell_1_images[pagePosition];
+	document.getElementById('pageNumber').innerHTML = 'Page ' + (pagePosition + 1) + ' of ' + (endPage + 1);
+	document.location.href="#topOfPage";
+}
+
+
+function go(type){
+	if(type=="next"){
+		if ( pagePosition == begPage ) { mid(); };
+		if ( pagePosition  < endPage ) { pagePosition++; disp(); };
+		if ( pagePosition == endPage ) { end(); };
+		disp();
+	};
+
+	if(type=="back"){
+		if ( pagePosition == endPage ) { mid(); };
+		if ( pagePosition  > begPage ) { pagePosition--; disp(); };
+		if ( pagePosition == begPage ) { beg(); };
+	};
+
+	if(type=="beginning"){
+		pagePosition = begPage;
+		disp();
+		beg();
+	};
+}
+</script>
+
+</head>
+<body bgcolor="white">
+<a name="topOfPage"></a>
+<center>
+<h2>IBM SDK for Multicore Acceleration IDE - Introductory Tutorial</h2>
+<div id="pageNumber">Page <script>document.write(pagePosition + 1);</script> of <script>document.write(endPage + 1);</script></div>
+<a href="ide_tutorial_toc.htm">Table of Contents</a>
+<table width="600px" border="0" cellspacing="0" summary="">
+	<tr>
+		<td><img src="images/clear.gif" align="left" width="22" height="22" onClick="go('back');" title="" name="back"></td>
+		<td><center><img src="images/clear.gif" width="22" height="22" onClick="go('beginning');" title="" name="home"></center></td>
+		<td><img src="images/icon_forward.png" align="right" width="22" height="22" onClick="go('next');" title="Next" name="next" ></td>
+	</tr>
+</table>
+<IFRAME name="textFrame" SRC="text/cell_01.htm" TITLE="IDE Tutorial" MARGINWIDTH=0 MARGINHEIGHT=0 width=800 height=250 frameborder=0 SCROLLING=AUTO></IFRAME>
+<p><img src="images/cell_01.jpg" align="center" width="865" height="525" alt="Eclipse" name="screen" ></p>
+
+<table width="600px" border="0" cellspacing="0" summary="">
+	<tr>
+		<td><img src="images/clear.gif" align="left" width="22" height="22" onClick="go('back');" title="" name="back2"></td>
+		<td><center><img src="images/clear.gif" width="22" height="22" onClick="go('beginning');" title="" name="home2"></center></td>
+		<td><img src="images/icon_forward.png" align="right" width="22" height="22" onClick="go('next');" title="Next" name="next2" ></td>
+	</tr>
+</table>
+</center>
+</body>
+<script language="JavaScript">
+
+page_index = getUrlParameter("page_index");
+
+if( page_index !== "" && page_index != 0) {
+	pagePosition = new Number(page_index);
+	if(pagePosition == begPage){ beg(); } else if(pagePosition == endPage){ end(); } else { mid(); }
+}
+
+disp();
+</script>
+</html>

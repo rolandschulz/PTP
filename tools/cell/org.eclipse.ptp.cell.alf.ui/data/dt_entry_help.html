@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Data Transfer Entries Help</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body bgcolor="white">
+<h2>Data Transfer Entries</h2>
+<p>The partitions will be eventually turned into a series of <b>data transfer entries</b>. 
+After partitioning, each buffer/array must have an equal number of data transfer entries.</p>
+<p>The number of data transfer (DT) entries for a buffer is computed as follows:<ul>
+<li>One dimensional: # DT = (dimension_size_x / distribution_size_x)</li>
+<li>Two dimensional: # DT = (dimension_size_x / distribution_size_x) * (dimension_size_y / distribution_size_y)</li>
+<li>Three dimensional: # DT = (dimension_size_x / distribution_size_x) * (dimension_size_y / distribution_size_y) * (dimension_size_z / distribution_size_z)</li>
+</ul></p>
+<p>The following examples illustrate some valid and invalid data distributions for the arrays: A[1024][512] and B[512][128].
+<ul>
+<li>(CYCLIC(512), CYCLIC(16)) onto A, and (CYCLIC(128), CYCLIC(8)) onto B is valid, because the number of DT entries for these two distributions
+are equal. (For A, the number of DT entries are (1024 / 512) * (512 / 16), and for B, the number of DT entries are (512 / 128) * (128 / 8))</li>
+<li>(*, CYCLIC(16)) onto A, and (CYCLIC(128), CYCLIC(16)) onto B is valid, because the number of DT entries for these distributions are equal (32).</li>
+<li>(CYCLIC(512), CYCLIC(16)) onto A, and (CYCLIC(128), CYCLIC(16)) onto B is invalid, because the number of DT entries for these two distributions is not equal.</li>
+</ul>
+</p>
+</body>
+</html>

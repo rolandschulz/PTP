@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Tutorial</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body>
+<h3>Edit Source File</h3>
+
+<p>A new editor will appear so you can enter your source code. Copy/Paste the following source code into your editor (we will uncomment the commented lines later): </p>
+<pre>#include &#60;stdio.h&#62;
+#include &#60;profile.h&#62;<br>
+int main(unsigned long long id)
+{
+  //prof_clear();
+  //prof_start();
+  printf("Hello Cell (0x%llx)\n", id);
+  //prof_stop();
+
+  return 0;
+}
+ 
+</body>
+</html>

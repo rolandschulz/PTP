@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>IBM SDK for Multicore Acceleration IDE</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body bgcolor="white"><p>
+<h3>How-to: Public Key Based Authentication Using OpenSSH</h3>
+<p>
+IBM's SDK for Multicore Acceleration IDE establishes connections to remote cell environments using Secure Shell (SSH).
+Two SSH authentication methods are supported: password based and public key based. This document explains how to configure your client and server (as well 
+as how to configure the Cell IDE's environments) to use the public key authentication method.
+<h4>Verify Software</h4>
+First, confirm that OpenSSH is the SSH software installed on the client system. Public key generation may me different under different implementations
+of SSH. The <b>ssh -V</b> command will print the version of your SSH software:
+<pre> > $ ssh -V
+  OpenSSH_4.3p2, OpenSSL 0.9.8b 04 May 2006
+</pre>
+
+<h4>Key Generation</h4>
+A RSA public/private key pair must be generated on the client system. The public key will be copied to the remote server that is 
+being connected to, while the private key will remain on the client machine in a secure location. The key pair generation is done using the <b>ssh-keygen</b> command:
+<pre> client$ mkdir ~/.ssh
+ client$ chmod 700 ~/.ssh
+ client$ ssh-keygen -q -f ~/.ssh/id_rsa -t rsa
+ Enter passphrase (empty for no passphrase): 
+ Enter same passphrase again:
+</pre>
+
+<h4>Key Distribution</h4>
+Next, the public key <b>~/.ssh/id_rsa.pub</b> needs to be copied to the remote server. Once the public key has been copied, you will 
+then append the key's contents to the file <b>~/.ssh/authorized_keys</b>:
+<pre> client$ scp ~/.ssh/id_rsa.pub user@server.example.com:
+ client$ ssh user@server.example.com
+ 
+  server$ mkdir ~/.ssh
+  server$ chmod 700 ~/.ssh
+  server$ cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
+  server$ chmod 600 ~/.ssh/authorized_keys
+  server$ rm ~/id_rsa.pub 
+</pre>
+
+<h4>Confirm Functionality</h4>
+Confirm that the public key authentication method is working by attempting to connect to the server. If the public key authentication method is being used, 
+then you will be asked for the passphrase when you connect:
+<pre> client$ ssh -o PreferredAuthentications=publickey user@server.example.edu
+ Enter passphrase for key '/home/user/.ssh/id_rsa':
+</pre>
+<h4>Cell Environment Configuration</h4>
+Finally, the Cell Environment inside the Cell IDE needs to be configured. Note that public key authentication can be used on any of the Cell target environment types
+except for the <b>Local Cell Simulator</b> type. The following steps explain how to configure your Cell Environment:
+<ul>
+<li>In Eclipse, open the <b>Cell Environments</b> view</li>
+<li>Open the cell environment's configuration window by either creating a new environment (right click on environment type and select <b>Create</b>) 
+or by editing an existing environment (right click on existing environment and select <b>Edit</b>)</li>
+<li>Select the option <b>Public key based authentication</b></li>
+<li>Press the <b>Browse</b> button next to the field <b>File with private key</b>, and select the private key file <b>~/.ssh/id_rsa</b></li>
+<li>Enter the passphrase that you entered when you created the public/private key pair</li>
+<li>Click <b>Finish</b> and start the environment using the green start arrow</li>
+</ul>
+</p>
+</body>
+</html>

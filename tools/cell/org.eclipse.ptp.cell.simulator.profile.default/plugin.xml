@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.cell.simulator.profile">
+      <profile
+            id="default"
+            name="Default Simulator">
+         <script path="simulator_init.tcl"/>
+         <file path="ssh_host_dsa_key"/>
+         <file path="ssh_host_dsa_key.pub"/>
+         <file path="ssh_host_rsa_key"/>
+         <file path="ssh_host_rsa_key.pub"/>
+         <file path="sshd_config"/>
+         <file path="configure.sh"/>
+      </profile>
+   </extension>
+
+
+</plugin>

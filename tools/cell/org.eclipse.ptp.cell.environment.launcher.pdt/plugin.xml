@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.cell.environment.launcher.pdt.ui.TargetLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.cell.environment.launcher.pdt.launchConfigurationTabGroup1"
+            type="org.eclipse.ptp.cell.environment.launcher.cellPdtLaunch">
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.eclipse.ptp.cell.environment.launcher.pdt.internal.PdtRemoteLaunchDelegate"
+            id="org.eclipse.ptp.cell.environment.launcher.cellPdtLaunch"
+            modes="profile"
+            name="%LaunchConfigurationTypeName"
+            public="true">
+      </launchConfigurationType>
+   </extension>
+	<extension
+			point="org.eclipse.ptp.remotetools.environment.launcher.launchConfigurationMacroSupplier">
+		<launchConfigurationMacroSupplier
+				id="org.eclipse.ptp.cell.environment.launcher.defaultCellLaunchMacroSupplier"
+				configTypeId="org.eclipse.ptp.cell.environment.launcher.cellPdtLaunch"
+				class="org.eclipse.ptp.cell.environment.launcher.cellbe.macros.DefaultTargetLaunchMacroSupplier">
+		</launchConfigurationMacroSupplier>
+	</extension>
+</plugin>

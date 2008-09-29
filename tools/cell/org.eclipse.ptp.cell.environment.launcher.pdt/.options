@@ -1,0 +1,34 @@
+# Debugging options for the $(plugin id) plugin.
+
+# Turns on debugging for the $(plugin id) plugin.
+# Also displays bundles overall start/stop time.
+org.eclipse.ptp.cell.environment.launcher.pdt/debug = false
+
+# Turns on launcher
+org.eclipse.ptp.cell.environment.launcher.pdt/debug/launcher = false
+
+# Turns on launcher/environment.
+org.eclipse.ptp.cell.environment.launcher.pdt/debug/launcher/variables = false
+
+org.eclipse.ptp.cell.environment.launcher.pdt/debug/profileintegration = false
+
+org.eclipse.ptp.cell.environment.launcher.pdt/debug/profileintegration/variables = false
+
+org.eclipse.ptp.cell.environment.launcher.pdt/debug/gui = false
+
+# And so on...
+# ...
+# ...
+# ...
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.environment.launcher.pdt/trace/id = launcher.pdt
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.environment.launcher.pdt/trace/thread = true
+
+# Displays the time stamp on debug message
+org.eclipse.ptp.cell.environment.launcher.pdt/trace/timestamp = true
+
+# Enable frequent debug option re-checking.
+org.eclipse.ptp.cell.environment.launcher.pdt/trace/dynamic = true

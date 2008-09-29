@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.ptp.cell.pdt.xml.PdtXmlCategory"
+            name="%PDTCategoryWizardName">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.ptp.cell.pdt.xml.PdtXmlCategory"
+            class="org.eclipse.ptp.cell.pdt.xml.wizard.CellPdtXmlWizard"
+            hasPages="true"
+            id="org.eclipse.ptp.cell.pdt.xml.wizard.cell"
+            name="%PDTConfigCellWizardName"
+            project="false">
+         <description>
+         	%PDTConfigCellWizardDescription
+         </description>
+      </wizard>
+      <!--<wizard
+            canFinishEarly="false"
+            category="org.eclipse.ptp.cell.pdt.xml.PdtXmlCategory"
+            class="org.eclipse.ptp.cell.pdt.xml.wizard.X86PdtXmlWizard"
+            hasPages="true"
+            id="org.eclipse.ptp.cell.pdt.xml.wizard.x86"
+            name="Configuration File For x86"
+            project="false">
+         <description>
+            This wizard creates a XML configuration file for the PDT tool using x86 as the target architecture
+         </description>
+      </wizard> -->
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.cell.pdt.xml.preferences.ui.PdtPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="PDT"
+            class="org.eclipse.ptp.cell.pdt.xml.preferences.ui.PdtPreferencesPage"
+            id="org.eclipse.ptp.cell.pdt.xml.preferences.ui.PdtPreferencesPage"
+            name="%PDTPreferencePageName">
+      </page>
+   </extension>
+
+</plugin>

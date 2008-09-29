@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="%CellPreferencePageName"
+            class="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage"
+            id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage">
+      </page>
+      <page
+            category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage"
+            class="org.eclipse.ptp.cell.preferences.ui.CellEnvironmentPreferencePage"
+            id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.EnvironmentPreferencePage"
+            name="%EnvironmentPreferencePageName"/>
+      <page
+            category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage"
+            class="org.eclipse.ptp.cell.preferences.ui.CellSPUTimingPreferencePage"
+            id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.SPUTimingPreferencePage"
+            name="%SPUTimingPreferencePageName"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.cell.preferences.ui.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

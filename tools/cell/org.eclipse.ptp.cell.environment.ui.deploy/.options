@@ -1,0 +1,21 @@
+# Debugging options for the org.eclipse.ptp.cell.environment.ui.deploy plugin
+
+# Turn on general debugging for the org.eclipse.ptp.cell.environment.ui.deploy plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.environment.ui.deploy/debug = false
+
+# Turn on tracing on jobs executed from wizards.
+org.eclipse.ptp.cell.environment.ui.deploy/debug/jobs = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.environment.ui.deploy/trace/id = ui.deploy
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.environment.ui.deploy/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.environment.ui.deploy/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.environment.ui.deploy/trace/dynamic = False

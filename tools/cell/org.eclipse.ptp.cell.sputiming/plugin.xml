@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="observerpoint" name="%SPUTimingExtensionPointName" schema="schema/sputiming.exsd"/>
+   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.eclipse.ptp.cell.sputiming.core.LaunchConfigurationDelegate"
+            id="org.eclipse.ptp.cell.spuTiming.launch"
+            modes="run, debug"
+            name="%SPUTimingLauncher.name"
+            public="true"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.cell.sputiming.ui.SPUTimingLauncherTabGroup"
+            description="%SPUTimingLauncher.description"
+            id="org.eclipse.ptp.cell.sputiming.launchConfigurationTabGroup.spuTiming"
+            type="org.eclipse.ptp.cell.spuTiming.launch"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.eclipse.ptp.cell.sputiming"
+            nameFilter="*.c*"
+            objectClass="org.eclipse.cdt.core.model.ICElement">
+         <menu
+               id="org.eclipse.ptp.cell.sputiming.menu"
+               label="%SPUTimingFileContextPopupMenu.label"
+               path="additions">
+            <groupMarker name="org.eclipse.ptp.cell.sputiming.groupMarker2"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.cell.sputiming.core.SPUTimingPopupAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.cell.sputiming.popup"
+               label="%SPUTimingFileContextPopupMenu.Launch.label"
+               menubarPath="org.eclipse.ptp.cell.sputiming.menu/groupMarker2"
+               tooltip="%SPUTimingFileContextPopupMenu.Launch.tooltip"/>
+      </objectContribution>
+   </extension>
+
+</plugin>

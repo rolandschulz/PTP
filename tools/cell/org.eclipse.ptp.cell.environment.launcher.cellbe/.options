@@ -1,0 +1,24 @@
+# Debugging options for the org.eclipse.ptp.cell.environment.launcher.cellbe plugin
+
+# Turn on general debugging for the org.eclipse.ptp.cell.environment.launcher.cellbe plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.environment.launcher.cellbe/debug = false
+
+# Turn on tracing on variables used by the launcher
+org.eclipse.ptp.cell.environment.ui.deploy/debug/variables = false
+
+# Turn on tracing on integration delegates used by the launcher
+org.eclipse.ptp.cell.environment.ui.deploy/debug/integration = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.environment.launcher.cellbe/trace/id = launcher.cellbe
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.environment.launcher.cellbe/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.environment.launcher.cellbe/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.environment.launcher.cellbe/trace/dynamic = False

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.ptp.cell.preferences;singleton:=true
+Bundle-Version: 3.1.0.qualifier
+Bundle-Activator: org.eclipse.ptp.cell.preferences.PreferencesPlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.cell.utils,
+ org.eclipse.ptp.remotetools.utils
+Eclipse-AutoStart: true
+Export-Package: org.eclipse.ptp.cell.preferences,
+ org.eclipse.ptp.cell.preferences.core,
+ org.eclipse.ptp.cell.preferences.events,
+ org.eclipse.ptp.cell.preferences.ui

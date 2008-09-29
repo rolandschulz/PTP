@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+	<!-- -->
+	<!-- Project Configuration Extension-point -->
+	<!-- -->
+	
+	<!-- We will create an extension-point to describe the available projects to be imported -->
+	<extension-point
+			id="exampleProjectCreationWizard"
+			name="%Example.cell.wizard.extension"
+			schema="schema/exampleProjectCreationWizard.exsd">
+	</extension-point>
+
+	<!-- -->
+	<!-- Contribute a New->Example... entry for Cell Development Toolkit Managed Builder Examples -->
+	<!-- -->
+
+	<!-- define the Cell Development Toolkit Managed Builder Examples project wizard category -->
+	<extension
+			point="org.eclipse.ui.newWizards">
+		<category
+				id="org.eclipse.ptp.cell.examples.ui.category"
+				name="%Example.cell.wizard.category"
+				parentCategory="org.eclipse.ui.Examples">
+		</category>
+	</extension>
+
+</plugin>

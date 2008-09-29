@@ -1,0 +1,24 @@
+# Debugging options for the org.eclipse.ptp.cell.managedbuilder.xl.ui plugin
+
+# Turns on general debugging for the org.eclipse.ptp.cell.managedbuilder.xl.ui plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.managedbuilder.xl.ui/debug = false
+
+# Turns on general debugging of option handlers.
+org.eclipse.ptp.cell.managedbuilder.xl.ui/debug/handler = false
+
+# Turns on general debugging of toolchain support.
+org.eclipse.ptp.cell.managedbuilder.xl.ui/debug/support = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.managedbuilder.xl.ui/trace/id = xl.ui
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.managedbuilder.xl.ui/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.managedbuilder.xl.ui/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.managedbuilder.xl.ui/trace/dynamic = False

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="CellRemoteDebugger" name="%CellRemoteDebugger" schema="schema/CellRemoteDebugger.exsd"/>
+   <!--
+	<extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.eclipse.ptp.cell.debug.launch.LocalCellCDILaunchDelegate"
+            id="org.eclipse.ptp.cell.debug.launch.remoteCellDebugDelegate"
+            modes="debug"
+            name="Local Cell BE Debug w/ remote gdbserver Launch"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.ptp.cell.debug.launch.remoteCellDebugDelegate"
+            icon="icons/iprocess.gif"
+            id="org.eclipse.ptp.cell.debug.launch.CellDebugLaunchConfigurationImage"/>
+   </extension>
+   -->
+   <extension
+         point="org.eclipse.cdt.debug.core.CDebugger">
+      <debugger
+            class="org.eclipse.ptp.cell.debug.cdi.SPUGDBServerCDIDebugger"
+            cpu="*"
+            id="org.eclipse.ptp.cell.debug.cdi.spuGDBServerCDIDebugger"
+            modes="run"
+            name="Cell SPU gdbserver gdb/mi"
+            platform="*"/>
+      <debugger
+            class="org.eclipse.ptp.cell.debug.cdi.PPUGDBServerCDIDebugger"
+            cpu="*"
+            id="org.eclipse.ptp.cell.debug.cdi.ppuGDBServerCDIDebugger"
+            modes="run"
+            name="Cell PPU gdbserver gdb/mi"
+            platform="*"/>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.debug.mi.core.commandFactories">
+      <commandFactory
+            class="org.eclipse.cdt.debug.mi.core.command.factories.StandardCommandFactory"
+            debuggerID="org.eclipse.ptp.cell.debug.cdi.ppuGDBServerCDIDebugger"
+            id="org.eclipse.ptp.cell.debug.cdi.ppuStandardCommandFactory"
+            miVersions="mi,mi1,mi2"
+            name="%StandardCommandFactory.name"
+            platforms="*"/>
+      <!--
+      <commandFactory
+            class="org.eclipse.cdt.debug.mi.core.command.factories.linux.StandardLinuxCommandFactory"
+            debuggerID="org.eclipse.ptp.cell.debug.cdi.ppuGDBServerCDIDebugger"
+            id="org.eclipse.ptp.cell.debug.cdi.ppuStandardLinuxCommandFactory"
+            miVersions="mi,mi1,mi2"
+            name="%StandardLinuxCommandFactory.name"
+            platforms="linux"/>
+      -->
+      <commandFactory
+            class="org.eclipse.cdt.debug.mi.core.command.factories.StandardCommandFactory"
+            debuggerID="org.eclipse.ptp.cell.debug.cdi.spuGDBServerCDIDebugger"
+            id="org.eclipse.ptp.cell.debug.cdi.spuStandardCommandFactory"
+            miVersions="mi,mi1,mi2"
+            name="%StandardCommandFactory.name"
+            platforms="*"/>
+      <!--
+      <commandFactory
+            class="org.eclipse.cdt.debug.mi.core.command.factories.linux.StandardLinuxCommandFactory"
+            debuggerID="org.eclipse.ptp.cell.debug.cdi.spuGDBServerCDIDebugger"
+            id="org.eclipse.ptp.cell.debug.cdi.spuStandardLinuxCommandFactory"
+            miVersions="mi,mi1,mi2"
+            name="%StandardLinuxCommandFactory.name"
+            platforms="linux"/>
+      -->
+   </extension>
+  
+</plugin>

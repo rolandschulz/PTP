@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+	<extension
+			id="XLCErrorParser"
+			name="XLC Error Parser"
+			point="org.eclipse.cdt.core.ErrorParser">
+		<errorparser
+				class="org.eclipse.ptp.cell.internal.errorparsers.XLCErrorParser">
+		</errorparser>
+	</extension>
+
+	<extension
+			point="org.eclipse.core.variables.dynamicVariables">
+
+		<variable
+				name="timestamp"
+				description="%TimestampVariableDescription"
+				resolver="org.eclipse.ptp.cell.core.variables.TimestampResolver">
+		</variable>
+		
+	</extension>
+
+</plugin>

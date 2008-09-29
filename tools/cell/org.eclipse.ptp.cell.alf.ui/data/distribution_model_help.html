@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Distribution Model Help</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body bgcolor="white">
+<h1>Distribution Model</h1>
+<p>The <b>distribution model</b> fields are used (as a hint) to indicate how the data (for each dimension of an array) 
+is to be distributed amongst the accelerator nodes. Each dimension of an array may be distributed in one of three ways:
+<ul>
+	<li><b>*</b>: No distribution</li>
+	<li><b>BLOCK</b>: Block distribution</li>
+	<li><b>CYCLIC</b>: Cyclic distribution</li> 
+</ul>
+</p>
+<h3>BLOCK</h3>
+<p>
+<b>BLOCK</b> distribution divides the indices of a dimension into contiguous, equal-sized blocks of size N/P,
+where N is the number of elements in the array dimension and P is the number of expected accelerator nodes. The <b>distribution size</b> field
+is automatically computed (cannot be changed), and is set to N/P.</p>
+<p>
+Note: for <b>BLOCK</b> data distribution, the expected number of accelerator nodes must be exact - the expected number 
+of accelerator nodes cannot be set to <b>0 (all available)</b>.
+</p><br>
+<p>
+<center>
+<img src="images/figure_1.bmp" alt="Cannot load figure 1"><br>
+Figure 1: A 1-dimensional array using <b>BLOCK</b> distribution with 4 accelerator nodes.<br><br>
+<img src="images/figure_2.bmp" alt="Cannot load figure 2"><br>
+Figure 2: A 2-dimensional array using <b>BLOCK</b> distribution with 4 accelerator nodes.<br><br>
+<img src="images/figure_3.bmp" alt="Cannot load figure 3"><br>
+Figure 3: A 3-dimensional array using <b>BLOCK</b> distribution with 4 accelerator nodes.<br><br>
+</center>
+</p>
+<h3>CYCLIC</h3>
+<p>
+<b>CYCLIC</b> distribution distributes the elements of a dimension evenly among the accelerator nodes in a round robin fashion. The 
+<b>distribution size</b> (entered by the user) determines how many elements are to be distributed to each accelerator node. The 
+user defined <b>distribution size</b> must be an integer between 1 and the size of the dimension.<br></p>
+<p>
+Note: the <b>CYCLIC</b> data distribution model can only be used when the dimension of the array is 1 or 2.
+</p><br>
+<p>
+<center>
+<img src="images/figure_4.bmp" alt="Cannot load figure 4"><br>
+Figure 4: A 1-dimensional array using <b>CYCLIC</b> distribution with 4 accelerator nodes.<br><br>
+<img src="images/figure_5.bmp" alt="Cannot load figure 5"><br>
+Figure 5: A 2-dimensional array using <b>CYCLIC</b> distribution with 4 accelerator nodes.<br><br>
+</center>
+</p>
+</body>
+</html>

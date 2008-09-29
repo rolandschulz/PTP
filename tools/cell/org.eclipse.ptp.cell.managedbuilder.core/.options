@@ -1,0 +1,30 @@
+# Debugging options for the org.eclipse.ptp.cell.managedbuilder.core plugin
+
+# Turn on general debugging for the org.eclipse.ptp.cell.managedbuilder.core plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.managedbuilder.core/debug = false
+
+# Turn on tracing on makefile generator.
+org.eclipse.ptp.cell.managedbuilder.core/debug/makefile = false
+
+# Turn on tracing on option handler.
+org.eclipse.ptp.cell.managedbuilder.core/debug/handler = false
+
+# Turn on tracing on option applicability handler.
+org.eclipse.ptp.cell.managedbuilder.core/debug/applicability = false
+
+# Turn on tracing on environment supplier..
+org.eclipse.ptp.cell.managedbuilder.core/debug/supplier = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.managedbuilder.core/trace/id = managedbuilder.core
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.managedbuilder.core/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.managedbuilder.core/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.managedbuilder.core/trace/dynamic = False

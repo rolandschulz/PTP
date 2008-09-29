@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="org.eclipse.ptp.cell.environment.ui.deploy.events"
+            targetID="org.eclipse.ptp.cell.environment.ui.views.CellEnvironmentView">
+         <action
+               class="org.eclipse.ptp.cell.environment.ui.deploy.events.ManageEnvironmentAction"
+               enablesFor="*"
+               icon="icons/manage.png"
+               id="org.eclipse.ptp.cell.environment.ui.deploy.events.ManageEnvironmentAction"
+               label="%ManageEnvironmentActionLabel"
+               style="push"
+               toolbarPath="Normal"
+               tooltip="%ManageEnvironmentActionToolTip">
+         </action>
+      </viewContribution>
+   </extension>
+
+</plugin>

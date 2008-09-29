@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.ptp.cell.alf.ui.ALFcategory"
+            name="%alfCategoryName"/>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.ptp.cell.alf.ui.ALFcategory"
+            class="org.eclipse.ptp.cell.alf.ui.wizard.ALFWizard"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            hasPages="true"
+            id="org.eclipse.ptp.cell.alf.ui.wizard"
+            name="%alfWizardName"
+            project="true">
+         <description>
+					%alfWizardDescription
+		 </description>
+      </wizard>
+   </extension>
+
+</plugin>

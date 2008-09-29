@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Linux)">
+	<META NAME="CREATED" CONTENT="20070326;10573700">
+	<META NAME="CHANGED" CONTENT="20070326;18320500">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 21.59cm 27.94cm; margin: 2cm }
+		H1 { margin-top: 0.1cm; margin-bottom: 0.1cm; background: #cccccc; page-break-before: auto; page-break-after: auto }
+		H1.western { font-family: "Nimbus Sans L", sans-serif; font-size: 10pt; so-language: en-US }
+		H1.cjk { font-family: "DejaVu Sans"; font-size: 16pt }
+		H1.ctl { font-family: "DejaVu Sans"; font-size: 16pt }
+		P { margin-bottom: 0.15cm; background: transparent }
+		P.western { font-size: 10pt; so-language: en-US }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="pt-BR" DIR="LTR">
+<H1 LANG="en-US" CLASS="western">Environment variables to launch
+systemsim:</H1>
+<UL>
+	<LI><P LANG="en-US" CLASS="western"><B>SYSTEMSIM_TOP</B></P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_NET_API_PORT: </B>TCP
+	socket port on localhost where simulator will listen for connections
+	with TCL commands. Eclipse Cell IDE will connect connect to this
+	port. Optional, <U>default is 8800</U>.</P>
+</UL>
+<H1 LANG="en-US" CLASS="western">Environment variables, provided by
+systemsim itself:</H1>
+<MULTICOL ID="Se&ccedil;&atilde;o1" DIR="LTR" COLS=2 GUTTER=19>
+	<UL>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>EXEC_DIR</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>LIB_DIR</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>IMAGES_DIR</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>TCL_LIBRARY</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>TK_LIBRARY</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>SYSTEMSIM_TOP</B></P>
+	</UL>
+</MULTICOL>
+<H1 LANG="en-US" CLASS="western">Environment variables to customize
+the launch:</H1>
+<UL>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_CPU_CONFIG: </B>A set
+	of TCL commands that create the machine configuration, that must
+	called myconf. The commands are separated by semicolon. Optional,
+	default is single processor Cell.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_MEMORY_SIZE: </B>The
+	amount of memory for the simulated machine, in MB. Optional, default
+	is 256MB.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_KERNEL_IMAGE: </B>Path
+	to image file for the OS kernel. Optional, default is the kernel
+	image provided by systemsim-cell in IMAGES_DIR.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_ROOT_IMAGE: </B>Path
+	to image file for the root file system. Optional, default is the
+	root image provided by systemsim-cell in IMAGES_DIR.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_ROOT_PERSISTENCE:</B>
+	Flag if changes on the root file system are to be saved or
+	discarted. Valid values are discard (forget all changes after
+	simulator finishes), write (write directly on the image file) and
+	journal (write changes on a journal file). Optional, default is
+	“discard”. An option will be implemented: "readonly"</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_ROOT_JOURNAL:</B> If
+	CELL_ROOT_PERSISTENCE is journal, gives the file that will record
+	changes on root file system. Optional, default is the image file
+	name, appended with .changes.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_EXTRA_IMAGE:</B> Path
+	to image file or device with an alternative file system. DANGER:
+	this file system MUST NOT be already mounted. Optional, default is
+	no extra image.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_EXTRA_MOUNTPOINT:</B> 
+	Path where the alternative file system will be mounted. Optional, default is
+	/mnt. If the path already exists, then the previous content on that
+	path will be hidden and replaced by the image content.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_EXTRA_TYPE:</B> 
+	File system type of the alternative image. Currently, the simulator 
+	does not support automatic type detection. Optional, default is
+	ext2. The only supported types are: iso9600 and ext2.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_EXTRA_PERSISTENCE:</B>
+	Flag if changes on the alternative file system are to be saved or
+	discarded. Valid values are the same as for CELL_ROOT_PERSISTENCE.
+	Optional, default is “discard”.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_EXTRA_JOURNAL: </B>If
+	CELL_EXTRA_PERSISTENCE is journal, gives the file that will record
+	changes on alternative file system. Optional, default is the image
+	file name, appended with .changes.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_NET_INIT: </B>Flag if
+	bogusnet should be configured or not. The user is required to own
+	permissions to create tun/tap devices. Valid values are true or
+	false. Optional, default is false.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_SSH_INIT: </B>Flag if
+	the ssh server will be started. Valid values are true or false.
+	Optional, default is false. This parameter is considered only if
+	CELL_NET_INIT is true.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_NET_IP_HOST</B>,
+	<B>CELL_NET_IP_SIMULATOR:</B> IP addresses for the virtual network
+	between the simulator and the host. Optional, default is 172.20.0.10
+	for CELL_NET_IP_HOST and 172.20.0.20 for CELL_NET_IP_SIMULATOR.
+	Required to run more than one instance of the simulator
+	simultaneously. This parameter is considered only if CELL_NET_INIT
+	is true.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_NET_MAC_SIMULATOR: </B>MAC
+	address for virtual network interface for the simulator. <U>Optional,
+	is and automatically calculated value, based on the IP address.
+	</U>Required to run more than one instance of the simulator
+	simultaneously. This parameter is considered only if CELL_NET_INIT
+	is true.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_NET_MASK: </B>
+	Subnetwork mask for virtual network interface for the simulator. 
+	Optional, default is 255.255.0.0. This parameter is considered only if CELL_NET_INIT
+	is true.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_CONSOLE_PORT:</B> TCP
+	socket port on localhost where simulator console will listen in
+	order to provide the a terminal that boots the simulator. Eclipse
+	Cell IDE will connect connect to this port. Optional, default
+	showing the terminal using xterm instead of a socket.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_CONSOLE_ECHO: </B>Flag
+	if the simulator terminal echoes input. Eclipse Cell IDE will set to
+	false since its own console already echoes the typed chars.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>CELL_CONSOLE_COMMANDS: </B>A string of extra bash commands that are to be executed when the simulator finishes launching.</P>
+</UL>
+<H1 LANG="en-US" CLASS="western">Internal variables:</H1>
+<MULTICOL ID="Se&ccedil;&atilde;o2" DIR="LTR" COLS=2 GUTTER=19>
+	<UL>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>CELL_WORKDIR</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>CELL_VAR_DIR</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>CELL_USERNAME</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>CELL_USERID</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>CELL_EXTRA_INIT</B></P>
+		<LI><P LANG="en-US" CLASS="western" STYLE="margin-bottom: 0cm"><B>CELL_CONSOLE_INIT</B></P>
+	</UL>
+</MULTICOL>
+<H1 LANG="en-US" CLASS="western">Events notified by simulator
+integration script:</H1>
+<P LANG="en-US" CLASS="western">Error conditions:</P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western"><B>ERROR: <I>Message</I>. </B>The
+	error always exits the simulator.</P>
+</UL>
+<P LANG="en-US" CLASS="western">Simulator launch:</P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western"><B>INIT: Parse. </B>Always. The
+	simulator starts parsing the TCL script.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>INIT: Check. </B>Always. The
+	launch integration script starts checking the environment variables.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>INIT: Configure. </B>Always.
+	The launch integration script starts applying parameters from the
+	environment variables and then creates the log directory.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>INIT: Bogusnet. </B>Always.
+	Only when bogusnet is enabled. The launch integration script starts
+	initializing bogus network.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>INIT: Console. </B>Always.
+	Only when listening to socket for Linux console. The simulator is
+	waiting to receive a TCL connection to provide main Linux console
+	input/output.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>INIT: Configured. </B>All
+	configuration is complete. The simulator starts booting the machine.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>BOOT: Bios. </B>Always. The
+	simulator started booting the bios. No action is done.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>BOOT: Linux.</B> Always. The
+	simulator started booting the Linux kernel. No action is done.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>BOOT: Linux.</B> Always. The
+	simulator started booting the operating system (like Fedora Core).
+	No action is done.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>BOOT: Configure. </B>Always.
+	The simulator started configuring the Linux environment. The launch
+	integration script takes control over the main Linux console to run
+	the configuration script.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>BOOT: Complete. </B>Always.
+	The Linux environment is configured. The launch integration script
+	stops the simulator.</P>
+</UL>
+<P LANG="en-US" CLASS="western">Shutdown:</P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western"><B>SHUTDOWN: Started. </B>The
+	kernel printed the shutdown notification on the main Linux console.
+	The operation system will be shut down and the simulator halted. No
+	action is done.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>SHUTDOWN: Complete. </B>The
+	operation system has shut down and the simulator is halted. The
+	launch integration script will exit the simulator.</P>
+</UL>
+<P LANG="en-US" CLASS="western">Simulator status:</P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western"><B>SIMULATOR: Start. </B>The
+	simulator resumed simulation.</P>
+	<LI><P LANG="en-US" CLASS="western"><B>SIMULATOR: Stop. </B>The
+	simulator paused simulation.</P>
+</UL>
+<H1 LANG="en-US" CLASS="western">Temporary files:</H1>
+<UL>
+	<LI><P LANG="en-US" CLASS="western">./<B>runinfo</B>: Directory.
+	Locks the directory to prevent more than one instance of the
+	simulator to be launched on the same path.</P>
+	<LI><P LANG="en-US" CLASS="western">./runinfo/<B>USERNAME</B>: Text
+	file. The user name of the user who creates the bogusnet.</P>
+	<LI><P LANG="en-US" CLASS="western">./runinfo/<B>USERID</B>: Text
+	file. The user ID of the user who creates the bogusnet.</P>
+	<LI><P LANG="en-US" CLASS="western">./runinfo/<B>NET_MAC_SIMULATOR</B>:
+	Text file. 
+	</P>
+	<LI><P LANG="en-US" CLASS="western">./runinfo/<B>NET_IP_HOST</B>:
+	Text file. 
+	</P>
+	<LI><P LANG="en-US" CLASS="western">./runinfo/<B>NET_IP_SIMULATOR</B>:
+	Text file. 
+	</P>
+	<LI><P LANG="en-US" CLASS="western">./runinfo/<B>NET_TAP_DEVICE:</B>
+	Text file. 
+	</P>
+</UL>
+</BODY>
+</HTML>

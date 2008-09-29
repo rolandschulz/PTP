@@ -1,0 +1,9 @@
+<toc label="IBM SDK for Multicore Acceleration IDE">
+	<topic label="Getting Started">
+		<link toc="toc/toc_gettingStarted.xml"/>
+	</topic>
+	<topic label="Reference">
+		<link toc="toc/toc_reference.xml"/>
+	</topic>
+	<topic label="Legal" href="html/notices.html"/>
+</toc>

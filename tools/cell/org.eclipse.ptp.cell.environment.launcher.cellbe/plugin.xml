@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+	<extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.cell.environment.launcher.cellbe.ui.TargetLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.cell.environment.launcher.cellLaunchConfigurationTabGroup"
+            type="org.eclipse.ptp.cell.environment.launcher.cellLaunch"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.eclipse.ptp.cell.environment.launcher.cellbe.internal.TargetLaunchDelegate"
+            id="org.eclipse.ptp.cell.environment.launcher.cellLaunch"
+            modes="run, debug"
+            name="%LaunchConfigurationType.name"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"/>
+   </extension>
+	<extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.ptp.cell.environment.launcher.cellLaunch"
+            icon="icons/iprocess.png"
+            id="org.eclipse.ptp.cell.environment.launcher.ConfigurationImage"/>
+   </extension>
+
+	<extension
+			point="org.eclipse.ptp.remotetools.environment.launcher.launchConfigurationMacroSupplier">
+		<launchConfigurationMacroSupplier
+				id="org.eclipse.ptp.cell.environment.launcher.defaultCellLaunchMacroSupplier"
+				configTypeId="org.eclipse.ptp.cell.environment.launcher.cellLaunch"
+				class="org.eclipse.ptp.cell.environment.launcher.cellbe.macros.DefaultTargetLaunchMacroSupplier">
+		</launchConfigurationMacroSupplier>
+	</extension>
+</plugin>

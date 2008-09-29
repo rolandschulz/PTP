@@ -1,0 +1,18 @@
+# Debugging options for the org.eclipse.ptp.cellexamples.ui plugin
+
+# Turn on general debugging for the org.eclipse.ptp.cellexamples.ui plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.examples.ui/debug = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.examples.ui/trace/id = examples.ui
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.examples.ui/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.examples.ui/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.examples.ui/trace/dynamic = False

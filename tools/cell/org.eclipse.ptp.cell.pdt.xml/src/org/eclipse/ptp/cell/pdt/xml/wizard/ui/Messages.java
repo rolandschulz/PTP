@@ -1,0 +1,50 @@
+package org.eclipse.ptp.cell.pdt.xml.wizard.ui;
+
+import org.eclipse.osgi.util.NLS;
+
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.cell.pdt.xml.wizard.ui.messages"; //$NON-NLS-1$
+	public static String PdtEventTreeContentProvider_ValidateParameter_ParameterMustBeDerivedFromAbstractEventElement;
+	public static String PdtWizardAddRemoveEventsPage_Button_Add;
+	public static String PdtWizardAddRemoveEventsPage_Button_AddAll;
+	public static String PdtWizardAddRemoveEventsPage_Button_Remove;
+	public static String PdtWizardAddRemoveEventsPage_Button_RemoveAll;
+	public static String PdtWizardAddRemoveEventsPage_Group_AvailableEventGroups;
+	public static String PdtWizardAddRemoveEventsPage_Group_SelectedEventGroups;
+	public static String PdtWizardAddRemoveEventsPage_WizardPage_Description;
+	public static String PdtWizardAddRemoveEventsPage_WizardPage_Title;
+	public static String PdtWizardConfigurationFilePage_CreateControls_Button_WorkspaceLabel;
+	public static String PdtWizardConfigurationFilePage_CreateControls_FrameLabel;
+	public static String PdtWizardConfigurationFilePage_CreateControls_Textbox_FileLabel;
+	public static String PdtWizardConfigurationFilePage_CreateControls_Textbox_FolderLabel;
+	public static String PdtWizardConfigurationFilePage_Description;
+	public static String PdtWizardConfigurationFilePage_HandleWorkspaceButton_Dialog_SelectWorkspaceResource;
+	public static String PdtWizardConfigurationFilePage_Title;
+	public static String PdtWizardConfigurationFilePage_ValidateControls_Error_EmptyFilename;
+	public static String PdtWizardConfigurationFilePage_ValidateControls_Error_InvalidDirectory;
+	public static String PdtWizardGroupsPositionAndColorPage_Button_SelectColor;
+	public static String PdtWizardGroupsPositionAndColorPage_CreateTable_ColumnHeader_EventGroup_Color;
+	public static String PdtWizardGroupsPositionAndColorPage_CreateTable_ColumnHeader_EventGroup_End;
+	public static String PdtWizardGroupsPositionAndColorPage_CreateTable_ColumnHeader_EventGroup_Name;
+	public static String PdtWizardGroupsPositionAndColorPage_CreateTable_ColumnHeader_EventGroup_Start;
+	public static String PdtWizardGroupsPositionAndColorPage_Description;
+	public static String PdtWizardGroupsPositionAndColorPage_DisplayErrorDialog_TableInputError;
+	public static String PdtWizardGroupsPositionAndColorPage_SelectColor_Dialog_Message;
+	public static String PdtWizardGroupsPositionAndColorPage_Title;
+	public static String PdtWizardSelectEventsPage_CreateControl_Checkbox_PpeProfile;
+	public static String PdtWizardSelectEventsPage_CreateControl_Checkbox_SpeProfile;
+	public static String PdtWizardSelectEventsPage_CreateControl_Checkbox_X86Profile;
+	public static String PdtWizardSelectEventsPage_CreateControl_Group_Description;
+	public static String PdtWizardSelectEventsPage_Description;
+	public static String PdtWizardSelectEventsPage_Frame_Title;
+	public static String PdtWizardSelectEventsPage_SelectionChanged_Tree_EventGroupItem;
+	public static String PdtWizardSelectEventsPage_SelectionChanged_Tree_EventSubgroupItem;
+	public static String PdtWizardSelectEventsPage_Title;
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages() {
+	}
+}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.cdt.debug.ui.CDebuggerPage">
+      <debuggerPage
+            class="org.eclipse.ptp.cell.debug.cdi.ui.pages.SPUGDBServerDebuggerPage"
+            debuggerID="org.eclipse.ptp.cell.debug.cdi.spuGDBServerCDIDebugger"
+            id="org.eclipse.ptp.cell.debug.cdi.ui.pages.spuGDBServerDebuggerPage">
+      </debuggerPage>
+      <debuggerPage
+            class="org.eclipse.ptp.cell.debug.cdi.ui.pages.PPUGDBServerDebuggerPage"
+            debuggerID="org.eclipse.ptp.cell.debug.cdi.ppuGDBServerCDIDebugger"
+            id="org.eclipse.ptp.cell.debug.cdi.ui.pages.ppuGDBServerDebuggerPage">
+      </debuggerPage>
+   </extension>
+   <!--
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.cell.debug.launch.ui.CellDebugGroupTabs"
+            id="org.eclipse.ptp.cell.debug.launch.ui.CellDebugLaunchGroup"
+            type="org.eclipse.ptp.cell.debug.launch.remoteCellDebugDelegate"/>
+   </extension>
+   -->
+    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage"
+            class="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugPreferencePage"
+            id="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugPreferencePage"
+            name="%DebugPreferencePage.name"/>
+      <page
+            category="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugPreferencePage"
+            class="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugSPUPreferencePage"
+            id="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugSPUPreferencePage"
+            name="%SPUDebugPreferencePage.name"/>
+      <page
+            category="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugPreferencePage"
+            class="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugPPUPreferencePage"
+            id="org.eclipse.ptp.cell.debug.ui.preferences.CellDebugPPUPreferencePage"
+            name="%PPUDebugPreferencePage.name"/>
+    </extension>
+     <extension
+         point="org.eclipse.ptp.cell.debug.core.CellRemoteDebugger">
+      <remotedebugger
+            class="org.eclipse.ptp.cell.debug.launch.remote.debugger.PPUGDBServer"
+            debuggerId="org.eclipse.ptp.cell.debug.cdi.ppuGDBServerCDIDebugger"
+            name="Cell PPU gdbserver"/>
+      <remotedebugger
+            class="org.eclipse.ptp.cell.debug.launch.remote.debugger.SPUGDBServer"
+            debuggerId="org.eclipse.ptp.cell.debug.cdi.spuGDBServerCDIDebugger"
+            name="Cell SPU gdbserver"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.cell.debug.preferences.DebugPreferencesInitializer">
+      </initializer>
+   </extension>
+</plugin>

@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+	<!-- A preference page to hold Cell Managed Build useful information -->
+	<!-- This preference page will hold the value for the path to the tools and compilers used during the build process -->
+	<extension
+			point="org.eclipse.ui.preferencePages">
+		<page
+				id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.ManagedBuilder"
+				category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage"
+				class="org.eclipse.ptp.cell.managedbuilder.ui.preferences.ManagedBuilderPreferencePage"
+				name="%preferenceName">
+		</page>
+	</extension>
+
+	<!-- We have to extend the buildDefinitions of CDT's MBS so that we can define new Managed Build Project Types, Configurations, Tool Chains and Tools -->
+	<extension
+			id="cell.managed.build.info"
+			name="%buildInfoName"
+			point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+	    <managedBuildRevision
+	    		fileVersion="1.2.0">
+	    </managedBuildRevision>
+
+   	    <!-- String values starting with percentage character refers to string definition in file plugin.properties -->
+
+		<!-- -->
+		<!-- PPU Project Types -->
+		<!-- -->
+
+		<!-- Cell PPU Executable Project Types -->
+		<projectType
+				id="cell.managedbuild.target.cell.ppu.exe"
+    	        isAbstract="false"
+        	    isTest="false"
+            	name="%TargetName.cell.ppu.exe">
+
+			<!-- Cell PPU Executable: GNU 32 bit Executable Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu32.exe.debug"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
+					name="%ConfigName.ppu.gnu32.Dbg">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu32.exe.debug.toolchain"
+						name="%ToolChainName.ppu.gnu32.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.exe.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Executable: GNU 32 bit Executable Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu32.exe.release"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
+					name="%ConfigName.ppu.gnu32.Rel">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu32.exe.release.toolchain"
+						name="%ToolChainName.ppu.gnu32.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.exe.release">
+				</toolChain>
+			</configuration>
+
+            <!-- Cell PPU Executable: GNU 64 bit Executable Debug Configuration -->
+            <!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu64.exe.debug"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
+					name="%ConfigName.ppu.gnu64.Dbg">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu64.exe.debug.toolchain"
+						name="%ToolChainName.ppu.gnu64.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.exe.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Executable: GNU 64 bit Executable Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					name="%ConfigName.ppu.gnu64.Rel"
+					id="cell.managedbuild.config.cell.ppu.gnu64.exe.release"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu64.exe.release.toolchain"
+						name="%ToolChainName.ppu.gnu64.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.exe.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Executable: XL 32 bit Executable Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl32.exe.debug"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser"
+					name="%ConfigName.ppu.xl32.Dbg">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl32.exe.debug.toolchain"
+						name="%ToolChainName.ppu.xl32.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl32.exe.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Executable: XL 32 bit Executable Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed  in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl32.exe.release"
+					name="%ConfigName.ppu.xl32.Rel"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl32.exe.release.toolchain"
+						name="%ToolChainName.ppu.xl32.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl32.exe.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Executable: XL 64 bit Executable Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl64.exe.debug"
+					name="%ConfigName.ppu.xl64.Dbg"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl64.exe.debug.toolchain"
+						name="%ToolChainName.ppu.xl64.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl64.exe.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Executable: XL 64 bit Executable Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl64.exe.release"
+					name="%ConfigName.ppu.xl64.Rel"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl64.exe.release.toolchain"
+						name="%ToolChainName.ppu.xl64.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl64.exe.release">
+				</toolChain>
+			</configuration>
+
+		</projectType>
+
+		<!-- Cell PPU Shared Library Project Types -->
+		<projectType
+				id="cell.managedbuild.target.cell.ppu.so"
+				name="%TargetName.cell.ppu.so"
+				isAbstract="false"
+				isTest="false">
+
+			<!-- Cell PPU Shared Library: GNU 32 bit Shared Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu32.so.debug"
+					name="%ConfigName.ppu.gnu32.Dbg"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu32.so.debug.toolchain"
+						name="%ToolChainName.ppu.gnu32.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.so.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: GNU 32 bit Shared Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu32.so.release"
+					name="%ConfigName.ppu.gnu32.Rel"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.coreGASErrorParser">
+				<!-- This tool chain is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu32.so.release.toolchain"
+						name="%ToolChainName.ppu.gnu32.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.so.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: GNU 64 bit Shared Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu64.so.debug"
+					name="%ConfigName.ppu.gnu64.Dbg"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu64.so.debug.toolchain"
+						name="%ToolChainName.ppu.gnu64.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.so.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: GNU 64 bit Shared Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu64.so.release"
+					name="%ConfigName.ppu.gnu64.Rel"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu64.so.release.toolchain"
+						name="%ToolChainName.ppu.gnu64.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.so.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: XL 32 bit Shared Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl32.so.debug"
+					name="%ConfigName.ppu.xl32.Dbg"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl32.so.debug.toolchain"
+						name="%ToolChainName.ppu.xl32.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl32.so.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: XL 32 bit Shared Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl32.so.release"
+					name="%ConfigName.ppu.xl32.Rel"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl32.so.release.toolchain"
+						name="%ToolChainName.ppu.xl32.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl32.so.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: XL 64 bit Shared Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl64.so.debug"
+					name="%ConfigName.ppu.xl64.Dbg"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl64.so.debug.toolchain"
+						name="%ToolChainName.ppu.xl64.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl64.so.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Shared Library: XL 64 bit Shared Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl64.so.release"
+					name="%ConfigName.ppu.xl64.Rel"
+					cleanCommand="rm -fr"
+					artifactExtension="so"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl64.so.release.toolchain"
+						name="%ToolChainName.ppu.xl64.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl64.so.release">
+				</toolChain>
+			</configuration>
+
+		</projectType>
+
+		<!-- Cell PPU Static Library Project Types -->
+		<projectType
+				id="cell.managedbuild.target.cell.ppu.lib"
+				name="%TargetName.cell.ppu.lib"
+				isAbstract="false"
+				isTest="false">
+
+			<!-- Cell PPU Static Library: GNU 32 bit Static Library Debug Configuratoin -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu32.lib.debug"
+					name="%ConfigName.ppu.gnu32.Dbg"
+					cleanCommand="rm -fr"
+					artifactExtension="a"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu32.lib.debug.toolchain"
+						name="%ToolChainName.ppu.gnu32.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.lib.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: GNU 32 bit Static Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu32.lib.release"
+					name="%ConfigName.ppu.gnu32.Rel"
+					cleanCommand="rm -fr"
+					artifactExtension="a"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu32.lib.release.toolchain"
+						name="%ToolChainName.ppu.gnu32.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.lib.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: GNU 64 bit Static Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu64.lib.debug"
+					name="%ConfigName.ppu.gnu64.Dbg"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu64.lib.debug.toolchain"
+						name="%ToolChainName.ppu.gnu64.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.lib.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: GNU 64 bit Static Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.gnu64.lib.release"
+					name="%ConfigName.ppu.gnu64.Rel"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipes.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.gnu64.lib.release.toolchain"
+						name="%ToolChainName.ppu.gnu64.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.lib.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: XL 32 bit Static Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl32.lib.debug"
+					name="%ConfigName.ppu.xl32.Dbg"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl32.lib.debug.toolchain"
+						name="%ToolChainName.ppu.xl32.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl32.lib.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: XL 32 bit Static Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl32.lib.release"
+					name="%ConfigName.ppu.xl32.Rel"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl32.lib.release.toolchain"
+						name="%ToolChainName.ppu.xl32.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl32.lib.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: XL 64 bit Static Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl64.lib.debug"
+					name="%ConfigName.ppu.xl64.Dbg"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl64.lib.debug.toolchain"
+						name="%ToolChainName.ppu.xl64.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl64.lib.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell PPU Static Library: XL 64 bit Static Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.ppu.xl64.lib.release"
+					name="%ConfigName.ppu.xl64.Rel"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.ppu.xl64.lib.release.toolchain"
+						name="%ToolChainName.ppu.xl64.Rel"
+						superClass="cell.managedbuild.toolchain.cell.ppu.xl64.lib.release">
+				</toolChain>
+			</configuration>
+
+		</projectType>
+
+		<!-- -->
+		<!-- SPU Project Types -->
+		<!-- -->
+
+		<!-- It is important to remeber that SPU just supports 32 bit object files -->
+
+		<!-- Cell SPU Executable Project Types -->
+		<projectType
+				id="cell.managedbuild.target.cell.spu.exe"
+				isAbstract="false"
+				isTest="false"
+				name="%TargetName.cell.spu.exe">
+
+			<!-- Cell SPU Executable: GNU Executable Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.gnu.exe.debug"
+					name="%ConfigName.spu.gnu.Dbg"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.gnu.exe.debug.toolchain"
+						name="%ToolChainName.spu.gnu.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.spu.gnu.exe.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell SPU Executable: GNU Executable Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.gnu.exe.release"
+					name="%ConfigName.spu.gnu.Rel"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.gnu.exe.release.toolchain"
+						name="%ToolChainName.spu.gnu.Rel"
+						superClass="cell.managedbuild.toolchain.cell.spu.gnu.exe.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell SPU Executable: XL Executable Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.xl.exe.debug"
+					name="%ConfigName.spu.xl.Dbg"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.xl.exe.debug.toolchain"
+						name="%ToolChainName.spu.xl.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.spu.xl.exe.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell SPU Executable: XL Executable Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.xl.exe.release"
+					name="%ConfigName.spu.xl.Rel"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.xl.exe.release.toolchain"
+						name="%ToolChainName.spu.xl.Rel"
+						superClass="cell.managedbuild.toolchain.cell.spu.xl.exe.release">
+				</toolChain>
+			</configuration>
+
+		</projectType>
+
+		<!-- Cell SPU Static Library Project Types -->
+		<projectType
+				id="cell.managedbuild.target.cell.spu.lib"
+				name="%TargetName.cell.spu.lib"
+				isAbstract="false"
+				isTest="false">
+
+			<!-- Cell SPU Static Library: GNU Static Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.gnu.lib.debug"
+					name="%ConfigName.spu.gnu.Dbg"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.gnu.lib.debug.toolchain"
+						name="%ToolChainName.spu.gnu.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.spu.gnu.lib.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell SPU Static Library: GNU Static Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.gnu.lib.release"
+					name="%ConfigName.spu.gnu.Rel"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.gnu.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.gnu.lib.release.toolchain"
+						name="%ToolChainName.spu.gnu.Rel"
+						superClass="cell.managedbuild.toolchain.cell.spu.gnu.lib.release">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell SPU Static Library: XL Static Library Debug Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.xl.lib.debug"
+					name="%ConfigName.spu.xl.Dbg"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.xl.lib.debug.toolchain"
+						name="%ToolChainName.spu.xl.Dbg"
+						superClass="cell.managedbuild.toolchain.cell.spu.xl.lib.debug">
+				</toolChain>
+			</configuration>
+
+			<!-- Cell SPU Static Library: XL Static Library Release Configuration -->
+			<!-- Uses defaults CDT Error Parsers that were developed for GNU plus a specific XL C/C++ Compiler Error Parser developed in Cell -->
+			<configuration
+					id="cell.managedbuild.config.cell.spu.xl.lib.release"
+					name="%ConfigName.spu.xl.Rel"
+					artifactExtension="a"
+					cleanCommand="rm -fr"
+					errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.ptp.cell.core.XLCErrorParser;org.eclipse.cdt.core.GASErrorParser">
+				<!-- This tool chain superClass is defined in org.eclipse.ptp.cell.managedbuild.xl.ui plugin -->
+				<toolChain
+						id="cell.managedbuild.config.cell.spu.xl.lib.release.toolchain"
+						name="%ToolChainName.spu.xl.Rel"
+						superClass="cell.managedbuild.toolchain.cell.spu.xl.lib.release">
+				</toolChain>
+			</configuration>
+
+		</projectType>
+
+   </extension>
+
+</plugin>

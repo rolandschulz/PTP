@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.ptp.cell.examples.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.ptp.cell.examples.ui" id="exampleProjectCreationWizard" name="Example Project Creation Wizard"/>
+      </appinfo>
+      <documentation>
+         This extension point allows to contribute with new example projects in the New Example Project Creation Wizard for Cell
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+         <documentation>
+            Extension-point root element.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="wizard"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="wizard">
+      <annotation>
+         <documentation>
+            Information about what wizard these example projects setup are linked to.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="projectSetup" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Id of the wizard that this extension is intended for.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="projectSetup">
+      <annotation>
+         <documentation>
+            Example project information.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Initial name of the example project to be displayed in the wizard.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="srcZip" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Path to the zip file containing the Eclipse Project to be imported. This path is relative to the plugin root directory.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="zipInternalRelativePath" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Path of the folder inside the zip file that will be used as the root in the import proccess. This path is relative to the root of the zip file. This path must not begin with a slash &apos;/&apos; character and must be terminated with a slash &apos;/&apos; character.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="open" type="string">
+            <annotation>
+               <documentation>
+                  Relative path of the file that will be opened when wizard finished.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="pageTitle" type="string">
+            <annotation>
+               <documentation>
+                  Title of the wizard page.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="pageDescription" type="string">
+            <annotation>
+               <documentation>
+                  Description of the example project to be shown in the wizard page.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="pageLabel" type="string">
+            <annotation>
+               <documentation>
+                  Label for the data to be input in the wizard page.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         1.1.1
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;pre&gt;
+ &lt;extension
+   point=&quot;org.eclipse.ptp.cell.examples.ui.exampleProjectCreationWizard&quot;
+   id=&quot;SimpleExampleProjectCreationWizardExtension&quot;&gt;
+  &lt;wizard
+    id=&quot;org.eclipse.ptp.cell.managedbuilder.examples.ui.SimpleExampleProjectCreationWizard&quot;&gt;
+   &lt;projectSetup
+     name=&quot;%Example.cell.wizard.managedbuilder.Simple_spu.projectName&quot;
+     srcZip=&quot;examples/simple/simple_spu.zip&quot;
+     zipInternalRelativePath=&quot;simple_spu/&quot;
+     pageTitle=&quot;%Example.cell.wizard.managedbuilder.Simple_spu.pageTitle&quot;
+     pageDescription=&quot;%Example.cell.wizard.managedbuilder.Simple_spu.pageDescription&quot;
+     pageLabel=&quot;%Example.cell.wizard.managedbuilder.Simple_spu.pageLabel&quot;&gt;
+   &lt;/projectSetup&gt;
+   &lt;projectSetup
+     name=&quot;%Example.cell.wizard.managedbuilder.Libsimple.projectName&quot;
+     srcZip=&quot;examples/simple/libsimple.zip&quot;
+     zipInternalRelativePath=&quot;libsimple/&quot;
+     pageTitle=&quot;%Example.cell.wizard.managedbuilder.Libsimple.pageTitle&quot;
+     pageDescription=&quot;%Example.cell.wizard.managedbuilder.Libsimple.pageDescription&quot;
+     pageLabel=&quot;%Example.cell.wizard.managedbuilder.Libsimple.pageLabel&quot;&gt;
+   &lt;/projectSetup&gt;
+   &lt;projectSetup
+     name=&quot;%Example.cell.wizard.managedbuilder.Simple.projectName&quot;
+     srcZip=&quot;examples/simple/simple.zip&quot;
+     zipInternalRelativePath=&quot;simple/&quot;
+     pageTitle=&quot;%Example.cell.wizard.managedbuilder.Simple.pageTitle&quot;
+     pageDescription=&quot;%Example.cell.wizard.managedbuilder.Simple.pageDescription&quot;
+     pageLabel=&quot;%Example.cell.wizard.managedbuilder.Simple.pageLabel&quot;&gt;
+   &lt;/projectSetup&gt;
+  &lt;/wizard&gt;
+ &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2006 IBM Corporation.&lt;br&gt;
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at &lt;a
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;&lt;br&gt;
+Contributors:&lt;br&gt;
+    IBM Corporation - initial implementation
+      </documentation>
+   </annotation>
+
+</schema>

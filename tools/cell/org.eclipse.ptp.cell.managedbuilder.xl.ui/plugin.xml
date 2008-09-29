@@ -1,0 +1,2636 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+	<!-- A preference page to hold Cell Managed Build useful information -->
+	<!-- This preference page will hold the value for the path to the tools and compilers used during the build process -->
+	<extension
+			point="org.eclipse.ui.preferencePages">
+		<page
+				id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.ManagedBuilder.XlTools"
+				category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.ManagedBuilder"
+				class="org.eclipse.ptp.cell.managedbuilder.xl.ui.preferences.XlToolsPreferencesPage"
+				name="%XlTools.PreferencePageName">
+		</page>
+	</extension>
+	<!-- Initializer class loads the default values or stored values in the preference page -->
+	<extension
+			point="org.eclipse.core.runtime.preferences">
+		<initializer
+				class="org.eclipse.ptp.cell.managedbuilder.xl.ui.preferences.XlToolsPreferencesInitializer">
+		</initializer>
+	</extension>
+
+	<!-- We have to extend the buildDefinitions of CDT's MBS so that we can define new Tool Chains and Tools -->
+	<extension
+			id="cell.xl.managed.build.info"
+			name="%XlTools.BuildDefinitionsName"
+			point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+		<managedBuildRevision
+				fileVersion="1.2.0">
+		</managedBuildRevision>
+
+   	   	<!-- String values starting with percentage character refers to string definition in file plugin.properties -->
+
+		<!-- -->
+		<!-- XL Tools -->
+		<!-- -->
+
+		<!-- XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.xl.linker"
+				name="%ToolName.linker.xl"
+				isAbstract="true"
+				outputFlag="-o"
+				command="ppuxlc">
+
+			<envVarBuildPath
+					pathType="buildpathLibrary"
+					variableList="LIBRARY_PATH">
+			</envVarBuildPath>
+
+			<!-- It follows the definitions of option categories and options for the categories of the XL Linker -->
+
+			<!-- General Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.linker"
+					name="%OptionCategory.General"
+					id="cell.xl.linker.category.general">
+			</optionCategory>
+			<!-- -qnocrt: Instructs the linker not to use the standard system startup files at link time -->
+			<!-- The default is -qcrt -->
+			<!-- Equivalent to "gcc -nostartfiles" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Linker.NoStartFiles"
+					category="cell.xl.linker.category.general"
+					command="-qnocrt"
+					id="cell.xl.linker.option.nostart"
+					valueType="boolean">
+			</option>
+			<!-- -qnolib: Instructs the compiler not to use the standard system libraries at link time -->
+			<!-- The default is -qlib -->
+			<!-- Equivalent to "gcc -nodefaultlibs" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Linker.NoDefLibs"
+					category="cell.xl.linker.category.general"
+					command="-qnolib"
+					id="cell.xl.linker.option.nodeflibs"
+					valueType="boolean">
+			</option>
+			<!-- -qnolib -qnocrt: Instructs the compiler not to use the standard system startup files neither the standard system libraries at link time -->
+			<!-- The default is -qcrt -qlib -->
+			<!-- Equivalent to "gcc -nostdlib" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Linker.NoStdLibs"
+					category="cell.xl.linker.category.general"
+					command="-qnolib -qnocrt"
+					id="cell.xl.linker.option.nostdlibs"
+					valueType="boolean">
+			</option>
+			<!-- -s: Strips the symbol table, line number information, and relocation information from the output file -->
+			<!-- Equivalent to "gcc -s" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Linker.Strip"
+					category="cell.xl.linker.category.general"
+					command="-s"
+					id="cell.xl.linker.option.strip"
+					valueType="boolean">
+			</option>
+			<!-- -qstaticlink: Objects generated with this compiler option in effect will not link with shared libraries -->
+			<!-- The default is -qnostaticlink -->
+			<!-- Equivalent to gcc -static -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Linker.Static"
+					category="cell.xl.linker.category.general"
+					command="-qstaticlink"
+					id="cell.xl.linker.option.noshared"
+					valueType="boolean">
+			</option>
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<!-- Post link analysis and optimization tools may need this information in order to perform correct modifications of executables. -->
+			<!-- This results in larger executables. -->
+			<option
+					id="cell.xl.linker.option.emitrelocs"
+					name="%Option.cell.xl.Linker.EmitRelocs"
+					category="cell.xl.linker.category.general"
+					command="-Wl,-q"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EmitRelocsValueHandler">
+			</option>
+
+			<!-- Library Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.linker"
+					name="%OptionCategory.Libs"
+					id="cell.xl.linker.category.libs">
+			</optionCategory>
+			<!-- -l<key>: Searches the file lib<key>.so and then lib<key>.a for dynamic linking, or only lib<key>.a for static linking -->
+			<!-- The default is to search only some of the compiler run-time libraries -->
+			<!-- Equivalent to "gcc -l<key>" -->
+			<option
+					id="cell.xl.linker.option.libs"
+					name="%Option.cell.xl.Linker.Libs"
+					category="cell.xl.linker.category.libs"
+					command="-l"
+					browseType="none"
+					valueType="libs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.LibraryListValueHandler"
+					valueHandlerExtraArgument="cell.xl.linker.option.libs.lm">
+			</option>
+			<!-- -L<dir>: At link time, searches the path directory for library files specified by the -lkey option -->
+			<!-- The default is to search only the standard directories -->
+			<!-- Equivalent to "gcc -L<dir>" -->
+			<option
+					id="cell.xl.linker.option.paths"
+					name="%Option.cell.xl.Linker.Libsearch"
+					category="cell.xl.linker.category.libs"
+					command="-L"
+					browseType="directory"
+					valueType="stringList">
+			</option>
+			<!-- -lm -->
+			<option
+					id="cell.xl.linker.option.libs.lm"
+					name="%Option.cell.xl.Linker.Libs.libm"
+					category="cell.xl.linker.category.libs"
+					command="-lm"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EspecialLibraryShortcutValueHandler"
+					valueHandlerExtraArgument="cell.xl.linker.option.libs"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.xl.linker.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.xl.linker">
+			</optionCategory>
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.xl.linker.option.profile.pdt"
+					name="%Option.cell.xl.Linker.Profile.pdt"
+					category="cell.xl.linker.category.profile"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.PDTEnablementValueHandler"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+			<!-- Miscellaneous Option Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.linker"
+					name="%OptionCategory.Misc"
+					id="cell.xl.linker.category.misc">
+			</optionCategory>
+			<!-- Other linker flags -->
+			<option
+					id="cell.xl.linker.option.ldflags"
+					name="%Option.cell.xl.Linker.Flags"
+					category="cell.xl.linker.category.misc"
+					valueType="string">
+			</option>
+			<!-- -Wl, <option1>, <option2>, ... : Gives the specified options to the linker -->
+			<!-- Equivalent to "gcc -Xlinker <option1>, <option2>, ..." -->
+			<option
+					id="cell.xl.linker.option.other"
+					name="%Option.Posix.Linker.XLinker"
+					category="cell.xl.linker.category.misc"
+					command="-Wl, ${VALUE}"
+					valueType="stringList">
+			</option>
+			<!-- Other objects -->
+			<option
+					id="cell.xl.linker.option.userobjs"
+					name="%Option.cell.xl.UserObjs"
+					category="cell.xl.linker.category.misc"
+					browseType="file"
+					valueType="userObjs">
+			</option>
+
+			<!-- Shared Library Settings Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.linker"
+					name="%OptionCategory.Shared.Settings"
+					id="cell.xl.linker.category.shared">
+			</optionCategory>
+			<!-- -qmkshrobj: Creates a shared object from the generated object files -->
+			<!-- Equivalent to "gcc -shared" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Linker.Shared"
+					category="cell.xl.linker.category.shared"
+					command="-qmkshrobj"
+					id="cell.xl.linker.option.shared"
+					valueType="boolean">
+			</option>
+			<!-- -Wl,-soname=: Gives -soname= option to the linker -->
+			<!-- Equivalent to "gcc -Wl,-soname=" -->
+			<option
+					name="%Option.cell.xl.Linker.SOName"
+					category="cell.xl.linker.category.shared"
+					command="-Wl,-soname="
+					id="cell.xl.linker.option.soname"
+					valueType="string">
+			</option>
+			<!-- -Wl,<dash><dash>out-implib=: Gives <dash><dash>out-implib= option to the linker -->
+			<!-- Equivalent to "gcc -Wl,<dash><dash>out-implib=" -->
+			<!-- <dash> = '-' : it is prohibited to use <dash><dash> in XML comments :) -->
+			<option
+					name="%Option.cell.xl.Linker.Implib"
+					category="cell.xl.linker.category.shared"
+					command="-Wl,--out-implib="
+					id="cell.xl.linker.option.implname"
+					valueType="string">
+			</option>
+			<!-- -Wl,<dash><dash>output-def=: Gives <dash><dash>output-def= option to the linker -->
+			<!-- Equivalent to "gcc -Wl,<dash><dash>output-def=" -->
+			<!-- <dash> = '-' : it is prohibited to use <dash><dash> in XML comments :) -->
+			<option
+					name="%Option.cell.xl.Linker.Defname"
+					category="cell.xl.linker.category.shared"
+					command="-Wl,--output-def="
+					id="cell.xl.linker.option.defname"
+					valueType="string">
+			</option>
+
+			<!-- File inputType accepted by the linker -->
+			<inputType
+					buildVariable="OBJS"
+					dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
+					id="cell.managedbuild.tool.cell.xl.linker.input"
+					multipleOfType="true"
+					name="%Option.cell.xl.Linker.Input"
+					sourceContentType="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"
+					sources="o">
+				<!-- Other user objects are aditional inputs -->
+				<additionalInput
+						paths="$(USER_OBJS)"
+						kind="additionalinputdependency">
+				</additionalInput>
+				<!-- Libraries are aditional inputs -->
+				<additionalInput
+						paths="$(LIBS)"
+						kind="additionalinput">
+				</additionalInput>
+			</inputType>
+
+			<!-- File outputType of the linker -->
+			<outputType
+					buildVariable="EXECUTABLES"
+					id="cell.managedbuild.tool.cell.xl.linker.output"
+					name="%Option.cell.xl.Linker.Output"
+					nameProvider="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuLinkOutputNameProvider">
+			</outputType>
+
+		</tool>
+
+		<!-- XL Assembler -->
+		<!-- As there is no XL Assembler available for Cell, it will be used the PPU GNU Assembler and SPU GNU Assembler defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+
+		<!-- XL C Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.xl.c.compiler"
+				name="%ToolName.compiler.xl.c"
+				isAbstract="true"
+				command="ppuxlc"
+				natureFilter="both"
+				outputFlag="-o">
+
+			<envVarBuildPath
+					pathType="buildpathInclude"
+					variableList="CPATH,C_INCLUDE_PATH">
+			</envVarBuildPath>
+
+			<!-- It follows the definitions of option categories and options for the categories of the XL C Compiler -->
+
+			<!-- Preprocessor Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Preproc"
+					id="cell.xl.c.compiler.category.preprocessor">
+			</optionCategory>
+			<!-- -qnostdinc: Standard include directories are not searched -->
+			<!-- The default is -qstdinc -->
+			<!-- Equivalent to "gcc -nostdinc" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Nostdinc"
+					category="cell.xl.c.compiler.category.preprocessor"
+					command="-qnostdinc"
+					id="cell.xl.c.compiler.option.preprocessor.nostdinc"
+					valueType="boolean">
+			</option>
+			<!-- -E: Instructs the compiler to preprocess the source files, but does not compile -->
+			<!-- Output goes to stdout -->
+			<!-- Equivalent to "gcc -E" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.PreprocOnly"
+					category="cell.xl.c.compiler.category.preprocessor"
+					command="-E"
+					id="cell.xl.c.compiler.option.preprocessor.preprocess"
+					valueType="boolean">
+			</option>
+
+			<!-- Symbols Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Symbols"
+					id="cell.xl.c.compiler.category.symbols">
+			</optionCategory>
+			<!-- -D<name>[=[<def>]]: Defines <name> as in the #define directive -->
+			<!-- <def> is an optional definition or value assigned to <name> -->
+			<!-- -D<name>= (no definition) is equivalent to #define <name> -->
+			<!-- -D<name> (no '=' and no definition) is equivalent to #define <name> 1 -->
+			<!-- The default is -D<name> -->
+			<!-- Equivalent to "gcc -D<name>[=[<def>]]" -->
+			<option
+					id="cell.xl.c.compiler.option.preprocessor.def.symbols"
+					name="%Option.cell.xl.Compiler.DefSym"
+					category="cell.xl.c.compiler.category.symbols"
+					command="-D"
+					valueType="definedSymbols">
+			</option>
+			<!-- -U<name>: Undefines the identifier name defined by the compiler or by the -Dname option -->
+			<!-- Equivalent to "gcc -U<name>" -->
+			<option
+					name="%Option.cell.xl.Compiler.UndefSym"
+					category="cell.xl.c.compiler.category.symbols"
+					command="-U"
+					id="cell.xl.c.compiler.option.preprocessor.undef.symbol"
+					valueType="stringList">
+			</option>
+
+			<!-- Directories Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Dirs"
+					id="cell.xl.c.compiler.category.dirs">
+			</optionCategory>
+			<!-- -I<dir>: Specifies an additional search path for #include filenames that do not specify an absolute path -->
+			<!-- Equivalent to "gcc -I<dir>" -->
+			<option
+					id="cell.xl.c.compiler.option.include.paths"
+					name="%Option.cell.xl.Compiler.IncludePaths"
+					category="cell.xl.c.compiler.category.dirs"
+					command="-I"
+					valueType="includePath"
+					browseType="directory">
+			</option>
+
+			<!-- Optimization Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Optimize"
+					id="cell.xl.c.compiler.category.optimization">
+			</optionCategory>
+			<!-- Optimization Level -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					name="%Option.cell.xl.Compiler.OptLevel"
+					category="cell.xl.c.compiler.category.optimization"
+					id="cell.xl.c.compiler.option.optimization.level"
+					valueType="enumerated">
+				<!-- -O0: No optmization -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.OptLevel.None"
+						isDefault="false"
+						command="-O0"
+						id="cell.xl.c.compiler.option.optimization.level.none">
+				</enumeratedOptionValue>
+				<!-- -O2: Little optimization -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.OptLevel.Optimize"
+						isDefault="true"
+						command="-O2"
+						id="cell.xl.c.compiler.option.optimization.level.optimize">
+				</enumeratedOptionValue>
+				<!-- -O3: Performs some memory and compile-time intensive optimizations in addition to those executed with -O2 -->
+				<!--  The -O3 specific optimizations have the potential to alter the semantics of a user's program -->
+				<!--  The compiler guards against these optimizations at -O2 and the option -qstrict is provided at -O3 to turn off these aggressive optimizations -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.OptLevel.More"
+						isDefault="false"
+						command="-O3"
+						id="cell.xl.c.compiler.option.optimization.level.more">
+				</enumeratedOptionValue>
+				<!-- -O4: This option is the same as -O3, except that it also sets the -qarch and -qtune options to the architecture of the compiling machine, sets the -qcache option most appropriate to the characteristics of the compiling machine, sets the -qhot option and sets the -qipa option -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.OptLevel.EvenMore"
+						isDefault="false"
+						command="-O4"
+						id="cell.xl.c.compiler.option.optimization.level.evenmore">
+				</enumeratedOptionValue>
+				<!-- -O5: Equivalent to -O4 -qipa=level=2 -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.OptLevel.Most"
+						isDefault="false"
+						command="-O5"
+						id="cell.xl.c.compiler.option.optimization.level.most">
+				</enumeratedOptionValue>
+			</option>
+			<!-- -qhot: Perform high-order transformations -->
+			<option
+					id="cell.xl.c.compiler.option.optimization.hot"
+					name="%Option.cell.xl.Compiler.Optimization.Hot"
+					category="cell.xl.c.compiler.category.optimization"
+					command="-qhot"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- -qhot=simd: Try auto-simdization -->
+			<option
+					id="cell.xl.c.compiler.option.optimization.simd"
+					name="%Option.cell.xl.Compiler.Optimization.SIMD"
+					category="cell.xl.c.compiler.category.optimization"
+					command="-qhot=simd"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- Don't inline functions -->
+			<option
+					id="cell.xl.c.compiler.option.optimization.noinline"
+					name="%Option.cell.xl.Compiler.Optimization.NoInline"
+					category="cell.xl.c.compiler.category.optimization"
+					command="-qnoinline"
+					valueType="boolean"
+					defaultValue="true">
+			</option>
+			<!-- Substitutes inline code for calls to function alloca. -->
+			<option
+					id="cell.xl.c.compiler.option.optimization.alloca"
+					name="%Option.cell.xl.Compiler.Optimization.Alloca"
+					category="cell.xl.c.compiler.category.optimization"
+					command="-ma"
+					valueType="boolean"
+					defaultValue="true">
+			</option>
+			<!-- Other optimization flags -->
+			<option
+					name="%Option.cell.xl.Compiler.OptLevel.Flags"
+					category="cell.xl.c.compiler.category.optimization"
+					id="cell.xl.c.compiler.option.optimization.flags"
+					valueType="string">
+			</option>
+
+			<!-- Debug Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Debug"
+					id="cell.xl.c.compiler.category.debug">
+			</optionCategory>
+			<!-- Debug Level -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					category="cell.xl.c.compiler.category.debug"
+					id="cell.xl.c.compiler.option.debugging.level"
+					valueType="enumerated">
+				<!-- No debug information generated -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.DebugLevel.None"
+						isDefault="false"
+						id="cell.xl.c.compiler.option.debugging.level.none">
+				</enumeratedOptionValue>
+				<!-- -g: Generates information for debugging tools -->
+				<!-- Equivalent to "gcc -g" -->
+				<enumeratedOptionValue
+						name="%Option.cell.xl.Compiler.DebugLevel.Def"
+						command="-g"
+						isDefault="true"
+						id="cell.xl.c.compiler.option.debugging.level.default">
+				</enumeratedOptionValue>
+			</option>
+			<!-- Other debug options -->
+			<option
+					name="%Option.cell.xl.Compiler.DebugLevel.Other"
+					category="cell.xl.c.compiler.category.debug"
+					id="cell.xl.c.compiler.option.debugging.other"
+					valueType="string">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.xl.c.compiler.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.xl.c.compiler">
+			</optionCategory>
+			<!-- -pg: Sets up the object files produced by the compiler for profiling -->
+			<!-- Equivalent to "gcc -pg" -->
+			<option
+					id="cell.xl.c.compiler.option.debugging.gprof"
+					name="%Option.cell.xl.Compiler.Profile.gprof"
+					category="cell.xl.c.compiler.category.profile"
+					command="-pg"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- -p: Sets up the object files produced by the compiler for profiling -->
+			<!-- Equivalent to "gcc -p" -->
+			<option
+					id="cell.xl.c.compiler.option.debugging.prof"
+					name="%Option.cell.xl.Compiler.Profile.prof"
+					category="cell.xl.c.compiler.category.profile"
+					command="-p"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+
+			<!-- Warnings Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Warn"
+					id="cell.xl.c.compiler.category.warnings">
+			</optionCategory>
+			<!-- -qsyntaxonly: Performs syntax checking without generating an object file -->
+			<!-- Equivalent to "gcc -fsyntax-only" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Warn.Syntax"
+					category="cell.xl.c.compiler.category.warnings"
+					command="-qsyntaxonly"
+					id="cell.xl.c.compiler.option.warnings.syntax"
+					valueType="boolean">
+			</option>
+			<!-- -w: Suppresses warnings and lower-level messages -->
+			<!-- Equivalent to "gcc -w" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Warn.nowarn"
+					category="cell.xl.c.compiler.category.warnings"
+					command="-w"
+					id="cell.xl.c.compiler.option.warnings.nowarn"
+					valueType="boolean">
+			</option>
+			<!-- -qinfo: Produces additional informational messages -->
+			<!-- If no suboption is specified, it is assumed -qinfo=all, which turns on all diagnostic messages for all groups -->
+			<!-- This option is used to substitute "gcc -Wall", but it prints too much more information -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Warn.allwarn"
+					category="cell.xl.c.compiler.category.warnings"
+					command="-qinfo"
+					id="cell.xl.c.compiler.option.warnings.allwarn"
+					valueType="boolean">
+			</option>
+			<!-- -qhalt=w: Stops the compiler after the first phase if the severity of errors detected equals or exceeds the warning level -->
+			<!-- Quite equivalent to "gcc -Werror" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Warn.toerrs"
+					category="cell.xl.c.compiler.category.warnings"
+					command="-qhalt=w"
+					id="cell.xl.c.compiler.option.warnings.toerrors"
+					valueType="boolean">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.xl.c.compiler.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.xl.c.compiler">
+			</optionCategory>
+
+			<!-- Miscellaneous Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.c.compiler"
+					name="%OptionCategory.Misc"
+					id="cell.xl.c.compiler.category.misc">
+			</optionCategory>
+			<!-- -c: Instructs the compiler to pass source files to the compiler only -->
+			<!-- By specifying this option, the object files are compiled but are not sent to the linkage editor -->
+			<!-- Equivalent to "gcc -c" -->
+			<!-- In CDT's definitions of GNU C Compiler it also has the -fmessage-length=0 flag, which is not necessary with XL C Compiler as the output lines are never splitted if they are too long -->
+			<option
+					defaultValue="-c"
+					name="%Option.cell.xl.Compiler.OtherFlags"
+					category="cell.xl.c.compiler.category.misc"
+					id="cell.xl.c.compiler.option.misc.other"
+					valueType="string">
+			</option>
+			<!-- -v: Verbose -->
+			<!-- Equivalent to "gcc -v" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Verbose"
+					category="cell.xl.c.compiler.category.misc"
+					command="-v"
+					id="cell.xl.c.compiler.option.misc.verbose"
+					valueType="boolean">
+			</option>
+			<!-- -f:c89: Setup the compiler environment to c89 stanza -->
+			<!-- Equivalent to "gcc -ansi" -->
+			<option
+					defaultValue="false"
+					name="%Option.cell.xl.Compiler.Ansi"
+					category="cell.xl.c.compiler.category.misc"
+					command="-F:c89"
+					id="cell.xl.c.compiler.option.misc.ansi"
+					valueType="boolean">
+			</option>
+
+			<!-- File inputType accepted by the C compiler -->
+			<inputType
+					dependencyCalculator="org.eclipse.ptp.cell.managedbuilder.makegen.xl.DefaultXLCDependencyCalculator"
+					dependencyContentType="org.eclipse.cdt.core.cHeader"
+					dependencyExtensions="h"
+					id="cell.managedbuild.tool.cell.xl.c.compiler.input"
+					name="%Option.cell.xl.Compiler.Input"
+					sourceContentType="org.eclipse.cdt.core.cSource"
+					sources="c">
+			</inputType>
+
+			<!-- File outputType of the C compiler -->
+			<outputType
+					buildVariable="OBJS"
+					id="cell.managedbuild.tool.cell.xl.c.compiler.output"
+					name="%Option.cell.xl.Compiler.Output"
+					outputs="o">
+			</outputType>
+
+		</tool>
+
+		<!-- XL C++ Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<!-- buildDefinitions of CDT's MBS defines an atribute named unusedChildren for the option element that, if used, would simplify a lot the definition below -->
+		<!-- With unusedChildren atribute, we could just extend cell.managedbuild.tool.cell.xl.c.compiler without the options not supported by C++ -->
+		<!-- Unfortunately, unusedChildren is not yet implemented in CDT 3.1, so we have to rewrite everything from XL C Compiler without the options not supported by XL C++ Compiler -->
+		<tool
+				name="%ToolName.compiler.xl.cpp"
+				id="cell.managedbuild.tool.cell.xl.cpp.compiler"
+				isAbstract="true"
+				command="ppuxlc++"
+				natureFilter="ccnature"
+				outputFlag="-o">
+
+			<envVarBuildPath
+					pathType="buildpathInclude"
+					variableList="CPATH,CPLUS_INCLUDE_PATH">
+			</envVarBuildPath>
+
+			<!-- It follows the definitions of option categories and options for the categories of the XL C++ Compiler -->
+
+			<!-- Preprocessor Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler"
+					name="%OptionCategory.Preproc"
+					id="cell.xl.cpp.compiler.category.preprocessor">
+			</optionCategory>
+			<!-- -qnostdinc: Standard include directories are not searched -->
+			<!-- The default is -qstdinc -->
+			<!-- Equivalent to "gcc -nostdinc" -->
+			<option
+					name="%Option.cell.xl.Compiler.Nostdinc"
+					category="cell.xl.cpp.compiler.category.preprocessor"
+					id="cell.xl.cpp.compiler.option.preprocessor.nostdinc"
+					superClass="cell.xl.c.compiler.option.preprocessor.nostdinc">
+			</option>
+			<!-- Instructs the compiler to preprocess the source files, but does not compile -->
+			<option
+					name="%Option.cell.xl.Compiler.PreprocOnly"
+					category="cell.xl.cpp.compiler.category.preprocessor"
+					id="cell.xl.cpp.compiler.option.preprocessor.preprocess"
+					superClass="cell.xl.c.compiler.option.preprocessor.preprocess">
+			</option>
+			
+			<!-- Symbols Options Category -->
+			<optionCategory
+					id="cell.xl.cpp.compiler.category.symbols"
+					name="%OptionCategory.Symbols"
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler">
+			</optionCategory>
+			<!-- Defines a <name> as in the #define directive -->
+			<option
+					name="%Option.cell.xl.Compiler.DefSym"
+					category="cell.xl.cpp.compiler.category.symbols"
+					id="cell.xl.cpp.compiler.option.preprocessor.def"
+					superClass="cell.xl.c.compiler.option.preprocessor.def.symbols">
+			</option>
+			<!-- Undefines the identifier name defined by the compiler or by the -Dname option -->
+			<option
+					name="%Option.cell.xl.Compiler.UndefSym"
+					category="cell.xl.cpp.compiler.category.symbols"
+					id="cell.xl.cpp.compiler.option.preprocessor.undef"
+					superClass="cell.xl.c.compiler.option.preprocessor.undef.symbol">
+			</option>
+			
+			<!-- Directories Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler"
+					name="%OptionCategory.Dirs"
+					id="cell.xl.cpp.compiler.category.dirs">
+			</optionCategory>
+			<!-- Specifies an additional search path for #include filenames that do not specify an absolute path -->
+			<option
+					name="%Option.cell.xl.Compiler.IncludePaths"
+					category="cell.xl.cpp.compiler.category.dirs"
+					id="cell.xl.cpp.compiler.option.include.paths"
+					superClass="cell.xl.c.compiler.option.include.paths">
+			</option>
+			
+			<!-- Optimization Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler"
+					name="%OptionCategory.Optimize"
+					id="cell.xl.cpp.compiler.category.optimization">
+			</optionCategory>
+			<!-- Optimization Level -->
+			<option
+					name="%Option.cell.xl.Compiler.OptLevel"
+					category="cell.xl.cpp.compiler.category.optimization"
+					id="cell.xl.cpp.compiler.option.optimization.level"
+					superClass="cell.xl.c.compiler.option.optimization.level">
+			</option>
+			<!-- -qhot: Perform high-order transformations -->
+			<option
+					id="cell.xl.cpp.compiler.option.optimization.hot"
+					name="%Option.cell.xl.Compiler.Optimization.Hot"
+					category="cell.xl.cpp.compiler.category.optimization"
+					superClass="cell.xl.c.compiler.option.optimization.hot">
+			</option>
+			<!-- -qhot=simd: Try auto-simdization -->
+			<option
+					id="cell.xl.cpp.compiler.option.optimization.simd"
+					name="%Option.cell.xl.Compiler.Optimization.SIMD"
+					category="cell.xl.cpp.compiler.category.optimization"
+					superClass="cell.xl.c.compiler.option.optimization.simd">
+			</option>
+			<!-- Don't inline functions -->
+			<option
+					id="cell.xl.cpp.compiler.option.optimization.noinline"
+					name="%Option.cell.xl.Compiler.Optimization.NoInline"
+					category="cell.xl.cpp.compiler.category.optimization"
+					superClass="cell.xl.c.compiler.option.optimization.noinline">
+			</option>
+			<!-- Substitutes inline code for calls to function alloca. -->
+			<option
+					id="cell.xl.cpp.compiler.option.optimization.alloca"
+					name="%Option.cell.xl.Compiler.Optimization.Alloca"
+					category="cell.xl.cpp.compiler.category.optimization"
+					superClass="cell.xl.c.compiler.option.optimization.alloca">
+			</option>
+			<!-- Other optimization flags -->
+			<option
+					name="%Option.cell.xl.Compiler.OptLevel.Flags"
+					category="cell.xl.cpp.compiler.category.optimization"
+					id="cell.xl.cpp.compiler.option.optimization.flags"
+					superClass="cell.xl.c.compiler.option.optimization.flags">
+			</option>
+			
+			<!-- Debug Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler"
+					name="%OptionCategory.Debug"
+					id="cell.xl.cpp.compiler.category.debug">
+			</optionCategory>
+			<!-- Debug Level -->
+			<option
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					category="cell.xl.cpp.compiler.category.debug"
+					id="cell.xl.cpp.compiler.option.debugging.level"
+					superClass="cell.xl.c.compiler.option.debugging.level">
+			</option>
+			<!-- Other debug options -->
+			<option
+					name="%Option.cell.xl.Compiler.DebugLevel.Other"
+					category="cell.xl.cpp.compiler.category.debug"
+					id="cell.xl.cpp.compiler.option.debugging.other"
+					superClass="cell.xl.c.compiler.option.debugging.other">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.xl.cpp.compiler.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler">
+			</optionCategory>
+			<!-- Sets up the object files produced by the compiler for profiling -->
+			<option
+					id="cell.xl.cpp.compiler.option.debugging.gprof"
+					name="%Option.cell.xl.Compiler.Profile.gprof"
+					category="cell.xl.cpp.compiler.category.profile"
+					superClass="cell.xl.c.compiler.option.debugging.gprof">
+			</option>
+			<!-- Sets up the object files produced by the compiler for profiling -->
+			<option
+					id="cell.xl.cpp.compiler.option.debugging.prof"
+					name="%Option.cell.xl.Compiler.Profile.prof"
+					category="cell.xl.cpp.compiler.category.profile"
+					superClass="cell.xl.c.compiler.option.debugging.prof">
+			</option>
+						
+			<!-- Warnings Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler"
+					name="%OptionCategory.Warn"
+					id="cell.xl.cpp.compiler.category.warnings">
+			</optionCategory>
+			<!-- Performs syntax checking without generating an object file -->
+			<option
+					name="%Option.cell.xl.Compiler.Warn.Syntax"
+					category="cell.xl.cpp.compiler.category.warnings"
+					id="cell.xl.cpp.compiler.option.warnings.syntax"
+					superClass="cell.xl.c.compiler.option.warnings.syntax">
+			</option>
+			<!-- Suppresses warnings and lower-level messages -->
+			<option
+					name="%Option.cell.xl.Compiler.Warn.nowarn"
+					category="cell.xl.cpp.compiler.category.warnings"
+					id="cell.xl.cpp.compiler.option.warnings.nowarn"
+					superClass="cell.xl.c.compiler.option.warnings.nowarn">
+			</option>
+			<!-- Produces additional informational messages -->
+			<option
+					name="%Option.cell.xl.Compiler.Warn.allwarn"
+					category="cell.xl.cpp.compiler.category.warnings"
+					id="cell.xl.cpp.compiler.option.warnings.allwarn"
+					superClass="cell.xl.c.compiler.option.warnings.allwarn">
+			</option>
+			<!-- Stops the compiler after the first phase if the severity of errors detected equals or exceeds the warning level -->
+			<option
+					name="%Option.cell.xl.Compiler.Warn.toerrs"
+					category="cell.xl.cpp.compiler.category.warnings"
+					id="cell.xl.cpp.compiler.option.warnigns.toerrors"
+					superClass="cell.xl.c.compiler.option.warnings.toerrors">
+			</option>
+			
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.xl.cpp.compiler.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler">
+			</optionCategory>
+			
+			<!-- Miscellaneous Options Category -->
+			<optionCategory
+					owner="cell.managedbuild.tool.cell.xl.cpp.compiler"
+					name="%OptionCategory.Misc"
+					id="cell.xl.cpp.compiler.category.misc">
+			</optionCategory>
+			<!-- -c: Instructs the compiler to pass source files to the compiler only -->
+			<!-- By specifying this option, the object files are compiled but are not sent to the linkage editor -->
+			<!-- In CDT's definitions of GNU C Compiler it also has the -fmessage-length=0 flag, which is not necessary with XL C++ Compiler as the output lines are never splitted if they are too long -->
+			<option
+					name="%Option.cell.xl.Compiler.OtherFlags"
+					category="cell.xl.cpp.compiler.category.misc"
+					id="cell.xl.cpp.compiler.option.misc.other"
+					superClass="cell.xl.c.compiler.option.misc.other">
+			</option>
+			<!-- Verbose -->
+			<option
+					name="%Option.cell.xl.Compiler.Verbose"
+					category="cell.xl.cpp.compiler.category.misc"
+					id="cell.xl.cpp.compiler.option.misc.verbose"
+					superClass="cell.xl.c.compiler.option.misc.verbose">
+			</option>
+			
+			<!-- File inputType accepted by the C++ compiler -->
+			<inputType
+					dependencyCalculator="org.eclipse.ptp.cell.managedbuilder.makegen.xl.DefaultXLCDependencyCalculator"
+					dependencyContentType="org.eclipse.cdt.core.cxxHeader"
+					dependencyExtensions="h,H,hpp"
+					id="cell.managedbuild.tool.cell.xl.cpp.compiler.input"
+					name="%Option.cell.xl.Compiler.Input"
+					sourceContentType="org.eclipse.cdt.core.cxxSource"
+					sources="c,C,cc,cxx,cpp">
+			</inputType>
+			
+			<!-- File outputType of the C++ compiler -->
+			<outputType
+					buildVariable="OBJS"
+					id="cell.managedbuild.tool.cell.xl.cpp.compiler.output"
+					name="%Option.cell.xl.Compiler.Output"
+					outputs="o">
+			</outputType>
+
+		</tool>
+
+		<!-- XL Archiver -->
+		<!-- This tool superClass is the CDT's GNU Archiver -->
+		<!-- As there is no archiver specifically available for XL, we must use the common GNU Archiver -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.xl.archiver"
+				name="%ToolName.archiver.xl"
+				isAbstract="true"
+				superClass="cdt.managedbuild.tool.gnu.archiver">
+
+			<option
+					id="cell.xl.archiver.lib.option.flags"
+					name="%Option.Posix.Archiver.Flags"
+					superClass="gnu.both.lib.option.flags"
+					defaultValue="-qcs">
+			</option>
+
+		</tool>
+
+		<!-- -->
+		<!-- PPU XL Tools -->
+		<!-- -->
+
+		<!-- PPU XL Linker -->
+		<!-- This tool is based in Cell's XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in PPU XL Linkers -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl.linker"
+				name="%ToolName.linker.ppu.xl"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.linker"
+				command="ppuxlc">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<option
+					id="cell.ppu.xl.linker.option.emitrelocs"
+					name="%Option.cell.xl.Linker.EmitRelocs"
+					superClass="cell.xl.linker.option.emitrelocs"
+					valueHandlerExtraArgument="cell.xl.linker.option.profile.pdt">
+			</option>
+
+			<!-- -l<library_name>: Libraries -->
+			<option
+					id="cell.ppu.xl.linker.option.libs"
+					name="%Option.cell.xl.Linker.Libs"
+					superClass="cell.xl.linker.option.libs"
+					valueHandlerExtraArgument="cell.ppu.xl.linker.option.libs.lm,cell.ppu.xl.linker.option.libs.lpthread,cell.ppu.xl.linker.option.libs.lspe2">
+			</option>
+			<!-- -L<dir>: At link time, searches the path directory for library files specified by the -lkey option -->
+			<option
+					id="cell.ppu.xl.linker.option.paths"
+					name="%Option.cell.xl.Linker.Libsearch"
+					superClass="cell.xl.linker.option.paths">
+			</option>
+			<!-- -lm -->
+			<option
+					id="cell.ppu.xl.linker.option.libs.lm"
+					name="%Option.cell.xl.Linker.Libs.libm"
+					superClass="cell.xl.linker.option.libs.lm"
+					valueHandlerExtraArgument="cell.ppu.xl.linker.option.libs">
+			</option>
+			<!-- -lpthread -->
+			<option
+					id="cell.ppu.xl.linker.option.libs.lpthread"
+					name="%Option.cell.xl.Linker.Libs.libpthread"
+					category="cell.xl.linker.category.libs"
+					command="-lpthread"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EspecialLibraryShortcutValueHandler"
+					valueHandlerExtraArgument="cell.ppu.xl.linker.option.libs"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+			<!-- -lspe2 -->
+			<option
+					id="cell.ppu.xl.linker.option.libs.lspe2"
+					name="%Option.cell.xl.Linker.Libs.libspe2"
+					category="cell.xl.linker.category.libs"
+					command="-lspe2"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EspecialLibraryShortcutValueHandler"
+					valueHandlerExtraArgument="cell.ppu.xl.linker.option.libs"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.ppu.xl.linker.option.profile.pdt"
+					name="%Option.cell.xl.Linker.Profile.pdt"
+					superClass="cell.xl.linker.option.profile.pdt"
+					valueHandlerExtraArgument="cell.xl.linker.option.emitrelocs">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.ppu.xl.linker.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.ppu.xl.linker">
+			</optionCategory>
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.ppu.xl.linker.option.arch"
+					name="%Option.cell.xl.Architecture"
+					category="cell.ppu.xl.linker.category.arch"
+					valueType="enumerated">
+				<!-- -q32: 32 bit option value -->
+				<enumeratedOptionValue
+						id="cell.ppu.xl.option.arch.32bit"
+						name="%Option.cell.xl.Architecture.32bit"
+						isDefault="true"
+						command="-q32">
+				</enumeratedOptionValue>
+				<!-- -q64: 64 bit option value -->
+				<enumeratedOptionValue
+						id="cell.ppu.xl.option.arch.64bit"
+						name="%Option.cell.xl.Architecture.64bit"
+						isDefault="false"
+						command="-q64">
+				</enumeratedOptionValue>
+			</option>
+
+		</tool>
+
+		<!-- PPU XL C Linker -->
+		<!-- This tool is based in Cell's PPU XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl.c.linker"
+				name="%ToolName.linker.ppu.xl.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.linker"
+				natureFilter="cnature"
+				command="ppuxlc">
+		</tool>
+
+		<!-- PPU XL C++ Linker -->
+		<!-- This tool is based in Cell's PPU XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl.cpp.linker"
+				name="%ToolName.linker.ppu.xl.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.linker"
+				command="ppuxlc++"
+				natureFilter="ccnature">
+		</tool>
+
+		<!-- PPU XL Assembler -->
+		<!-- As there is no XL Assembler available for Cell, it will be used the PPU GNU Assembler defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+
+		<!-- PPU XL C Compiler -->
+		<!-- This tool is based in Cell's XL C Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl.c.compiler"
+				name="%ToolName.compiler.ppu.xl.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.c.compiler"
+				command="ppuxlc">
+
+			<!-- Generate Position Independet Code (PIC) Option -->
+			<option
+					id="cell.ppu.xl.c.compiler.option.pic"
+					name="%Option.cell.xl.Compiler.PIC"
+					category="cell.xl.c.compiler.category.misc"
+					valueType="enumerated">
+				<!-- No PIC -->
+				<enumeratedOptionValue
+						id="cell.ppu.xl.option.pic.no"
+						name="%Option.cell.xl.Compiler.PIC.NoPIC"
+						isDefault="true">
+				</enumeratedOptionValue>
+				<!-- -qpic=small -->
+				<enumeratedOptionValue
+						id="cell.ppu.xl.option.pic.smallpic"
+						name="%Option.cell.xl.Compiler.PIC.SmallPIC"
+						command="-qpic=small">
+				</enumeratedOptionValue>
+				<!-- -qpic=large -->
+				<enumeratedOptionValue
+						id="cell.ppu.xl.option.pic.largepic"
+						name="%Option.cell.xl.Compiler.PIC.LargePIC"
+						command="-qpic=large">
+				</enumeratedOptionValue>
+			</option>
+
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- Let's just inherit PPU XL Linker definitions as they are the same -->
+			<option
+					id="cell.ppu.xl.c.compiler.option.arch"
+					name="%Option.cell.xl.Architecture"
+					category="cell.xl.c.compiler.category.arch"
+					superClass="cell.ppu.xl.linker.option.arch">
+			</option>
+			<!-- -qenablevmx: Enables the generation of vector instructions -->
+			<option
+					id="cell.ppu.xl.c.compiler.option.arch.vmx"
+					name="%Option.cell.xl.Compiler.Architecture.VMX"
+					category="cell.xl.c.compiler.category.arch"
+					command="-qenablevmx"
+					valueType="boolean"
+					defaultValue="true"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.xl.ui.VmxValueHandler"
+					valueHandlerExtraArgument="cell.ppu.xl.c.compiler.option.arch.altivec">
+			</option>
+			<!-- -qaltivec: Instructs the compiler to support vector data types and operators -->
+			<option
+					id="cell.ppu.xl.c.compiler.option.arch.altivec"
+					name="%Option.cell.xl.Compiler.Architecture.Altivec"
+					category="cell.xl.c.compiler.category.arch"
+					command="-qaltivec"
+					valueType="boolean"
+					defaultValue="true"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.xl.ui.AltivecValueHandler"
+					valueHandlerExtraArgument="cell.ppu.xl.c.compiler.option.arch.vmx">
+			</option>
+			
+			<inputType
+            		id="cell.managedbuild.tool.cell.ppu.xl.c.compiler.input"
+         			name="%Option.cell.xl.Compiler.Input"
+         			scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.xlc.core.PPUXLCManagedMakePerProjectProfile"
+         			superClass="cell.managedbuild.tool.cell.xl.c.compiler.input">
+            </inputType>
+
+		</tool>
+
+		<!-- PPU XL C++ Compiler -->
+		<!-- This tool is based in Cell's XL C++ Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl.cpp.compiler"
+				name="%ToolName.compiler.ppu.xl.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.cpp.compiler"
+				command="ppuxlc++">
+
+			<!-- Generate Position Independet Code (PIC) Option -->
+			<option
+					id="cell.ppu.xl.cpp.compiler.option.pic"
+					name="%Option.cell.xl.Compiler.PIC"
+					category="cell.xl.cpp.compiler.category.misc"
+					superClass="cell.ppu.xl.c.compiler.option.pic">
+			</option>
+
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- Let's just inherit PPU XL Linker definitions as they are the same -->
+			<option
+					id="cell.ppu.xl.cpp.compiler.option.arch"
+					name="%Option.cell.xl.Architecture"
+					category="cell.xl.cpp.compiler.category.arch"
+					superClass="cell.ppu.xl.linker.option.arch">
+			</option>
+			<!-- -qenablevmx: Enables the generation of vector instructions -->
+			<option
+					id="cell.ppu.xl.cpp.compiler.option.arch.vmx"
+					name="%Option.cell.xl.Compiler.Architecture.VMX"
+					category="cell.xl.cpp.compiler.category.arch"
+					superClass="cell.ppu.xl.c.compiler.option.arch.vmx"
+					valueHandlerExtraArgument="cell.ppu.xl.cpp.compiler.option.arch.altivec">
+			</option>
+			<!-- -qaltivec: Instructs the compiler to support vector data types and operators -->
+			<option
+					id="cell.ppu.xl.cpp.compiler.option.arch.altivec"
+					name="%Option.cell.xl.Compiler.Architecture.Altivec"
+					category="cell.xl.cpp.compiler.category.arch"
+					superClass="cell.ppu.xl.c.compiler.option.arch.altivec"
+					valueHandlerExtraArgument="cell.ppu.xl.cpp.compiler.option.arch.vmx">
+			</option>
+			
+			<inputType
+        			id="cell.managedbuild.tool.cell.ppu.xl.cpp.compiler.input"
+         			name="%Option.cell.xl.Compiler.Input"
+         			scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.xlc.core.PPUXLCManagedMakePerProjectProfile"
+         			superClass="cell.managedbuild.tool.cell.xl.cpp.compiler.input">
+            </inputType>
+
+		</tool>
+
+		<!-- PPU XL Archiver -->
+		<!-- This tool is based in Cell's XL Archiver -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl.archiver"
+				name="%ToolName.archiver.ppu.xl"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.archiver"
+				command="ppu-ar">
+		</tool>
+
+		<!-- PPU XL Embed SPU -->
+		<!-- As there is no PPU XL Embed SPU available for Cell, it will be used the PPU GNU Embed SPU defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+
+		<!-- -->
+		<!-- PPU XL Linkers pre-configured -->
+		<!-- -->
+
+		<!-- PPU XL C Linker: 32 bit Option -->
+		<!-- This tool is based in Cell's PPU XL C Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl32.c.linker"
+				name="%ToolName.linker.ppu.xl32.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.c.linker">
+
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.xl32.c.linker.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.linker.option.arch"
+					defaultValue="cell.ppu.xl.option.arch.32bit">
+			</option>
+
+		</tool>
+
+		<!-- PPU XL C Linker: 64 bit Option -->
+		<!-- This tool is based in Cell's PPU XL C Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl64.c.linker"
+				name="%ToolName.linker.ppu.xl64.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.c.linker">
+
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.xl64.c.linker.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.linker.option.arch"
+					defaultValue="cell.ppu.xl.option.arch.64bit">
+			</option>
+
+		</tool>
+
+		<!-- PPU XL C++ Linker: 32 bit Option -->
+		<!-- This tool is based in Cell's PPU XL C++ Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl32.cpp.linker"
+				name="%ToolName.linker.ppu.xl32.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.cpp.linker">
+
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.xl32.cpp.linker.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.linker.option.arch"
+					defaultValue="cell.ppu.xl.option.arch.32bit">
+			</option>
+
+		</tool>
+
+		<!-- PPU XL C++ Linker: 64 bit Option -->
+		<!-- This tool is based in Cell's PPU XL C++ Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl64.cpp.linker"
+				name="%ToolName.linker.ppu.xl64.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.cpp.linker">
+
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.xl64.cpp.linker.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.linker.option.arch"
+					defaultValue="cell.ppu.xl.option.arch.64bit">
+			</option>
+		</tool>
+
+		<!-- -->
+		<!-- PPU XL Compilers pre-configured -->
+		<!-- -->
+
+		<!-- PPU XL C Compiler: 32 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU XL C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl32.c.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.c.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.32bit"
+					id="cell.ppu.xl32.c.compiler.debug.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.c.compiler.option.arch">
+			</option>
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.none"
+					id="cell.ppu.xl32.c.compiler.debug.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.c.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.default"
+					id="cell.ppu.xl32.c.compiler.debug.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU XL C Compiler: 32 bit Release Options -->
+		<!-- This tool is based in Cell's PPU XL C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl32.c.release"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.c.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.32bit"
+					id="cell.ppu.xl32.c.compiler.release.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.c.compiler.option.arch">
+			</option>
+			<!-- In release, let's optimize -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.optimize"
+					id="cell.ppu.xl32.c.compiler.release.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.c.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.none"
+					id="cell.ppu.xl32.c.compiler.release.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU XL C Compiler: 64 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU XL 32 bit C Compiler with Debug Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl64.c.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.debug">
+			<!-- Generate 64 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.64bit"
+					id="cell.ppu.xl64.c.compiler.debug.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl32.c.compiler.debug.option.arch">
+			</option>
+		</tool>
+
+		<!-- PPU XL C Compiler: 64 bit Release Options -->
+		<!-- This tool is based in Cell's PPU XL 32 bit C Compiler with Release Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl64.c.release"
+				superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.release">
+			<!-- Generate 64 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.64bit"
+					id="cell.ppu.xl64.c.compiler.release.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl32.c.compiler.release.option.arch">
+			</option>
+		</tool>
+
+		<!-- PPU XL C++ Compiler: 32 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU XL C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl32.cpp.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.cpp.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.32bit"
+					id="cell.ppu.xl32.cpp.compiler.debug.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.cpp.compiler.option.arch">
+			</option>
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.none"
+					id="cell.ppu.xl32.cpp.compiler.debug.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.default"
+					id="cell.ppu.xl32.cpp.compiler.debug.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU XL C++ Compiler: 32 bit Release Options -->
+		<!-- This tool is based in Cell's PPU XL C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl32.cpp.release"
+				superClass="cell.managedbuild.tool.cell.ppu.xl.cpp.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.32bit"
+					id="cell.ppu.xl32.cpp.compiler.release.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl.cpp.compiler.option.arch">
+			</option>
+			<!-- In release, let's optimize -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.optimize"
+					id="cell.ppu.xl32.cpp.compiler.release.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.none"
+					id="cell.ppu.xl32.cpp.compiler.release.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU XL C++ Compiler: 64 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU XL 32 bit C++ Compiler with Debug Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl64.cpp.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.debug">
+			<!-- Generate 64 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.64bit"
+					id="cell.ppu.xl64.cpp.compiler.debug.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl32.cpp.compiler.debug.option.arch">
+			</option>
+		</tool>
+
+		<!-- PPU XL C++ Compiler: 64 bit Release Options -->
+		<!-- This tool is based in Cell's PPU XL 32 bit C++ Compiler with Release Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.xl64.cpp.release"
+				superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.release">
+			<!-- Generate 64 bit object code -->
+			<option
+					defaultValue="cell.ppu.xl.option.arch.64bit"
+					id="cell.ppu.xl64.cpp.compiler.release.option.arch"
+					name="%Option.cell.xl.Architecture"
+					superClass="cell.ppu.xl32.cpp.compiler.release.option.arch">
+			</option>
+		</tool>
+
+		<!-- -->
+		<!-- SPU XL Tools -->
+		<!-- -->
+
+		<!-- SPU XL Linker -->
+		<!-- This tools is based in Cell's XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in SPU XL Linkers -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.linker"
+				name="%ToolName.linker.spu.xl"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.linker"
+				command="spuxlc">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<option
+					id="cell.spu.xl.linker.option.emitrelocs"
+					name="%Option.cell.xl.Linker.EmitRelocs"
+					superClass="cell.xl.linker.option.emitrelocs"
+					valueHandlerExtraArgument="cell.xl.linker.option.profile.pdt,cell.xl.linker.option.userobjs">
+			</option>
+			<!-- -Wl,-\-stack-analysis: Estimate maximum stack requirement. -->
+			<option
+					id="cell.spu.xl.linker.option.stackanalysis"
+					name="%Option.cell.xl.Linker.StackAnalysis"
+					category="cell.xl.linker.category.general"
+					command="-Wl,--stack-analysis"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- -Wl,-\-emit-stack-syms: Add __stack_func giving stack needed for each func. -->
+			<option
+					id="cell.spu.xl.linker.option.emitstacksyms"
+					name="%Option.cell.xl.Linker.EmitStackSyms"
+					category="cell.xl.linker.category.general"
+					command="-Wl,--emit-stack-syms"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- -Wl,-N: Set the text and data sections to be readable and writable. -->
+			<!-- Also, do not page-align the  data  segment,  and  disable linking against shared libraries. -->
+			<!-- If the output format supports Unix style magic numbers, mark the output as "OMAGIC". -->
+			<option
+					id="cell.spu.xl.linker.option.omagic"
+					name="%Option.cell.xl.Linker.Omagic"
+					category="cell.xl.linker.category.general"
+					command="-Wl,-N"
+					valueType="boolean"
+					defaultValue="true"
+					tip="%Option.cell.xl.Linker.Omagic.tip">
+			</option>
+
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.spu.xl.linker.option.profile.pdt"
+					name="%Option.cell.xl.Linker.Profile.pdt"
+					superClass="cell.xl.linker.option.profile.pdt"
+					valueHandlerExtraArgument="cell.xl.linker.option.emitrelocs,cell.xl.linker.option.userobjs">
+			</option>
+
+			<!-- Other objects -->
+			<option
+					id="cell.spu.xl.linker.option.userobjs"
+					name="%Option.cell.xl.UserObjs"
+					superClass="cell.xl.linker.option.userobjs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.OtherObjectsValueHandler"
+					valueHandlerExtraArgument="cell.xl.linker.option.profile.pdt,cell.xl.linker.option.emitrelocs">
+			</option>
+
+			<!-- Overlay Options Category -->
+			<optionCategory
+					id="cell.spu.xl.linker.category.overlay"
+					name="%OptionCategory.Overlay"
+					owner="cell.managedbuild.tool.cell.spu.xl.linker">
+			</optionCategory>
+			<!-- Option to add a linker script to the linking process -->
+			<option
+					id="cell.spu.xl.linker.option.overlay"
+					name="%Option.cell.xl.Linker.Overlay"
+					category="cell.spu.xl.linker.category.overlay"
+					command="-Wl,-T,"
+					valueType="string"
+					browseType="file">
+			</option>
+
+		</tool>
+
+		<!-- SPU XL C Linker -->
+		<!-- This tool is based in Cell's SPU XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.c.linker"
+				name="%ToolName.linker.spu.xl.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.spu.xl.linker"
+				natureFilter="cnature">
+		</tool>
+
+		<!-- SPU XL C++ Linker -->
+		<!-- This tool is based in Cell's XL Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.cpp.linker"
+				name="%ToolName.linker.spu.xl.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.spu.xl.linker"
+				natureFilter="ccnature">
+		</tool>
+
+		<!-- SPU XL Assembler -->
+		<!-- As there is no XL Assembler available for Cell, it will be used the SPU GNU Assembler defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+
+		<!-- SPU XL C Compiler -->
+		<!-- This tool is based in Cell's XL C Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.c.compiler"
+				name="%ToolName.compiler.spu.xl.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.c.compiler"
+				command="spuxlc">
+
+			<!-- -D<name>[=[<def>]]: Defines <name> as in the #define directive -->
+			<option
+					id="cell.spu.xl.c.compiler.option.preprocessor.def.symbols"
+					name="%Option.cell.xl.Compiler.DefSym"
+					superClass="cell.xl.c.compiler.option.preprocessor.def.symbols"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.SymbolsDefinitionValueHandler"
+					valueHandlerExtraArgument="cell.spu.xl.c.compiler.option.profile.pdt,cell.xl.c.compiler.option.include.paths">
+			</option>
+
+			<!-- -I<dir>: Specifies an additional search path for #include filenames that do not specify an absolute path -->
+			<option
+					id="cell.spu.xl.c.compiler.option.include.paths"
+					name="%Option.cell.xl.Compiler.IncludePaths"
+					superClass="cell.xl.c.compiler.option.include.paths"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.IncludePathsValueHandler"
+					valueHandlerExtraArgument="cell.spu.xl.c.compiler.option.profile.pdt,cell.xl.c.compiler.option.preprocessor.def.symbols">
+			</option>
+
+			<!-- Option to choose the instruction scheduling parameters to be used: SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.xl.c.compiler.option.tune"
+					name="%Option.cell.xl.Compiler.Optimization.Tune"
+					category="cell.xl.c.compiler.category.optimization"
+					valueType="enumerated">
+				<!-- Instruction scheduling for SPU -->
+				<enumeratedOptionValue
+						id="cell.spu.xl.option.optimization.tune.cell"
+						name="%Option.cell.xl.Compiler.Optimization.SPU"
+						isDefault="true"
+						command="">
+				</enumeratedOptionValue>
+				<!-- -qtune=edp: instruction scheduling parameters for SPU with enhanced Double Precision -->
+				<enumeratedOptionValue
+						id="cell.spu.xl.option.optimization.tune.celledp"
+						name="%Option.cell.xl.Compiler.Optimization.SPUDP"
+						command="-qtune=edp">
+				</enumeratedOptionValue>
+			</option>
+
+			<!-- Use C99-style standard main interface -->
+			<option
+					id="cell.spu.xl.c.compiler.option.stdmain"
+					name="%Option.cell.xl.Compiler.StandardMain"
+					category="cell.xl.c.compiler.category.misc"
+					command="-qstdmain"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+
+			<!-- Enable PDT compiler flags -->
+			<option
+					id="cell.spu.xl.c.compiler.option.profile.pdt"
+					name="%Option.cell.xl.Compiler.Profile.pdt"
+					superClass="cell.xl.linker.option.profile.pdt"
+					category="cell.xl.c.compiler.category.profile"
+					valueHandlerExtraArgument="cell.xl.c.compiler.option.preprocessor.def.symbols,cell.xl.c.compiler.option.include.paths">
+			</option>
+
+			<!-- Option to choose if the tool will generate object code for SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.xl.c.compiler.option.arch"
+					name="%Option.cell.xl.Architecture"
+					category="cell.xl.c.compiler.category.arch"
+					valueType="enumerated">
+				<!-- SPU -->
+				<enumeratedOptionValue
+						id="cell.spu.xl.option.arch.cell"
+						name="%Option.cell.xl.Compiler.Architecture.SPU"
+						isDefault="true"
+						command="">
+				</enumeratedOptionValue>
+				<!-- -qarch=edp: SPU with enhanced Double Precision -->
+				<enumeratedOptionValue
+						id="cell.spu.xl.option.arch.celledp"
+						name="%Option.cell.xl.Compiler.Architecture.SPUDP"
+						command="-qarch=edp">
+				</enumeratedOptionValue>
+			</option>
+			
+			<inputType
+         			id="cell.managedbuild.tool.cell.spu.xl.c.compiler.input"
+         			name="%Option.cell.xl.Compiler.Input"
+         			scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.xlc.core.SPUXLCManagedMakePerProjectProfile"
+         			superClass="cell.managedbuild.tool.cell.xl.c.compiler.input">
+            </inputType>
+
+		</tool>
+
+		<!-- SPU XL C++ Compiler -->
+		<!-- This tool is based in Cell's XL C++ Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler"
+				name="%ToolName.compiler.spu.xl.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.cpp.compiler"
+				command="spuxlc++">
+
+			<!-- Defines a <name> as in the #define directive -->
+			<option
+					id="cell.spu.xl.cpp.compiler.option.preprocessor.def"
+					name="%Option.cell.xl.Compiler.DefSym"
+					superClass="cell.xl.cpp.compiler.option.preprocessor.def"
+					category="cell.xl.cpp.compiler.category.symbols"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.SymbolsDefinitionValueHandler"
+					valueHandlerExtraArgument="cell.spu.xl.cpp.compiler.option.profile.pdt,cell.xl.cpp.compiler.option.include.paths">
+			</option>
+
+			<!-- Specifies an additional search path for #include filenames that do not specify an absolute path -->
+			<option
+					id="cell.spu.xl.cpp.compiler.option.include.paths"
+					name="%Option.cell.xl.Compiler.IncludePaths"
+					category="cell.xl.cpp.compiler.category.dirs"
+					superClass="cell.xl.cpp.compiler.option.include.paths"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.IncludePathsValueHandler"
+					valueHandlerExtraArgument="cell.spu.xl.cpp.compiler.option.profile.pdt,cell.xl.cpp.compiler.option.preprocessor.def">
+			</option>
+
+			<!-- Option to choose the instruction scheduling parameters to be used: SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.xl.cpp.compiler.option.tune"
+					name="%Option.cell.xl.Compiler.Optimization.Tune"
+					category="cell.xl.cpp.compiler.category.optimization"
+					superClass="cell.spu.xl.c.compiler.option.tune">
+			</option>
+
+			<!-- Use C99-style standard main interface -->
+			<option
+					id="cell.spu.xl.cpp.compiler.option.stdmain"
+					name="%Option.cell.xl.Compiler.StandardMain"
+					category="cell.xl.cpp.compiler.category.misc"
+					superClass="cell.spu.xl.c.compiler.option.stdmain">
+			</option>
+
+			<!-- Enable PDT compiler flags -->
+			<option
+					id="cell.spu.xl.cpp.compiler.option.profile.pdt"
+					name="%Option.cell.xl.Compiler.Profile.pdt"
+					superClass="cell.spu.xl.c.compiler.option.profile.pdt"
+					category="cell.xl.cpp.compiler.category.profile"
+					valueHandlerExtraArgument="cell.xl.cpp.compiler.option.preprocessor.def,cell.xl.cpp.compiler.option.include.paths">
+			</option>
+
+			<!-- Option to choose if the tool will generate object code for SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.xl.cpp.compiler.option.arch"
+					name="%Option.cell.xl.Architecture"
+					category="cell.xl.cpp.compiler.category.arch"
+					superClass="cell.spu.xl.c.compiler.option.arch">
+			</option>
+			
+			<inputType
+         			id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.input"
+         			name="%Option.cell.xl.Compiler.Input"
+         			scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.xlc.core.SPUXLCManagedMakePerProjectProfile"
+         			superClass="cell.managedbuild.tool.cell.xl.cpp.compiler.input">
+            </inputType>
+
+		</tool>
+
+		<!-- SPU XL Archiver -->
+		<!-- This tool is based in Cell's XL Archiver -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.archiver"
+				name="%ToolName.archiver.spu.xl"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.xl.archiver"
+				command="spu-ar">
+		</tool>
+
+		<!-- -->
+		<!-- SPU XL Compiler pre-configured -->
+		<!-- -->
+
+		<!-- SPU XL C Compiler: Debug Options -->
+		<!-- This tool is based in Cell's SPU XL C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.c.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.xl.c.debug"
+				superClass="cell.managedbuild.tool.cell.spu.xl.c.compiler">
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.none"
+					id="cell.spu.xl.c.compiler.debug.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.c.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.default"
+					id="cell.spu.xl.c.compiler.debug.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- SPU XL C Compiler: Release Options -->
+		<!-- This tool is based in Cell's SPU XL C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.c.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.xl.c.release"
+				superClass="cell.managedbuild.tool.cell.spu.xl.c.compiler">
+			<!-- In release, let's optimize -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.optimize"
+					id="cell.spu.xl.c.compiler.release.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.c.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.none"
+					id="cell.spu.xl.c.compiler.release.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- SPU XL C++ Compiler: Debug Options -->
+		<!-- This tool is based in Cell's SPU XL C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.xl.cpp.debug"
+				superClass="cell.managedbuild.tool.cell.spu.xl.cpp.compiler">
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.none"
+					id="cell.spu.xl.cpp.compiler.debug.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.default"
+					id="cell.spu.xl.cpp.compiler.debug.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- SPU XL C++ Compiler: Release Options -->
+		<!-- This tool is based in Cell's SPU XL C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.xl.cpp.release"
+				superClass="cell.managedbuild.tool.cell.spu.xl.cpp.compiler">
+			<!-- In release, let's optimize -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.optimization.level.optimize"
+					id="cell.spu.xl.cpp.compiler.release.option.optimization.level"
+					name="%Option.cell.xl.Compiler.OptLevel"
+					superClass="cell.xl.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="cell.xl.c.compiler.option.debugging.level.none"
+					id="cell.spu.xl.cpp.compiler.release.option.debugging.level"
+					name="%Option.cell.xl.Compiler.DebugLevel"
+					superClass="cell.xl.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- -->
+		<!-- XL Tool Chains -->
+		<!-- -->
+
+		<!-- Cell XL Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell XL tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other XL Tool Chains for Cell -->
+		<!-- XL Tool Chain for Cell currently runs only on x86, x86_64, ppc and ppc64 architectures -->
+		<!-- XL Tool Chain form Cell currently runs only in linux -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.xl"
+				name="%ToolChainName.xl.Gen"
+				isAbstract="true"
+				isToolChainSupported="org.eclipse.ptp.cell.managedbuilder.xl.ui.internal.ManagedXLToolChainSupport"
+				archList="x86,x86_64,ppc,ppc64"
+				osList="linux"
+				configurationEnvironmentSupplier="org.eclipse.ptp.cell.managedbuilder.xl.core.XlToolChainEnvironmentSupplier"
+				configurationMacroSupplier="org.eclipse.ptp.cell.managedbuilder.xl.core.XlToolChainMacroSupplier">
+			<!-- The target platform of Cell C/C++ Projects are Cell based processor machines running Linux -->
+			<!-- The object file generated will be as ELF -->
+			<!-- As CDT already has an ELF parser, we will use it -->
+			<targetPlatform
+					id="cell.managedbuild.target.cell.xl.platform"
+					name="%PlatformName.xl"
+					binaryParser="org.eclipse.cdt.core.ELF"
+					osList="linux"
+					archList="ppc64">
+			</targetPlatform>
+		</toolChain>
+
+		<!-- -->
+		<!-- PPU XL Tool Chains -->
+		<!-- -->
+
+		<!-- Cell PPU XL Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of PPU XL tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL Tool Chains for Cell -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl"
+				name="%ToolChainName.ppu.xl.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.xl"
+				scannerConfigDiscoveryProfileId="org.eclipse.ptp.cell.managedbuilder.core.PPUXLCManagedMakePerProjectProfile">
+			<!-- The builder is the tool that will manage the build of the project -->
+			<!-- CDT uses "make", and Cell is not different -->
+			<builder
+					id="cell.managedbuild.target.cell.ppu.xl.builder"
+					name="%BuilderName.xl"
+					superClass="cdt.managedbuild.target.gnu.builder"
+					buildfileGenerator="org.eclipse.ptp.cell.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+			</builder>
+		</toolChain>
+
+		<!-- Cell PPU XL 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of PPU XL 32 bit tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 32 bit Tool Chains for Cell -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32"
+				name="%ToolChainName.ppu.xl32.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl">
+			<!-- As there is no XL Assembler available for Cell, it will be used the PPU GNU Assembler defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+			<!-- PPU GNU Assembler: 32 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU 32 bit Assembler -->
+			<!-- The assembler is the same for all PPU XL 32 bit Tool Chains for Cell -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.assembler"
+					name="%ToolName.assembler.ppu.gnu32"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.assembler">
+			</tool>
+			<!-- As there is no PPU XL Embed SPU available for Cell, it will be used the PPU GNU Embed SPU defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+			<!-- PPU GNU Embed SPU: 32 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU 32 bit Embed SPU -->
+			<!-- The PPU Embed SPU is the same for all PPU XL 32 bit Tool Chains for Cell -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.embedspu"
+					name="%ToolName.embedspu.ppu.gnu32"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.embedspu">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of PPU XL 64 bit tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 64 bit Tool Chains for Cell -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64"
+				name="%ToolChainName.ppu.xl64.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl">
+			<!-- As there is no XL Assembler available for Cell, it will be used the PPU GNU Assembler defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+			<!-- PPU GNU Assembler: 64 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU 64 bit Assembler -->
+			<!-- The assembler is the same for all PPU XL 64 bit Tool Chains for Cell -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.assembler"
+					name="%ToolName.assembler.ppu.gnu64"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.assembler">
+			</tool>
+			<!-- As there is no PPU XL Embed SPU available for Cell, it will be used the PPU GNU Embed SPU defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+			<!-- PPU GNU Embed SPU: 64 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU 64 bit Embed SPU -->
+			<!-- The PPU Embed SPU is the same for all PPU XL 64 bit Tool Chains for Cell -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.embedspu"
+					name="%ToolName.embedspu.ppu.gnu64"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.embedspu">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 32 bit Executable Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU XL 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU XL 32 bit Executable tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 32 bit Executable Tool Chains -->
+		<!-- To build a 32 bit executable, the targetTool is the PPU XL 32 bit C Linker or the PPU XL 32 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.exe"
+				name="%ToolChainName.ppu.xl32.Exe"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32"
+				targetTool="cell.managedbuild.tool.cell.ppu.xl32.c.linker.exe;cell.managedbuild.tool.cell.ppu.xl32.cpp.linker.exe">
+			<!-- PPU XL C Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.linker.exe"
+					name="%ToolName.linker.ppu.xl32.c"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.linker">
+			</tool>
+			<!-- PPU XL C++ Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.linker.exe"
+					name="%ToolName.linker.ppu.xl32.cpp"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.linker">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 64 bit Executable Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU XL 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU XL 64 bit Executable tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 64 bit Executable Tool Chains -->
+		<!-- To build a 64 bit executable, the targetTools is the PPU XL 64 bit C Linker or the PPU XL 64 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the biuld of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTools and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.exe"
+				name="%ToolChainName.ppu.xl64.Exe"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64"
+				targetTool="cell.managedbuild.tool.cell.ppu.xl64.c.linker.exe;cell.managedbuild.tool.cell.ppu.xl64.cpp.linker.exe">
+			<!-- PPU XL C Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.linker.exe"
+					name="%ToolName.linker.ppu.xl64.c"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.linker">
+			</tool>
+			<!-- PPU XL C++ Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.linker.exe"
+					name="%ToolName.linker.ppu.xl64.cpp"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.linker">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: XL 32 bit Executable Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.exe.debug"
+				name="%ToolChainName.ppu.xl32.Exe.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32.exe">
+			<!-- PPU XL C Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.xl32.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.debug">
+			</tool>
+			<!-- PPU XL C++ Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.xl32.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: XL 32 bit Executable Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.exe.release"
+				name="%ToolChainName.ppu.xl32.Exe.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32.exe">
+			<!-- PPU XL C Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.exe.release"
+					name="%ToolName.compiler.ppu.xl32.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.release">
+			</tool>
+			<!-- PPU XL C++ Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.exe.release"
+					name="%ToolName.compiler.ppu.xl32.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: XL 64 bit Executable Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.exe.debug"
+				name="%ToolChainName.ppu.xl64.Exe.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64.exe">
+			<!-- PPU XL C Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.xl64.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.debug">
+			</tool>
+			<!-- PPU XL C++ Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.xl64.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: XL 64 bit Executable Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.exe.release"
+				name="%ToolChainName.ppu.xl64.Exe.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64.exe">
+			<!-- PPU XL C Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.exe.release"
+					name="%ToolName.compiler.ppu.xl64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.release">
+			</tool>
+			<!-- PPU XL C++ Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.exe.release"
+					name="%ToolName.compiler.ppu.xl64.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 32 bit Shared Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU XL 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU XL 32 bit Shared Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 32 bit Shared Library Tool Chains -->
+		<!-- To build a 32 bit shared library, the targetTool is the PPU XL 32 bit C Linker or the PPU XL 32 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.so"
+				name="%ToolChainName.ppu.xl32.So"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32"
+				targetTool="cell.managedbuild.tool.cell.ppu.xl32.c.linker.so;cell.managedbuild.tool.cell.ppu.xl32.cpp.linker.so">
+			<!-- PPU XL C Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.linker.so"
+					name="%ToolName.linker.ppu.xl32.c"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.linker">
+				<!-- Generate shared object files -->
+				<option
+						id="cell.ppu.xl32.c.linker.so.option.shared"
+						name="%Option.cell.xl.Linker.Shared"
+						defaultValue="true"
+						superClass="cell.xl.linker.option.shared">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.xl32.c.linker.so.output"
+						name="%Option.cell.xl.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.c.linker.output">
+				</outputType>
+			</tool>
+			<!-- PPU XL C++ Linker -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.linker.so"
+					name="%ToolName.linker.ppu.xl32.c"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.linker">
+				<!-- Generate shared object files -->
+				<option
+						id="cell.ppu.xl32.cpp.linker.so.option.shared"
+						name="%Option.cell.xl.Linker.Shared"
+						defaultValue="true"
+						superClass="cell.xl.linker.option.shared">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.xl32.cpp.linker.so.output"
+						name="%Option.cell.xl.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.c.linker.output">
+				</outputType>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 64 bit  Shared Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU XL 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU XL 64 bit Shared Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 64 bit Shared Library Tool Chains -->
+		<!-- To build a 64 bit shared library, the targetTool is the PPU XL 64 bit C Linker or the PPU XL 64 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the biuld of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTools and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.so"
+				name="%ToolChainName.ppu.xl64.So"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64"
+				targetTool="cell.managedbuild.tool.cell.ppu.xl64.c.linker.so;cell.managedbuild.tool.cell.ppu.xl64.cpp.linker.so">
+			<!-- PPU XL C Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.linker.so"
+					name="%ToolName.linker.ppu.xl64.c"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.linker">
+				<!-- Generate shared object fiels -->
+				<option
+						id="cell.ppu.xl64.c.linker.so.option.shared"
+						name="%Option.cell.xl.Linker.Shared"
+						defaultValue="true"
+						superClass="cell.xl.linker.option.shared">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.xl64.c.linker.so.output"
+						name="%Option.cell.xl.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.c.linker.output">
+				</outputType>
+			</tool>
+			<!-- PPU XL C++ Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.linker.so"
+					name="%ToolName.linker.ppu.xl64.c"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.linker">
+				<!-- Generate shared object files -->
+				<option
+						id="cell.ppu.xl64.cpp.linker.so.option.shared"
+						name="%Option.cell.xl.Linker.Shared"
+						defaultValue="true"
+						superClass="cell.xl.linker.option.shared">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.xl64.cpp.linker.so.output"
+						name="%Option.cell.xl.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.c.linker.output">
+				</outputType>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: XL 32 bit Shared Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.so.debug"
+				name="%ToolChainName.ppu.xl32.So.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32.so">
+			<!-- PPU XL C Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.so.debug"
+					name="%ToolName.compiler.ppu.xl32.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.xl32.c.compiler.so.debug.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.c.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+			<!-- PPU XL C++ Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.so.debug"
+					name="%ToolName.compiler.ppu.xl32.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.xl32.cpp.compiler.so.debug.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: XL 32 bit Shared Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.so.release"
+				name="%ToolChainName.ppu.xl32.So.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32.so">
+			<!-- PPU XL C Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.so.release"
+					name="%ToolName.compiler.ppu.xl32.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.xl32.c.compiler.so.release.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.c.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+			<!-- PPU XL C++ Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.so.release"
+					name="%ToolName.compiler.ppu.xl32.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.xl32.cpp.compiler.so.release.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: XL 64 bit Shared Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.so.debug"
+				name="%ToolChainName.ppu.xl64.So.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64.so">
+			<!-- PPU XL C Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.so.debug"
+					name="%ToolName.compiler.ppu.xl64.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.xl64.c.compiler.so.debug.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.c.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+			<!-- PPU XL C++ Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.so.debug"
+					name="%ToolName.compiler.ppu.xl64.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.xl64.cpp.compiler.so.debug.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: XL 64 bit Shared Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.so.release"
+				name="%ToolChainName.ppu.xl64.So.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64.so">
+			<!-- PPU XL C Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.so.release"
+					name="%ToolName.compiler.ppu.xl64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.xl64.c.compiler.so.release.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.c.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+			<!-- PPU XL C++ Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.so.release"
+					name="%ToolName.compiler.ppu.xl64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.xl64.cpp.compiler.so.release.option.pic"
+						name="%Option.cell.xl.Compiler.PIC"
+						superClass="cell.ppu.xl.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.xl.option.pic.smallpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 32 bit Static Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU XL 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU XL 32 bit Static Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 32 bit Static Library Tool Chains -->
+		<!-- To build a 32 bit static library, the targetTool is the PPU XL Archiver -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.lib"
+				name="%ToolChainName.ppu.xl32.Lib"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32"
+				targetTool="cell.managedbuild.tool.cell.ppu.xl32.archiver.lib">
+			<!-- PPU XL Archiver -->
+			<!-- The PPU XL Archiver does not have 32 bit or 64 bit options -->
+			<!-- The PPU XL Archiver just packs the object files together -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.archiver.lib"
+					name="%ToolName.archiver.ppu.xl"
+					superClass="cell.managedbuild.tool.cell.ppu.xl.archiver">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU XL 64 bit Static Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU XL 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU XL 64 bit Static Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU XL 64 bit Static Library Tool Chains -->
+		<!-- To build a 64 bit static library, the targetTool si the PPU XL Archiver -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.lib"
+				name="%ToolChainName.ppu.xl64.Lib"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64"
+				targetTool="cell.managedbuild.tool.cell.ppu.xl64.archiver.lib">
+			<!-- PPU XL Archiver -->
+			<!-- The PPU XL Archiver does not have 32 bit or 64 bit options -->
+			<!-- The PPU XL Archiver just packs the object files together -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.archiver.lib"
+					name="%ToolName.archiver.ppu.xl"
+					superClass="cell.managedbuild.tool.cell.ppu.xl.archiver">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: XL 32 bit Static Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.lib.debug"
+				name="%ToolChainName.ppu.xl32.Lib.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32.lib">
+			<!-- PPU XL C Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.xl32.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.debug">
+			</tool>
+			<!-- PPU XL C++ Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.xl32.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: XL 32 bit Static Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl32.lib.release"
+				name="%ToolChainName.ppu.xl32.Lib.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl32.lib">
+			<!-- PPU XL C Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.lib.release"
+					name="%ToolName.compiler.ppu.xl32.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.c.compiler.release">
+			</tool>
+			<!-- PPU XL C++ Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.lib.release"
+					name="%ToolName.compiler.ppu.xl32.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl32.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: XL 64 bit Static Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.lib.debug"
+				name="%ToolChainName.ppu.xl64.Lib.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64.lib">
+			<!-- PPU XL C Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.xl64.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.debug">
+			</tool>
+			<!-- PPU XL C++ Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.xl64.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: XL 64 bit Static Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.xl64.lib.release"
+				name="%ToolChainName.ppu.xl64.Lib.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.xl64.lib">
+			<!-- PPU XL C Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.lib.release"
+					name="%ToolName.compiler.ppu.xl64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.c.compiler.release">
+			</tool>
+			<!-- PPU XL C++ Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.lib.release"
+					name="%ToolName.compiler.ppu.xl64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.xl64.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- -->
+		<!-- SPU XL Tool Chains -->
+		<!-- -->
+
+		<!-- Cell SPU XL Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of SPU XL tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other SPU XL Tool Chains for Cell -->
+		<!-- It is important to remember that SPU just supports 32 bit object files -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl"
+				name="%ToolChainName.spu.xl.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.xl"
+				scannerConfigDiscoveryProfileId="org.eclipse.ptp.cell.managedbuilder.core.SPUXLCManagedMakePerProjectProfile">
+			<!-- The builder is the tool that will manage the build of the project -->
+			<!-- CDT uses "make", and Cell is not different -->
+			<builder
+					id="cell.managedbuild.target.cell.xl.builder"
+					name="%BuilderName.xl"
+					superClass="cdt.managedbuild.target.gnu.builder">
+			</builder>
+			<!-- As there is no XL Assembler available for Cell, it will be used the SPU GNU Assembler defined in org.eclipse.ptp.cell.managedbuilder.gnu.ui -->
+			<!-- SPU GNU Assembler -->
+			<!-- This tool is based in Cell's SPU GNU Assembler -->
+			<!-- The assembler is the same for all SPU XL Tool Chains for Cell -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.assembler"
+					name="%ToolName.assembler.spu.gnu"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.assembler">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU XL Executable Generic Tool Chain -->
+		<!-- This tool chain is based on Cell SPU XL Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell SPU XL Executable tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other SPU XL Executable Tool Chains -->
+		<!-- To build an executable, the targetTool is the XL C Linker or the XL C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTools and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl.exe"
+				name="%ToolChainName.spu.xl.Exe"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.spu.xl"
+				targetTool="cell.managedbuild.tool.cell.spu.xl.c.linker.exe;cell.managedbuild.tool.cell.spu.xl.cpp.linker.exe">
+			<!-- SPU XL C Linker -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.c.linker.exe"
+					name="%ToolName.linker.spu.xl.c"
+					superClass="cell.managedbuild.tool.cell.spu.xl.c.linker">
+			</tool>
+			<!-- SPU XL C++ Linker -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.cpp.linker.exe"
+					name="%ToolName.linker.spu.xl.cpp"
+					superClass="cell.managedbuild.tool.cell.spu.xl.cpp.linker">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Executable: XL Executable Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl.exe.debug"
+				name="%ToolChainName.spu.xl.Exe.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.spu.xl.exe">
+			<!-- SPU XL C Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.c.compiler.exe.debug"
+					name="%ToolName.compiler.spu.xl.c.debug"
+					superClass="cell.managedbuild.tool.cell.spu.xl.c.compiler.debug">
+			</tool>
+			<!-- SPU XL C++ Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.exe.debug"
+					name="%ToolName.compiler.spu.xl.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Executable: XL Executable Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl.exe.release"
+				name="%ToolChainName.spu.xl.Exe.Rel"
+				superClass="cell.managedbuild.toolchain.cell.spu.xl.exe">
+			<!-- SPU XL C Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.c.compiler.exe.release"
+					name="%ToolName.compiler.spu.xl.c.release"
+					superClass="cell.managedbuild.tool.cell.spu.xl.c.compiler.release">
+			</tool>
+			<!-- SPU XL C++ Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.exe.release"
+					name="%ToolName.compiler.spu.xl.cpp.release"
+					superClass="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU XL Static Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell SPU XL Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options on Cell SPU XL Static Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other SPU XL Static Library Tool Chains -->
+		<!-- To build a static library, the targetTools is the XL Archiver -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl.lib"
+				name="%ToolChainName.spu.xl.Lib"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.spu.xl"
+				targetTool="cell.managedbuild.tool.cell.sp.xl.archiver">
+			<!-- SPU XL Archiver -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.archiver.lib"
+					name="%ToolName.archiver.spu.xl"
+					superClass="cell.managedbuild.tool.cell.spu.xl.archiver">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Static Library: XL Static Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl.lib.debug"
+				name="%ToolChainName.spu.xl.Lib.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.spu.xl.lib">
+			<!-- SPU XL C Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.c.compiler.lib.debug"
+					name="%ToolName.compiler.spu.xl.c.debug"
+					superClass="cell.managedbuild.tool.cell.spu.xl.c.compiler.debug">
+			</tool>
+			<!-- SPU XL C++ Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.lib.debug"
+					name="%ToolName.compiler.spu.xl.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Static Library: XL Static Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.xl.lib.release"
+				name="%ToolChainName.spu.xl.Lib.Rel"
+				superClass="cell.managedbuild.toolchain.cell.spu.xl.lib">
+			<!-- SPU XL C Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.xl.c.compiler.lib.release"
+					name="%ToolName.compiler.spu.xl.c.release"
+					superClass="cell.managedbuild.tool.cell.spu.xl.c.compiler.release">
+			</tool>
+			<!-- SPU XL C++ Compiler Release -->
+			<tool
+					id="cell.managedbiuld.tool.cell.spu.xl.cpp.compiler.lib.release"
+					name="%ToolName.compiler.spu.xl.cpp.release"
+					superClass="cell.managedbuild.tool.cell.spu.xl.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+	</extension>
+</plugin>

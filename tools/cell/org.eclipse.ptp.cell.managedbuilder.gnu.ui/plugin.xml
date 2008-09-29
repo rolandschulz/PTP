@@ -1,0 +1,2354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+	<!-- A preference page to hold Cell Managed Build useful information -->
+	<!-- This preference page will hold the value for the path to the tools and compilers used during the build process -->
+	<extension
+			point="org.eclipse.ui.preferencePages">
+		<page
+				id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.ManagedBuilder.GnuTools"
+				category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.ManagedBuilder"
+				class="org.eclipse.ptp.cell.managedbuilder.gnu.ui.preferences.GnuToolsPreferencesPage"
+				name="%GnuTools.PreferencePageName">
+		</page>
+	</extension>
+	<!-- Initializer class loads the default values or stored values in the preference page -->
+	<extension
+			point="org.eclipse.core.runtime.preferences">
+		<initializer
+				class="org.eclipse.ptp.cell.managedbuilder.gnu.ui.preferences.GnuToolsPreferencesInitializer">
+		</initializer>
+	</extension>
+
+	<!-- We have to extend the buildDefinitions of CDT's MBS so that we can define new Tool Chains and Tools -->
+	<extension
+			id="cell.gnu.managed.build.info"
+			name="%GnuTools.BuildDefinitionsName"
+			point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+	    <managedBuildRevision
+	    		fileVersion="1.2.0">
+	    </managedBuildRevision>
+
+   	    <!-- String values starting with percentage character refers to string definition in file plugin.properties -->
+
+		<!-- -->
+		<!-- GNU Tools for Cell -->
+		<!-- -->
+
+		<!-- GNU C Linker for Cell-->
+		<!-- This tool superClass is the CDT's GNU C Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.gnu.c.linker"
+				name="%ToolName.linker.gnu.c"
+				superClass="cdt.managedbuild.tool.gnu.c.linker"
+				isAbstract="true">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<!-- Post link analysis and optimization tools may need this information in order to perform correct modifications of executables. -->
+			<!-- This results in larger executables. -->
+			<option
+					id="cell.gnu.c.linker.option.emitrelocs"
+					name="%Option.cell.gnu.Linker.EmitRelocs"
+					category="gnu.c.link.category.general"
+					command="-Wl,-q"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EmitRelocsValueHandler">
+			</option>
+
+			<!-- -l<library_name>: Libraries -->
+			<option
+					id="cell.gnu.c.linker.option.libs"
+					name="%Option.Posix.Libs"
+					superClass="gnu.c.link.option.libs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.LibraryListValueHandler"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.libs.lm">
+			</option>
+			<!-- -lm -->
+			<option
+					id="cell.gnu.c.linker.option.libs.lm"
+					name="%Option.cell.gnu.Linker.Libs.libm"
+					category="gnu.c.link.category.libs"
+					command="-lm"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EspecialLibraryShortcutValueHandler"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.libs"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.gnu.c.linker.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.gnu.c.linker">
+			</optionCategory>
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.gnu.c.linker.option.profile.pdt"
+					name="%Option.cell.gnu.Linker.Profile.pdt"
+					category="cell.gnu.c.linker.category.profile"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.PDTEnablementValueHandler"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+		</tool>
+
+		<!-- GNU C++ Linker for Cell -->
+		<!-- This tool superClass is the CDT's GNU C++ Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.gnu.cpp.linker"
+				name="%ToolName.linker.gnu.cpp"
+				superClass="cdt.managedbuild.tool.gnu.cpp.linker"
+				isAbstract="true">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<!-- Post link analysis and optimization tools may need this information in order to perform correct modifications of executables. -->
+			<!-- This results in larger executables. -->
+			<option
+					id="cell.gnu.cpp.linker.option.emitrelocs"
+					name="%Option.cell.gnu.Linker.EmitRelocs"
+					category="gnu.cpp.link.category.options"
+					superClass="cell.gnu.c.linker.option.emitrelocs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EmitRelocsValueHandler">
+			</option>
+			
+			<!-- -l<library_name>: Libraries -->
+			<option
+					id="cell.gnu.cpp.linker.option.libs"
+					name="%Option.Posix.Libs"
+					superClass="gnu.cpp.link.option.libs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.LibraryListValueHandler"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.libs.lm">
+			</option>
+			<!-- -lm -->
+			<option
+					id="cell.gnu.cpp.linker.option.libs.lm"
+					name="%Option.cell.gnu.Linker.Libs.libm"
+					category="gnu.cpp.link.category.libs"
+					superClass="cell.gnu.c.linker.option.libs.lm"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.libs">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.gnu.cpp.linker.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.gnu.cpp.linker">
+			</optionCategory>
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.gnu.cpp.linker.option.profile.pdt"
+					name="%Option.cell.gnu.Linker.Profile.pdt"
+					category="cell.gnu.cpp.linker.category.profile"
+					superClass="cell.gnu.c.linker.option.profile.pdt">
+			</option>
+
+		</tool>
+
+		<!-- GNU C Compiler for Cell-->
+		<!-- This tool superClass is the CDT's GNU C Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.gnu.c.compiler"
+				name="%ToolName.compiler.gnu.c"
+				superClass="cdt.managedbuild.tool.gnu.c.compiler"
+				isAbstract="true">
+
+			<!-- -Winline: Warn if a function can not be inlined and it was declared as inline. -->
+			<!-- Even with this option, the compiler will not warn about failures to inline functions declared in system headers. -->
+			<option
+					id="cell.gnu.c.compiler.option.warnings.inline"
+					name="%Option.cell.gnu.Compiler.InlineWarning"
+					category="gnu.c.compiler.category.warnings"
+					command="-Winline"
+					valueType="boolean"
+					defaultValue="true">
+			</option>
+			<!-- -Wextra: Print extra warning messages. -->
+			<option
+					id="cell.gnu.c.compiler.option.warnings.extra"
+					name="%Option.cell.gnu.Compiler.ExtraWarning"
+					category="gnu.c.compiler.category.warnings"
+					command="-Wextra"
+					valueType="boolean"
+					defaultValue="true">
+			</option>
+
+			<!-- -fno-inline: Don't pay attention to the "inline" keyword. -->
+			<option
+					id="cell.gnu.c.compiler.option.optimization.noinline"
+					name="%Option.cell.gnu.Compiler.Optimization.NoInline"
+					category="gnu.c.compiler.category.optimization"
+					command="-fno-inline"
+					valueType="boolean"
+					defaultValue="true">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.gnu.c.compiler.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.gnu.c.compiler">
+			</optionCategory>
+			<!-- -pg: Sets up the object files produced by the compiler for profiling -->
+			<option
+					id="cell.gnu.c.compiler.option.profile.gprof"
+					name="%Option.cell.gnu.Compiler.gprof"
+					superClass="gnu.c.compiler.option.debugging.gprof"
+					category="cell.gnu.c.compiler.category.profile">
+			</option>
+			<!-- -p: Sets up the object files produced by the compiler for profiling -->			
+			<option
+					id="cell.gnu.c.compiler.option.profile.prof"
+					name="%Option.cell.gnu.Compiler.prof"
+					superClass="gnu.c.compiler.option.debugging.prof"
+					category="cell.gnu.c.compiler.category.profile">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.gnu.c.compiler.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.gnu.c.compiler">
+			</optionCategory>
+
+		</tool>
+
+		<!-- GNU C++ Compiler for Cell -->
+		<!-- This tool superClass is the CDT's GNU C++ Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.gnu.cpp.compiler"
+				name="%ToolName.compiler.gnu.cpp"
+				superClass="cdt.managedbuild.tool.gnu.cpp.compiler"
+				isAbstract="true">
+			
+			<!-- -Winline: Warn if a function can not be inlined and it was declared as inline. -->
+			<!-- Even with this option, the compiler will not warn about failures to inline functions declared in system headers. -->
+			<option
+					id="cell.gnu.cpp.compiler.option.warnings.inline"
+					name="%Option.cell.gnu.Compiler.InlineWarning"
+					category="gnu.cpp.compiler.category.warnings"
+					superClass="cell.gnu.c.compiler.option.warnings.inline">
+			</option>
+			<!-- -Wextra: Print extra warning messages. -->
+			<option
+					id="cell.gnu.cpp.compiler.option.warnings.extra"
+					name="%Option.cell.gnu.Compiler.ExtraWarning"
+					category="gnu.cpp.compiler.category.warnings"
+					superClass="cell.gnu.c.compiler.option.warnings.extra">
+			</option>
+
+			<!-- -fno-inline: Don't pay attention to the "inline" keyword. -->
+			<option
+					id="cell.gnu.cpp.compiler.option.optimization.noinline"
+					name="%Option.cell.gnu.Compiler.Optimization.NoInline"
+					category="gnu.cpp.compiler.category.optimization"
+					superClass="cell.gnu.c.compiler.option.optimization.noinline">
+			</option>
+
+			<!-- Profile & Trace Options Category -->
+			<optionCategory
+					id="cell.gnu.cpp.compiler.category.profile"
+					name="%OptionCategory.Profile"
+					owner="cell.managedbuild.tool.cell.gnu.cpp.compiler">
+			</optionCategory>
+			<!-- -pg: Sets up the object files produced by the compiler for profiling -->
+			<option
+					id="cell.gnu.cpp.compiler.option.profile.gprof"
+					name="%Option.cell.gnu.Compiler.gprof"
+					superClass="gnu.cpp.compiler.option.debugging.gprof"
+					category="cell.gnu.cpp.compiler.category.profile">
+			</option>
+			<!-- -p: Sets up the object files produced by the compiler for profiling -->			
+			<option
+					id="cell.gnu.cpp.compiler.option.profile.prof"
+					name="%Option.cell.gnu.Compiler.prof"
+					superClass="gnu.cpp.compiler.option.debugging.prof"
+					category="cell.gnu.cpp.compiler.category.profile">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.gnu.cpp.compiler.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.gnu.cpp.compiler">
+			</optionCategory>
+
+		</tool>
+
+		<!-- GNU Archiver for Cell -->
+		<!-- This tool superClass is the CDT's GNU Archiver -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.gnu.archiver"
+				name="%ToolName.archiver.gnu"
+				superClass="cdt.managedbuild.tool.gnu.archiver"
+				isAbstract="true">
+
+			<option
+					id="cell.gnu.archiver.lib.option.flags"
+					name="%Option.Posix.Archiver.Flags"
+					superClass="gnu.both.lib.option.flags"
+					defaultValue="-qcs">
+			</option>
+
+		</tool>
+
+		<!-- -->
+		<!-- PPU GNU Tools -->
+		<!-- -->
+
+		<!-- PPU GNU C Linker -->
+		<!-- This tool superClass is the Cell's GNU C Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.c.linker"
+				name="%ToolName.linker.ppu.gnu.c"
+				superClass="cell.managedbuild.tool.cell.gnu.c.linker"
+				isAbstract="true"
+				command="ppu-gcc">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.emitrelocs"
+					name="%Option.cell.gnu.Linker.EmitRelocs"
+					superClass="cell.gnu.c.linker.option.emitrelocs"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.profile.pdt">
+			</option>
+
+			<!-- -l<library_name>: Libraries -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.libs"
+					name="%Option.Posix.Libs"
+					superClass="cell.gnu.c.linker.option.libs"
+					valueHandlerExtraArgument="cell.ppu.gnu.c.linker.option.libs.lm,cell.ppu.gnu.c.linker.option.libs.lpthread,cell.ppu.gnu.c.linker.option.libs.lspe2">
+			</option>
+			<!-- -lm -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.libs.lm"
+					name="%Option.cell.gnu.Linker.Libs.libm"
+					superClass="cell.gnu.c.linker.option.libs.lm"
+					valueHandlerExtraArgument="cell.ppu.gnu.c.linker.option.libs">
+			</option>
+			<!-- -lpthread -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.libs.lpthread"
+					name="%Option.cell.gnu.Linker.Libs.libpthread"
+					category="gnu.c.link.category.libs"
+					command="-lpthread"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EspecialLibraryShortcutValueHandler"
+					valueHandlerExtraArgument="cell.ppu.gnu.c.linker.option.libs"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+			<!-- -lspe2 -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.libs.lspe2"
+					name="%Option.cell.gnu.Linker.Libs.libspe2"
+					category="gnu.c.link.category.libs"
+					command="-lspe2"
+					valueType="boolean"
+					defaultValue="false"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.EspecialLibraryShortcutValueHandler"
+					valueHandlerExtraArgument="cell.ppu.gnu.c.linker.option.libs"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.profile.pdt"
+					name="%Option.cell.gnu.Linker.Profile.pdt"
+					superClass="cell.gnu.c.linker.option.profile.pdt"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.emitrelocs">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.ppu.gnu.c.linker.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.ppu.gnu.c.linker">
+			</optionCategory>
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.ppu.gnu.c.linker.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.ppu.gnu.c.linker.category.arch"
+					valueType="enumerated">
+				<!-- -m32: 32 bit option value -->
+				<enumeratedOptionValue
+						id="cell.ppu.gnu.option.arch.32bit"
+						name="%Option.cell.gnu.Architecture.32bit"
+						isDefault="false"
+						command="-m32">
+				</enumeratedOptionValue>
+				<!-- -m64: 64 bit option value -->
+				<enumeratedOptionValue
+						id="cell.ppu.gnu.option.arch.64bit"
+						name="%Option.cell.gnu.Architecture.64bit"
+						isDefault="true"
+						command="-m64">
+				</enumeratedOptionValue>
+			</option>
+
+		</tool>
+
+		<!-- PPU GNU C++ Linker -->
+		<!-- This tool superClass is the Cell's GNU C++ Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.cpp.linker"
+				name="%ToolName.linker.ppu.gnu.cpp"
+				superClass="cell.managedbuild.tool.cell.gnu.cpp.linker"
+				isAbstract="true"
+				command="ppu-g++">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.emitrelocs"
+					name="%Option.cell.gnu.Linker.EmitRelocs"
+					superClass="cell.gnu.cpp.linker.option.emitrelocs"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.profile.pdt">
+			</option>
+
+			<!-- -l<libary_name>: Libraries -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.libs"
+					name="%Option.Posix.Libs"
+					superClass="cell.gnu.cpp.linker.option.libs"
+					valueHandlerExtraArgument="cell.ppu.gnu.cpp.linker.option.libs.lm,cell.ppu.gnu.cpp.linker.option.libs.lpthread,cell.ppu.gnu.cpp.linker.option.libs.lspe2">
+			</option>
+			<!-- -lm -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.libs.lm"
+					name="%Option.cell.gnu.Linker.Libs.libm"
+					superClass="cell.gnu.cpp.linker.option.libs.lm"
+					valueHandlerExtraArgument="cell.ppu.gnu.cpp.linker.option.libs">
+			</option>
+			<!-- -lpthread -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.libs.lpthread"
+					name="%Option.cell.gnu.Linker.Libs.libpthread"
+					category="gnu.cpp.link.category.libs"
+					superClass="cell.ppu.gnu.c.linker.option.libs.lpthread"
+					valueHandlerExtraArgument="cell.ppu.gnu.cpp.linker.option.libs">
+			</option>
+			<!-- -lspe2 -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.libs.lspe2"
+					name="%Option.cell.gnu.Linker.Libs.libspe2"
+					category="gnu.cpp.link.category.libs"
+					superClass="cell.ppu.gnu.c.linker.option.libs.lspe2"
+					valueHandlerExtraArgument="cell.ppu.gnu.cpp.linker.option.libs">
+			</option>
+
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.profile.pdt"
+					name="%Option.cell.gnu.Linker.Profile.pdt"
+					superClass="cell.gnu.cpp.linker.option.profile.pdt"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.emitrelocs">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.ppu.gnu.cpp.linker.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.ppu.gnu.cpp.linker">
+			</optionCategory>
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- Let's just inherit PPU GNU C Linker definitions as they are the same -->
+			<option
+					id="cell.ppu.gnu.cpp.linker.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.ppu.gnu.cpp.linker.category.arch"
+					superClass="cell.ppu.gnu.c.linker.option.arch">
+			</option>
+
+		</tool>
+
+		<!-- PPU GNU Assembler -->
+		<!-- This tool superClass is the CDT's GNU Assembler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.assembler"
+				name="%ToolName.assembler.ppu.gnu"
+				superClass="cdt.managedbuild.tool.gnu.assembler"
+				isAbstract="true"
+				command="ppu-as">
+		</tool>
+
+		<!-- PPU GNU C Compiler -->
+		<!-- This tool superClass is the GNU C Compiler for Cell -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.c.compiler"
+				name="%ToolName.compiler.ppu.gnu.c"
+				superClass="cell.managedbuild.tool.cell.gnu.c.compiler"
+				isAbstract="true"
+				command="ppu-gcc">
+
+			<!-- Generate Position Independent Code (PIC) Option -->
+			<option
+					id="cell.ppu.gnu.c.compiler.option.pic"
+					name="%Option.cell.gnu.Compiler.PIC"
+					category="gnu.c.compiler.category.other"
+					valueType="enumerated">
+				<!-- No PIC -->
+				<enumeratedOptionValue
+						id="cell.ppu.gnu.option.pic.no"
+						name="%Option.cell.gnu.Compiler.PIC.NoPIC"
+						isDefault="true">
+				</enumeratedOptionValue>
+				<!-- -fpic -->
+				<enumeratedOptionValue
+						id="cell.ppu.gnu.option.pic.limitedpic"
+						name="%Option.cell.gnu.Compiler.PIC.LimitedPIC"
+						command="-fpic">
+				</enumeratedOptionValue>
+				<!-- -fPIC -->
+				<enumeratedOptionValue
+						id="cell.ppu.gnu.option.pic.unlimitedpic"
+						name="%Option.cell.gnu.Compiler.PIC.UnlimitedPIC"
+						command="-fPIC">
+				</enumeratedOptionValue>
+			</option>
+
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- Let's just inherit PPU GNU C Linker definitions as they are the same -->
+			<option
+					id="cell.ppu.gnu.c.compiler.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.gnu.c.compiler.category.arch"
+					superClass="cell.ppu.gnu.c.linker.option.arch">
+			</option>
+			<!-- -mabi=altivec: Extend the current ABI with Altivec extension -->
+			<option
+					id="cell.ppu.gnu.c.compiler.option.arch.altivec_abi"
+					name="%Option.cell.gnu.Compiler.Architecture.AltivecABI"
+					category="cell.gnu.c.compiler.category.arch"
+					command="-mabi=altivec"
+					valueType="boolean"
+					defaultValue="true"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.gnu.ui.AltivecABIValueHandler"
+					valueHandlerExtraArgument="cell.ppu.gnu.c.compiler.option.arch.altivec">
+			</option>
+			<!-- -maltivec: Generate code that uses Altivec instructions -->
+			<option
+					id="cell.ppu.gnu.c.compiler.option.arch.altivec"
+					name="%Option.cell.gnu.Compiler.Architecture.Altivec"
+					category="cell.gnu.c.compiler.category.arch"
+					command="-maltivec"
+					valueType="boolean"
+					defaultValue="true"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.gnu.ui.AltivecValueHandler"
+					valueHandlerExtraArgument="cell.ppu.gnu.c.compiler.option.arch.altivec_abi">
+			</option>
+
+			<inputType
+					id="cell.managedbuild.tool.cell.ppu.gnu.c.compiler.input"
+					superClass="cdt.managedbuild.tool.gnu.c.compiler.input"
+					scannerConfigDiscoveryProfileId="org.eclipse.ptp.cell.managedbuilder.core.PPUGCCManagedMakePerProjectProfile">
+			</inputType>
+
+		</tool>
+
+		<!-- PPU GNU C++ Compiler -->
+		<!-- This tool superClass is the Cell's GNU C++ Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.cpp.compiler"
+				name="%ToolName.compiler.ppu.gnu.cpp"
+				superClass="cell.managedbuild.tool.cell.gnu.cpp.compiler"
+				isAbstract="true"
+				command="ppu-g++">
+
+			<!-- Symbols Options Category -->
+			<optionCategory
+					id="cell.ppu.gnu.cpp.compiler.category.symbols"
+					name="%OptionCategory.Symbols"
+					owner="cell.managedbuild.tool.cell.ppu.gnu.cpp.compiler">
+			</optionCategory>
+			<!-- -D<name>[=[<def>]]: Defines <name> as in the #define directive -->
+			<!-- <def> is an optional definition or value assigned to <name> -->
+			<!-- -D<name>= (no definition) is equivalent to #define <name> -->
+			<!-- -D<name> (no '=' and no definition) is equivalent to #define <name> 1 -->
+			<!-- The default is -D<name> -->
+			<option
+					id="cell.ppu.gnu.cpp.compiler.option.symbols.def.symbols"
+					name="%Option.cell.gnu.Compiler.DefSym"
+					superClass="gnu.cpp.compiler.option.preprocessor.def"
+					category="cell.ppu.gnu.cpp.compiler.category.symbols">
+			</option>
+			<!-- -U<name>: Undefines the identifier name defined by the compiler or by the -Dname option -->
+			<option
+					id="cell.ppu.gnu.cpp.compiler.option.symbols.undef.symbols"
+					name="%Option.cell.gnu.Compiler.UndefSym"
+					superClass="gnu.cpp.compiler.option.preprocessor.undef"
+					category="cell.ppu.gnu.cpp.compiler.category.symbols">
+			</option>
+
+			<!-- Generate Position Independent Code (PIC) Option -->
+			<option
+					id="cell.ppu.gnu.cpp.compiler.option.pic"
+					name="%Option.cell.gnu.Compiler.PIC"
+					category="gnu.cpp.compiler.category.other"
+					superClass="cell.ppu.gnu.c.compiler.option.pic">
+			</option>
+
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- Let's just inherit PPU GNU C Linker definitions as they are the same -->
+			<option
+					id="cell.ppu.gnu.cpp.compiler.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.gnu.cpp.compiler.category.arch"
+					superClass="cell.ppu.gnu.c.linker.option.arch">
+			</option>
+			<!-- -mabi=altivec: Extend the current ABI with Altivec extension -->
+			<option
+					id="cell.ppu.gnu.cpp.compiler.option.arch.altivec_abi"
+					name="%Option.cell.gnu.Compiler.Architecture.AltivecABI"
+					category="cell.gnu.cpp.compiler.category.arch"
+					superClass="cell.ppu.gnu.c.compiler.option.arch.altivec_abi"
+					valueHandlerExtraArgument="cell.ppu.gnu.cpp.compiler.option.arch.altivec">
+			</option>
+			<!-- -maltivec: Generate code that uses Altivec instructions -->
+			<option
+					id="cell.ppu.gnu.cpp.compiler.option.arch.altivec"
+					name="%Option.cell.gnu.Compiler.Architecture.Altivec"
+					category="cell.gnu.cpp.compiler.category.arch"
+					superClass="cell.ppu.gnu.c.compiler.option.arch.altivec"
+					valueHandlerExtraArgument="cell.ppu.gnu.cpp.compiler.option.arch.altivec_abi">
+			</option>
+
+			<inputType
+					id="cell.managedbuild.tool.cell.ppu.gnu.cpp.compiler.input"
+					superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"
+					scannerConfigDiscoveryProfileId="org.eclipse.ptp.cell.managedbuilder.core.PPUGCCManagedMakePerProjectProfile">
+			</inputType>
+
+		</tool>
+
+		<!-- PPU GNU Archiver -->
+		<!-- This tool superClass is the GNU Archiver for Cell -->
+		<!-- The only modification is the command -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.archiver"
+				name="%ToolName.archiver.ppu.gnu"
+				superClass="cell.managedbuild.tool.cell.gnu.archiver"
+				isAbstract="true"
+				command="ppu-ar">
+		</tool>
+
+		<!-- PPU GNU Embed SPU -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<!-- This tool generates a PPU object file from a SPU object file -->
+		<!-- This PPU object file with embedded code can, afterwards, be used in PPU projects to build applications with PPU and SPU embedded code in the same application -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu.embedspu"
+				name="%ToolName.embedspu.ppu.gnu"
+				isAbstract="true"
+				natureFilter="both"
+				command="ppu-embedspu"
+				commandLinePattern="${COMMAND} ${FLAGS} $(subst .,_,$(basename $(notdir ${OUTPUT}))) ${INPUTS} ${OUTPUT}"
+				commandLineGenerator="org.eclipse.ptp.cell.managedbuilder.core.EmbedSPUCommandLineGenerator">
+
+			<!-- Inputs Options Category -->
+			<optionCategory
+					id="cell.ppu.gnu.embedspu.category.inputs"
+					name="%OptionCategory.Inputs"
+					owner="cell.managedbuild.tool.cell.ppu.gnu.embedspu">
+			</optionCategory>
+			<!-- SPU object files from SPU Projects -->
+			<option
+					id="cell.ppu.gnu.embedspu.option.inputs"
+					name="%Option.cell.gnu.Embedspu.Inputs"
+					category="cell.ppu.gnu.embedspu.category.inputs"
+					valueType="stringList"
+					browseType="file"
+					applicabilityCalculator="org.eclipse.ptp.cell.managedbuilder.core.OptionNotApplicableInCommandLine">
+			</option>
+
+			<!-- Architecture Options Category -->
+			<optionCategory
+					id="cell.ppu.gnu.embedspu.category.arch"
+					name="%OptionCategory.Architecture"
+					owner="cell.managedbuild.tool.cell.ppu.gnu.embedspu">
+			</optionCategory>
+			<!-- Option to choose if the tool will generate 32 bit or 64 bit object code -->
+			<!-- Let's just inherit PPU GNU C Linker definitions as they are the same -->
+			<option
+					id="cell.ppu.gnu.embedspu.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.ppu.gnu.embedspu.category.arch"
+					superClass="cell.ppu.gnu.c.linker.option.arch">
+			</option>
+
+			<!-- File inputType accepted by the PPU GNU Embed SPU -->
+			<inputType
+					id="cell.managedbuild.tool.cell.ppu.gnu.embedspu.input"
+					name="%Option.cell.gnu.Embedspu.Input"
+					sources="spuo"
+					sourceContentType="org.eclipse.ptp.cell.managedbuilder.core.compiledSPUIntermediateObjectFile"
+					dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
+					option="cell.ppu.gnu.embedspu.option.inputs">
+			</inputType>
+
+			<!-- File outputType of the PPU GNU Embed SPU -->
+			<outputType
+					id="cell.managedbuild.tool.cell.ppu.gnu.embedspu.output"
+					name="%Option.cell.gnu.Embedspu.Output"
+					outputs="o"
+					buildVariable="OBJS">
+			</outputType>
+		</tool>
+
+		<!-- -->
+		<!-- PPU GNU Linkers pre-configured -->
+		<!-- -->
+
+		<!-- PPU GNU C Linker: 32 bit Option -->
+		<!-- This tool is based in Cell's PPU GNU C Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu32.c.linker"
+				name="%ToolName.linker.ppu.gnu32.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.c.linker">
+
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.gnu32.c.linker.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.c.linker.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.32bit">
+			</option>
+
+		</tool>
+
+		<!-- PPU GNU C Linker: 64 bit Option -->
+		<!-- This tool is based in Cell's PPU GNU C Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu64.c.linker"
+				name="%ToolName.linker.ppu.gnu64.c"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.c.linker">
+
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.gnu64.c.linker.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.c.linker.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.64bit">
+			</option>
+
+		</tool>
+
+		<!-- PPU GNU C++ Linker: 32 bit Option -->
+		<!-- This tool is based in Cell's PPU GNU C++ Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker"
+				name="%ToolName.linker.ppu.gnu32.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.cpp.linker">
+
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.gnu32.cpp.linker.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.cpp.linker.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.32bit">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C++ Linker: 64 bit Option -->
+		<!-- This tool is based in Cell's PPU GNU C++ Linker -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker"
+				name="%ToolName.linker.ppu.gnu64.cpp"
+				isAbstract="true"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.cpp.linker">
+
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.gnu64.cpp.linker.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.cpp.linker.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.64bit">
+			</option>
+		</tool>
+
+		<!-- -->
+		<!-- PPU GNU Compilers pre-configured -->
+		<!-- -->
+
+		<!-- PPU GNU C Compiler: 32 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU GNU C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu32.c.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.c.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.gnu32.c.compiler.debug.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.c.compiler.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.32bit">
+			</option>
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="gnu.c.optimization.level.none"
+					id="cell.ppu.gnu32.c.compiler.debug.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.c.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="gnu.c.debugging.level.max"
+					id="cell.ppu.gnu32.c.compiler.debug.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C Compiler: 32 bit Release Options -->
+		<!-- This tool is based in Cell's PPU GNU C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu32.c.release"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.c.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.gnu32.c.compiler.release.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.c.compiler.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.32bit">
+			</option>
+			<!-- In release, let's optimize the most -->
+			<option
+					defaultValue="gnu.c.optimization.level.most"
+					id="cell.ppu.gnu32.c.compiler.release.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.c.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="gnu.c.debugging.level.none"
+					id="cell.ppu.gnu32.c.compiler.release.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C Compiler: 64 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU GNU 32 bit C Compiler with Debug Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu64.c.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.debug">
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.gnu64.c.compiler.debug.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu32.c.compiler.debug.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.64bit">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C Compiler: 64 bit Release Options -->
+		<!-- This tool is based in Cell's PPU GNU 32 bit C Compiler with Release Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu64.c.release"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.release">
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.gnu64.c.compiler.release.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu32.c.compiler.release.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.64bit">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C++ Compiler: 32 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU GNU C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu32.cpp.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.cpp.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.gnu32.cpp.compiler.debug.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.cpp.compiler.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.32bit">
+			</option>
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="gnu.cpp.compiler.optimization.level.none"
+					id="cell.ppu.gnu32.cpp.compiler.debug.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="gnu.cpp.compiler.debugging.level.max"
+					id="cell.ppu.gnu32.cpp.compiler.debug.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C++ Compiler: 32 bit Release Options -->
+		<!-- This tool is based in Cell's PPU GNU C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu32.cpp.release"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu.cpp.compiler">
+			<!-- Generate 32 bit object code -->
+			<option
+					id="cell.ppu.gnu32.cpp.compiler.release.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu.cpp.compiler.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.32bit">
+			</option>
+			<!-- In release, let's optimize the most -->
+			<option
+					defaultValue="gnu.cpp.compiler.optimization.level.most"
+					id="cell.ppu.gnu32.cpp.compiler.release.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="gnu.cpp.compiler.debugging.level.none"
+					id="cell.ppu.gnu32.cpp.compiler.release.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C++ Compiler: 64 bit Debug Options -->
+		<!-- This tool is based in Cell's PPU GNU 32 bit C++ Compiler with Debug Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu64.cpp.debug"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.debug">
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.gnu64.cpp.compiler.debug.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu32.cpp.compiler.debug.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.64bit">
+			</option>
+		</tool>
+
+		<!-- PPU GNU C++ Compiler: 64 bit Release Options -->
+		<!-- This tool is based in Cell's PPU GNU 32 bit C++ Compiler with Release Options defined above -->
+		<tool
+				id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.ppu.gnu64.cpp.release"
+				superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.release">
+			<!-- Generate 64 bit object code -->
+			<option
+					id="cell.ppu.gnu64.cpp.compiler.release.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					superClass="cell.ppu.gnu32.cpp.compiler.release.option.arch"
+					defaultValue="cell.ppu.gnu.option.arch.64bit">
+			</option>
+		</tool>
+
+		<!-- -->
+		<!-- SPU GNU Tools -->
+		<!-- -->
+
+		<!-- SPU GNU C Linker -->
+		<!-- This tool superClass is the Cell's GNU C Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.c.linker"
+				name="%ToolName.linker.spu.gnu.c"
+				superClass="cell.managedbuild.tool.cell.gnu.c.linker"
+				isAbstract="true"
+				command="spu-gcc">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<option
+					id="cell.spu.gnu.c.linker.option.emitrelocs"
+					name="%Option.cell.gnu.Linker.EmitRelocs"
+					superClass="cell.gnu.c.linker.option.emitrelocs"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.profile.pdt,gnu.c.link.option.userobjs">
+			</option>
+			<!-- -Wl,-\-stack-analysis: Estimate maximum stack requirement. -->
+			<option
+					id="cell.spu.gnu.c.linker.option.stackanalysis"
+					name="%Option.cell.gnu.Linker.StackAnalysis"
+					category="gnu.c.link.category.general"
+					command="-Wl,--stack-analysis"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- -Wl,-\-emit-stack-syms: Add __stack_func giving stack needed for each func. -->
+			<option
+					id="cell.spu.gnu.c.linker.option.emitstacksyms"
+					name="%Option.cell.gnu.Linker.EmitStackSyms"
+					category="gnu.c.link.category.general"
+					command="-Wl,--emit-stack-syms"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+			<!-- -Wl,-N: Set the text and data sections to be readable and writable. -->
+			<!-- Also, do not page-align the  data  segment,  and  disable linking against shared libraries. -->
+			<!-- If the output format supports Unix style magic numbers, mark the output as "OMAGIC". -->
+			<option
+					id="cell.spu.gnu.c.linker.option.omagic"
+					name="%Option.cell.gnu.Linker.Omagic"
+					category="gnu.c.link.category.general"
+					command="-Wl,-N"
+					valueType="boolean"
+					defaultValue="true"
+					tip="%Option.cell.gnu.Linker.Omagic.tip">
+			</option>
+
+			<!-- Other objects to link -->
+			<option
+					id="cell.spu.gnu.c.linker.option.userobjs"
+					name="%Option.Posix.UserObjs"
+					superClass="gnu.c.link.option.userobjs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.OtherObjectsValueHandler"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.profile.pdt,cell.gnu.c.linker.option.emitrelocs">
+			</option>
+
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.spu.gnu.c.linker.option.profile.pdt"
+					name="%Option.cell.gnu.Linker.Profile.pdt"
+					superClass="cell.gnu.c.linker.option.profile.pdt"
+					valueHandlerExtraArgument="cell.gnu.c.linker.option.emitrelocs,gnu.c.link.option.userobjs">
+			</option>
+
+			<!-- Overlay Options Category -->
+			<optionCategory
+					id="cell.spu.gnu.c.linker.category.overlay"
+					name="%OptionCategory.Overlay"
+					owner="cell.managedbuild.tool.cell.spu.gnu.c.linker">
+			</optionCategory>
+			<!-- Option to add a linker script to the linking process -->
+			<option
+					id="cell.spu.gnu.c.linker.option.overlay"
+					name="%Option.cell.gnu.Linker.Overlay"
+					category="cell.spu.gnu.c.linker.category.overlay"
+					command="-Wl,-T,"
+					valueType="string"
+					browseType="file">
+			</option>
+
+		</tool>
+
+		<!-- SPU GNU C++ Linker -->
+		<!-- This tool superClass is the Cell's GNU C++ Linker -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.cpp.linker"
+				name="%ToolName.linker.spu.gnu.cpp"
+				superClass="cell.managedbuild.tool.cell.gnu.cpp.linker"
+				isAbstract="true"
+				command="spu-g++">
+
+			<!-- -Wl,-q: Leave relocation sections and contents in fully linked executables. -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.emitrelocs"
+					name="%Option.cell.gnu.Linker.EmitRelocs"
+					superClass="cell.gnu.cpp.linker.option.emitrelocs"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.profile.pdt,gnu.cpp.link.option.userobjs">
+			</option>
+			<!-- -Wl,-\-stack-analysis: Estimate maximum stack requirement. -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.stackanalysis"
+					name="%Option.cell.gnu.Linker.StackAnalysis"
+					category="gnu.cpp.link.category.options"
+					superClass="cell.spu.gnu.c.linker.option.stackanalysis">
+			</option>
+			<!-- -Wl,-\-emit-stack-syms: Add __stack_func giving stack needed for each func. -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.emitstacksyms"
+					name="%Option.cell.gnu.Linker.EmitStackSyms"
+					category="gnu.cpp.link.category.options"
+					superClass="cell.spu.gnu.c.linker.option.emitstacksyms">
+			</option>
+			<!-- -Wl,-N: Set the text and data sections to be readable and writable. -->
+			<!-- Also, do not page-align the  data  segment,  and  disable linking against shared libraries. -->
+			<!-- If the output format supports Unix style magic numbers, mark the output as "OMAGIC". -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.omagic"
+					name="%Option.cell.gnu.Linker.Omagic"
+					category="gnu.cpp.link.category.options"
+					superClass="cell.spu.gnu.c.linker.option.omagic">
+			</option>
+
+			<!-- Other objects to link -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.userobjs"
+					name="%Option.Posix.UserObjs"
+					superClass="gnu.cpp.link.option.userobjs"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.OtherObjectsValueHandler"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.profile.pdt,cell.gnu.cpp.linker.option.emitrelocs">
+			</option>
+
+			<!-- Enable PDT linker flags -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.profile.pdt"
+					name="%Option.cell.gnu.Linker.Profile.pdt"
+					superClass="cell.gnu.cpp.linker.option.profile.pdt"
+					valueHandlerExtraArgument="cell.gnu.cpp.linker.option.emitrelocs,gnu.cpp.link.option.userobjs">
+			</option>
+
+			<!-- Overlay Options Category -->
+			<optionCategory
+					id="cell.spu.gnu.cpp.linker.category.overlay"
+					name="%OptionCategory.Overlay"
+					owner="cell.managedbuild.tool.cell.spu.gnu.cpp.linker">
+			</optionCategory>
+			<!-- Option to add a linker script to the linking process -->
+			<option
+					id="cell.spu.gnu.cpp.linker.option.overlay"
+					name="%Option.cell.gnu.Linker.Overlay"
+					category="cell.spu.gnu.cpp.linker.category.overlay"
+					superClass="cell.spu.gnu.c.linker.option.overlay">
+			</option>
+
+		</tool>
+
+		<!-- SPU GNU Assembler -->
+		<!-- This tool superClass is the CDT's GNU Assembler -->
+		<!-- The only modification is the command -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.assembler"
+				name="%ToolName.assembler.spu.gnu"
+				superClass="cdt.managedbuild.tool.gnu.assembler"
+				isAbstract="true"
+				command="spu-as">
+		</tool>
+
+		<!-- SPU GNU C Compiler -->
+		<!-- This tool superClass is the GNU C Compiler for Cell -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.c.compiler"
+				name="%ToolName.compiler.spu.gnu.c"
+				superClass="cell.managedbuild.tool.cell.gnu.c.compiler"
+				isAbstract="true"
+				command="spu-gcc">
+
+			<!-- Symbols definition -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.preprocessor.def.symbols"
+					name="%Option.cell.gnu.Compiler.DefSym"
+					superClass="gnu.c.compiler.option.preprocessor.def.symbols"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.SymbolsDefinitionValueHandler"
+					valueHandlerExtraArgument="cell.spu.gnu.c.compiler.option.profile.pdt,gnu.c.compiler.option.include.paths">
+			</option>
+
+			<!-- Include Paths -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.include.paths"
+					name="%Option.cell.gnu.Compiler.InclPaths"
+					superClass="gnu.c.compiler.option.include.paths"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.IncludePathsValueHandler"
+					valueHandlerExtraArgument="cell.spu.gnu.c.compiler.option.profile.pdt,gnu.c.compiler.option.preprocessor.def.symbols">
+			</option>
+
+			<!-- Option to choose the instruction scheduling parameters to be used: SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.tune"
+					name="%Option.cell.gnu.Compiler.Optimization.Tune"
+					category="gnu.c.compiler.category.optimization"
+					valueType="enumerated">
+				<!-- -mtune=cell: instruction scheduling parameters for SPU -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.optimization.tune.cell"
+						name="%Option.cell.gnu.Compiler.Optimization.SPU"
+						isDefault="true"
+						command="-mtune=cell">
+				</enumeratedOptionValue>
+				<!-- -mtune=celledp: instruction scheduling parameters for SPU with enhanced Double Precision -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.optimization.tune.celledp"
+						name="%Option.cell.gnu.Compiler.Optimization.SPUDP"
+						command="-mtune=celledp">
+				</enumeratedOptionValue>
+			</option>
+			<!-- Option to define accuracy of float operations -->
+			<!-- -mfloat=[fast|accurate] -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.float"
+					name="%Option.cell.gnu.Compiler.Optimization.Float"
+					category="gnu.c.compiler.category.optimization"
+					valueType="enumerated">
+				<!-- -mfloat=fast -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.optimization.float.fast"
+						name="%Option.cell.gnu.Compiler.Optimization.Fast"
+						isDefault="true"
+						command="-mfloat=fast">
+				</enumeratedOptionValue>
+				<!-- -mfloat=accurate -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.optimization.float.accurate"
+						name="%Option.cell.gnu.Compiler.Optimization.Accurate"
+						command="-mfloat=accurate">
+				</enumeratedOptionValue>
+			</option>
+			<!-- Option to define accuracy of double operations -->
+			<!-- -mdouble=[fast|accurate] -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.double"
+					name="%Option.cell.gnu.Compiler.Optimization.Double"
+					category="gnu.c.compiler.category.optimization"
+					valueType="enumerated">
+				<!-- -mdouble=fast -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.optimization.double.fast"
+						name="%Option.cell.gnu.Compiler.Optimization.Fast"
+						isDefault="true"
+						command="-mdouble=fast">
+				</enumeratedOptionValue>
+				<!-- -mdouble=accurate -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.optimization.double.accurate"
+						name="%Option.cell.gnu.Compiler.Optimization.Accurate"
+						command="-mdouble=accurate">
+				</enumeratedOptionValue>
+			</option>
+
+			<!-- -Wno-main: Don't warn if the type of main is suspicious. -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.warnings.nomain"
+					name="%Option.cell.gnu.Compiler.NoMain"
+					category="gnu.c.compiler.category.warnings"
+					command="-Wno-main"
+					valueType="boolean"
+					defaultValue="true">
+			</option>
+
+			<!-- Use C99-style standard main interface -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.stdmain"
+					name="%Option.cell.gnu.Compiler.StandardMain"
+					category="gnu.c.compiler.category.other"
+					command="-mstdmain"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+
+			<!-- Enable PDT compiler flags -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.profile.pdt"
+					name="%Option.cell.gnu.Compiler.Profile.pdt"
+					superClass="cell.gnu.c.linker.option.profile.pdt"
+					category="cell.gnu.c.compiler.category.profile"
+					valueHandlerExtraArgument="gnu.c.compiler.option.preprocessor.def.symbols,gnu.c.compiler.option.include.paths">
+			</option>
+
+			<!-- Option to choose if the tool will generate object code for SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.gnu.c.compiler.category.arch"
+					valueType="enumerated">
+				<!-- -march=cell: SPU -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.arch.cell"
+						name="%Option.cell.gnu.Compiler.Architecture.SPU"
+						isDefault="true"
+						command="-march=cell">
+				</enumeratedOptionValue>
+				<!-- -march=celledp: SPU with enhanced Double Precision -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.arch.celledp"
+						name="%Option.cell.gnu.Compiler.Architecture.SPUDP"
+						command="-march=celledp">
+				</enumeratedOptionValue>
+			</option>
+
+			<!-- Software-managed Cache Options Category -->
+			<optionCategory
+					id="cell.spu.gnu.c.compiler.category.cache"
+					name="%OptionCategory.Cache"
+					owner="cell.managedbuild.tool.cell.spu.gnu.c.compiler">
+			</optionCategory>
+			<!-- Option to specify whether to access variables in 32-bit or 64-bit PPE objects -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.ppeaddress"
+					name="%Option.cell.gnu.Compiler.PPEAddresses"
+					category="cell.spu.gnu.c.compiler.category.cache"
+					valueType="enumerated">
+				<!-- -mea32: 32-bit PPE addresses -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.ppeaddress.32bit"
+						name="%Option.cell.gnu.Compiler.PPEAddresses.32bit"
+						isDefault="true"
+						command="-mea32">
+				</enumeratedOptionValue>
+				<!-- -mea64: 64-bit PPE addresses -->
+				<enumeratedOptionValue
+						id="cell.spu.gnu.option.ppeaddress.64bit"
+						name="%Option.cell.gnu.Compiler.PPEAddresses.64bit"
+						command="-mea64">
+				</enumeratedOptionValue>
+			</option>
+			<!-- Size of the software-managed cache -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.cachesize"
+					name="%Option.cell.gnu.Compiler.CacheSize"
+					category="cell.spu.gnu.c.compiler.category.cache"
+					command="-mcache-size="
+					valueType="string">
+			</option>
+			<!-- Option to specify that cache write-back to PPE memory doesn't need to be performed using atomic updates -->
+			<option
+					id="cell.spu.gnu.c.compiler.option.noatomicupdate"
+					name="%Option.cell.gnu.Compiler.NoAtomicUpdate"
+					category="cell.spu.gnu.c.compiler.category.cache"
+					command="-mno-atomic-updates"
+					valueType="boolean"
+					defaultValue="false">
+			</option>
+
+			<inputType
+					id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.input"
+					superClass="cdt.managedbuild.tool.gnu.c.compiler.input"
+					scannerConfigDiscoveryProfileId="org.eclipse.ptp.cell.managedbuilder.core.SPUGCCManagedMakePerProjectProfile">
+			</inputType>
+
+		</tool>
+
+		<!-- SPU GNU C++ Compiler -->
+		<!-- This tool superClass is the Cell's GNU C++ Compiler -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler"
+				name="%ToolName.compiler.spu.gnu.cpp"
+				superClass="cell.managedbuild.tool.cell.gnu.cpp.compiler"
+				isAbstract="true"
+				command="spu-g++">
+
+			<!-- Symbols definition -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.def.symbols"
+					name="%Option.cell.gnu.Compiler.DefSym"
+					superClass="gnu.cpp.compiler.option.preprocessor.def"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.SymbolsDefinitionValueHandler"
+					valueHandlerExtraArgument="cell.spu.gnu.cpp.compiler.option.profile.pdt,gnu.cpp.compiler.option.include.paths">
+			</option>
+
+			<!-- Include Paths -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.include.paths"
+					name="%Option.cell.gnu.Compiler.InclPaths"
+					superClass="gnu.cpp.compiler.option.include.paths"
+					valueHandler="org.eclipse.ptp.cell.managedbuilder.core.IncludePathsValueHandler"
+					valueHandlerExtraArgument="cell.spu.gnu.cpp.compiler.option.profile.pdt,gnu.cpp.compiler.option.preprocessor.def">
+			</option>
+
+			<!-- Option to choose the instruction scheduling parameters to be used: SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.tune"
+					name="%Option.cell.gnu.Compiler.Optimization.Tune"
+					category="gnu.cpp.compiler.category.optimization"
+					superClass="cell.spu.gnu.c.compiler.option.tune">
+			</option>
+			<!-- Option to define accuracy of float operations -->
+			<!-- -mfloat=[fast|accurate] -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.float"
+					name="%Option.cell.gnu.Compiler.Optimization.Float"
+					category="gnu.cpp.compiler.category.optimization"
+					superClass="cell.spu.gnu.c.compiler.option.float">
+			</option>
+			<!-- Option to define accuracy of double operations -->
+			<!-- -mdouble=[fast|accurate] -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.double"
+					name="%Option.cell.gnu.Compiler.Optimization.Double"
+					category="gnu.cpp.compiler.category.optimization"
+					superClass="cell.spu.gnu.c.compiler.option.double">
+			</option>
+
+			<!-- -Wno-main: Don't warn if the type of main is suspicious. -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.warnings.nomain"
+					name="%Option.cell.gnu.Compiler.NoMain"
+					category="gnu.cpp.compiler.category.warnings"
+					superClass="cell.spu.gnu.c.compiler.option.warnings.nomain">
+			</option>
+
+			<!-- Use C99-style standard main interface -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.stdmain"
+					name="%Option.cell.gnu.Compiler.StandardMain"
+					category="gnu.cpp.compiler.category.other"
+					superClass="cell.spu.gnu.c.compiler.option.stdmain">
+			</option>
+
+			<!-- Enable PDT compiler flags -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.profile.pdt"
+					name="%Option.cell.gnu.Compiler.Profile.pdt"
+					superClass="cell.spu.gnu.c.compiler.option.profile.pdt"
+					category="cell.gnu.cpp.compiler.category.profile"
+					valueHandlerExtraArgument="gnu.cpp.compiler.option.preprocessor.def,gnu.cpp.compiler.option.include.paths">
+			</option>
+
+			<!-- Option to choose if the tool will generate object code for SPU or SPU with enhanced Double Precision -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.arch"
+					name="%Option.cell.gnu.Architecture"
+					category="cell.gnu.cpp.compiler.category.arch"
+					superClass="cell.spu.gnu.c.compiler.option.arch">
+			</option>
+
+			<!-- Software-managed Cache Options Category -->
+			<optionCategory
+					id="cell.spu.gnu.cpp.compiler.category.cache"
+					name="%OptionCategory.Cache"
+					owner="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler">
+			</optionCategory>
+			<!-- Option to specify whether to access variables in 32-bit or 64-bit PPE objects -->
+			<!-- The possible values for this option are pre-defined by an enumeration -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.ppeaddress"
+					name="%Option.cell.gnu.Compiler.PPEAddresses"
+					category="cell.spu.gnu.cpp.compiler.category.cache"
+					superClass="cell.spu.gnu.c.compiler.option.ppeaddress">
+			</option>
+			<!-- Size of the software-managed cache -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.cachesize"
+					name="%Option.cell.gnu.Compiler.CacheSize"
+					category="cell.spu.gnu.cpp.compiler.category.cache"
+					superClass="cell.spu.gnu.c.compiler.option.cachesize">
+			</option>
+			<!-- Option to specify that cache write-back to PPE memory doesn't need to be performed using atomic updates -->
+			<option
+					id="cell.spu.gnu.cpp.compiler.option.noatomicupdate"
+					name="%Option.cell.gnu.Compiler.NoAtomicUpdate"
+					category="cell.spu.gnu.cpp.compiler.category.cache"
+					superClass="cell.spu.gnu.c.compiler.option.noatomicupdate">
+			</option>
+
+			<inputType
+					id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.input"
+					superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"
+					scannerConfigDiscoveryProfileId="org.eclipse.ptp.cell.managedbuilder.core.SPUGCCManagedMakePerProjectProfile">
+			</inputType>
+
+		</tool>
+
+		<!-- SPU GNU Archiver -->
+		<!-- This tool superClass is the GNU Archiver for Cell -->
+		<!-- The only modification is the command -->
+		<!-- This is an abstract element as it will be specialized afterwards to be used in a specific tool chain -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.archiver"
+				name="%ToolName.archiver.spu.gnu"
+				superClass="cell.managedbuild.tool.cell.gnu.archiver"
+				isAbstract="true"
+				command="spu-ar">
+		</tool>
+
+		<!-- -->
+		<!-- SPU GNU Compilers pre-configured -->
+		<!-- -->
+
+		<!-- SPU GNU C Compiler: Debug Options -->
+		<!-- This tool is based in Cell's SPU GNU C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.gnu.c.debug"
+				superClass="cell.managedbuild.tool.cell.spu.gnu.c.compiler">
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="gnu.c.optimization.level.none"
+					id="cell.spu.gnu.c.compiler.debug.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.c.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="gnu.c.debugging.level.max"
+					id="cell.spu.gnu.c.compiler.debug.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- SPU GNU C Compiler: Release Options -->
+		<!-- This tool is based in Cell's SPU GNU C Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.gnu.c.release"
+				superClass="cell.managedbuild.tool.cell.spu.gnu.c.compiler">
+			<!-- In release, let's optimize the most -->
+			<option
+					defaultValue="gnu.c.optimization.level.most"
+					id="cell.spu.gnu.c.compiler.release.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.c.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="gnu.c.debugging.level.none"
+					id="cell.spu.gnu.c.compiler.release.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.c.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- SPU GNU C++ Compiler: Debug Options -->
+		<!-- This tool is based in Cell's SPU GNU C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.debug"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.gnu.cpp.debug"
+				superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler">
+			<!-- While debugging, optimization is not necessary -->
+			<option
+					defaultValue="gnu.cpp.compiler.optimization.level.none"
+					id="cell.spu.gnu.cpp.compiler.debug.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- While debugging, compilation has to generate debug information -->
+			<option
+					defaultValue="gnu.cpp.compiler.debugging.level.max"
+					id="cell.spu.gnu.cpp.compiler.debug.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- SPU GNU C++ Compiler: Release Options -->
+		<!-- This tool is based in Cell's SPU GNU C++ Compiler -->
+		<tool
+				id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.release"
+				isAbstract="true"
+				name="%ToolName.compiler.spu.gnu.cpp.release"
+				superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler">
+			<!-- In release, let's optimize the most -->
+			<option
+					defaultValue="gnu.cpp.compiler.optimization.level.most"
+					id="cell.spu.gnu.cpp.compiler.release.option.optimization.level"
+					name="%Option.cell.gnu.Compiler.OptLevel"
+					superClass="gnu.cpp.compiler.option.optimization.level">
+			</option>
+			<!-- In release, no debug information is necessary -->
+			<option
+					defaultValue="gnu.cpp.compiler.debugging.level.none"
+					id="cell.spu.gnu.cpp.compiler.release.option.debugging.level"
+					name="%Option.cell.gnu.Compiler.DebugLevel"
+					superClass="gnu.cpp.compiler.option.debugging.level">
+			</option>
+		</tool>
+
+		<!-- -->
+		<!-- GNU Tool Chains -->
+		<!-- -->
+
+		<!-- Cell GNU Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell GNU tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other GNU Tool Chains for Cell -->
+		<!-- GNU Tool Chain for Cell currently runs on x86, x86_64, ppc and ppc64 architectures -->
+		<!-- GNU Tool Chain for Cell currently runs only in linux -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.gnu"
+				name="%ToolChainName.gnu.Gen"
+				isAbstract="true"
+				isToolChainSupported="org.eclipse.ptp.cell.managedbuilder.gnu.ui.internal.ManagedGNUToolChainSupport"
+				archList="x86,x86_64,ppc,ppc64"
+				osList="linux"
+				configurationEnvironmentSupplier="org.eclipse.ptp.cell.managedbuilder.gnu.core.GnuToolChainEnvironmentSupplier"
+				configurationMacroSupplier="org.eclipse.ptp.cell.managedbuilder.gnu.core.GnuToolChainMacroSupplier">
+			<!-- The target platform of Cell C/C++ Projects are Cell based processor machines running Linux -->
+			<!-- The object file generated will be an ELF -->
+			<!-- As CDT already has an ELF parser, we will use it -->
+			<targetPlatform
+					id="cell.managedbuild.target.cell.gnu.platform"
+					name="%PlatformName.gnu"
+					binaryParser="org.eclipse.cdt.core.ELF"
+					osList="linux"
+					archList="ppc64">
+			</targetPlatform>
+		</toolChain>
+
+		<!-- -->
+		<!-- PPU GNU Tool Chains -->
+		<!-- -->
+
+		<!-- Cell PPU GNU Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common option of PPU GNU tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU Tool Chains for Cell -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu"
+				name="%ToolChainName.ppu.gnu.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.gnu">
+			<!-- The builder is the tool that will manage the build of the project -->
+			<!-- CDT uses "make", and Cell is not different -->
+			<builder
+					id="cell.managedbuild.target.cell.ppu.gnu.builder"
+					name="%BuilderName.gnu"
+					superClass="cdt.managedbuild.target.gnu.builder"
+					buildfileGenerator="org.eclipse.ptp.cell.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+			</builder>
+		</toolChain>
+
+		<!-- Cell PPU GNU 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of PPU GNU 32 bit tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 32 bit Tool Chains for Cell -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32"
+				name="%ToolChainName.ppu.gnu32.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu">
+			<!-- PPU GNU Assembler: 32 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU Assembler -->
+			<!-- The assembler is the same for all PPU GNU 32 bit Tool Chains for Cell -->
+			<!-- To generate 32 bit object code we have to use ppu32-as -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.assembler"
+					name="%ToolName.assembler.ppu.gnu32"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu.assembler"
+					command="ppu32-as">
+			</tool>
+			<!-- PPU GNU Embed SPU: 32 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU Embed SPU -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.embedspu"
+					name="%ToolName.embedspu.ppu.gnu32"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu.embedspu">
+				<!-- Generate 32 bit object code -->
+				<option
+						id="cell.ppu.gnu32.embedspu.option.arch"
+						name="%Option.cell.gnu.Architecture"
+						superClass="cell.ppu.gnu.embedspu.option.arch"
+						defaultValue="cell.ppu.gnu.option.arch.32bit">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of PPU GNU 64 bit tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 64 bit Tool Chains for Cell -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64"
+				name="%ToolChainName.ppu.gnu64.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu">
+			<!-- PPU GNU Assembler: 64 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU Assembler -->
+			<!-- The assembler is the same for all PPU GNU 64 bit Tool Chains for Cell -->
+			<!-- To generate 64 bit object code we have to use ppu-as -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.assembler"
+					name="%ToolName.assembler.ppu.gnu64"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu.assembler">
+			</tool>
+			<!-- PPU GNU Embed SPU: 64 bit Option -->
+			<!-- This tool is based in Cell's PPU GNU Embed SPU -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.embedspu"
+					name="%ToolName.embedspu.ppu.gnu64"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu.embedspu">
+				<!-- Generate 64 bit object code -->
+				<option
+						id="cell.ppu.gnu64.embedspu.option.arch"
+						name="%Option.cell.gnu.Architecture"
+						superClass="cell.ppu.gnu.embedspu.option.arch"
+						defaultValue="cell.ppu.gnu.option.arch.64bit">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 32 bit Executable Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU GNU 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU GNU 32 bit Executable tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 32 bit Executable Tool Chains -->
+		<!-- To build a 32 bit executable, the targetTool is the GNU 32 bit C Linker or the GNU 32 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.exe"
+				name="%ToolChainName.ppu.gnu32.Exe"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32"
+				targetTool="cell.managedbuild.tool.cell.ppu.gnu32.c.linker.exe;cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker.exe">
+			<!-- PPU GNU C Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.linker.exe"
+					name="%ToolName.linker.ppu.gnu32.c"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.linker">
+			</tool>
+			<!-- PPU GNU C++ Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker.exe"
+					name="%ToolName.linker.ppu.gnu32.cpp"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 64 bit Executable Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU GNU 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU GNU 64 bit Executable tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 64 bit Executable Tool Chains -->
+		<!-- To build a 64 bit executable, the targetTool is the GNU 64 bit C Linker or the GNU 64 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.exe"
+				name="%ToolChainName.ppu.gnu64.Exe"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64"
+				targetTool="cell.managedbuild.tool.cell.ppu.gnu64.c.linker.exe;cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker.exe">
+			<!-- PPU GNU C Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.linker.exe"
+					name="%ToolName.linker.ppu.gnu64.c"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.linker">
+			</tool>
+			<!-- PPU GNU C++ Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker.exe"
+					name="%ToolName.linker.ppu.gnu64.cpp"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: GNU 32 bit Executable Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.exe.debug"
+				name="%ToolChainName.ppu.gnu32.Exe.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.exe">
+			<!-- PPU GNU C Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.gnu32.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.debug">
+			</tool>
+			<!-- PPU GNU C++ Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.gnu32.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: GNU 32 bit Executable Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.exe.release"
+				name="%ToolChainName.ppu.gnu32.Exe.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.exe">
+			<!-- PPU GNU C Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.exe.release"
+					name="%ToolName.compiler.ppu.gnu32.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.release">
+			</tool>
+			<!-- PPU GNU C++ Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.exe.release"
+					name="%ToolName.compiler.ppu.gnu32.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: GNU 64 bit Executable Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.exe.debug"
+				name="%ToolChainName.ppu.gnu64.Exe.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.exe">
+			<!-- PPU GNU C Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.gnu64.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.debug">
+			</tool>
+			<!-- PPU GNU C++ Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.exe.debug"
+					name="%ToolName.compiler.ppu.gnu64.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Executable: GNU 64 bit Executable Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.exe.release"
+				name="%ToolChainName.ppu.gnu64.Exe.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.exe">
+			<!-- PPU GNU C Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.exe.release"
+					name="%ToolName.compiler.ppu.gnu64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.release">
+			</tool>
+			<!-- PPU GNU C++ Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.exe.release"
+					name="%ToolName.compiler.ppu.gnu64.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 32 bit Shared Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU GNU 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU GNU 32 bit Shared Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 32 bit Shared Library Tool Chains -->
+		<!-- To build a 32 bit shared library, the targetTool is the GNU 32 bit C Linker or the GNU 32 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain	
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.so"
+				name="%ToolChainName.ppu.gnu32.So"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32"
+				targetTool="cell.managedbuild.tool.cell.ppu.gnu32.c.linker.so;cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker.so">
+			<!-- PPU GNU C Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.linker.so"
+					name="%ToolName.linker.ppu.gnu32.c"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.linker">
+				<!-- Generate shared object files -->
+				<option
+						defaultValue="true"
+						id="cell.ppu.gnu32.c.link.so.option.shared"
+						name="%Option.cell.gnu.Linker.Shared"
+						superClass="gnu.c.link.option.shared">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.gnu32.c.linker.so.output"
+						name="%Option.cell.gnu.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.c.linker.output">
+				</outputType>
+			</tool>
+			<!-- PPU GNU C++ Linker: 32 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker.so"
+					name="%ToolName.linker.ppu.gnu32.cpp"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker">
+				<!-- Generate shared object files -->
+				<option
+						defaultValue="true"
+						id="cell.ppu.gnu32.cpp.link.so.option.shared"
+						name="%Option.cell.gnu.Linker.Shared"
+						superClass="gnu.cpp.link.option.shared">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C++ Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.linker.so.output"
+						name="%Option.cell.gnu.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.cpp.linker.output">
+				</outputType>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 64 bit Shared Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU GNU 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell PPU GNU 64 bit Shared Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 64 bit Shared Library Tool Chains -->
+		<!-- To build a 64 bit shared library, the targetTool is the GNU 64 bit C Linker or the GNU 64 bit C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.so"
+				name="%ToolChainName.ppu.gnu64.So"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64"
+				targetTool="cell.managedbuild.tool.cell.ppu.gnu64.c.linker.so;cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker.so">
+			<!-- PPU GNU C Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.linker.so"
+					name="%ToolName.linker.ppu.gnu64.c"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.linker">
+				<!-- Generate shared object files -->
+				<option
+						id="cell.ppu.gnu64.c.link.so.option.shared"
+						name="%Option.cell.gnu.Linker.Shared"
+						superClass="gnu.c.link.option.shared"
+						defaultValue="true">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.gnu64.c.linker.so.output"
+						name="%Option.cell.gnu.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.c.linker.output">
+				</outputType>
+			</tool>
+			<!-- PPU GNU C++ Linker: 64 bit Option -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker.so"
+					name="%ToolName.linker.ppu.gnu64.cpp"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker">
+				<!-- Generate shared object files -->
+				<option
+						id="cell.ppu.gnu64.cpp.link.so.option.shared"
+						name="%Option.cell.gnu.Linker.Shared"
+						superClass="gnu.cpp.link.option.shared"
+						defaultValue="true">
+				</option>
+				<!-- outputType setted to shared object files -->
+				<!-- Cell uses CDT's definitions of shared objects outputType for GNU C++ Linker as the base for its own definition -->
+				<outputType
+						id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.linker.so.output"
+						name="%Option.cell.gnu.Linker.Output"
+						superClass="cdt.managedbuild.tool.gnu.cpp.linker.output">
+				</outputType>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: GNU 32 bit Shared Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.so.debug"
+				name="%ToolChainName.ppu.gnu32.So.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.so">
+			<!-- PPU GNU C Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.so.debug"
+					name="%ToolName.compiler.ppu.gnu32.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu32.c.compiler.so.debug.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.c.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+			<!-- PPU GNU C++ Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.so.debug"
+					name="%ToolName.compiler.ppu.gnu32.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu32.cpp.compiler.so.debug.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: GNU 32 bit Shared Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.so.release"
+				name="%ToolChainName.ppu.gnu32.So.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.so">
+			<!-- PPU GNU C Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.so.release"
+					name="%ToolName.compiler.ppu.gnu32.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu32.c.compiler.so.release.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.c.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+			<!-- PPU GNU C++ Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.so.release"
+					name="%ToolName.compiler.ppu.gnu32.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu32.cpp.compiler.so.release.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: GNU 64 bit Shared Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.so.debug"
+				name="%ToolChainName.ppu.gnu64.So.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.so">
+			<!-- PPU GNU C Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.so.debug"
+					name="%ToolName.compiler.ppu.gnu64.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.debug">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu64.c.compiler.so.debug.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.c.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+			<!-- PPU GNU C++ Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.so.debug"
+					name="%ToolName.compiler.ppu.gnu64.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.debug">
+				<!-- Genereate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu64.cpp.compiler.so.debug.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Shared Library: GNU 64 bit Shared Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.so.release"
+				name="%ToolChainName.ppu.gnu64.So.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.so">
+			<!-- PPU GNU C Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.so.release"
+					name="%ToolName.compiler.ppu.gnu64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu64.c.compiler.so.release.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.c.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+			<!-- PPU GNU C++ Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.so.release"
+					name="%ToolName.compiler.ppu.gnu64.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.release">
+				<!-- Generate Position Independent Code (PIC) -->
+				<option
+						id="cell.ppu.gnu64.cpp.compiler.so.release.option.pic"
+						name="%Option.cell.gnu.Compiler.PIC"
+						superClass="cell.ppu.gnu.cpp.compiler.option.pic"
+						defaultValue="cell.ppu.gnu.option.pic.limitedpic">
+				</option>
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 32 bit Static Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU GNU 32 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options on Cell PPU GNU 32 bit Static Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 32 bit Static Library Tool Chains -->
+		<!-- To build a 32 bit static library, the targetTool is the GNU Archiver -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.lib"
+				name="%ToolChainName.ppu.gnu32.Lib"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32"
+				targetTool="cell.managedbuild.tool.cell.ppu.gnu32.archiver.lib">
+			<!-- PPU GNU Archiver -->
+			<!-- The PPU GNU Archiver does not have 32 bit or 64 bit options -->
+			<!-- The PPU GNU Archiver just packs the object files together -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.archiver.lib"
+					name="%ToolName.archiver.ppu.gnu"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu.archiver">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU GNU 64 bit Static Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell PPU GNU 64 bit Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options on Cell PPU GNU 64 bit Static Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other PPU GNU 64 bit Static Library Tool Chains -->
+		<!-- To build 64 bit a static library, the targetTool is the GNU Archiver -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.lib"
+				name="%ToolChainName.ppu.gnu64.Lib"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64"
+				targetTool="cell.managedbuild.tool.cell.ppu.gnu64.archiver.lib">
+			<!-- PPU GNU Archiver -->
+			<!-- The PPU GNU Archiver does not have 32 bit or 64 bit options -->
+			<!-- The PPU GNU Archiver just packs the object files together -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.archiver.lib"
+					name="%ToolName.archiver.ppu.gnu"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu.archiver">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: GNU 32 bit Static Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.lib.debug"
+				name="%ToolChainName.ppu.gnu32.Lib.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.lib">
+			<!-- PPU GNU C Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.gnu32.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.debug">
+			</tool>
+			<!-- PPU GNU C++ Compiler 32 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.gnu32.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: GNU 32 bit Static Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu32.lib.release"
+				name="%ToolChainName.ppu.gnu32.Lib.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu32.lib">
+			<!-- PPU GNU C Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.lib.release"
+					name="%ToolName.compiler.ppu.gnu32.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.c.compiler.release">
+			</tool>
+			<!-- PPU GNU C++ Compiler 32 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.lib.release"
+					name="%ToolName.compiler.ppu.gnu32.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu32.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: GNU 64 bit Static Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.lib.debug"
+				name="%ToolChainName.ppu.gnu64.Lib.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.lib">
+			<!-- PPU GNU C Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.gnu64.c.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.debug">
+			</tool>
+			<!-- PPU GNU C++ Compiler 64 bit Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.lib.debug"
+					name="%ToolName.compiler.ppu.gnu64.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell PPU Static Library: GNU 64 bit Static Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.ppu.gnu64.lib.release"
+				name="%ToolChainName.ppu.gnu64.Lib.Rel"
+				superClass="cell.managedbuild.toolchain.cell.ppu.gnu64.lib">
+			<!-- PPU GNU C Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.lib.release"
+					name="%ToolName.compiler.ppu.gnu64.c.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.c.compiler.release">
+			</tool>
+			<!-- PPU GNU C++ Compiler 64 bit Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.lib.release"
+					name="%ToolName.compiler.ppu.gnu64.cpp.release"
+					superClass="cell.managedbuild.tool.cell.ppu.gnu64.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- -->
+		<!-- SPU GNU Tool Chains -->
+		<!-- -->
+
+		<!-- Cell SPU GNU Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of SPU GNU tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other SPU GNU Tool Chains for Cell -->
+		<!-- It is important to remeber that SPU just supports 32 bit object files -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu"
+				name="%ToolChainName.spu.gnu.Gen"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.gnu">
+			<!-- The builder is the tool that will manage the build of the project -->
+			<!-- CDT uses "make", and Cell is not different -->
+			<builder
+					id="cell.managedbuild.target.cell.gnu.builder"
+					name="%BuilderName.gnu"
+					superClass="cdt.managedbuild.target.gnu.builder">
+			</builder>
+			<!-- SPU GNU Assembler -->
+			<!-- The assembler is the same for all SPU GNU Tool Chains for Cell -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.assembler.generic"
+					name="%ToolName.assembler.spu.gnu"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.assembler">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU GNU Executable Generic Tool Chain -->
+		<!-- This tool chain is based on Cell SPU GNU Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options of Cell SPU GNU Executable tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other SPU GNU Executable Tool Chains -->
+		<!-- To build an executable, the targetTool is the GNU C Linker or the GNU C++ Linker -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTools and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu.exe"
+				name="%ToolChainName.spu.gnu.Exe"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.spu.gnu"
+				targetTool="cell.managedbuild.tool.cell.spu.gnu.c.linker.exe;cell.managedbuild.tool.cell.spu.gnu.cpp.linker.exe">
+			<!-- SPU GNU C Linker -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.c.linker.exe"
+					name="%ToolName.linker.spu.gnu.c"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.c.linker">
+			</tool>
+			<!-- SPU GNU C++ Linker -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.cpp.linker.exe"
+					name="%ToolName.linker.spu.gnu.cpp"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.linker">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Executable: GNU Executable Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu.exe.debug"
+				name="%ToolChainName.spu.gnu.Exe.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.spu.gnu.exe">
+			<!-- SPU GNU C Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.exe.debug"
+					name="%ToolName.compiler.spu.gnu.c.debug"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.c.compiler.debug">
+			</tool>
+			<!-- SPU GNU C++ Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.exe.debug"
+					name="%ToolName.compiler.spu.gnu.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Executable: GNU Executable Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu.exe.release"
+				name="%ToolChainName.spu.gnu.Exe.Rel"
+				superClass="cell.managedbuild.toolchain.cell.spu.gnu.exe">
+			<!-- SPU GNU C Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.exe.release"
+					name="%ToolName.compiler.spu.gnu.c.release"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.c.compiler.release">
+			</tool>
+			<!-- SPU GNU C++ Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.exe.release"
+					name="%ToolName.compiler.spu.gnu.cpp.release"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU GNU Static Library Generic Tool Chain -->
+		<!-- This tool chain is based on Cell SPU GNU Generic Tool Chain -->
+		<!-- This abstract tool chain puts together common options on Cell SPU GNU Static Library tool chains -->
+		<!-- It will be used as the base tool chain in the description of the other SPU GNU Static Library Tool Chains -->
+		<!-- To build a static library, the targetTool is the GNU Archiver -->
+		<!-- The targetTool is the last tool ran when invoking the build of the Project -->
+		<!-- CDT knows the other tools to run from the list of tools described in the toolChain -->
+		<!-- CDT knows the order to run the tools because it constructs a fluxogram linking inputType to outputType of the different tools in the toolChain beggining from the targetTool and going backwards -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu.lib"
+				name="%ToolChainName.spu.gnu.Lib"
+				isAbstract="true"
+				superClass="cell.managedbuild.toolchain.cell.spu.gnu"
+				targetTool="cell.managedbuild.tool.cell.spu.gnu.archiver">
+			<!-- SPU GNU Archiver -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.archiver.lib"
+					name="%ToolName.archiver.spu.gnu"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.archiver">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Static Library: GNU Static Library Debug Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu.lib.debug"
+				name="%ToolChainName.spu.gnu.Lib.Dbg"
+				superClass="cell.managedbuild.toolchain.cell.spu.gnu.lib">
+			<!-- SPU GNU C Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.lib.debug"
+					name="%ToolName.compiler.spu.gnu.c.debug"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.c.compiler.debug">
+			</tool>
+			<!-- SPU GNU C++ Compiler Debug -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.lib.debug"
+					name="%ToolName.compiler.spu.gnu.cpp.debug"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.debug">
+			</tool>
+		</toolChain>
+
+		<!-- Cell SPU Static Library: GNU Static Library Release Tool Chain -->
+		<toolChain
+				id="cell.managedbuild.toolchain.cell.spu.gnu.lib.release"
+				name="%ToolChainName.spu.gnu.Lib.Rel"
+				superClass="cell.managedbuild.toolchain.cell.spu.gnu.lib">
+			<!-- SPU GNU C Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.c.compiler.lib.release"
+					name="%ToolName.compiler.spu.gnu.c.release"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.c.compiler.release">
+			</tool>
+			<!-- SPU GNU C++ Compiler Release -->
+			<tool
+					id="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.lib.release"
+					name="%ToolName.compiler.spu.gnu.cpp.release"
+					superClass="cell.managedbuild.tool.cell.spu.gnu.cpp.compiler.release">
+			</tool>
+		</toolChain>
+
+	</extension>
+
+</plugin>

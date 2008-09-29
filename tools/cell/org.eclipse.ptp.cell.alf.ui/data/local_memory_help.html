@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Local Memory Help</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body bgcolor="white">
+<h2>Local Memory (accelerators)</h2>
+<p>The sum of the data size partitioned into each accelerator and the expected stack size cannot exceed the accelerators local memory size (246 KB).
+The data size for each accelerator can be calculated as follows:<br>
+<pre>
+sum = 0;
+
+for_each(IO_BUFFER)
+{
+  sum += data_transfer_size;
+}
+
+sum += expected_stack_size;
+
+if(sum > (246 * 1024))
+  return error;
+</pre>
+</p><br>
+<p>
+The <b>data_transfer_size</b> for each buffer is computed as follows (<b>element_type</b> is determined by the field labeled <b>Element type:</b> in the buffer dialog):
+<ul>
+<li>One dimensional: data_transfer_size = sizeof(element_type) * distribution_size_x</li>
+<li>Two dimensional: data_transfer_size = sizeof(element_type) * distribution_size_x * distribution_size_y</li>
+<li>Three dimensional: data_transfer_size = sizeof(element_type) * distribution_size_x * distribution_size_y * distribution_size_z</li>
+</ul>
+</p>
+</body>
+</html>

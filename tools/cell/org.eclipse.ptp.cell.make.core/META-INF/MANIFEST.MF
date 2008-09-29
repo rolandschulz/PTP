@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.ptp.cell.make.core;singleton:=true
+Bundle-Version: 3.1.0.qualifier
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.cdt.make.core,
+ org.eclipse.cdt.core,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.ptp.cell.utils
+Export-Package: org.eclipse.ptp.cell.make.internal.core.scannerconfig,
+ org.eclipse.ptp.cell.make.internal.core.scannerconfig.xl
+Eclipse-LazyStart: true
+Bundle-Activator: org.eclipse.ptp.cell.make.core.Activator

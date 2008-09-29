@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate">
+      <control
+            class="org.eclipse.ptp.cell.environment.cellsimulator.core.local.LocalLaunchEnvironment"
+            name="Local Cell Simulator"/>
+      <control
+            class="org.eclipse.ptp.cell.environment.cellsimulator.core.remote.RemoteLaunchEnvironment"
+            name="Remote Cell Simulator"/>
+   </extension>
+	<extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.EnvironmentPreferencePage"
+            class="org.eclipse.ptp.cell.environment.cellsimulator.preferences.ui.LocalSimulatorPreferencePage"
+            id="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.EnvironmentPreferencePage.SimulatorPreferencePage"
+            name="%LocalCellSimulatorPreferencePageName"/>
+      <page
+            category="org.eclipse.ptp.cell.preferences.ui.CellPreferencePage.EnvironmentPreferencePage"
+            class="org.eclipse.ptp.cell.environment.cellsimulator.preferences.ui.RemoteSimulatorPreferencePage"
+            id="org.eclipse.ptp.cell.environment.remotesimulator.page1"
+            name="%RemoteCellSimulatorPreferencePageName"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.cell.environment.cellsimulator.preferences.ui.LocalSimulatorPreferenceInitializer"/>
+      <initializer class="org.eclipse.ptp.cell.environment.cellsimulator.preferences.ui.RemoteSimulatorPreferenceInitializer"/>
+   </extension>
+</plugin>

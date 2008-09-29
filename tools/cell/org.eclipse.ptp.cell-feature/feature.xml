@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.cell"
+      label="%featureName"
+      version="3.1.0.qualifier"
+      provider-name="%providerName"
+      os="linux"
+      arch="ppc,ppc64,x86,x86_64">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
+      <import plugin="org.eclipse.core.variables"/>
+      <import plugin="org.eclipse.cdt.debug.mi.core"/>
+      <import plugin="org.eclipse.cdt.debug.core"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.cdt.debug.ui"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.cdt.debug.mi.ui"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.ptp.remotetools.environment.core"/>
+      <import plugin="org.eclipse.ptp.remotetools.core"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.ptp.remotetools.environment.launcher"/>
+      <import plugin="org.eclipse.cdt.make.core"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ptp.remotetools.utils"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.jface"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.cell.alf.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.debug.be.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.debug.be.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.debug.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.debug.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.environment.cellsimulator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.environment.launcher.cellbe"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.environment.launcher.pdt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.environment.remotesimulator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.environment.ui.deploy"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.examples.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.make.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.examples.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.gnu.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.gnu.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.xl.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.managedbuilder.xl.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.pdt.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.preferences"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.simulator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.simulator.architecture.dualcell"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.simulator.architecture.dualsoma"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.simulator.architecture.singlecell"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.simulator.architecture.singlesoma"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.simulator.profile.default"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.sputiming"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.sputiming.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

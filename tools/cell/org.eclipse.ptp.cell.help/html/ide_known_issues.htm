@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>IBM SDK for Multicore Acceleration</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body bgcolor="white"><p>
+<h3>Known Issues</h3>
+There are a few known issues with the Cell IDE. These issues are as follows:
+
+<h4>Java API</h4>
+There is a known bug with the cell simulator's capacity to use the Java API along with the simulator GUI window. In order to enable the use of 
+the Java API with the simulator, you must set the option <b>USE_JAVA_API</b> to true: "USE_JAVA_API=true". This parameter can be found in the file 
+<b>parameters.properties</b> which is located at: eclipse/plugins/org.eclipse.ptp.cell.simulator/org/eclipse/ptp/cell/simulator/conf. If the <b>USE_JAVA_API</b> 
+option is set to true, then the simulator GUI window cannot be used.
+</p>
+<p>
+<h4>Broken GDBServer Connection</h4>
+If you are debugging a Cell application remotely using gdbserver and the connection to the gdbserver is broken, then the Cell IDE will try to 
+reconnect automatically. However, this will not be successful even though the gdbserver is still running on the target machine.<br><br>
+Moreover, if you stop this debug session and try to start a new one, the Cell IDE will issue an error because the gdbserver is
+still occupying the previous configure port on the target machine and the Cell IDE will not be able to launch another instance
+of gdbserver in the same port unless the debug launcher configuration is modified.<br><br>
+The workaround for this is to kill the gdbserver application on the target machine before launching another debug session again.
+</p>
+<p>
+<h4>Remote Launch Directory Needs to be Writable for All Users</h4>
+The Cell Target Application launcher automatically creates a remote directory for launching the application. By default, 
+this directory is given by following macros: ${system_workspace}/${user_workspace}/${project_name}/${timestamp}. If you are 
+sharing the remote (cell be) machine, then you must be sure that all users can write to the directory given by ${system_workspace}.
+</p>
+<p>
+The first user that connects to the machine will create ${system_workspace}. The next users will create their directories 
+inside ${system_workspace}. However, if ${system_workspace} was not created will full write privileges, then the next users 
+will not be able to launch.
+</p>
+<p>
+<h4>Proper Configuration for Localhost</h4>
+While using the Cell Target Application launcher and Local Cell Simulator, the Cell IDE calls Inet4Address.getLocalHost() for several times. In some 
+cases, this method may fail if your machine is not configured correctly. This failure could result in the Cell IDE refusing to 
+create new simulator environments and/or causing failures with the Cell Target Application launcher.</p>
+<p>
+If this problem is encountered, check the /etc/hosts file and ensure that the following line is present: 
+<pre>  127.0.0.1 localhost mymachine</pre>
+where "mymachine" is the name of the machine as given by the environment variable $HOSTNAME.
+</p>
+<p>
+<h4>Valid MAC Addresses for Local Cell Simulator</h4>
+The local simulator configuration window allows you to choose your own MAC address. If you decide to specify your own MAC address, 
+the following rules apply:
+<ul>
+<li>The first number of the address MUST NOT be odd. It MUST be even. It should be n*4+2 (02, 06, 10, ....)</li>
+<ul>
+<li>If the first number is odd, then SSH will not connect, even if simulator pings successfully.</li>
+<li>If the first digit is not n*4+2, then it does not conform to RFC.</li>
+</ul>
+<li>The second and third numbers are recommended as 00.</li>
+<li>The recommended MAC addresses are: 02-00-00-00-00-00, 02-00-00-00-00-01, 02-00-00-00-00-02, 02-00-00-00-00-03</li>
+</ul>
+</p>
+</body>
+</html>

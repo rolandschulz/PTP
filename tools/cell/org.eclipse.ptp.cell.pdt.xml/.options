@@ -1,0 +1,29 @@
+# Debugging options for the $(plugin id) plugin
+
+# Turns on debugging for the $(plugin id) plugin.
+# Also displays bundles overall start/stop time.
+org.eclipse.ptp.cell.pdt.xml/debug = false
+
+org.eclipse.ptp.cell.pdt.xml/debug/xmlgenerator = false
+
+org.eclipse.ptp.cell.pdt.xml/debug/eventforestgenerator = false
+
+org.eclipse.ptp.cell.pdt.xml/debug/xmlwizard = false
+
+
+# And so on...
+# ...
+# ...
+# ...
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.pdt.xml/trace/id = pdt.xml
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.pdt.xml/trace/thread = true
+
+# Displays the time stamp on debug message
+org.eclipse.ptp.cell.pdt.xml/trace/timestamp = true
+
+# Enable frequent debug option re-checking.
+org.eclipse.ptp.cell.pdt.xml/trace/dynamic = true

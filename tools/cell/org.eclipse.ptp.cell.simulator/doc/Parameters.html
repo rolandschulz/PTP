@@ -1,0 +1,909 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Linux)">
+	<META NAME="CREATED" CONTENT="20070328;10252100">
+	<META NAME="CHANGED" CONTENT="20070518;17441700">
+	<STYLE TYPE="text/css">
+	<!--
+		TD P { margin-top: 0.1cm; margin-bottom: 0cm }
+		TD P.western { font-size: 9pt; so-language: en-US }
+		H1 { margin-top: 0.1cm; margin-bottom: 0.2cm }
+		H1.western { font-family: "Sans", sans-serif; font-size: 10pt; so-language: en-US }
+		P { margin-top: 0.1cm; margin-bottom: 0.1cm }
+		P.western { font-size: 10pt; so-language: en-US }
+		TH P { margin-top: 0.1cm; margin-bottom: 0cm }
+		TH P.western { font-size: 9pt; so-language: en-US }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="pt-BR" DIR="LTR">
+<H1 LANG="en-US" CLASS="western">SimulatorControl Parameters</H1>
+<P LANG="en-US" CLASS="western">Default values:</P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	req: The value is <I>required</I>. No default value is possible. The
+	parameters must be assigned.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	---: Has no default value, since the parameters is calculated by the
+	object that implements ISimulatorParameters.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	tclSD: Tcl Script Default. This parameter is optional. If assigned
+	to null, then the TCL script will use its own default value.
+	Typically, if this parameter is passed as environment variable, the
+	the variable will not be set.</P>
+</UL>
+<P LANG="en-US" CLASS="western">Uses:</P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	Tcl (env): Passes as environment variable to the TCL script. This
+	implies use by SimulatorControl to create the list of environment
+	variables to create the simulator process.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	Ctrl: Used by SimulatorControl for internal logic. This parameter is
+	not passed to the simulator.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	Ctrl (deploy): Used by SimulatorControl during the deploy of files.
+	This parameter is not passed to the simulator.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	Ctrl (launch): Used by SimulatorControl to create the simulator
+	process. This parameter is not passed to the simulator.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	Ctrl (cleanup): Used by SimulatorControl during the cleanup. This
+	parameter is not passed to the simulator.</P>
+	<LI><P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+	Ctrl (cmdline): Used by SimulatorControl build the commandline.</P>
+</UL>
+<P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+<BR>
+</P>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=2 CELLSPACING=0>
+	<COL WIDTH=73*>
+	<COL WIDTH=19*>
+	<COL WIDTH=92*>
+	<COL WIDTH=36*>
+	<COL WIDTH=36*>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=29%>
+				<P LANG="en-US" CLASS="western">Parameter</P>
+			</TH>
+			<TH WIDTH=7%>
+				<P LANG="en-US" CLASS="western">Type</P>
+			</TH>
+			<TH WIDTH=36%>
+				<P LANG="en-US" CLASS="western">Default</P>
+			</TH>
+			<TH WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Use</P>
+			</TH>
+			<TH WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Pref.</P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">SimulatorBaseDirectory</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">req</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl, Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local, Remote</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">SimulatorExecutable</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">---, calculated on
+				SimulatorBaseDirectory</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (launch)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">SnifExecutable</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">---, calculated on
+				SimulatorBaseDirectory</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cleanup)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">WorkDirectory</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">req</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (launch, cleanup)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local, Remote</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">LogDirectory</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">---, calculated on WorkDirectory</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cleanup)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">TapDevicePath</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">---, calculated on WorkDirectory</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cleanup)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ArchitectureTclString</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">MemorySize</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">0, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">DeployFileNames</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String[]</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, no deploy</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (deploy)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">DeployFileSources</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">URL[] 
+				</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, no deploy</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (deploy)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">TclScriptName</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">req</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (deploy, cmdline)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">TclScriptSource</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">URL 
+				</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">req</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (deploy)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ExtraCommandLineSwitches</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, no extra switches</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cmdline)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doNetworkInit</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">false</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doSshInit</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">false</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">IpHost</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local has automatic based on
+				preferences.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">IpSimulator</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl, Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local has automatic based on
+				preferences.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">MacSimulator</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local has automatic based on
+				preferences.</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">NetmaskSimulator</SPAN></P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">String</SPAN></P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">null.
+				tclSD</SPAN></P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">Tcl
+				(env)</SPAN></P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">Parameters</SPAN></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doMountExtraImage</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">---, calculated on ExtraImagePath
+				not null</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ExtraImagePath</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ExtraImageJournalPath</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ExtraImagePersistence</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">FS_UNKNOWN, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ExtraImageType</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ExtraImageMountpoint</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doJavaApiSocketInit</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">false</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cmdline)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">JavaApiPort</SPAN></P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">int</SPAN></P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">0,
+				tclSD</SPAN></P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">Tcl
+				(env)</SPAN></P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">JavaApiSocketPort</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">8800</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cmdline)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">JavaApiSocketHost</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, localhost</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">JavaApiSocketPortMaxTries</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">5</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">JavaApiSocketPortTryWait</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int (ms)</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">1000</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">KernelImagePath</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local, Remote</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">RootImageJournalPath</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">RootImagePath</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local, Remote</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">RootImagePersistence</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">FS_UNKNOWN, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doConsoleTerminalInit</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">true</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cmdline)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doConsoleSocketInit</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">false</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl, Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doConsoleEcho</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">true</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">ConsolePort</SPAN></P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">int</SPAN></P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">0,
+				tclSD</SPAN></P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><SPAN STYLE="background: #ffff00">Tcl
+				(env)</SPAN></P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ConsoleSocketPort</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">0, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ConsoleSocketHost</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, localhost</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ConsoleSocketPortMaxTries</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">5</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ConsoleSocketPortTryWait</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">int (ms)</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">1000</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">ConsoleCommand</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">String</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">null, tclSD</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Tcl (env)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western"><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=29%>
+				<P LANG="en-US" CLASS="western">doShowSimulatorGUI</P>
+			</TD>
+			<TD WIDTH=7%>
+				<P LANG="en-US" CLASS="western">boolean</P>
+			</TD>
+			<TD WIDTH=36%>
+				<P LANG="en-US" CLASS="western">false</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Ctrl (cmdline)</P>
+			</TD>
+			<TD WIDTH=14%>
+				<P LANG="en-US" CLASS="western">Local, Remote</P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+<P LANG="en-US" CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm">
+<BR>
+</P>
+</BODY>
+</HTML>

@@ -1,0 +1,20 @@
+# Debugging options for the org.eclipse.ptp.cell.debug.core plugin.
+
+# Turns on debugging for the org.eclipse.ptp.cell.debug.core plugin.
+# Also displays bundles overall start/stop time.
+org.eclipse.ptp.cell.debug.core/debug = false
+
+# Turns on tracing of debug launch delegate
+org.eclipse.ptp.cell.debug.core/debug/launch/delegate = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.debug.core/trace/id = debug.core
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.debug.core/trace/thread = true
+
+# Displays the time stamp on debug message
+org.eclipse.ptp.cell.debug.core/trace/timestamp = true
+
+# Enable frequent debug option re-checking.
+org.eclipse.ptp.cell.debug.core/trace/dynamic = true

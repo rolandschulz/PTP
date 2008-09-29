@@ -1,0 +1,7 @@
+<toc label="Getting Started">
+	<topic label="Introduction" href="html/ide_intro.htm"/>
+	<topic label="Prerequisites" href="html/ide_req.htm"/>
+	<topic label="Installation Guide" href="html/ide_install.htm"/>
+	<topic label="Tutorial" href="html/ide_tutorial/ide_tutorial_toc.htm"/>
+	<topic label="Known Issues" href="html/ide_known_issues.htm"/>
+</toc>

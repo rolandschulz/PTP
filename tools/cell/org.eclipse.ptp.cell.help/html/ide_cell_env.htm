@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>IBM SDK for Multicore Acceleration IDE</title>
+	<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body bgcolor="white"><p>
+<h3>Cell Environments</h3>
+There are 4 types of cell environments that can be used to run and debug cell applications:
+<ol>
+	<li><b>Attached Cell Simulator</b> - Cell simulator running on a remote machine. The simulator must be manually started on the remote machine,
+	as opposed to the <b>Remote Cell Simulator</b> type, where the Cell IDE handles the starting of the simulator on the remote host.</li>
+	<li><b>Cell Box</b> - Physical Cell machine (remote or native cell machine running the Cell IDE).</li>
+	<li><b>Local Cell Simulator</b> - Cell simulator running on the native machine.</li>
+	<li><b>Remote Cell Simulator</b> - Cell simulator running on a remote machine. The Cell IDE handles starting the remote simulator, as 
+	opposed to the <b>Attached Cell Simulator</b> type, where the simulator must be manually started on the remote host.</li>
+</ol>
+Prior to running/debugging a cell application, a cell environment must be created and started:<ul>
+  <li>Open the <b>Cell Environments</b> view.</li>
+  <li>Right click on any of the 4 available cell machine types and select <b>Create</b>.</li>
+  <li>Fill in any necessary configuration values and click <b>Finish</b>.</li>
+  <li>Start the environment: Click on the green <b>Start</b> arrow button.</.li>  
+  <li>After the cell environment has started, it is ready to be used for cell application deployment.</li> 
+</ul>
+<br>
+<b>More information:</b>
+<ul>
+  <li><a href="ide_native_cell.htm">Running the Cell IDE on Cell BE</a></li>
+  <li><a href="ide_native_ppc.htm">Running the Cell IDE on PPC</a></li>
+  <li><a href="cdt_xlc_error_parser.htm">How-to: Use CDT xl C Error Parser</a></li>
+  <li><a href="ide_public_key.htm">How-to: Public Key Based Authentication Using OpenSSH</a></li>
+</ul>
+</p>
+</body>
+</html>
