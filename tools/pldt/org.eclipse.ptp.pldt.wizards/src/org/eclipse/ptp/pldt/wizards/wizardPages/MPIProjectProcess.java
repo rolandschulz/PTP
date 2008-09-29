@@ -46,7 +46,7 @@ import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
  *
  */
 public class MPIProjectProcess extends ProcessRunner {
-	private static final boolean traceOn=true;
+	private static final boolean traceOn=false;
 	private boolean wizTraceOn=MPIProjectWizardPage.wizardTraceOn;
 	//private static final templateID=
 
