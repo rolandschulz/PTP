@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+
+   <extension
+         point="org.eclipse.ui.views">
+               <category
+            name="%SPUTimingView"
+            id="SpuTimingCategory">
+      </category>
+      
+      <view
+            name="%SPUTimingDiagramView"
+            icon="icons/sample.gif"
+            category="SpuTimingCategory"
+            class="org.eclipse.ptp.cell.sputiming.ui.views.SpuTimingDiagramView"
+            id="org.eclipse.ptp.cell.sputiming.views.SpuTimingDiagramView">
+      </view>
+   
+   </extension>
+   <extension
+         point="org.eclipse.ptp.cell.sputiming.observerpoint">
+      <observer
+            class="org.eclipse.ptp.cell.sputiming.ui.SPUTimingObserver"
+            id="org.eclipse.ptp.cell.sputiming.ui.observer1"
+            name="org.eclipse.ptp.cell.sputiming.ui.observer1"/>
+   </extension>
+
+</plugin>

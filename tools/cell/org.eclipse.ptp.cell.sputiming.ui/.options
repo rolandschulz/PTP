@@ -1,0 +1,24 @@
+# Debugging options for the org.eclipse.ptp.cell.sputiming.ui plugin
+
+# Turn on general debugging for the org.eclipse.ptp.cell.sputiming.ui plugin.
+# Also displays overall startup time.
+org.eclipse.ptp.cell.sputiming.ui/debug = false
+
+# Turn on debugging of sputiming visualization extension point(s)
+org.eclipse.ptp.cell.sputiming.ui/debug/notification = false
+
+# Turn on debugging of sputiming GUI events
+org.eclipse.ptp.cell.sputiming.ui/debug/ui = false
+
+# String that is displayed before each trace message
+org.eclipse.ptp.cell.sputiming.ui/trace/id = sputiming.ui
+
+# Displays the thread ID on debug message
+org.eclipse.ptp.cell.sputiming.ui/trace/thread = True
+
+# Displays the timestamp on debug message
+org.eclipse.ptp.cell.sputiming.ui/trace/timestamp = True
+
+# Re-reads the .options file before executing a block of code that contains
+# tracing information
+org.eclipse.ptp.cell.sputiming.ui/trace/dynamic = False
