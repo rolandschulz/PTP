@@ -24,7 +24,7 @@ public class FileMold extends GenericControlMold {
 	public static final int DIRECTORY_SELECTION = 
 		1 << index++;
 	
-	protected static final String BUTTON_TEXT = "Browse";
+	protected static final String BUTTON_TEXT = Messages.BrowseButtonText;
 	
 	int bitmask;
 	

@@ -10,10 +10,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.ptp.remotetools.core,
- org.eclipse.ptp.remotetools.utils
+ org.eclipse.ptp.remotetools.utils,
+ org.eclipse.core.filesystem,
+ org.eclipse.ptp.utils.core;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.remotetools.environment,
  org.eclipse.ptp.remotetools.environment.control,
  org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ptp.remotetools.environment.extension,
- org.eclipse.ptp.remotetools.environment.wizard
+ org.eclipse.ptp.remotetools.environment.wizard,
+ org.eclipse.ptp.remotetools.utils.verification

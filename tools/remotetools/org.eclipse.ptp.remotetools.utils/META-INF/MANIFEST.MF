@@ -16,9 +16,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Eclipse-LazyStart: true
 Export-Package: 
  org.eclipse.ptp.remotetools.utils,
- org.eclipse.ptp.remotetools.utils.extensionpoints,
- org.eclipse.ptp.remotetools.utils.file,
  org.eclipse.ptp.remotetools.utils.linux.commandline,
  org.eclipse.ptp.remotetools.utils.network,
- org.eclipse.ptp.remotetools.utils.stream,
- org.eclipse.ptp.remotetools.utils.verification
+ org.eclipse.ptp.remotetools.utils.stream

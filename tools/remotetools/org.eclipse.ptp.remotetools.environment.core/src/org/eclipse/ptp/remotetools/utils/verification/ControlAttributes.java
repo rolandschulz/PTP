@@ -94,7 +94,7 @@ public class ControlAttributes implements Cloneable {
 	 * default. If default not available or not parseable, get empty string.
 	 */
 	public String getString(String attributeKey) {
-		return getString(attributeKey, "");
+		return getString(attributeKey, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class ControlAttributes implements Cloneable {
 	 * empty string.
 	 */
 	public String getText(String attributeKey) {
-		return getText(attributeKey, "");
+		return getText(attributeKey, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -127,8 +127,8 @@ public class ControlAttributes implements Cloneable {
 		String textValue = getAttributeOrDefault(attributeKey);
 		if (textValue == null)
 			textValue = defaultValue;
-		textValue = textValue.replaceAll("\\n", "\n");
-		textValue = textValue.replaceAll("\\\\", "\\");
+		textValue = textValue.replaceAll("\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		textValue = textValue.replaceAll("\\\\", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
 		return textValue;
 	}
 
@@ -266,7 +266,7 @@ public class ControlAttributes implements Cloneable {
 			return Integer.parseInt(stringValue);
 		} catch (NumberFormatException e) {
 			throw new IllegalAttributeException(e, attributeName,
-					"is not valid integer number", stringValue);
+					Messages.ControlAttributes_InvalidIntegerNumber, stringValue);
 		}
 	}
 
@@ -277,7 +277,7 @@ public class ControlAttributes implements Cloneable {
 			return Integer.parseInt(stringValue);
 		} catch (NumberFormatException e) {
 			throw new IllegalAttributeException(e, attributeName,
-					"is not valid integer number", stringValue);
+					Messages.ControlAttributes_InvalidIntegerNumber, stringValue);
 		}
 	}
 
@@ -294,7 +294,7 @@ public class ControlAttributes implements Cloneable {
 			return Double.parseDouble(stringValue);
 		} catch (NumberFormatException e) {
 			throw new IllegalAttributeException(e, attributeName,
-					"is not valid decimal number", stringValue);
+					Messages.ControlAttributes_InvalidDecimalNumber, stringValue);
 		}
 	}
 
@@ -305,7 +305,7 @@ public class ControlAttributes implements Cloneable {
 			return Double.parseDouble(stringValue);
 		} catch (NumberFormatException e) {
 			throw new IllegalAttributeException(e, attributeName,
-					"is not valid decimal number", stringValue);
+					Messages.ControlAttributes_InvalidDecimalNumber, stringValue);
 		}
 	}
 
@@ -314,10 +314,10 @@ public class ControlAttributes implements Cloneable {
 		String stringValue = verifyString(attributeName, attributeKey);
 
 		// TODO: Implement a proper checking
-		Path path = new Path("");
+		Path path = new Path(""); //$NON-NLS-1$
 		if (!path.isValidPath(stringValue)) {
 			throw new IllegalAttributeException(attributeName,
-					"is not valid path", stringValue);
+					Messages.ControlAttributes_InvalidPath, stringValue);
 		}
 		return new Path(stringValue);
 	}
@@ -327,7 +327,7 @@ public class ControlAttributes implements Cloneable {
 		String stringValue = getAttributeOrDefault(attributeKey);
 		if (stringValue == null) {
 			throw new IllegalAttributeException(attributeName,
-					"must not be empty");
+					Messages.ControlAttributes_MustNotBeEmpty);
 		}
 		return stringValue;
 	}
@@ -357,8 +357,8 @@ public class ControlAttributes implements Cloneable {
 
 	public void setTextAttribute(String attributeKey, String value) {
 		String textValue = value;
-		textValue = textValue.replaceAll("\\", "\\\\");
-		textValue = textValue.replaceAll("\n", "\\n");
+		textValue = textValue.replaceAll("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		textValue = textValue.replaceAll("\n", "\\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		setAttribute(attributeKey, textValue);
 	}
 

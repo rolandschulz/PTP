@@ -7,5 +7,7 @@ Bundle-Activator: org.eclipse.ptp.utils.core.Activator
 Require-Bundle: org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.utils.core
+Export-Package: org.eclipse.ptp.utils.core,
+ org.eclipse.ptp.utils.core.extensionpoints,
+ org.eclipse.ptp.utils.core.file
 Bundle-Vendor: Eclipse.org

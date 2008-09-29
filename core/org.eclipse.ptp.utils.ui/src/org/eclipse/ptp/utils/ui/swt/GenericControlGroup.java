@@ -256,7 +256,7 @@ public abstract class GenericControlGroup extends Composite {
 		if (label != null) {
 			label.setText(text);
 		} else {
-			throw new IllegalArgumentException("ControlGroup has not a label");
+			throw new IllegalArgumentException(Messages.GenericControlGroup_NoControlGroupLabel);
 		}
 	}
 
@@ -272,7 +272,7 @@ public abstract class GenericControlGroup extends Composite {
 		if (button != null) {
 			button.setText(text);
 		} else {
-			throw new IllegalArgumentException("ControlGroup has not a button");
+			throw new IllegalArgumentException(Messages.GenericControlGroup_NoControlGroupButton);
 		}
 	}
 

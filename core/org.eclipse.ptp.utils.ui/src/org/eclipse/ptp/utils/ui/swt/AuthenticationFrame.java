@@ -179,7 +179,7 @@ public final class AuthenticationFrame extends Frame {
 		
 		// Will reuse this mold for all TextGroup controls.
 		TextMold tmold = new TextMold(TextMold.GRID_DATA_ALIGNMENT_FILL | 
-				TextMold.GRID_DATA_GRAB_EXCESS_SPACE, "Host:");
+				TextMold.GRID_DATA_GRAB_EXCESS_SPACE, Messages.AuthenticationFrame_Host);
 		
 		// Host field
 		tmold.setLabel(mold.labelHostAddress);
@@ -341,50 +341,50 @@ public final class AuthenticationFrame extends Frame {
 		String pluginID = Activator.getDefault().getBundle().getSymbolicName();
 		
 		if ((!isLocalhostSelected()) && (hostAddressTextGroup.getText().getText().trim().length() == 0)) {
-			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Host Address cannot be empty", 
+			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_EmptyHostAddressException, 
 					null));
 		} 
 		if(hostPortTextGroup.getText().getText().trim().length() == 0) {
-			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Host Port cannot be empty", 
+			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_EmptyHostPortException, 
 					null));
 		} 
 		if(usernameTextGroup.getText().getText().trim().length() == 0) {
-			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Username cannot be empty", 
+			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_EmptyUsernameException, 
 					null));
 		}
 		if(!isPasswdBased()) {
 			if(privateKeyPathGroup.getText().getText().trim().length() == 0) {
-				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Private key path cannot be empty", 
+				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_EmptyPrivateKeyPathException, 
 						null));
 			} 
 			File path = new File(privateKeyPathGroup.getText().getText());
 			if(!path.exists()) {
-				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "File doesn't exist", 
+				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_FileDoesNotExistException, 
 							null));
 			}
 			if(!path.isFile()) {
-				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Path doesn't point to a file", 
+				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_PathIsNotFileExcpetion, 
 						null));
 			} 
 			if(!path.canRead()) {
-				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "File isn't readable", 
+				throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_FileNotReadableException, 
 						null));
 			} 
 		}
 		try {
 			Integer.parseInt(timeoutTextGroup.getText().getText());
 		} catch(NumberFormatException ne) {
-			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Timeout must be an integer",
+			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_TimeoutException,
 					null));
 		}
 		try {
 			Integer.parseInt(hostPortTextGroup.getText().getText());
 		} catch(NumberFormatException ne) {
-			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Port number must be an integer",
+			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_PortNumberException,
 					null));
 		}
-		if(cipherTypeGroup.getSelectedItem() == null || cipherTypeGroup.getSelectedItem().getId().equals("")) {
-			throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, "Invalid cipher type", null));
+		if(cipherTypeGroup.getSelectedItem() == null || cipherTypeGroup.getSelectedItem().getId().equals("")) { //$NON-NLS-1$
+						throw new CoreException(new Status(IStatus.ERROR, pluginID, 0, Messages.AuthenticationFrame_InvalidCipherTypeException, null));
 		}
 	}
 	

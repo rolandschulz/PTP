@@ -19,7 +19,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
 
-class FileButtonSelectionListener extends SelectionAdapter {
+public class FileButtonSelectionListener extends SelectionAdapter {
 	
 	private Text text;
 	private String title;

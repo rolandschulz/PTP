@@ -17,7 +17,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Text;
 
-class DirectoryButtonSelectionListener extends SelectionAdapter {
+public class DirectoryButtonSelectionListener extends SelectionAdapter {
 	
 	private Text text;
 	private String title;

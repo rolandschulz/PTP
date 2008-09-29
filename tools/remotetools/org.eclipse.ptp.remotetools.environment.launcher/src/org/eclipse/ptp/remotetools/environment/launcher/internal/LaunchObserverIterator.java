@@ -17,8 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.ptp.remotetools.environment.launcher.RemoteLauncherPlugin;
 import org.eclipse.ptp.remotetools.environment.launcher.core.ILaunchObserver;
-import org.eclipse.ptp.remotetools.utils.extensionpoints.ExtensionPointEnumeration;
-
+import org.eclipse.ptp.utils.core.extensionpoints.ExtensionPointEnumeration;
 
 public class LaunchObserverIterator implements Enumeration {
 	

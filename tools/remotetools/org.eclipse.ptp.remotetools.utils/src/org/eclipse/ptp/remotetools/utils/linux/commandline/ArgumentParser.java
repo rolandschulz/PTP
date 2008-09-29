@@ -319,7 +319,7 @@ public class ArgumentParser {
 	 */
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("<");
+		buffer.append("<"); //$NON-NLS-1$
 		Iterator iterator = this.tokens.iterator();
 		boolean first = true;
 		while (iterator.hasNext()) {
@@ -331,7 +331,7 @@ public class ArgumentParser {
 			}
 			buffer.append(token);
 		}
-		buffer.append(">");
+		buffer.append(">"); //$NON-NLS-1$
 		return buffer.toString();
 	}
 	

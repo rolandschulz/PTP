@@ -88,6 +88,6 @@ public class StreamBridge  {
 	}
 	
 	public void run() {
-		streamObserver.run();
+		streamObserver.start();
 	}
 }
