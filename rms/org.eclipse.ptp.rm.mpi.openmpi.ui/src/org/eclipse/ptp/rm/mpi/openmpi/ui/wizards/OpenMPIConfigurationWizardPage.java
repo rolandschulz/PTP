@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import sun.security.action.GetLongAction;
+
 public class OpenMPIConfigurationWizardPage extends
 		AbstractToolRMConfigurationWizardPage {
 
@@ -177,7 +179,8 @@ public class OpenMPIConfigurationWizardPage extends
 	}
 
 	public void handleVersionSelected() {
-		listenerEnabled = false;
+		getWidgetListener().disable();
+//		listenerEnabled = false;
 		DataSource dataSource = (DataSource) this.getDataSource();
 		dataSource.justValidate();
 		String launchCmd = null;
@@ -199,7 +202,8 @@ public class OpenMPIConfigurationWizardPage extends
 		resetErrorMessages();
 		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
 		dataSource.copyToFields();
-		listenerEnabled = true;
+//		listenerEnabled = true;
+		getWidgetListener().enable();
 	}
 
 
