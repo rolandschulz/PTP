@@ -113,7 +113,7 @@ public class DebugPolicy {
 				}
 				InputStream is = url.openStream();
 				if (is == null) {
-					throw new IOException("InputStream is  null"); //$NON-NLS-1$
+					throw new IOException("InputStream is null"); //$NON-NLS-1$
 				}
 				Properties properties = new Properties();
 				properties.load(is);

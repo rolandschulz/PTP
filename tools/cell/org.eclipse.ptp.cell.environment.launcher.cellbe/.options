@@ -5,10 +5,10 @@
 org.eclipse.ptp.cell.environment.launcher.cellbe/debug = false
 
 # Turn on tracing on variables used by the launcher
-org.eclipse.ptp.cell.environment.ui.deploy/debug/variables = false
+org.eclipse.ptp.cell.environment.launcher.cellbe/debug/variables = false
 
 # Turn on tracing on integration delegates used by the launcher
-org.eclipse.ptp.cell.environment.ui.deploy/debug/integration = false
+org.eclipse.ptp.cell.environment.launcher.cellbe/debug/integration = false
 
 # String that is displayed before each trace message
 org.eclipse.ptp.cell.environment.launcher.cellbe/trace/id = launcher.cellbe

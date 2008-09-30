@@ -42,7 +42,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
-import org.eclipse.ptp.rm.core.utils.ArgumentParser;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
 /**

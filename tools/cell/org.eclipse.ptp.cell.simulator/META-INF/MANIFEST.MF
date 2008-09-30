@@ -8,7 +8,8 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.console,
- org.eclipse.ptp.cell.utils
+ org.eclipse.ptp.cell.utils,
+ org.eclipse.ptp.utils.core;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.cell.simulator,
  org.eclipse.ptp.cell.simulator.conf,

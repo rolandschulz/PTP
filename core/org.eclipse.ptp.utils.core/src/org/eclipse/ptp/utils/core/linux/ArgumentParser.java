@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.cell.utils.linux.commandline;
+package org.eclipse.ptp.utils.core.linux;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -17,12 +17,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ptp.cell.utils.debug.Debug;
-
 
 public class ArgumentParser {
-	List tokens;
-	
+	List<String> tokens;
+
 	/**
 	 * Create a command line representation from the string with a shell command line.
 	 * The command line is parsed and split on spaces. Quoted or escaped spaces are preserved..
@@ -61,16 +59,14 @@ public class ArgumentParser {
 	 * Create a command line representation from the command and an list of parameters.
 	 * The elements are not parsed not (un)escaped., but taked as the are.
 	 */
-	public ArgumentParser(String command, List parameterList) {
-		this.tokens = new ArrayList();
+	public ArgumentParser(String command, List<String> parameterList) {
+		this.tokens = new ArrayList<String>();
 		this.tokens.add(command);
 		this.tokens.addAll(parameterList);
 	}
-	
-	private static List parseCommandline(String commandline) {
-		Debug.read();
-		Debug.POLICY.enter(Debug.DEBUG_LINUX_ARGUMENT, commandline);
-		ArrayList result = new ArrayList();
+
+	private static List<String> parseCommandline(String commandline) {
+		ArrayList<String> result = new ArrayList<String>();
 		StringCharacterIterator iterator = new StringCharacterIterator(commandline);
 	    
 		for (iterator.first(); iterator.current() != CharacterIterator.DONE; iterator.next()) {
@@ -167,15 +163,6 @@ public class ArgumentParser {
 	    	result.add(buffer.toString()); 	
 	    }
 		
-		if (Debug.DEBUG_LINUX_ARGUMENT) {
-			Debug.POLICY.trace("Parsed list:"); //$NON-NLS-1$
-			for (Iterator it = result.iterator(); it.hasNext();) {
-				String s = (String) it.next();
-				Debug.POLICY.trace(s);				
-			}
-			Debug.POLICY.trace("(end of list)"); //$NON-NLS-1$
-			Debug.POLICY.exit();
-		}
 		return result;
 	}
 	
@@ -187,10 +174,8 @@ public class ArgumentParser {
 	 * @return
 	 */
 	public String getCommandLine(boolean fullEscape) {
-		Debug.read();
-		Debug.POLICY.enter(Debug.DEBUG_LINUX_ARGUMENT, fullEscape);
 		StringBuffer buffer = new StringBuffer();
-		Iterator iterator = this.tokens.iterator();
+		Iterator<String> iterator = this.tokens.iterator();
 		boolean first = true;
 		while (iterator.hasNext()) {
 			String token = (String) iterator.next();
@@ -201,13 +186,10 @@ public class ArgumentParser {
 			}
 			buffer.append(escapeToken(token, fullEscape));
 		}
-		Debug.POLICY.exit(Debug.DEBUG_LINUX_ARGUMENT, buffer.toString());
 		return buffer.toString();
 	}
 	
 	private StringBuffer escapeToken(String token, boolean fullEscape) {
-		Debug.read();
-		Debug.POLICY.enter(Debug.DEBUG_LINUX_ARGUMENT, token, fullEscape);
 		StringBuffer buffer = new StringBuffer();
 		StringCharacterIterator iter = new StringCharacterIterator(token);
 	    for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) {
@@ -257,7 +239,6 @@ public class ArgumentParser {
 	    		continue;
 	    	}
 	     }
-	    Debug.POLICY.exit(Debug.DEBUG_LINUX_ARGUMENT, buffer.toString());
 	    return buffer;
 	}
 
@@ -273,7 +254,7 @@ public class ArgumentParser {
 	 * Returns a List of all entries of the command line.
 	 * @return The List
 	 */
-	public List getTokenList() {
+	public List<String> getTokenList() {
 		return new ArrayList(this.tokens);
 	}
 	

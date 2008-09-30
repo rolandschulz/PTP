@@ -27,11 +27,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.cell.debug.core.debug.Debug;
-import org.eclipse.ptp.cell.utils.linux.commandline.ArgumentParser;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl.TargetSocket;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
 
 

@@ -9,5 +9,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.utils.core,
  org.eclipse.ptp.utils.core.extensionpoints,
- org.eclipse.ptp.utils.core.file
+ org.eclipse.ptp.utils.core.file,
+ org.eclipse.ptp.utils.core.linux
 Bundle-Vendor: Eclipse.org

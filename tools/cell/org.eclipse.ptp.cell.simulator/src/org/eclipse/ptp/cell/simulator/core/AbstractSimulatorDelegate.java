@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.ptp.cell.simulator.conf.Parameters;
-import org.eclipse.ptp.cell.utils.linux.commandline.ArgumentParser;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
 
 /**

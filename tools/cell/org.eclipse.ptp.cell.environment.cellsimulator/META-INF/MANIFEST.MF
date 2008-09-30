@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.ptp.cell.simulator,
  org.eclipse.debug.core,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.utils,
- org.eclipse.ptp.utils.ui;bundle-version="1.0.0"
+ org.eclipse.ptp.utils.ui;bundle-version="1.0.0",
+ org.eclipse.ptp.utils.core;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Export-Package: 
  org.eclipse.ptp.cell.environment.cellsimulator

@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.cell.sputiming.Activator;
 import org.eclipse.ptp.cell.sputiming.debug.Debug;
-import org.eclipse.ptp.cell.utils.linux.commandline.ArgumentParser;
 import org.eclipse.ptp.cell.utils.process.ProcessController;
 import org.eclipse.ptp.cell.utils.stream.StreamBridge;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 import org.eclipse.ui.console.IOConsole;
 
 

@@ -26,7 +26,6 @@ import org.eclipse.ptp.cell.simulator.core.AbstractSimulatorDelegate;
 import org.eclipse.ptp.cell.simulator.core.ISimulatorParameters;
 import org.eclipse.ptp.cell.simulator.core.SimulatorException;
 import org.eclipse.ptp.cell.simulator.core.SimulatorOperationException;
-import org.eclipse.ptp.cell.utils.linux.commandline.ArgumentParser;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
 import org.eclipse.ptp.remotetools.core.IRemoteDownloadExecution;
@@ -44,6 +43,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
 
 /**

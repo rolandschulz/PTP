@@ -33,7 +33,7 @@ import org.eclipse.ptp.cell.simulator.core.ISimulatorParameters;
 import org.eclipse.ptp.cell.simulator.core.SimulatorException;
 import org.eclipse.ptp.cell.simulator.core.SimulatorOperationException;
 import org.eclipse.ptp.cell.simulator.tools.ContentRetrieverTool;
-import org.eclipse.ptp.cell.utils.linux.commandline.ArgumentParser;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
 
 /**
