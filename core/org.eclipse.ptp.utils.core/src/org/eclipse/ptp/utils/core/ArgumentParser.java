@@ -21,12 +21,15 @@ import java.util.List;
  * Convert a string containing a command and arguments separated by whitespace into an
  * array of strings for each token. Preserve whitespace if the token is
  * quoted.
+ * @deprecated This calss was replaced by {@link org.eclipse.ptp.utils.core.linux.ArgumentParser}.
  */
 public class ArgumentParser {
 	private String cmdLine;
 	private List<String> arguments = null;
 	
-	public ArgumentParser(String cmdLine) {
+	// Prevent instances
+	//public ArgumentParser(String cmdLine) {
+	private ArgumentParser(String cmdLine) {
 		this.cmdLine = cmdLine;
 	}
 	

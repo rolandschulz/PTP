@@ -25,7 +25,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.utils.core.ArgumentParser;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
 /**
  * Abstract implementation of a job that executes a command on the remote host and parses its output.
@@ -105,10 +105,9 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			 * TODO: Substitution of attributes in the command strng
 			 * TODO: Append remote installation path to launch command.
 			 * TODO: Extend class to provide XML SAX parser.
-			 * TODO: Use better argument parser.
 			 */
 			ArgumentParser argumentParser = new ArgumentParser(command);
-			List<String> arguments = argumentParser.getArguments();
+			List<String> arguments = argumentParser.getTokenList();
 
 			checkCancel(monitor);
 
