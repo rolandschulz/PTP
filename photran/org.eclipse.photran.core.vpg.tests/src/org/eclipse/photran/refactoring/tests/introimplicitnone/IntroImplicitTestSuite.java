@@ -10,8 +10,9 @@ public class IntroImplicitTestSuite extends TestSuite
     public static Test suite() throws Exception
     {
         TestSuite suite = new TestSuite();
-        suite.addTest(getSuiteFor("hello.f90"));
-        suite.addTest(getSuiteFor("hello2.f90"));
+        suite.addTest(getSuiteFor("bigexpression.f90"));
+        suite.addTest(getSuiteFor("fortran.f90"));
+        suite.addTest(getSuiteFor("crazyimplicits.f90"));
         return suite;
     }
     
