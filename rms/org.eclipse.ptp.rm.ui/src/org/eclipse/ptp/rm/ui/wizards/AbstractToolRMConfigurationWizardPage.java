@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
 
-	protected boolean listenerEnabled = false;
+//	protected boolean listenerEnabled = false;
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private IRemoteServices remoteServices = null;
