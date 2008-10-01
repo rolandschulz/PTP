@@ -103,10 +103,21 @@ test_str(int tnum)
 	bitset *	b = str_to_bitset(str1, &end);
 	str2 = bitset_to_str(b);
 	if (strncmp(str1, str2, 9) != 0) {
-		printf("TEST_%d FAIL: %s != %s\n", tnum, str1, str2);
+		printf("TEST_%d_1 FAIL: %s != %s\n", tnum, str1, str2);
 	} else if (*end != 'a') {
-		printf("TEST_%d FAIL: end == %d\n", tnum, *end);
+		printf("TEST_%d_1 FAIL: end == %d\n", tnum, *end);
 	} else {
-		printf("TEST_%d SUCCEDED\n", tnum);
+		printf("TEST_%d_1 SUCCEDED\n", tnum);
+	}
+
+	str1 = "3:07";
+	b = str_to_bitset(str1, NULL);
+	str2 = bitset_to_str(b);
+	if (strncmp(str1, str2, 9) != 0) {
+		printf("TEST_%d_2 FAIL: %s != %s\n", tnum, str1, str2);
+	} else if (*end != 'a') {
+		printf("TEST_%d_2 FAIL: end == %d\n", tnum, *end);
+	} else {
+		printf("TEST_%d_2 SUCCEDED\n", tnum);
 	}
 }

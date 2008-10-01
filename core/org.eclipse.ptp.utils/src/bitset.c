@@ -296,7 +296,7 @@ bitset_firstset(bitset *b)
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-#define NUM_BYTES(bits) (bits > 0 ? ((bits-1) >> 3) + 1 : 1)
+#define NUM_BYTES(bits) ((bits >> 3) + 1)
 
 /**
  * Return a string representation of a bitset. We use hex to compress
@@ -304,8 +304,10 @@ static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b
  *
  * Format is "NN:HHHHHH..." where "NN" is the actual number of bits in hex,
  * and "HHHHH...." is a hex representation of the bits in the set. The number
- * of characters in the bit string is always exactly enough to represent all
- * the bits.
+ * of characters in the bit string is always rounded to the nearest byte.
+ *
+ * e.g. "111" -> "3:07"
+ * 		"11011010101011101" -> "11:01b55d"
  */
 char *
 bitset_to_str(bitset *b)
@@ -316,10 +318,10 @@ bitset_to_str(bitset *b)
 	int				bit;
 	char *			str;
 	char *			s;
-	unsigned char	byte;
+	unsigned char	val;
 
 	if (b == NULL) {
-		return strdup("0:0");
+		return strdup("0:00");
 	}
 
 	/*
@@ -327,7 +329,7 @@ bitset_to_str(bitset *b)
 	 */
 	bytes = NUM_BYTES(b->bs_nbits);
 
-	str = (char *)malloc((bytes * 2) + 8 + 2);
+	str = (char *)malloc(bytes + 8 + 2);
 
 	/*
 	 * Start with actual number of bits (silently truncate to 32 bits)
@@ -339,12 +341,12 @@ bitset_to_str(bitset *b)
 	*s++ = ':';
 
 	for (pbit = (bytes << 3) - 1; pbit > 0; ) {
-		for (byte = 0, bit = 3; bit >= 0; bit--, pbit--) {
+		for (val = 0, bit = 3; bit >= 0; bit--, pbit--) {
 			if (pbit < b->bs_nbits && bitset_test(b, pbit)) {
-				byte |= (1 << bit);
+				val |= (1 << bit);
 			}
 		}
-		*s++ = tohex[byte & 0x0f];
+		*s++ = tohex[val & 0x0f];
 	}
 
 	if (b->bs_nbits == 0) {
@@ -365,7 +367,6 @@ str_to_bitset(char *str, char **end)
 {
 	int			nbits;
 	int			bytes;
-	int			chars;
 	int			n;
 	int			pos;
 	int			b;
@@ -380,7 +381,7 @@ str_to_bitset(char *str, char **end)
 		nbits += digittoint(*str);
 	}
 
-	chars = (nbits >> 2) + 1;
+	bytes = NUM_BYTES(nbits);
 
 	if (*str++ != ':' || nbits == 0) {
 		return NULL;
@@ -388,7 +389,7 @@ str_to_bitset(char *str, char **end)
 
 	bp = bitset_new(nbits);
 
-	for (pos = (chars << 2) - 1; *str != '\0' && isxdigit(*str) && pos >= 0; str++) {
+	for (pos = (bytes << 3) - 1; *str != '\0' && isxdigit(*str) && pos >= 0; str++) {
 		b = digittoint(*str);
 		for (n = 3; n >= 0; n--, pos--) {
 			if (b & (1 << n)) {
