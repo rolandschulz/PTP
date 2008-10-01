@@ -153,7 +153,7 @@ aggregate_callback(sdm_message msg) {
 void
 server(dbg_backend *dbgr)
 {
-	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "starting server on [%d,%d]\n", sdm_route_get_id(), sdm_route_get_size());
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "starting server on %d, size=%d\n", sdm_route_get_id(), sdm_route_get_size());
 
 	backend = dbgr;
 
