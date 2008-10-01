@@ -141,7 +141,9 @@ sdm_routing_table_next(void)
 	rv = read_routing_table_entry(routing_file, &entry);
 
 	if (rv < 0) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
+		if (rv == -1) {
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
+		}
 		close_routing_file(routing_file);
 		routing_file = NULL;
 		return NULL;
@@ -200,14 +202,15 @@ read_routing_table_entry(FILE *routing_file, routing_table_entry *entry)
 			&(entry->nodeID), entry->hostname,
 			&(entry->port));
 
-	printf("nodeID: %d, hostname: %s, port: %d\n", entry->nodeID, entry->hostname, entry->port);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] nodeID: %d, hostname: %s, port: %d\n", sdm_route_get_id(),
+			entry->nodeID, entry->hostname, entry->port);
 
-	// Error reading file
-	if(ferror(routing_file))
-		return -1;
-	if(rv == EOF)
+	if (rv == EOF)
 		return -2;
-
+	// Error reading file
+	if(ferror(routing_file)) {
+		return -1;
+	}
 
 	return 0;
 }
