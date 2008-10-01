@@ -150,7 +150,7 @@ public class OpenMPIConfigurationWizardPage extends
 		contents.setLayout(layout);
 		
 		createVersionContents(contents);
-		createOpenMpiContests(contents);
+		createOpenMPIContents(contents);
 		
 		return contents;
 	}
@@ -194,7 +194,7 @@ public class OpenMPIConfigurationWizardPage extends
 		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 			Preferences preferences = OpenMPI13PreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD);
-			debugCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DEBUG_CMD);
+			debugCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD);
 		} else {
 			assert false;
