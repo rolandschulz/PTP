@@ -151,7 +151,7 @@ public class ProxyPacket {
 		CharBuffer len_str = decoder.decode(lengthBytes);
 		
 		if (debug) {
-			System.out.print("PACKET:[" + len_str);
+			System.out.print("RECEIVE:[" + len_str);
 		}
 	
 		int len;
@@ -229,6 +229,10 @@ public class ProxyPacket {
 		 */
 		String packet = ProtocolUtil.encodeIntVal(body.length() + 1, 
 				PACKET_LENGTH_SIZE) + " " + body;
+		
+		if (debug) {
+			System.out.println("SEND:[" + packet + "]");
+		}
 		
 		fullWrite(channel, encoder.encode(CharBuffer.wrap(packet)));
 	}
