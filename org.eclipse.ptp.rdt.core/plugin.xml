@@ -58,4 +58,23 @@
          </run>
       </builder>
    </extension>
+   <extension
+         id="RemoteGCCStandardMakePerProjectProfile"
+         name="Remote GCC Standard Make Per Project Profile"
+         point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
+      <scannerInfoCollector
+            class="org.eclipse.ptp.rdt.core.remotemake.ProjectDescriptionCollector"
+            scope="project"/>
+      <buildOutputProvider>
+         <open/>
+         <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser"/>
+      </buildOutputProvider>
+      <scannerInfoProvider providerId="specsFile">
+         <run
+               command="gcc"
+               arguments="-E -P -v -dD ${specs_file_path}"
+               class="org.eclipse.ptp.rdt.core.remotemake.RemoteGCCSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+      </scannerInfoProvider>
+   </extension>
 </plugin>
