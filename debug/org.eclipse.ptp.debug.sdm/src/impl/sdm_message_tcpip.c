@@ -151,7 +151,7 @@ sdm_parent_port_bind(int parentbaseport)
 		if(bind(sockfd, (struct sockaddr *)&(sockaddr_info), sizeof(struct sockaddr_in)) < 0) {
 			if(errno != EADDRINUSE) {
 				// Error!
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Could not bind to the port! - errno %d\n",
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error binding to the port! - errno %d\n",
 						sdm_route_get_id(), errno);
 				return -1;
 			}
@@ -160,6 +160,14 @@ sdm_parent_port_bind(int parentbaseport)
 			break;
 		}
 		// Increment port number and try again
+	}
+
+	if (parentport < parentbaseport + MAX_PORT_INCREMENT) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] bound to port %d\n", sdm_route_get_id(), parentport);
+	} else {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] could not find port to bind to\n", sdm_route_get_id());
+		close(sockfd);
+		return -1;
 	}
 
 	if(listen(sockfd, 5) < 0) {
@@ -274,8 +282,9 @@ sdm_tcpip_init()
 		//printf("This node is a server!\n");
 
 		for (sdm_routing_table_set(); (entry = sdm_routing_table_next()) != NULL; ) {
-			//printf("numId: %d, parentId: %d, myid: %d\n", numericId, parent_sockd_map->id, sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] found entry for node %d\n", sdm_route_get_id(), entry->nodeID);
 			if(entry->nodeID == sdm_route_get_id()) {
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] found my entry\n", sdm_route_get_id());
 				parentsockd = sdm_parent_port_bind(entry->port);
 				break;
 			}
@@ -284,6 +293,7 @@ sdm_tcpip_init()
 		//parentsockd = sdm_parent_port_bind(parentport);
 		//printf("parentsockd returns from bind: %d\n", parentsockd);
 		if(parentsockd < 0) {
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to port\n", sdm_route_get_id());
 			return -1;
 		}
 		//printf("Parent %d successfully connected\n", parent_sockd_map->id);
@@ -312,6 +322,7 @@ sdm_tcpip_init()
 				childsockd = sdm_connect_to_child(entry->hostname, entry->port);
 
 				if(childsockd < 0) {
+					DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to connect to child %s:%s\n", sdm_route_get_id(), entry->hostname, entry->port);
 					return -1;
 				}
 				//printf("Connection to child %d successful\n", mapp->id);
