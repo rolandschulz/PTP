@@ -309,12 +309,12 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		layout.marginWidth = 0;
 		contents.setLayout(layout);
 		
-		createOpenMpiContests(contents);
+		createOpenMPIContents(contents);
 		
 		return contents;
 	}
 
-	protected void createOpenMpiContests(Composite parent) {
+	protected void createOpenMPIContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 4;
