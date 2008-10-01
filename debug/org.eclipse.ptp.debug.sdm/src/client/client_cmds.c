@@ -126,7 +126,7 @@ send_command(sdm_idset dest, int timeout, char *cmd, int len, void *cbdata)
 {
 	sdm_message 	msg;
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send_command %s\n", sdm_route_get_id(), _set_to_str(dest));
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send_command dest=%s cmd=%s\n", sdm_route_get_id(), _set_to_str(dest), cmd);
 
 	msg = sdm_message_new(cmd, len);
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
@@ -145,6 +145,8 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, 
 {
 	struct timeval	tv = { 0, CLIENT_TIMEOUT };
 
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] DbgClntInit num_svrs=%d\n", sdm_route_get_id(), num_svrs);
+
 	tmp_idset = sdm_set_new();
 	tmp_bitset = bitset_new(num_svrs);
 
@@ -157,7 +159,7 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, 
 	 * Create a bitset containing all processes
 	 */
 	dbg_procs = sdm_set_new();
-	sdm_set_add_all(dbg_procs, num_svrs);
+	sdm_set_add_all(dbg_procs, num_svrs-1);
 
 	/*
 	 * Reset state
