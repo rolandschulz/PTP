@@ -28,14 +28,17 @@ int
 sdm_init(int argc, char *argv[])
 {
 	if (sdm_routing_table_init(argc, argv) < 0) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_routing_table_init failed\n", sdm_route_get_id());
 		return -1;
 	}
 
 	if (sdm_message_init(argc, argv) < 0) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_init failed\n", sdm_route_get_id());
 		return -1;
 	}
 
 	if (sdm_aggregate_init(argc, argv) < 0) {
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_init failed\n", sdm_route_get_id());
 		return -1;
 	}
 
