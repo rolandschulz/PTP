@@ -150,15 +150,22 @@
       </indexerUI>
       
    </extension>
-      <extension
-         id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
-         name="RDT Remote C/C++ Indexing Service"
-         point="org.eclipse.ptp.rdt.services.providers">
+   <extension
+		 id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
+		 name="RDT Remote C/C++ Indexing Service"
+		 point="org.eclipse.ptp.rdt.services.providers">
       <provider
             class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
             configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
             id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
-            name="RDT Remote C/C++ Indexing Service"
+            name="%RDTRemoteCIndexingService.name"
+            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.NullCIndexServiceProvider"
+            configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
+            id="org.eclipse.ptp.rdt.ui.NullCIndexServiceProvider"
+            name="%NullCIndexingService.name"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
       </provider>
    </extension>
@@ -185,8 +192,15 @@
             class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
             configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
             id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"
-            name="RDT Remote Build Service"
+            name="%RDTRemoteBuildService.name"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
+      </provider>
+      <provider
+	        class="org.eclipse.ptp.rdt.ui.serviceproviders.NullBuildServiceProvider"
+	        configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
+	        id="org.eclipse.ptp.rdt.ui.NullBuildServiceProvider"
+	        name="%NullBuildService.name"
+	        serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
    </extension>
    <extension

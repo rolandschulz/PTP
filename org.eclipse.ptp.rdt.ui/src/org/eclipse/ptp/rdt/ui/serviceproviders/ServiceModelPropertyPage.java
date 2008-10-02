@@ -15,6 +15,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.rdt.ui.wizards.ConfigureRemoteServices;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 /**
@@ -33,6 +35,11 @@ public class ServiceModelPropertyPage extends PropertyPage {
 	
 	public ServiceModelPropertyPage() {
 		fModelWidget = new PropertyPageServiceModelWidget();
+		fModelWidget.setConfigChangeListener(new Listener() {
+			public void handleEvent(Event event) {
+				setValid(fModelWidget.isConfigured());
+			}			
+		});
 	}
 
 	@Override

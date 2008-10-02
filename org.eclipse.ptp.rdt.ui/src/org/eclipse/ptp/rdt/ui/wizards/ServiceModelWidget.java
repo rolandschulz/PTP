@@ -31,6 +31,8 @@ import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.ptp.rdt.ui.serviceproviders.NullBuildServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.NullCIndexServiceProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
@@ -124,10 +126,12 @@ public class ServiceModelWidget{
 					fConfigureButton.setEnabled(false);
 					return;
 				}
-				fConfigureButton.setEnabled(true);
 				final TableItem item = fTable.getItem(selectionIndex);
 				IService service = (IService) item.getData(SERVICE_KEY);
 				IServiceProviderDescriptor provider = (IServiceProviderDescriptor) item.getData(PROVIDER_KEY);
+				
+				updateConfigureButton(provider);
+				
 				final CCombo combo = new CCombo(fTable, SWT.READ_ONLY);
 				
 				// populate with list of providers
@@ -162,23 +166,39 @@ public class ServiceModelWidget{
 							item.setText(1, descriptor.getName());
 							IService service = (IService) item.getData(SERVICE_KEY);
 							item.setData(PROVIDER_KEY, descriptor);
+
+							updateConfigureButton(descriptor);							
 							
-							//look in cache first
-							IServiceProvider serviceProvider = fProviderIDToProviderMap.get(descriptor.getId());
-							
-							if (serviceProvider == null) {
-								ServiceModelManager manager = ServiceModelManager.getInstance();
-								serviceProvider = manager.getServiceProvider(descriptor);
+							//look in cache to see if there is a service provider that is already setup
+							IServiceProvider provider = fProviderIDToProviderMap.get(descriptor.getId());
+							String configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$							
+							if (provider != null) { //a service provider was already setup
+								configString = provider.getConfigurationString();
 							}
 							
-							// column 2 holds the configuration string of the provider's current configuration 
-							String configString = serviceProvider.getConfigurationString();
-							if (configString == null) {
-								configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
-							}
 							item.setText(2, configString);
 							
+							if (descriptor.getId().compareTo(NullBuildServiceProvider.ID) == 0 ||
+									descriptor.getId().compareTo(NullCIndexServiceProvider.ID) == 0) {
+								
+								//since the null providers are chosen, setup the service provider and the mappings
+								ServiceModelManager manager = ServiceModelManager.getInstance();
+								IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+								
+								configString = serviceProvider.getConfigurationString();				
+								if (configString == null) {
+									configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+								}
+								item.setText(2, configString);
+								fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);
+							}
+							
 							fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
+							
+							// allow container page to check if configurations are set
+							if (fConfigChangeListener != null)
+								fConfigChangeListener.handleEvent(null);
+							
 							combo.dispose();
 							break;
 						}
@@ -229,6 +249,7 @@ public class ServiceModelWidget{
 			}
 			item.setText(2, configString);
 			
+			// allow container page to check if configurations are set
 			if (fConfigChangeListener != null)
 				fConfigChangeListener.handleEvent(null);
 		}
@@ -263,21 +284,43 @@ public class ServiceModelWidget{
 			item.setData(SERVICE_KEY, service);
 			
 			// column 1 holds a dropdown with a list of providers
-			IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
+			// default entry is the null provider if there is one			
+			IServiceProviderDescriptor descriptor;
+			if (service.getId().compareTo(NullBuildServiceProvider.SERVICE_ID) == 0)
+				descriptor = service.getProviderDescriptor(NullBuildServiceProvider.ID);
+			else if (service.getId().compareTo(NullCIndexServiceProvider.SERVICE_ID) == 0)
+				descriptor = service.getProviderDescriptor(NullCIndexServiceProvider.ID);
+			else
+				descriptor = service.getProviders().iterator().next();
 			item.setText(1, descriptor.getName());
 			item.setData(PROVIDER_KEY, descriptor);
 			
-			ServiceModelManager manager = ServiceModelManager.getInstance();
-			IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+			// No actual providers are created yet so there's no configuration
+			String configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
 			
-			String configString = serviceProvider.getConfigurationString();
-			// column 2 holds the configuration string of the provider's current configuration 
-			if (configString == null) {
-				configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+			if (descriptor.getId().compareTo(NullBuildServiceProvider.ID) == 0 ||
+					descriptor.getId().compareTo(NullCIndexServiceProvider.ID) == 0) {
+				
+				//since the null providers are chosen, setup the service provider and the mappings
+				ServiceModelManager manager = ServiceModelManager.getInstance();
+				IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+				
+				configString = serviceProvider.getConfigurationString();				
+				if (configString == null) {
+					configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+				}
+				
+				fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);				
 			}
+			
+			// column 2 holds the configuration string of the provider's current configuration 
 			item.setText(2, configString);
 			
 			fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
+			
+			// allow container page to check if configurations are set
+			if (fConfigChangeListener != null)
+				fConfigChangeListener.handleEvent(null);
 		}
 	}
 	
@@ -395,10 +438,17 @@ public class ServiceModelWidget{
 	}
 		
 	/**
-	 * Enable/disable the configure button in this widget
+	 * Enable/disable the configure button in this widget based on the service provider descriptor selected
 	 * @param enabled
 	 */
-	public void updateConfigureButton(boolean enabled) {
-		fConfigureButton.setEnabled(enabled);
+	protected void updateConfigureButton(IServiceProviderDescriptor descriptor) {
+		//no need to configure the null providers so disable the configure button
+
+		if (descriptor.getId().compareTo(NullBuildServiceProvider.ID) == 0 ||
+			descriptor.getId().compareTo(NullCIndexServiceProvider.ID) == 0)
+			
+			fConfigureButton.setEnabled(false);
+		else
+			fConfigureButton.setEnabled(true);
 	}
 }
