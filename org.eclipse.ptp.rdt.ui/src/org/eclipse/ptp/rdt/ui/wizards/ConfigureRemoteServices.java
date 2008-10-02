@@ -61,8 +61,9 @@ public class ConfigureRemoteServices {
 			IServiceProvider provider = providerIDToProviderMap.get(serviceProviderID);
 			config.setServiceProvider(service, provider);
 
-			// note: we only have one config at this point so it will be active by default
+			//have to set it as active
 			serviceModelManager.putConfiguration(project, config);
+			serviceModelManager.setActiveConfiguration(project, config);
 		}
 		
 		try {

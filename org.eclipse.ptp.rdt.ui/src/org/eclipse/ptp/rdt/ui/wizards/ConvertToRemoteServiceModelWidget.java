@@ -22,6 +22,8 @@ import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.ptp.rdt.ui.serviceproviders.NullBuildServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.NullCIndexServiceProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -77,8 +79,8 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 		fTable.removeAll();
 		if (project == null) {
 			super.createTableContent(project);
-		} else if (projectToServices.get(fCurrentProject) == null && projectToProviders.get(fCurrentProject) == null) {
-				super.createTableContent(project);
+		} else if (projectToServices.get(project) == null && projectToProviders.get(project) == null) {
+			super.createTableContent(project);
 		} else {
 			Set<IService> services = getContributedServices(project);
 			Iterator<IService> iterator = services.iterator();
@@ -107,14 +109,37 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 					
 					configString = provider.getConfigurationString();					
 				} else { //no previous user selection
-					IServiceProviderDescriptor descriptor = service.getProviders().iterator().next();
+					
+					// column 1 holds a dropdown with a list of providers
+					// default entry is the null provider if there is one			
+					IServiceProviderDescriptor descriptor;
+					if (service.getId().compareTo(NullBuildServiceProvider.SERVICE_ID) == 0)
+						descriptor = service.getProviderDescriptor(NullBuildServiceProvider.ID);
+					else if (service.getId().compareTo(NullCIndexServiceProvider.SERVICE_ID) == 0)
+						descriptor = service.getProviderDescriptor(NullCIndexServiceProvider.ID);
+					else
+						descriptor = service.getProviders().iterator().next();
 					item.setText(1, descriptor.getName());
 					item.setData(PROVIDER_KEY, descriptor);
 					
-					ServiceModelManager manager = ServiceModelManager.getInstance();
-					IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+					//No actual providers are created yet so there's no configuration
+					configString =  Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
 					
-					configString = serviceProvider.getConfigurationString();
+					if (descriptor.getId().compareTo(NullBuildServiceProvider.ID) == 0 ||
+							descriptor.getId().compareTo(NullCIndexServiceProvider.ID) == 0) {
+						
+						//since the null providers are choosen, setup the service provider mappings
+						ServiceModelManager manager = ServiceModelManager.getInstance();
+						IServiceProvider serviceProvider = manager.getServiceProvider(descriptor);
+						
+						configString = serviceProvider.getConfigurationString();
+						// column 2 holds the configuration string of the provider's current configuration 
+						if (configString == null) {
+							configString = Messages.getString("ServiceModelWidget.4"); //$NON-NLS-1$
+						}
+						fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
+						fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);						
+					}
 				}
 				
 				// column 2 holds the configuration string of the provider's current configuration 
@@ -127,6 +152,15 @@ public class ConvertToRemoteServiceModelWidget extends ServiceModelWidget {
 			fServiceIDToSelectedProviderID.putAll(serviceIDToSelectedProviderID);
 			fProviderIDToProviderMap.putAll(providerIDToProviderMap);
 		}
+		projectToServices.put(project, fServiceIDToSelectedProviderID);
+		projectToProviders.put(project, fProviderIDToProviderMap);
+		
+		if (fConfigChangeListener != null)
+			fConfigChangeListener.handleEvent(null);
+		
+		//reset the configuration button
+		if (fConfigureButton != null)
+			fConfigureButton.setEnabled(false);
 	}
 
 	public void emptyTable() {
