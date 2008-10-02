@@ -52,8 +52,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	private IResourceManagerControl resourceManager = null;
 	private IRemoteServices remoteServices = null;
-	private IRemoteUIServices remoteUIServices = null;
-	private IRemoteConnection connection = null;
+	//private IRemoteUIServices remoteUIServices = null;
+	//private IRemoteConnection connection = null;
 	
 	private String errMsg = null;
 	protected Text fRMDebuggerPathText = null;
@@ -216,10 +216,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return path to file selected in browser
 	 */
 	private String browseFile() {
-		if (remoteUIServices != null) {
-			IRemoteUIFileManager fileManager = remoteUIServices.getUIFileManager();
+		IRemoteUIServices remoteUISrv = getRemoteUIServices();
+		if (remoteUISrv != null) {
+			IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 			if (fileManager != null) {
-				fileManager.setConnection(connection);
+				fileManager.setConnection(getRemoteConnection());
 				IPath path = fileManager.browseFile(getShell(), 
 						Messages.getString("SDMDebuggerPage.selectDebuggerExe"), 
 						fRMDebuggerPathText.getText()); //$NON-NLS-1$
@@ -265,33 +266,70 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		
 		IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
-			IResourceManagerConfiguration rmConfig = rm.getConfiguration();
-
 			/*
 			 * If the resource manager has been changed and this is a remote
 			 * resource manager, then update the host field
 			 */
 			if (resourceManager != rm) {
 				resourceManager = rm;
-				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
-					remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
-					if (remoteServices != null) {
-						connection = remoteServices.getConnectionManager().getConnection(remConfig.getConnectionName());
-						if (remConfig.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-							address = connection.getAddress();
-						} else {
-							address = remConfig.getLocalAddress();
-						}
-						remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+				AbstractRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
+				if (config != null) {
+					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+						return getRemoteConnection().getAddress();
+					} else {
+						return  config.getLocalAddress();
 					}
 				} else {
-					address = "localhost"; //$NON-NLS-1$
+					return "localhost"; //$NON-NLS-1$
 				}
 			}
 		}
-		
 		return address;
+	}
+	
+	private AbstractRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
+		if (resourceManager != null) {
+			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
+			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration)
+				return (AbstractRemoteResourceManagerConfiguration)rmConfig;
+		}		
+		return null;
+		
+	}
+	
+	/**
+	 * Return remote services
+	 * @return remote services
+	 */
+	private IRemoteServices getRemoteServices() {
+		if (resourceManager == null)
+			return null;
+		
+		if (remoteServices == null) {
+			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
+			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
+				AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
+			}
+		}
+		return remoteServices;
+	}
+	private IRemoteUIServices getRemoteUIServices() {
+		IRemoteServices rsrv = getRemoteServices();
+		if (rsrv != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
+		}
+		return null;
+	}
+	
+	private IRemoteConnection getRemoteConnection() {
+		IRemoteServices rsrv = getRemoteServices();
+		if (rsrv != null) {
+			AbstractRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
+			if (config != null)
+				return rsrv.getConnectionManager().getConnection(config.getConnectionName());
+		}
+		return null;
 	}
 	
     /**
