@@ -165,7 +165,6 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	            	fServiceModelWidget.addServicesToTable(project);
 	            	remoteServices.setText(MessageFormat.format(Messages.getString("WizardProjectConversion.servicesTableForProjectLabel"), new Object[] {project.getName()}));  //$NON-NLS-1$
                 }
-                fServiceModelWidget.updateConfigureButton(false);
             }
         });		
 		tableViewer.addCheckStateListener(new ICheckStateListener() {
