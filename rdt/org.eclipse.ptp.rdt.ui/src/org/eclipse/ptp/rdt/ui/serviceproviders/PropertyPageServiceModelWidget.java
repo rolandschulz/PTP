@@ -92,6 +92,10 @@ public class PropertyPageServiceModelWidget extends ServiceModelWidget {
 				
 				fServiceIDToSelectedProviderID.put(service.getId(), provider.getId());
 				fProviderIDToProviderMap.put(provider.getId(), provider);
+				
+				// allow container page to check if configurations are set
+				if (fConfigChangeListener != null)
+					fConfigChangeListener.handleEvent(null);
 			}
 		}		
 	}
