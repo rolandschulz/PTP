@@ -150,7 +150,7 @@ public class PdtProfileIntegration extends NullLaunchIntegration {
 					
 					// Look for the prefix of the filename
 					IPath path = new Path(dirItems[i].getPath());
-					if(path.lastSegment().matches("^" + pdtOutputPrefix + "-.*")) {//$NON-NLS-1$ //$NON-NLS-2$
+					if(path.lastSegment().matches("^" + pdtOutputPrefix + ".*")) {//$NON-NLS-1$ //$NON-NLS-2$
 						filteredItems.add(rFile);
 					}
 				} catch(RemoteOperationException e) {
