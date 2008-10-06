@@ -69,20 +69,27 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			if (launchCmdText != null)
+			if (launchCmdText != null) {
 				launchCmd = extractText(launchCmdText);
-			if (debugCmdText != null)
+			}
+			if (debugCmdText != null) {
 				debugCmd = extractText(debugCmdText);
-			if (discoverCmdText != null)
+			}
+			if (discoverCmdText != null) {
 				discoverCmd = extractText(discoverCmdText);
-			if (periodicMonitorCmdText != null)
+			}
+			if (periodicMonitorCmdText != null) {
 				periodicMonitorCmd = extractText(periodicMonitorCmdText);
-			if (periodicMonitorTimeSpinner != null)
+			}
+			if (periodicMonitorTimeSpinner != null) {
 				periodicMonitorTime = periodicMonitorTimeSpinner.getSelection();
-			if (continuousMonitorCmdText != null)
+			}
+			if (continuousMonitorCmdText != null) {
 				continuousMonitorCmd = extractText(continuousMonitorCmdText);
-			if (remoteInstallPathText != null)
+			}
+			if (remoteInstallPathText != null) {
 				remoteInstallPath = extractText(remoteInstallPathText);
+			}
 		}
 
 		@Override
@@ -99,9 +106,9 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 				}
 			}
 			if (periodicMonitorCmdText != null) {
-//				if (periodicMonitorCmd == null) {
-//					throw new ValidationException("Periodic monitor command is missing");
-//				}
+				//				if (periodicMonitorCmd == null) {
+				//					throw new ValidationException("Periodic monitor command is missing");
+				//				}
 				if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
 					throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_InvalidPeriodicMonitorCommandTimeRange);
 				}
@@ -111,108 +118,136 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		@Override
 		protected void copyToStorage() {
 			Preferences config = getPreferences();
-			if (launchCmdText != null)
+			if (launchCmdText != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
-			if (debugCmdText != null)
+			}
+			if (debugCmdText != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD, toPreference(debugCmd));
-			if (discoverCmdText != null)
+			}
+			if (discoverCmdText != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD, toPreference(discoverCmd));
-			if (periodicMonitorCmdText != null)
+			}
+			if (periodicMonitorCmdText != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD, toPreference(periodicMonitorCmd));
-			if (periodicMonitorTimeSpinner != null)
+			}
+			if (periodicMonitorTimeSpinner != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME, periodicMonitorTime);
-			if (continuousMonitorCmdText != null)
+			}
+			if (continuousMonitorCmdText != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD, toPreference(continuousMonitorCmd));
-			if (remoteInstallPathText != null)
+			}
+			if (remoteInstallPathText != null) {
 				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH, toPreference(remoteInstallPath));
+			}
 			savePreferences();
 		}
 
 		@Override
 		protected void loadFromStorage() {
 			Preferences config = getPreferences();
-			if (launchCmdText != null)
+			if (launchCmdText != null) {
 				launchCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
-			if (debugCmdText != null)
+			}
+			if (debugCmdText != null) {
 				debugCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
-			if (discoverCmdText != null)
+			}
+			if (discoverCmdText != null) {
 				discoverCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
-			if (periodicMonitorCmdText != null)
+			}
+			if (periodicMonitorCmdText != null) {
 				periodicMonitorCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-			if (periodicMonitorTimeSpinner != null)
+			}
+			if (periodicMonitorTimeSpinner != null) {
 				periodicMonitorTime = config.getInt(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
-			if (continuousMonitorCmdText != null)
+			}
+			if (continuousMonitorCmdText != null) {
 				continuousMonitorCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
-			if (remoteInstallPathText != null)
+			}
+			if (remoteInstallPathText != null) {
 				remoteInstallPath = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+			}
 		}
 
 		@Override
 		protected void loadDefault() {
 			Preferences config = getPreferences();
-			if (launchCmdText != null)
+			if (launchCmdText != null) {
 				launchCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
-			if (debugCmdText != null)
+			}
+			if (debugCmdText != null) {
 				debugCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
-			if (discoverCmdText != null)
+			}
+			if (discoverCmdText != null) {
 				discoverCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
-			if (periodicMonitorCmdText != null)
+			}
+			if (periodicMonitorCmdText != null) {
 				periodicMonitorCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-			if (periodicMonitorTimeSpinner != null)
+			}
+			if (periodicMonitorTimeSpinner != null) {
 				periodicMonitorTime = config.getDefaultInt(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
-			if (continuousMonitorCmdText != null)
+			}
+			if (continuousMonitorCmdText != null) {
 				continuousMonitorCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
-			if (remoteInstallPathText != null)
+			}
+			if (remoteInstallPathText != null) {
 				remoteInstallPath = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+			}
 		}
 
 		@Override
 		protected void copyToFields() {
-			if (launchCmdText != null)
+			if (launchCmdText != null) {
 				applyText(launchCmdText, launchCmd);
-			if (debugCmdText != null)
+			}
+			if (debugCmdText != null) {
 				applyText(debugCmdText, debugCmd);
-			if (discoverCmdText != null)
+			}
+			if (discoverCmdText != null) {
 				applyText(discoverCmdText, discoverCmd);
-			if (periodicMonitorCmdText != null)
+			}
+			if (periodicMonitorCmdText != null) {
 				applyText(periodicMonitorCmdText, periodicMonitorCmd);
-			if (periodicMonitorTimeSpinner != null)
+			}
+			if (periodicMonitorTimeSpinner != null) {
 				periodicMonitorTimeSpinner.setSelection(periodicMonitorTime);
-			if (continuousMonitorCmdText != null)
+			}
+			if (continuousMonitorCmdText != null) {
 				applyText(continuousMonitorCmdText, continuousMonitorCmd);
-			if (remoteInstallPathText != null)
+			}
+			if (remoteInstallPathText != null) {
 				applyText(remoteInstallPathText, remoteInstallPath);
+			}
 		}
 	}
 
 	public static final String EMPTY_STRING = "";  //$NON-NLS-1$
-	private Text launchCmdText = null;
-	private Text debugCmdText = null;
-	private Text discoverCmdText = null;
-	private Text continuousMonitorCmdText = null;
-	private Text periodicMonitorCmdText = null;
-	private Spinner periodicMonitorTimeSpinner = null;
-	private Text remoteInstallPathText = null;
+	Text launchCmdText = null;
+	Text debugCmdText = null;
+	Text discoverCmdText = null;
+	Text continuousMonitorCmdText = null;
+	Text periodicMonitorCmdText = null;
+	Spinner periodicMonitorTimeSpinner = null;
+	Text remoteInstallPathText = null;
 
 	private int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
-	private final String prefix; // to get preferences
+	final String prefix; // to get preferences
 
-   public AbstractToolsPreferencePage(String prefix, int capabilities) {
+	public AbstractToolsPreferencePage(String prefix, int capabilities) {
 		super();
-    	this.capabilities = capabilities;
-    	this.prefix = prefix;
+		this.capabilities = capabilities;
+		this.prefix = prefix;
 	}
 
 	public AbstractToolsPreferencePage(String prefix, int capabilities, String title, ImageDescriptor image) {
 		super(title, image);
-    	this.capabilities = capabilities;
-    	this.prefix = prefix;
+		this.capabilities = capabilities;
+		this.prefix = prefix;
 	}
 
 	public AbstractToolsPreferencePage(String prefix, int capabilities, String title) {
 		super(title);
-    	this.capabilities = capabilities;
-    	this.prefix = prefix;
+		this.capabilities = capabilities;
+		this.prefix = prefix;
 	}
 
 	@Override
