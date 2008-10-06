@@ -7,6 +7,7 @@ Bundle-Activator: org.eclipse.ptp.debug.sdm.ui.SDMDebugUIPlugin
 Bundle-Vendor: Eclipse.org
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.filesystem,
  org.eclipse.debug.ui,
  org.eclipse.ptp.debug.ui,
  org.eclipse.ptp.ui,
