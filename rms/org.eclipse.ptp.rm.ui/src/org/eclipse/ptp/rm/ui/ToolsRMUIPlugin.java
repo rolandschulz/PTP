@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rm.core.Messages;
 import org.eclipse.ptp.rm.ui.utils.DebugUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -89,7 +88,7 @@ public class ToolsRMUIPlugin extends AbstractUIPlugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.ToolsRMPlugin_Exception_InternalError, e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.ToolsRMUIPlugin_Exception_InternalError, e));
 	}
 
 	/**

@@ -27,7 +27,7 @@ import org.eclipse.swt.events.TypedEvent;
  * @author Daniel Felix Ferber
  */
 public abstract class WidgetListener implements SelectionListener,
-		ModifyListener {
+ModifyListener {
 	/** State of the listener (enabled/disabled). */
 	private boolean listenerEnabled = true;
 
@@ -48,10 +48,10 @@ public abstract class WidgetListener implements SelectionListener,
 
 	public void widgetDefaultSelected(SelectionEvent e) {
 		if (isEnabled()) {
-			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: widgetDefaultSelected on {0}", calculareSource(e));
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: widgetDefaultSelected on {0}", calculareSource(e)); //$NON-NLS-1$
 			doWidgetDefaultSelected(e);
 		} else {
-			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored widgetDefaultSelected on {0}", calculareSource(e));
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored widgetDefaultSelected on {0}", calculareSource(e)); //$NON-NLS-1$
 		}
 	}
 
@@ -61,10 +61,10 @@ public abstract class WidgetListener implements SelectionListener,
 
 	public void widgetSelected(SelectionEvent e) {
 		if (isEnabled()) {
-			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: widgetSelected on {0}", calculareSource(e));
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: widgetSelected on {0}", calculareSource(e)); //$NON-NLS-1$
 			doWidgetSelected(e);
 		} else {
-			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored widgetSelected on {0}", calculareSource(e));
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored widgetSelected on {0}", calculareSource(e)); //$NON-NLS-1$
 		}
 	}
 
@@ -74,10 +74,10 @@ public abstract class WidgetListener implements SelectionListener,
 
 	public void modifyText(ModifyEvent e) {
 		if (isEnabled()) {
-			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: modifyText on {0}", calculareSource(e));
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: modifyText on {0}", calculareSource(e)); //$NON-NLS-1$
 			doModifyText(e);
 		} else {
-			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored modifyText on {0}", calculareSource(e));
+			DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "Widget listener: ignored modifyText on {0}", calculareSource(e)); //$NON-NLS-1$
 		}
 	}
 
