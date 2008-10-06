@@ -15,6 +15,11 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public abstract class AbstractToolRMFactory extends AbstractResourceManagerFactory {
 
 	public AbstractToolRMFactory(String name) {
@@ -26,6 +31,7 @@ public abstract class AbstractToolRMFactory extends AbstractResourceManagerFacto
 		return (IResourceManagerConfiguration) configuration.clone();
 	}
 
+	@Override
 	abstract public IResourceManagerControl create(IResourceManagerConfiguration config);
 
 	abstract public IResourceManagerConfiguration createConfiguration();

@@ -12,32 +12,19 @@ package org.eclipse.ptp.rm.core;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 
-
 /**
- * OMPI-specific attributes
+ * 
+ * @author Daniel Felix Ferber
  */
 public class AbstractToolsAttributes {
-	
+
 	/*
 	 * I have disabled getLaunchArgumentsAttributeDefinition since
 	 * the launch command will contain all arguments and a variable substitution
 	 * to be replaced with the program executable path.
 	 */
-	
-//	private static final String LAUNCH_ARGS_ATTR_ID = "launchArgs";
-
-//	private final static StringAttributeDefinition launchArgs =
-//		new StringAttributeDefinition(LAUNCH_ARGS_ATTR_ID, LAUNCH_ARGS_ATTR_ID,
-//				"Launch Arguments", true, "");
-
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{
-//				launchArgs,
-			};
+		return new IAttributeDefinition[] {};
 	}
-
-//	public static StringAttributeDefinition getLaunchArgumentsAttributeDefinition() {
-//		return launchArgs;
-//	}
 }

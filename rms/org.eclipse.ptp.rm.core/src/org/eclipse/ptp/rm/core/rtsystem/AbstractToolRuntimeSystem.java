@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
@@ -73,23 +72,24 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @author dfferber
 	 * TODO: Is this JobRunner really required? Why not dispatching the jobs immediately?
 	 */
-	private class JobRunner implements Runnable {
+	class JobRunner implements Runnable {
 		public void run() {
 			DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: started job thread", rmConfiguration.getName()); //$NON-NLS-1$
 			try {
 				while (connection != null) {
 					Job job = pendingJobQueue.take();
-					if (job instanceof IToolRuntimeSystemJob)
+					if (job instanceof IToolRuntimeSystemJob) {
 						DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: schedule job #{1}", rmConfiguration.getName(), ((IToolRuntimeSystemJob)job).getJobID()); //$NON-NLS-1$
-					else
-						DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: schedule job #{1}", rmConfiguration.getName(), job.getName());
+					} else {
+						DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: schedule job #{1}", rmConfiguration.getName(), job.getName()); //$NON-NLS-1$
+					}
 					job.schedule();
 				}
 			} catch (InterruptedException e) {
 				// Ignore
 			} catch (Exception e) {
 				DebugUtil.error(DebugUtil.JOB_TRACING, "RTS {0}: {1}", rmConfiguration.getName(), e); //$NON-NLS-1$
-				PTPCorePlugin.log(e);
+				ToolsRMPlugin.log(e);
 			}
 			DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminated job thread", rmConfiguration.getName()); //$NON-NLS-1$
 		}
@@ -131,10 +131,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	Map<String, Job> jobs = Collections.synchronizedMap(new HashMap<String, Job>());
 
 	/** Jobs created, but not yet started. */
-	private LinkedBlockingQueue<Job> pendingJobQueue = new LinkedBlockingQueue<Job>();
+	LinkedBlockingQueue<Job> pendingJobQueue = new LinkedBlockingQueue<Job>();
 
 	/** Jobs created and started. */
-//	ConcurrentLinkedQueue<IToolRuntimeSystemJob> runningJobQueue = new ConcurrentLinkedQueue<IToolRuntimeSystemJob>();
+	//	ConcurrentLinkedQueue<IToolRuntimeSystemJob> runningJobQueue = new ConcurrentLinkedQueue<IToolRuntimeSystemJob>();
 
 	/** Helper object to create events for the RM. */
 	private IRuntimeEventFactory eventFactory = new RuntimeEventFactory();
@@ -156,14 +156,14 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: startup", rmConfiguration.getName()); //$NON-NLS-1$
 		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
 		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Could not find remote services for resource manager"));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoRemoteServices));
 		}
 		IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
 		Assert.isNotNull(connectionManager);
 
 		connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
 		if (connection == null) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Could not find connection for resource manager"));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoConnection));
 		}
 
 		if (!connection.isOpen()) {
@@ -196,7 +196,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		if (!monitor.isCanceled()) {
 			fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
 			if (jobQueueThread == null) {
-				jobQueueThread = new Thread(new JobRunner(), "Job Queue Manager");
+				jobQueueThread = new Thread(new JobRunner(), Messages.AbstractToolRuntimeSystem_JobQueueManagerThreadTitle);
 				jobQueueThread.start();
 			}
 		} else {
@@ -343,7 +343,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
 		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Resource manager has not be initialized"));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_ResourceManagerNotInitialized));
 		}
 
 		/*
@@ -391,29 +391,29 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @param id job ID
 	 * @param attrs new attributes
 	 */
-//	protected void changeJobAttributes(String id, IAttribute<?, ?, ?>... attrs) {
-//		ElementAttributeManager mgr = new ElementAttributeManager();
-//		AttributeManager attrMgr = new AttributeManager();
-//		for (IAttribute<?, ?, ?> attr : attrs) {
-//			attrMgr.addAttribute(attr);
-//		}
-//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
-//	}
+	//	protected void changeJobAttributes(String id, IAttribute<?, ?, ?>... attrs) {
+	//		ElementAttributeManager mgr = new ElementAttributeManager();
+	//		AttributeManager attrMgr = new AttributeManager();
+	//		for (IAttribute<?, ?, ?> attr : attrs) {
+	//			attrMgr.addAttribute(attr);
+	//		}
+	//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
+	//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
+	//	}
 
-//	/**
-//	 * Notify RM to change job state.
-//	 *
-//	 * @param id job ID
-//	 * @param state new state
-//	 */
-//	protected void changeJobState(String id, JobAttributes.State state) {
-//		ElementAttributeManager mgr = new ElementAttributeManager();
-//		AttributeManager attrMgr = new AttributeManager();
-//		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(state));
-//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
-//	}
+	//	/**
+	//	 * Notify RM to change job state.
+	//	 *
+	//	 * @param id job ID
+	//	 * @param state new state
+	//	 */
+	//	protected void changeJobState(String id, JobAttributes.State state) {
+	//		ElementAttributeManager mgr = new ElementAttributeManager();
+	//		AttributeManager attrMgr = new AttributeManager();
+	//		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(state));
+	//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
+	//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
+	//	}
 
 	/**
 	 * Notify RM to create a new job.
@@ -433,7 +433,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		jobAttrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobID));
 		jobAttrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(parentID));
 		jobAttrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.PENDING));
-		jobAttrMgr.addAttribute(JobAttributes.getUserIdAttributeDefinition().create(System.getenv("USER")));
+		jobAttrMgr.addAttribute(JobAttributes.getUserIdAttributeDefinition().create(System.getenv("USER"))); //$NON-NLS-1$
 		jobAttrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(generateJobName()));
 
 		/*
@@ -457,7 +457,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			jobAttrMgr.addAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition().create(numProcs));
 		} catch (IllegalValueException e) {
-			PTPCorePlugin.log(e);
+			ToolsRMPlugin.log(e);
 		}
 		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgs.toArray(new String[0])));
 		if (debugAttr != null) {
@@ -510,6 +510,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			attrMgr.addAttribute(NodeAttributes.getNumberAttributeDefinition().create(number));
 		} catch (IllegalValueException e) {
+			/*
+			 * This exception is not possible, since number is always valid.
+			 */
+			ToolsRMPlugin.log(e);
+			assert false;
 		}
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
@@ -640,7 +645,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @return job name
 	 */
 	protected String generateJobName() {
-		return "job" + jobNumber++;
+		return "job" + jobNumber++; //$NON-NLS-1$
 	}
 
 	public IRemoteProcessBuilder createProcessBuilder(List<String> command) {

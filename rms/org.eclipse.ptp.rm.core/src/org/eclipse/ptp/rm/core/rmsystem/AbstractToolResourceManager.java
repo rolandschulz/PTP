@@ -30,8 +30,10 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
-public abstract class AbstractToolResourceManager extends
-		AbstractRuntimeResourceManager {
+/**
+ * @author Daniel Felix Ferber
+ */
+public abstract class AbstractToolResourceManager extends AbstractRuntimeResourceManager {
 
 	public AbstractToolResourceManager(String id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
@@ -53,6 +55,9 @@ public abstract class AbstractToolResourceManager extends
 	 */
 	@Override
 	protected void doBeforeCloseConnection() {
+		/*
+		 * Defaults to empty implementation
+		 */
 	}
 
 	/*
@@ -61,6 +66,9 @@ public abstract class AbstractToolResourceManager extends
 	 */
 	@Override
 	protected void doAfterCloseConnection() {
+		/*
+		 * Defaults to empty implementation
+		 */
 	}
 
 	/*
@@ -69,6 +77,9 @@ public abstract class AbstractToolResourceManager extends
 	 */
 	@Override
 	protected void doAfterOpenConnection() {
+		/*
+		 * Defaults to empty implementation
+		 */
 	}
 
 	/*
@@ -77,6 +88,9 @@ public abstract class AbstractToolResourceManager extends
 	 */
 	@Override
 	protected void doBeforeOpenConnection() {
+		/*
+		 * Defaults to empty implementation
+		 */
 	}
 
 	/*
@@ -85,7 +99,6 @@ public abstract class AbstractToolResourceManager extends
 	 */
 	@Override
 	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
-		// QUESTION why this could not be put into the AbstractRuntimeRM as default implementation?
 		return newJob(queue, jobId, attrs);
 	}
 
@@ -169,7 +182,7 @@ public abstract class AbstractToolResourceManager extends
 	protected boolean doUpdateQueues(Collection<IPQueueControl> queues, AttributeManager attrs) {
 		return updateQueues(queues, attrs);
 	}
-	
+
 	protected void createHostList(OutputStream os, String queueID, String jobID) throws CoreException {
 		String rmID = getConfiguration().getResourceManagerId();
 		IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rmID);
@@ -177,8 +190,6 @@ public abstract class AbstractToolResourceManager extends
 		IPJob job = queue.getJobById(jobID);
 		IPProcess processes [] = job.getProcesses();
 		processes[0].getNode();
-		
-		
 	}
 
 }

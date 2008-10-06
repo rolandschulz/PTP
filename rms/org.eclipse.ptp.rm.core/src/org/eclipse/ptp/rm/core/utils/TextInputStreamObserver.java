@@ -66,21 +66,21 @@ public class TextInputStreamObserver extends Thread {
 	}
 
 	void log(String string) {
-//		System.err.println(name + ": " + s);
+		//		System.err.println(name + ": " + s);
 	}
 
 	void newLine(String line) {
-		log("Received: " + Integer.toString(line.length()) + " bytes");
+		log("Received: " + Integer.toString(line.length()) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
 		listener.newLine(line);
 	}
 
 	void streamClosed() {
-		log("Stream closed");
+		log("Stream closed"); //$NON-NLS-1$
 		listener.streamClosed();
 	}
 
 	void streamError(Exception e) {
-		log("Recovered from exception: " + e.getMessage());
+		log("Recovered from exception: " + e.getMessage()); //$NON-NLS-1$
 		listener.streamError(e);
 	}
 
