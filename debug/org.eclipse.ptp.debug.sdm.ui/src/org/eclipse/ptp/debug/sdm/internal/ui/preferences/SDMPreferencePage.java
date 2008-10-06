@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.internal.ui.preferences;
 
-import java.io.File;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
@@ -33,11 +31,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -52,19 +48,19 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	    }
 	    public void widgetSelected(SelectionEvent e) {
    			Object source = e.getSource();
-   			if (source == sdmPathButton)
-   				handleSDMButtonSelected();
-   			else if (source == sdmBackendCombo)
+   			//if (source == sdmPathButton)
+   				//handleSDMButtonSelected();
+   			if (source == sdmBackendCombo)
    				handleSDMComboSelected();
    		}
     }
-	private Text sdmPathText = null;
-	private Text sdmHostText = null;
+	//private Text sdmPathText = null;
+	//private Text sdmHostText = null;
 	private Text sdmBackendPathText = null;
 	private Text sdmArgsText = null;
 	private Combo sdmBackendCombo = null;
 	
-    private Button sdmPathButton = null;
+    //private Button sdmPathButton = null;
     protected WidgetListener listener = new WidgetListener();
     
 	public SDMPreferencePage() {
@@ -79,6 +75,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);
+		/*
 		String name = sdmPathText.getText();
 		if (name == null) {
 			setErrorMessage(PreferenceMessages.getString("SDMPreferencePage.no_sdm"));
@@ -89,6 +86,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 			setErrorMessage(PreferenceMessages.getString("SDMPreferencePage.Selection_must_be_file"));
 			return false;
 		}
+		*/
 		return true;
 	}
 	
@@ -97,9 +95,9 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	 */
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
-		sdmPathText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_FILE));
+		//sdmPathText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_FILE));
 		sdmArgsText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS));
-		sdmHostText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_HOST));
+		//sdmHostText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_HOST));
 		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
 		sdmBackendPathText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH));
 		super.performDefaults();
@@ -120,12 +118,13 @@ public class SDMPreferencePage extends AbstractPreferencePage {
      * @param event
      */
     public void propertyChange(PropertyChangeEvent event) {
-    		setValid(isValid());
+    	setValid(isValid());
     }	
 	
 	/**
 	 * Handle sdm path button selected
 	 */
+    /*
 	private void handleSDMButtonSelected() {
 		FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
 		String filePath = dialog.open();
@@ -133,6 +132,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 			sdmPathText.setText(filePath);
 		}
 	}
+	*/
 	
     /**
 	 * Handle combo selection
@@ -167,14 +167,16 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	 */
 	protected void createSDMSetting(Composite parent) {
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("SDMPreferencePage.sdm_group"));
-		Composite comp = createComposite(group, 3);
+		Composite comp = createComposite(group, 2);
 
-		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_host"));
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		/*
 		gd.horizontalSpan = 2;
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_host"));
 		sdmHostText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		sdmHostText.setLayoutData(gd);
 		sdmHostText.addModifyListener(listener);
+		*/
 		
 		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_backend"));
 		sdmBackendCombo = new Combo(comp, SWT.READ_ONLY);
@@ -187,13 +189,14 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 		sdmBackendPathText.setLayoutData(gd);
 		sdmBackendPathText.addModifyListener(listener);
 		
+		/*
 		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_selection"));
 		sdmPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		sdmPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		sdmPathText.addModifyListener(listener);		
 		sdmPathButton = createButton(comp, PreferenceMessages.getString("SDMPreferencePage.browse_1"), SWT.PUSH);
 		sdmPathButton.addSelectionListener(listener);
-		
+		*/
 		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_args"));
 		sdmArgsText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		sdmArgsText.setLayoutData(gd);
@@ -205,9 +208,9 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
-		sdmPathText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE));
+		//sdmPathText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE));
 		sdmArgsText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS));
-		sdmHostText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_HOST));
+		//sdmHostText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_HOST));
 		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
 		sdmBackendPathText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH));
 	}
@@ -217,9 +220,9 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_FILE, sdmPathText.getText());
+		//store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_FILE, sdmPathText.getText());
 		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_ARGS, sdmArgsText.getText());
-		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_HOST, sdmHostText.getText());
+		//store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_HOST, sdmHostText.getText());
 		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE, sdmBackendCombo.getItem(sdmBackendCombo.getSelectionIndex()));
 		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH, sdmBackendPathText.getText());
 	}

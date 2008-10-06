@@ -37,7 +37,7 @@ public interface SDMPreferenceConstants {
 	/**
 	 * Location of the sdm
 	 */
-	public static final String SDM_DEBUGGER_FILE = PLUGIN_ID + ".debugger_file";
+	//public static final String SDM_DEBUGGER_FILE = PLUGIN_ID + ".debugger_file";
 	
 	/**
 	 * Extra arguments to pass to the sdm (e.g. debugging flags)
@@ -47,8 +47,8 @@ public interface SDMPreferenceConstants {
 	/**
 	 * Host for the sdm client
 	 */
-	public static final String SDM_DEBUGGER_HOST = PLUGIN_ID + ".debugger_host";
-	public static final String SDM_DEFAULT_DEUBGGER_HOST = "localhost";
+	//public static final String SDM_DEBUGGER_HOST = PLUGIN_ID + ".debugger_host";
+	//public static final String SDM_DEFAULT_DEUBGGER_HOST = "localhost";
 
 	/**
 	 * Debugger backend
