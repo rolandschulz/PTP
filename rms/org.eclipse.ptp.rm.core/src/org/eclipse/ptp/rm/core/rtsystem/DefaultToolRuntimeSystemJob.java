@@ -73,9 +73,11 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					}
 
 					public void streamClosed() {
+						// Empty implementation.
 					}
 
 					public void streamError(Exception e) {
+						// Empty implementation.
 					}
 				}
 		);
@@ -89,9 +91,11 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					}
 
 					public void streamClosed() {
+						// Empty implementation.
 					}
 
 					public void streamError(Exception e) {
+						// Empty implementation.
 					}
 				}
 		);
@@ -128,7 +132,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected HashMap<String, String> doRetrieveToolEnvironment()
-			throws CoreException {
+	throws CoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}

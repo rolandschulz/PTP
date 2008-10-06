@@ -85,7 +85,7 @@ public class InputStreamObserver extends Thread {
 	}
 
 	protected void log(String s) {
-//		PTPCorePlugin.log(s);
+		//		PTPCorePlugin.log(s);
 	}
 
 	protected void log(Throwable e) {
@@ -94,7 +94,7 @@ public class InputStreamObserver extends Thread {
 
 	void streamClosed() {
 		if (closed) return;
-		log("Stream closed");
+		log("Stream closed"); //$NON-NLS-1$
 		closed = true;
 		for (Object listener : listeners.getListeners()) {
 			try {
@@ -108,7 +108,7 @@ public class InputStreamObserver extends Thread {
 
 	void streamError(Exception e) {
 		if (closed) return;
-		log("Recovered from exception: " + e.getMessage());
+		log("Recovered from exception: " + e.getMessage()); //$NON-NLS-1$
 		for (Object listener : listeners.getListeners()) {
 			try {
 				((IInputStreamListener)listener).streamError(e);
@@ -121,7 +121,7 @@ public class InputStreamObserver extends Thread {
 
 	void newBytes(byte buffer[], int length) {
 		if (closed) return;
-		log("Received: " + Integer.toString(length) + " bytes");
+		log("Received: " + Integer.toString(length) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (Object listener : listeners.getListeners()) {
 			try {
 				((IInputStreamListener)listener).newBytes(buffer, length);
@@ -138,7 +138,7 @@ public class InputStreamObserver extends Thread {
 	@Override
 	public void run() {
 		byte buffer[] = new byte[BUFFER_SIZE];
-		log("Started observing");
+		log("Started observing"); //$NON-NLS-1$
 		while (!killed) {
 			try {
 				int bytes = input.read(buffer);
@@ -174,7 +174,7 @@ public class InputStreamObserver extends Thread {
 				}
 			}
 		}
-		log("Finished observing");
+		log("Finished observing"); //$NON-NLS-1$
 	}
 
 	public void addListener(IInputStreamListener listener) {

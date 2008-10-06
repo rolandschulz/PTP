@@ -23,8 +23,11 @@ import org.eclipse.ui.IMemento;
  * target, as done on AbstractRemoteResourceManagerConfiguration, but without
  * proxy settings.
  */
+/**
+ * @author Daniel Felix Ferber
+ */
 public abstract class AbstractToolRMConfiguration extends
-		AbstractRemoteResourceManagerConfiguration implements Cloneable {
+AbstractRemoteResourceManagerConfiguration implements Cloneable {
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private static final String TAG_LAUNCH_CMD = "launchCmd"; //$NON-NLS-1$
@@ -91,7 +94,7 @@ public abstract class AbstractToolRMConfiguration extends
 		public String getLaunchCmd() {
 			return launchCmd;
 		}
-		
+
 		public void setLaunchCmd(String launchCmd) {
 			this.launchCmd = launchCmd;
 		}
@@ -99,7 +102,7 @@ public abstract class AbstractToolRMConfiguration extends
 		public String getDebugCmd() {
 			return debugCmd;
 		}
-		
+
 		public void setDebugCmd(String debugCmd) {
 			this.debugCmd = debugCmd;
 		}
@@ -172,9 +175,9 @@ public abstract class AbstractToolRMConfiguration extends
 		String discoverCmd = memento.getString(TAG_DISCOVER_CMD);
 		String periodicMonitorCmd = memento.getString(TAG_PERIODIC_MONITOR_CMD);
 		Integer periodicMonitorTime = memento
-				.getInteger(TAG_PERIODIC_MONITOR_TIME);
+		.getInteger(TAG_PERIODIC_MONITOR_TIME);
 		String continuousMonitorCmd = memento
-				.getString(TAG_CONTINUOUS_MONITOR_CMD);
+		.getString(TAG_CONTINUOUS_MONITOR_CMD);
 		String remoteInstallPath = memento.getString(TAG_REMOTE_INSTALL_PATH);
 		boolean useDefaults = Boolean.parseBoolean(memento
 				.getString(TAG_USE_DEFAULTS));
@@ -241,11 +244,11 @@ public abstract class AbstractToolRMConfiguration extends
 	public void setLaunchCmd(String launchCmd) {
 		this.launchCmd = launchCmd;
 	}
-	
+
 	public String getDebugCmd() {
 		return debugCmd;
 	}
-	
+
 	public void setDebugCmd(String debugCmd) {
 		this.debugCmd = debugCmd;
 	}
@@ -300,29 +303,29 @@ public abstract class AbstractToolRMConfiguration extends
 
 	public boolean hasDiscoverCmd() {
 		return (capabilities & CAP_DISCOVER) != 0 && discoverCmd != null
-				&& !discoverCmd.trim().equals(EMPTY_STRING);
+		&& !discoverCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasLaunchCmd() {
 		return (capabilities & CAP_LAUNCH) != 0 && launchCmd != null
-				&& !launchCmd.trim().equals(EMPTY_STRING);
+		&& !launchCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasDebugCmd() {
 		return (capabilities & CAP_LAUNCH) != 0 && debugCmd != null
-				&& !debugCmd.trim().equals(EMPTY_STRING);
+		&& !debugCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasContinuousMonitorCmd() {
 		return (capabilities & CAP_CONTINUOUS_MONITOR) != 0
-				&& continuousMonitorCmd != null
-				&& !continuousMonitorCmd.trim().equals(EMPTY_STRING);
+		&& continuousMonitorCmd != null
+		&& !continuousMonitorCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasPeriodicMonitorCmd() {
 		return (capabilities & CAP_PERIODIC_MONITOR) != 0
-				&& periodicMonitorCmd != null
-				&& !periodicMonitorCmd.trim().equals(EMPTY_STRING);
+		&& periodicMonitorCmd != null
+		&& !periodicMonitorCmd.trim().equals(EMPTY_STRING);
 	}
 
 	protected int getCapabilities() {

@@ -13,9 +13,13 @@ package org.eclipse.ptp.rm.core.utils;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class DebugUtil {
 	private static final String COMMAND_TRACING_OPTION = "org.eclipse.ptp.rm.core/debug/command"; //$NON-NLS-1$
 	private static final String COMMAND_TRACING_OPTION_MORE = "org.eclipse.ptp.rm.core/debug/command/more"; //$NON-NLS-1$
@@ -39,46 +43,43 @@ public class DebugUtil {
 
 	public static void configurePluginDebugOptions() {
 		if (ToolsRMPlugin.getDefault().isDebugging()) {
-//			org.eclipse.ptp.core.util.DebugUtil.configurePluginDebugOptions();
-//			if (org.eclipse.ptp.core.util.DebugUtil.RM_TRACING) {
-				String option = Platform.getDebugOption(COMMAND_TRACING_OPTION);
-				if (option != null) {
-					COMMAND_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(COMMAND_TRACING_OPTION_MORE);
-				if (option != null) {
-					COMMAND_TRACING_MORE = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(JOB_TRACING_OPTION);
-				if (option != null) {
-					JOB_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(RTS_TRACING_OPTION);
-				if (option != null) {
-					RTS_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(RTS_DISCOVER_TRACING_OPTION);
-				if (option != null) {
-					RTS_DISCOVER_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(RTS_MONITOR_TRACING_OPTION);
-				if (option != null) {
-					RTS_MONITOR_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(RTS_JOB_TRACING_OPTION);
-				if (option != null) {
-					RTS_JOB_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(RTS_JOB_TRACING_OPTION_MORE);
-				if (option != null) {
-					RTS_JOB_TRACING_MORE = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
-				option = Platform.getDebugOption(RTS_JOB_OUTPUT_TRACING_OPTION);
-				if (option != null) {
-					RTS_JOB_OUTPUT_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
-				}
+			String option = Platform.getDebugOption(COMMAND_TRACING_OPTION);
+			if (option != null) {
+				COMMAND_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
 			}
-//		}
+			option = Platform.getDebugOption(COMMAND_TRACING_OPTION_MORE);
+			if (option != null) {
+				COMMAND_TRACING_MORE = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(JOB_TRACING_OPTION);
+			if (option != null) {
+				JOB_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(RTS_TRACING_OPTION);
+			if (option != null) {
+				RTS_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(RTS_DISCOVER_TRACING_OPTION);
+			if (option != null) {
+				RTS_DISCOVER_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(RTS_MONITOR_TRACING_OPTION);
+			if (option != null) {
+				RTS_MONITOR_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(RTS_JOB_TRACING_OPTION);
+			if (option != null) {
+				RTS_JOB_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(RTS_JOB_TRACING_OPTION_MORE);
+			if (option != null) {
+				RTS_JOB_TRACING_MORE = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+			option = Platform.getDebugOption(RTS_JOB_OUTPUT_TRACING_OPTION);
+			if (option != null) {
+				RTS_JOB_OUTPUT_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+			}
+		}
 	}
 
 	public static void trace(boolean option, String pattern, Object ... arguments) {

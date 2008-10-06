@@ -113,7 +113,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			doPrepareExecution();
 		} catch (CoreException e) {
 			changeJobState(JobAttributes.State.ERROR);
-			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
+			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_PrepareExecution, e);
 		}
 
 		try {
@@ -157,7 +157,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				}
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed to caculate work directory, environment or command line to launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_CreateCommand, e);
 			}
 
 			try {
@@ -165,7 +165,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doBeforeExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed before executing command to launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
 			}
 
 			/*
@@ -178,7 +178,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				process = processBuilder.start();
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed to execute command to  launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecuteCommand, e);
 			}
 
 			try {
@@ -186,7 +186,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionStarted();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed after executing command to launch parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionStarted, e);
 			}
 
 			changeJobState(JobAttributes.State.RUNNING);
@@ -196,14 +196,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doWaitExecution();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed while executing parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_WaitExecution, e);
 			}
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
 			if (process.exitValue() != 0) {
 				changeJobState(JobAttributes.State.ERROR);
 				if (! terminateJobFlag) {
-					return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to run command to launch parallel application, return exit value {0}.", process.exitValue()));
+					return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Exception_LaunchApplication, process.exitValue()));
 				} else {
 					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
 					return Status.CANCEL_STATUS;
@@ -223,12 +223,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionFinished();
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed after finishing execution of parallel application.", e);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionFinished, e);
 			}
 
 			changeJobState(JobAttributes.State.TERMINATED);
 
-			return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind("Command successfull, return exit value {0}.", process.exitValue()));
+			return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Success, process.exitValue()));
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", jobID); //$NON-NLS-1$
@@ -286,7 +286,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		String workdir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
 		String newWorkdir = replaceVariables(workdir, baseSubstitutionAttributeManager);
 		if (! workdir.equals(newWorkdir)) {
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "Changed work directory from {0} to {1}", workdir, newWorkdir);
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "Changed work directory from {0} to {1}", workdir, newWorkdir); //$NON-NLS-1$
 			workdir = newWorkdir;
 		}
 		return workdir;
@@ -320,7 +320,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			String value = env.getValue();
 			String newValue = replaceVariables(value, baseSubstitutionAttributeManager);
 			if (! value.equals(newValue)) {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "Changed environment '{0}={1}' to '{0}={2}", env.getKey(), value, newValue);
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "Changed environment '{0}={1}' to '{0}={2}", env.getKey(), value, newValue); //$NON-NLS-1$
 				env.setValue(newValue);
 			}
 		}
@@ -366,7 +366,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				try {
 					newAttributeManager.addAttribute(attributeDefinition.create());
 				} catch (IllegalValueException e) {
-					throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind("Failed to create default attribute for {0}.", attributeDefinition.getName()), e));
+					throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Exception_DefaultAttributeValue, attributeDefinition.getName()), e));
 				}
 			}
 		}
@@ -482,8 +482,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * TODO move this patter substitution code into the attribute manager
 	 * TODO enable the attribute manager to do substitution -> have this feature available on entire PTP.
 	 */
-	static final Pattern variablePattern = Pattern.compile(("/$/{(/w+)("+"(?:(?:////)|(?:///})|[^/}])*"+")/}").replace('/','\\'));
-	static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\'));
+	static final Pattern variablePattern = Pattern.compile(("/$/{(/w+)("+"(?:(?:////)|(?:///})|[^/}])*"+")/}").replace('/','\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\')); //$NON-NLS-1$
 
 	/**
 	 * Performs substitution of variables using attributes from the attribute manager as variables.
@@ -514,11 +514,11 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 					/*
 					 * Retrieve parameters or use defaults.
 					 */
-					String optStartStr = "";
-					String optEndStr = "";
-					String startStr = "";
-					String endStr = "";
-					String separatorStr = " ";
+					String optStartStr = ""; //$NON-NLS-1$
+					String optEndStr = ""; //$NON-NLS-1$
+					String startStr = ""; //$NON-NLS-1$
+					String endStr = ""; //$NON-NLS-1$
+					String separatorStr = " "; //$NON-NLS-1$
 					Matcher paramMatcher = parameterPattern.matcher(parameterList);
 					if (paramMatcher.find()) {
 						startStr = paramMatcher.group(1);

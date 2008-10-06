@@ -130,9 +130,8 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			} catch (CoreException e) {
 				DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command parsing failed: {0}", e); //$NON-NLS-1$
 				parseStatus = e.getStatus();
-				if (parseStatus.getSeverity() == IStatus.ERROR) {
+				if (parseStatus.getSeverity() == IStatus.ERROR)
 					throw e;
-				}
 			}
 
 			checkCancel(monitor);
@@ -154,10 +153,10 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			return parseStatus;
 		} catch (CoreException e) {
 			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
-			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Command failed.", e);
+			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractRemoteCommandJob_Exception_CommandFailed, e);
 		} catch (Exception e) {
 			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
-			return new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, "Internal error", e);
+			return new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractRemoteCommandJob_Exception_InternalError, e);
 		} finally {
 			synchronized (this) {
 				jobProcess.destroy();
@@ -167,9 +166,8 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	}
 
 	private void checkCancel(IProgressMonitor monitor) throws CoreException {
-		if (monitor.isCanceled()) {
+		if (monitor.isCanceled())
 			throw new CoreException(new Status(IStatus.INFO, ToolsRMPlugin.PLUGIN_ID, interruptedErrorMessage, null));
-		}
 	}
 
 	@Override
