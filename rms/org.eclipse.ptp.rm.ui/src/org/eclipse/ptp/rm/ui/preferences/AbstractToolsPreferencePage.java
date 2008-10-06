@@ -88,14 +88,14 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		@Override
 		protected void validateLocal() throws ValidationException {
 			if (launchCmdText != null && launchCmd == null) {
-				throw new ValidationException("Launch command is missing");
+				throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingLaunchCommand);
 			}
 			if (debugCmdText != null && debugCmd == null) {
-				throw new ValidationException("Debug command is missing");
+				throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingMissingDebugCommand);
 			}
 			if (discoverCmdText != null) {
 				if (discoverCmd == null) {
-					throw new ValidationException("Discover command is missing");
+					throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingDiscoverCommand);
 				}
 			}
 			if (periodicMonitorCmdText != null) {
@@ -103,7 +103,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 //					throw new ValidationException("Periodic monitor command is missing");
 //				}
 				if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
-					throw new ValidationException("Time period must be an integer greater than 0");
+					throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_InvalidPeriodicMonitorCommandTimeRange);
 				}
 			}
 		}
@@ -241,14 +241,14 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
-			label.setText("Launch command:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_LaunchCommand);
 
 			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
 			launchCmdText.addModifyListener(getListener());
 
 			label = new Label(contents, SWT.NONE);
-			label.setText("Debug command:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_DebugCommand);
 
 			debugCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
@@ -260,7 +260,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0) {
 			Label label = new Label(contents, SWT.NONE);
-			label.setText("Discover command:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_DiscoverCommand);
 
 			discoverCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
@@ -272,14 +272,14 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
-			label.setText("Monitor command:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_PeriodicMonitorCommand);
 
 			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 1, 1));
 			periodicMonitorCmdText.addModifyListener(getListener() );
 
 			label = new Label(contents, SWT.NONE);
-			label.setText("Period:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_PeriodicMonitorCommandPeriod);
 			periodicMonitorTimeSpinner = new Spinner(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false, 1, 1));
 			periodicMonitorTimeSpinner.addModifyListener(getListener());
@@ -290,7 +290,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
-			label.setText("Continuous monitor command:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_ContinuosMonitorCommand);
 
 			continuousMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			continuousMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
@@ -302,7 +302,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		 */
 		if ((capabilities & AbstractToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
-			label.setText("Path to Open MPI Installation:");
+			label.setText(Messages.AbstractToolsPreferencePage_Label_InstallationPath);
 
 			remoteInstallPathText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.ui.wizards;
 
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
@@ -7,8 +17,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public abstract class AbstractConfigurationWizardPage extends
-		RMConfigurationWizardPage {
+RMConfigurationWizardPage {
 
 	private final WizardPageWidgetListener listener = createListener();
 	private final WizardPageDataSource dataSource = createDataSource();
@@ -91,7 +106,7 @@ public abstract class AbstractConfigurationWizardPage extends
 	public void createControl(Composite parent) {
 		listener.disable();
 		Composite composite = doCreateContents(parent);
-//		doCreateContents(composite);
+		//		doCreateContents(composite);
 		setControl(composite);
 		listener.enable();
 	}

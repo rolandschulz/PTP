@@ -26,7 +26,7 @@ public abstract class PreferenceDataSource extends DataSource {
 	 * @return The converted string.
 	 */
 	protected String toPreference(String s) {
-		return (s == null ? "" : s);
+		return (s == null ? "" : s); //$NON-NLS-1$
 	}
 
 	/**

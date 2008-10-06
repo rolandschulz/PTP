@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.ui.launch;
 
 import org.eclipse.ptp.rm.ui.utils.WidgetListener;
@@ -6,7 +16,7 @@ import org.eclipse.swt.events.SelectionEvent;
 
 public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends WidgetListener {
 	private final AbstractRMLaunchConfigurationDynamicTab dynamicTab;
-	
+
 	public RMLaunchConfigurationDynamicTabWidgetListener(
 			AbstractRMLaunchConfigurationDynamicTab dynamicTab) {
 		super();
@@ -20,7 +30,7 @@ public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends Widg
 			dynamicTab.fireContentsChanged();
 		}
 	}
-	
+
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		super.widgetSelected(e);
@@ -28,7 +38,7 @@ public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends Widg
 			dynamicTab.fireContentsChanged();
 		}
 	}
-	
+
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
 		super.widgetDefaultSelected(e);

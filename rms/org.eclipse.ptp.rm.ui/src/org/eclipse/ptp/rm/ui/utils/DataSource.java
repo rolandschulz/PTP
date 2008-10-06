@@ -69,7 +69,7 @@ public abstract class DataSource {
 	private boolean canSave = false;
 	private boolean canAccept = false;
 
-	protected static final String EMPTY_STRING = "";
+	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	/**
 	 * Update the page with the error message and status.
@@ -169,7 +169,7 @@ public abstract class DataSource {
 	abstract protected void update();
 
 	protected void addException(ValidationException e) {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Add Exception: {0}", e.getMessage());
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Add Exception: {0}", e.getMessage()); //$NON-NLS-1$
 		if (firstException == null) {
 			firstException = e;
 			canAccept = e.canAccept();
@@ -184,19 +184,19 @@ public abstract class DataSource {
 	}
 
 	protected void resetExceptions() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Reset exceptions");
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Reset exceptions"); //$NON-NLS-1$
 		firstException = null;
 		canAccept = true;
 		canSave = true;
 	}
 
 	public boolean canAccept() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canAccept={0}", canAccept);
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canAccept={0}", canAccept); //$NON-NLS-1$
 		return canAccept;
 	}
 
 	public boolean canSave() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canSave={0}", canSave);
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canSave={0}", canSave); //$NON-NLS-1$
 		return canSave;
 	}
 
@@ -209,18 +209,17 @@ public abstract class DataSource {
 	}
 
 	public String getErrorMessage() {
-		if (firstException == null) {
+		if (firstException == null)
 			return null;
-		} else {
+		else
 			return firstException.getMessage();
-		}
 	}
 
 	/**
 	 * Get values from widgets into intermediary storage and validate them.
 	 */
 	final public boolean justValidate() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justValidate()");
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justValidate()"); //$NON-NLS-1$
 		try {
 			resetExceptions();
 			copyFromFields();
@@ -236,7 +235,7 @@ public abstract class DataSource {
 	 * Put values from intermediary storage into widgets and update visibility and 'enablebility' of widgets.
 	 */
 	final public void justUpdate() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justUpdate()");
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justUpdate()"); //$NON-NLS-1$
 		copyToFields();
 		try {
 			resetExceptions();
@@ -257,7 +256,7 @@ public abstract class DataSource {
 	 * @return true if could store to preferences, false otherwise.
 	 */
 	final public boolean storeAndValidate() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: storeAndValidate()");
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: storeAndValidate()"); //$NON-NLS-1$
 		try {
 			resetExceptions();
 			copyFromFields();
@@ -276,7 +275,7 @@ public abstract class DataSource {
 	 * preferences.
 	 */
 	final public void loadAndUpdate() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: loadAndUpdate()");
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: loadAndUpdate()"); //$NON-NLS-1$
 		loadFromStorage();
 		copyToFields();
 		try {
@@ -296,7 +295,7 @@ public abstract class DataSource {
 	 * Values are also validated.
 	 */
 	final public void loadDefaultsAndUpdate() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: loadDefaultsAndUpdate()");
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: loadDefaultsAndUpdate()"); //$NON-NLS-1$
 		loadDefault();
 		copyToFields();
 		try {

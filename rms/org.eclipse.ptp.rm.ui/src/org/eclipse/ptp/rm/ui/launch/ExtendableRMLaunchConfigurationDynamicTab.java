@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.ui.launch;
 
 import java.util.ArrayList;
@@ -22,9 +32,9 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 public abstract class ExtendableRMLaunchConfigurationDynamicTab
-		extends
-		org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
-		implements IRMLaunchConfigurationContentsChangedListener {
+extends
+org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
+implements IRMLaunchConfigurationContentsChangedListener {
 
 	private final List<AbstractRMLaunchConfigurationDynamicTab> tabControllers = new ArrayList<AbstractRMLaunchConfigurationDynamicTab>();
 	private Composite control;
@@ -37,9 +47,8 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
-			if (! validation.isSuccess()) {
+			if (! validation.isSuccess())
 				return validation;
-			}
 		}
 		return new RMLaunchValidation(true, null);
 	}
@@ -47,30 +56,29 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
 		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
-			if (! validation.isSuccess()) {
+			if (! validation.isSuccess())
 				return validation;
-			}
 		}
 		return new RMLaunchValidation(true, null);
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue)
-			throws CoreException {
-				control = new Composite(parent, SWT.NONE);
-				GridLayout layout = new GridLayout();
-				control.setLayout(layout);
+	throws CoreException {
+		control = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		control.setLayout(layout);
 
-				final TabFolder tabFolder = new TabFolder(control, SWT.NONE);
-				tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final TabFolder tabFolder = new TabFolder(control, SWT.NONE);
+		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-				for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-					final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
-					tabControl.createControl(tabFolder, rm, queue);
-					simpleTabItem.setText(tabControl.getText());
-					simpleTabItem.setImage(tabControl.getImage());
-					simpleTabItem.setControl(tabControl.getControl());
-				}
-			}
+		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
+			tabControl.createControl(tabFolder, rm, queue);
+			simpleTabItem.setText(tabControl.getText());
+			simpleTabItem.setImage(tabControl.getImage());
+			simpleTabItem.setControl(tabControl.getControl());
+		}
+	}
 
 	public Control getControl() {
 		return control;
@@ -78,15 +86,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab
 
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration) {
-				RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-				for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-					RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
-					if (! validation.isSuccess()) {
-						resultValidation = validation;
-					}
-				}
-				return resultValidation;
+		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
+		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
+			if (! validation.isSuccess()) {
+				resultValidation = validation;
 			}
+		}
+		return resultValidation;
+	}
 
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);

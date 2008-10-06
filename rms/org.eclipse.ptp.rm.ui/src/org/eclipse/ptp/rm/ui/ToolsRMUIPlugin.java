@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ui;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.ui.utils.DebugUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -17,18 +19,19 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class ToolsRMUIPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.ui";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.ui"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static ToolsRMUIPlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public ToolsRMUIPlugin() {
+		// Nothing to do.
 	}
 
 	/*
@@ -57,8 +60,49 @@ public class Activator extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static ToolsRMUIPlugin getDefault() {
 		return plugin;
+	}
+
+	/**
+	 * Create log entry from an IStatus
+	 * 
+	 * @param status
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Create log entry from a string
+	 * 
+	 * @param msg
+	 */
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
+
+	/**
+	 * Create log entry from a Throwable
+	 * 
+	 * @param e
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.ToolsRMUIPlugin_Exception_InternalError, e));
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			// If the default instance is not yet initialized,
+			// return a static identifier. This identifier must
+			// match the plugin id defined in plugin.xml
+			return PLUGIN_ID;
+		return getDefault().getBundle().getSymbolicName();
 	}
 
 }

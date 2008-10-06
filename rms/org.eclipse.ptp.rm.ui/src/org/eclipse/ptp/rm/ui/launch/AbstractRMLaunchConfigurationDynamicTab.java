@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.ui.launch;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -12,7 +22,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 
 public abstract class AbstractRMLaunchConfigurationDynamicTab implements
-		IRMLaunchConfigurationDynamicTab {
+IRMLaunchConfigurationDynamicTab {
 
 	private final ListenerList listenerList = new ListenerList();
 
@@ -64,20 +74,18 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements
 
 	public RMLaunchValidation canSave(Control control,
 			IResourceManager rm, IPQueue queue) {
-		if (dataSource.canSave()) {
+		if (dataSource.canSave())
 			return new RMLaunchValidation(true, null);
-		} else {
+		else
 			return new RMLaunchValidation(false, dataSource.getErrorMessage());
-		}
 	}
 
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig,
 			IResourceManager rm, IPQueue queue) {
-		if (dataSource.canAccept()) {
+		if (dataSource.canAccept())
 			return new RMLaunchValidation(true, null);
-		} else {
+		else
 			return new RMLaunchValidation(false, dataSource.getErrorMessage());
-		}
 	}
 
 	public RMLaunchValidation initializeFrom(Control control,
@@ -89,11 +97,10 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements
 		widgetListener.disable();
 		dataSource.loadAndUpdate();
 		widgetListener.enable();
-		if (dataSource.getErrorMessage() == null) {
+		if (dataSource.getErrorMessage() == null)
 			return new RMLaunchValidation(true, null);
-		} else {
+		else
 			return new RMLaunchValidation(false, dataSource.getErrorMessage());
-		}
 	}
 
 	public RMLaunchValidation performApply(
@@ -103,26 +110,25 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements
 		dataSource.setQueue(queue);
 		dataSource.setConfigurationWorkingCopy(configuration);
 		dataSource.storeAndValidate();
-		if (dataSource.getErrorMessage() == null) {
+		if (dataSource.getErrorMessage() == null)
 			return new RMLaunchValidation(true, null);
-		} else {
+		else
 			return new RMLaunchValidation(false, dataSource.getErrorMessage());
-		}
 	}
 
-//	public RMLaunchValidation setDefaults(
-//			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-//			IPQueue queue) {
-//		dataSource.setResourceManager(rm);
-//		dataSource.setQueue(queue);
-//		dataSource.setConfigurationWorkingCopy(configuration);
-//		dataSource.storeDefaults();
-//		if (dataSource.getErrorMessage() == null) {
-//			return new RMLaunchValidation(true, null);
-//		} else {
-//			return new RMLaunchValidation(false, dataSource.getErrorMessage());
-//		}
-//	}
+	//	public RMLaunchValidation setDefaults(
+	//			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
+	//			IPQueue queue) {
+	//		dataSource.setResourceManager(rm);
+	//		dataSource.setQueue(queue);
+	//		dataSource.setConfigurationWorkingCopy(configuration);
+	//		dataSource.storeDefaults();
+	//		if (dataSource.getErrorMessage() == null) {
+	//			return new RMLaunchValidation(true, null);
+	//		} else {
+	//			return new RMLaunchValidation(false, dataSource.getErrorMessage());
+	//		}
+	//	}
 
 	public abstract Image getImage();
 
