@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
+import org.eclipse.cdt.internal.ui.wizards.DefaultEntryDescriptor;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.AbstractCWizard;
@@ -51,9 +52,8 @@ public class RemoteMakefileWizard extends AbstractCWizard {
 				handler.addTc(tcs[i]);
 		EntryDescriptor ed = new EntryDescriptor(ID, null, NAME, true, handler, null); 
 		// A default project type for that category -- not using any template.
-		EntryDescriptor entryDescriptor = new EntryDescriptor(ID + ".default", ID, //$NON-NLS-1$
+		EntryDescriptor entryDescriptor = new DefaultEntryDescriptor(ID + ".default", ID, //$NON-NLS-1$
 				EMPTY_PROJECT, false, handler, null);
-		entryDescriptor.setDefaultForCategory(true);
 		return new EntryDescriptor[] {ed, entryDescriptor};
 	}
 
