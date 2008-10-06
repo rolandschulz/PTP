@@ -185,13 +185,12 @@ public class SDMDebugger implements IPDebugger {
 		}
 
 		// remote setting
-		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);;
-		if (dbgExePath == null) {
-			dbgExePath = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE);
-		}
-		PTPLaunchPlugin.getDefault().verifyResource(dbgExePath, configuration);
-
-		IPath path = new Path(dbgExePath);
+		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)"");
+		//if (dbgExePath == null) {
+			//dbgExePath = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE);
+		//}
+		IPath path = PTPLaunchPlugin.getDefault().verifyResource(dbgExePath, configuration);
+		//IPath path = new Path(dbgExePath);
 		attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
 		attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toString()));
 

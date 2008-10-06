@@ -10,19 +10,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
+import java.io.IOException;
+
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
-import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -157,10 +159,33 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
 			errMsg = Messages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
 		} else {
-			errMsg = null;
+			if (!vertifyPath(fRMDebuggerPathText.getText()))
+				errMsg = Messages.getString("SDMDebuggerPage.err4"); //$NON-NLS-1$
+			else
+				errMsg = null;
 		}
 		setErrorMessage(errMsg);
 		return (errMsg == null);
+	}
+	
+	private boolean vertifyPath(String path) {
+		IRemoteConnection rmConn = getRemoteConnection();
+		if (rmConn != null) {
+			IRemoteFileManager fileManager = getRemoteServices().getFileManager(rmConn);
+			try {
+				IFileStore res = fileManager.getResource(new Path(path), new NullProgressMonitor());
+				if (res.fetchInfo().exists()) {
+					return true;
+				}
+			}
+			catch (IOException e) {
+				return false;
+			}
+		}
+		if (new Path(path).toFile().exists()) {
+			return true;
+		}		
+		return false;
 	}
 	
 	/* (non-Javadoc)
@@ -185,8 +210,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		/*
 		 * We have just selected SDM as the debugger...
 		 */
-		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-		String path = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE);
+		//Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
+		String path = "";//store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE);
 		/*
 		 * Guess that the sdm executable is in the same location as the proxy. If not then use the
 		 * preference setting.
