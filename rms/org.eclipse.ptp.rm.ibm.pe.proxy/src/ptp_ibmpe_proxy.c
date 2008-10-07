@@ -129,6 +129,7 @@ typedef struct {
     char *submit_jobid;		/* Jobid used when submitted by GUI     */
     pid_t poe_pid;		/* Process id for main poe process      */
     pid_t task0_pid;		/* Process id for app. task 0           */
+    int debugging;		/* Job is being debugged 		*/
     int stdin_fd;		/* STDIN pipe/file descriptor           */
     int stdout_fd;		/* STDOUT pipe/file descriptor          */
     int stderr_fd;		/* STDERR pipe/file descriptor          */
@@ -203,8 +204,10 @@ static int start_events(int trans_id, int nargs, char *args[]);
 static int halt_events(int trans_id, int nargs, char *args[]);
 static void post_error(int trans_id, int type, char *msg);
 static void post_submitjob_error(int trans_id, char *subid, char *msg);
-static char
-**create_exec_parmlist(char *execname, char *targetname, char *args);
+static char **create_exec_parmlist(char *execname, char *targetname, char *args);
+static char **create_child_sdm_parmlist(char *debugdir, char *debugname, char *numprocs_arg);
+static char **create_debug_parmlist(char *debugname, int debug_args_count, char **debug_args,
+				    char *argp);
 static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem,
 			       char *mp_rdma_count);
 static void add_environment_variable(char *env_var);
@@ -255,8 +258,10 @@ static void enqueue_event(proxy_msg * event);
 static void print_message(int type, const char *format, ...);
 static void print_message_args(int argc, char *optional_args[]);
 static int find_load_leveler_library(void);
-static int load_load_leveler_library(int trans_id);
 int main(int argc, char *argv[]);
+#ifdef HAVE_LLAPI_H
+static int load_load_leveler_library(int trans_id);
+#endif
 
 extern char **environ;
 static int events_enabled = 0;
@@ -278,7 +283,6 @@ static char emsg_buffer[_POSIX_PATH_MAX + 50];	/* Buffer for building error msg 
 static int use_load_leveler = 0;	/* Use LL resource managment/tracking      */
 static char *user_libpath;	/* Alternate libdir for LoadLeveler      */
 static int multicluster_status;	/* LoadLeveler multicluster status          */
-static int state_template;	/* Rewrite template file at startup      */
 static int min_node_sleep_seconds = 30;	/* Min. LL node status interval     */
 static int max_node_sleep_seconds = 300;	/* Max. LL node status interval    */
 static int job_sleep_seconds = 30;	/* LL job status interval        */
@@ -312,6 +316,7 @@ static char *my_username;
 static int next_env_entry;
 static int env_array_size;
 static char **env_array;
+static int trace_sdm;
 
 #ifdef __linux__
 static struct option longopts[] = {
@@ -694,7 +699,7 @@ int_launch_attr int_attrs[] = {
      "Number of Nodes", "Number of nodes to allocate (MP_NODES)", 1, 1, INT_MAX},
     {"MP_TASKS_PER_NODE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Tasks per Node",
      "Number of tasks to assign to a node (MP_TASKS_PER_NODE)", 1, 1, INT_MAX},
-
+  
     {"MP_RETRYCOUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
      "Number of times to retry node allocation (MP_RETRYCOUNT)", 1, 1, INT_MAX},
 	/*
@@ -915,30 +920,37 @@ run(int trans_id, int nargs, char *args[])
      */
     char *execname;
     char *execdir;
+    char *debugdir;
+    char *debugname;
+    char *numprocs_arg;
+    char **debug_args;
     char *argp;
     char *jobid;
     char *cp;
     char *cwd;
+    char *stdin_path;
+    char *stdout_path;
+    char *stderr_path;
+    char *mp_buffer_mem;
+    char *mp_buffer_mem_max;
+    char *mp_rdma_count;
+    char *mp_rdma_count_2;
+    char **envp;
     jobinfo *job;
     int i;
+    int debug_arg_count;
     int label_io;
     int split_io;
     int status;
     int stdout_pipe[2];
     int stderr_pipe[2];
-    char *stdin_path;
-    char *stdout_path;
-    char *stderr_path;
     pid_t pid;
-    char *mp_buffer_mem;
-    char *mp_buffer_mem_max;
     int mp_buffer_mem_set;
-    char mp_buffer_mem_value[50];
-    char *mp_rdma_count;
-    char *mp_rdma_count_2;
     int mp_rdma_count_set;
-    char mp_rdma_count_value[50];
     int redirect;
+    int debug_mode;
+    char mp_rdma_count_value[50];
+    char mp_buffer_mem_value[50];
 
     TRACE_ENTRY;
     print_message_args(nargs, args);
@@ -960,10 +972,16 @@ run(int trans_id, int nargs, char *args[])
     mp_rdma_count_2 = "";
     mp_rdma_count_set = 0;
     mp_rdma_count_value[0] = '\0';
+    debug_arg_count = 0;
+    debug_mode = 0;
     /*
      * Process arguments passed to this function
      */
     TRACE_DETAIL("+++ Parsing arguments\n");
+    numprocs_arg = NULL;
+    trace_sdm = 0;
+    debug_args = (char **) malloc(10 * sizeof(char *));
+    malloc_check(debug_args, __FUNCTION__, __LINE__);
     for (i = 0; args[i] != NULL; i++) {
 	/*
 	 * Check if this is a PE environment variable, for instance
@@ -1102,6 +1120,25 @@ run(int trans_id, int nargs, char *args[])
 		}
 		else if (strcmp(args[i], JOB_ENV_ATTR) == 0) {
 		}
+		else if (strcmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR) == 0) {
+		    debugname = strdup(cp);
+		    debug_mode = 1;
+		}
+		else if (strcmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR) == 0) {
+		    debugdir = strdup(cp);
+		}
+		else if (strcmp(args[i], JOB_DEBUG_ARGS_ATTR) == 0) {
+		    debug_args[debug_arg_count] = strdup(cp);
+		    if (strncmp(debug_args[debug_arg_count], "--numprocs=", 11) == 0) {
+			numprocs_arg = debug_args[debug_arg_count];
+		    }
+		    debug_arg_count = debug_arg_count + 1;
+		}
+		else if (strcmp(args[i], JOB_DEBUG_FLAG_ATTR) == 0) {
+		    trace_sdm = 1;
+		}
+		else if (strcmp(args[i], "debugStopInMain") == 0) {
+		}
 		*(cp - 1) = '=';
 	    }
 	}
@@ -1189,7 +1226,6 @@ run(int trans_id, int nargs, char *args[])
     pid = fork();
     if (pid == 0) {
 	char **argv;
-	char **envp;
 	char poe_target[_POSIX_PATH_MAX * 2 + 2];
 	int max_fd;
 
@@ -1201,7 +1237,12 @@ run(int trans_id, int nargs, char *args[])
 	 * parameters and environment variables.
 	 */
 	TRACE_DETAIL("+++ Creating poe exec() parameter list\n");
-	argv = create_exec_parmlist(POE, poe_target, argp);
+	if (debug_mode) {
+	    argv = create_child_sdm_parmlist(debugdir, debugname, numprocs_arg);
+	}
+	else {
+	    argv = create_exec_parmlist(POE, poe_target, argp);
+	}
 	envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value);
 	/*
 	 * Connect stdio to pipes or files owned by parent process (the
@@ -1234,7 +1275,6 @@ run(int trans_id, int nargs, char *args[])
 	 */
 	snprintf(poe_target, sizeof poe_target, "%s/%s", execdir, execname);
 	poe_target[sizeof poe_target - 1] = '\0';
-	TRACE_DETAIL_V("+++ Ready to invoke %s\n", poe_target);
 	i = 0;
 	while (envp[i] != NULL) {
 	    TRACE_DETAIL_V("Target env[%d]: %s\n", i, envp[i]);
@@ -1245,6 +1285,7 @@ run(int trans_id, int nargs, char *args[])
 	    TRACE_DETAIL_V("Target arg[%d]: %s\n", i, argv[i]);
 	    i = i + 1;
 	}
+	TRACE_DETAIL("+++ Ready to invoke child process\n");
 	status = execve("/usr/bin/poe", argv, envp);
 	print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
 	post_submitjob_error(trans_id, jobid, "Exec failed");
@@ -1253,7 +1294,7 @@ run(int trans_id, int nargs, char *args[])
     }
     else {
 	if (pid == -1) {
-		post_submitjob_error(trans_id, jobid, "Fork failed");
+	    post_submitjob_error(trans_id, jobid, "Fork failed");
 	    return PROXY_RES_OK;
 	}
 	else {
@@ -1261,6 +1302,48 @@ run(int trans_id, int nargs, char *args[])
 	    char queue_id_str[12];
 	    char jobid_str[12];
 
+	    if (debug_mode) {
+		  /*
+		   * If this is a debug session then we need to start the top level SDM process
+		   * at this point. The child SDM processes have already been created by the
+		   * fork/exec of the poe process (which in the debug case is 'poe sdm ...') above.
+		   */
+		pid_t sdm_pid;
+		char *debugger;
+		int len;
+		char **argv;
+
+		sdm_pid = fork();
+		if (sdm_pid == 0) {
+		    TRACE_DETAIL("+++ Ready to invoke top level SDM\n");
+		    argv = create_debug_parmlist(debugname, debug_arg_count, debug_args, argp);
+		    len = strlen(debugdir) + strlen(debugname) + 2;
+		    debugger = (char *) malloc(len);
+		    malloc_check(debugger, __FUNCTION__, __LINE__);
+		    strcpy(debugger, debugdir);
+		    strcat(debugger, "/");
+		    strcat(debugger, debugname);
+sleep(5);
+		    status = execve(debugger, argv, envp);
+		    print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
+		    post_submitjob_error(trans_id, jobid, "Exec failed");
+		    TRACE_EXIT;
+		    exit(1);
+		}
+		else {
+		    if (sdm_pid == -1) {
+			post_submitjob_error(trans_id, jobid, "Fork for top level SDMfailed");
+			return PROXY_RES_OK;
+		    }
+		    else {
+			/*
+			 * This is the parent leg of the fork for invoking the top level SDM.
+			 * No explicit processing required here. All we care about is
+			 * eventually catching the SDM exit status so we don't create a zonbie.
+			 */
+		    }
+	        }
+	    }
 	    if (!job->stdout_redirect) {
 		close(stdout_pipe[1]);
 	    }
@@ -1276,6 +1359,7 @@ run(int trans_id, int nargs, char *args[])
 	    job->task0_pid = -1;
 	    job->submit_time = time(NULL);
 	    job->proxy_jobid = generate_id();
+	    job->debugging = debug_mode;
 	    TRACE_DETAIL_V("+++ Created poe process pid %d for jobid %d\n", job->poe_pid,
 			   job->proxy_jobid);
 	    /*
@@ -1599,6 +1683,23 @@ startup_monitor(void *job_ident)
     taskp = tasks;
     sprintf(jobid_str, "%d", ((jobinfo *) job_ident)->proxy_jobid);
     msg = proxy_new_process_event(start_events_transid, jobid_str, numtasks);
+    if (job->debugging) {
+	FILE *routing_file;
+	
+	TRACE_DETAIL("\nCreating routing file\n");
+	routing_file = fopen("routing_file", "rw");
+	if (routing_file != NULL) {
+	    fprintf(routing_file, "%d\n", numtasks);
+	    TRACE_DETAIL("Writing routing data\n");
+	    for (i = 0; i < numtasks; i++) {
+		fprintf(routing_file, "%d %s 7777\n", i, taskp[i].hostname);
+	    }
+	    fclose(routing_file);
+	}
+	else {
+	    TRACE_DETAIL_V("\nError writing routing file: %s\n", strerror(errno));
+	}
+    }
     if (job->discovered_job) {
 	/*
 	 * If this is a job running before the proxy started, then
@@ -1746,6 +1847,8 @@ zombie_reaper(void *arg)
 	    /*
 	     * Look for job with matching poe process pid. If found, then
 	     * post process status to front end and clean up resources
+	     * If no match to pid is found, it's probably a top level SDM debugger
+	     * process, and no additional processing is needed.
 	     */
 	    SetList(jobs);
 	    job = GetListElement(jobs);
@@ -1808,8 +1911,7 @@ zombie_reaper(void *arg)
     TRACE_EXIT;
 }
 
-static
-    void
+void
 redirect_io(void)
 {
     /*
@@ -2071,7 +2173,7 @@ monitor_LoadLeveler_nodes(void *job_ident)
 		    rc = my_ll_get_data(node, LL_MachineName, &node_name);
 		    if (rc == 0) {
 			print_message(INFO_MESSAGE, "Node name=%s\n", node_name);
-			if ((node_object = get_node_in_hash(cluster_object->node_hash, node_name)) != NULL) {
+			if ((node_object = get_node_in_hash(cluster_object->node_hash, node_name)) != NULL) {	
 
 	      /*-----------------------------------------------------------------------*
                * node returned by LoadLeveler was found in our ptp node list.          *
@@ -2155,7 +2257,7 @@ monitor_LoadLeveler_nodes(void *job_ident)
 		    query_elem = NULL;
 		}
 
-	    }
+	    }	
 	}
 	else {
 	    sleep_time_reset = 1;
@@ -2172,7 +2274,7 @@ monitor_LoadLeveler_nodes(void *job_ident)
 	else {
 	    sleep_seconds = sleep_seconds + min_node_sleep_seconds;
 	    if (sleep_seconds > max_node_sleep_seconds) {
-		sleep_seconds = max_node_sleep_seconds;
+		sleep_seconds = max_node_sleep_seconds;	
 	    }
 	}
 
@@ -2191,7 +2293,7 @@ monitor_LoadLeveler_nodes(void *job_ident)
 	    }
 	}
 
-    }
+    }	
 
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return NULL;
@@ -2644,7 +2746,7 @@ monitor_LoadLeveler_jobs(void *job_ident)
 					    while (task_list_element != NULL) {
 						task_object = task_list_element->l_value;
 						task_list_element = task_list_element->l_next;
-						if (task_object != 0) {
+						if (task_object != 0) {	
 						    if (task_object->task_found == 0) {
 							task_object->task_state =
 							    MY_STATE_TERMINATED;
@@ -2666,7 +2768,7 @@ monitor_LoadLeveler_jobs(void *job_ident)
 							if (SizeOfList(task_list) == 0) {
 							    if (job_object->job_state ==
 								MY_STATE_RUNNING) {
-								job_object->job_state = MY_STATE_TERMINATED;
+								job_object->job_state = MY_STATE_TERMINATED;	
 								print_message(INFO_MESSAGE,
 									      "Schedule event notification: Job=%s.%d.%d terminated for LoadLeveler Cluster=%s.\n",
 									      job_object->ll_step_id.from_host,
@@ -2708,8 +2810,8 @@ monitor_LoadLeveler_jobs(void *job_ident)
 				job = my_ll_next_obj(query_elem);
 			    }
 			}
-		    }
-		}
+		    }	
+		}	
 		if (query_elem != NULL) {
 		    rc = my_ll_free_objs(query_elem);
 		    rc = my_ll_deallocate(query_elem);
@@ -2956,6 +3058,54 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 	argv[i] = NULL;
     }
     TRACE_EXIT;
+    return argv;
+}
+
+char **
+create_debug_parmlist(char *debugname, int debug_args_count, char **debug_args,
+		      char *argp)
+{
+    char **argv;
+    int n;
+    int i;
+
+    argv = (char **) malloc((debug_args_count + 3) * sizeof(char *));
+    malloc_check(argv, __FUNCTION__, __LINE__);
+    n = 0;
+    argv[n++] = debugname;
+    if (trace_sdm) {
+	argv[n++] = "--debug";
+    }
+    for (i = 0; i < debug_args_count; i++) {
+	argv[n++] = debug_args[i];
+    }
+    argv[n++] = NULL;
+    return argv;
+}
+
+char **
+create_child_sdm_parmlist(char *debugdir, char *debugname, char *numprocs_arg)
+{
+    char *debugger;
+    char **argv;
+    int len;
+    int n;
+
+    len = strlen(debugdir) + strlen(debugname) + 2;
+    debugger = (char *) malloc(len * sizeof(char));
+    malloc_check(debugger, __FUNCTION__, __LINE__);
+    argv = (char **) malloc(6 * sizeof(char *));
+    malloc_check(argv, __FUNCTION__, __LINE__);
+    sprintf(debugger, "%s/%s", debugdir, debugname);
+    n = 0;
+    argv[n++] = "poe";
+    argv[n++] = debugger;
+    if (trace_sdm) {
+	argv[n++] = "--debug";
+    }
+    argv[n++] = "--debugger=gdb-mi";
+    argv[n++] = numprocs_arg;
+    argv[n++] = NULL;
     return argv;
 }
 
@@ -4075,7 +4225,7 @@ get_node_in_hash(Hash * node_hash, char *node_name)
     hash_key = HashCompute(node_name, strlen(node_name));
     node_list = HashSearch(node_hash, hash_key);
     if (node_list != NULL) {
-	node_list_element = node_list->l_head;
+	node_list_element = node_list->l_head;	
 	while (node_list_element != NULL) {
 	    node_object = node_list_element->l_value;
 	    node_list_element = node_list_element->l_next;
@@ -4114,7 +4264,7 @@ get_task_in_list(List * task_list, char *task_instance_machine_name, int ll_task
 	    return task_object;
 	}
     }
-    task_object = NULL;
+    task_object = NULL;	
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. task_object=x\'%08x\'.\n",
 		  __FUNCTION__, __LINE__, task_object);
     return task_object;
@@ -4150,7 +4300,7 @@ get_multicluster_status()
 	    }
 
 	    /* Get information relating to LoadLeveler clusters.
-	     * QUERY_ALL: we are querying for local cluster data
+	     * QUERY_ALL: we are querying for local cluster data 
 	     * NULL: no filter needed
 	     * ALL_DATA: we want all the information available about the cluster */
 
@@ -4173,7 +4323,7 @@ get_multicluster_status()
 		    print_message(ERROR_MESSAGE,
 				  "Error rc=%d trying to determine if LoadLeveler is running local or multicluster configuration. Defaulting to local cluster only (no multicluster).\n",
 				  rc);
-		    multicluster_status = 0;
+		    multicluster_status = 0;	
 		}
 		else {
 		    print_message(INFO_MESSAGE, "Multicluster returned is = %d.\n",
@@ -4860,7 +5010,7 @@ send_stderr(jobinfo * job, char *buf)
 
 /*************************************************************************/
 
-static void
+void
 send_ok_event(int trans_id)
 {
     proxy_msg *msg;
@@ -4904,7 +5054,7 @@ post_submitjob_error(int trans_id, char *subid, char *msgtext)
  * and attribute values allowed for each event are defined in proxy_event.h
  */
 
-static proxy_msg *
+proxy_msg *
 proxy_attr_def_int_limits_event(int trans_id, char *id,
 				char *name, char *desc, int display, int def, int llimit,
 				int ulimit)
@@ -4925,7 +5075,7 @@ proxy_attr_def_int_limits_event(int trans_id, char *id,
     return msg;
 }
 
-static proxy_msg *
+proxy_msg *
 proxy_attr_def_long_int_limits_event(int trans_id, char *id,
 				     char *name, char *desc, int display, long long def,
 				     long long llimit, long long ulimit)
@@ -4950,7 +5100,7 @@ proxy_attr_def_long_int_limits_event(int trans_id, char *id,
     return msg;
 }
 
-static proxy_msg *
+proxy_msg *
 proxy_attr_def_enum_event(int trans_id, char *id,
 			  char *name, char *desc, int display, char *def, int count)
 {
@@ -4968,7 +5118,7 @@ proxy_attr_def_enum_event(int trans_id, char *id,
     return msg;
 }
 
-static void
+void
 send_new_node_list(int trans_id, int machine_id, List * new_nodes)
 {
     proxy_msg *msg;
@@ -4989,7 +5139,7 @@ send_new_node_list(int trans_id, int machine_id, List * new_nodes)
     enqueue_event(msg);
 }
 
-static void
+void
 send_job_state_change_event(int trans_id, int proxy_jobid, char *state)
 {
     proxy_msg *msg;
@@ -5001,7 +5151,7 @@ send_job_state_change_event(int trans_id, int proxy_jobid, char *state)
     enqueue_event(msg);
 }
 
-static void
+void
 send_process_state_change_event(int trans_id, jobinfo * job, char *state)
 {
     /*
@@ -5065,7 +5215,7 @@ send_process_state_change_event(int trans_id, jobinfo * job, char *state)
     }
 }
 
-static void
+void
 send_process_state_output_event(int trans_id, int procid, char *output)
 {
     proxy_msg *msg;
@@ -5078,13 +5228,13 @@ send_process_state_output_event(int trans_id, int procid, char *output)
     enqueue_event(msg);
 }
 
-static int
+int
 generate_id()
 {
     return base_id + last_id++;
 }
 
-static void
+void
 enqueue_event(proxy_msg * msg)
 {
     proxy_svr_queue_msg(pe_proxy, msg);
@@ -5612,7 +5762,7 @@ print_message_args(int argc, char *optional_args[])
     int i;
     if (optional_args != NULL) {
 	for (i = 0; i < argc; i++) {
-	    print_message(TRACE_MESSAGE, " '%s'", optional_args[i]);
+	    print_message(TRACE_MESSAGE, " '%s\n'", optional_args[i]);
 	}
     }
 }
