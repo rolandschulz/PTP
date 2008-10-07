@@ -22,6 +22,34 @@
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.dstore.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.services" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.make.core"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.ptp.remote.core" version="2.0.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.ui" version="5.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.search" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views" version="3.2.200" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help" version="3.3.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.3.100" match="greaterOrEqual"/>
+      <import plugin="com.ibm.icu" version="3.8.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.navigator.resources" version="3.3.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.connectorservice.dstore" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.services" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.ui" version="5.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.services.dstore" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.subsystems.files.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.console" version="3.3.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
