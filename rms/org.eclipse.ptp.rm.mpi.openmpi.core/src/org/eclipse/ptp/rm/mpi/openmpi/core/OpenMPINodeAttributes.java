@@ -27,29 +27,30 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 /**
  * Node attributes
+ * @author Daniel Felix Ferber
  */
 public class OpenMPINodeAttributes {
 
-	private static final String NUM_NODES_ID = "Open_MPI_numNodes";
-	private static final String MAX_NUM_NODES_ID = "Open_MPI_maxNumNodes";
-	private static final String STATUS_MESSAGE = "Open_MPI_statusMessage";
-	private static final String OVERSUBSCRIBED = "Open_MPI_oversubscribed";
+	private static final String NUM_NODES_ID = "Open_MPI_numNodes"; //$NON-NLS-1$
+	private static final String MAX_NUM_NODES_ID = "Open_MPI_maxNumNodes"; //$NON-NLS-1$
+	private static final String STATUS_MESSAGE = "Open_MPI_statusMessage"; //$NON-NLS-1$
+	private static final String OVERSUBSCRIBED = "Open_MPI_oversubscribed"; //$NON-NLS-1$
 
-	private final static IntegerAttributeDefinition numNodesDef =
-		new IntegerAttributeDefinition(NUM_NODES_ID, "Open MPI number of nodes",
-				"Open MPI number of nodes on the host", true, 0);
+	private final static IntegerAttributeDefinition numNodesAttrDef =
+		new IntegerAttributeDefinition(NUM_NODES_ID, Messages.OpenMPINodeAttributes_numNodesAttrDef_title,
+				Messages.OpenMPINodeAttributes_numNodesAttrDef_description, true, new Integer(0));
 
-	private final static IntegerAttributeDefinition maxNumNodesDef =
-		new IntegerAttributeDefinition(MAX_NUM_NODES_ID, "Open MPI maximal number of nodes",
-				"Open MPI maximal number of nodes on the host", true, 0);
+	private final static IntegerAttributeDefinition maxNumNodesAttrDef =
+		new IntegerAttributeDefinition(MAX_NUM_NODES_ID, Messages.OpenMPINodeAttributes_maxNumNodesAttrDef_title,
+				Messages.OpenMPINodeAttributes_maxNumNodesAttrDef_description, true, new Integer(0));
 
-	private final static StringAttributeDefinition statusMessageDef =
-		new StringAttributeDefinition(STATUS_MESSAGE, "Open MPI status message",
-				"Open MPI status message", true, "");
-	
-	private final static BooleanAttributeDefinition oversubscribedDefinition =
-		new BooleanAttributeDefinition(OVERSUBSCRIBED, "Open MPI oversubscribed",
-		"Open MPI oversubscribed node (more processes than available)", true, false); 
+	private final static StringAttributeDefinition statusMessageAttrDef =
+		new StringAttributeDefinition(STATUS_MESSAGE, Messages.OpenMPINodeAttributes_statusMessageAttrDef_title,
+				Messages.OpenMPINodeAttributes_statusMessageAttrDef_description, true, ""); //$NON-NLS-1$
+
+	private final static BooleanAttributeDefinition oversubscribedAttrDef =
+		new BooleanAttributeDefinition(OVERSUBSCRIBED, Messages.OpenMPINodeAttributes_oversubscribedAttrDef_title,
+				Messages.OpenMPINodeAttributes_oversubscribedAttrDef_description, true, new Boolean(false));
 
 	/**
 	 * Number of slots suggested on the node.
@@ -57,7 +58,7 @@ public class OpenMPINodeAttributes {
 	 * Note: openmpi 1.2 and 1.3
 	 */
 	public static IntegerAttributeDefinition getNumberOfNodesAttributeDefinition() {
-		return numNodesDef;
+		return numNodesAttrDef;
 	}
 
 	/**
@@ -66,7 +67,7 @@ public class OpenMPINodeAttributes {
 	 * Note: openmpi 1.2 and 1.3
 	 */
 	public static IntegerAttributeDefinition getMaximalNumberOfNodesAttributeDefinition() {
-		return maxNumNodesDef;
+		return maxNumNodesAttrDef;
 	}
 
 	/**
@@ -74,20 +75,20 @@ public class OpenMPINodeAttributes {
 	 * <p>
 	 * Note: openmpi 1.2 and 1.3
 	 */
-	public static StringAttributeDefinition getStatusMessageDefinition() {
-		return statusMessageDef;
+	public static StringAttributeDefinition getStatusMessageAttributeDefinition() {
+		return statusMessageAttrDef;
 	}
-	
+
 	/**
 	 * If node is oversubscribed.
 	 * <p>
 	 * Note: openmpi 1.2 and 1.3
 	 */
-	public static BooleanAttributeDefinition getOversubscribedDefinition() {
-		return oversubscribedDefinition;
+	public static BooleanAttributeDefinition getOversubscribedAttributeDefinition() {
+		return oversubscribedAttrDef;
 	}
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{numNodesDef,maxNumNodesDef,statusMessageDef};
+		return new IAttributeDefinition[]{numNodesAttrDef,maxNumNodesAttrDef,statusMessageAttrDef};
 	}
 }

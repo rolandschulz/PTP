@@ -18,19 +18,24 @@ import java.util.regex.Pattern;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIHostMap.Host;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIHostMapParser {
 	private OpenMPIHostMapParser() {
 		// Do not allow instances.
 	}
 
 	OpenMPIHostMap map = new OpenMPIHostMap();
-//	boolean hasErrors = false;
+	//	boolean hasErrors = false;
 
-	static Pattern pattern = Pattern.compile("\\s*(\\S+)((?:\\s+\\S+=\\d+)*)\\s*");
-	static Pattern paramPattern = Pattern.compile("\\s*(\\S+)=(\\d+)");
-//	static Pattern hostnamePattern = Pattern.compile("\\s*(\\S+)");
-//	static Pattern slotsPattern = Pattern.compile("\\s+(?:slots|cpus|count)\\s*=\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
-//	static Pattern maxSlotsPattern = Pattern.compile("\\s+max-slots\\s*=\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
+	static Pattern pattern = Pattern.compile("\\s*(\\S+)((?:\\s+\\S+=\\d+)*)\\s*"); //$NON-NLS-1$
+	static Pattern paramPattern = Pattern.compile("\\s*(\\S+)=(\\d+)"); //$NON-NLS-1$
+	//	static Pattern hostnamePattern = Pattern.compile("\\s*(\\S+)");
+	//	static Pattern slotsPattern = Pattern.compile("\\s+(?:slots|cpus|count)\\s*=\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
+	//	static Pattern maxSlotsPattern = Pattern.compile("\\s+max-slots\\s*=\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
 	/*
 	 * Some very advanced regex. Maches a line that does NOT contain a valid parameter.
 	 * In other words, matches a line with any invalid parameter.
@@ -39,7 +44,7 @@ public class OpenMPIHostMapParser {
 	 * (.*\\s(?:count|cpus|slots)\\s*= - matches the words count,cpus or slots starting anywhere,
 	 *     with a space before, and followed by equal with optional interleaving space.
 	 */
-//	static Pattern othersPattern = Pattern.compile("^(?!.*\\s(?:count|cpus|slots|max-slots)\\s*=)", Pattern.CASE_INSENSITIVE);
+	//	static Pattern othersPattern = Pattern.compile("^(?!.*\\s(?:count|cpus|slots|max-slots)\\s*=)", Pattern.CASE_INSENSITIVE);
 
 	public static OpenMPIHostMap parse(BufferedReader reader) throws IOException {
 		OpenMPIHostMapParser parser = new OpenMPIHostMapParser();
@@ -85,11 +90,11 @@ public class OpenMPIHostMapParser {
 			 * Try to get slots and max-slots information.
 			 */
 			while (matcher.find()) {
-//			for (int i = 2; i <= matcher.groupCount(); i+=2) {
+				//			for (int i = 2; i <= matcher.groupCount(); i+=2) {
 				String key = matcher.group(1);
 				String value = matcher.group(2);
 
-				if (key.equalsIgnoreCase("slots") || key.equalsIgnoreCase("cpus") || key.equalsIgnoreCase("count")) {
+				if (key.equalsIgnoreCase("slots") || key.equalsIgnoreCase("cpus") || key.equalsIgnoreCase("count")) {   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 					/*
 					 * On failure to parse, assume 0 processors (no info available).
 					 */
@@ -102,7 +107,7 @@ public class OpenMPIHostMapParser {
 						host.addErrors(OpenMPIHostMap.Host.ERR_NUM_SLOTS);
 						host.setNumProcessors(1);
 					}
-				} else if (key.equalsIgnoreCase("max-slots")) {
+				} else if (key.equalsIgnoreCase("max-slots")) { //$NON-NLS-1$
 					try {
 						/*
 						 * On failure to parse, assume 0 (no information available).
@@ -143,10 +148,10 @@ public class OpenMPIHostMapParser {
 		return parser.map;
 	}
 	public static void main(String[] args) {
-		Pattern pattern = Pattern.compile("\\s*(\\S+)(?:\\s+(\\S+)\\s*=\\s*(\\d+))*");
-		Matcher m = pattern.matcher("e slots=3 max-slots=4 r=5");
+		Pattern pattern = Pattern.compile("\\s*(\\S+)(?:\\s+(\\S+)\\s*=\\s*(\\d+))*"); //$NON-NLS-1$
+		Matcher m = pattern.matcher("e slots=3 max-slots=4 r=5"); //$NON-NLS-1$
 		if (!m.matches()) {
-			System.out.println("no");
+			System.out.println("no"); //$NON-NLS-1$
 			return;
 		}
 		for(int i = 1; i <= m.groupCount(); i++) {

@@ -10,17 +10,17 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIHostMap {
 	public static class Host {
 		public final static int NO_ERRORS = 0;
@@ -76,7 +76,7 @@ public class OpenMPIHostMap {
 	}
 
 	public Host[] getHosts() {
-		return (Host[]) hosts.toArray(new Host[hosts.size()]);
+		return hosts.toArray(new Host[hosts.size()]);
 	}
 
 	public Iterator<Host> getHostIterator() {

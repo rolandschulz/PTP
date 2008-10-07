@@ -19,15 +19,20 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIResourceManagerConfiguration extends
-		AbstractToolRMConfiguration implements Cloneable {
+AbstractToolRMConfiguration implements Cloneable {
 
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
 
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
-	public static final String VERSION_12 = "openmpi-1.2";
-	public static final String VERSION_13 = "openmpi-1.3";
+	public static final String VERSION_12 = "openmpi-1.2"; //$NON-NLS-1$
+	public static final String VERSION_13 = "openmpi-1.3"; //$NON-NLS-1$
 
 
 	/**
@@ -142,13 +147,13 @@ public class OpenMPIResourceManagerConfiguration extends
 
 	@Override
 	public void setDefaultNameAndDesc() {
-		String name = "Open_MPI";
+		String name = Messages.OpenMPIResourceManagerConfiguration_defaultName;
 		String conn = getConnectionName();
 		if (conn != null && !conn.equals(EMPTY_STRING)) {
 			name += "@" + conn; //$NON-NLS-1$
 		}
 		setName(name);
-		setDescription("Open MPI Resource Manager");
+		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
 
 	public String getVersionId() {

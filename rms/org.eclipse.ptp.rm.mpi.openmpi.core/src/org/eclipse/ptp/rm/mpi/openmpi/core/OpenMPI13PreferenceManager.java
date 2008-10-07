@@ -13,14 +13,13 @@ package org.eclipse.ptp.rm.mpi.openmpi.core;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPI13PreferenceManager extends AbstractToolsPreferenceManager {
-	private static final String LAUNCH_CMD = "mpirun -xml -display-map ${Open_MPI_args} ${Open_MPI_env} ${execPath}/${execName} ${progArgs}";
-	private static final String DEBUG_CMD = "mpirun -xml -display-map ${Open_MPI_args} ${Open_MPI_env} ${debugExecPath}/${debugExecName} ${debugArgs}";
-	private static final String DISCOVER_CMD = "ompi_info -a --parseable";
-	private static final String PATH = "";
-	private static final boolean USE_DEFAULTS = true;
-
-	public static final String PREFIX = "openmpi-1.3-";
+	public static final String PREFIX = "openmpi-1.3-"; //$NON-NLS-1$
 
 	public static Preferences getPreferences() {
 		return OpenMPIPlugin.getDefault().getPluginPreferences();
@@ -33,10 +32,10 @@ public class OpenMPI13PreferenceManager extends AbstractToolsPreferenceManager {
 	public static void initializePreferences() {
 		Preferences preferences = OpenMPIPlugin.getDefault().getPluginPreferences();
 		// Initialize only preferences as in OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
-		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, LAUNCH_CMD);
-		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, DEBUG_CMD);
-		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, DISCOVER_CMD);
-		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, PATH);
-		preferences.setDefault(PREFIX + PREFS_USE_DEFAULTS, USE_DEFAULTS);
+		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, OpenMPI13Defaults.LAUNCH_CMD);
+		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, OpenMPI13Defaults.DEBUG_CMD);
+		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, OpenMPI13Defaults.DISCOVER_CMD);
+		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, OpenMPI13Defaults.PATH);
+		preferences.setDefault(PREFIX + PREFS_USE_DEFAULTS, OpenMPI13Defaults.USE_DEFAULTS);
 	}
 }

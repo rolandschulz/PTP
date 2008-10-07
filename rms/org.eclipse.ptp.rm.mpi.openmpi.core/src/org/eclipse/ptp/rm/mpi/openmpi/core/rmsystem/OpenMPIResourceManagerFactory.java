@@ -17,14 +17,19 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	public OpenMPIResourceManagerFactory() {
 		// QUESTION: Wouldnt it be better to take name from extension point?
 		// Extension point already has a name.
-		super("Open MPI");
+		super(Messages.OpenMPIResourceManagerFactory_ResourceManagerName);
 	}
-	
+
 	protected OpenMPIResourceManagerFactory(String name) {
 		super(name);
 	}

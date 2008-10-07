@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIApplicationAttributes;
@@ -27,6 +28,11 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes.MappingMode;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIProcessMapText12Parser {
 	private OpenMPIProcessMapText12Parser() {
 		// Do not allow instances.
@@ -60,12 +66,12 @@ public class OpenMPIProcessMapText12Parser {
 
 		// Cell: 0 Nodename: dyn531995.br.ibm.com Launch id: -1 Username: NULL
 		line = reader.readLine();
-		Pattern p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*");
+		Pattern p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		int nodeIndex;
 		String nodeName;
 		if (!m.matches() || m.groupCount() != 4)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
 			nodeIndex = Integer.parseInt(s);
@@ -75,7 +81,7 @@ public class OpenMPIProcessMapText12Parser {
 			s = m.group(3);
 			s = m.group(4);
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 
 		OpenMPIProcessMap.Node node = new OpenMPIProcessMap.Node(nodeIndex, nodeName);
@@ -85,32 +91,32 @@ public class OpenMPIProcessMapText12Parser {
 		// Data type: ORTE_PROCESS_NAME Data Value: NULL
 		line = reader.readLine();
 		line = reader.readLine();
-		p = Pattern.compile("[^:]*:[^:]*:\\s*(\\S*).*");
+		p = Pattern.compile("[^:]*:[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		// Ignore deamon name
 
 		// Oversubscribed: True Num elements in procs list: 6
 		line = reader.readLine();
-		p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*");
+		p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		int numProcesses;
 		if (!m.matches() || m.groupCount() != 2)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
-			if (s.equalsIgnoreCase("true")) {
-				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedDefinition().create(true));
-			} else if (s.equalsIgnoreCase("false")) {
-				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedDefinition().create(false));
+			if (s.equalsIgnoreCase("true")) { //$NON-NLS-1$
+				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(true));
+			} else if (s.equalsIgnoreCase("false")) { //$NON-NLS-1$
+				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(false));
 			} else {
-				throw new IOException("Invalid line: " + line);
+				throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 			}
 			s = m.group(2);
 			numProcesses = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 
 		// Mapped proc:
@@ -118,7 +124,7 @@ public class OpenMPIProcessMapText12Parser {
 		// Data type: ORTE_PROCESS_NAME Data Value: [0,1,0]
 		// Proc Rank: 0 Proc PID: 0 App_context index: 0
 		// (empty line)
-//		for (int i = 0; i < node.num_procs; i ++) {
+		//		for (int i = 0; i < node.num_procs; i ++) {
 		for (int i = 0; i < numProcesses; i ++) {
 			String processName;
 			int processIndex;
@@ -128,17 +134,17 @@ public class OpenMPIProcessMapText12Parser {
 			line = reader.readLine();
 			line = reader.readLine();
 			line = reader.readLine();
-			p = Pattern.compile("[^:]*:[^:]*:\\s*(\\S*).*");
+			p = Pattern.compile("[^:]*:[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 			m = p.matcher(line);
 			if (!m.matches() || m.groupCount() != 1)
-				throw new IOException("Invalid line: " + line);
+				throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 			processName = m.group(1);
 
 			line = reader.readLine();
-			p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*");
+			p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 			m = p.matcher(line);
 			if (!m.matches() || m.groupCount() != 3)
-				throw new IOException("Invalid line: " + line);
+				throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 			try {
 				String s = m.group(1);
 				processIndex = Integer.parseInt(s);
@@ -147,7 +153,7 @@ public class OpenMPIProcessMapText12Parser {
 				s = m.group(3);
 				applicationIndex = Integer.parseInt(s);
 			} catch (NumberFormatException e) {
-				throw new IOException("Invalid line: " + line);
+				throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 			}
 
 			/*
@@ -175,22 +181,22 @@ public class OpenMPIProcessMapText12Parser {
 	private void readLine3(BufferedReader reader) throws IOException {
 		// Num elements in nodes list: 1
 		String line = reader.readLine();
-		Pattern p = Pattern.compile("[^:]*:\\s*(\\d*).*");
+		Pattern p = Pattern.compile("[^:]*:\\s*(\\d*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
 			numNodes = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 	}
 
 	private void readAppContext(BufferedReader reader) throws IOException {
 		// Data for app_context: index 0 app: hellio
 		String line = reader.readLine();
-		Pattern p = Pattern.compile("[^:]*:\\s*\\w*\\s*(\\d*)[^:]*:\\s*(\\w*).*");
+		Pattern p = Pattern.compile("[^:]*:\\s*\\w*\\s*(\\d*)[^:]*:\\s*(\\w*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 
 		int applicationIndex;
@@ -198,27 +204,27 @@ public class OpenMPIProcessMapText12Parser {
 		int numberOfProcessors;
 
 		if (!m.matches() || m.groupCount() != 2)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
 			applicationIndex = Integer.parseInt(s);
 			s = m.group(2);
 			applicationName = s;
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 
 		// Num procs: 4
 		line = reader.readLine();
-		p = Pattern.compile("[^:]*:\\s*(\\d*).*");
+		p = Pattern.compile("[^:]*:\\s*(\\d*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
 			numberOfProcessors = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 
 		OpenMPIProcessMap.Application application = new OpenMPIProcessMap.Application(applicationIndex, applicationName, numberOfProcessors);
@@ -226,7 +232,7 @@ public class OpenMPIProcessMapText12Parser {
 
 		// Argv[0]: hellio
 		line = reader.readLine();
-		p = Pattern.compile("\\s*Argv\\[\\d*\\]\\s*:\\s*(.*)");
+		p = Pattern.compile("\\s*Argv\\[\\d*\\]\\s*:\\s*(.*)"); //$NON-NLS-1$
 		m = p.matcher(line);
 		List<String> arguments = new ArrayList<String>();
 		while (m.matches()) {
@@ -234,11 +240,11 @@ public class OpenMPIProcessMapText12Parser {
 			line = reader.readLine();
 			m = p.matcher(line);
 		}
-		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIProgArgsAttrDef().create(arguments.toArray(new String[arguments.size()])));
+		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIProgArgsAttributeDefinition().create(arguments.toArray(new String[arguments.size()])));
 
 		// Env[0]: OMPI_MCA_rmaps_base_display_map=1
 		line = reader.readLine();
-		p = Pattern.compile("\\s*Env\\[\\d*\\]\\s*:\\s*(.*)");
+		p = Pattern.compile("\\s*Env\\[\\d*\\]\\s*:\\s*(.*)"); //$NON-NLS-1$
 		m = p.matcher(line);
 		List<String> environment = new ArrayList<String>();
 		while (m.matches()) {
@@ -246,27 +252,27 @@ public class OpenMPIProcessMapText12Parser {
 			line = reader.readLine();
 			m = p.matcher(line);
 		}
-		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIEnvAttrDef().create(environment.toArray(new String[environment.size()])));
+		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIEnvAttributeDefinition().create(environment.toArray(new String[environment.size()])));
 
 		// Working dir: /home/dfferber/EclipseWorkspaces/runtime-New_configuration/hellio/Debug (user: 0)
 		// NO line = reader.readLine();
 		// Line was alread read.
-		p = Pattern.compile("[^:]*:\\s*(.*)");
+		p = Pattern.compile("[^:]*:\\s*(.*)"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		{
 			String s = m.group(1).trim();
-			application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIWorkingDirAttrDef().create(s));
+			application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIWorkingDirAttributeDefinition().create(s));
 		}
 
 		// Num maps: 1
 		// ... lines of maps ... (ignored by now)
 		line = reader.readLine();
-		p = Pattern.compile("[^:]*:\\s*(\\d*).*");
+		p = Pattern.compile("[^:]*:\\s*(\\d*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
 			// Ignore this information.
@@ -275,7 +281,7 @@ public class OpenMPIProcessMapText12Parser {
 				line = reader.readLine();
 			}
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 
 	}
@@ -283,63 +289,63 @@ public class OpenMPIProcessMapText12Parser {
 	private void readLine2(BufferedReader reader) throws IOException {
 		// Starting vpid: 0 Vpid range: 6 Num app_contexts: 2
 		String line = reader.readLine();
-		Pattern p = Pattern.compile("[^:]*:\\s*(\\d*)[^:]*:\\s*(\\w*)[^:]*:\\s*(\\w*).*");
+		Pattern p = Pattern.compile("[^:]*:\\s*(\\d*)[^:]*:\\s*(\\w*)[^:]*:\\s*(\\w*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 3)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
 			String s = m.group(1);
 			try {
-				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidStart().create(Integer.parseInt(s)));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidStartAttributeDefinition().create(Integer.parseInt(s)));
 			} catch (IllegalValueException e) {
-			// This is not possible.
+				// This is not possible.
 				assert false;
 			}
 			s = m.group(2);
 			try {
-				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidRange().create(Integer.parseInt(s)));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidRangeAttributeDefinition().create(Integer.parseInt(s)));
 			} catch (IllegalValueException e) {
-			// This is not possible.
+				// This is not possible.
 				assert false;
 			}
 			s = m.group(3);
 			numApplications = Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 	}
 
 	private void readLine1(BufferedReader reader) throws IOException {
 		// [dyn531995.br.ibm.com:12281] Map for job: 1 Generated by mapping mode: bynode
 		String line = reader.readLine();
-		Pattern p = Pattern.compile("\\[([^:]*):(\\d*)\\][^:]*:\\s*(\\d*)[^:]*:\\s*(\\w*).*");
+		Pattern p = Pattern.compile("\\[([^:]*):(\\d*)\\][^:]*:\\s*(\\d*)[^:]*:\\s*(\\w*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 4)
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		try {
-			map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getHostname().create(m.group(1)));
+			map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getHostnameAttributeDefinition().create(m.group(1)));
 			try {
-				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMpiJobId().create(Integer.parseInt(m.group(3))));
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMpiJobIdAttributeDefinition().create(Integer.parseInt(m.group(3))));
 			} catch (IllegalValueException e) {
 				// This is not possible.
 				assert false;
 			}
 			String mode = m.group(4);
-			if (mode.equalsIgnoreCase("bynode")) {
-				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMappingModeDefinition().create(MappingMode.BY_NODE));
-			} else if (mode.equalsIgnoreCase("byslot")) {
-				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMappingModeDefinition().create(MappingMode.BY_SLOT));
+			if (mode.equalsIgnoreCase("bynode")) { //$NON-NLS-1$
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMappingModeAttributeDefinition().create(MappingMode.BY_NODE));
+			} else if (mode.equalsIgnoreCase("byslot")) { //$NON-NLS-1$
+				map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMappingModeAttributeDefinition().create(MappingMode.BY_SLOT));
 			} else {
-				throw new IOException("Invalid line: " + line);
+				throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 			}
 		} catch (NumberFormatException e) {
-			throw new IOException("Invalid line: " + line);
+			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 	}
 
 	public static void main(String[] args) {
 		try {
-			FileInputStream is = new FileInputStream("test.txt");
+			FileInputStream is = new FileInputStream("test.txt"); //$NON-NLS-1$
 			OpenMPIProcessMapText12Parser.parse(is);
 		} catch (Exception e) {
 			e.printStackTrace();
