@@ -1,0 +1,44 @@
+package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
+
+import org.eclipse.osgi.util.NLS;
+
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.openmpi.ui.launch.messages"; //$NON-NLS-1$
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_Arguments;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultArguments;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultMCAParameters;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_LaunchArguments;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_MCAParameters;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_PArameterTable_Column_Name;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_ParameterTable_Column_Value;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Title;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyArguments;
+	public static String AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyParameter;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_Browse;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_BySlot;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_HostFile;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NoLocal;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NoOversubscribe;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NumberProcesses;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_Prefix;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Title;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_HostGroup;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_HostList;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_OptionsGroup;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyHostfile;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyHostList;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyPrefix;
+	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_NoProcess;
+	public static String OpenMPILaunchConfigurationDefaults_Exception_FailedReadFile;
+	public static String OpenMPILaunchConfigurationDefaults_FailedParseInteger;
+	public static String OpenMPILaunchConfigurationDefaults_MissingValue;
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages() {
+		// Prevent instances.
+	}
+}
