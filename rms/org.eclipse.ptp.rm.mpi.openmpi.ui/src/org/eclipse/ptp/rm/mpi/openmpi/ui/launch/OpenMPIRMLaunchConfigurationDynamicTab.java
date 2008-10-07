@@ -76,7 +76,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
 public class OpenMPIRMLaunchConfigurationDynamicTab extends
-	AbstractRMLaunchConfigurationDynamicTab {
+AbstractRMLaunchConfigurationDynamicTab {
 
 	private class DataSource {
 		private int numProcs;
@@ -110,9 +110,6 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		private final String argsDefault = EMPTY_STRING;
 		private final Map<String, String> paramsDefault = new HashMap<String, String>();
 
-		public DataSource() {
-		}
-
 		public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 			resetValidation();
 			loadConfig(configuration);
@@ -140,8 +137,11 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 		}
 
 		private void applyText(Text t, String s) {
-			if (s == null) t.setText(EMPTY_STRING);
-			else t.setText(s);
+			if (s == null) {
+				t.setText(EMPTY_STRING);
+			} else {
+				t.setText(s);
+			}
 		}
 
 		private void copyFromFields() {
@@ -568,9 +568,9 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+				|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+				|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+				|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
 			}
 		};
 		TableViewerEditor.create(paramsViewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
@@ -704,9 +704,8 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 			 */
 			@Override
 			public String getText(Object element) {
-				if (element instanceof Parameter) {
+				if (element instanceof Parameter)
 					return ((Parameter)element).getValue();
-				}
 				return null;
 			}
 
@@ -749,7 +748,7 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 
 	}
 
-   /**
+	/**
 	 * Convert a comma separated list into one host per line
 	 *
 	 * @param list
@@ -776,9 +775,8 @@ public class OpenMPIRMLaunchConfigurationDynamicTab extends
 	 * @return
 	 */
 	private String fixString(String s) {
-		if (s == null) {
+		if (s == null)
 			return "\"\"";
-		}
 		return "\"" + s + "\"";
 	}
 

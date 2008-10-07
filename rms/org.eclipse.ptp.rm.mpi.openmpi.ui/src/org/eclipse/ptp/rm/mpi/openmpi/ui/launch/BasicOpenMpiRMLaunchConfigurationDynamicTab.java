@@ -175,16 +175,16 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		@Override
 		protected void validateLocal() throws ValidationException {
 			if (numProcs < 1) {
-				throw new ValidationException("Must specify at least one process");
+				throw new ValidationException(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_NoProcess);
 			}
 			if (usePrefix && prefix == null) {
-				throw new ValidationException("Prefix cannot be empty");
+				throw new ValidationException(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyPrefix);
 			}
 			if (useHostFile && hostFile == null) {
-				throw new ValidationException("Must provide a host file");
+				throw new ValidationException(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyHostfile);
 			}
 			if (useHostList && hostList == null) {
-				throw new ValidationException("Must provide at least one host name");
+				throw new ValidationException(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyHostList);
 			}
 		}
 
@@ -196,14 +196,14 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		 */
 		private String hostListToText(String list) {
 			if (list == null) {
-				return "";
+				return ""; //$NON-NLS-1$
 			}
-			String result = "";
-			String[] values = list.split(",");
+			String result = ""; //$NON-NLS-1$
+			String[] values = list.split(","); //$NON-NLS-1$
 			for (int i = 0; i < values.length; i++) {
-				if (!values[i].equals("")) {
+				if (!values[i].equals("")) { //$NON-NLS-1$
 					if (i > 0) {
-						result += "\r";
+						result += "\r"; //$NON-NLS-1$
 					}
 					result += values[i];
 				}
@@ -229,7 +229,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 
 	@Override
 	public String getText() {
-		return "Basic Open MPI";
+		return Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Title;
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -239,7 +239,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		control.setLayout(layout);
 
 		Label label  = new Label(control, SWT.NONE);
-		label.setText("Number of processes:");
+		label.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NumberProcesses);
 
 		numProcsSpinner = new Spinner(control, SWT.BORDER);
 		numProcsSpinner.addModifyListener(getListener());
@@ -247,26 +247,26 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 
 		final Group optionsGroup = new Group(control, SWT.NONE);
 		optionsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-		optionsGroup.setText("Options");
+		optionsGroup.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_OptionsGroup);
 		layout = new GridLayout();
 		layout.numColumns = 3;
 		optionsGroup.setLayout(layout);
 
 		bySlotButton = new Button(optionsGroup, SWT.CHECK);
 		bySlotButton.addSelectionListener(getListener());
-		bySlotButton.setText("By slot");
+		bySlotButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_BySlot);
 
 		noOversubscribeButton = new Button(optionsGroup, SWT.CHECK);
 		noOversubscribeButton.addSelectionListener(getListener());
-		noOversubscribeButton.setText("No oversubscribe");
+		noOversubscribeButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NoOversubscribe);
 
 		noLocalButton = new Button(optionsGroup, SWT.CHECK);
 		noLocalButton.addSelectionListener(getListener());
-		noLocalButton.setText("No local");
+		noLocalButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NoLocal);
 
 		usePrefixButton = new Button(optionsGroup, SWT.CHECK);
 		usePrefixButton.addSelectionListener(getListener());
-		usePrefixButton.setText("Prefix:");
+		usePrefixButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_Prefix);
 
 		prefixText = new Text(optionsGroup, SWT.BORDER);
 		prefixText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -274,14 +274,14 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 
 		final Group hostGroup = new Group(control, SWT.NONE);
 		hostGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		hostGroup.setText("Hosts");
+		hostGroup.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_HostGroup);
 		layout = new GridLayout();
 		layout.numColumns = 3;
 		hostGroup.setLayout(layout);
 
 		hostFileButton = new Button(hostGroup, SWT.CHECK);
 		hostFileButton.addSelectionListener(getListener());
-		hostFileButton.setText("Host file:");
+		hostFileButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_HostFile);
 
 		hostFileText = new Text(hostGroup, SWT.BORDER);
 		hostFileText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -294,12 +294,12 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		GridData gd = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
 		gd.widthHint = pixelconverter.convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 		browseButton.setLayoutData(gd);
-		browseButton.setText("Browse");
+		browseButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_Browse);
 
 		hostListButton = new Button(hostGroup, SWT.CHECK);
 		hostListButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
 		hostListButton.addSelectionListener(getListener());
-		hostListButton.setText("Host list:");
+		hostListButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_HostList);
 
 		hostListText = new Text(hostGroup, SWT.V_SCROLL | SWT.BORDER);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
@@ -320,7 +320,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		try {
 			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(numProcs));
 		} catch (IllegalValueException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIUIPlugin.getDefault().getBundle().getSymbolicName(), "Invalid configuration", e));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIUIPlugin.getDefault().getBundle().getSymbolicName(), Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration, e));
 		}
 
 		attrs.add(OpenMPILaunchAttributes.getLaunchArgumentsAttributeDefinition().create(OpenMPILaunchConfiguration.calculateArguments(configuration)));

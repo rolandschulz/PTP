@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
 public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
-		AbstractRMLaunchConfigurationDynamicTab {
+AbstractRMLaunchConfigurationDynamicTab {
 
 	private Composite control;
 	private Button useArgsDefaultsButton;
@@ -77,7 +77,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
 			if (e.getSource() == paramsViewer) {
-//				fireContentsChanged();
+				//				fireContentsChanged();
 				updateControls();
 			} else {
 				super.doWidgetSelected(e);
@@ -171,16 +171,14 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (!useDefArgs && args == null) {
-				throw new ValidationException("Arguments cannot be empty");
-			}
+			if (!useDefArgs && args == null)
+				throw new ValidationException(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyArguments);
 			if (!useDefParams) {
 				for (Object object : paramsViewer.getCheckedElements()) {
 					if (object instanceof Parameter) {
 						Parameter param = (Parameter)object;
-						if (param.getValue().equals("")) {
-							throw new ValidationException("Parameter value cannot be empty");
-						}
+						if (param.getValue().equals("")) //$NON-NLS-1$
+							throw new ValidationException(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyParameter);
 					}
 				}
 			}
@@ -193,15 +191,14 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 		 * @return
 		 */
 		private String hostListToText(String list) {
-			if (list == null) {
-				return "";
-			}
-			String result = "";
-			String[] values = list.split(",");
+			if (list == null)
+				return ""; //$NON-NLS-1$
+			String result = ""; //$NON-NLS-1$
+			String[] values = list.split(","); //$NON-NLS-1$
 			for (int i = 0; i < values.length; i++) {
-				if (!values[i].equals("")) {
+				if (!values[i].equals("")) { //$NON-NLS-1$
 					if (i > 0) {
-						result += "\r";
+						result += "\r"; //$NON-NLS-1$
 					}
 					result += values[i];
 				}
@@ -227,7 +224,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 
 	@Override
 	public String getText() {
-		return "Advanced Open MPI";
+		return Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Title;
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -239,25 +236,25 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		argumentsGroup.setLayout(layout);
-		argumentsGroup.setText("Launch arguments");
+		argumentsGroup.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_LaunchArguments);
 
 		useArgsDefaultsButton = new Button(argumentsGroup, SWT.CHECK);
-		useArgsDefaultsButton.setText("Use default arguments");
-//		useArgsDefaultsButton.setSelection(true);
+		useArgsDefaultsButton.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultArguments);
+		//		useArgsDefaultsButton.setSelection(true);
 		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		useArgsDefaultsButton.setLayoutData(gd);
 		useArgsDefaultsButton.addSelectionListener(getListener());
 
 		Label label = new Label(argumentsGroup, SWT.NONE);
 		label.setLayoutData(new GridData());
-		label.setText("Arguments:");
+		label.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_Arguments);
 
 		argsText = new Text(argumentsGroup, SWT.BORDER);
 		argsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-//		argsText.setEnabled(false);
+		//		argsText.setEnabled(false);
 
 		final Group ompiParameteresGroup = new Group(control, SWT.NONE);
-		ompiParameteresGroup.setText("MCA Parameters");
+		ompiParameteresGroup.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_MCAParameters);
 		layout = new GridLayout();
 		layout.numColumns = 2;
 		ompiParameteresGroup.setLayout(layout);
@@ -265,14 +262,15 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 
 		useParamsDefaultsButton = new Button(ompiParameteresGroup, SWT.CHECK);
 		useParamsDefaultsButton.addSelectionListener(getListener());
-		useParamsDefaultsButton.setText("Use default parameters");
+		useParamsDefaultsButton.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultMCAParameters);
 		gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		useParamsDefaultsButton.setLayoutData(gd);
-//		useParamsDefaultsButton.setSelection(true);
+		//		useParamsDefaultsButton.setSelection(true);
 
 		paramsViewer = CheckboxTableViewer.newCheckList(ompiParameteresGroup, SWT.CHECK|SWT.FULL_SELECTION);
 		paramsViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {
+				// Empty implementation.
 			}
 			public Object[] getElements(Object inputElement) {
 				if (inputElement != null && inputElement instanceof Parameters) {
@@ -282,6 +280,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 				return null;
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+				// Empty implementation.
 			}
 		});
 		paramsViewer.setSorter(new ViewerSorter() {
@@ -301,9 +300,9 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+				|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+				|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+				|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
 			}
 		};
 		TableViewerEditor.create(paramsViewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
@@ -358,7 +357,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 
 		});
 		column1.getColumn().setResizable(true);
-		column1.getColumn().setText("Name");
+		column1.getColumn().setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_PArameterTable_Column_Name);
 
 		/*
 		 * Value column
@@ -370,9 +369,8 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 			 */
 			@Override
 			public String getText(Object element) {
-				if (element instanceof Parameter) {
+				if (element instanceof Parameter)
 					return ((Parameter)element).getValue();
-				}
 				return null;
 			}
 
@@ -399,7 +397,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 			}
 		});
 		column2.getColumn().setResizable(true);
-		column2.getColumn().setText("Value");
+		column2.getColumn().setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_ParameterTable_Column_Value);
 
 		paramsTable.addControlListener(new ControlAdapter() {
 			@Override
@@ -438,10 +436,10 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 	public void updateControls() {
 		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
 		paramsTable.setEnabled(!useParamsDefaultsButton.getSelection());
-//		if (getLocalDataSource().useDefArgs) {
-//			String launchArgs = OpenMPILaunchConfiguration.calculateArguments(getControl());
-//			argsText.setText(launchArgs);
-//		}
+		//		if (getLocalDataSource().useDefArgs) {
+		//			String launchArgs = OpenMPILaunchConfiguration.calculateArguments(getControl());
+		//			argsText.setText(launchArgs);
+		//		}
 	}
 
 	private DataSource getLocalDataSource() {
