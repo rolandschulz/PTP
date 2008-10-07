@@ -17,31 +17,34 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 /**
  * OMPI-specific attributes
+ * 
+ * @author Daniel Felix Ferber
  */
 public class OpenMPILaunchAttributes {
-	private static final String LAUNCH_ARGS_ATTR_ID = "Open_MPI_args";
-	private static final String ENV_KEYS_ATTR_ID = "Open_MPI_envKeys";
-	private static final String ENV_ARGS_ATTR_ID = "Open_MPI_env";
+	private static final String LAUNCH_ARGS_ATTR_ID = "Open_MPI_args"; //$NON-NLS-1$
+	private static final String ENV_KEYS_ATTR_ID = "Open_MPI_envKeys"; //$NON-NLS-1$
+	private static final String ENV_ARGS_ATTR_ID = "Open_MPI_env"; //$NON-NLS-1$
 
-	private final static StringAttributeDefinition launchArgs =
-		new StringAttributeDefinition(LAUNCH_ARGS_ATTR_ID, "Open MPI arguments",
-				"Command line arguments for Open MPI", false, "");
+	private final static StringAttributeDefinition launchArgsAttrDef =
+		new StringAttributeDefinition(LAUNCH_ARGS_ATTR_ID, Messages.OpenMPILaunchAttributes_launchArgsAttrDef_title,
+				Messages.OpenMPILaunchAttributes_launchArgsAttrDef_description, false, ""); //$NON-NLS-1$
 
-   private final static ArrayAttributeDefinition<String> environmentKeyDefinition = new ArrayAttributeDefinition<String>(
-			ENV_KEYS_ATTR_ID, "Open MPI environment variables", "Name of environment variables supplied to the each Open MPI processes", false,
+	private final static ArrayAttributeDefinition<String> environmentKeyAttrDef = new ArrayAttributeDefinition<String>(
+			ENV_KEYS_ATTR_ID, Messages.OpenMPILaunchAttributes_environmentKeyAttrDef_title,
+			Messages.OpenMPILaunchAttributes_environmentKeyAttrDef_description, false,
 			new String[0]);
 
-	private final static StringAttributeDefinition environmentArgsDefinition = new StringAttributeDefinition(
-			ENV_ARGS_ATTR_ID, "Open MPI Environment arguments", "Command line arguments to set environment variables for each Open MPI processes", false,
-			"${Open_MPI_envKeys:: -x ::-x :}");
+	private final static StringAttributeDefinition environmentArgsAttrDef = new StringAttributeDefinition(
+			ENV_ARGS_ATTR_ID, Messages.OpenMPILaunchAttributes_environmentArgsAttrDef_title, Messages.OpenMPILaunchAttributes_environmentArgsAttrDef_description, false,
+	"${Open_MPI_envKeys:: -x ::-x :}"); //$NON-NLS-1$
 
 	/**
 	 * List of names of environment variables for the application.
 	 * <p>
 	 * Note: openmpi 1.2 and 1.3
 	 */
- 	public static ArrayAttributeDefinition<String> getEnvironmentKeysDefinition() {
-		return environmentKeyDefinition;
+	public static ArrayAttributeDefinition<String> getEnvironmentKeysAttributeDefinition() {
+		return environmentKeyAttrDef;
 	}
 
 	/**
@@ -49,8 +52,8 @@ public class OpenMPILaunchAttributes {
 	 * <p>
 	 * Note: openmpi 1.2 and 1.3
 	 */
-	public static StringAttributeDefinition getEnvironmentArgsDefinition() {
-		return environmentArgsDefinition;
+	public static StringAttributeDefinition getEnvironmentArgsAttributeDefinition() {
+		return environmentArgsAttrDef;
 	}
 
 	/**
@@ -59,13 +62,13 @@ public class OpenMPILaunchAttributes {
 	 * Note: openmpi 1.2 and 1.3
 	 */
 	public static StringAttributeDefinition getLaunchArgumentsAttributeDefinition() {
-		return launchArgs;
+		return launchArgsAttrDef;
 	}
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
-				launchArgs,environmentArgsDefinition,environmentKeyDefinition
-			};
+				launchArgsAttrDef,environmentArgsAttrDef,environmentKeyAttrDef
+		};
 	}
 
 

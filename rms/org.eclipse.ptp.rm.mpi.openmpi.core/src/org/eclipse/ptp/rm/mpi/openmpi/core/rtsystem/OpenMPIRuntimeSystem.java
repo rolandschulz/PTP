@@ -23,6 +23,11 @@ import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	private Parameters params = new Parameters();
@@ -116,9 +121,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	protected Job createDiscoverJob() {
-		if (! rmConfiguration.hasDiscoverCmd()) {
+		if (! rmConfiguration.hasDiscoverCmd())
 			return null;
-		}
 		Job job = new OpenMPIDiscoverJob(this);
 		job.setPriority(Job.INTERACTIVE);
 		job.setSystem(false);
@@ -133,25 +137,25 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected Job createPeriodicMonitorJob() {
-//		if (! rmConfiguration.hasPeriodicMonitorCmd()) {
-//			return null;
-//		}
-//		Job job = new CommandJob(NLS.bind("Periodic monitor on {0}", rmConfiguration.getName()),
-//				rmConfiguration.getPeriodicMonitorCmd(),
-//				"Interrupted while running periodic monitor command.",
-//				"Failed to create remote process for periodic monitor command.",
-//				"Failed to parse output of periodic monitor command.",
-//				rmConfiguration.getPeriodicMonitorTime()) {
-//
-//					@Override
-//					protected void parse(BufferedReader output) throws CoreException {
-//						doParsePeriodicMonitorCommand(output);
-//					}
-//		};
-//		job.setPriority(Job.SHORT);
-//		job.setSystem(true);
-//		job.setUser(false);
-//		return job;
+		//		if (! rmConfiguration.hasPeriodicMonitorCmd()) {
+		//			return null;
+		//		}
+		//		Job job = new CommandJob(NLS.bind("Periodic monitor on {0}", rmConfiguration.getName()),
+		//				rmConfiguration.getPeriodicMonitorCmd(),
+		//				"Interrupted while running periodic monitor command.",
+		//				"Failed to create remote process for periodic monitor command.",
+		//				"Failed to parse output of periodic monitor command.",
+		//				rmConfiguration.getPeriodicMonitorTime()) {
+		//
+		//					@Override
+		//					protected void parse(BufferedReader output) throws CoreException {
+		//						doParsePeriodicMonitorCommand(output);
+		//					}
+		//		};
+		//		job.setPriority(Job.SHORT);
+		//		job.setSystem(true);
+		//		job.setUser(false);
+		//		return job;
 		return null;
 	}
 
@@ -162,29 +166,29 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected Job createContinuousMonitorJob() {
-//		if (! rmConfiguration.hasContinuousMonitorCmd()) {
-//			return null;
-//		}
-//		Job job = new CommandJob(NLS.bind("Continuous monitor on {0}", rmConfiguration.getName()),
-//				rmConfiguration.getContinuousMonitorCmd(),
-//				"Interrupted while running continuous monitor command.",
-//				"Failed to create remote process for continuous monitor command.",
-//				"Failed to parse output of continuous monitor command.") {
-//
-//					@Override
-//					protected void parse(BufferedReader output) throws CoreException {
-//						doParseContinuousMonitorCommand(output);
-//					}
-//		};
-//		job.setPriority(Job.LONG);
-//		job.setSystem(true);
-//		job.setUser(false);
-//		return job;
+		//		if (! rmConfiguration.hasContinuousMonitorCmd()) {
+		//			return null;
+		//		}
+		//		Job job = new CommandJob(NLS.bind("Continuous monitor on {0}", rmConfiguration.getName()),
+		//				rmConfiguration.getContinuousMonitorCmd(),
+		//				"Interrupted while running continuous monitor command.",
+		//				"Failed to create remote process for continuous monitor command.",
+		//				"Failed to parse output of continuous monitor command.") {
+		//
+		//					@Override
+		//					protected void parse(BufferedReader output) throws CoreException {
+		//						doParseContinuousMonitorCommand(output);
+		//					}
+		//		};
+		//		job.setPriority(Job.LONG);
+		//		job.setSystem(true);
+		//		job.setUser(false);
+		//		return job;
 		return null;
 	}
 
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new OpenMPIRuntimeSystemJob(jobID, queueID, "Open Mpi Job", this, attrMgr);
+		return new OpenMPIRuntimeSystemJob(jobID, queueID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
 	}
 }

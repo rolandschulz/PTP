@@ -46,6 +46,11 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfig
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	Object lock1 = new Object();
 
@@ -75,7 +80,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
-		final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), "Open MPI run", 0);
+		final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), Messages.OpenMPIRuntimeSystemJob_ProcessName, 0);
 		processIDs = new String[] { zeroIndexProcessID } ;
 
 		/*
@@ -110,19 +115,19 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					PTPCorePlugin.log(e);
 				} finally {
 					stdoutPipedStreamListener.disable();
-//					if (stdoutObserver != null) {
-//						stdoutObserver.removeListener(stdoutPipedStreamListener);
-//					}
-//					try {
-//						stdoutOutputStream.close();
-//					} catch (IOException e) {
-//						PTPCorePlugin.log(e);
-//					}
-//					try {
-//						stdoutInputStream.close();
-//					} catch (IOException e) {
-//						PTPCorePlugin.log(e);
-//					}
+					//					if (stdoutObserver != null) {
+					//						stdoutObserver.removeListener(stdoutPipedStreamListener);
+					//					}
+					//					try {
+					//						stdoutOutputStream.close();
+					//					} catch (IOException e) {
+					//						PTPCorePlugin.log(e);
+					//					}
+					//					try {
+					//						stdoutInputStream.close();
+					//					} catch (IOException e) {
+					//						PTPCorePlugin.log(e);
+					//					}
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", jobID); //$NON-NLS-1$
 			}
@@ -150,7 +155,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					while (line != null) {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
-//							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							//							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
 							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
 						}
 						line = stderrBufferedReader.readLine();
@@ -160,19 +165,19 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					PTPCorePlugin.log(e);
 				} finally {
 					stderrPipedStreamListener.disable();
-//					if (stderrObserver != null) {
-//						stderrObserver.removeListener(stderrPipedStreamListener);
-//					}
-//					try {
-//						stderrOutputStream.close();
-//					} catch (IOException e) {
-//						PTPCorePlugin.log(e);
-//					}
-//					try {
-//						stderrInputStream.close();
-//					} catch (IOException e) {
-//						PTPCorePlugin.log(e);
-//					}
+					//					if (stderrObserver != null) {
+					//						stderrObserver.removeListener(stderrPipedStreamListener);
+					//					}
+					//					try {
+					//						stderrOutputStream.close();
+					//					} catch (IOException e) {
+					//						PTPCorePlugin.log(e);
+					//					}
+					//					try {
+					//						stderrInputStream.close();
+					//					} catch (IOException e) {
+					//						PTPCorePlugin.log(e);
+					//					}
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", jobID); //$NON-NLS-1$
 			}
@@ -271,7 +276,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		if (parserException != null) {
 			process.destroy();
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Failed to parse Open Mpi run command output.", parserException));
+			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIRuntimeSystemJob_Exception_FailedParse, parserException));
 		}
 
 		/*
@@ -291,7 +296,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			String nodeID = rtSystem.getNodeIDforName(nodename);
 			if (nodeID == null) {
 				process.destroy();
-				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), "Hostnames from Open MPI output do not match expected hostname.", parserException));
+				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIRuntimeSystemJob_Exception_HostnamesDoNotMatch, parserException));
 			}
 
 			String processName = newProcess.getName();
@@ -359,6 +364,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doTerminateJob() {
+		// Empty implementation.
 	}
 
 	@Override
@@ -440,19 +446,19 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		for (String key : environment.keySet()) {
 			keys[p++] = key;
 		}
-		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentKeysDefinition().create(keys));
+		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentKeysAttributeDefinition().create(keys));
 
 		/*
 		 * An OpenMPI specific attribute.
 		 * A shortcut that generates arguments for the OpenMPI run command.
 		 */
-		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentArgsDefinition().create());
+		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentArgsAttributeDefinition().create());
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
-}
+	}
 
 	@Override
 	protected HashMap<String, String> doRetrieveToolEnvironment()
-			throws CoreException {
+	throws CoreException {
 		// No extra environment variables needs to be set for OpenMPI.
 		return null;
 	}

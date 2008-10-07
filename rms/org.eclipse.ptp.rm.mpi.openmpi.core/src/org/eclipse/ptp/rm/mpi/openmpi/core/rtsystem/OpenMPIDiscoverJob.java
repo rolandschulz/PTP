@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
 import java.io.BufferedReader;
@@ -32,23 +42,28 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIMachineAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIHostMap.Host;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	OpenMPIRuntimeSystem rts;
 
 	public OpenMPIDiscoverJob(OpenMPIRuntimeSystem rts) {
 		super(rts,
-			NLS.bind("Discover Open MPI on {0}", rts.getRmConfiguration().getName()),
-			rts.getRmConfiguration().getDiscoverCmd(),
-			"Interrupted while running Open MPI discover command.",
-			"Failed to create remote process for Open MPI discover command.",
-			"Failed to parse output of Open MPI discover command.");
+				NLS.bind(Messages.OpenMPIDiscoverJob_name, rts.getRmConfiguration().getName()),
+				rts.getRmConfiguration().getDiscoverCmd(),
+				Messages.OpenMPIDiscoverJob_interruptedErrorMessage,
+				Messages.OpenMPIDiscoverJob_processErrorMessage,
+				Messages.OpenMPIDiscoverJob_parsingErrorMessage);
 		this.rts = rts;
 	}
 
@@ -58,13 +73,13 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		 * Local copy of attributes from the RuntimeSystem
 		 */
 		IRemoteConnection connection = rts.getConnection();
+		assert connection != null;
 		IRemoteServices remoteServices = rts.getRemoteServices();
+		assert remoteServices != null;
 		IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 		Parameters params = rts.getParameters();
 		Map<String, String> hostToElementMap = rts.getHostToElementMap();
 		OpenMPIResourceManagerConfiguration rmConfiguration = (OpenMPIResourceManagerConfiguration) rts.getRmConfiguration();
-		assert connection != null;
-		assert remoteServices != null;
 		assert fileMgr != null;
 		assert params != null;
 		assert hostToElementMap != null;
@@ -76,7 +91,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
 		String machineID = rts.createMachine(rm.getName());
 		rts.setMachineID(machineID);
-		String queueID = rts.createQueue("default");
+		String queueID = rts.createQueue(Messages.OpenMPIDiscoverJob_defaultQueueName);
 		rts.setQueueID(queueID);
 
 		IPMachine machine = rm.getMachineById(machineID);
@@ -139,11 +154,11 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				}
 				if (host.getErrors() != 0) {
 					if ((host.getErrors() & Host.ERR_MAX_NUM_SLOTS) != 0) {
-						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageDefinition().create("Invalid 'max-slots' parameter was ignored for this host."));
+						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(Messages.OpenMPIDiscoverJob_Exception_InvalidMaxSlotsParameter));
 					} else if ((host.getErrors() & Host.ERR_NUM_SLOTS) != 0) {
-						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageDefinition().create("Invalid 'slots/cpus/count' parameter was ignored for this host."));
+						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(Messages.OpenMPIDiscoverJob_Exception_InvalidSlotsParameter));
 					} else if ((host.getErrors() & Host.ERR_UNKNOWN_ATTR) != 0) {
-						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageDefinition().create("Invalid parameter was ignored for this host."));
+						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(Messages.OpenMPIDiscoverJob_Exception_IgnoredInvalidParameter));
 					}
 					attrManager.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
 					hasSomeError = true;
@@ -152,11 +167,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			}
 			if (hostMap.hasErrors) {
 				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				machine.addAttribute(OpenMPIMachineAttributes.getStatusMessageDefinition().create("Parse error(s) in hostfile."));
+				machine.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(Messages.OpenMPIDiscoverJob_Exception_HostFileParseError));
 			}
-			if (hostMap.hasParseErrors() || hasSomeError) {
-				throw new CoreException(new Status(IStatus.WARNING, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), "There are errors in the hostfile."));
-			}
+			if (hostMap.hasParseErrors() || hasSomeError)
+				throw new CoreException(new Status(IStatus.WARNING, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIDiscoverJob_Exception_HostFileErrors));
 
 		} catch (CoreException e) {
 			/*
@@ -165,7 +179,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			if (e.getStatus().getSeverity() == IStatus.ERROR) {
 				AttributeManager attrManager = new AttributeManager();
 				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Error while running discover command: {0}.", e.getMessage())));
+				attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailed, e.getMessage())));
 				rts.changeMachine(machineID, attrManager);
 			}
 			throw e;
@@ -175,7 +189,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			 */
 			AttributeManager attrManager = new AttributeManager();
 			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageDefinition().create(NLS.bind("Internal error while running discover command: {0}", e.getMessage())));
+			attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
 			rts.changeMachine(machineID, attrManager);
 		}
 	}
@@ -184,7 +198,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			IRemoteServices remoteServices, IRemoteFileManager fileMgr,
 			Parameters params,
 			OpenMPIResourceManagerConfiguration rmConfiguration)
-			throws CoreException, IOException {
+	throws CoreException, IOException {
 
 		/*
 		 * OpenMpi 1.2 uses rds_hostfile_path. Open 1.3 uses orte_default_hostfile.
@@ -198,7 +212,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "rds_hostfile_path: {0}", (rds_param==null?"null":rds_param.getValue())); //$NON-NLS-1$  //$NON-NLS-2$
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "orte_default_hostfile: {0}", (orte_param==null?"null":orte_param.getValue())); //$NON-NLS-1$  //$NON-NLS-2$
-		
+
 		if (rds_param != null) {
 			hostFilePath = rds_param.getValue();
 			if (hostFilePath.trim().length() == 0) {
@@ -213,14 +227,14 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				}
 			}
 		}
-		
+
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "hostFilePath: {0}", (hostFilePath==null?"null":hostFilePath)); //$NON-NLS-1$  //$NON-NLS-2$
 
 		// Validate.
 		if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 			if (hostFilePath == null) {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Missing mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
-				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, "Discover command did not inform path to default hostfile. If necessary, set MCA parameters to define default hostfile path."));
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandMissingHostFilePath));
 			}
 			DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Found mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
 		} else if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
@@ -228,7 +242,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				hostMap = new OpenMPIHostMap();
 				String hostname = getRemoteHostname(connection, remoteServices);
 				hostMap.addDefaultHost(hostname);
-				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Missing optional hostfile for Open MPI 1.3. Assuming {0} as default host.", hostname); //$NON-NLS-1$				
+				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Missing optional hostfile for Open MPI 1.3. Assuming {0} as default host.", hostname); //$NON-NLS-1$
 				return hostMap;
 			} else {
 				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Found optional hostfile for Open MPI 1.3."); //$NON-NLS-1$
@@ -238,9 +252,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 
 		IPath path = new Path(hostFilePath);
-		if (! path.isAbsolute()) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind("Discover command informed a path to hostfile that is not an absolute path ({0}).", hostFilePath)));
-		}
+		if (! path.isAbsolute())
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFilePathNotAbsolute, hostFilePath)));
 
 		// Try to read.
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Opening hostfile."); //$NON-NLS-1$
@@ -250,14 +263,14 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		try {
 			hostfile = fileMgr.getResource(new Path(hostFilePath), monitor);
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind("Failed find hostfile ({0}).", hostFilePath), e));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileNotFound, hostFilePath), e));
 		}
 
 		InputStream is = null;
 		try {
 			is = hostfile.openInputStream(EFS.NONE, monitor);
 		} catch (CoreException e) {
-			Status s = new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind("Failed read hostfile ({0}).", hostfile), e);
+			Status s = new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailedReadHostFile, hostfile), e);
 			throw new CoreException(s);
 		}
 
@@ -266,7 +279,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			hostMap = OpenMPIHostMapParser.parse(reader);
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind("Failed to parse hostfile ({0}).", hostfile), e));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailedParseHostFile, hostfile), e));
 		}
 
 		/*
@@ -276,18 +289,18 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		if (hostMap.count() == 0) {
 			if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 				// This was not correct for remote hosts. Worked only for local hosts.
-//					try {
-//						InetAddress localhost = InetAddress.getLocalHost();
-//						hostMap.addDefaultHost(localhost.getHostName());
-//					} catch (UnknownHostException e) {
-//						throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Cannot retrive network information for local machine. Check network configuration."));
-//					}
+				//					try {
+				//						InetAddress localhost = InetAddress.getLocalHost();
+				//						hostMap.addDefaultHost(localhost.getHostName());
+				//					} catch (UnknownHostException e) {
+				//						throw new CoreException(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Cannot retrive network information for local machine. Check network configuration."));
+				//					}
 				String hostname = getRemoteHostname(connection, remoteServices);
 				hostMap.addDefaultHost(hostname);
 				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Hostfile is empty. Added default host {0} for Open MPI 1.2.", hostname); //$NON-NLS-1$
 			} else if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Empty hostfile is not allowed for Open MPI 1.3."); //$NON-NLS-1$
-				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind("Empty hostfile is not allowed ({0}).", hostfile)));
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileEmpty, hostfile)));
 			} else {
 				assert false;
 			}
@@ -297,12 +310,12 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 
 	private String getRemoteHostname(IRemoteConnection connection,
 			IRemoteServices remoteServices) throws CoreException, IOException {
-		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, "hostname");
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, "hostname"); //$NON-NLS-1$
 		IRemoteProcess process = null;
 		try {
 			process = processBuilder.start();
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, "Failed to run command to get hostname.", e));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailed, e));
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		try {
@@ -310,18 +323,16 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		} catch (InterruptedException e) {
 			// Ignore
 		}
-		if (process.exitValue() != 0) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind("Command to get hostname failed with exit code {0}", process.exitValue())));
-		}
+		if (process.exitValue() != 0)
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, process.exitValue())));
 		String hostname = br.readLine();
-		if (hostname == null) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, "Failed to parse command for hostname."));
-		}
+		if (hostname == null)
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse));
 		return hostname;
 	}
 
 	private void parseParameters(BufferedReader output, Parameters params)
-			throws CoreException {
+	throws CoreException {
 
 		try {
 			String line;
@@ -355,11 +366,11 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			if (DebugUtil.RTS_DISCOVER_TRACING) {
 				System.out.println("Open MPI parameters:"); //$NON-NLS-1$
 				for (Parameters.Parameter param : params.getParameters()) {
-					System.out.println(MessageFormat.format("  {0}={1}", param.getName(), param.getValue()));
+					System.out.println(MessageFormat.format("  {0}={1}", param.getName(), param.getValue())); //$NON-NLS-1$
 				}
 			}
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), "Failed to parse output of discover command.", e));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParseOutput, e));
 		}
 	}
 }

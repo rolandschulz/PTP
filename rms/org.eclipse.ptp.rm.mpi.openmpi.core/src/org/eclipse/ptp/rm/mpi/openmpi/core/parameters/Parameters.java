@@ -13,17 +13,22 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.parameters;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class Parameters implements Cloneable {
 	public class Parameter implements Cloneable {
 		private String name;
-		private String value = "";
-		private String help = "";
+		private String value = ""; //$NON-NLS-1$
+		private String help = ""; //$NON-NLS-1$
 		private boolean readOnly = false;
 
 		public Parameter(String name) {
 			this.name = name;
 		}
-		
+
 		/* (non-Javadoc)
 		 * @see java.lang.Object#clone()
 		 */
@@ -77,31 +82,32 @@ public class Parameters implements Cloneable {
 		public void setName(String name) {
 			this.name = name;
 		}
-		
+
 		/**
 		 * @param readOnly the readOnly to set
 		 */
 		public void setReadOnly(boolean readOnly) {
 			this.readOnly = readOnly;
 		}
-		
+
 		/**
 		 * @param value
 		 */
 		public void setValue(String value) {
 			this.value = value;
 		}
-		
+
 		/* (non-Javadoc)
 		 * @see java.lang.Object#toString()
 		 */
+		@Override
 		public String toString() {
 			return getName();
 		}
 	}
 
 	private Map<String, Parameter> params = new HashMap<String, Parameter>();
-	
+
 	/**
 	 * @param name
 	 */
@@ -109,7 +115,7 @@ public class Parameters implements Cloneable {
 		params.put(param.getName(), param);
 		return param;
 	}
-	
+
 	/**
 	 * @param name
 	 */
@@ -118,7 +124,7 @@ public class Parameters implements Cloneable {
 		params.put(name, param);
 		return param;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
@@ -130,7 +136,7 @@ public class Parameters implements Cloneable {
 		}
 		return newParams;
 	}
-	
+
 	/**
 	 * @param name
 	 * @return
@@ -138,14 +144,14 @@ public class Parameters implements Cloneable {
 	public Parameter getParameter(String name) {
 		return params.get(name);
 	}
-	
+
 	/**
 	 * @return
 	 */
 	public int getParameterCount() {
 		return params.size();
 	}
-	
+
 	/**
 	 * @return
 	 */

@@ -20,6 +20,11 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIRuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIResourceManager extends AbstractToolResourceManager {
 
 	private Integer OPENMPI_RMID;
@@ -49,9 +54,8 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	 * @return parameters
 	 */
 	public Parameters getParameters() {
-		if (rts == null) {
+		if (rts == null)
 			return null;
-		}
 		try {
 			return rts.getParameters().clone();
 		} catch (CloneNotSupportedException e) {

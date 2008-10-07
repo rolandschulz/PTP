@@ -10,16 +10,21 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * @author Daniel Felix Ferber
  */
 public class OpenMPIPlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.core";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static OpenMPIPlugin plugin;
@@ -28,6 +33,7 @@ public class OpenMPIPlugin extends Plugin {
 	 * The constructor
 	 */
 	public OpenMPIPlugin() {
+		// Nothing to do
 	}
 
 	/*
@@ -38,6 +44,8 @@ public class OpenMPIPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		OpenMPI12Defaults.loadDefaults();
+		OpenMPI13Defaults.loadDefaults();
 		OpenMPI12PreferenceManager.initializePreferences();
 		OpenMPI13PreferenceManager.initializePreferences();
 	}
@@ -59,5 +67,65 @@ public class OpenMPIPlugin extends Plugin {
 	 */
 	public static OpenMPIPlugin getDefault() {
 		return plugin;
+	}
+
+	/**
+	 * Raise core exception.
+	 * @param message
+	 * @return
+	 */
+	public static CoreException coreErrorException(String message) {
+		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message));
+	}
+
+	/**
+	 * Raise core exception.
+	 * @param message
+	 * @param t
+	 * @return
+	 */
+	public static CoreException coreErrorException(String message, Throwable t) {
+		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message, t));
+	}
+
+	/**
+	 * Create log entry from an IStatus
+	 * 
+	 * @param status
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Create log entry from a string
+	 * 
+	 * @param msg
+	 */
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
+
+	/**
+	 * Create log entry from a Throwable
+	 * 
+	 * @param e
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.OpenMPIPlugin_Exception_InternalError, e));
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			// If the default instance is not yet initialized,
+			// return a static identifier. This identifier must
+			// match the plugin id defined in plugin.xml
+			return PLUGIN_ID;
+		return getDefault().getBundle().getSymbolicName();
 	}
 }

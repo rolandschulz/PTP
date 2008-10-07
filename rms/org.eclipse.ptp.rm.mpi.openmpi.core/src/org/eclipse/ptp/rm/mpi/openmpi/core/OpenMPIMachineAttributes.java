@@ -25,26 +25,27 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 /**
  * Node attributes
+ * @author Daniel Felix Ferber
  */
 public class OpenMPIMachineAttributes {
 
-	private static final String STATUS_MESSAGE = "Open_MPI_statusMessage";
+	private static final String STATUS_MESSAGE = "Open_MPI_statusMessage"; //$NON-NLS-1$
 
-	private final static StringAttributeDefinition statusMessageDef =
-		new StringAttributeDefinition(STATUS_MESSAGE, "Open MPI status message",
-				"Open MPI status message", true, "");
+	private final static StringAttributeDefinition statusMessageAttrDef =
+		new StringAttributeDefinition(STATUS_MESSAGE, Messages.OpenMPIMachineAttributes_statusMessageAttrDef_title,
+				Messages.OpenMPIMachineAttributes_statusMessageAttrDef_description, true, ""); //$NON-NLS-1$
 
 	/**
 	 * Status message if it was not possible to discover the machine.
 	 * <p>
 	 * Note: openmpi 1.2 and 1.3
 	 */
-	public static StringAttributeDefinition getStatusMessageDefinition() {
-		return statusMessageDef;
+	public static StringAttributeDefinition getStatusMessageAttributeDefinition() {
+		return statusMessageAttrDef;
 	}
 
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{statusMessageDef};
+		return new IAttributeDefinition[]{statusMessageAttrDef};
 	}
 
 }
