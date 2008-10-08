@@ -3,7 +3,8 @@
       id="org.eclipse.ptp.perf.tau"
       label="%featureName"
       version="2.1.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.ptp">
 
    <description url="http://www.cs.uoregon.edu/research/tau/home.php">
       %description
