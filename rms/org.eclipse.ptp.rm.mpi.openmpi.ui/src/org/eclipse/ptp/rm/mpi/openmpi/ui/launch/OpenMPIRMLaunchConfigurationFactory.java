@@ -16,13 +16,17 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIRMLaunchConfigurationFactory extends
-		AbstractRMLaunchConfigurationFactory {
+AbstractRMLaunchConfigurationFactory {
 
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm) throws CoreException {
-		return new OpenMPIRMLaunchConfigurationDynamicTab(rm);
-//		return new NewOpenMPIRMLaunchConfigurationDynamicTab(rm);
+		return new NewOpenMPIRMLaunchConfigurationDynamicTab(rm);
 	}
 
 	@Override

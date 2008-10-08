@@ -29,13 +29,16 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import sun.security.action.GetLongAction;
-
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIConfigurationWizardPage extends
-		AbstractToolRMConfigurationWizardPage {
+AbstractToolRMConfigurationWizardPage {
 
 	String versionIds[] = new String[] { OpenMPIResourceManagerConfiguration.VERSION_12, OpenMPIResourceManagerConfiguration.VERSION_13 };
-	String versionsNames[] = new String[] { "Open MPI 1.2", "Open MPI 1.3"};
+	String versionsNames[] = new String[] { Messages.OpenMPIConfigurationWizardPage_VersionCombo_Version12, Messages.OpenMPIConfigurationWizardPage_VersionCombo_Version13};
 
 	protected Combo versionCombo;
 
@@ -109,7 +112,7 @@ public class OpenMPIConfigurationWizardPage extends
 		@Override
 		protected void validateLocal() throws ValidationException {
 			if (versionId == null) {
-				throw new ValidationException("No Open MPI version selected");
+				throw new ValidationException(Messages.OpenMPIConfigurationWizardPage_Validation_NoVersionSelected);
 			}
 			super.validateLocal();
 		}
@@ -133,7 +136,7 @@ public class OpenMPIConfigurationWizardPage extends
 	}
 
 	public OpenMPIConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , "Open MPI", "Open MPI tool configuration", "Enter information to configure the Open MPI tool");
+		super(wizard, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , Messages.OpenMPIConfigurationWizardPage_Name, Messages.OpenMPIConfigurationWizardPage_Title, Messages.OpenMPIConfigurationWizardPage_Description);
 	}
 
 	@Override
@@ -148,10 +151,10 @@ public class OpenMPIConfigurationWizardPage extends
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		contents.setLayout(layout);
-		
+
 		createVersionContents(contents);
 		createOpenMPIContents(contents);
-		
+
 		return contents;
 	}
 
@@ -169,7 +172,7 @@ public class OpenMPIConfigurationWizardPage extends
 		 */
 
 		Label label = new Label(contents, SWT.NONE);
-		label.setText("Open MPI version:");
+		label.setText(Messages.OpenMPIConfigurationWizardPage_Label_Version);
 
 		versionCombo = new Combo(contents, SWT.DROP_DOWN | SWT.READ_ONLY);
 		for (int i = 0; i < versionsNames.length; i++) {
@@ -180,7 +183,7 @@ public class OpenMPIConfigurationWizardPage extends
 
 	public void handleVersionSelected() {
 		getWidgetListener().disable();
-//		listenerEnabled = false;
+		//		listenerEnabled = false;
 		DataSource dataSource = (DataSource) this.getDataSource();
 		dataSource.justValidate();
 		String launchCmd = null;
@@ -202,7 +205,7 @@ public class OpenMPIConfigurationWizardPage extends
 		resetErrorMessages();
 		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
 		dataSource.copyToFields();
-//		listenerEnabled = true;
+		//		listenerEnabled = true;
 		getWidgetListener().enable();
 	}
 

@@ -8,23 +8,25 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
+package org.eclipse.ptp.rm.mpi.openmpi.ui.preferences;
 
-
-import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * 
  * @author Daniel Felix Ferber
  *
  */
-public class NewOpenMPIRMLaunchConfigurationDynamicTab extends
-ExtendableRMLaunchConfigurationDynamicTab {
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.openmpi.ui.preferences.messages"; //$NON-NLS-1$
+	public static String OpenMPI12PreferencePage_Title;
+	public static String OpenMPI13PreferencePage_Title;
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-	public NewOpenMPIRMLaunchConfigurationDynamicTab(IResourceManager rm) {
-		super();
-		addDynamicTab(new BasicOpenMpiRMLaunchConfigurationDynamicTab());
-		addDynamicTab(new AdvancedOpenMpiRMLaunchConfigurationDynamicTab(rm));
+	private Messages() {
+		// Prevent instances.
 	}
 }

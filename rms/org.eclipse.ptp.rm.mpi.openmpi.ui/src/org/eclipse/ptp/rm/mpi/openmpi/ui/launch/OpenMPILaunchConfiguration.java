@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
 
 import java.util.Map;
@@ -7,6 +17,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPILaunchConfiguration {
 	public static final String ATTR_BASE = OpenMPIUIPlugin.PLUGIN_ID + ".launchAttributes"; //$NON-NLS-1$
 	public static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs"; //$NON-NLS-1$
@@ -67,8 +82,9 @@ public class OpenMPILaunchConfiguration {
 	 */
 	static private String fixString(String s) {
 		// TODO is that right and escaped correctly?
-		if (s == null)
+		if (s == null) {
 			return "\"\""; //$NON-NLS-1$
+		}
 		return "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
