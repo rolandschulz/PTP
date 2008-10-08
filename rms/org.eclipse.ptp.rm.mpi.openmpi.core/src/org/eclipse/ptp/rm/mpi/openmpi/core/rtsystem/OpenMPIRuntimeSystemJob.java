@@ -42,6 +42,7 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
@@ -112,7 +113,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					}
 				} catch (IOException e) {
 					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: {0}", e); //$NON-NLS-1$
-					PTPCorePlugin.log(e);
+					OpenMPIPlugin.log(e);
 				} finally {
 					stdoutPipedStreamListener.disable();
 					//					if (stdoutObserver != null) {
@@ -162,7 +163,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					}
 				} catch (IOException e) {
 					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: {0}", e); //$NON-NLS-1$
-					PTPCorePlugin.log(e);
+					OpenMPIPlugin.log(e);
 				} finally {
 					stderrPipedStreamListener.disable();
 					//					if (stderrObserver != null) {
