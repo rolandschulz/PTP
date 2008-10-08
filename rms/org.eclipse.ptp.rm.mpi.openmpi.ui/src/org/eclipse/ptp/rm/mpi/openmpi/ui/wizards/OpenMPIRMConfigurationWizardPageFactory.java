@@ -21,8 +21,13 @@ import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPIRMConfigurationWizardPageFactory extends
-	RMConfigurationWizardPageFactory {
+RMConfigurationWizardPageFactory {
 
 	public OpenMPIRMConfigurationWizardPageFactory() {
 		// no-op
@@ -34,7 +39,7 @@ public class OpenMPIRMConfigurationWizardPageFactory extends
 		};
 	}
 
-//	@Override
+	//	@Override
 	@Override
 	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
 		List<RMConfigurationWizardPage> list = new ArrayList<RMConfigurationWizardPage>();
@@ -43,7 +48,7 @@ public class OpenMPIRMConfigurationWizardPageFactory extends
 		return list.toArray(new RMConfigurationWizardPage[list.size()]);
 	}
 
-//	@Override
+	//	@Override
 	@Override
 	public Class<? extends IResourceManagerFactory> getRMFactoryClass() {
 		return OpenMPIResourceManagerFactory.class;

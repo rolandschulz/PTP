@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
 
 import java.io.IOException;
@@ -16,6 +26,11 @@ import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.osgi.framework.Bundle;
 
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPILaunchConfigurationDefaults {
 	public static int ATTR_NUMPROCS;
 	public static boolean ATTR_BYSLOT;
@@ -39,17 +54,17 @@ public class OpenMPILaunchConfigurationDefaults {
 		Bundle bundle = OpenMPIPlugin.getDefault().getBundle();
 		Properties properties = read(defaultsPropertiesPath, bundle);
 
-		ATTR_NUMPROCS = getInteger(bundle, properties, "ATTR_NUMPROCS"); //$NON-NLS-1$
-		ATTR_BYSLOT = getBoolean(bundle, properties, "ATTR_BYSLOT"); //$NON-NLS-1$
-		ATTR_NOOVERSUBSCRIBE = getBoolean(bundle, properties, "ATTR_NOOVERSUBSCRIBE"); //$NON-NLS-1$
-		ATTR_NOLOCAL = getBoolean(bundle, properties, "ATTR_NOLOCAL"); //$NON-NLS-1$
-		ATTR_PREFIX = getString(bundle, properties, "ATTR_PREFIX"); //$NON-NLS-1$
-		ATTR_USEPREFIX = getBoolean(bundle, properties, "ATTR_USEPREFIX"); //$NON-NLS-1$
-		ATTR_HOSTFILE = getString(bundle, properties, "ATTR_HOSTFILE"); //$NON-NLS-1$
-		ATTR_USEHOSTFILE = getBoolean(bundle, properties, "ATTR_USEHOSTFILE"); //$NON-NLS-1$
-		ATTR_ARGUMENTS = getString(bundle, properties, "ATTR_ARGUMENTS"); //$NON-NLS-1$
-		ATTR_USEDEFAULTARGUMENTS = getBoolean(bundle, properties, "ATTR_USEDEFAULTARGUMENTS"); //$NON-NLS-1$
-		ATTR_USEDEFAULTPARAMETERS = getBoolean(bundle, properties, "ATTR_USEDEFAULTPARAMETERS"); //$NON-NLS-1$
+		ATTR_NUMPROCS = getInteger(bundle, properties, "NUMPROCS"); //$NON-NLS-1$
+		ATTR_BYSLOT = getBoolean(bundle, properties, "BYSLOT"); //$NON-NLS-1$
+		ATTR_NOOVERSUBSCRIBE = getBoolean(bundle, properties, "NOOVERSUBSCRIBE"); //$NON-NLS-1$
+		ATTR_NOLOCAL = getBoolean(bundle, properties, "NOLOCAL"); //$NON-NLS-1$
+		ATTR_PREFIX = getString(bundle, properties, "PREFIX"); //$NON-NLS-1$
+		ATTR_USEPREFIX = getBoolean(bundle, properties, "USEPREFIX"); //$NON-NLS-1$
+		ATTR_HOSTFILE = getString(bundle, properties, "HOSTFILE"); //$NON-NLS-1$
+		ATTR_USEHOSTFILE = getBoolean(bundle, properties, "USEHOSTFILE"); //$NON-NLS-1$
+		ATTR_ARGUMENTS = getString(bundle, properties, "ARGUMENTS"); //$NON-NLS-1$
+		ATTR_USEDEFAULTARGUMENTS = getBoolean(bundle, properties, "USEDEFAULTARGUMENTS"); //$NON-NLS-1$
+		ATTR_USEDEFAULTPARAMETERS = getBoolean(bundle, properties, "USEDEFAULTPARAMETERS"); //$NON-NLS-1$
 
 		assert ATTR_PREFIX != null;
 		assert ATTR_HOSTFILE != null;
@@ -72,10 +87,11 @@ public class OpenMPILaunchConfigurationDefaults {
 
 	public static String getString(Bundle bundle, Properties properties, String key) throws CoreException {
 		String value = properties.getProperty(key);
-		if (value == null)
+		if (value == null) {
 			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPILaunchConfigurationDefaults_MissingValue, key)));
-		else
+		} else {
 			return value;
+		}
 	}
 
 	public static int getInteger(Bundle bundle, Properties properties, String key) throws CoreException {

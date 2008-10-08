@@ -15,10 +15,15 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.preferences.AbstractToolsPreferencePage;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPI12PreferencePage extends AbstractToolsPreferencePage {
 
 	public OpenMPI12PreferencePage() {
-		super(OpenMPI12PreferenceManager.PREFIX, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES, "Open MPI 1.2 preferences");
+		super(OpenMPI12PreferenceManager.PREFIX, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES, Messages.OpenMPI12PreferencePage_Title);
 	}
 
 	@Override

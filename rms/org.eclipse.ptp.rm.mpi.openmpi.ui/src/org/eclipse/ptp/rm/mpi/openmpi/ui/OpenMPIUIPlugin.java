@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * @author Daniel Felix Ferber
  */
 public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
@@ -85,7 +86,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Create log entry from an IStatus
-	 * 
+	 *
 	 * @param status
 	 */
 	public static void log(IStatus status) {
@@ -94,7 +95,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Create log entry from a string
-	 * 
+	 *
 	 * @param msg
 	 */
 	public static void log(String msg) {
@@ -103,7 +104,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Create log entry from a Throwable
-	 * 
+	 *
 	 * @param e
 	 */
 	public static void log(Throwable e) {
@@ -112,7 +113,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Generate a unique identifier
-	 * 
+	 *
 	 * @return unique identifier string
 	 */
 	public static String getUniqueIdentifier() {

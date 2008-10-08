@@ -15,10 +15,15 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.preferences.AbstractToolsPreferencePage;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class OpenMPI13PreferencePage extends AbstractToolsPreferencePage {
 
 	public OpenMPI13PreferencePage() {
-		super(OpenMPI13PreferenceManager.PREFIX, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES, "Open MPI 1.3 preferences");
+		super(OpenMPI13PreferenceManager.PREFIX, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES, Messages.OpenMPI13PreferencePage_Title);
 	}
 
 	@Override

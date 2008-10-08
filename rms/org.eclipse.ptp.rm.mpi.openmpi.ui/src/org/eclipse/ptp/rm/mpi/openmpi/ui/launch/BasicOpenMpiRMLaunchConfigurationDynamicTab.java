@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
 
 import java.util.ArrayList;
@@ -36,21 +46,26 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
-		AbstractRMLaunchConfigurationDynamicTab {
+AbstractRMLaunchConfigurationDynamicTab {
 
-	private Composite control;
-	private Spinner numProcsSpinner;
-	private Button bySlotButton;
-	private Button noOversubscribeButton;
-	private Button noLocalButton;
-	private Button usePrefixButton;
-	private Text prefixText;
-	private Text hostFileText;
-	private Button hostFileButton;
-	private Text hostListText;
-	private Button hostListButton;
-	private Button browseButton;
+	Composite control;
+	Spinner numProcsSpinner;
+	Button bySlotButton;
+	Button noOversubscribeButton;
+	Button noLocalButton;
+	Button usePrefixButton;
+	Text prefixText;
+	Text hostFileText;
+	Button hostFileButton;
+	Text hostListText;
+	Button hostListButton;
+	Button browseButton;
 
 	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
 		public WidgetListener(AbstractRMLaunchConfigurationDynamicTab dynamicTab) {
@@ -60,7 +75,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		@Override
 		protected void doModifyText(ModifyEvent e) {
 			if (e.getSource() == numProcsSpinner || e.getSource() == prefixText || e.getSource() == hostFileText || e.getSource() == hostListText) {
-//				getDataSource().justValidate();
+				//				getDataSource().justValidate();
 			} else{
 				super.doModifyText(e);
 			}
@@ -69,9 +84,9 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
 			if (e.getSource() == bySlotButton || e.getSource() == noOversubscribeButton || e.getSource() == noLocalButton || e.getSource() == usePrefixButton) {
-//				getDataSource().justValidate();
+				//				getDataSource().justValidate();
 			} else if (e.getSource() == usePrefixButton || e.getSource() == hostFileButton || e.getSource() == hostListButton) {
-//				getDataSource().justValidate();
+				//				getDataSource().justValidate();
 				updateControls();
 			} else {
 				super.doWidgetSelected(e);
