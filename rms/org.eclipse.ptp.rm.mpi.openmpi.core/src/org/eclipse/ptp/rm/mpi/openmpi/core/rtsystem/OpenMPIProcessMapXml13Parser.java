@@ -24,9 +24,9 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -58,7 +58,7 @@ public class OpenMPIProcessMapXml13Parser {
 				try {
 					((IOpenMpiProcessMapXml13ParserListener ) listener).startDocument();
 				} catch (Exception e) {
-					PTPCorePlugin.log(e);
+					OpenMPIPlugin.log(e);
 				}
 			}
 		}
@@ -210,7 +210,7 @@ public class OpenMPIProcessMapXml13Parser {
 				try {
 					((IOpenMpiProcessMapXml13ParserListener ) listener).endDocument();
 				} catch (Exception e) {
-					PTPCorePlugin.log(e);
+					OpenMPIPlugin.log(e);
 				}
 			}
 
@@ -282,14 +282,14 @@ public class OpenMPIProcessMapXml13Parser {
 				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(num_slots));
 			} catch (IllegalValueException e) {
 				// This is not possible
-				PTPCorePlugin.log(e);
+				OpenMPIPlugin.log(e);
 			}
 			if (has_max_slots) {
 				try {
 					node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(max_slots));
 				} catch (IllegalValueException e) {
 					// This is not possible
-					PTPCorePlugin.log(e);
+					OpenMPIPlugin.log(e);
 				}
 			}
 			super.prepare();

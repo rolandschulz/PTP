@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -183,7 +182,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 				useHostList = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTLIST);
 			} catch (CoreException e) {
 				// TODO handle exception?
-				PTPCorePlugin.log(e);
+				OpenMPIUIPlugin.log(e);
 			}
 		}
 
