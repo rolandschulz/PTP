@@ -61,7 +61,9 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvoca
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
+import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Path;
+import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -460,12 +462,12 @@ public class CDTMiner extends Miner {
 					if (TypeHierarchyUtil.isValidInput(binding)) {
 						ICElement member= null;
 						if (!TypeHierarchyUtil.isValidTypeInput(binding)) {
-							member= TypeHierarchyUtil.findDeclaration(project, index, name, binding, converter);
+							member= TypeHierarchyUtil.findDeclaration(project, index, name, binding, converter, new RemoteCProjectFactory());
 							name= null;
 							binding= TypeHierarchyUtil.findTypeBinding(binding);
 						}
 						if (TypeHierarchyUtil.isValidTypeInput(binding)) {
-							ICElement input= TypeHierarchyUtil.findDefinition(project, index, name, binding, converter);
+							ICElement input= TypeHierarchyUtil.findDefinition(project, index, name, binding, converter, new RemoteCProjectFactory());
 							if (input != null) {
 								result = new ICElement[] {input, member};
 							}
@@ -475,6 +477,7 @@ public class CDTMiner extends Miner {
 
 				if (result != null) {
 					System.out.println("Found input."); //$NON-NLS-1$
+					System.out.println("Details: " + result.toString()); //$NON-NLS-1$
 					System.out.flush();
 				}
 				
@@ -508,11 +511,11 @@ public class CDTMiner extends Miner {
 				ICElement member = input;
 				IIndexName name= IndexQueries.remoteElementToName(index, member);
 				if (name != null) {
-					member= IndexQueries.getCElementForName(project, index, name, converter);
+					member= IndexQueries.getCElementForName(project, index, name, converter, new RemoteCProjectFactory());
 					IBinding binding= index.findBinding(name);
 					binding= TypeHierarchyUtil.findTypeBinding(binding);
 					if (TypeHierarchyUtil.isValidTypeInput(binding)) {
-						ICElement definition= TypeHierarchyUtil.findDefinition(project, index, null, binding, converter);
+						ICElement definition= TypeHierarchyUtil.findDefinition(project, index, null, binding, converter, new RemoteCProjectFactory());
 						if (input != null) {
 							result = new ICElement[] {definition, member};
 						}
@@ -549,9 +552,10 @@ public class CDTMiner extends Miner {
 				IProgressMonitor monitor = new NullProgressMonitor();
 				THGraph graph = new THGraph();
 				graph.setLocationConverter(getLocationConverter(hostName));
-				graph.defineInputNode(index, input);
-				graph.addSuperClasses(index, monitor);
-				graph.addSubClasses(index, monitor);
+				final RemoteCProjectFactory projectFactory = new RemoteCProjectFactory();
+				graph.defineInputNode(index, input, projectFactory);
+				graph.addSuperClasses(index, monitor, projectFactory);
+				graph.addSubClasses(index, monitor, projectFactory);
 
 				System.out.println("Found " + graph.getLeaveNodes().size() + " leaf node(s)."); //$NON-NLS-1$ //$NON-NLS-2$
 				System.out.flush();
@@ -767,7 +771,7 @@ public class CDTMiner extends Miner {
 					if (needToFindDefinition(subject)) {
 						IBinding binding= IndexQueries.elementToBinding(index, subject);
 						if (binding != null) {
-							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null, subject.getCProject());
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null, subject.getCProject(), new RemoteCProjectFactory());
 							if (result.length > 0) {
 								definitions = result;
 							}
@@ -776,7 +780,7 @@ public class CDTMiner extends Miner {
 					if (definitions == null) {
 						IIndexName name= IndexQueries.remoteElementToName(index, subject);
 						if (name != null) {
-							ICElement handle= IndexQueries.getCElementForName(tu, index, name);
+							ICElement handle= IndexQueries.getCElementForName(tu, index, name, new RemoteCProjectFactory());
 							definitions = new ICElement[] {handle};
 						}
 					}
@@ -821,20 +825,20 @@ public class CDTMiner extends Miner {
 					IBinding binding= name.resolveBinding();
 					if (isRelevantForCallHierarchy(binding)) {
 						if (name.isDefinition()) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, name, null);
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, new RemoteCProjectFactory());
 							if (elem != null) {
 								definitions = new ICElement[]{elem};
 							}
 						}
 						else {
-							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project);
+							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project, new RemoteCProjectFactory());
 							if (elems.length == 0) {
 								ICElement elem= null;
 								if (name.isDeclaration()) {
-									elem= IndexQueries.getCElementForName(project, index, name, null);
+									elem= IndexQueries.getCElementForName(project, index, name, null, new RemoteCProjectFactory());
 								}
 								else {
-									elem= IndexQueries.findAnyDeclaration(index, project, binding, null);
+									elem= IndexQueries.findAnyDeclaration(index, project, binding, null, new RemoteCProjectFactory());
 								}
 								if (elem != null) {
 									elems= new ICElement[]{elem};
@@ -912,7 +916,7 @@ public class CDTMiner extends Miner {
 						IIndexName rname = names[i];
 						IIndexName caller= rname.getEnclosingDefinition();
 						if (caller != null) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, caller, converter);
+							ICElement elem= IndexQueries.getCElementForName(project, index, caller, converter, new RemoteCProjectFactory());
 							if (elem != null) {
 								IIndexFileLocation indexLocation = createLocation(hostName, rname.getFile().getLocation());
 								IIndexName name = new DummyName(rname, rname.getFileLocation(), indexLocation);
@@ -990,7 +994,7 @@ public class CDTMiner extends Miner {
 						IIndexName name = refs[i];
 						IBinding binding= index.findBinding(name);
 						if (isRelevantForCallHierarchy(binding)) {
-							ICElement[] defs = IndexQueries.findRepresentative(index, binding, converter, subject.getCProject());
+							ICElement[] defs = IndexQueries.findRepresentative(index, binding, converter, subject.getCProject(), new RemoteCProjectFactory());
 							if (defs != null && defs.length > 0) {
 								IIndexFileLocation indexLocation = createLocation(hostName, name.getFile().getLocation());
 								IIndexName reference = new DummyName(name, name.getFileLocation(), indexLocation);

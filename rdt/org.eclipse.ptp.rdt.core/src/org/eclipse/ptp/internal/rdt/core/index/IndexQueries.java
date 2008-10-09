@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.rdt.core.index;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
@@ -63,9 +62,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.rdt.core.miners.RemoteIndexFileLocation;
 import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.CElement;
+import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 
@@ -284,25 +283,25 @@ public class IndexQueries {
 	}
 
 
-	public static ICElement[] findRepresentative(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject) throws CoreException {
-		ICElement[] defs = findAllDefinitions(index, binding, converter, preferProject);
+	public static ICElement[] findRepresentative(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject, ICProjectFactory projectFactory) throws CoreException {
+		ICElement[] defs = findAllDefinitions(index, binding, converter, preferProject, projectFactory);
 		if (defs.length == 0) {
-			ICElement elem = findAnyDeclaration(index, null, binding, converter);
+			ICElement elem = findAnyDeclaration(index, null, binding, converter, projectFactory);
 			if (elem != null) {
 				defs = new ICElement[] { elem };
 			}
 		}
 		return defs;
 	}
-
-	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject) throws CoreException {
+	
+	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject, ICProjectFactory projectFactory) throws CoreException {
 		if (binding != null) {
 			IIndexName[] defs= index.findNames(binding, IIndex.FIND_DEFINITIONS | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
-
+			
 			ArrayList<ICElement> result= new ArrayList<ICElement>();
 			for (int i = 0; i < defs.length; i++) {
 				IIndexName in = defs[i];
-				ICElement definition= getCElementForName(preferProject, index, in, converter);
+				ICElement definition= getCElementForName(preferProject, index, in, converter, projectFactory);
 				if (definition != null) {
 					result.add(definition);
 				}
@@ -312,7 +311,7 @@ public class IndexQueries {
 		}
 		return EMPTY_ELEMENTS;
 	}
-
+	
 	/**
 	 * Creates CElementHandles for definitions or declarations when you expect to find those
 	 * in the index.
@@ -321,12 +320,18 @@ public class IndexQueries {
 	 * @param declName
 	 * @return the ICElementHandle or <code>null</code>.
 	 */
-	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IASTName declName, IIndexLocationConverter converter) 
+	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IASTName declName, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		assert !declName.isReference();
 		IBinding binding= declName.resolveBinding();
 		if (binding != null) {
-			ITranslationUnit tu= getTranslationUnit(preferProject, declName, converter);
+			ICProject cProject = preferProject;
+			
+			if(preferProject == null) {
+				cProject = projectFactory.getProjectForFile(declName.getFileLocation().getFileName());
+			}
+			
+			ITranslationUnit tu= getTranslationUnit(cProject, declName, converter);
 			if (tu != null) {
 //				IFile file= (IFile) tu.getResource();
 //				long timestamp= file != null ? file.getLocalTimeStamp() : 0;
@@ -353,7 +358,7 @@ public class IndexQueries {
 	private static ITranslationUnit getTranslationUnit(ICProject cproject, final IASTFileLocation fileLocation, IIndexLocationConverter converter) {
 		if (fileLocation != null) {
 			IPath path= Path.fromOSString(fileLocation.getFileName());
-			TranslationUnit unit = new TranslationUnit(null, path.lastSegment(), cproject == null ? null : cproject.getElementName());
+			TranslationUnit unit = new TranslationUnit(cproject, path.lastSegment(), cproject == null ? null : cproject.getElementName());
 			if (converter != null) {
 				IIndexFileLocation location = converter.fromInternalFormat(fileLocation.getFileName());
 				unit.setLocationURI(location.getURI());
@@ -363,17 +368,24 @@ public class IndexQueries {
 		return null;
 	}
 
-	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IIndexName declName, IIndexLocationConverter converter) 
+	public static ICElement getCElementForName(ICProject preferProject, IIndex index, IIndexName declName, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		assert !declName.isReference();
-		ITranslationUnit tu= getTranslationUnit(preferProject, declName, converter);
+		
+		ICProject cProject = preferProject;
+		
+		if(preferProject == null) {
+			cProject = projectFactory.getProjectForFile(declName.getFileLocation().getFileName());
+		}
+		
+		ITranslationUnit tu= getTranslationUnit(cProject, declName, converter);
 		if (tu != null) {
-			return getCElementForName(tu, index, declName);
+			return getCElementForName(tu, index, declName, projectFactory);
 		}
 		return null;
 	}
-
-	public static ICElement getCElementForName(ITranslationUnit tu, IIndex index, IIndexName declName) 
+	
+	public static ICElement getCElementForName(ITranslationUnit tu, IIndex index, IIndexName declName, ICProjectFactory projectFactory) 
 			throws CoreException {
 //		IRegion region= new Region(declName.getNodeOffset(), declName.getNodeLength());
 //		long timestamp= declName.getFile().getTimestamp();
@@ -384,12 +396,12 @@ public class IndexQueries {
 		}
 	}
 
-	public static ICElement findAnyDeclaration(IIndex index, ICProject preferProject, IBinding binding, IIndexLocationConverter converter) 
+	public static ICElement findAnyDeclaration(IIndex index, ICProject preferProject, IBinding binding, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		if (binding != null) {
 			IIndexName[] names= index.findNames(binding, IIndex.FIND_DECLARATIONS);
 			for (int i = 0; i < names.length; i++) {
-				ICElement elem= getCElementForName(preferProject, index, names[i], converter);
+				ICElement elem= getCElementForName(preferProject, index, names[i], converter, projectFactory);
 				if (elem != null) {
 					return elem;
 				}
@@ -398,13 +410,13 @@ public class IndexQueries {
 		return null;
 	}
 
-	public static ICElement attemptConvertionToHandle(IIndex index, ICElement input, IIndexLocationConverter converter) throws CoreException {
+	public static ICElement attemptConvertionToHandle(IIndex index, ICElement input, IIndexLocationConverter converter, ICProjectFactory projectFactory) throws CoreException {
 		if (input instanceof CElement) {
 			return input;
 		}
 		IIndexName name= elementToName(index, input);
 		if (name != null) {
-			ICElement handle= getCElementForName(input.getCProject(), index, name, converter);
+			ICElement handle= getCElementForName(input.getCProject(), index, name, converter, projectFactory);
 			if (handle != null) {
 				return handle;
 			}
