@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.internal.rdt.core.model.LocalCProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
 public class LocalNavigationService extends AbstractNavigationService {
@@ -33,7 +34,7 @@ public class LocalNavigationService extends AbstractNavigationService {
 				return null;
 			} 
 			else {
-				return IndexQueries.attemptConvertionToHandle(index, input, null);
+				return IndexQueries.attemptConvertionToHandle(index, input, null, new LocalCProjectFactory());
 			}
 		}
 		finally {

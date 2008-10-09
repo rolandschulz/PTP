@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 /**
  * @author crecoskie
@@ -71,4 +73,40 @@ public class ScopeManager {
 		return scopeNamesToFileSetMap.keySet();
 	}
 
+	/**
+	 * Returns a Set of all scopes that the specified file occurs in.
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public Set<String> getScopesForFile(String filename) {
+		Set<String> resultSet = new TreeSet<String>();
+		
+		// canonicalize the filename
+		IPath path = Path.fromOSString(filename);
+		String canonicalPath = path.toOSString();
+		
+		
+		// HACK
+		// FIXME IPath.fromOSString() won't strip leading double slashes due to support for UNC paths.
+		// We need to strip them.  This means that using UNC paths on a UNIX backend won't work.  Oh well.
+		if(canonicalPath.startsWith("//")) { //$NON-NLS-1$
+			canonicalPath = canonicalPath.substring(1);
+		}
+		
+		
+		// check each scope for the file
+		Set<String> allScopes = getAllScopes();
+		Set<String> scopeFiles = null;
+		
+		for(String scopeName : allScopes) {
+			scopeFiles = getFilesForScope(scopeName);
+			if(scopeFiles.contains(canonicalPath)) {
+				resultSet.add(scopeName);
+			}
+		}
+		
+		return resultSet;
+	}
+	
 }
