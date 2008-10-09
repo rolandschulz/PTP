@@ -26,6 +26,7 @@ import org.eclipse.cdt.core.resources.IConsole;
 import org.eclipse.cdt.internal.core.ConsoleOutputSniffer;
 import org.eclipse.cdt.make.core.IMakeBuilderInfo;
 import org.eclipse.cdt.make.core.MakeBuilder;
+import org.eclipse.cdt.make.core.MakeCorePlugin;
 import org.eclipse.cdt.make.internal.core.MakeMessages;
 import org.eclipse.cdt.make.internal.core.StreamMonitor;
 import org.eclipse.cdt.make.internal.core.scannerconfig.ScannerInfoConsoleParserFactory;
@@ -35,13 +36,20 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
@@ -67,6 +75,42 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
  *
  */
 public class RemoteMakeBuilder extends MakeBuilder {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.make.core.MakeBuilder#clean(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void clean(IProgressMonitor monitor) throws CoreException {
+		final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(getProject(), REMOTE_MAKE_BUILDER_ID);
+		if (shouldBuild(CLEAN_BUILD, info)) {
+			IResourceRuleFactory ruleFactory= ResourcesPlugin.getWorkspace().getRuleFactory();
+			final ISchedulingRule rule = ruleFactory.modifyRule(getProject());
+			Job backgroundJob = new Job("Standard Make Builder"){  //$NON-NLS-1$
+				/* (non-Javadoc)
+				 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+				 */
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+
+							public void run(IProgressMonitor monitor) {
+								invokeMake(CLEAN_BUILD, info, monitor);
+							}
+						}, rule, IWorkspace.AVOID_UPDATE, monitor);
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
+					IStatus returnStatus = Status.OK_STATUS;
+					return returnStatus;
+				}
+				
+				
+			};
+			
+			backgroundJob.setRule(rule);
+			backgroundJob.schedule();
+		}
+	}
 
 	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
 	
