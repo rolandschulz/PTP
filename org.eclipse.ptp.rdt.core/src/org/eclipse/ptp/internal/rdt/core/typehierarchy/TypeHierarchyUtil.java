@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.typehierarchy;
 
 import org.eclipse.cdt.core.dom.ast.DOMException;
@@ -16,6 +26,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 
 public class TypeHierarchyUtil {
 
@@ -58,30 +69,30 @@ public class TypeHierarchyUtil {
 		return false;
 	}
 
-	public static ICElement findDeclaration(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverter converter) 
+	public static ICElement findDeclaration(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		if (name != null && name.isDefinition()) {
-			return IndexQueries.getCElementForName(project, index, name, converter);
+			return IndexQueries.getCElementForName(project, index, name, converter, projectFactory);
 		}
 	
-		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project);
+		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project, projectFactory);
 		if (elems.length > 0) {
 			return elems[0];
 		}
-		return IndexQueries.findAnyDeclaration(index, project, binding, converter);
+		return IndexQueries.findAnyDeclaration(index, project, binding, converter, projectFactory);
 	}
 
-	public static ICElement findDefinition(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverter converter) 
+	public static ICElement findDefinition(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		if (name != null && name.isDefinition()) {
-			return IndexQueries.getCElementForName(project, index, name, converter);
+			return IndexQueries.getCElementForName(project, index, name, converter, projectFactory);
 		}
 	
-		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project);
+		ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project, projectFactory);
 		if (elems.length > 0) {
 			return elems[0];
 		}
-		return IndexQueries.findAnyDeclaration(index, project, binding, converter);
+		return IndexQueries.findAnyDeclaration(index, project, binding, converter, projectFactory);
 	}
 
 }

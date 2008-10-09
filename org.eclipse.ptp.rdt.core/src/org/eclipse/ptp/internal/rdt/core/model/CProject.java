@@ -38,6 +38,7 @@ public class CProject extends Parent implements ICProject {
 
 	public CProject(String name) {
 		super(null, ICElement.C_PROJECT, name);
+		fCProject = this;
 	}
 	
 	public ICElement findElement(IPath path) throws CModelException {
