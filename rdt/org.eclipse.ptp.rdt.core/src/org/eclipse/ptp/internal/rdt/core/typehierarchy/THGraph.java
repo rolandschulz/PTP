@@ -42,6 +42,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 import org.eclipse.ptp.rdt.core.RDTLog;
 
 public class THGraph implements Serializable {
@@ -140,11 +141,11 @@ public class THGraph implements Serializable {
 		return fLeaveNodes;
 	}
 
-	public void defineInputNode(IIndex index, ICElement input) {
+	public void defineInputNode(IIndex index, ICElement input, ICProjectFactory projectFactory) {
 		if (input != null) {
 			try {
 				fFileIsIndexed= true;
-				input= IndexQueries.attemptConvertionToHandle(index, input, fConverter);
+				input= IndexQueries.attemptConvertionToHandle(index, input, fConverter, projectFactory);
 				fInputNode= addNode(input);
 			} catch (CoreException e) {
 				RDTLog.logError(e);
@@ -152,7 +153,7 @@ public class THGraph implements Serializable {
 		}
 	}
 
-	public void addSuperClasses(IIndex index, IProgressMonitor monitor) {
+	public void addSuperClasses(IIndex index, IProgressMonitor monitor, ICProjectFactory projectFactory) {
 		if (fInputNode == null) {
 			return;
 		}
@@ -169,7 +170,7 @@ public class THGraph implements Serializable {
 			try {
 				IIndexBinding binding = IndexQueries.elementToBinding(index, elem);
 				if (binding != null) {
-					addMembers(index, graphNode, binding);
+					addMembers(index, graphNode, binding, projectFactory);
 				}
 				if (binding instanceof ICPPClassType) {
 					ICPPClassType ct= (ICPPClassType) binding;
@@ -181,11 +182,11 @@ public class THGraph implements Serializable {
 						ICPPBase base= bases[i];
 						IName name= base.getBaseClassSpecifierName();
 						IBinding basecl= name != null ? index.findBinding(name) : base.getBaseClass();
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
 						for (int j = 0; j < baseElems.length; j++) {
 							ICElement baseElem = baseElems[j];
 							THGraphNode baseGraphNode= addNode(baseElem);
-							addMembers(index, baseGraphNode, basecl);							
+							addMembers(index, baseGraphNode, basecl, projectFactory);							
 							addEdge(graphNode, baseGraphNode);
 							if (handled.add(baseElem)) {
 								stack.add(baseElem);
@@ -198,11 +199,11 @@ public class THGraph implements Serializable {
 					IType type= ct.getType();
 					if (type instanceof IBinding) {
 						IBinding basecl= (IBinding) type;
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
 						if (baseElems.length > 0) {
 							ICElement baseElem= baseElems[0];
 							THGraphNode baseGraphNode= addNode(baseElem);
-							addMembers(index, baseGraphNode, basecl);							
+							addMembers(index, baseGraphNode, basecl, projectFactory);							
 							addEdge(graphNode, baseGraphNode);
 							if (handled.add(baseElem)) {
 								stack.add(baseElem);
@@ -219,7 +220,7 @@ public class THGraph implements Serializable {
 		}
 	}
 
-	public void addSubClasses(IIndex index, IProgressMonitor monitor) {
+	public void addSubClasses(IIndex index, IProgressMonitor monitor, ICProjectFactory projectFactory) {
 		if (fInputNode == null) {
 			return;
 		}
@@ -247,11 +248,11 @@ public class THGraph implements Serializable {
 							IIndexName subClassDef= indexName.getEnclosingDefinition();
 							if (subClassDef != null) {
 								IBinding subClass= index.findBinding(subClassDef);
-								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter, null);
+								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter, null, projectFactory);
 								if (subClassElems.length > 0) {
 									ICElement subClassElem= subClassElems[0];
 									THGraphNode subGraphNode= addNode(subClassElem);
-									addMembers(index, subGraphNode, subClass);							
+									addMembers(index, subGraphNode, subClass, projectFactory);							
 									addEdge(subGraphNode, graphNode);
 									if (handled.add(subClassElem)) {
 										stack.add(subClassElem);
@@ -266,27 +267,27 @@ public class THGraph implements Serializable {
 			}
 		}
 	}
-	
-	private void addMembers(IIndex index, THGraphNode graphNode, IBinding binding) throws CoreException {
+		
+	private void addMembers(IIndex index, THGraphNode graphNode, IBinding binding, ICProjectFactory projectFactory) throws CoreException {
 		if (graphNode.getMembers(false) == null) {
 			ArrayList<ICElement> memberList= new ArrayList<ICElement>();
 			try {
 				if (binding instanceof ICPPClassType) {
 					ICPPClassType ct= (ICPPClassType) binding;
 					IBinding[] members= ct.getDeclaredFields();
-					addMemberElements(index, members, memberList);
+					addMemberElements(index, members, memberList, projectFactory);
 					members= ct.getDeclaredMethods();
-					addMemberElements(index, members, memberList);
+					addMemberElements(index, members, memberList, projectFactory);
 				}
 				else if (binding instanceof ICompositeType) {
 					ICompositeType ct= (ICompositeType) binding;
 					IBinding[] members= ct.getFields();
-					addMemberElements(index, members, memberList);
+					addMemberElements(index, members, memberList, projectFactory);
 				}
 				else if (binding instanceof IEnumeration) {
 					IEnumeration ct= (IEnumeration) binding;
 					IBinding[] members= ct.getEnumerators();
-					addMemberElements(index, members, memberList);
+					addMemberElements(index, members, memberList, projectFactory);
 				}
 			} catch (DOMException e) {
 				// problem bindings should not be reported to the log.
@@ -300,11 +301,11 @@ public class THGraph implements Serializable {
 		}
 	}
 	
-	private void addMemberElements(IIndex index, IBinding[] members, List<ICElement> memberList) 
+	private void addMemberElements(IIndex index, IBinding[] members, List<ICElement> memberList, ICProjectFactory projectFactory) 
 			throws CoreException {
 		for (int i = 0; i < members.length; i++) {
 			IBinding binding = members[i];
-			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter, null);
+			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter, null, projectFactory);
 			if (elems.length > 0) {
 				memberList.add(elems[0]);
 			}
