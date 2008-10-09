@@ -51,7 +51,7 @@ Export-Package: org.eclipse.ptp.internal.rdt.ui.actions,
  org.eclipse.ptp.rdt.ui.subsystems,
  org.eclipse.ptp.rdt.ui.wizards
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: org.eclipse.ptp.rdt.ui.activator.Activator
+Bundle-Activator: org.eclipse.ptp.rdt.ui.UIPlugin
 Bundle-Vendor: %providerName
 Import-Package: org.eclipse.rse.files.ui.dialogs,
  org.eclipse.rse.internal.subsystems.files.dstore
