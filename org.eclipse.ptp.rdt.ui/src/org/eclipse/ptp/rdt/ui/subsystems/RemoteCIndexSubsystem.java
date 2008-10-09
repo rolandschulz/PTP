@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
+import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.dstore.core.model.DataStoreSchema;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
@@ -768,18 +769,13 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	public Object sendRequest(String requestType, Object[] arguments, IProgressMonitor monitor) {
 		DataStore dataStore = getDataStore();
 	    if (dataStore == null)
-	    {
 	    	return null;
-	    }
 	    
         DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), requestType);
-        
         if (queryCmd == null)
-        {
-	    	return null;
-        }
+	    	return null;        
 
-     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+     	StatusMonitor statusMonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
     	ArrayList<Object> args = new ArrayList<Object>();
 
     	for (Object argument : arguments) {
@@ -806,20 +802,13 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
     	
     	try
         {
-    		IProgressMonitor progressMonitor;
-    		if (monitor == null) {
-    			progressMonitor = new NullProgressMonitor();
-    		} else {
-    			progressMonitor = monitor;
-    		}
-        	smonitor.waitForUpdate(status, progressMonitor);
-        	if (progressMonitor.isCanceled())
-        	{
-        		cancelOperation(progressMonitor, status.getParent());
+    		monitor = monitor == null ? new NullProgressMonitor() : monitor;
+        	statusMonitor.waitForUpdate(status, monitor);
+        	if (monitor.isCanceled()) {
+        		cancelOperation(monitor, status.getParent());
         	}
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
         	e.printStackTrace();
         }
     	
@@ -827,14 +816,16 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
     	if (element == null) {
     		return null;
     	}
+    	
+    	if(DataStoreResources.model_error.equals(element.getType())) { // Error occurred on the server
+    		RDTLog.logError(status.getValue()); // prints the server error stack trace to the log
+    		return null;
+    	}
+    	
     	String data = element.getName();
 		try
 		{
 			Object result = Serializer.deserialize(data);
-			if (result == null)
-			{
-				return null;
-			}
 			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
