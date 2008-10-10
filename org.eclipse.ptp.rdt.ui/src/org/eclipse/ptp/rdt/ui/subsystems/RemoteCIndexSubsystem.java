@@ -54,6 +54,7 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
@@ -625,6 +626,16 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		return Status.OK_STATUS;
 	}
 	
+	
+	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
+		monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.9"), 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] {scope, unit, selectedText, selectionStart, selectionLength}, monitor);
+		if(result == null)
+			return OpenDeclarationResult.failureUnexpectedError();
+		return (OpenDeclarationResult)result;
+	}
+	
+	
 	// call hierarchy
 	
 
@@ -946,5 +957,9 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 			fInitializedProjects.add(project);
 		}
 	}
+
+
+
+	
 	
 }

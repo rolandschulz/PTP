@@ -13,8 +13,10 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{THGraph.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{DummyName.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{SimpleName.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{THGraphNode.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{DummyFile.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{OpenDeclarationResult.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.callhierarchy{CElementSet.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{Serializer.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/miners"/>

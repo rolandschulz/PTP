@@ -41,7 +41,6 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.NullLogService;
 import org.eclipse.cdt.core.parser.ParserLanguage;
-import org.eclipse.cdt.core.parser.ScannerInfo;
 import org.eclipse.cdt.internal.core.indexer.ILanguageMapper;
 import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
@@ -61,10 +60,10 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvoca
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
-import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Path;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
+import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
@@ -113,6 +112,10 @@ public class CDTMiner extends Miner {
 	public static final String C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH = "C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH"; //$NON-NLS-1$
 	public static final String C_TYPE_HIERARCHY_FIND_INPUT1 = "C_TYPE_HIERARCHY_FIND_INPUT1"; //$NON-NLS-1$
 	public static final String C_TYPE_HIERARCHY_FIND_INPUT2 = "C_TYPE_HIERARCHY_FIND_INPUT2"; //$NON-NLS-1$
+	
+	// navigation
+	public static final String C_NAVIGATION_OPEN_DECLARATION = "C_NAVIGATION_OPEN_DECLARATION"; //$NON-NLS-1$
+	public static final String T_NAVIGATION_RESULT = "Type.Navigation.Result"; //$NON-NLS-1$
 	
 	public static String LINE_SEPARATOR;
 	
@@ -438,6 +441,33 @@ public class CDTMiner extends Miner {
 				e.printStackTrace();
 			}
 		}
+		else if (name.equals(C_NAVIGATION_OPEN_DECLARATION)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
+				String selectedText = getString(theCommand, 3);
+				int selectionStart = getInteger(theCommand, 4);
+				int selectionLength = getInteger(theCommand, 5);
+				
+				System.out.println("Open declaration..."); //$NON-NLS-1$
+				System.out.flush();
+				
+				OpenDeclarationResult result = OpenDeclarationHandler.handleOpenDeclaration(scopeName, unit, selectedText, selectionStart, selectionLength);
+				
+				String resultString = Serializer.serialize(result);
+				status.getDataStore().createObject(status, T_NAVIGATION_RESULT, resultString);
+				statusDone(status);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				throw e;
+			}
+			
+		}
 		
 		return status;
 	}
@@ -743,6 +773,9 @@ public class CDTMiner extends Miner {
 		createCommandDescriptor(schemaRoot, "Compute type graph", C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Find input from element", C_TYPE_HIERARCHY_FIND_INPUT1, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Find input from text selection", C_TYPE_HIERARCHY_FIND_INPUT2, false); //$NON-NLS-1$
+		
+		// navigation
+		createCommandDescriptor(schemaRoot, "Open declaration", C_NAVIGATION_OPEN_DECLARATION, false); //$NON-NLS-1$
 		
 		_dataStore.refresh(schemaRoot);
 	}
@@ -1141,15 +1174,14 @@ public class CDTMiner extends Miner {
 
 	}
 	 
-	public IASTTranslationUnit getASTTranslationUnit(String filePath, IIndex index) {
+	public IASTTranslationUnit getASTTranslationUnit(String filePath, IStandaloneScannerInfoProvider scannerInfoProvider, IIndex index) {
 		ILanguageMapper languageMapper = new RemoteLanguageMapper();
 		
 		ILanguage language = languageMapper.getLanguage(filePath);
 		
-		// TODO: handle real scanner info
 		IASTTranslationUnit tu = null;
 		try {
-			tu = language.getASTTranslationUnit(new CodeReader(filePath), new ScannerInfo(),
+			tu = language.getASTTranslationUnit(new CodeReader(filePath), scannerInfoProvider.getScannerInformation(filePath),
 					StandaloneSavedCodeReaderFactory.getInstance(), index, getParserOptions(filePath), new NullLogService());
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block

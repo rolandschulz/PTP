@@ -63,7 +63,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 		providerMemento.putString(HOST_NAME_KEY, fHostName);
 	}
 
-	public ISearchService getSearchService() {
+	public synchronized ISearchService getSearchService() {
 		if(!isConfigured())
 			return null;
 		
@@ -73,7 +73,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 		return fSearchService;
 	}
 
-	public IContentAssistService getContentAssistService() {
+	public synchronized IContentAssistService getContentAssistService() {
 		if(!isConfigured())
 			return null;
 		

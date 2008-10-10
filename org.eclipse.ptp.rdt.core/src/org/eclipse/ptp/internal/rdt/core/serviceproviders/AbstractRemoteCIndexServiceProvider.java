@@ -13,8 +13,9 @@ package org.eclipse.ptp.internal.rdt.core.serviceproviders;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.RemoteCallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
-import org.eclipse.ptp.internal.rdt.core.index.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexLifecycleService;
+import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
+import org.eclipse.ptp.internal.rdt.core.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.RemoteTypeHierarchyService;
 import org.eclipse.ptp.rdt.core.messages.Messages;
@@ -74,11 +75,17 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 		return fIndexLifecycleService;
 	}
 	
-	public INavigationService getNavigationService() {
-		return null;
+	public synchronized INavigationService getNavigationService() {
+		if(!isConfigured())
+			return null;
+		
+		if(fNavigationService== null)
+			fNavigationService = new RemoteNavigationService(fHost, fConnectorService);
+		
+		return fNavigationService;
 	}
 	
-	public ICallHierarchyService getCallHierarchyService() {
+	public synchronized ICallHierarchyService getCallHierarchyService() {
 		if(!isConfigured())
 			return null;
 		
@@ -88,7 +95,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 		return fCallHierarchyService;
 	}
 	
-	public ITypeHierarchyService getTypeHierarchyService() {
+	public synchronized ITypeHierarchyService getTypeHierarchyService() {
 		if(!isConfigured())
 			return null;
 		

@@ -133,15 +133,15 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	}
 
 	public CodeReader getCodeReader() {
-		if (fLocation != null) {
-			String filePath = fLocation.getPath();
-			try {
-				return new CodeReader(filePath);
-			} catch (IOException e) {
-				throw new IllegalArgumentException(e);
-			}
+		if(fLocation == null)
+			return null;
+		
+		String filePath = fLocation.getPath();
+		try {
+			return new CodeReader(filePath);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
