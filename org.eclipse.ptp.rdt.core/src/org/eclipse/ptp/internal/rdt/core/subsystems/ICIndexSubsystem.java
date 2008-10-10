@@ -23,6 +23,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
@@ -213,4 +214,18 @@ public interface ICIndexSubsystem {
 	 * @return
 	 */
 	public ICElement[] findTypeHierarchyInput(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength);
+
+	/**
+	 * Returns a list of names that represent the declarations of the 
+	 * given selection in the ITranslationUnit.
+	 *  
+	 * @param scope
+	 * @param unit the <code>ITranslationUnit</code> that should be searched.
+	 * @param selectedText used as a fallback for searching the index
+	 * @param selectionStart the character offset of the selection.
+	 * @param selectionLength the total characters in the selection.
+	 * @param monitor
+	 * @return
+	 */
+	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor);
 }

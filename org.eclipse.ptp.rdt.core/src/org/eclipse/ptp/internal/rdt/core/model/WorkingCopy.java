@@ -18,11 +18,15 @@ import org.eclipse.cdt.core.parser.CodeReader;
 public class WorkingCopy extends TranslationUnit implements IRemoteWorkingCopy {
 	private static final long serialVersionUID = 1L;
 	
-	String fContents;
+	private String fContents;
 
 	public WorkingCopy(Parent parent, ITranslationUnit unit, String contents) {
 		super(parent, unit);
 		fContents = contents;
+	}
+	
+	public WorkingCopy(Parent parent, ITranslationUnit unit, char[] contents) {
+		this(parent, unit, new String(contents));
 	}
 	
 	public String getText() {
@@ -36,6 +40,14 @@ public class WorkingCopy extends TranslationUnit implements IRemoteWorkingCopy {
 	
 	@Override
 	public CodeReader getCodeReader() {
-		return new CodeReader(getContents());
+		if (fLocation == null)
+			return null;
+		
+		return new CodeReader(fLocation.getPath(), getContents());
+	}
+	
+	@Override
+	public boolean isWorkingCopy() {
+		return true;
 	}
 }
