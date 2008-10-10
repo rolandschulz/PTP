@@ -18,14 +18,13 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.services.core.ServiceConfiguration;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
@@ -41,6 +40,8 @@ import org.eclipse.rse.internal.connectorservice.dstore.Activator;
  */
 public class ConfigureRemoteServices {
 	
+	public static String DEFAULT_CONFIG = Messages.getString("ConfigureRemoteServices.0"); //$NON-NLS-1$
+	
 	/**
 	 * @throws NullPointerException if any of the parameters are null
 	 */
@@ -52,8 +53,7 @@ public class ConfigureRemoteServices {
 				
 		final ServiceModelManager serviceModelManager = ServiceModelManager.getInstance();
 
-		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project);
-		ServiceConfiguration config = new ServiceConfiguration(info.getConfigurationName());
+		ServiceConfiguration config = new ServiceConfiguration(DEFAULT_CONFIG);
 		
 		for(String serviceID : serviceIDToProviderIDMap.keySet()) {
 			IService service = serviceModelManager.getService(serviceID);
