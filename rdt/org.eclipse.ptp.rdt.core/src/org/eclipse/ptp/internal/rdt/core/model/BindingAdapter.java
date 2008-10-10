@@ -63,6 +63,8 @@ public class BindingAdapter {
 	 */
 	public static ICElement adaptBinding(ITranslationUnit unit, IBinding binding, int offset, int length, boolean definition) throws CModelException, DOMException {
 		Parent parent = adapt(unit, binding.getScope());
+		if(parent == null)
+			return null;
 		
 		SourceManipulation element = null;
 		

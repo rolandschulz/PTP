@@ -10,27 +10,56 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.index;
 
+import java.io.Serializable;
+
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.model.ISourceRange;
 
-public class DummyFileLocation implements IASTFileLocation {
-
-	ISourceRange fRange;
+public class DummyFileLocation implements IASTFileLocation, Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	private final int endLine;
+	private final int startLine;
+	private final int length;
+	private final int offset;
+	private final String fileName;
+	
 	
 	public DummyFileLocation(ISourceRange range) {
-		fRange = range;
+		this.length = range.getLength();
+		this.offset = range.getStartPos();
+		this.endLine = range.getEndLine();
+		this.startLine = range.getStartLine();
+		this.fileName = null;
 	}
 	
+	public DummyFileLocation(IASTFileLocation location) {
+		this.length = location.getNodeLength();
+		this.offset = location.getNodeOffset();
+		this.endLine = location.getEndingLineNumber();
+		this.startLine = location.getStartingLineNumber();
+		this.fileName = location.getFileName();
+	}
+	
+	public DummyFileLocation(String fileName, int length, int offset, int startLine, int endLine) {
+		this.length = length;
+		this.offset = offset;
+		this.endLine = endLine;
+		this.startLine = startLine;
+		this.fileName = fileName;
+	}
+
 	public int getEndingLineNumber() {
-		return fRange.getEndLine();
+		return endLine;
 	}
 
 	public String getFileName() {
-		return null;
+		return fileName;
 	}
 
 	public int getStartingLineNumber() {
-		return fRange.getStartLine();
+		return startLine;
 	}
 
 	public IASTFileLocation asFileLocation() {
@@ -38,11 +67,11 @@ public class DummyFileLocation implements IASTFileLocation {
 	}
 
 	public int getNodeLength() {
-		return fRange.getLength();
+		return length;
 	}
 
 	public int getNodeOffset() {
-		return fRange.getStartPos();
+		return offset;
 	}
 
 }

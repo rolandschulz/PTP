@@ -12,7 +12,7 @@ package org.eclipse.ptp.rdt.core.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
-import org.eclipse.ptp.internal.rdt.core.index.INavigationService;
+import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 
