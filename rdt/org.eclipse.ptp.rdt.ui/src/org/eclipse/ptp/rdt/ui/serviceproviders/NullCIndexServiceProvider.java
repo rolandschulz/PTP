@@ -32,7 +32,8 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
-import org.eclipse.ptp.internal.rdt.core.index.INavigationService;
+import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
+import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
@@ -219,7 +220,11 @@ public class NullCIndexServiceProvider extends
 	public INavigationService getNavigationService() {
 		return new INavigationService() {
 
-			public ICElement findElement(Scope scope, ICElement input) throws CoreException, InterruptedException {
+			public OpenDeclarationResult openDeclaration(Scope scope,
+					ITranslationUnit workingCopy, String selectedText,
+					int selectionStart, int selectionLength,
+					IProgressMonitor monitor) {
+				
 				return null;
 			}
 			
