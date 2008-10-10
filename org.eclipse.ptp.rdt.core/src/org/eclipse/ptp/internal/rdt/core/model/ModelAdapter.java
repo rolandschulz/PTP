@@ -38,6 +38,7 @@ import org.eclipse.cdt.core.model.ITypeDef;
 import org.eclipse.cdt.core.model.IUsing;
 import org.eclipse.cdt.core.model.IVariable;
 import org.eclipse.cdt.core.model.IVariableDeclaration;
+import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.core.runtime.IPath;
 
 public class ModelAdapter {
@@ -139,7 +140,11 @@ public class ModelAdapter {
 			result = new VariableDeclaration(parent, (IVariableDeclaration) element);
 			break;
 		case ICElement.C_UNIT:
-			result = new TranslationUnit(parent, (ITranslationUnit) element);
+			ITranslationUnit tu = (ITranslationUnit) element;
+			if(tu.isWorkingCopy())
+				result = new WorkingCopy(parent, tu, ((IWorkingCopy)tu).getContents());
+			else
+				result = new TranslationUnit(parent, tu);
 			break;
 		case ICElement.C_PROJECT:
 			result = new CProject(element.getElementName());
