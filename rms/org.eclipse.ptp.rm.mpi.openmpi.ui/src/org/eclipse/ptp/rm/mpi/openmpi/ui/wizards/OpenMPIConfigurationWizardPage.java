@@ -111,9 +111,8 @@ AbstractToolRMConfigurationWizardPage {
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (versionId == null) {
+			if (versionId == null)
 				throw new ValidationException(Messages.OpenMPIConfigurationWizardPage_Validation_NoVersionSelected);
-			}
 			super.validateLocal();
 		}
 
@@ -183,31 +182,31 @@ AbstractToolRMConfigurationWizardPage {
 
 	public void handleVersionSelected() {
 		getWidgetListener().disable();
-		//		listenerEnabled = false;
 		DataSource dataSource = (DataSource) this.getDataSource();
 		dataSource.justValidate();
 		String launchCmd = null;
 		String debugCmd = null;
 		String discoverCmd = null;
+		String remoteInstallPath = null;
 		if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 			Preferences preferences = OpenMPI12PreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 			Preferences preferences = OpenMPI13PreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else {
 			assert false;
 		}
 		resetErrorMessages();
 		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
+		dataSource.setUseDefaults(true);
 		dataSource.copyToFields();
-		//		listenerEnabled = true;
 		getWidgetListener().enable();
 	}
-
-
 }

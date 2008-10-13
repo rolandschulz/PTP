@@ -113,7 +113,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		private AbstractToolRMConfiguration config = null;
 
-		private boolean useDefaults = false;
+		private boolean useToolDefaults = false;
 		private String launchCmd = null;
 		private String debugCmd = null;
 		private String discoverCmd = null;
@@ -132,8 +132,12 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			this.remoteInstallPath = remoteInstallPath;
 		}
 
+		public void setUseDefaults(boolean useToolDefaults) {
+			this.useToolDefaults = useToolDefaults;
+		}
+
 		public boolean isUseDefaults() {
-			return useDefaults;
+			return useToolDefaults;
 		}
 
 		public String getLaunchCmd() {
@@ -166,7 +170,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			useDefaults = defaultButton.getSelection();
+			useToolDefaults = defaultButton.getSelection();
 
 			if (launchCmdText != null) {
 				launchCmd = extractText(launchCmdText);
@@ -193,16 +197,20 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (! useDefaults) {
-				if (launchCmdText != null && launchCmd == null)
+			if (! useToolDefaults) {
+				if (launchCmdText != null && launchCmd == null) {
 					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingLaunchCommand);
-				if (debugCmdText != null && debugCmd == null)
+				}
+				if (debugCmdText != null && debugCmd == null) {
 					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDebugCommand);
+				}
 				if (discoverCmdText != null) {
-					if (discoverCmd == null)
+					if (discoverCmd == null) {
 						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDiscoverCommand);
-					if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1)
+					}
+					if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
 						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_InvalidPeriodicMonitorCommandTimeRange);
+					}
 				}
 			}
 		}
@@ -230,7 +238,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			if (remoteInstallPathText != null) {
 				config.setRemoteInstallPath(remoteInstallPath);
 			}
-			config.setUseDefaults(useDefaults);
+			config.setUseToolDefaults(useToolDefaults);
 		}
 
 		@Override
@@ -257,8 +265,8 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 				remoteInstallPath = config.getRemoteInstallPath();
 			}
 			// Hack, since "Use default" is not yet implement, always assign true
-			// useDefaults = config.useDefaults();
-			useDefaults = true;
+			useToolDefaults = config.useToolDefaults();
+			// useDefaults = true;
 		}
 
 		@Override
@@ -284,7 +292,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			if (remoteInstallPathText != null) {
 				applyText(remoteInstallPathText, remoteInstallPath);
 			}
-			defaultButton.setSelection(useDefaults);
+			defaultButton.setSelection(useToolDefaults);
 		}
 
 		@Override
@@ -504,7 +512,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 	@Override
 	protected void updateControls() {
 		// Hack, since "Use default" is not yet implement, always leave it disabled.
-		defaultButton.setEnabled(false);
+		//		defaultButton.setEnabled(false);
 
 		boolean enabled = ! defaultButton.getSelection();
 
@@ -526,11 +534,11 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		if (continuousMonitorCmdText != null) {
 			continuousMonitorCmdText.setEnabled(enabled);
 		}
-		if (remoteInstallPathText != null) {
-			remoteInstallPathText.setEnabled(enabled);
-		}
-		if (browseButton != null) {
-			browseButton.setEnabled(enabled);
-		}
+		//		if (remoteInstallPathText != null) {
+		//			remoteInstallPathText.setEnabled(enabled);
+		//		}
+		//		if (browseButton != null) {
+		//			browseButton.setEnabled(enabled);
+		//		}
 	}
 }
