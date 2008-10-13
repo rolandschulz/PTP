@@ -56,7 +56,7 @@ import org.eclipse.ui.WorkbenchException;
  *
  */
 public class ParallelLaunchConfigurationDelegate
-	extends AbstractParallelLaunchConfigurationDelegate {
+extends AbstractParallelLaunchConfigurationDelegate {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
@@ -76,9 +76,8 @@ public class ParallelLaunchConfigurationDelegate
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								if (monitor.isCanceled()) {
+								if (monitor.isCanceled())
 									throw new InterruptedException("The job is cancelled."); //$NON-NLS-1$
-								}
 								monitor.beginTask("Debugger has started, waiting for connection...", 1); //$NON-NLS-1$
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch, project, execPath);
@@ -162,14 +161,15 @@ public class ParallelLaunchConfigurationDelegate
 		}
 		monitor.beginTask("", 250);
 		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { "Launching " + configuration.getName() })); //$NON-NLS-1$ $NON-NLS-2$
-		if (monitor.isCanceled()) {
+		if (monitor.isCanceled())
 			return;
-		}
 		IPDebugger debugger = null;
 		IPJob job = null;
 
 		monitor.worked(10);
 		monitor.subTask("Copying data . . .");
+
+		AttributeManager attrManager = getAttributeManager(configuration, mode);
 
 		// All copy pre-"job submission" occurs here
 		copyExecutable(configuration, monitor);
@@ -177,7 +177,6 @@ public class ParallelLaunchConfigurationDelegate
 
 		//switch perspective
 		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
-		AttributeManager attrManager = getAttributeManager(configuration, mode);
 		try {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
@@ -192,9 +191,8 @@ public class ParallelLaunchConfigurationDelegate
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
 				debugger.initialize(configuration, attrManager, monitor);
-				if (monitor.isCanceled()) {
+				if (monitor.isCanceled())
 					return;
-				}
 				debugger.getLaunchAttributes(configuration, attrManager);
 			}
 
@@ -208,9 +206,8 @@ public class ParallelLaunchConfigurationDelegate
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 			}
-			if (e.getStatus().getCode() != IStatus.CANCEL) {
+			if (e.getStatus().getCode() != IStatus.CANCEL)
 				throw e;
-			}
 		} finally {
 			monitor.done();
 		}
@@ -256,21 +253,21 @@ public class ParallelLaunchConfigurationDelegate
 		}
 		if (display != null && !display.isDisposed()) {
 			display.syncExec(new Runnable() {
-	            public void run() {
+				public void run() {
 					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
 					if (window != null) {
 						IWorkbenchPage page = window.getActivePage();
 						if (page != null) {
-			                if (page.getPerspective().getId().equals(perspectiveID))
-			                    return;
+							if (page.getPerspective().getId().equals(perspectiveID))
+								return;
 
 							try {
-				                window.getWorkbench().showPerspective(perspectiveID, window);
-			                } catch (WorkbenchException e) { }
+								window.getWorkbench().showPerspective(perspectiveID, window);
+							} catch (WorkbenchException e) { }
 						}
 					}
-	            }
-	        });
+				}
+			});
 		}
 	}
 }
