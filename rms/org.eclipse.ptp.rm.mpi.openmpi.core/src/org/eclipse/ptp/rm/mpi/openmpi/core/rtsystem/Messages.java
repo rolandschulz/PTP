@@ -37,6 +37,8 @@ public class Messages extends NLS {
 	public static String OpenMPIDiscoverJob_parsingErrorMessage;
 	public static String OpenMPIDiscoverJob_processErrorMessage;
 	public static String OpenMPIProcessMapText12Parser_Exception_InvalidLine;
+	public static String OpenMPIProcessMapText12Parser_Exception_MissingDisplayMapInformation;
+	public static String OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation;
 	public static String OpenMPIProcessMapXml13Parser_Exception_AttributeNotInteger;
 	public static String OpenMPIProcessMapXml13Parser_Exception_MissingAttribute;
 	public static String OpenMPIProcessMapXml13Parser_Exception_UnknownAttribute;
