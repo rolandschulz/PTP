@@ -12,6 +12,11 @@ package org.eclipse.ptp.rm.core;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * 
+ * @author Daniel Felix Ferber
+ *
+ */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.core.messages"; //$NON-NLS-1$
 	public static String ToolsRMPlugin_Exception_InternalError;

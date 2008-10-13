@@ -11,9 +11,17 @@
 package org.eclipse.ptp.rm.core;
 
 /**
+ * Defines constants used to store preferences for a tool. This preference
+ * manager only defines constants. It does not provide static methods to
+ * read/write/initialize preferences, as used by the PTP plugins. The
+ * read/write/initialize operations need to be implemented as static methods in
+ * classes extending this resource manager, since only the extending class has
+ * knowledge how to read/write/initialize a subset of the preferences that are
+ * applicable to the tool.
+ * 
  * @author Daniel Felix Ferber
  */
-public class AbstractToolsPreferenceManager {
+public abstract class AbstractToolsPreferenceManager {
 	public static final String PREFS_LAUNCH_CMD = "launchCmd"; //$NON-NLS-1$
 	public static final String PREFS_DEBUG_CMD = "debugCmd"; //$NON-NLS-1$
 	public static final String PREFS_DISCOVER_CMD = "discoverCmd"; //$NON-NLS-1$
