@@ -63,9 +63,15 @@ public class OpenMPIProcessMapText12Parser {
 		// Mapped node:
 		// ignore
 		String line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 
 		// Cell: 0 Nodename: dyn531995.br.ibm.com Launch id: -1 Username: NULL
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		Pattern p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		int nodeIndex;
@@ -91,6 +97,9 @@ public class OpenMPIProcessMapText12Parser {
 		// Data type: ORTE_PROCESS_NAME Data Value: NULL
 		line = reader.readLine();
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		p = Pattern.compile("[^:]*:[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
@@ -99,6 +108,9 @@ public class OpenMPIProcessMapText12Parser {
 
 		// Oversubscribed: True Num elements in procs list: 6
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		int numProcesses;
@@ -134,6 +146,9 @@ public class OpenMPIProcessMapText12Parser {
 			line = reader.readLine();
 			line = reader.readLine();
 			line = reader.readLine();
+			if (line == null) {
+				throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+			}
 			p = Pattern.compile("[^:]*:[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 			m = p.matcher(line);
 			if (!m.matches() || m.groupCount() != 1)
@@ -141,6 +156,9 @@ public class OpenMPIProcessMapText12Parser {
 			processName = m.group(1);
 
 			line = reader.readLine();
+			if (line == null) {
+				throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+			}
 			p = Pattern.compile("[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*)[^:]*:\\s*(\\S*).*"); //$NON-NLS-1$
 			m = p.matcher(line);
 			if (!m.matches() || m.groupCount() != 3)
@@ -181,6 +199,9 @@ public class OpenMPIProcessMapText12Parser {
 	private void readLine3(BufferedReader reader) throws IOException {
 		// Num elements in nodes list: 1
 		String line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		Pattern p = Pattern.compile("[^:]*:\\s*(\\d*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
@@ -196,6 +217,9 @@ public class OpenMPIProcessMapText12Parser {
 	private void readAppContext(BufferedReader reader) throws IOException {
 		// Data for app_context: index 0 app: hellio
 		String line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		Pattern p = Pattern.compile("[^:]*:\\s*\\w*\\s*(\\d*)[^:]*:\\s*(\\w*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 
@@ -216,6 +240,9 @@ public class OpenMPIProcessMapText12Parser {
 
 		// Num procs: 4
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		p = Pattern.compile("[^:]*:\\s*(\\d*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
@@ -232,24 +259,36 @@ public class OpenMPIProcessMapText12Parser {
 
 		// Argv[0]: hellio
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		p = Pattern.compile("\\s*Argv\\[\\d*\\]\\s*:\\s*(.*)"); //$NON-NLS-1$
 		m = p.matcher(line);
 		List<String> arguments = new ArrayList<String>();
 		while (m.matches()) {
 			arguments.add(m.group(1));
 			line = reader.readLine();
+			if (line == null) {
+				throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+			}
 			m = p.matcher(line);
 		}
 		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIProgArgsAttributeDefinition().create(arguments.toArray(new String[arguments.size()])));
 
 		// Env[0]: OMPI_MCA_rmaps_base_display_map=1
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		p = Pattern.compile("\\s*Env\\[\\d*\\]\\s*:\\s*(.*)"); //$NON-NLS-1$
 		m = p.matcher(line);
 		List<String> environment = new ArrayList<String>();
 		while (m.matches()) {
 			environment.add(m.group(1));
 			line = reader.readLine();
+			if (line == null) {
+				throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+			}
 			m = p.matcher(line);
 		}
 		application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIEnvAttributeDefinition().create(environment.toArray(new String[environment.size()])));
@@ -269,6 +308,9 @@ public class OpenMPIProcessMapText12Parser {
 		// Num maps: 1
 		// ... lines of maps ... (ignored by now)
 		line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		p = Pattern.compile("[^:]*:\\s*(\\d*).*"); //$NON-NLS-1$
 		m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 1)
@@ -289,6 +331,9 @@ public class OpenMPIProcessMapText12Parser {
 	private void readLine2(BufferedReader reader) throws IOException {
 		// Starting vpid: 0 Vpid range: 6 Num app_contexts: 2
 		String line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
+		}
 		Pattern p = Pattern.compile("[^:]*:\\s*(\\d*)[^:]*:\\s*(\\w*)[^:]*:\\s*(\\w*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 3)
@@ -318,6 +363,9 @@ public class OpenMPIProcessMapText12Parser {
 	private void readLine1(BufferedReader reader) throws IOException {
 		// [dyn531995.br.ibm.com:12281] Map for job: 1 Generated by mapping mode: bynode
 		String line = reader.readLine();
+		if (line == null) {
+			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_MissingDisplayMapInformation);
+		}
 		Pattern p = Pattern.compile("\\[([^:]*):(\\d*)\\][^:]*:\\s*(\\d*)[^:]*:\\s*(\\w*).*"); //$NON-NLS-1$
 		Matcher m = p.matcher(line);
 		if (!m.matches() || m.groupCount() != 4)
