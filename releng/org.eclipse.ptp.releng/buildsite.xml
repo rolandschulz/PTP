@@ -3,6 +3,9 @@
 	<description url="http://download.eclipse.org/tools/ptp/releases/2.1">
 		Parallel Tools Platform update site - Release 2.1
 	</description>
+	<feature url="features/org.eclipse.ptp_@buildVersion@.jar" id="org.eclipse.ptp" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
+	</feature>
 	<feature url="features/org.eclipse.ptp.core_@buildVersion@.jar" id="org.eclipse.ptp.core" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
