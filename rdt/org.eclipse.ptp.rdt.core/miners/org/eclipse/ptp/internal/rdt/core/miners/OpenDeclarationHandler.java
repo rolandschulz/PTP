@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.CElement;
 import org.eclipse.ptp.internal.rdt.core.model.Path;
+import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.navigation.SimpleName;
 
@@ -62,8 +63,7 @@ public class OpenDeclarationHandler {
 		System.out.println("offset: " + selectionStart); //$NON-NLS-1$
 		System.out.println("length: " + selectionLength); //$NON-NLS-1$
 
-	
-		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME);
 
 		System.out.println("Acquiring read lock"); //$NON-NLS-1$
 		System.out.flush();
