@@ -19,6 +19,10 @@
       %license
    </license>
 
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
+   </url>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.ptp.core"/>
