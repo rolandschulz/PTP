@@ -4,7 +4,6 @@
       label="%featureName"
       version="2.1.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp"
       image="eclipse_update_120.jpg">
 
    <description url="http://eclipse.org/ptp">
@@ -18,6 +17,10 @@
    <license url="%licenseURL">
       %license
    </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
+   </url>
 
    <requires>
       <import plugin="org.eclipse.ptp.core" version="2.0.0" match="greaterOrEqual"/>
