@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SDM Debug Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.debug.sdm.core;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Activator: org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin
@@ -38,4 +38,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.remote,
  org.eclipse.core.filesystem;bundle-version="1.2.0"
 Eclipse-LazyStart: true
-Bundle-Vendor: Eclipse.org
+Bundle-Vendor: %pluginProvider
