@@ -37,6 +37,6 @@ public class OpenMPI12PreferenceManager extends AbstractToolsPreferenceManager {
 		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, OpenMPI12Defaults.DEBUG_CMD);
 		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, OpenMPI12Defaults.DISCOVER_CMD);
 		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, OpenMPI12Defaults.PATH);
-		preferences.setDefault(PREFIX + PREFS_USE_DEFAULTS, OpenMPI12Defaults.USE_DEFAULTS);
+		//		preferences.setDefault(PREFIX + PREFS_USE_DEFAULTS, OpenMPI12Defaults.USE_DEFAULTS);
 	}
 }

@@ -19,8 +19,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 
 /**
@@ -130,65 +132,24 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		return job;
 	}
 
-	/**
-	 * Creates a job that periodically monitors the remote machine. The default implementation runs the periodic monitor
-	 * command if defined in the RM capability.
-	 * @return
-	 */
 	@Override
 	protected Job createPeriodicMonitorJob() {
-		//		if (! rmConfiguration.hasPeriodicMonitorCmd()) {
-		//			return null;
-		//		}
-		//		Job job = new CommandJob(NLS.bind("Periodic monitor on {0}", rmConfiguration.getName()),
-		//				rmConfiguration.getPeriodicMonitorCmd(),
-		//				"Interrupted while running periodic monitor command.",
-		//				"Failed to create remote process for periodic monitor command.",
-		//				"Failed to parse output of periodic monitor command.",
-		//				rmConfiguration.getPeriodicMonitorTime()) {
-		//
-		//					@Override
-		//					protected void parse(BufferedReader output) throws CoreException {
-		//						doParsePeriodicMonitorCommand(output);
-		//					}
-		//		};
-		//		job.setPriority(Job.SHORT);
-		//		job.setSystem(true);
-		//		job.setUser(false);
-		//		return job;
 		return null;
 	}
 
-	/**
-	 * Creates a job that keeps monitoring the remote machine. The default implementation runs the continuous monitor
-	 * command if defined in the RM capability.
-	 * @return
-	 */
 	@Override
 	protected Job createContinuousMonitorJob() {
-		//		if (! rmConfiguration.hasContinuousMonitorCmd()) {
-		//			return null;
-		//		}
-		//		Job job = new CommandJob(NLS.bind("Continuous monitor on {0}", rmConfiguration.getName()),
-		//				rmConfiguration.getContinuousMonitorCmd(),
-		//				"Interrupted while running continuous monitor command.",
-		//				"Failed to create remote process for continuous monitor command.",
-		//				"Failed to parse output of continuous monitor command.") {
-		//
-		//					@Override
-		//					protected void parse(BufferedReader output) throws CoreException {
-		//						doParseContinuousMonitorCommand(output);
-		//					}
-		//		};
-		//		job.setPriority(Job.LONG);
-		//		job.setSystem(true);
-		//		job.setUser(false);
-		//		return job;
 		return null;
 	}
 
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
 		return new OpenMPIRuntimeSystemJob(jobID, queueID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
+	}
+
+
+	@Override
+	public AbstractEffectiveTollRMConfiguration retrieveEffectiveToolRmConfiguration() {
+		return new EffectiveOpenMPIResourceManagerConfiguration(getRmConfiguration());
 	}
 }
