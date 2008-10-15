@@ -29,3 +29,4 @@ Export-Package: org.eclipse.ptp.ui,
  org.eclipse.ptp.ui.utils,
  org.eclipse.ptp.ui.views,
  org.eclipse.ptp.ui.wizards
+Bundle-ClassPath: ptpui.jar
