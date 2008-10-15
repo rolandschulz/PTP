@@ -111,6 +111,8 @@
 		<!-- Create symlink to latest build -->
 		<symlink action="delete" link="${copyToDir}/latest" failonerror="false"/>
 		<symlink link="${copyToDir}/latest" resource="${copyToDir}/${buildType}.${buildId}" overwrite="true"/>
+		<symlink action="delete" link="${copyToDir}/ptp-master-${branchVersion}-latest.zip" failonerror="false"/>
+		<symlink link="${copyToDir}/ptp-master-${branchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${masterFile}" overwrite="true"/>
 	</target>
 	
 	<target name="tagone">
