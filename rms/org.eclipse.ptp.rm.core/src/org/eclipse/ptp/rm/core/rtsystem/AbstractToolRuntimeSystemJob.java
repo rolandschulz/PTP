@@ -42,8 +42,9 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
-import org.eclipse.ptp.utils.core.linux.ArgumentParser;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
+import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
 /**
  * Implements a job that controls the parallel application launched with a command line tool.
@@ -107,7 +108,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				System.out.println(array[i]);
 			}
 		}
-		
+
 		try {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
 			doPrepareExecution();
@@ -210,13 +211,13 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				}
 			}
 
-//			try {
-//				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
-//				process.waitFor();
-//			} catch (InterruptedException e) {
-//				changeJobState(JobAttributes.State.ERROR);
-//				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while terminating the command.", e);
-//			}
+			//			try {
+			//				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
+			//				process.waitFor();
+			//			} catch (InterruptedException e) {
+			//				changeJobState(JobAttributes.State.ERROR);
+			//				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while terminating the command.", e);
+			//			}
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle finish", jobID); //$NON-NLS-1$
@@ -403,7 +404,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				JobAttributes.getSubIdAttributeDefinition(),
 				JobAttributes.getUserIdAttributeDefinition(),
 				JobAttributes.getWorkingDirectoryAttributeDefinition()
-			};
+		};
 	}
 
 	final protected AttributeManager retrieveCommandSubstitutionAttributes(
@@ -431,8 +432,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		/*
 		 * Create launch command. If there is no launch command, simply launch the executable.
 		 */
+		AbstractEffectiveTollRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
 		List<String> command = new ArrayList<String>();
-		if (! rtSystem.rmConfiguration.hasLaunchCmd()) {
+		if (! effectiveConfiguration.hasLaunchCmd()) {
 			// Fall back to calling the executable.
 			StringAttribute execPath = getAttrMgr().getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
 			ArrayAttribute<String> arguments = getAttrMgr().getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition());
@@ -440,7 +442,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			command.addAll(arguments.getValue());
 		} else {
 			// Use the tool to launch executable
-			String launchCommand = rtSystem.rmConfiguration.getLaunchCmd();
+			String launchCommand = effectiveConfiguration.getLaunchCmd();
 			Assert.isNotNull(launchCommand);
 			Assert.isTrue(launchCommand.trim().length() > 0);
 			launchCommand = replaceVariables(launchCommand, substitutionAttributeManager);
@@ -454,8 +456,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		/*
 		 * Create debug command. If there is no debug command, simply launch the executable.
 		 */
+		AbstractEffectiveTollRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
 		List<String> command = new ArrayList<String>();
-		if (! rtSystem.rmConfiguration.hasDebugCmd()) {
+		if (! effectiveConfiguration.hasDebugCmd()) {
 			// Fall back to calling the executable.
 			StringAttribute execPath = getAttrMgr().getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
 			ArrayAttribute<String> arguments = getAttrMgr().getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition());
@@ -463,7 +466,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			command.addAll(arguments.getValue());
 		} else {
 			// Use the tool to launch executable
-			String debugCommand = rtSystem.rmConfiguration.getDebugCmd();
+			String debugCommand = effectiveConfiguration.getDebugCmd();
 			Assert.isNotNull(debugCommand);
 			Assert.isTrue(debugCommand.trim().length() > 0);
 			debugCommand = replaceVariables(debugCommand, substitutionAttributeManager);

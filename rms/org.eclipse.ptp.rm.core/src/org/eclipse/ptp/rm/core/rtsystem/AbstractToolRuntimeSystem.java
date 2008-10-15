@@ -48,6 +48,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
@@ -680,4 +681,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	public IRemoteServices getRemoteServices() {
 		return remoteServices;
 	}
+
+	public abstract AbstractEffectiveTollRMConfiguration retrieveEffectiveToolRmConfiguration();
 }

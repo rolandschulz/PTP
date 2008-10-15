@@ -60,7 +60,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	public OpenMPIDiscoverJob(OpenMPIRuntimeSystem rts) {
 		super(rts,
 				NLS.bind(Messages.OpenMPIDiscoverJob_name, rts.getRmConfiguration().getName()),
-				rts.getRmConfiguration().getDiscoverCmd(),
+				rts.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(),
 				Messages.OpenMPIDiscoverJob_interruptedErrorMessage,
 				Messages.OpenMPIDiscoverJob_processErrorMessage,
 				Messages.OpenMPIDiscoverJob_parsingErrorMessage);
@@ -298,7 +298,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				String hostname = getRemoteHostname(connection, remoteServices);
 				hostMap.addDefaultHost(hostname);
 				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Hostfile is empty. Added default host {0} for Open MPI 1.2.", hostname); //$NON-NLS-1$
-			} else if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			} else if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Empty hostfile is not allowed for Open MPI 1.3."); //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileEmpty, hostfile)));
 			} else {

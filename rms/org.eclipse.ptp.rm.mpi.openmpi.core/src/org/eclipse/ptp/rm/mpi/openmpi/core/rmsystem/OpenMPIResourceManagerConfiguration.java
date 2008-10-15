@@ -102,7 +102,7 @@ AbstractToolRMConfiguration implements Cloneable {
 		setDebugCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD));
 		setDiscoverCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD));
 		setRemoteInstallPath(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-		setUseToolDefaults(prefs.getBoolean(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_USE_DEFAULTS));
+		//		setUseToolDefaults(prefs.getBoolean(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_USE_DEFAULTS));
 		setVersionId(VERSION_13);
 	}
 

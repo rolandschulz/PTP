@@ -468,4 +468,5 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected void doPrepareExecution() throws CoreException {
 		// Nothing to do
 	}
+
 }
