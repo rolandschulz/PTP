@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.osgi.framework.Bundle;
 
@@ -51,7 +50,7 @@ public class OpenMPILaunchConfigurationDefaults {
 
 	public static void loadDefaults() throws CoreException {
 		Path defaultsPropertiesPath = new Path(defaultsResourcePath);
-		Bundle bundle = OpenMPIPlugin.getDefault().getBundle();
+		Bundle bundle = OpenMPIUIPlugin.getDefault().getBundle();
 		Properties properties = read(defaultsPropertiesPath, bundle);
 
 		ATTR_NUMPROCS = getInteger(bundle, properties, "NUMPROCS"); //$NON-NLS-1$
