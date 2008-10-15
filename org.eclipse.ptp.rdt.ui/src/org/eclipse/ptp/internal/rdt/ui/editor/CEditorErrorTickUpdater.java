@@ -100,14 +100,20 @@ public class CEditorErrorTickUpdater implements IProblemChangedListener {
 	}	
 			
 	public void updateEditorImage(ICElement celement) {
-		Image titleImage= fCEditor.getTitleImage();
-		if (titleImage == null) {
-			return;
-		}
-		Image newImage= fLabelProvider.getImage(celement);
-		if (titleImage != newImage) {
-			postImageChange(newImage);
-		}
+		
+		// TODO:  FIXME:  right now this is interfering with having a remote editor icon, as the icon from the CElement
+		// will always be that of the file, which is shared in common with CDT.
+		// What we really need is to get the error status and annotate the existing image.
+		
+		
+//		Image titleImage= fCEditor.getTitleImage();
+//		if (titleImage == null) {
+//			return;
+//		}
+//		Image newImage= fLabelProvider.getImage(celement);
+//		if (titleImage != newImage) {
+//			postImageChange(newImage);
+//		}
 	}
 	
 	private void postImageChange(final Image newImage) {
