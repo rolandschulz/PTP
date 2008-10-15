@@ -4,6 +4,7 @@
       label="%featureName"
       version="3.1.0.qualifier"
       provider-name="%providerName"
+      plugin="org.eclipse.ptp.cell.core"
       os="linux"
       arch="ppc,ppc64,x86,x86_64">
 
@@ -156,13 +157,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.cell.managedbuilder.examples.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ptp.cell.managedbuilder.gnu.core"
          download-size="0"
          install-size="0"
@@ -271,6 +265,13 @@
 
    <plugin
          id="org.eclipse.ptp.cell.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.cell"
          download-size="0"
          install-size="0"
          version="0.0.0"
