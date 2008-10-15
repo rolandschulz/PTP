@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Utils Core Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.utils.core
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.utils.core.Activator
@@ -11,4 +11,4 @@ Export-Package: org.eclipse.ptp.utils.core,
  org.eclipse.ptp.utils.core.extensionpoints,
  org.eclipse.ptp.utils.core.file,
  org.eclipse.ptp.utils.core.linux
-Bundle-Vendor: Eclipse.org
+Bundle-Vendor: %pluginProvider
