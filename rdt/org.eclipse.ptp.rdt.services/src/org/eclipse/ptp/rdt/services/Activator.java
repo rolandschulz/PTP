@@ -1,7 +1,10 @@
 package org.eclipse.ptp.rdt.services;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rdt.services.core.ProjectDeletionListener;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -40,12 +43,19 @@ public class Activator extends AbstractUIPlugin {
 		} catch(Exception e) {
 			log(e);
 		}
+		
+		ProjectDeletionListener.startListening();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+		try {
+			ProjectDeletionListener.stopListening();
+		}
+		finally {
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**

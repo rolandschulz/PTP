@@ -97,6 +97,9 @@ public interface IServiceModelManager {
 	public IService getService(String id);
 	
 	/**
+	 * TODO What happens if you try to remove the active configuration?
+	 * TODO What happens if there are no configurations left after removing the given configuration?
+	 * 
 	 * Remove the service configuration from a project.
 	 * If the configuration was not set up on the project then this method
 	 * does nothing.
@@ -108,6 +111,16 @@ public interface IServiceModelManager {
 	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public void removeConfiguration(IProject project, IServiceConfiguration conf);
+	
+	
+	/**
+	 * Removes all the configurations and services associated to the given project.
+	 * If the project has not been configured then this method does nothing.
+	 * 
+	 * @throws NullPointerException if project is null
+	 */
+	public void remove(IProject project);
+	
 	
 	/**
 	 * Set the active configuration for a project. By default, the first configuration created

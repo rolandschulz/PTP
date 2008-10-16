@@ -246,6 +246,15 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 	}
 	
+	
+	public void remove(IProject project) {
+		if(project == null)
+			throw new NullPointerException();
+		configurations.remove(project);
+		activeConfigurations.remove(project);
+		projectServices.remove(project);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
 	 */
@@ -490,4 +499,6 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}
 	}
+
+	
 }
