@@ -1,5 +1,25 @@
 package org.eclipse.ptp.rm.core.rmsystem;
 
+/**
+ * Stores the tool configuration attributes that shall be used, according the
+ * the "useDefault" attribute from the resource manager configuration, and
+ * appends the remoteInstallPath to the command, if applicable.
+ * <p>
+ * The selection of the values for the configuration MUST be implemented by the
+ * constructor. Typically, if "useDefaults" is of, then configuration is copied
+ * from the resource manager configuration. Else, if "useDefaults" is true, then
+ * the constructor usually copies the configuration from default values or from
+ * the preferences. The constructor may use
+ * {@link #applyValues(String, String, String, String, int, String, String)} to
+ * set all configuration attributes.
+ * <p>
+ * All command attributes do automatically add the remoteInstallPath in front to
+ * the command string, if remoteInstallPath is not null and not empty.
+ * <p>
+ * The class provides getters to read the configuration attributes.
+ * 
+ * @author Daniel Felix Ferber
+ */
 public class AbstractEffectiveTollRMConfiguration {
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private String launchCmd;
@@ -13,20 +33,16 @@ public class AbstractEffectiveTollRMConfiguration {
 
 	private AbstractToolRMConfiguration configuration;
 
-	public AbstractEffectiveTollRMConfiguration(AbstractToolRMConfiguration configuration) {
+	public AbstractEffectiveTollRMConfiguration(
+			AbstractToolRMConfiguration configuration) {
 		this.configuration = configuration;
 		this.capabilities = configuration.getCapabilities();
 	}
 
-	protected void applyValues(
-			String launchCmd,
-			String debugCmd,
-			String discoverCmd,
-			String periodicMonitorCmd,
-			int periodicMonitorTime,
-			String continuousMonitorCmd,
-			String remoteInstallPath
-	) {
+	protected void applyValues(String launchCmd, String debugCmd,
+			String discoverCmd, String periodicMonitorCmd,
+			int periodicMonitorTime, String continuousMonitorCmd,
+			String remoteInstallPath) {
 		this.launchCmd = launchCmd;
 		this.debugCmd = debugCmd;
 		this.discoverCmd = discoverCmd;
@@ -36,41 +52,55 @@ public class AbstractEffectiveTollRMConfiguration {
 		this.remoteInstallPath = remoteInstallPath;
 	}
 
+	protected String completeCommand(String command) {
+		if (remoteInstallPath == null) return command;
+		if (remoteInstallPath.length() == 0) return command;
+		// TODO: Remove this hard-coded path calculation!
+		return remoteInstallPath+"/"+command.trim(); //$NON-NLS-1$
+	}
+
 	public String getLaunchCmd() {
-		return launchCmd;
+		return completeCommand(launchCmd);
 	}
+
 	public String getDebugCmd() {
-		return debugCmd;
+		return completeCommand(debugCmd);
 	}
+
 	public String getDiscoverCmd() {
-		return discoverCmd;
+		return completeCommand(discoverCmd);
 	}
+
 	public String getPeriodicMonitorCmd() {
-		return periodicMonitorCmd;
+		return completeCommand(periodicMonitorCmd);
 	}
+
 	public int getPeriodicMonitorTime() {
 		return periodicMonitorTime;
 	}
+
 	public String getContinuousMonitorCmd() {
-		return continuousMonitorCmd;
+		return completeCommand(continuousMonitorCmd);
 	}
+
 	public String getRemoteInstallPath() {
 		return remoteInstallPath;
 	}
 
 	public boolean hasDiscoverCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0 && discoverCmd != null
+		return (capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0
+		&& discoverCmd != null
 		&& !discoverCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasLaunchCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0 && launchCmd != null
-		&& !launchCmd.trim().equals(EMPTY_STRING);
+		return (capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0
+		&& launchCmd != null && !launchCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasDebugCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0 && debugCmd != null
-		&& !debugCmd.trim().equals(EMPTY_STRING);
+		return (capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0
+		&& debugCmd != null && !debugCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasContinuousMonitorCmd() {

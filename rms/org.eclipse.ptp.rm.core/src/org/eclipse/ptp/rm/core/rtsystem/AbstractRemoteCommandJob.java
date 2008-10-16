@@ -159,7 +159,9 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			return new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractRemoteCommandJob_Exception_InternalError, e);
 		} finally {
 			synchronized (this) {
-				jobProcess.destroy();
+				if (jobProcess != null) {
+					jobProcess.destroy();
+				}
 				jobProcess = null;
 			}
 		}
