@@ -23,13 +23,13 @@ AbstractEffectiveTollRMConfiguration {
 				launchCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_LAUNCH_CMD);
 				debugCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DEBUG_CMD);
 				discoverCmd = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_DISCOVER_CMD);
-				remoteInstallPath = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
+				// remoteInstallPath = preferences.getString(OpenMPI12PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 			} else if (openMPIconfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 				Preferences preferences = OpenMPI13PreferenceManager.getPreferences();
 				launchCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD);
 				debugCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD);
 				discoverCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD);
-				remoteInstallPath = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
+				// remoteInstallPath = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 			} else {
 				assert false;
 			}
@@ -37,8 +37,9 @@ AbstractEffectiveTollRMConfiguration {
 			launchCmd = openMPIconfiguration.getLaunchCmd();
 			debugCmd = openMPIconfiguration.getDebugCmd();
 			discoverCmd = openMPIconfiguration.getDiscoverCmd();
-			remoteInstallPath = openMPIconfiguration.getRemoteInstallPath();
+			// remoteInstallPath = openMPIconfiguration.getRemoteInstallPath();
 		}
+		remoteInstallPath = openMPIconfiguration.getRemoteInstallPath();
 		applyValues(launchCmd, debugCmd, discoverCmd, null, 0, null, remoteInstallPath);
 	}
 
