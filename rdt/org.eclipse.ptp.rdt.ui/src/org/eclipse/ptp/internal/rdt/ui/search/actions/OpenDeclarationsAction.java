@@ -237,7 +237,6 @@ public class OpenDeclarationsAction extends SelectionParseAction {
 					try {
 						ISourceRange sourceRange = ((ISourceReference) target).getSourceRange();
 						URI uri = replacePath(target.getLocationURI(), target.getPath().toString());
-						System.out.println(uri);
 						open(uri, target, sourceRange.getIdStartPos(), sourceRange.getIdLength());
 					} catch (CModelException e) {
 						RDTLog.logError(e);
