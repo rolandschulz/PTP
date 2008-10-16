@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rdt.core.remotemake;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +20,10 @@ import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.CMacroEntry;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
-import org.eclipse.cdt.core.settings.model.ICFolderDescription;
 import org.eclipse.cdt.core.settings.model.ICLanguageSetting;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
-import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
 import org.eclipse.cdt.core.settings.model.ICSettingEntry;
-import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector;
 import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector3;
 import org.eclipse.cdt.make.core.scannerconfig.InfoContext;
 import org.eclipse.cdt.make.core.scannerconfig.ScannerInfoTypes;
@@ -45,10 +41,6 @@ public class ProjectDescriptionCollector implements IScannerInfoCollector3 {
 		if(!(resource instanceof IResource))
 			return;
 		
-		System.out.println("contributeToScannerConfig"); //$NON-NLS-1$
-		System.out.println(resource);
-		System.out.println(scannerInfo);
-
 		Map<ScannerInfoTypes, List<String>> info = (Map<ScannerInfoTypes, List<String>>)scannerInfo;
 		
 		// get a writable description

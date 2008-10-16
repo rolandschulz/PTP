@@ -349,5 +349,14 @@
          </selection>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+       <hyperlinkDetector
+            class="org.eclipse.ptp.internal.rdt.ui.editor.CElementHyperlinkDetector"
+            id="org.eclipse.ptp.internal.rdt.ui.editor.CElementHyperlinkDetector"
+            name="%cElementHyperlinkDetector"
+            targetId="org.eclipse.cdt.ui.cCode">
+      </hyperlinkDetector>
+   </extension>
    
 </plugin>
