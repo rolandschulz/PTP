@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
@@ -323,9 +325,15 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			attrMgr.addAttributes(newProcess.getAttributeManager().getAttributes());
 			rtSystem.changeProcess(processID, attrMgr);
 
-			IPProcessControl control = (IPProcessControl) ipJob.getProcessById(processID);
+			IPProcessControl processControl = (IPProcessControl) ipJob.getProcessById(processID);
 			IPNode node = ipMachine.getNodeById(nodeID);
-			control.addNode(node);
+
+			/*
+			 * Although one could call processControl.addNode(node) to assign the process to the node, this does not work.
+			 * It is necessary to call nodeControl.addProcesses(processControl) instead.
+			 */
+			IPNodeControl nodeControl = (IPNodeControl) node;
+			nodeControl.addProcesses(Arrays.asList(new IPProcessControl[] {processControl} ));
 		}
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: finished updating model", jobID); //$NON-NLS-1$
 	}
