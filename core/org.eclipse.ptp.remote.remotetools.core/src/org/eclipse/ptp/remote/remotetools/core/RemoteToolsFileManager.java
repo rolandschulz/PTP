@@ -130,6 +130,9 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			if (user != null && !user.equals("")) {
 				auth = user + "@" + auth;
 			}
+			if (!path.isAbsolute()) {
+				path = getWorkingDirectory().append(path);
+			}
 			return new URI("remotetools", auth, path.toPortableString(), null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
