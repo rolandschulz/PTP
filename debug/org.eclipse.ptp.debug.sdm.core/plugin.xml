@@ -9,13 +9,13 @@
      </extension>
      <extension
            point="org.eclipse.ptp.debug.core.parallelDebuggers">
-        <paralleldebugger
+        <debugger
               class="org.eclipse.ptp.debug.sdm.core.SDMDebugger"
               cpu="*"
               id="org.eclipse.ptp.debug.sdm"
               modes="run"
               name="%SDM.name"
               platform="*">
-        </paralleldebugger>
+        </debugger>
      </extension>
 </plugin>
