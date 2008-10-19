@@ -12,3 +12,4 @@ Export-Package: org.eclipse.ptp.utils.core,
  org.eclipse.ptp.utils.core.file,
  org.eclipse.ptp.utils.core.linux
 Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin

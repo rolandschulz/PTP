@@ -16,3 +16,4 @@ Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.remote.remotetools.core,
  org.eclipse.ptp.remote.remotetools.core.environment,
  org.eclipse.ptp.remote.remotetools.core.environment.conf
+Bundle-Localization: plugin
