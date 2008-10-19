@@ -11,3 +11,4 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.utils.ui.swt
 Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin
