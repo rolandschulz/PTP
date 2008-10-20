@@ -4,6 +4,7 @@ Bundle-Name: PTP RM UI Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.rm.ui
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.ui.ToolsRMUIPlugin
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.rm.remote,

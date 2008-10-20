@@ -1,9 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Open MPI Core Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.mpi.openmpi.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.ptp.core,
@@ -18,3 +19,4 @@ Export-Package: org.eclipse.ptp.rm.mpi.openmpi.core,
  org.eclipse.ptp.rm.mpi.openmpi.core.parameters,
  org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem,
  org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem
+Bundle-Vendor: %pluginProvider
