@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Remote Tools UI Adapter Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remote.remotetools.ui;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remote.remotetools.ui.Activator
-Bundle-Vendor: eclipse.org
+Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.remote.remotetools.core;bundle-version="2.0.1",
@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.remotetools.utils;bundle-version="3.0.0",
  org.eclipse.ptp.remote.core;bundle-version="2.0.1",
  org.eclipse.ptp.remote.ui;bundle-version="2.0.0",
- org.eclipse.ui.ide;bundle-version="3.4.0",
+ org.eclipse.ui.ide,
  org.eclipse.ptp.utils.ui;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

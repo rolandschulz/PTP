@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Remote Resource Manager Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.remote
 Bundle-Version: 2.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.remote.Activator
-Bundle-Vendor: Eclipse.org
+Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
