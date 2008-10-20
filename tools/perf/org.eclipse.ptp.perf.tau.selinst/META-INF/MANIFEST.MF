@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: TAU Selective Instrumentation Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.perf.tau.selinst;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
@@ -15,4 +15,4 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: false
 Export-Package: org.eclipse.ptp.perf.tau.selinst,
  org.eclipse.ptp.perf.tau.selinst.popup.actions
-Bundle-Vendor: University of Oregon
+Bundle-Vendor: %pluginProvider

@@ -4,7 +4,7 @@
       label="%featureName"
       version="2.1.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp">
+      plugin="org.eclipse.ptp.perf.tau">
 
    <description url="http://www.cs.uoregon.edu/research/tau/home.php">
       %description
@@ -17,6 +17,10 @@
    <license url="%licenseURL">
       %license
    </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
+   </url>
 
    <requires>
       <import plugin="org.eclipse.ui"/>

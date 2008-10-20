@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Performance Tools Framework TAU Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.perf.tau;singleton:=true
 Bundle-Version: 1.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.perf.tau.Activator
@@ -17,4 +17,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.perf,
  org.eclipse.cdt.managedbuilder.core
 Eclipse-LazyStart: true
-Bundle-Vendor: University of Oregon
+Bundle-Vendor: %pluginProvider

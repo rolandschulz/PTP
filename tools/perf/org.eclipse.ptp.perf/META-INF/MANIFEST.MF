@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Performance Tools Framework Core Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.perf;singleton:=true
 Bundle-Version: 1.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.perf.Activator
@@ -20,4 +20,4 @@ Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.perf,
  org.eclipse.ptp.perf.internal,
  org.eclipse.ptp.perf.ui
-Bundle-Vendor: University of Oregon
+Bundle-Vendor: %pluginProvider

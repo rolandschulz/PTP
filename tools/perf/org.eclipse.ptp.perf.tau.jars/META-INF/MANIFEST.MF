@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: TAU External Jars Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.perf.tau.jars
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: batik-combined.jar,
@@ -34,4 +34,4 @@ Export-Package: edu.uoregon.tau.common,
  edu.uoregon.tau.perfdmf.database,
  edu.uoregon.tau.perfdmf.loader,
  edu.uoregon.tau.vis
-Bundle-Vendor: University of Oregon
+Bundle-Vendor: %pluginProvider

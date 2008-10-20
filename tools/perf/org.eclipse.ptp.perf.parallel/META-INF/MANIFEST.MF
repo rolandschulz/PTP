@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Performance Tools Framework Parallel Fragment
+Bundle-Name: %fragmentName.parallel
 Bundle-SymbolicName: org.eclipse.ptp.perf.parallel;singleton:=true
 Bundle-Version: 1.0.1.qualifier
 Fragment-Host: org.eclipse.ptp.perf;bundle-version="1.0.0"
@@ -9,4 +9,4 @@ Require-Bundle: org.eclipse.ptp.core,
  org.eclipse.ptp.launch,
  org.eclipse.ptp.debug.core
 Export-Package: org.eclipse.ptp.perf.parallel
-Bundle-Vendor: University of Oregon
+Bundle-Vendor: %pluginProvider
