@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ui.utils;
 
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -94,6 +95,20 @@ public abstract class DataSource {
 	}
 
 	/**
+	 * Facility to get string value of a {@link Combo} widget, or null if the
+	 * widget is empty.
+	 *
+	 * @param text
+	 *            The widget
+	 * @return The string value of widget or null widget is empty.
+	 */
+	protected String extractText(Combo text) {
+		assert text != null;
+		String s = text.getText().trim();
+		return (s.length() == 0 ? null : s);
+	}
+
+	/**
 	 * Facility to set the string value of a {@link Text} widget.
 	 *
 	 * @param t
@@ -102,6 +117,23 @@ public abstract class DataSource {
 	 *            The new string value.
 	 */
 	protected void applyText(Text t, String s) {
+		assert t != null;
+		if (s == null) {
+			t.setText(EMPTY_STRING);
+		} else {
+			t.setText(s);
+		}
+	}
+
+	/**
+	 * Facility to set the string value of a {@link Text} widget.
+	 *
+	 * @param t
+	 *            The {@link Text} widget.
+	 * @param s
+	 *            The new string value.
+	 */
+	protected void applyText(Combo t, String s) {
 		assert t != null;
 		if (s == null) {
 			t.setText(EMPTY_STRING);
