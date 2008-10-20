@@ -56,7 +56,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteServices remoteServices = null;
 	//private IRemoteUIServices remoteUIServices = null;
 	//private IRemoteConnection connection = null;
-	
+
 	private String errMsg = null;
 	protected Text fRMDebuggerPathText = null;
 	protected Text fRMDebuggerAddressText = null;
@@ -76,7 +76,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		} catch(CoreException e) {
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -84,55 +84,55 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout(2, false));
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 		Label label = new Label(comp, SWT.NONE);
 		label.setText(Messages.getString("SDMDebuggerPage.path")); //$NON-NLS-1$
 		GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
-		
+
 		fRMDebuggerPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fRMDebuggerPathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-		    	updateLaunchConfigurationDialog();
+				updateLaunchConfigurationDialog();
 			}
 		});
 		fRMDebuggerBrowseButton = createPushButton(comp, Messages.getString("SDMDebuggerPage.browse"), null); //$NON-NLS-1$
 		fRMDebuggerBrowseButton.addSelectionListener(new SelectionAdapter() {
-		    @Override
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String file = browseFile();
 				if (file != null) {
 					fRMDebuggerPathText.setText(file);
 				}
-		    }
+			}
 		});
-		
+
 		label = new Label(comp, SWT.NONE);
 		label.setText(Messages.getString("SDMDebuggerPage.host")); //$NON-NLS-1$
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
-		
+
 		fRMDebuggerAddressText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		fRMDebuggerAddressText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fRMDebuggerAddressText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-		    	updateLaunchConfigurationDialog();
+				updateLaunchConfigurationDialog();
 			}
 		});
-	
+
 		setControl(parent);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
 		return Messages.getString("SDMDebuggerPage.debuggname"); //$NON-NLS-1$
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
@@ -148,7 +148,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		} catch (CoreException e) {
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
@@ -159,35 +159,35 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
 			errMsg = Messages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
 		} else {
-			if (!vertifyPath(fRMDebuggerPathText.getText()))
+			if (!vertifyPath(fRMDebuggerPathText.getText())) {
 				errMsg = Messages.getString("SDMDebuggerPage.err4"); //$NON-NLS-1$
-			else
+			} else {
 				errMsg = null;
+			}
 		}
 		setErrorMessage(errMsg);
 		return (errMsg == null);
 	}
-	
+
 	private boolean vertifyPath(String path) {
+		System.out.println("vertifyPath: "+path);
 		IRemoteConnection rmConn = getRemoteConnection();
 		if (rmConn != null) {
 			IRemoteFileManager fileManager = getRemoteServices().getFileManager(rmConn);
 			try {
 				IFileStore res = fileManager.getResource(new Path(path), new NullProgressMonitor());
-				if (res.fetchInfo().exists()) {
+				if (res.fetchInfo().exists())
 					return true;
-				}
 			}
 			catch (IOException e) {
 				return false;
 			}
 		}
-		if (new Path(path).toFile().exists()) {
+		if (new Path(path).toFile().exists())
 			return true;
-		}		
 		return false;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
@@ -233,7 +233,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, path);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
 	}
-		
+
 	/**
 	 * Browse for a file. If remoteServices is not null, then the currently
 	 * select resource manager supports remote browsing.
@@ -246,12 +246,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 			if (fileManager != null) {
 				fileManager.setConnection(getRemoteConnection());
-				IPath path = fileManager.browseFile(getShell(), 
-						Messages.getString("SDMDebuggerPage.selectDebuggerExe"), 
-						fRMDebuggerPathText.getText()); //$NON-NLS-1$
-				if (path != null) {
+				IPath path = fileManager.browseFile(getShell(),
+						Messages.getString("SDMDebuggerPage.selectDebuggerExe"),
+						fRMDebuggerPathText.getText());
+				if (path != null)
 					return path.toString();
-				}
 			}
 		} else {
 			FileDialog dialog = new FileDialog(getShell());
@@ -266,14 +265,14 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * Work out the address to supply as argument to the debug server. There are currently
 	 * two cases:
 	 * 
-	 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is 
-	 * running the proxy (since this is where the tunnel begins), but accessible from the machine running 
-	 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a 
-	 * cluster), it will typically NOT be the same address that is used to start the proxy. 
+	 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is
+	 * running the proxy (since this is where the tunnel begins), but accessible from the machine running
+	 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a
+	 * cluster), it will typically NOT be the same address that is used to start the proxy.
 	 * 
-	 * 2. If port forwarding is not enabled, then the address will be the address of the host running 
-	 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly. 
-	 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster. 
+	 * 2. If port forwarding is not enabled, then the address will be the address of the host running
+	 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly.
+	 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster.
 	 * In many environments, compute nodes cannot communicate outside their local network.
 	 * 
 	 * @param configuration
@@ -288,7 +287,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		} catch (CoreException e) {
 			return EMPTY_STRING;
 		}
-		
+
 		IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
 			/*
@@ -299,29 +298,27 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				resourceManager = rm;
 				AbstractRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
 				if (config != null) {
-					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING))
 						return getRemoteConnection().getAddress();
-					} else {
+					else
 						return  config.getLocalAddress();
-					}
-				} else {
+				} else
 					return "localhost"; //$NON-NLS-1$
-				}
 			}
 		}
 		return address;
 	}
-	
+
 	private AbstractRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
 		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
 			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration)
 				return (AbstractRemoteResourceManagerConfiguration)rmConfig;
-		}		
+		}
 		return null;
-		
+
 	}
-	
+
 	/**
 	 * Return remote services
 	 * @return remote services
@@ -329,7 +326,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteServices getRemoteServices() {
 		if (resourceManager == null)
 			return null;
-		
+
 		if (remoteServices == null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
 			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
@@ -341,12 +338,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 	private IRemoteUIServices getRemoteUIServices() {
 		IRemoteServices rsrv = getRemoteServices();
-		if (rsrv != null) {
+		if (rsrv != null)
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
-		}
 		return null;
 	}
-	
+
 	private IRemoteConnection getRemoteConnection() {
 		IRemoteServices rsrv = getRemoteServices();
 		if (rsrv != null) {
@@ -356,15 +352,15 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 		return null;
 	}
-	
-    /**
-     * Get and clean content of a Text field
-     * @param text text obtained from a Text field
-     * @return cleaned up content
-     */
-    protected String getFieldContent(String text) {
-        if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
-            return null;
-        return text;
-    }
+
+	/**
+	 * Get and clean content of a Text field
+	 * @param text text obtained from a Text field
+	 * @return cleaned up content
+	 */
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+			return null;
+		return text;
+	}
 }
