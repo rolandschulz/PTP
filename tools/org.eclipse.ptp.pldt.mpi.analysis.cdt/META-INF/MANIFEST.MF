@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: CDT Analysis - more general analysis features
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.analysis.cdt
 Bundle-Version: 2.1.0.qualifier
 Bundle-Activator: org.eclipse.ptp.pldt.mpi.analysis.cdt.Activator
@@ -12,4 +12,4 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs,
  org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl
-Bundle-Vendor: IBM Research
+Bundle-Vendor: %pluginProvider
