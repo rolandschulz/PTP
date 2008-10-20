@@ -1,10 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: IBM PE Help Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.pe.help;singleton:=true
 Bundle-Version: 2.0.1.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.ibm.pe.help.Activator
-Bundle-Vendor: IBM
+Bundle-Localization: plugin
+Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Eclipse-LazyStart: true
