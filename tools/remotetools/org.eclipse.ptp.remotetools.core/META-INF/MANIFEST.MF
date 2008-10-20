@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Remote Tools Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remotetools.core;singleton:=true
 Bundle-Version: 2.1.8.qualifier
 Bundle-Activator: org.eclipse.ptp.remotetools.RemotetoolsPlugin
-Bundle-Vendor: IBM
+Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  com.jcraft.jsch,

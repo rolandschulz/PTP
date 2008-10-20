@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP RSE UI Adapter Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remote.rse.ui;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remote.rse.ui.Activator
@@ -16,3 +16,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
+Bundle-Vendor: %pluginProvider
