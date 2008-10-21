@@ -57,7 +57,7 @@ public class RemoteCPerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea); //$NON-NLS-1$
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
-		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);
+		//layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);
 		layout.addActionSet(CUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
 		layout.addActionSet(IPageLayout.ID_NAVIGATE_ACTION_SET);
 		
