@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly marked, 
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
  * so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ *
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.proxy;
@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.command.IProxyDebugCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugBreakpointAfterCommand;
@@ -61,10 +62,10 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public static final int STEP_INTO = 0;
 	public static final int STEP_OVER = 1;
 	public static final int STEP_FINISH = 2;
-	
+
 	/**
 	 * Convert a proxy representation of a bitset into a BitList
-	 * 
+	 *
 	 * @param str
 	 * @return proxy bitset converted to BitList
 	 */
@@ -72,11 +73,11 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		String[] parts = str.split(":");
 		int len = Integer.parseInt(parts[0], 16); // Skip trailing NULL
 		return new BitList(len, parts[1]);
-	}	
-	
+	}
+
 	/**
 	 * Convert a BitList to it's proxy representation
-	 * 
+	 *
 	 * @param set
 	 * @return proxy representation of a BitList
 	 */
@@ -89,13 +90,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	 * Wait for the debugger to connect. We will receive a connected event
 	 * when the debug server actually connects, or a timeout event if the server
 	 * fails to connect.
-	 * 
+	 *
 	 * @param monitor
 	 * @return true on successful connection, false otherwise
 	 * @throws IOException
 	 */
 	public boolean waitConnect(IProgressMonitor monitor) throws IOException {
-		System.out.println("debug: waiting for connect");
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "debug: waiting for connect");
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -128,31 +129,31 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 			monitor.done();
 		}
 	}
-	
+
 	public void debugStartSession(String prog, String path, String dir, String[] args) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugStartSessionCommand(prog, path, dir, args);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugSetLineBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, int line, String expression, int ignoreCount, int tid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetLineBreakpointCommand(encodeBitSet(procs), bpid, isTemporary, isHardware, file, line, expression, ignoreCount, tid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugSetFuncBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func, String expression, int ignoreCount, int tid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetFunctionBreakpointCommand(encodeBitSet(procs), bpid, isTemporary, isHardware, file, func, expression, ignoreCount, tid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugSetWatchpoint(BitList procs, int bpid, String expression, boolean isAccess, boolean isRead, String condition, int ignoreCount) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetWatchpointCommand(encodeBitSet(procs), bpid, expression, isAccess, isRead, condition, ignoreCount);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDeleteBreakpointCommand(encodeBitSet(procs), bpid);
 		sendCommand(cmd);
@@ -188,25 +189,25 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugGo(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugGoCommand(encodeBitSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugStep(BitList procs, int count, int type) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugStepCommand(encodeBitSet(procs), count, type);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugTerminate(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugTerminateCommand(encodeBitSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugInterrupt(BitList procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugInterruptCommand(encodeBitSet(procs));
 		sendCommand(cmd);
@@ -259,13 +260,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void setDataReadMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, int rows, int cols, Character asChar) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDataReadMemoryCommand(encodeBitSet(procs), offset, address, format, wordSize, rows, cols, asChar);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void setDataWriteMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, String value) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDataWriteMemoryCommand(encodeBitSet(procs), offset, address, format, wordSize, value);
 		sendCommand(cmd);
@@ -277,13 +278,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugSignalInfo(BitList procs, String arg) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSignalInfoCommand(encodeBitSet(procs), arg);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugCLIHandle(BitList procs, String arg) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugCLICommand(encodeBitSet(procs), arg);
 		sendCommand(cmd);
@@ -295,7 +296,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	
+
 	public void debugVariableDelete(BitList procs, String name) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugVariableDeleteCommand(encodeBitSet(procs), name);
 		sendCommand(cmd);
