@@ -20,6 +20,7 @@ import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -187,7 +188,7 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 		Map<String, String> serviceIDToProviderIDMap = projectToServices.get(project);
 		Map<String, IServiceProvider> providerIDToProviderMap = projectToProviders.get(project);
 		
-		ConfigureRemoteServices.configure(project, serviceIDToProviderIDMap, providerIDToProviderMap);
+		ConfigureRemoteServices.configure(project, serviceIDToProviderIDMap, providerIDToProviderMap, new NullProgressMonitor());
 	}
 
 	/* (non-Javadoc)

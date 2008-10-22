@@ -68,6 +68,8 @@ public interface IIndexLifecycleService {
 	 * @param newElements
 	 * @param changedElements
 	 * @param deletedElements
+	 * @param monitor
+	 * @param task that this operation originates from
 	 */
-	void update(Scope scope, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor);
+	void update(Scope scope, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task);
 }
