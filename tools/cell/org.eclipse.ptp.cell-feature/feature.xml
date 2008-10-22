@@ -4,7 +4,7 @@
       label="%featureName"
       version="2.1.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.cell.core"
+      plugin="org.eclipse.ptp.cell"
       os="linux"
       arch="ppc,ppc64,x86,x86_64">
 
