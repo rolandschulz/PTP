@@ -37,7 +37,7 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		rmFolder.addView(IPTPUIConstants.VIEW_RESOURCEMANAGER);
 
 		IFolderLayout jobsFolder= layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float)0.75, "rmFolder");
-		//jobsFolder.addView(IPTPUIConstants.VIEW_PARALLELJOBS);
+		jobsFolder.addView(IPTPUIConstants.VIEW_PARALLELJOBS);
 		jobsFolder.addView(IPTPUIConstants.VIEW_JOBSLIST);
 
 		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, (float)0.25, "rmFolder");
