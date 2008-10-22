@@ -52,6 +52,8 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerProgress;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
@@ -306,12 +308,15 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	    return Status.OK_STATUS;
 
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#indexDelta(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, java.util.List, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus indexDelta(Scope scope, IStandaloneScannerInfoProvider provider, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor)
-	{
+	public IStatus indexDelta(Scope scope,
+			IStandaloneScannerInfoProvider provider,
+			List<ICElement> newElements, List<ICElement> changedElements,
+			List<ICElement> deletedElements, IProgressMonitor monitor,
+			RemoteIndexerTask task) {
 		DataStore dataStore = getDataStore();
 		   
 	    if (dataStore != null)
@@ -384,73 +389,58 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
                    	DataElement deletedElement = dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_REMOVED, remotePath);
                    	args.add(deletedElement);
                	}
-               	
-        
             	
                 DataElement status = dataStore.command(queryCmd, args, result);   
-//                int num = 0;
-//                try
-//                {
-//                	Display display = Display.getCurrent();
-//
-//                	if (workCount > 0)
-//                	{
-//                		String statValue = status.getName();
-//                		int totalWorked = 0;
-//                		while (!statValue.equals("done") && !monitor.isCanceled()) //$NON-NLS-1$
-//                		{
-//                			  
-//                			while (display != null && display.readAndDispatch());
-//                			             			
-//      
-//                			String numStr = status.getValue();
-//                			if (!numStr.equals("start") && !numStr.equals("working")) //$NON-NLS-1$ //$NON-NLS-2$
-//                			{
-//                				try
-//                				{
-//                					int newnum = Integer.parseInt(numStr);
-//                					if (newnum > num)
-//                					{
-//                						int delta = newnum - num; 
-//                		
-//                						num = newnum;
-//	
-//                			       		monitor.subTask("Indexing " + status.getAttribute(DE.A_SOURCE_LOCATION));   //$NON-NLS-1$
-//                						monitor.worked(delta);
-//                						totalWorked+=delta;
-//                						while (display != null && display.readAndDispatch());
-//                					}    
-//                					else
-//                					{
-//                						Thread.sleep(100); 
-//                					}
-//                				}
-//                				catch (Exception e)
-//                				{
-//                					e.printStackTrace();
-//                				}
-//                			}
-//             
-//                			
-//                			statValue = status.getName();
-//                		}
-                try {
-					smonitor.waitForUpdate(status, monitor);
-					if (monitor.isCanceled()) {
-						cancelOperation(monitor, status.getParent());
+                
+                //poll for progress information until the operation is done or cancelled
+                while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+
+                	RemoteIndexerProgress progress = getIndexerProgress(status);
+                	task.updateProgressInformation(progress);
+                	try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
+                }
+                
+				try {
+					if (monitor.isCanceled()) 
+						cancelOperation(monitor, status.getParent());
 				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
 				monitor.done();
 			}
-
 		}
 	    
-    return Status.OK_STATUS;
-
+	    return Status.OK_STATUS;
 	}
-	
+
+	private RemoteIndexerProgress getIndexerProgress(DataElement status) {
+		int num = status.getNestedSize();
+    	if (num > 0) {    		
+			DataElement element = status.get(num-1);
+    		String data = element.getName();
+    		try
+    		{
+    			Object result = Serializer.deserialize(data);
+    			if (result == null || !(result instanceof RemoteIndexerProgress))
+    			{
+    				return null;
+    			}
+    			RemoteIndexerProgress info = (RemoteIndexerProgress) result;
+    			return info;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		} catch (ClassNotFoundException e) {
+    			e.printStackTrace();
+    		}    		
+    	}
+    	return null;
+	}
+
 	// scope management
 
 	/* (non-Javadoc)
@@ -957,9 +947,4 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 			fInitializedProjects.add(project);
 		}
 	}
-
-
-
-	
-	
 }

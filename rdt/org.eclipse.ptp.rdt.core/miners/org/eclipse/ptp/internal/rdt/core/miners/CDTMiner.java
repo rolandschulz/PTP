@@ -87,6 +87,9 @@ public class CDTMiner extends Miner {
 	public static final String T_INDEX_DELTA_ADDED = "Type.Index.Delta.Added"; //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_REMOVED = "Type.Index.Delta.Removed"; //$NON-NLS-1$
 	public static final String T_INDEX_SCANNER_INFO_PROVIDER = "Type.Index.ScannerInfoProvider"; //$NON-NLS-1$
+	
+	// indexer progress
+	public static final String T_INDEXER_PROGRESS_INFO = "Type.Indexer.ProgressInfo"; //$NON-NLS-1$
 		
 	// scope management
 	public static final String C_SCOPE_REGISTER = "C_SCOPE_REGISTER"; //$NON-NLS-1$
@@ -722,7 +725,7 @@ public class CDTMiner extends Miner {
 				indexer.setTraceStatistics(true);
 				indexer.setShowProblems(true);
 				indexer.setShowActivity(true);
-				indexer.handleDelta(addedFiles, changedFiles, removedFiles, getProgressMonitor());
+				indexer.handleDelta(addedFiles, changedFiles, removedFiles, getProgressMonitor(indexer, status));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -735,6 +738,10 @@ public class CDTMiner extends Miner {
 			statusDone(status);
 		}
 		
+	}
+	
+	private IProgressMonitor getProgressMonitor(StandaloneFastIndexer indexer, DataElement status) {
+		return new RemoteIndexProgressMonitor(indexer, status);
 	}
 
 	private IProgressMonitor getProgressMonitor() {
