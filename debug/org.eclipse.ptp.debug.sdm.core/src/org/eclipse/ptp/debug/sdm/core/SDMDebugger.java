@@ -185,7 +185,7 @@ public class SDMDebugger implements IPDebugger {
 		}
 
 		// remote setting
-		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)"");
+		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, "");
 		//if (dbgExePath == null) {
 			//dbgExePath = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE);
 		//}
@@ -196,7 +196,7 @@ public class SDMDebugger implements IPDebugger {
 
 		String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
 		if (dbgWD != null) {
-			StringAttribute wdAttr = (StringAttribute) attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
+			StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
 			if (wdAttr != null) {
 				wdAttr.setValueAsString(dbgWD);
 			} else {
@@ -351,7 +351,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	private void writeRoutingFile(IPLaunch launch) throws CoreException {
-		System.out.println("Write");
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "debug: Write routing file");
 		IProgressMonitor monitor = new NullProgressMonitor();
 		OutputStream os = null;
 		try {
