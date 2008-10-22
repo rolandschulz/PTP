@@ -170,7 +170,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	private boolean vertifyPath(String path) {
-		System.out.println("vertifyPath: "+path);
 		IRemoteConnection rmConn = getRemoteConnection();
 		if (rmConn != null) {
 			IRemoteFileManager fileManager = getRemoteServices().getFileManager(rmConn);
@@ -237,7 +236,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/**
 	 * Browse for a file. If remoteServices is not null, then the currently
 	 * select resource manager supports remote browsing.
-	 * 
+	 *
 	 * @return path to file selected in browser
 	 */
 	private String browseFile() {
@@ -264,17 +263,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/**
 	 * Work out the address to supply as argument to the debug server. There are currently
 	 * two cases:
-	 * 
+	 *
 	 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is
 	 * running the proxy (since this is where the tunnel begins), but accessible from the machine running
 	 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a
 	 * cluster), it will typically NOT be the same address that is used to start the proxy.
-	 * 
+	 *
 	 * 2. If port forwarding is not enabled, then the address will be the address of the host running
 	 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly.
 	 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster.
 	 * In many environments, compute nodes cannot communicate outside their local network.
-	 * 
+	 *
 	 * @param configuration
 	 * @return
 	 */
