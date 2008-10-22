@@ -36,6 +36,8 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 	protected ITranslationUnit[] fChanged;
 	protected ITranslationUnit[] fRemoved;
 	
+	private RemoteIndexerProgress fRemoteProgress = new RemoteIndexerProgress();
+	
 	public RemoteIndexerTask(RemoteFastIndexer indexer,
 			IIndexServiceProvider indexingServiceProvider, ITranslationUnit[] added, ITranslationUnit[] changed, ITranslationUnit[] removed) {
 		fIndexer = indexer;
@@ -59,9 +61,17 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 	 * @see org.eclipse.cdt.core.dom.IPDOMIndexerTask#getProgressInformation()
 	 */
 	public IndexerProgress getProgressInformation() {
-		IndexerProgress progress = new IndexerProgress();
-		// TODO:  real progress information
-		return progress;
+		
+		synchronized (fRemoteProgress) {
+			return RemoteIndexerProgress.getIndexerProgress(fRemoteProgress);
+		}
+	}
+	
+	public void updateProgressInformation(RemoteIndexerProgress progress){
+		synchronized (fRemoteProgress) {
+			if (progress != null)
+				fRemoteProgress = progress;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -71,8 +81,7 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 		IIndexLifecycleService service = fIndexServiceProvider.getIndexLifeCycleService();
 		IProject project = fIndexer.getProject().getProject();
 		String name = project.getName();
-		service.update(new Scope(name), Arrays.asList((ICElement[])fAdded), Arrays.asList((ICElement[])fChanged), Arrays.asList((ICElement[])fRemoved), monitor);
-
+		service.update(new Scope(name), Arrays.asList((ICElement[])fAdded), Arrays.asList((ICElement[])fChanged), Arrays.asList((ICElement[])fRemoved), monitor, this);
 	}
 
 }
