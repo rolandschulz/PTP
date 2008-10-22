@@ -17,6 +17,8 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
@@ -48,6 +50,8 @@ public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 	public void run(IProgressMonitor monitor) throws InvocationTargetException,
 			InterruptedException {
 		
+		monitor.beginTask("configure model services", 100); //$NON-NLS-1$
+	
 		IProject project = null;
 		
 		// go through the mappings of services and set the service model to match
@@ -66,11 +70,12 @@ public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 			Object obj2 = MBSCustomPageManager.getPageProperty(
 					ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID,
 					ServiceModelWizardPage.ID_TO_PROVIDERS_MAP_PROPERTY);
-			
+			monitor.worked(10);
 			if (obj2 instanceof Map) {
 				Map<String, IServiceProvider> providerIDToProviderMap = (Map<String, IServiceProvider>) obj2;				
-				ConfigureRemoteServices.configure(project, serviceIDToProviderIDMap, providerIDToProviderMap);
+				ConfigureRemoteServices.configure(project, serviceIDToProviderIDMap, providerIDToProviderMap, new SubProgressMonitor(monitor,90));
 			}
 		}
+		monitor.done();
 	}
 }

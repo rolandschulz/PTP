@@ -19,6 +19,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
@@ -46,7 +47,9 @@ public class ConfigureRemoteServices {
 	 * @throws NullPointerException if any of the parameters are null
 	 */
 	public static void configure(IProject project, Map<String, String> serviceIDToProviderIDMap, 
-			Map<String, IServiceProvider> providerIDToProviderMap) {
+			Map<String, IServiceProvider> providerIDToProviderMap, IProgressMonitor monitor) {
+		
+		monitor.beginTask("actual Configure remote services", 100); //$NON-NLS-1$
 		
 		if(project == null)
 			throw new NullPointerException();
@@ -55,11 +58,15 @@ public class ConfigureRemoteServices {
 
 		ServiceConfiguration config = new ServiceConfiguration(DEFAULT_CONFIG);
 		
+		int workUnit = 90/serviceIDToProviderIDMap.size();
+		
 		for(String serviceID : serviceIDToProviderIDMap.keySet()) {
 			IService service = serviceModelManager.getService(serviceID);
 			String serviceProviderID = serviceIDToProviderIDMap.get(serviceID);
 			IServiceProvider provider = providerIDToProviderMap.get(serviceProviderID);
 			config.setServiceProvider(service, provider);
+			
+			monitor.worked(workUnit);
 
 			//have to set it as active
 			serviceModelManager.putConfiguration(project, config);
@@ -77,5 +84,7 @@ public class ConfigureRemoteServices {
 		Properties properties = new Properties();
 		properties.put(IndexerPreferences.KEY_FILES_TO_PARSE_UP_FRONT, ""); //$NON-NLS-1$
 		IndexerPreferences.setProperties(project, IndexerPreferences.SCOPE_PROJECT_PRIVATE, properties);
+		monitor.worked(10);
+		monitor.done();		
 	}
 }

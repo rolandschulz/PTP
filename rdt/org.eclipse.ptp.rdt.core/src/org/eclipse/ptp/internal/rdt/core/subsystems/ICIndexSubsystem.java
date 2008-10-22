@@ -22,6 +22,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
@@ -87,9 +88,12 @@ public interface ICIndexSubsystem {
 	 * @param changedElements
 	 * @param deletedElements
 	 * @param monitor
+	 * @param task that this operation originates from
 	 * @return IStatus indicating success or failure
 	 */
-	public IStatus indexDelta(Scope scope, IStandaloneScannerInfoProvider provider, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor);
+	public IStatus indexDelta(Scope scope, IStandaloneScannerInfoProvider provider,	List<ICElement> newElements, List<ICElement> changedElements, 
+			List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task);
+	
 	
 	// scope management
 	/**

@@ -32,6 +32,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -204,8 +205,9 @@ public class NullCIndexServiceProvider extends
 				
 			}
 
-			public void update(Scope scope, List<ICElement> newElements, List<ICElement> changedElements,
-					List<ICElement> deletedElements, IProgressMonitor monitor) {
+			public void update(Scope scope, List<ICElement> asList,
+					List<ICElement> asList2, List<ICElement> asList3,
+					IProgressMonitor monitor, RemoteIndexerTask task) {
 				// do nothing
 				
 			}

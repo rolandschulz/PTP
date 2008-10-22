@@ -83,14 +83,14 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#update(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, java.util.List, java.util.List)
 	 */
 	public void update(Scope scope, List<ICElement> newElements,
-			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor) {
+			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		
 		List<ICElement> elements = new ArrayList<ICElement>(newElements);
 		elements.addAll(changedElements);
 		
 		IStandaloneScannerInfoProvider provider = RemoteScannerInfoProviderFactory.getProvider(elements);
 		ICIndexSubsystem indexSubsystem = getSubSystem();
-		indexSubsystem.indexDelta(scope, provider, newElements, changedElements, deletedElements, monitor);
+		indexSubsystem.indexDelta(scope, provider, newElements, changedElements, deletedElements, monitor, task);
 	}
 	
 	public void reindex(Scope scope, IProgressMonitor monitor) {

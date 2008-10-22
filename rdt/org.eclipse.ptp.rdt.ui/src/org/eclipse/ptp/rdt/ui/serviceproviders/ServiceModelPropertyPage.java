@@ -12,6 +12,7 @@
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.rdt.ui.wizards.ConfigureRemoteServices;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -56,7 +57,7 @@ public class ServiceModelPropertyPage extends PropertyPage {
 	public boolean performOk() {
 		// called when OK or Apply is pressed
 		IProject project = (IProject) getElement();
-		ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap());
+		ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap(), new NullProgressMonitor());
 		return true;
 	}
 
