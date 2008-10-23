@@ -523,7 +523,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
     private FileSelectorRowWidget mpSaveLLFile;
     private FileSelectorRowWidget mpSaveHostFile;
     private FileSelectorRowWidget mpPriorityLogDir;
-    private FileSelectorRowWidget mpPriorityLogName;
+    private TextRowWidget mpPriorityLogName;
     private FileSelectorRowWidget mpCkptDir;
     private FileSelectorRowWidget mpCkptFile;
     @SuppressWarnings("unused")
@@ -648,9 +648,6 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		    break;
 		case MP_PRIORITY_LOG_DIR_SELECTOR:
 		    getDirectory(mpPriorityLogDir, "File.mpPriorityLogDirTitle", "mpPriorityLogDirPath");
-		    break;
-		case MP_PRIORITY_LOG_NAME_SELECTOR:
-		    getOutputFile(mpPriorityLogName, "File.mpPriorityLogNameTitle", "mpPriorityLogNamePath");
 		    break;
 		case MP_CKPTDIR_SELECTOR:
 		    getDirectory(mpCkptDir, "File.mpCkptDirTitle", "mpCkptDirPath");
@@ -1612,7 +1609,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	mpSaveLLFile = createFileSelector(miscTabPane, rm, MP_SAVE_LLFILE, MP_SAVE_LLFILE_SELECTOR);
 	mpSaveHostFile = createFileSelector(miscTabPane, rm, MP_SAVEHOSTFILE, MP_SAVEHOSTFILE_SELECTOR);
 	mpPriorityLogDir = createFileSelector(miscTabPane, rm, MP_PRIORITY_LOG_DIR, MP_PRIORITY_LOG_DIR_SELECTOR);
-	mpPriorityLogName = createFileSelector(miscTabPane, rm, MP_PRIORITY_LOG_NAME, MP_PRIORITY_LOG_NAME_SELECTOR);
+	mpPriorityLogName = createTextWidget(miscTabPane, rm, MP_PRIORITY_LOG_NAME);
 	mpCkptDir = createFileSelector(miscTabPane, rm, MP_CKPTDIR, MP_CKPTDIR_SELECTOR);
 	mpCkptFile = createFileSelector(miscTabPane, rm, MP_CKPTFILE, MP_CKPTFILE_SELECTOR);
 	mpIONodeFile = createFileSelector(miscTabPane, rm, MP_IONODEFILE, MP_IONODEFILE_SELECTOR);
@@ -2658,7 +2655,6 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	validateOutputPath(mpSaveLLFile, "Invalid.mpSaveLLFile");
 	validateOutputPath(mpSaveHostFile, "Invalid.mpSaveHostFile");
 	validateDirectory(mpPriorityLogDir, "Invalid.mpPriorityLogDir");
-	validateOutputPath(mpPriorityLogName, "Invalid.mpPriorityLogName");
 	validateInputPath(mpIONodeFile, "Invalid.mpIONodeFile");
     }
 
