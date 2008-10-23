@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - Initial Implementation
  *
@@ -14,7 +14,7 @@ package org.eclipse.ptp.launch.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.launch.ui.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.launch.messages.messages"; //$NON-NLS-1$
 
 	public static String CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION;
 	public static String Tab_common_Browse_1;
@@ -51,7 +51,7 @@ public class Messages extends NLS {
 	public static String AbstractDebuggerTab_No_debugger_available;
 	public static String AbstractDebuggerTab_Debugger;
 	public static String AbstractDebuggerTab_ErrorLoadingDebuggerPage;
-	
+
 	public static String DebuggerTab_Stop_at_main_on_startup;
 	public static String DebuggerTab_Debugger_Options;
 	public static String DebuggerTab_Mode_not_supported;
@@ -180,7 +180,7 @@ public class Messages extends NLS {
 	public static String UploadRuleDialog_RemoteDirectoryFrame_LabelDirectory;
 	public static String UploadRuleDialog_RemoteDirectoryFrame_Title;
 	public static String UploadRuleDialog_Title;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
