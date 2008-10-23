@@ -62,7 +62,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected AttributeManager attrMgr;
 	protected AbstractToolRuntimeSystem rtSystem;
 
-	private boolean terminateJobFlag = false;
+	protected boolean terminateJobFlag = false;
 
 	public AbstractToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
 			AttributeManager attrMgr) {
@@ -201,15 +201,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
-			if (process.exitValue() != 0) {
-				changeJobState(JobAttributes.State.ERROR);
-				if (! terminateJobFlag) {
-					return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Exception_LaunchApplication, process.exitValue()));
-				} else {
-					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
-					return Status.CANCEL_STATUS;
-				}
-			}
+
 
 			//			try {
 			//				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$

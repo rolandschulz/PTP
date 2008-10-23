@@ -24,6 +24,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -35,6 +36,7 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
@@ -50,7 +52,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
 
 /**
- * 
+ *
  * @author Daniel Felix Ferber
  *
  */
@@ -158,7 +160,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					while (line != null) {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
-							//							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
 							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
 						}
 						line = stderrBufferedReader.readLine();
@@ -231,7 +233,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					 * If output could not be parsed, the kill the mpi process.
 					 */
 					parserException = e;
-					process.destroy();
+//					process.destroy();
 					DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {0}", e); //$NON-NLS-1$
 				} finally {
 					parserPipedStreamListener.disable();
@@ -278,8 +280,49 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 
 		if (parserException != null) {
-			process.destroy();
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIRuntimeSystemJob_Exception_FailedParse, parserException));
+			/*
+			 * If process completed with error, then it display map parsing failed because of the error message.
+			 * If process did not complete, the destroy it.
+			 */
+//			synchronized (this) {
+//				try {
+//					wait(1000);
+//				} catch (InterruptedException e) {
+//					// Ignore
+//				}
+//			}
+			boolean parseError = true;
+//			if (!process.isCompleted()) {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: destroy process due error while parsing display map", jobID); //$NON-NLS-1$
+//				process.destroy();
+//			} else {
+//				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: process terminated with no valid display map", jobID); //$NON-NLS-1$
+//				if (process.exitValue() != 0) {
+//					parseError = false;
+//				}
+//			}
+			/*
+			 * Wait until both stdout and stderr stop because stream are closed.
+			 * Error messages may be still queued in the stream.
+			 */
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
+			try {
+				stderrObserver.join();
+			} catch (InterruptedException e1) {
+				// Ignore
+			}
+
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
+			try {
+				stdoutObserver.join();
+			} catch (InterruptedException e1) {
+				// Ignore
+			}
+			if (parseError) {
+				throw OpenMPIPlugin.coreErrorException("Failed to parse output of Open MPI command. Check output for errors.", parserException); //$NON-NLS-1$
+			} else {
+				throw OpenMPIPlugin.coreErrorException("Open MPI failed to launch parallel application. Check output for errors."); //$NON-NLS-1$
+			}
 		}
 
 		/*
@@ -378,6 +421,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionFinished() throws CoreException {
+		if (process.exitValue() != 0) {
+			changeJobState(JobAttributes.State.ERROR);
+			if (! terminateJobFlag) {
+				throw OpenMPIPlugin.coreErrorException(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue, process.exitValue()));
+			} else {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
+			}
+		}
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
 	}
 
@@ -415,6 +466,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected void doExecutionCleanUp() {
 		if (process != null) {
 			process.destroy();
+			process = null;
 		}
 		if (stderrObserver != null) {
 			stderrObserver.kill();
