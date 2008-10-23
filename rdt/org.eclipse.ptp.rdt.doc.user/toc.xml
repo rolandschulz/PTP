@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="RDT Table of Contents" topic="html/toc.html">
+<toc label="RDT User Documentation" topic="html/toc.html">
+   <topic href="html/readme.html" label="Important Notes Before You Begin">
+   </topic>
+   <topic href="html/release_notes.html" label="Release Notes">
+   </topic>
    <topic label="Getting Started">
       <anchor id="gettingstarted"/>
    </topic>
@@ -13,8 +17,5 @@
    </topic>
    <topic label="Reference">
       <anchor id="reference"/>
-   </topic>
-   <topic label="Samples">
-      <anchor id="samples"/>
    </topic>
 </toc>
