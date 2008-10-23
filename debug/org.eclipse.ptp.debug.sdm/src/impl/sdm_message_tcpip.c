@@ -139,7 +139,7 @@ sdm_parent_port_bind(int parentbaseport)
 	//.Create a socket and bind to the port
 	sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
-	//printf("[ACCEPT] sockfd: %d\n", sockfd);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] [ACCEPT] sockfd: %d\n", sdm_route_get_id(), sockfd);
 
 	memset(&sockaddr_info, 0, sizeof(struct sockaddr_in));
 	sockaddr_info.sin_family = AF_INET;
@@ -156,7 +156,7 @@ sdm_parent_port_bind(int parentbaseport)
 				return -1;
 			}
 		} else { // Bound successfully
-			//printf("port bound: %d\n", parentport);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] port bound: %d\n", sdm_route_get_id(), parentport);
 			break;
 		}
 		// Increment port number and try again
@@ -180,7 +180,7 @@ sdm_parent_port_bind(int parentbaseport)
 		memset(&peersockaddr_info, 0, sizeof(struct sockaddr_in));
 		peersockfd = accept(sockfd, (struct sockaddr *)&(peersockaddr_info), &peeraddr_len);
 
-		//printf("peersockfd: %d\n", peersockfd);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] peersockfd: %d\n", sdm_route_get_id(), peersockfd);
 
 		if(peersockfd < 0) {
 			perror("Status of accepting data from parent");
@@ -279,7 +279,7 @@ sdm_tcpip_init()
 	if(sdm_route_get_id() != SDM_MASTER) {
 		int parentsockd = -1;
 
-		//printf("This node is a server!\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] This node is a server!\n", sdm_route_get_id());
 
 		for (sdm_routing_table_set(); (entry = sdm_routing_table_next()) != NULL; ) {
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] found entry for node %d\n", sdm_route_get_id(), entry->nodeID);
@@ -290,13 +290,12 @@ sdm_tcpip_init()
 			}
 		}
 
-		//parentsockd = sdm_parent_port_bind(parentport);
-		//printf("parentsockd returns from bind: %d\n", parentsockd);
 		if(parentsockd < 0) {
 			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to port\n", sdm_route_get_id());
 			return -1;
 		}
-		//printf("Parent %d successfully connected\n", parent_sockd_map->id);
+
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Parent %d successfully connected\n", sdm_route_get_id(), parent_sockd_map->id);
 
 		// Update the parent socket descriptor
 		parent_sockd_map->sockd = parentsockd;
@@ -304,7 +303,7 @@ sdm_tcpip_init()
 
 	// If node is leaf, initialization is done
 	if(children_sockd_map == NULL) {
-		//printf("This node is a leaf\n");
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] This node is a leaf\n", sdm_route_get_id());
 		return 0;
 	}
 
@@ -315,17 +314,15 @@ sdm_tcpip_init()
 
 		mapp = children_sockd_map;
 		while(mapp != NULL) {
-			//printf("read id: %d\n", mapp->id);
 			if(mapp->id == entry->nodeID) {
-				//printf("Childrenid found! Start connection!\n");
 				// ID found! Connect to the children and generate a socket descriptor
 				childsockd = sdm_connect_to_child(entry->hostname, entry->port);
 
 				if(childsockd < 0) {
-					DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to connect to child %s:%s\n", sdm_route_get_id(), entry->hostname, entry->port);
+					DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to connect to child %s:%d\n", sdm_route_get_id(), entry->hostname, entry->port);
 					return -1;
 				}
-				//printf("Connection to child %d successful\n", mapp->id);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Connection to child %d successful\n", sdm_route_get_id(), mapp->id);
 
 				// Set the children socket descriptor
 				mapp->sockd = childsockd;
@@ -333,8 +330,6 @@ sdm_tcpip_init()
 			}
 			mapp = mapp->next;
 		}
-
-		//printf("ID: %s, host: %s, port: %d\n", table_entry.nodeID, table_entry.hostname, table_entry.port);
 	}
 
 	return 0;
@@ -370,11 +365,9 @@ sdm_fetch_sockd(int nodeid)
 	sdm_id_sockd_map_p p;
 
 	// Look for nodeid on the children list first
-	//printf("Looking for the socket associated with nodeid: %d\n", nodeid);
 	p = children_sockd_map;
 	while(p != NULL) {
 		if(p->id == nodeid) {
-			//printf("child sockd %d matches\n", p->sockd);
 			return p->sockd;
 		}
 		p = p->next;
@@ -383,7 +376,6 @@ sdm_fetch_sockd(int nodeid)
 	// Then, must be the parent
 	p = parent_sockd_map;
 	if(p->id == nodeid) {
-		//printf("parent sockd %d matches\n", p->sockd);
 		return p->sockd;
 	}
 
@@ -439,13 +431,11 @@ sdm_get_active_sock_desc()
 	// Add all valid sockets to the FD_SET
 	FD_ZERO(&rfdset);
 	if(parent_sockd_map != NULL) {
-//		printf("Inserting parentsockd %d on FD_SET\n", parent_sockd_map->sockd);
 		FD_SET(parent_sockd_map->sockd, &rfdset);
 		fdmax = parent_sockd_map->sockd;
 	}
 	p = children_sockd_map;
 	while(p != NULL) {
-//		printf("Inserting childsockd %d on FD_SET\n", p->sockd);
 		FD_SET(p->sockd, &rfdset);
 
 		if(p->sockd > fdmax) {
@@ -454,11 +444,9 @@ sdm_get_active_sock_desc()
 
 		p = p->next;
 	}
-//	printf("fdmax: %d\n", fdmax);
 
 	if(fdmax < 0) {
 		// No children socket opened
-//		printf("No children socket opened!\n");
 		return -2;
 	}
 
@@ -479,7 +467,6 @@ sdm_get_active_sock_desc()
 	p = children_sockd_map;
 	while(p != NULL) {
 		if(FD_ISSET(p->sockd, &rfdset)) {
-//			printf("childsockd %d active on FD_SET\n", p->sockd);
 			return p->sockd;
 		}
 
@@ -487,7 +474,6 @@ sdm_get_active_sock_desc()
 	}
 	if(parent_sockd_map != NULL) {
 		if(FD_ISSET(parent_sockd_map->sockd, &rfdset)) {
-//			printf("parentsockd %d active on FD_SET\n", parent_sockd_map->sockd);
 			return parent_sockd_map->sockd;
 		}
 	}
@@ -561,7 +547,6 @@ sdm_tcpip_send(int sockd, char *buf, int length)
 	// Write all message to the socket
 	do {
 		wcount = write(sockd, (void *)buf, length);
-//		printf("wrote %d bytes\n", length);
 
 		if (wcount <= 0) {
 			if (wcount < 0) {
