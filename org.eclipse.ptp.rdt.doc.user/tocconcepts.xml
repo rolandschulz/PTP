@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Concepts" link_to="toc.xml#concepts"> 
-	<topic label="Main Topic"  href="html/concepts/maintopic.html"> 
-		<topic label="Sub Topic" href="html/concepts/subtopic.html" /> 
-	</topic>
-	<topic label="Main Topic 2">
-		<topic label="Sub Topic 2" href="html/concepts/subtopic2.html" /> 
-	</topic> 
+<toc label="Concepts" link_to="toc.xml#concepts">
+   <topic href="html/concepts/overview.html" label="Overview">
+   </topic>
+   <topic href="html/concepts/services.html" label="Services">
+      <topic href="html/concepts/build_service.html" label="Build Service">
+      </topic>
+      <topic href="html/concepts/c_indexing_service.html" label="C/C++ Indexing Service">
+      </topic>
+   </topic>
+   <topic href="html/concepts/providers.html" label="Providers">
+      <topic href="html/concepts/build_service_providers.html" label="Build Service Providers">
+      </topic>
+      <topic href="html/concepts/c_indexing_service_providers.html" label="C/C++ Indexing Service Providers">
+      </topic>
+   </topic>
+   <topic href="html/concepts/service_model.html" label="Service Model">
+   </topic> 
 </toc>
