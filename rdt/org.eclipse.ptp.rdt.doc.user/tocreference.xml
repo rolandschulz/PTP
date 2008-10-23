@@ -2,10 +2,22 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Reference" link_to="toc.xml#reference"> 
-	<topic label="Main Topic"  href="html/reference/maintopic.html"> 
-		<topic label="Sub Topic" href="html/reference/subtopic.html" /> 
+	<topic label="Remote C/C++ New Project Wizard"  href="html/reference/remote_c_new_project_wizard.html"> 
 	</topic>
-	<topic label="Main Topic 2">
-		<topic label="Sub Topic 2" href="html/reference/subtopic2.html" /> 
-	</topic> 
+ <topic href="html/reference/remote_c_views_and_editors.html" label="Remote C/C++ Views and Editors">
+    <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor">
+    </topic>
+    <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy">
+    </topic>
+    <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy">
+    </topic>
+ </topic>
+ <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search">
+ </topic>
+ <topic href="html/reference/import_export_project_settings.html" label="Import/Export Project Settings Wizards">
+ </topic>
+ <topic href="html/reference/remote_paths_and_symbols.html" label="Remote Paths and Symbols Property Page">
+ </topic>
+ <topic href="html/reference/remote_services.html" label="Remote Services Property Page">
+ </topic>
 </toc>
