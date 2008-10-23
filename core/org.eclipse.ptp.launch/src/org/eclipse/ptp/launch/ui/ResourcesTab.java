@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -33,7 +34,7 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
@@ -88,13 +89,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public boolean canSave() {
 		setErrorMessage(null);
 		if (resourceManager == null) {
-			setErrorMessage(LaunchMessages.getResourceString("ResourcesTab.No_Resource_Manager")); //$NON-NLS-1$
+			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return false;
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 		final Composite launchComp = getLaunchAttrsScrollComposite();
 		if (rmDynamicTab == null || launchComp == null) {
-			setErrorMessage(LaunchMessages.getFormattedResourceString("ResourcesTab.No_Launch_Control", resourceManager.getName())); //$NON-NLS-1$
+			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] {resourceManager.getName()}));
 			return false;
 		}
 		RMLaunchValidation validation = rmDynamicTab.canSave(launchComp, resourceManager, null);
@@ -121,7 +122,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
 		IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
-		new Label(comp, SWT.NONE).setText(LaunchMessages.getResourceString("ApplicationTab.RM_Selection_Label")); //$NON-NLS-1$
+		new Label(comp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 			
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -148,7 +149,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		// The composite that holds the RM's attributes for the launch configuration
 		Group attrGroup = new Group(comp, SWT.NONE);
-		attrGroup.setText(LaunchMessages.getResourceString("ResourcesTab.Launch_Attributes")); //$NON-NLS-1$
+		attrGroup.setText(Messages.ResourcesTab_Launch_Attributes);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.horizontalSpan = numColumns;
 		attrGroup.setLayoutData(gd);
@@ -172,7 +173,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return LaunchMessages.getResourceString("ResourcesTab.Resources"); //$NON-NLS-1$
+		return Messages.ResourcesTab_Resources;
 	}
 
 	/* (non-Javadoc)
@@ -183,8 +184,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		
         resourceManager = getResourceManager(configuration);
 		if (resourceManager == null) {
-			setErrorMessage(LaunchMessages
-					.getResourceString("ApplicationTab.No_Resource_Manager_Available")); //$NON-NLS-1$
+			setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
 			return;
 		}
 
@@ -193,8 +193,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 		final Composite launchComp = getLaunchAttrsScrollComposite();
 		if (rmDynamicTab == null || launchComp == null) {
-			setErrorMessage(LaunchMessages.getFormattedResourceString(
-					"ResourcesTab.No_Launch_Configuration", resourceManager.getName())); //$NON-NLS-1$
+			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] {resourceManager.getName()}));
 			return;
 		}
 		
@@ -210,15 +209,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		setErrorMessage(null);
 		setMessage(null);
 		if (resourceManager == null) {
-			setErrorMessage(LaunchMessages.getResourceString(
-					"ResourcesTab.No_Resource_Manager")); //$NON-NLS-1$
+			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return false;
 		}
 
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 		if (rmDynamicTab == null) {
-			setErrorMessage(LaunchMessages.getFormattedResourceString(
-					"ResourcesTab.No_Launch_Configuration", resourceManager.getName())); //$NON-NLS-1$
+			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] {resourceManager.getName()}));
 			return false;
 		}
 		RMLaunchValidation validation = rmDynamicTab.isValid(configuration, resourceManager, null);
@@ -240,8 +237,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 						resourceManager.getUniqueName());
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 			if (rmDynamicTab == null) {
-				setErrorMessage(LaunchMessages.getFormattedResourceString(
-						"ResourcesTab.No_Launch_Configuration", resourceManager.getName())); //$NON-NLS-1$
+				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] {resourceManager.getName()}));
 				return;
 			}
 			RMLaunchValidation validation = rmDynamicTab.performApply(configuration, resourceManager, null);
@@ -259,8 +255,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         IResourceManager rm = getResourceManagerDefault();
 		if (rm == null) {
-			setErrorMessage(LaunchMessages.getResourceString(
-					"ResourcesTab.No_Resource_Manager")); //$NON-NLS-1$
+			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return;
 		}
         String rmName = rm.getUniqueName();
@@ -270,8 +265,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 		if (rmDynamicTab == null) {
-			setErrorMessage(LaunchMessages.getFormattedResourceString(
-					"ResourcesTab.No_Launch_Configuration", rm.getName())); //$NON-NLS-1$
+			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] {resourceManager.getName()}));
 		} else {
 			rmDynamicTab.setDefaults(configuration, rm, null);
 		}

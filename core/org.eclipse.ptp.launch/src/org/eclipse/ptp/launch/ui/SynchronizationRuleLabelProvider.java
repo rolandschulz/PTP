@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.internal.LinuxPath;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.swt.graphics.Image;

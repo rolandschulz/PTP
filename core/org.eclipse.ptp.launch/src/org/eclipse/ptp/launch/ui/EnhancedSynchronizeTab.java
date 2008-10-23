@@ -35,6 +35,7 @@ import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
 import org.eclipse.ptp.launch.data.RuleFactory;
 import org.eclipse.ptp.launch.data.UploadRule;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.Frame;
 import org.eclipse.ptp.utils.ui.swt.FrameMold;
 import org.eclipse.swt.SWT;

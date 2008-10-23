@@ -19,7 +19,6 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.io.File;
-import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -38,13 +37,14 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -126,27 +126,27 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		mainComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label projLabel = new Label(mainComp, SWT.NONE);
-		projLabel.setText(LaunchMessages.getResourceString("ApplicationTab.&Project_Label")); //$NON-NLS-1$
+		projLabel.setText(Messages.ApplicationTab_Project_Label);
 		projLabel.setLayoutData(spanGridData(-1, 2));
 
 		projText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		projText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		projText.addModifyListener(listener);
 
-		projButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.&Browse_1"), null); //$NON-NLS-1$
+		projButton = createPushButton(mainComp, Messages.Tab_common_Browse_1, null);
 		projButton.addSelectionListener(listener);
 
 		createVerticalSpacer(comp, 1);
 
 		Label appLabel = new Label(mainComp, SWT.NONE);
-		appLabel.setText(LaunchMessages.getResourceString("ApplicationTab.&Application_Label")); //$NON-NLS-1$
+		appLabel.setText(Messages.ApplicationTab_Application_Label);
 		appLabel.setLayoutData(spanGridData(-1, 2));
 
 		appText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		appText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		appText.addModifyListener(listener);
 
-		appButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null); //$NON-NLS-1$
+		appButton = createPushButton(mainComp, Messages.Tab_common_Browse_2, null);
 		appButton.addSelectionListener(listener);
 
 		createVerticalSpacer(mainComp, 2);
@@ -168,7 +168,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 
 		createVerticalSpacer(mainComp, 2);
 
-		consoleButton = createCheckButton(mainComp, LaunchMessages.getResourceString("ApplicationTab.Console")); //$NON-NLS-1$
+		consoleButton = createCheckButton(mainComp, Messages.ApplicationTab_Console);
 		consoleButton.setSelection(false);
 		consoleButton.addSelectionListener(listener);
 	}
@@ -185,7 +185,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return LaunchMessages.getResourceString("ApplicationTab.Main"); //$NON-NLS-1$
+		return Messages.ApplicationTab_Main; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -202,7 +202,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			localAppButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false));
 			consoleButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false));
 		} catch (CoreException e) {
-			setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage())); //$NON-NLS-1$
+			setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION); //$NON-NLS-1$
 		}
 		handleLocalApplicationButtonSelected(); // Refreshes the local path textbox enable state.
 	}
@@ -222,22 +222,22 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			if (status.isOK()) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 				if (!project.exists()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("ApplicationTab.Project_not_exist"), new Object[] {name})); //$NON-NLS-1$
+					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_not_exist, new Object[] {name}));
 					return false;
 				}
 				if (!project.isOpen()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("ApplicationTab.Project_is_closed"), new Object[] {name})); //$NON-NLS-1$
+					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_is_closed, new Object[] {name}));
 					return false;
 				}
 			} else {
-				setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("ApplicationTab.Illegal_project"), new Object[]{status.getMessage()})); //$NON-NLS-1$
+				setErrorMessage(NLS.bind(Messages.ApplicationTab_Illegal_project, new Object[]{status.getMessage()}));
 				return false;
 			}
 		}
 
 		name = getFieldContent(appText.getText());
 		if (name == null) {
-			setErrorMessage(LaunchMessages.getResourceString("ApplicationTab.Application_program_not_specified")); //$NON-NLS-1$
+			setErrorMessage(Messages.ApplicationTab_Application_program_not_specified);
 			return false;
 		}
 
@@ -321,16 +321,16 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	protected IResource chooseFile() {
 		final IProject project = getProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("ApplicationTab.Project_required"),
-					LaunchMessages.getResourceString("ApplicationTab.Enter_project_before_browsing_for_program")); //$NON-NLS-1$
+			MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
+					Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 			return null;
 		}
 
 		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 		BaseWorkbenchContentProvider contentProvider = new BaseWorkbenchContentProvider();
 		ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), labelProvider, contentProvider);
-		dialog.setTitle(LaunchMessages.getResourceString("ApplicationTab.Program_selection"));
-		dialog.setMessage(LaunchMessages.getFormattedResourceString("ApplicationTab.Choose_program_to_run_from_NAME", project.getName()));
+		dialog.setTitle(Messages.ApplicationTab_Program_selection);
+		dialog.setMessage(Messages.ApplicationTab_Choose_program_to_run_from_NAME);
 		dialog.setBlockOnOpen(true);
 		dialog.setAllowMultiple(false);
 		dialog.setInput(project);
@@ -338,19 +338,19 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			public IStatus validate(Object[] selection) {
 				if (selection.length == 0 || ! (selection[0] instanceof IFile)) {
 					return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO,
-							LaunchMessages.getResourceString("ApplicationTab.Selection_must_be_file"), null); //$NON-NLS-1$
+							Messages.ApplicationTab_Selection_must_be_file, null);
 				}
 				try {
 					IResource resource = project.findMember( ((IFile)selection[0]).getProjectRelativePath());
 					if (resource == null || resource.getType() != IResource.FILE) {
 						return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO,
-								LaunchMessages.getResourceString("ApplicationTab.Selection_must_be_file"), null); //$NON-NLS-1$
+								Messages.ApplicationTab_Selection_must_be_file, null);
 					}
 
 					return new Status(IStatus.OK, PTPCorePlugin.getUniqueIdentifier(), IStatus.OK, resource.getName(), null);
 				} catch (Exception ex) {
 					return new Status(IStatus.ERROR, PTPCorePlugin.PLUGIN_ID, IStatus.INFO,
-							LaunchMessages.getResourceString("ApplicationTab.Selection_must_be_file"), null); //$NON-NLS-1$
+							Messages.ApplicationTab_Selection_must_be_file, null);
 				}
 			}
 		});
@@ -370,8 +370,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 
 		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
-		dialog.setTitle(LaunchMessages.getResourceString("ApplicationTab.Project_Selection_Title")); //$NON-NLS-1$
-		dialog.setMessage(LaunchMessages.getResourceString("ApplicationTab.Project_Selection_Message")); //$NON-NLS-1$
+		dialog.setTitle(Messages.ApplicationTab_Project_Selection_Title);
+		dialog.setMessage(Messages.ApplicationTab_Project_Selection_Message);
 		dialog.setElements(projects);
 
 		IProject project = getProject();
@@ -455,8 +455,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
 			if (project == null) {
-				MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("ApplicationTab.Project_required"),
-						LaunchMessages.getResourceString("ApplicationTab.Enter_project_before_browsing_for_program")); //$NON-NLS-1$
+				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
+						Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
 			initPath = getProject().getLocationURI().getPath();
@@ -514,8 +514,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
 			if (project == null) {
-				MessageDialog.openInformation(getShell(), LaunchMessages.getResourceString("ApplicationTab.Project_required"),
-						LaunchMessages.getResourceString("ApplicationTab.Enter_project_before_browsing_for_program")); //$NON-NLS-1$
+				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
+						Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
 			initPath = getProject().getLocationURI().getPath();

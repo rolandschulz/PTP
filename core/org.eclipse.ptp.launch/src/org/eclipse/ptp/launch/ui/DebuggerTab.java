@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -19,11 +18,12 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -86,7 +86,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 		IPDebugConfiguration debugConfig = getDebugConfig();
 		String mode = fAttachMode ? IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH : IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
 		if (!debugConfig.supportsMode(mode)) {
-			setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("DebuggerTab.Mode_not_supported"), new Object[]{mode}));
+			setErrorMessage(NLS.bind(Messages.DebuggerTab_Mode_not_supported, new Object[]{mode}));
 			return false;
 		}
 		if (super.isValid(config) == false) {
@@ -137,7 +137,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			GridLayout layout = new GridLayout(2, false);
 			optionsComp.setLayout(layout);
 			optionsComp.setLayoutData(new GridData(GridData.BEGINNING, GridData.CENTER, true, false, 2, 1));
-			fStopInMain = createCheckButton(optionsComp, LaunchMessages.getResourceString("DebuggerTab.Stop_at_main_on_startup"));
+			fStopInMain = createCheckButton(optionsComp, Messages.DebuggerTab_Stop_at_main_on_startup);
 			GridData data = new GridData();
 			data.horizontalAlignment = GridData.BEGINNING;
 			fStopInMain.setLayoutData(data);
@@ -218,7 +218,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	protected boolean validateDebuggerConfig(ILaunchConfiguration config) {
 		IPDebugConfiguration debugConfig = getDebugConfig();
 		if (debugConfig == null) {
-			setErrorMessage(LaunchMessages.getResourceString("DebuggerTab.No_debugger_available"));
+			setErrorMessage(Messages.DebuggerTab_No_debugger_available);
 			return false;
 		}
 		return true;

@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.ComboGroup;
 import org.eclipse.ptp.utils.ui.swt.ComboMold;
 import org.eclipse.ptp.utils.ui.swt.Frame;
