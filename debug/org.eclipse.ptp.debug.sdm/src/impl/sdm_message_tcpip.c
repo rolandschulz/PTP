@@ -59,7 +59,9 @@ typedef struct id_sockd_map {
 static void (*sdm_recv_callback)(sdm_message msg) = NULL;
 static void	(*deliver_callback)(const sdm_message msg) = NULL;
 
-#define MAX_PORT_INCREMENT 1000 /* Max port increment before failing */
+#define MAX_PORT_INCREMENT	1000	/* Max port increment before failing */
+#define CHILD_CONNECT_TRIES	5		/* Number of times to try each port */
+#define CHILD_CONNECT_SLEEP	1		/* Seconds to sleep between each connection attempt */
 
 sdm_id_sockd_map_p children_sockd_map, parent_sockd_map; /* Leaf case, children = NULL
 									 						Root case, parent = NULL */
@@ -205,6 +207,9 @@ sdm_parent_port_bind(int parentbaseport)
 /**
  * Connect to the child node using hostname. Port is the first that connects between
  * childbaseport and childbaseport + MAX_PORT_INCREMENT
+ *
+ * Try CHILD_CONNECT_TRIES to connect to each port, delaying CHILD_CONNECT_SLEEP between each attempt.
+ *
  * This function also checks if the protocol is the sdm one.
  */
 int
@@ -213,13 +218,13 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 	struct addrinfo hints, *result;
 	int sockfd;
 	int childport;
+	int num_tries;
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = PF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 
-	for(childport = childbaseport;childport < childbaseport + MAX_PORT_INCREMENT;
-	 childport++) {
+	for(childport = childbaseport;childport < childbaseport + MAX_PORT_INCREMENT; childport++) {
 		char port_str[10];
 
 		// Get first result from the linked list
@@ -238,8 +243,12 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 					sdm_route_get_id(), hostname, port_str);
 			return -1;
 		}
-		//printf("connecting to hostname %s port %d\n", hostname, childport);
-		if(connect(sockfd, result->ai_addr, result->ai_addrlen) < 0) {
+
+		for (num_tries = 0; num_tries < CHILD_CONNECT_TRIES; num_tries++) {
+			if (connect(sockfd, result->ai_addr, result->ai_addrlen) >= 0) {
+				break;
+			}
+
 			if( (errno != ECONNREFUSED) && (errno != ENETUNREACH) &&
 				(errno != ETIMEDOUT) ) {
 				perror("connect");
@@ -248,13 +257,18 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 						sdm_route_get_id(), hostname, port_str);
 				return -1;
 			}
-		} else {
+
+			sleep(CHILD_CONNECT_SLEEP);
+		}
+
+		if (num_tries < CHILD_CONNECT_TRIES){
 			freeaddrinfo(result);
 
 			// Check if it is connected to another sdm process before returning sockfd
-			if(is_server_peer_valid(sockfd)) {
+			if (is_server_peer_valid(sockfd)) {
 				return sockfd;
 			}
+
 			close(sockfd);
 		}
 	}
