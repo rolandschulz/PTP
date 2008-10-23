@@ -4983,25 +4983,26 @@ send_stdout(jobinfo * job, char *buf)
     char *outp;
     int task;
 
-    cp = strchr(buf, ':');
-    if (cp != NULL) {
-	if (job->split_io) {
+    if (job->split_io) {
+        cp = strchr(buf, ':');
+        if (cp != NULL) {
 	    *cp = '\0';
 	    task = atoi(buf);
 	    *cp = ':';
-	}
-	else {
+	    if (job->label_io) {
+	        outp = buf;
+	    }
+	    else {
+	        outp = cp + 1;
+	    }
+        }
+        else {
 	    task = 0;
-	}
-	if (job->label_io) {
 	    outp = buf;
-	}
-	else {
-	    outp = cp + 1;
-	}
+        }
     }
     else {
-	task = 0;
+        task = 0;
 	outp = buf;
     }
     send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, outp);
