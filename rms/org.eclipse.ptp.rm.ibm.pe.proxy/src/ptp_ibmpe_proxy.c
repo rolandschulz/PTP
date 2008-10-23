@@ -130,6 +130,11 @@ typedef struct {
     pid_t poe_pid;		/* Process id for main poe process      */
     pid_t task0_pid;		/* Process id for app. task 0           */
     int debugging;		/* Job is being debugged 		*/
+    char *sdm_debugdir;         /* Directory path for SDM debugger      */
+    char *sdm_debugname;        /* Pathname to the top level debugger   */
+    char **sdm_debugargs;       /* Array of debugger args               */
+    char **sdm_envp;            /* Environment variables for SDM        */
+    int sdm_debug_arg_count;    /* Number of debugger args              */
     int stdin_fd;		/* STDIN pipe/file descriptor           */
     int stdout_fd;		/* STDOUT pipe/file descriptor          */
     int stderr_fd;		/* STDERR pipe/file descriptor          */
@@ -1302,48 +1307,6 @@ run(int trans_id, int nargs, char *args[])
 	    char queue_id_str[12];
 	    char jobid_str[12];
 
-	    if (debug_mode) {
-		  /*
-		   * If this is a debug session then we need to start the top level SDM process
-		   * at this point. The child SDM processes have already been created by the
-		   * fork/exec of the poe process (which in the debug case is 'poe sdm ...') above.
-		   */
-		pid_t sdm_pid;
-		char *debugger;
-		int len;
-		char **argv;
-
-		sdm_pid = fork();
-		if (sdm_pid == 0) {
-		    TRACE_DETAIL("+++ Ready to invoke top level SDM\n");
-		    argv = create_debug_parmlist(debugname, debug_arg_count, debug_args, argp);
-		    len = strlen(debugdir) + strlen(debugname) + 2;
-		    debugger = (char *) malloc(len);
-		    malloc_check(debugger, __FUNCTION__, __LINE__);
-		    strcpy(debugger, debugdir);
-		    strcat(debugger, "/");
-		    strcat(debugger, debugname);
-sleep(5);
-		    status = execve(debugger, argv, envp);
-		    print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
-		    post_submitjob_error(trans_id, jobid, "Exec failed");
-		    TRACE_EXIT;
-		    exit(1);
-		}
-		else {
-		    if (sdm_pid == -1) {
-			post_submitjob_error(trans_id, jobid, "Fork for top level SDMfailed");
-			return PROXY_RES_OK;
-		    }
-		    else {
-			/*
-			 * This is the parent leg of the fork for invoking the top level SDM.
-			 * No explicit processing required here. All we care about is
-			 * eventually catching the SDM exit status so we don't create a zonbie.
-			 */
-		    }
-	        }
-	    }
 	    if (!job->stdout_redirect) {
 		close(stdout_pipe[1]);
 	    }
@@ -1360,6 +1323,14 @@ sleep(5);
 	    job->submit_time = time(NULL);
 	    job->proxy_jobid = generate_id();
 	    job->debugging = debug_mode;
+            if (debug_mode) {
+                job->debugging = debug_mode;
+                job->sdm_envp = envp;
+                job->sdm_debugdir = debugdir;
+                job->sdm_debugname = debugname;
+                job->sdm_debugargs = debug_args;
+                job->sdm_debug_arg_count = debug_arg_count;
+            }
 	    TRACE_DETAIL_V("+++ Created poe process pid %d for jobid %d\n", job->poe_pid,
 			   job->proxy_jobid);
 	    /*
@@ -1782,6 +1753,46 @@ startup_monitor(void *job_ident)
      */
     if (!job->stdout_redirect && !job->discovered_job) {
 	RegisterFileHandler(job->stdout_fd, READ_FILE_HANDLER, stdout_handler, job);
+    }
+    if (job->debugging) {
+	  /*
+	   * If this is a debug session then we need to start the top level SDM process
+	   * at this point. The child SDM processes have already been created by the
+	   * fork/exec of the poe process (which in the debug case is 'poe sdm ...') above.
+	   */
+	pid_t sdm_pid;
+	char *debugger;
+	int len;
+	char **argv;
+
+	sdm_pid = fork();
+	if (sdm_pid == 0) {
+	    TRACE_DETAIL("+++ Ready to invoke top level SDM\n");
+	    argv = create_debug_parmlist(job->sdm_debugname, job->sdm_debug_arg_count, job->sdm_debugargs, argv);
+	    len = strlen(job->sdm_debugdir) + strlen(job->sdm_debugname) + 2;
+	    debugger = (char *) malloc(len);
+	    malloc_check(debugger, __FUNCTION__, __LINE__);
+	    strcpy(debugger, job->sdm_debugdir);
+	    strcat(debugger, "/");
+	    strcat(debugger, job->sdm_debugname);
+sleep(5);
+	    status = execve(debugger, argv, job->sdm_envp);
+	    print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
+	    TRACE_EXIT;
+	    exit(1);
+	}
+	else {
+	    if (sdm_pid == -1) {
+		return PROXY_RES_OK;
+	    }
+	    else {
+		/*
+		 * This is the parent leg of the fork for invoking the top level SDM.
+		 * No explicit processing required here. All we care about is
+		 * eventually catching the SDM exit status so we don't create a zonbie.
+		 */
+	    }
+        }
     }
     /*
      * The startup thread exits at this point, so clear the reference in
@@ -3069,12 +3080,13 @@ create_debug_parmlist(char *debugname, int debug_args_count, char **debug_args,
     int n;
     int i;
 
-    argv = (char **) malloc((debug_args_count + 3) * sizeof(char *));
+    argv = (char **) malloc((debug_args_count + 4) * sizeof(char *));
     malloc_check(argv, __FUNCTION__, __LINE__);
     n = 0;
     argv[n++] = debugname;
     if (trace_sdm) {
 	argv[n++] = "--debug";
+        argv[n++] = "--master";
     }
     for (i = 0; i < debug_args_count; i++) {
 	argv[n++] = debug_args[i];
