@@ -20,6 +20,7 @@ static char * MPIRankVars[] = {
 };
 
 #define BUFFER_SIZE 255
+#define ROUTING_TABLE_TIMEOUT 1000
 
 static int wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsigned sec);
 static int read_routing_table_entry(FILE *routing_file, routing_table_entry *entry);
@@ -55,7 +56,7 @@ sdm_routing_table_init(int argc, char *argv[])
 	/*
 	 * Master and servers wait for the routing file to appear
 	 */
-	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, 10); //TODO: Get filename from the environment
+	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
 	if(rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
 		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error opening the routing file\n");
@@ -119,7 +120,7 @@ sdm_routing_table_set(void)
 		routing_file = NULL;
 	}
 
-	rv = wait_for_routing_file("routing_file", &routing_file, &tbl_size, 10); //TODO: Get filename from the environment
+	rv = wait_for_routing_file("routing_file", &routing_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
 	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
 		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error opening the routing file\n");
@@ -311,7 +312,9 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 			rv = read_routing_table_size(fp, &size); // Returns FILE pointer to
 															// the after the header
 
-			printf("effsize: %d, size: %d, rv: %d\n", eff_size, size, rv);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] effsize: %d, size: %d, rv: %d\n", sdm_route_get_id(),
+					eff_size, size, rv);
+
 			switch (rv) {
 			case -1:
 				// error
