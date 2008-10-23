@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Text;
  * - Make createContents extensible
  */
 /**
- * 
+ *
  */
 public class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
 
@@ -264,9 +264,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			if (remoteInstallPathText != null) {
 				remoteInstallPath = config.getRemoteInstallPath();
 			}
-			// Hack, since "Use default" is not yet implement, always assign true
 			useToolDefaults = config.useToolDefaults();
-			// useDefaults = true;
 		}
 
 		@Override
@@ -511,9 +509,6 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 	 */
 	@Override
 	protected void updateControls() {
-		// Hack, since "Use default" is not yet implement, always leave it disabled.
-		//		defaultButton.setEnabled(false);
-
 		boolean enabled = ! defaultButton.getSelection();
 
 		if (launchCmdText != null) {

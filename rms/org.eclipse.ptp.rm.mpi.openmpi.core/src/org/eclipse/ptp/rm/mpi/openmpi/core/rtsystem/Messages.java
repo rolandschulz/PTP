@@ -46,7 +46,9 @@ public class Messages extends NLS {
 	public static String OpenMPIRuntimeSystem_JobName;
 	public static String OpenMPIRuntimeSystemJob_Exception_FailedParse;
 	public static String OpenMPIRuntimeSystemJob_Exception_HostnamesDoNotMatch;
+	public static String OpenMPIRuntimeSystemJob_Exception_FailedExecute0;
 	public static String OpenMPIRuntimeSystemJob_ProcessName;
+	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
