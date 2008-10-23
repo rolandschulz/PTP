@@ -550,6 +550,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
 	}
 
+	/**
+	 * Get if the executable shall be copied to remote target before launch.
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	public boolean getCopyExecutable(ILaunchConfiguration configuration)
+			throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false);
+	}
+
 	private int jobCount = 0;
 
 	/*
@@ -760,7 +771,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			ArgumentParser ap = new ArgumentParser(temp);
 			List<String> args = ap.getTokenList();
 			if (args != null) {
-				return (String[]) args.toArray(new String[args.size()]);
+				return args.toArray(new String[args.size()]);
 			}
 		}
 		return new String[0];
@@ -976,18 +987,25 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
 
 	/**
+	 * Verify the validity of executable path.
+	 * If the executable is to be copied, then no additional verification is required.
+	 * Otherwise, the path must point to an existing file.
 	 * @param configuration
 	 * @return
 	 */
 	protected IPath verifyExecutablePath(ILaunchConfiguration configuration)  throws CoreException {
-		String exePath = getExecutablePath(configuration);
-		IPath path = verifyResource(exePath, configuration);
-		if (path == null) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
-					new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {exePath})),
-							IStatus.INFO);
+		if (getCopyExecutable(configuration)) {
+			return new Path(getExecutablePath(configuration));
+		} else {
+			String exePath = getExecutablePath(configuration);
+			IPath path = verifyResource(exePath, configuration);
+			if (path == null) {
+				abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
+						new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {exePath})),
+								IStatus.INFO);
+			}
+			return path;
 		}
-		return path;
 	}
 
 	/**
@@ -1067,7 +1085,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 */
 	protected void copyExecutable(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		boolean copyExecutable =
-			configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false);
+			getCopyExecutable(configuration);
 
 		if(copyExecutable) {
 			// Get remote and local paths
@@ -1330,7 +1348,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
             strings.add(key+"="+value);
 
 		}
-		return (String[]) strings.toArray(new String[strings.size()]);
+		return strings.toArray(new String[strings.size()]);
 	}
 
 }
