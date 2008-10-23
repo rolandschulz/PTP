@@ -18,7 +18,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 
 /**
- * 
+ *
  * @author Daniel Felix Ferber
  *
  */
@@ -44,6 +44,8 @@ public class OpenMPILaunchConfiguration {
 			String launchArgs = "-np " + Integer.toString(configuration.getAttribute(ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS)); //$NON-NLS-1$
 			if (configuration.getAttribute(ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT)) {
 				launchArgs += " -byslot"; //$NON-NLS-1$
+			} else {
+				launchArgs += " -bynode"; //$NON-NLS-1$
 			}
 			if (configuration.getAttribute(ATTR_NOOVERSUBSCRIBE, OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE)) {
 				launchArgs += " -nooversubscribe"; //$NON-NLS-1$
