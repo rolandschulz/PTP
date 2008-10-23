@@ -46,7 +46,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -81,7 +81,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		log(status);
 		Shell shell = getActiveWorkbenchShell();
 		if (shell != null) {
-			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
+			ErrorDialog.openError(shell, Messages.Launch_common_Error, message, status);
 		}
 	}
 
@@ -96,7 +96,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		Shell shell = getActiveWorkbenchShell();
 		if (shell != null) {
 			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null); //$NON-NLS-1$	
-			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
+			ErrorDialog.openError(shell, Messages.Launch_common_Error, message, status);
 		}
 	}
 	

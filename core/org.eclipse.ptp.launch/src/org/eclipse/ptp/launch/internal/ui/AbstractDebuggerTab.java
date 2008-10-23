@@ -20,6 +20,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.LaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -155,7 +156,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 			try {
 				tab = PTPDebugUIPlugin.getDefault().getDebuggerPage(debugConfig.getID());
 			} catch (CoreException e) {
-				PTPLaunchPlugin.errorDialog(LaunchMessages.getResourceString("AbstractDebuggerTab.ErrorLoadingDebuggerPage"), e.getStatus());
+				PTPLaunchPlugin.errorDialog(Messages.AbstractDebuggerTab_ErrorLoadingDebuggerPage, e.getStatus());
 			}
 			setDynamicTab(tab);
 		}
@@ -212,7 +213,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		setErrorMessage(null);
 		setMessage(null);
 		if (getDebugConfig() == null) {
-			setErrorMessage(LaunchMessages.getResourceString("AbstractDebuggerTab.No_debugger_available"));
+			setErrorMessage(Messages.AbstractDebuggerTab_No_debugger_available);
 			return false;
 		}
 
@@ -236,7 +237,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	}
 
 	public String getName() {
-		return LaunchMessages.getResourceString("AbstractDebuggerTab.Debugger");
+		return Messages.AbstractDebuggerTab_Debugger;
 	}
 
 	protected void createDebuggerCombo(Composite parent, int colspan) {
@@ -247,7 +248,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		gd.horizontalSpan = colspan;
 		comboComp.setLayoutData(gd);
 		Label dlabel = new Label(comboComp, SWT.NONE);
-		dlabel.setText(LaunchMessages.getResourceString("Launch.common.DebuggerColon"));
+		dlabel.setText(Messages.Launch_common_DebuggerColon);
 		fDCombo = new Combo(comboComp, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fDCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		fDCombo.addModifyListener(new ModifyListener() {
@@ -285,7 +286,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 
 	protected void createDebuggerGroup(Composite parent, int colspan) {
 		Group debuggerGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		debuggerGroup.setText(LaunchMessages.getResourceString("DebuggerTab.Debugger_Options"));
+		debuggerGroup.setText(Messages.DebuggerTab_Debugger_Options);
 		setDynamicTabHolder(debuggerGroup);
 		GridLayout tabHolderLayout = new GridLayout();
 		tabHolderLayout.marginHeight = 0;

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.io.File;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -29,7 +30,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -88,32 +89,32 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 		setControl(workingDirComp);
 		
 		Label workingDirLabel = new Label(workingDirComp, SWT.NONE);
-		workingDirLabel.setText(LaunchMessages.getResourceString("WorkingDirectoryBlock.Working_directory_colon"));
+		workingDirLabel.setText(Messages.WorkingDirectoryBlock_Working_directory_colon);
 		workingDirLabel.setLayoutData(spanGridData(-1, 3));
 
 		useDefaultWorkingDirButton = new Button(workingDirComp, SWT.CHECK);
-		useDefaultWorkingDirButton.setText(LaunchMessages.getResourceString("WorkingDirectoryBlock.Use_de&fault_working_directory"));
+		useDefaultWorkingDirButton.setText(Messages.WorkingDirectoryBlock_Use_default_working_directory);
 		useDefaultWorkingDirButton.setLayoutData(spanGridData(-1, 3));
 		useDefaultWorkingDirButton.addSelectionListener(listener);
 		
-		localDirButton = createRadioButton(workingDirComp, LaunchMessages.getResourceString("WorkingDirectoryBlock.&Local_directory"));
+		localDirButton = createRadioButton(workingDirComp, Messages.WorkingDirectoryBlock_Local_directory);
 		localDirButton.addSelectionListener(listener);
 				
 		workingDirText = new Text(workingDirComp, SWT.SINGLE | SWT.BORDER);
 		workingDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		workingDirText.addModifyListener(listener);
 		
-		workingDirBrowseButton = createPushButton(workingDirComp, LaunchMessages.getResourceString("Tab.common.&Browse_1"), null);
+		workingDirBrowseButton = createPushButton(workingDirComp, Messages.Tab_common_Browse_1, null);
 		workingDirBrowseButton.addSelectionListener(listener);
 		
-		workspaceDirButton = createRadioButton(workingDirComp, LaunchMessages.getResourceString("WorkingDirectoryBlock.Works&pace"));
+		workspaceDirButton = createRadioButton(workingDirComp, Messages.WorkingDirectoryBlock_Workspace);
 		workspaceDirButton.addSelectionListener(listener);
 		
 		workspaceDirText = new Text(workingDirComp, SWT.SINGLE | SWT.BORDER);
 		workspaceDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		workspaceDirText.addModifyListener(listener);
 		
-		workspaceDirBrowseButton = createPushButton(workingDirComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null);
+		workspaceDirBrowseButton = createPushButton(workingDirComp, Messages.Tab_common_Browse_2, null);
 		workspaceDirBrowseButton.addSelectionListener(listener);        
     }
 
@@ -152,7 +153,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 			}
 			handleUseDefaultWorkingDirButtonSelected();            
         } catch (CoreException e) {
-            setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
+            setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION);
         }
     }
     
@@ -185,17 +186,17 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 			if (workingDirPath != null) {
 				File dir = new File(workingDirPath);
 				if (!dir.exists()) {
-					setErrorMessage(LaunchMessages.getResourceString("WorkingDirectoryBlock.Working_directory_does_not_exist"));
+					setErrorMessage(Messages.WorkingDirectoryBlock_Working_directory_does_not_exist);
 					return false;
 				}
 				if (!dir.isDirectory()) {
-					setErrorMessage(LaunchMessages.getResourceString("WorkingDirectoryBlock.Working_directory_is_not_a_directory"));
+					setErrorMessage(Messages.WorkingDirectoryBlock_Working_directory_is_not_a_directory);
 					return false;
 				}
 			}
 		} else {
 			if (getContainer(workingDirText.getText()) == null) {
-				setErrorMessage(LaunchMessages.getResourceString("WorkingDirectoryBlock.Project_or_folder_does_not_exist"));
+				setErrorMessage(Messages.WorkingDirectoryBlock_Project_or_folder_does_not_exist);
 				return false;
 			}
 		}		
@@ -206,7 +207,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
      * @see ILaunchConfigurationTab#getName()
      */
     public String getName() {
-        return LaunchMessages.getResourceString("WorkingDirectoryBlock.Working_directory");
+        return Messages.WorkingDirectoryBlock_Working_directory;
     }
 
     /**
@@ -295,7 +296,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	 */
 	protected void handleWorkingDirBrowseButtonSelected() {
 		DirectoryDialog dialog = new DirectoryDialog(getShell());
-		dialog.setMessage(LaunchMessages.getResourceString("WorkingDirectoryBlock.Select_&working_directory_for_launch_configuration"));
+		dialog.setMessage(Messages.WorkingDirectoryBlock_Select_working_directory_for_launch_configuration);
 		String currentWorkingDir = workingDirText.getText();
 		if (currentWorkingDir != null && !currentWorkingDir.trim().equals(EMPTY_STRING)) {
 			File path = new File(currentWorkingDir);
@@ -313,7 +314,8 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	 * the workspace
 	 */
 	protected void handleWorkspaceDirBrowseButtonSelected() {
-		ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), getWorkspaceRoot(), false, LaunchMessages.getResourceString("WorkingDirectoryBlock.Select_&workspace_relative_working_directory"));		
+		ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), getWorkspaceRoot(), false, 
+				Messages.WorkingDirectoryBlock_Select_workspace_relative_working_directory);		
 		IContainer currentContainer = getContainer(workspaceDirText.getText());
 		if (currentContainer != null) {
 			IPath path = currentContainer.getFullPath();

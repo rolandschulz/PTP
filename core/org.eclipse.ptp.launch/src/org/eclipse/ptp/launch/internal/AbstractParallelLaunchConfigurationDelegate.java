@@ -54,6 +54,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -97,7 +98,7 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.RuleFactory;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
@@ -111,7 +112,6 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.utils.core.linux.ArgumentParser;
-//import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  *
@@ -661,7 +661,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected AttributeManager getAttributeManager(ILaunchConfiguration configuration, String mode) throws CoreException {
 		IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0); //$NON-NLS-1$
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager, null, 0);
 		}
 
 		AttributeManager attrMgr = new AttributeManager();
@@ -781,16 +781,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		IProject project = verifyProject(configuration);
 		String fileName = getProgramName(configuration);
 		if (fileName == null)
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_not_specified"), null, IStatus.INFO);
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified, null, IStatus.INFO);
 
 		IPath programPath = new Path(fileName);
 		if (!programPath.isAbsolute()) {
 			programPath = project.getFile(programPath).getLocation();
 		}
 		if (!programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"),
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
 					new FileNotFoundException(
-							LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", programPath.toString())),
+							NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {programPath.toString()})),
 							IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 		/* --old
@@ -912,7 +912,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 
 		final IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager, null, 0);
 		}
 
 		JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
@@ -955,9 +955,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		} catch (ClassCastException e) {
 		} catch (IOException e) {
 		}
-		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Program_is_not_a_recongnized_executable"));
+		Throwable exception = new FileNotFoundException(Messages.AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable);
 		int code = IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
-		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code, LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Program_is_not_a_recongnized_executable"), exception);
+		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code, Messages.AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable, exception);
 		status.add(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), code, exception == null ? "" : exception.getLocalizedMessage(), exception));
 		throw new CoreException(status);
 	}
@@ -969,9 +969,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected void verifyDebuggerPath(String dbgPath, ILaunchConfiguration configuration) throws CoreException {
 		IPath path = verifyResource(dbgPath, configuration);
 		if (path == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found"),
-					new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found",
-							dbgPath)), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found,
+					new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {dbgPath})),
+								IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 	}
 
@@ -983,10 +983,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		String exePath = getExecutablePath(configuration);
 		IPath path = verifyResource(exePath, configuration);
 		if (path == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"),
-					new FileNotFoundException(
-							LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found",
-							exePath)), IStatus.INFO);
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
+					new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {exePath})),
+							IStatus.INFO);
 		}
 		return path;
 	}
@@ -1015,12 +1014,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
     protected IProject verifyProject(ILaunchConfiguration configuration) throws CoreException {
         String proName = getProjectName(configuration);
         if (proName == null) {
-   			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Project_not_specified"), null, IStatus.INFO);
+   			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Project_not_specified, null, IStatus.INFO);
         }
 
         IProject project = getProject(proName);
         if (project == null || !project.exists() || !project.isOpen()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Project_does_not_exist_or_is_not_a_project"), null, IStatus.INFO);
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project, null, IStatus.INFO);
         }
 
         return project;
@@ -1183,8 +1182,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			path = verifyResource(workPath, configuration);
 		}
         if (path == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"),
-					new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Path_not_found", path.toString())), IStatus.INFO);
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Working_directory_does_not_exist, null, IStatus.INFO);
 		}
 		return path.toString();
     }

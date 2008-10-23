@@ -18,7 +18,6 @@
 package org.eclipse.ptp.perf.parallel;
 
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,12 +35,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.ApplicationTab;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.swt.SWT;
@@ -110,7 +110,7 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
 		IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
-		new Label(rmComp, SWT.NONE).setText(LaunchMessages.getResourceString("PMainTab.RM_Selection_Label")); //$NON-NLS-1$
+		new Label(rmComp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 			
 		resourceManagerCombo = new Combo(rmComp, SWT.READ_ONLY);
 		for (int i = 0; i < rms.length; i++) {
@@ -124,14 +124,14 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 	
 	private void createProjectControl(Composite mainComp){
 		Label projLabel = new Label(mainComp, SWT.NONE);
-		projLabel.setText(LaunchMessages.getResourceString("PMainTab.&Project_Label")); //$NON-NLS-1$
+		projLabel.setText(Messages.ApplicationTab_Project_Label);
 		projLabel.setLayoutData(spanGridData(-1, 2));
 
 		projText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		projText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		projText.addModifyListener(listener);
 		
-		projButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.&Browse_1"), null); //$NON-NLS-1$
+		projButton = createPushButton(mainComp, Messages.Tab_common_Browse_1, null);
 		projButton.addSelectionListener(listener);
 	}
 	
@@ -147,7 +147,7 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 //		appText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 //		appText.addModifyListener(listener);
 //		
-//		appButton = createPushButton(mainComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null); //$NON-NLS-1$
+//		appButton = createPushButton(mainComp, Messages.Tab_common_Browse_2, null); //$NON-NLS-1$
 //		appButton.addSelectionListener(listener);
 
 		Label appLabel = new Label(mainComp, SWT.NONE);
@@ -213,14 +213,13 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 
             resourceManager = getResourceManager(configuration);
 			if (resourceManager == null) {
-				setErrorMessage(LaunchMessages
-						.getResourceString("PMainTab.No_Resource_Manager_Available")); //$NON-NLS-1$
+				setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
 				return;
 			}
 
 			setResourceManagerComboSelection(resourceManager);
         } catch (CoreException e) {
-            setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage())); //$NON-NLS-1$
+            setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION);
         }
     	initializeConfCombo(configuration);
     }
@@ -290,8 +289,7 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 		setMessage(null);
 
 		if (resourceManager == null) {
-			setErrorMessage(LaunchMessages
-					.getResourceString("PMainTab.No_Resource_Manager_Available")); //$NON-NLS-1$
+			setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
 			return false;
 		}
 		
@@ -302,15 +300,15 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 			if (status.isOK()) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 				if (!project.exists()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_not_exist"), new Object[] {name})); //$NON-NLS-1$
+					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_not_exist, new Object[] {name}));
 					return false;
 				}
 				if (!project.isOpen()) {
-					setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Project_is_closed"), new Object[] {name})); //$NON-NLS-1$
+					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_is_closed, new Object[] {name}));
 					return false;
 				}
 			} else {
-				setErrorMessage(MessageFormat.format(LaunchMessages.getResourceString("PMainTab.Illegal_project"), new Object[]{status.getMessage()})); //$NON-NLS-1$
+				setErrorMessage(NLS.bind(Messages.ApplicationTab_Illegal_project, new Object[]{status.getMessage()}));
 				return false;
 			}
 		}

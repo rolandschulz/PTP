@@ -25,7 +25,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -69,7 +69,7 @@ public class ArgumentsTab extends LaunchConfigurationTab {
                 
 		Label programArgumentLabel = new Label(parallelComp, SWT.NONE);
 		programArgumentLabel.setLayoutData(spanGridData(-1, 2));
-		programArgumentLabel.setText(LaunchMessages.getResourceString("ArgumentsTab.Parallel_Program_Arguments"));
+		programArgumentLabel.setText(Messages.ArgumentsTab_Parallel_Program_Arguments);
 		argumentText = new Text(parallelComp, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		GridData gd = spanGridData(GridData.FILL_HORIZONTAL, 2);
 		gd.heightHint = 40;
@@ -99,7 +99,7 @@ public class ArgumentsTab extends LaunchConfigurationTab {
             argumentText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, EMPTY_STRING));            
             workingDirectoryBlock.initializeFrom(configuration);
         } catch (CoreException e) {
-            setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
+            setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION);
         }
     }
 
@@ -125,7 +125,7 @@ public class ArgumentsTab extends LaunchConfigurationTab {
      * @see ILaunchConfigurationTab#getName()
      */
     public String getName() {
-        return LaunchMessages.getResourceString("ArgumentsTab.Arguments");
+        return Messages.ArgumentsTab_Arguments;
     }
 
     /**
