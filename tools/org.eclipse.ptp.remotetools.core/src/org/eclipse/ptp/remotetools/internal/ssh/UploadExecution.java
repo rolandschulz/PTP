@@ -68,7 +68,7 @@ public class UploadExecution extends KillableExecution implements IRemoteUploadE
 		// Must wait the channel to open or we can have a racing on process
 		// trying to manipulate non-existent files (e.g. set file attributes after
 		// the upload)
-		while(channel.isClosed() || !channel.isConnected()) {
+		while(!channel.isClosed() && !channel.isConnected()) {
 			synchronized (this) {
 				try {
 					this.wait(10);
