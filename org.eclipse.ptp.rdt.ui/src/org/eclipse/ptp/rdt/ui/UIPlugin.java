@@ -31,6 +31,7 @@ public class UIPlugin extends Plugin {
 	public static final String INCLUDE_BROWSER_VIEW_ID = "org.eclipse.ptp.rdt.ui.includeBrowser"; //$NON-NLS-1$
 	
 	private static final String PREFERENCE_HAS_ALREADY_RUN = "org.eclipse.ptp.rdt.ui.hasRun"; //$NON-NLS-1$
+	public static final String REMOTE_SEARCH_ACTION_SET_ID = "org.eclipse.ptp.rdt.ui.SearchActionSet"; //$NON-NLS-1$
 	
 	@Override
 	public void start(BundleContext context) throws Exception {
