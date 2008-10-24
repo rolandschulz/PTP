@@ -4,3 +4,4 @@ Bundle-Name: RDT User Documentation Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.rdt.doc.user; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Vendor: Eclipse.org
+Require-Bundle: org.eclipse.help;bundle-version="3.3.100"
