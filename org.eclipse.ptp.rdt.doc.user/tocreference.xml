@@ -14,9 +14,17 @@
  </topic>
  <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search">
  </topic>
- <topic href="html/reference/import_export_project_settings.html" label="Import/Export Project Settings Wizards">
+ <topic label="Import/Export Project Settings Wizards">
+    <topic href="html/reference/settings_wizard_export.html" label="Export Wizard">
+    </topic>
+    <topic href="html/reference/settings_wizard_import.html" label="Import Wizard">
+    </topic>
  </topic>
- <topic href="html/reference/remote_paths_and_symbols.html" label="Remote Paths and Symbols Property Page">
+ <topic label="Remote Paths and Symbols Property Page">
+    <topic href="html/reference/remote_properties_paths.html" label="Remote Paths">
+    </topic>
+    <topic href="html/reference/remote_properties_symbols.html" label="Symbols">
+    </topic>
  </topic>
  <topic href="html/reference/remote_services.html" label="Remote Services Property Page">
  </topic>
