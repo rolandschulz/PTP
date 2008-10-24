@@ -33,7 +33,7 @@
             class="org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchPage"
             extensions="c:90,cpp:90, cxx:90, cc:90,C:90, h:90, hh:90, hpp:90, H:90"
             icon="icons/obj16/csearch_obj.gif"
-            id="org.eclipse.rdt.ui.searchPage"
+            id="org.eclipse.ptp.rdt.ui.searchPage"
             label="%remoteCSearchPage.label"
             showScopeSection="true"
             sizeHint="460, 160">
@@ -357,6 +357,21 @@
             name="%cElementHyperlinkDetector"
             targetId="org.eclipse.cdt.ui.cCode">
       </hyperlinkDetector>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="%CSearchActionSet.label"
+            visible="false"
+            id="org.eclipse.ptp.rdt.ui.SearchActionSet">
+         <action
+               label="%openCSearchPageAction.label"
+               icon="icons/obj16/csearch_obj.gif"
+               class="org.eclipse.ptp.internal.rdt.ui.search.actions.OpenRemoteCSearchPageAction"
+               menubarPath="org.eclipse.search.menu/dialogGroup"
+               id="org.eclipse.ptp.rdt.ui.OpenRemoteCSearchPage">
+         </action>
+      </actionSet>
    </extension>
    
 </plugin>
