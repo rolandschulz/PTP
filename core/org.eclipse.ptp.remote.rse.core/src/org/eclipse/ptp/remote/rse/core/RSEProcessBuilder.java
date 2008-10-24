@@ -21,7 +21,6 @@ import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
-import org.eclipse.rse.services.shells.HostShellProcessAdapter;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
 
@@ -133,8 +132,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			return null;
 		}
 		
-		Process p = new HostShellProcessAdapter(hostShell);
-		return new RSEProcess(p);
+		return new RSEProcess(hostShell);
 	}
 	
 	private String spaceEscapify(String inputString) {
