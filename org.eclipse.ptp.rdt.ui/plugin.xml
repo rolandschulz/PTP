@@ -72,7 +72,7 @@
             class="org.eclipse.ptp.internal.rdt.ui.editor.CEditor"
             contributorClass="org.eclipse.ptp.internal.rdt.ui.editor.CEditorActionContributor"
             default="true"
-            icon="icons/obj16/c_file_obj.gif"
+            icon="icons/view16/remoteccppeditortab.gif"
             id="org.eclipse.pdt.rdt.ui.editor.CEditor"
             name="%remoteEditor.name"
             symbolicFontName="org.eclipse.cdt.ui.editors.textfont">
@@ -118,6 +118,7 @@
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
             class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteCppProjectWizard"
             hasPages="true"
+            icon="icons/etool16/newremote_c_proj.gif"
             id="org.eclipse.ptp.rdt.ui.newRemoteProjectWizard"
             name="%wizard.name.0"
             project="true">
@@ -272,6 +273,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.ptp.rdt.ui.perspectives.RemoteCPerspectiveFactory"
+            icon="icons/etool16/remote_c_pers.gif"
             id="org.eclipse.ptp.rdt.ui.remoteCPerspective"
             name="%perspective.name.0">
       </perspective>
@@ -328,7 +330,7 @@
       <wizard
             category="org.eclipse.cdt.ui.exportWizardCategory"
             class="org.eclipse.ptp.internal.rdt.ui.wizards.settings.ProjectSettingsExportWizard"
-            icon="icons/obj16/hfolder_obj.gif"
+            icon="icons/etool16/exportc_settings.gif"
             id="org.eclipse.ptp.rdt.ui.settingswizard.export"
             name="%export.name">
          <selection
@@ -341,7 +343,7 @@
       <wizard
             category="org.eclipse.cdt.ui.import"
             class="org.eclipse.ptp.internal.rdt.ui.wizards.settings.ProjectSettingsImportWizard"
-            icon="icons/obj16/hfolder_obj.gif"
+            icon="icons/etool16/importc_settings.gif"
             id="org.eclipse.ptp.rdt.ui.settingswizard.import"
             name="%import.name">
          <selection

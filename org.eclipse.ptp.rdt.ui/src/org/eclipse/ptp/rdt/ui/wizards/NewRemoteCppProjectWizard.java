@@ -16,8 +16,11 @@ import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.internal.rdt.ui.RDTPluginImages;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * A wizard for creating new Remote C/C++ Projects
@@ -61,5 +64,13 @@ public class NewRemoteCppProjectWizard extends CDTCommonProjectWizard {
 		return new String[] { CProjectNature.C_NATURE_ID, CCProjectNature.CC_NATURE_ID, RemoteNature.REMOTE_NATURE_ID};
 	}
 
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#initializeDefaultPageImageDescriptor()
+	 */
+	@Override
+	protected void initializeDefaultPageImageDescriptor() {
+		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
+	}
 
 }
