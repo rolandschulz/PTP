@@ -9,7 +9,17 @@
 </head>
 
 <body>
-<h1><img src="images/barrier.gif"> Barrier Analysis: A Short Introduction</h1>
+<h1><img src="images/barrier.gif"> PLDT MPI Barrier Analysis</h1>
+<h2><img src="images/barrier.gif"> Overview of PLDT MPI Barrier Analysis</h2>
+<p>MPI Barrier Analysis detects potential deadlocks in MPI applications,
+and shows barrier matches, barrier errors, and paths of all barrier
+matching sets.  Includes detections across multiple functions and source files.
+<br><img src="images/barrierMatches.gif">
+<br>&nbsp;
+<br><img src="images/barrierErrors.gif">
+<br>&nbsp;
+
+<h2><img src="images/barrier.gif"> Barrier Analysis: A Short Introduction</h2>
 <p>A common source of errors in SPMD (Single Program Multiple Data) programming causes deadlocks when barrier
 statements, in which all tasks must synchronize, are not matched properly.
 If one MPI task in a communicator does not pass through the same number of MPI_Barrier statements as the
@@ -191,6 +201,8 @@ The loop (<code>while(x < my_rank)</code>)
 contains an error also, since different 
 tasks may execute a different number of iterations, and thus encounter a different number of
 barriers.
+<h3>Removing Barrier Markers</h3>
+<p>To remove barrier markers, simply run barrier analysis on any file without barrier errors (even a trivial non-source file).
  <!-- since this code isn't included, don't refer to it here  
 <h3> MPB </h3>
 <p>MPB is a scientific application which computes the electromagnetic model using
@@ -232,6 +244,8 @@ other path contains no barrier (case 1 clause).
 <p>&nbsp;
 <p>&nbsp;
 <p>&nbsp;
+
+<p><a href="toc.html">Back to PLDT Help Table of Contents</a>
 <p>&nbsp;
 <p>&nbsp;
 </body>

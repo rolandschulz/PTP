@@ -7,7 +7,15 @@ Setup for MPI Tools within the Parallel Language Development Tools
 	<script type="text/javascript" src="thumb.js"> </script>
 <body>
 <h1>Setup for MPI Tools within the Parallel Language Development Tools</h1>
-
+<h2>Terminology of CDT projects</h2>
+<p>Note: the older
+CDT 4.0 refers to a C project in which it manages the makefile as  a "Managed Make Project" or a "Managed Build Project"
+and a project which 
+you supply the makefile is a "Standard Make project."
+<p>CDT 5.0 refers to a C project in which it manages the makefile as just a "C Project" and a project which 
+you supply the makefile is a "Makefile project."
+<p>Both terminologies are sometimes used in these instructions.
+<h2>Project Setup</h2>
 <p>To use  the PTP Parallel Language Development
 Tools feature for MPI development, you need to 
 <ol>
@@ -16,6 +24,10 @@ Tools feature for MPI development, you need to
 </ol>
 
 <h2 id="prefs">Specifying the MPI Include path in Preferences</h2>
+<p>Note: As of PLDT 2.1, you will be prompted if the MPI (or OpenMP) include path hasn't been set up in PLDT Preferences.
+The first time you use the New Project Wizard to create an MPI or OpenMP project, 
+you'll be prompted to set up the preferences to point to the appropriate header files.
+<p>Or, you can set it up ahead of time as specified below.
 <p>To specify the MPI include path, use Window > Preferences. (For Mac, use Eclipse > Preferences)
 Under PTP, Parallel Language Development Tools, MPI...
 (Note: If you do not have core PTP installed, the "Parallel Language 
@@ -26,6 +38,7 @@ for in the MPI Artifact view.  You can also specify the default MPI build comman
 These values will make the MPI New Project Wizard page make more
 accurate predictions of settings for new projects.
 <br><img src="images/pldt-prefs1.png">
+<p>Hit OK to close the Preferences dialog.
 
 
 
@@ -39,18 +52,24 @@ There are two ways to do this.
 </ol>
 <h2 id="wizard">Use the PLDT new project wizards</h2>
 <p>Create a new "C project"
-<br>File->New->C project (if you are already in the C/C++ perspective this may be the simplest)
-<br>is one way; there are several ways to get to this wizard
+<br>One way is to use the menu: File->New->C project (if you are already in the C/C++ perspective this may be the simplest).
+<br>There are several ways to get to this wizard (including context menu in the Project Explorer view). 
 Enter a project name; under Project types, expand 'executable' and select, e.g. "MPI Hello World C project"
 <br>
-<img src="images/mpiWizard.gif">
-<br>Select Next.
-<br>On the next page, fill in any project template values, e.g. your name.
+<img src="images/mpiWizard.png">
+<p>Note: if you have not set the MPI Preferences yet, you'll be prompted at this point:
+<br><img src="images/mpiPrefsHaveNotBeenSet.png">
+<p>&nbsp;
+<p>See the above <a href="#prefs">Specify the MPI include path in preferences</a> for how to fill this in.
+<p>After specifying the preferences, or if it wasn't required, select Next to go to the next page of the New Project Wizard.
+
+<br>On the next page, the Basic Settings page of the wizard, fill in any project template values, e.g. your name.
 <br>Then select Next.
 <br><img src="images/mpiWizard2.gif">
-<p>On the next page, "MPI Project Settings" page,  make sure the "Add MPI project settings to this project"
-is checked.  If you want to change any of the default values for this project, you can do so
+<p>On the next page, "MPI Project Settings" page,  the "Add MPI project settings to this project" should be checked.
+If you want to change any of the default values for this project, you can do so
 here by unchecking the "Use default information" and altering the values.
+The default values were chosen based on your input to the PLDT Preferences above.
 
 <br><img src="images/mpiWizard3.gif">
 <p>Select Finish.
@@ -71,25 +90,28 @@ The Console view at the bottom shows the results of the project build.
 above to set the MPI information for a project,
 the MPI information can be added to the project manually as follows.
 <ol>
-<li>Create a CDT project (e.g. Managed Make C Project)
+<li>Create a C project 
 
 <li>Set up the include paths etc:
+<br>To bring up the Project Properties, rightMouse on the project name, and select "Properties" (at the bottom of the context menu list)
 <br>Project Properties, C/C++ Build, Configuration Settings,
 Tool Settings tab, Directories
 <br>--> Add include path for mpi header files etc. - path to the 'include' dir
-<br><img src="images/include.gif">
+<br><img src="images/include.png">
+<p>&nbsp;
 <p>
 Project Properties, C/C++ Build, Configuration Settings,
 Tool Settings tab, GCC C Linker, Libraries
 <ol>
 <li>Under "Libraries (-l)"  add the symbol "mpi"  
 <li> Under "Library search path (-L)" add the path to the 'lib' dir in MPI dir.
-<br><img src="images/lib.gif">
+<br><img src="images/lib.png">
+<p>&nbsp;
 <li><b>MPI Build Command:</b> Note: If you have an MPI installed that requires a different
 build command, such as 'mpicc' instead of 'gcc', specify it here as well.
 Select the compiler tool on the left and modify the 'Command:' value.
 You probably also need to do the same for the linker tool.
-<br><img src="images/mpiBuildCommand.gif">
+<br><img src="images/mpiBuildCommand.png">
 </ol>
 <p>
 
