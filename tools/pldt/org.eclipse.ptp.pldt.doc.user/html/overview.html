@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>
+PTP Parallel Language Development Tools 
+</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<script type="text/javascript" src="thumb.js"> </script>
+	</head>
+<body>
+<h1 id="top"> <img src="images/analyze.gif"> PTP Parallel Language Development Tools </h1>
+<p>Release 2.1
+<p>The PTP Parallel Language Development Tools (PLDT) provide
+tools to aid in MPI, OpenMP, UPC Programming and other parallel languages and tools.
+<br>Features of the PLDT include:
+<ul>
+<li>Analysis of C and C++ code to determine the location of artifacts (APIs and other appropriate items in code) for the following parallel programming systems:
+<ul>
+<li>MPI
+<li>OpenMP
+<li>LAPI
+<li>UPC
+</ul>
+<li>"Artifact View" indicates locations of Artifacts found
+in source code
+<li>Navigation to source code location of artifacts
+<li>Content assist via Cntl-Space completes API names
+while typing, and fills in arguments too.
+<li>Hover help shows API names, arguments, and descriptions.
+<li>Reference information about APIs via F1 (Cntl-F1 on Linux; Help key on Mac)
+<li>MPI Barrier Analysis detects potential deadlocks in MPI applications,
+and shows barrier matches, barrier errors, and paths of all barrier
+matching sets.  Includes detections across multiple functions and source files.
+<li>OpenMP problems view of common errors, OpenMP "show #pragma region" action,
+OpenMP "Show Concurrency" action.
+
+
+
+<li>CDT "New C Project" wizard includes a  wizard page that can 
+automatically add in the include paths etc. for MPI and OpenMP projects.
+<li>New project wizard can include sample MPI and OpenMP source files 
+and set up the projects to save time.
+<li>Welcome pages introduce new Eclipse users to PLDT.
+<li>Single-menu UI for PLDT analysis features simplifies the editor toolbar.
+<br><img src="images/pldt-menu.png">
+<br>&nbsp;
+<p>The features added in PLDT 2.1 include:
+<li>Support for Eclipse 3.4 and CDT 5.0
+<li>UPC support
+<li>MPI code templates
+</ul>
+See also <a href="whatsnew.html">New and Noteworthy </a> - what's new in PLDT 2.1
+<h2>
+Pre-requisites:
+</h2>
+<p>PLDT 2.1 requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
+<ul>
+<li><b>Eclipse</b> platform: Version  3.4 or later
+<li><b>CDT:</b>
+Version 5.0.1 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
+for C/C++, if based on Eclipse 3.4/CDT 5.0.1 or later, should also work, but not much testing has yet been done.)
+
+<li><b>MPI:</b>
+Get MPI and its header file, a version that runs on
+your system (e.g. OpenMPI for Linux/Mac; MPICH2 for win32)
+<ul>
+<li>Make sure it's in your path 
+<li>You may need to install it in a directory such that there are no spaces in the path
+(that is, not in 'Program Files' etc.)
+</ul>
+<li><b>OpenMP:</b>
+The PTP PLDT OpenMP tools also  need the OpenMP header file, similar to the MPI
+pre-requisites above.
+<li><b>UPC:</b>
+Header file required
+<li><b>LAPI:</b>
+Header file required
+
+</ul>
+<p>Note that <i>running</i> MPI or OpenMP (or UPC, or LAPI) is not really required for the PLDT
+to function and provide analysis and help with MPI and OpenMP development.
+Just the header files are required in order to know which "artifacts" should
+be located.
+<p>To run the core part of PTP (Parallel Tools Platform, <a href="http://eclipse.org/ptp">http://eclipse.org/ptp</a>,
+to run and debug parallel programs on the local machine), you need whatever runtime it requires.  Currently 
+(2.1, October 2008) this includes OpenMPI, which is available for Linux and Mac Only, but via PTP Remote Tools and/or RDT (Remote Development Tools),
+other  systems can be accessed remotely, and don't need to be installed on the same machine where Eclipse is installed.
+<p>For PLDT, a runtime system is not required, and PLDT will work (e.g. for development and analysis only) on Windows as well.
+
+<h2>Miscellaneous Topics</h2>
+<h3>Misplaced icon?</h3>
+<p>Note: if, after installing PLDT, the PLDT menu icon is misplaced over on the left side
+of the Eclipse toolbar:
+<br><img src="images/pldtIconMisplaced.gif">
+<br>You can put it in its proper place by selecting Window > Reset Perspective.
+<p>&nbsp;
+<li>Eclipse Welcome page includes pointers to information for PLDT.
+<br><img src="images/welcomeOverview.gif">
+<br><img src="images/welcomeC-pldt.gif">
+<br>&nbsp;
+<h3>Tracing in PLDT</h3>
+<p>Tracing is enabled for some parts of PLDT.  <a href="tracing.html">See tracing instructions for how to turn this on.</a>
+<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+</body>
+</html>
