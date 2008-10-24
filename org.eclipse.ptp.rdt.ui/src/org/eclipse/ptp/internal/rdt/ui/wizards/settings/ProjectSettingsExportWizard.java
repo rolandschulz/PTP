@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.rdt.ui.wizards.settings;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.internal.rdt.ui.RDTPluginImages;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -22,7 +23,8 @@ public class ProjectSettingsExportWizard extends ProjectSettingsWizard implement
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		super.init(workbench, selection);
-		setWindowTitle(Messages.ProjectSettingsWizardPage_Export_title); 
+		setWindowTitle(Messages.ProjectSettingsWizardPage_Export_title);
+		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_EXPORT_C_SETTINGS);
 	}
 
 	@Override
