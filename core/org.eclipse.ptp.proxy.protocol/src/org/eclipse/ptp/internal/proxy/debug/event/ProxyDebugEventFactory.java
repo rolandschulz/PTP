@@ -273,7 +273,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 		 */
 		case IProxyDebugEvent.EVENT_DBG_THREAD_SELECT:
 			int current_thread_id = Integer.parseInt(args[1]);
-			ProxyDebugStackFrame th_frame = toFrame(args[2], args[3], args[4], args[6], args[7]);
+			ProxyDebugStackFrame th_frame = toFrame(args[2], args[3], args[4], args[6], args[5]);
 			evt = new ProxyDebugSetThreadSelectEvent(packet.getTransID(), bits, current_thread_id, th_frame);
 			break;
 		
