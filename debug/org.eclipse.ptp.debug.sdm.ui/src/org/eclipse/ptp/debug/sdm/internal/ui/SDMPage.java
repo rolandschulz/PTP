@@ -54,10 +54,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	private IResourceManagerControl resourceManager = null;
 	private IRemoteServices remoteServices = null;
-	//private IRemoteUIServices remoteUIServices = null;
-	//private IRemoteConnection connection = null;
-
 	private String errMsg = null;
+	private boolean pathIsDirty = false;
+	
 	protected Text fRMDebuggerPathText = null;
 	protected Text fRMDebuggerAddressText = null;
 	protected Button fRMDebuggerBrowseButton = null;
@@ -95,6 +94,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fRMDebuggerPathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
+				pathIsDirty = true;
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -154,36 +154,44 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
+		errMsg = null;
 		if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			errMsg = Messages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
 		} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
 			errMsg = Messages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
-		} else {
-			if (!vertifyPath(fRMDebuggerPathText.getText())) {
+		} else if (pathIsDirty) {
+			if  (!verifyPath(fRMDebuggerPathText.getText())) {
 				errMsg = Messages.getString("SDMDebuggerPage.err4"); //$NON-NLS-1$
-			} else {
-				errMsg = null;
 			}
+			pathIsDirty = false;
 		}
 		setErrorMessage(errMsg);
 		return (errMsg == null);
 	}
 
-	private boolean vertifyPath(String path) {
+	/**
+	 * Verify that the supplied path exists on the remote system
+	 * 
+	 * @param path path to verify
+	 * @return true if path exists
+	 */
+	private boolean verifyPath(String path) {
 		IRemoteConnection rmConn = getRemoteConnection();
 		if (rmConn != null) {
 			IRemoteFileManager fileManager = getRemoteServices().getFileManager(rmConn);
 			try {
 				IFileStore res = fileManager.getResource(new Path(path), new NullProgressMonitor());
-				if (res.fetchInfo().exists())
+				if (res.fetchInfo().exists()) {
 					return true;
+				}
 			}
 			catch (IOException e) {
 				return false;
 			}
 		}
-		if (new Path(path).toFile().exists())
+		if (new Path(path).toFile().exists()) {
 			return true;
+		}
 		return false;
 	}
 
@@ -236,7 +244,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/**
 	 * Browse for a file. If remoteServices is not null, then the currently
 	 * select resource manager supports remote browsing.
-	 *
+	 * 
 	 * @return path to file selected in browser
 	 */
 	private String browseFile() {
@@ -263,17 +271,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/**
 	 * Work out the address to supply as argument to the debug server. There are currently
 	 * two cases:
-	 *
+	 * 
 	 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is
 	 * running the proxy (since this is where the tunnel begins), but accessible from the machine running
 	 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a
 	 * cluster), it will typically NOT be the same address that is used to start the proxy.
-	 *
+	 * 
 	 * 2. If port forwarding is not enabled, then the address will be the address of the host running
 	 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly.
 	 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster.
 	 * In many environments, compute nodes cannot communicate outside their local network.
-	 *
+	 * 
 	 * @param configuration
 	 * @return
 	 */
@@ -308,6 +316,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		return address;
 	}
 
+	/**
+	 * Get the RM configuration information
+	 * 
+	 * @return AbstractRemoteResourceManagerConfiguration
+	 */
 	private AbstractRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
 		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
@@ -335,6 +348,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 		return remoteServices;
 	}
+	
+	/**
+	 * Look up remote UI services
+	 * 
+	 * @return IRemoteUIServices
+	 */
 	private IRemoteUIServices getRemoteUIServices() {
 		IRemoteServices rsrv = getRemoteServices();
 		if (rsrv != null)
@@ -342,6 +361,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		return null;
 	}
 
+	/**
+	 * Get the current remote connection selected in the RM
+	 * 
+	 * @return IRemoteConnection
+	 */
 	private IRemoteConnection getRemoteConnection() {
 		IRemoteServices rsrv = getRemoteServices();
 		if (rsrv != null) {
