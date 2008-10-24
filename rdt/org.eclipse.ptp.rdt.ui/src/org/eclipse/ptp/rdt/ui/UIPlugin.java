@@ -11,8 +11,12 @@
 
 package org.eclipse.ptp.rdt.ui;
 
+import org.eclipse.cdt.internal.ui.ICStatusConstants;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -25,6 +29,9 @@ import org.osgi.framework.BundleContext;
  *
  */
 public class UIPlugin extends Plugin {
+	
+	private static UIPlugin fInstance = null;
+	
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rdt.ui"; //$NON-NLS-1$
 	public static final String TYPE_HIERARCHY_VIEW_ID = "org.eclipse.ptp.rdt.ui.typeHierarchy"; //$NON-NLS-1$
 	public static final String CALL_HIERARCHY_VIEW_ID = "org.eclipse.ptp.rdt.ui.callHierarchy"; //$NON-NLS-1$
@@ -33,6 +40,23 @@ public class UIPlugin extends Plugin {
 	private static final String PREFERENCE_HAS_ALREADY_RUN = "org.eclipse.ptp.rdt.ui.hasRun"; //$NON-NLS-1$
 	public static final String REMOTE_SEARCH_ACTION_SET_ID = "org.eclipse.ptp.rdt.ui.SearchActionSet"; //$NON-NLS-1$
 	
+	public UIPlugin() {
+		fInstance = this;
+	}
+	
+	/**
+	 * Returns the standard display to be used. The method first checks, if
+	 * the thread calling this method has an associated display. If so, this
+	 * display is returned. Otherwise the method returns the default display.
+	 */
+	public static Display getStandardDisplay() {
+		Display display= Display.getCurrent();
+		if (display == null) {
+			display= Display.getDefault();
+		}
+		return display;		
+	}	
+	
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -40,7 +64,9 @@ public class UIPlugin extends Plugin {
 		turnOffIndexerAnnotations();
 	}
 	
-	
+	public static UIPlugin getDefault() {
+		return fInstance;
+	}
 	
 	/**
 	 * Turns off the C/C++ Indexer Marker annotations.
@@ -70,5 +96,23 @@ public class UIPlugin extends Plugin {
 		}
 	}
 	
+	public static void log(Throwable e) {
+		log("Error", e); //$NON-NLS-1$
+	}
+
+	public static void log(String message, Throwable e) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
+	}
+
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
 	
+	public void logErrorMessage(String message) {
+		log(new Status(IStatus.ERROR, getPluginId(), ICStatusConstants.INTERNAL_ERROR, message, null));
+	}
+	
+	public static String getPluginId() {
+		return PLUGIN_ID;
+	}
 }
