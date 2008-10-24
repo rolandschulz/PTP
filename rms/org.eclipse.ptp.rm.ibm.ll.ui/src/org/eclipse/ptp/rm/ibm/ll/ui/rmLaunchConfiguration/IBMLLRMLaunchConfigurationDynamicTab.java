@@ -1342,6 +1342,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		createLimitsTab(rm);
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":createControl returning.");
+		currentRM = rm;
 	}
 
 	/**
@@ -2354,11 +2355,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 //				LL_PTP_NETWORK_LAPI);
 //		llNetwork_mpi_lapi = createTextWidget(nodesNetworkTabPane, rm,
 //				LL_PTP_NETWORK_MPI_LAPI);
-		validateNumericRange(llNodeMin, LL_PTP_NODE_MIN, "Invalid.llNodeMin");
-		validateNumericRange(llNodeMax, LL_PTP_NODE_MAX, "Invalid.llNodeMax");
+//		validateNumericRange(llNodeMin, LL_PTP_NODE_MIN, "Invalid.llNodeMin");
+//		validateNumericRange(llNodeMax, LL_PTP_NODE_MAX, "Invalid.llNodeMax");
 //no checks will be performed on the following widgets at this time
 //		llTaskGeometry = createTextWidget(nodesNetworkTabPane, rm,
 //				LL_PTP_TASK_GEOMETRY);
+
+		validateNumericMinMax(llNodeMin, LL_PTP_NODE_MIN, "Invalid.llNodeMin", llNodeMax, LL_PTP_NODE_MAX, "Invalid.llNodeMax"); 
 		validatePositiveNumeric(llTasksPerNode,"Invalid.llTasksPerNode");
 		validatePositiveNumeric(llTotalTasks,"Invalid.llTotalTasks");
 
@@ -2582,6 +2585,55 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":isValidListSelection returning.");
 		return true;
+	}
+
+	/**
+	 * Validate that the minValue is less than or equal to the maxValue.
+	 *
+	 * @param controlMin
+	 *            The min Text widget to be verified
+	 * @param attrNameMin
+	 *            The name of the min attribute
+	 * @param errorIDMin
+	 *            The id of the error message used if controlMin validation fails
+	 * @param controlMax
+	 *            The max Text widget to be verified
+	 * @param attrNameMax
+	 *            The name of the max attribute
+	 * @param errorIDMax
+	 *            The id of the error message used if controlMax validation fails
+	 * @throws ValidationException
+	 *             Indicates that Text widget failed validation
+	 */
+	private void validateNumericMinMax(TextRowWidget controlMin, String attrNameMin, String errorIDMin,
+			TextRowWidget controlMax, String attrNameMax,
+			String errorIDMax) throws ValidationException {
+		String strMin = "", strMax = "";
+		int iMin = 0, iMax = 0;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateNumericMinMax entered.");
+				
+		if (controlMin != null) {
+			strMin = controlMin.getValue();
+			if (strMin.length() > 0) {
+				iMin = validatePositiveNumeric(strMin, errorIDMin);
+			}
+		}
+		if (controlMax != null) {
+			strMax = controlMax.getValue();
+			if (strMax.length() > 0) {
+				iMax = validatePositiveNumeric(strMax, errorIDMax);
+			}
+		}
+		if ((strMin.length() > 0) && (strMax.length() > 0)) {
+			if (iMin > iMax) {
+				throw new ValidationException(Messages.getString("Invalid.llNodeMinMax"));
+			}
+		}
+		
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateNumericMinMax returning.");
 	}
 
 	/**
@@ -2932,8 +2984,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validatePositiveNumeric returning.");
 	}
 
-	private void validatePositiveNumeric(String value, String errorID) throws ValidationException {
-		int n;
+	private int validatePositiveNumeric(String value, String errorID) throws ValidationException {
+		int n = 0;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":validatePositiveNumeric entered.");
@@ -2948,6 +3000,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":validatePositiveNumeric returning.");
+		return n;
 	}
 
 	private void validateClockValue(TextRowWidget control, String errorID) throws ValidationException {
