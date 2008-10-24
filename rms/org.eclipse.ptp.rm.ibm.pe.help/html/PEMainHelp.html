@@ -17,10 +17,12 @@
 <h2><A name=introduction></A>Introduction</h2>
 <p>This plugin allows you to run a parallel application using IBM Parallel Environment from within the PTP framework. 
 In addition to running applications, you can monitor their status, control their execution, and view their stdio
-output from within PTP.</p>
+output from within PTP. You can also debug a parallel application using the built in PTP parallel debugger.</p>
+<p>You can run and debug parallel applications either as local projects or as remote projects, using the remote development 
+environment support that is part of PTP.</p>
 <p>Optionally, you can use IBM Tivoli WorkloadScheduler LoadLeveler to manage your application's access to system resources</p>
 <p>This plugin consists of two parts. The first is the Eclipse PTP plugin code which is responsible for the PTP views 
-presented to the user and the user's interaction with those views. The second part is a resource manage (proxy), which is
+presented to the user and the user's interaction with those views. The second part is a resource manager (proxy), which is
 responsible for communicating with the PTP PE plugin code, invoking the parallel application, and reporting application
 status to the PTP PE plugin.</p>
 <h2><A name=requirements></A>Requirements</h2>
@@ -36,7 +38,7 @@ access to system resources</li>
 <ul>
 <li>
 <a href="http://publib.boulder.ibm.com/epubs/pdf/am101m00.pdf">
-IBM Parallel Environment for AIX and Linux Installation Guide</a>a>
+IBM Parallel Environment for AIX and Linux Installation Guide</a>
 </li>
 <li>
 <a href="http://publib.boulder.ibm.com/epubs/pdf/am102m00.pdf">
@@ -74,7 +76,7 @@ the directory containing llapi.h. (Use <b>configure --help</b> to see a complete
 <li>Invoke <b>make</b> in the same directory.
 </ol>
 <h2><A name=starting></A>Getting Started</h2>
-<p>Define an appropriate project, either a C/C++ project using CDT, or a FORTRAN project using Photran. You can define 
+<p>Define an appropriate project, either a C/C++ project using CDT, or a Fortran project using Photran. You can define 
 either a standard make project or a managed make project.</p>
 <p>When you define the project, you should specify the project location as a directory which is shared among all nodes 
 where the parallel application will run to ensure Parallel Environment has access to the executable on all nodes. The 
@@ -87,13 +89,13 @@ to invoke the compiler, either in your makefile, or when specifying the compiler
 <ul>
 <li>mpcc_r for C programs</li>
 <li>mpCC_r for C++ programs</li>
-<li>mpxlf_r for FORTRAN programs</li>
+<li>mpxlf_r for Fortran programs</li>
 </ul>
 <li>Linux</li>
 <ul>
 <li>mpcc for C programs</li>
 <li>mpCC for C++ programs</li>
-<li>mpfort for FORTRAN programs</li>
+<li>mpfort for Fortran programs</li>
 </ul>
 </ul> 
 <p>The following image shows how the compiler is specified for a managed make project. The correct linker should also
@@ -214,6 +216,12 @@ click the <b>Apply</b>button to save the current settings for the launch configu
 invoke the application.</p>
 <p>As a minimum, the launch configuration or the Parallel Environment setup script must specify the path name of a valid 
 hostfile (MP_HOSTFILE) and number of parallel tasks (MP_TASKS)<p>
+<h3><a name=debugging></a>Debugging a Parallel Application</h3>
+You can debug a parallel application using the built in PTP parallel debugger. You can do this using the same run configuration 
+that you use for running your application. You can debug the application by clicking the debug icon 
+in the Eclipse toolbar or by selecting <b>Debug Configurations</b> from the Eclipse run menu. Before you debug a parallel application 
+for the first time, you should make sure that you have properly configured the debugger by opening
+the run configuration and selecting the debug tab then making sure the debugger settings are correct.</p>  
 <h2><a name=redirection></a>Redirecting stdio</h2>
 <p>The default behavior is that data the application writes to stdout is sent to the PTP GUI. That data can be viewed by 
 double clicking the task icon for the task, normally task 0, in the jobs view row for the application. This will open
@@ -223,6 +231,7 @@ was invoked.</p>
 PTP GUI for handling can cause the GUI to become slow or unresponsive. Alternatively, stdout and stderr can be redirected to
 files on the node where the resource manager process is running. This is done by specifying the path name for stdout or
 stderr in the fields labelled <b>Stdout Path</b> or <b>Stderr Path</b> in the parallel tab of the launch configuration.</p>
+
 <h2><a name=monitoring></a>Monitoring Application Execution</h2>
 <p>Once you click run to invoke the application, the resource manager will monitor the application's execution. When Parallel
 Environment allocates tasks to nodes, the default machine view for the resource manager will be updated to show the nodes 
