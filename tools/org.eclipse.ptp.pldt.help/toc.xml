@@ -2,7 +2,7 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="PTP Parallel Language Development Tools" topic="html/toc.html">
-
+   <topic href="html/overview.html" label="Overview"/>
       <topic label="Setup for PTP MPI tools"  href="html/setup.html"/> 
       <topic label="Running PTP MPI tools"  href="html/run.html"/> 
            <topic label="Setup for PTP OpenMP tools"  href="html/setupOMP.html"/> 
@@ -10,7 +10,10 @@
    <topic href="html/barrier.html" label="MPI Barrier Analysis">
    </topic> 
       <topic href="html/runUPC.html" label="UPC tools"/>
-   <topic label="New and Noteworthy"  href="html/whatsnew.html"/>
+   <topic href="html/whatsnew.html" label="New and Noteworthy"/>
+
+
+
 
 
 </toc>
