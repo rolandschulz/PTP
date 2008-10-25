@@ -1221,6 +1221,7 @@ run(int trans_id, int nargs, char *args[])
     job->stderr_info.cp = job->stderr_info.write_buf;
     job->stderr_info.write_func = send_stderr;
     job->discovered_job = 0;
+    envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value);
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
     if (pid == 0) {
@@ -1242,7 +1243,6 @@ run(int trans_id, int nargs, char *args[])
 	else {
 	    argv = create_exec_parmlist(POE, poe_target, argp);
 	}
-	envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value);
 	/*
 	 * Connect stdio to pipes or files owned by parent process (the
 	 * proxy)
