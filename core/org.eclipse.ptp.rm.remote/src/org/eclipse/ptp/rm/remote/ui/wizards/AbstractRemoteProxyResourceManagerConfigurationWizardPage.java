@@ -795,7 +795,12 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		} else {
 			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		}
-		int defIndex = allServices.length - 1; 
+		int defIndex = 0; 
+		Arrays.sort(allServices, new Comparator<IRemoteServices>() {
+			public int compare(IRemoteServices c1, IRemoteServices c2) {
+				return c1.getName().compareToIgnoreCase(c2.getName());
+			}
+		});		
 		remoteCombo.removeAll();
 		for (int i = 0; i < allServices.length; i++) {
 			remoteCombo.add(allServices[i].getName());
