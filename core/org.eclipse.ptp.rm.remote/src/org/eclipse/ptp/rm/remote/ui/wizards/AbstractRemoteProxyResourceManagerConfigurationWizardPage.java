@@ -23,6 +23,8 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
@@ -396,8 +398,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		defaultSetting();
 		initializeRemoteServicesCombo();
 		initializeLocalHostCombo();
-		updatePage();
 		loading = false;
+		updatePage();
 	}
 	
 	/**
@@ -427,7 +429,16 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	private void registerListeners() {
 		remoteCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				handleRemoteServiceSelected();
+				/*
+				 * If we're loading saved settings, then we want to select the
+				 * saved connection after the remote services are selected. Otherwise
+				 * just pick the default item.
+				 */
+				if (loading) {
+					handleRemoteServiceSelected(connection);
+				} else {
+					handleRemoteServiceSelected(null);
+				}
 				updateSettings();
 			}
 		});
@@ -667,8 +678,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	protected void handleNewRemoteConnectionSelected() 
 	{
 		if (uiConnectionManager != null) {
-			uiConnectionManager.newConnection(getShell());
-			handleRemoteServiceSelected();
+			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
 		}
 	}
 	
@@ -729,8 +739,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * 
 	 * The assumption is that this will trigger a call to the selection
 	 * handler for the connection combo.
+	 * 
+	 * @param conn connection to select as current. If conn is null, select the first item in the list.
 	 */
-	protected void handleRemoteServiceSelected() {
+	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
 		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
 		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
@@ -741,24 +753,20 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 				uiConnectionManager = remUIServices.getUIConnectionManager();
 			}
 			IRemoteConnection[] connections = connectionManager.getConnections();
+			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
+				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+					return c1.getName().compareToIgnoreCase(c2.getName());
+				}
+			});
 			connectionCombo.removeAll();
-			int selected = connections.length - 1;
+			int selected = 0;
 			for (int i = 0; i < connections.length; i++) {
 				connectionCombo.add(connections[i].getName());
-				if (connection != null && connections[i].equals(connection)) {
+				if (conn != null && connections[i].equals(conn)) {
 					selected = i;
 				}
 			}
 			if (connections.length > 0) {
-				/*
-				 * If we're not initializing then reset connection when new
-				 * service provider is selected.
-				 */
-				if (!loading) {
-					selected = connections.length - 1;
-					connection = null;
-				}
-							
 				connectionCombo.select(selected);
 				/*
 				 * Linux doesn't call selection handler so need to call it explicitly here 
@@ -800,7 +808,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			/*
 			 * Linux doesn't call selection handler so need to call it explicitly here
 			 */ 
-			handleRemoteServiceSelected(); 
+			handleRemoteServiceSelected(connection); 
 			handleConnectionSelected();
 		}
 	}
@@ -842,14 +850,16 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected void updatePage() 
 	{
-		setErrorMessage(null);
-		setMessage(null);
-	
-		if (!isValidSetting()) {
-			setValid(false);
-		} else {
-			performOk();
-			setValid(true);
+		if (!loading) {
+			setErrorMessage(null);
+			setMessage(null);
+		
+			if (!isValidSetting()) {
+				setValid(false);
+			} else {
+				performOk();
+				setValid(true);
+			}
 		}
 	}
 }
