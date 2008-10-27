@@ -88,6 +88,24 @@
 		<include name="**/about.mappings" />
 	</replace>
 	<unzip src="${tauJars}" dest="${buildDirectory}"/>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc/BUILD">
+		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.linux.ppc/BUILD">
+		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.linux.x86/BUILD">
+		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.linux.x86_64/BUILD">
+		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.macosx.ppc/BUILD">
+		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.macosx.x86/BUILD">
+		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+	</replace>
 </target>
 
 <!-- ===================================================================== -->
