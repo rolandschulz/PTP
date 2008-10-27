@@ -4,12 +4,14 @@
 <toc label="Reference" link_to="toc.xml#reference"> 
 	<topic label="Remote C/C++ New Project Wizard"  href="html/reference/remote_c_new_project_wizard.html"> 
 	</topic>
- <topic href="html/reference/remote_c_views_and_editors.html" label="Remote C/C++ Views and Editors">
+ <topic label="Remote C/C++ Views and Editors">
     <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor">
     </topic>
     <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy">
     </topic>
     <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy">
+    </topic>
+    <topic href="html/reference/outline_view.html" label="Outline View">
     </topic>
  </topic>
  <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search">
