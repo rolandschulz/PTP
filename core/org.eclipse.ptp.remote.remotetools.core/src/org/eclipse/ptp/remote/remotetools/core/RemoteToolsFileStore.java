@@ -32,6 +32,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
+import org.eclipse.ptp.remotetools.core.IRemoteUploadExecution;
 
 public class RemoteToolsFileStore extends FileStore {
 
@@ -48,14 +49,15 @@ public class RemoteToolsFileStore extends FileStore {
 		IRemoteFileManager fileMgr = RemoteToolsServices.getInstance().getFileManager(conn);
 		return (RemoteToolsFileStore)fileMgr.getResource(new Path(path), new NullProgressMonitor());
 	}
-	
+
 	private IRemoteItem remoteItem;
 	private URI remoteURI;
 	private RemoteToolsFileManager fileMgr;
 	private IRemoteExecutionManager exeMgr;
 	private boolean isDirectory;
+	private IRemoteUploadExecution uploadExecution = null;
 
-	public RemoteToolsFileStore(RemoteToolsFileManager mgr, IRemoteItem remoteItem, 
+	public RemoteToolsFileStore(RemoteToolsFileManager mgr, IRemoteItem remoteItem,
 			boolean isDirectory) {
 		this.fileMgr = mgr;
 		this.exeMgr = mgr.getExecutionManager();
@@ -69,7 +71,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public String[] childNames(int options, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		IRemoteItem[] items;
 		try {
 			items = exeMgr.getRemoteFileTools().listItems(remoteItem.getPath());
@@ -78,16 +80,16 @@ public class RemoteToolsFileStore extends FileStore {
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					e.getMessage()));
 		}
-		
+
 		String[] names = new String[items.length];
-		                
+
 		for (int i = 0; i < items.length; i++)
 		{
 			IPath path = new Path(items[i].getPath());
 			names[i] = path.lastSegment();
 		}
-		
-		return names;	
+
+		return names;
 	}
 
 	/* (non-Javadoc)
@@ -95,7 +97,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public void delete(int options, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		try {
 			exeMgr.getRemoteFileTools().removeFile(remoteItem.getPath());
 		}
@@ -111,18 +113,18 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		FileInfo info = new FileInfo(new Path(remoteItem.getPath()).lastSegment());
 		if (remoteItem == null || !remoteItem.exists()) {
 			info.setExists(false);
 			return info;
 		}
-		
+
 		info.setExists(true);
 		info.setLastModified(remoteItem.getModificationTime());
 		info.setDirectory(isDirectory);
 		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !remoteItem.isWritable());
-		
+
 		if (!isDirectory) {
 			IRemoteFile file = (IRemoteFile)remoteItem;
 			info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, file.isExecutable());
@@ -138,12 +140,12 @@ public class RemoteToolsFileStore extends FileStore {
 	@Override
 	public IFileStore getChild(String name) {
 		IPath childPath = new Path(remoteItem.getPath()).append(name);
-		
+
 		IFileStore resource = fileMgr.lookup(childPath);
 		if (resource != null) {
 			return resource;
 		}
-		
+
 		try {
 			return fileMgr.getResource(childPath, new NullProgressMonitor());
 		} catch (IOException e) {
@@ -172,7 +174,7 @@ public class RemoteToolsFileStore extends FileStore {
 	@Override
 	public IFileStore getParent() {
 		IPath parent = new Path(exeMgr.getRemotePathTools().parent(remoteItem.getPath()));
-		
+
 		IFileStore resource = fileMgr.lookup(parent);
 		if (resource != null) {
 			return resource;
@@ -189,15 +191,15 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileStore mkdir(int options, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		try {
 			exeMgr.getRemoteFileTools().createDirectory(remoteItem.getPath());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(), 
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					"The directory could not be created", e));
 		}
-			
+
 		return this;
 	}
 
@@ -206,11 +208,11 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					"Is a directory"));
+			"Is a directory"));
 		}
 		try {
 			return exeMgr.getRemoteCopyTools().executeDownload(remoteItem.getPath()).getInputStreamFromProcessRemoteFile();
@@ -226,15 +228,16 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor)
-			throws CoreException {
-			
+	throws CoreException {
+
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					"Is a directory"));
+			"Is a directory"));
 		}
 		try {
-			return exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath()).getOutputStreamToProcessRemoteFile();
+			uploadExecution = exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath());
+			return uploadExecution.getOutputStreamToProcessRemoteFile();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
@@ -249,6 +252,12 @@ public class RemoteToolsFileStore extends FileStore {
 	public void putInfo(IFileInfo info, int options,
 			IProgressMonitor monitor) throws CoreException {
 		try {
+			if (uploadExecution != null) {
+				if (!uploadExecution.wasFinished()) {
+					uploadExecution.waitForEndOfExecution();
+				}
+				uploadExecution = null;
+			}
 			boolean modified = false;
 			remoteItem.refreshAttributes();
 			if ((options & EFS.SET_ATTRIBUTES) != 0) {
@@ -261,7 +270,7 @@ public class RemoteToolsFileStore extends FileStore {
 					file.setExecutable(executable);
 				}
 				modified = true;
-			} 
+			}
 			if ((options & EFS.SET_LAST_MODIFIED) != 0) {
 				long modtime = info.getLastModified();
 				remoteItem.setModificationTime(modtime);
@@ -276,7 +285,7 @@ public class RemoteToolsFileStore extends FileStore {
 					e.getMessage(), e));
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#toURI()
 	 */

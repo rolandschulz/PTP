@@ -29,7 +29,7 @@ public class UploadExecution extends KillableExecution implements IRemoteUploadE
 	InputStream sourceStream;
 	ByteArrayOutputStream errorStream;
 	OutputStream outputStream;
-	
+
 	public UploadExecution(ExecutionManager executionManager, String remoteFile, InputStream source) throws RemoteConnectionException {
 		super(executionManager);
 		this.sourceStream = source;
@@ -44,12 +44,13 @@ public class UploadExecution extends KillableExecution implements IRemoteUploadE
 		return outputStream;
 	}
 
+	@Override
 	public void startExecution() throws RemoteConnectionException {
-		
+
 		ChannelExec channel = createChannel(false);
 		IRemotePathTools pathTool = getExecutionManager().getRemotePathTools();
 		setCommandLine("cat >" + pathTool.quote(remoteFile, true)); //$NON-NLS-1$
-		
+
 		if (sourceStream != null) {
 			channel.setInputStream(sourceStream);
 			outputStream = null;
@@ -61,22 +62,9 @@ public class UploadExecution extends KillableExecution implements IRemoteUploadE
 			}
 		}
 		channel.setErrStream(errorStream);
-		
+
 		super.startExecution();
 		Debug.println("Uploading " + remoteFile); //$NON-NLS-1$
-		
-		// Must wait the channel to open or we can have a racing on process
-		// trying to manipulate non-existent files (e.g. set file attributes after
-		// the upload)
-		while(!channel.isClosed() && !channel.isConnected()) {
-			synchronized (this) {
-				try {
-					this.wait(10);
-				} catch (InterruptedException e) {
-					// Ignore
-				}
-			}
-		}
 	}
 
 	public String getErrorMessage() {
