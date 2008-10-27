@@ -3,10 +3,16 @@
 
 <toc label="Getting Started" link_to="toc.xml#gettingstarted">
    <topic href="html/gettingstarted/server_installation.html" label="Server Installation">
+      <topic href="html/gettingstarted/server_installation_unix.html" label="Installing the server on Linux/Unix">
+      </topic>
+      <topic href="html/gettingstarted/server_installation_windows.html" label="Installing the server on Windows">
+      </topic>
    </topic>
    <topic href="html/gettingstarted/creating_a_connection.html" label="Creating a Connection">
    </topic>
-   <topic href="html/gettingstarted/launching_the_server.html" label="Launching The Server">
+   <topic href="html/gettingstarted/editing_connection_properties.html" label="Editing Connection Properties">
+   </topic>
+   <topic href="PLUGINS_ROOT/org.eclipse.rse.doc.user/tasks/tbegindiscon.html" label="Disconnecting From A Remote Server">
    </topic>
    <topic href="html/gettingstarted/creating_a_remote_project.html" label="Creating A Remote Project">
    </topic>
