@@ -2,12 +2,21 @@
 #
 # This script is used to build proxy plugins in the workspace
 #
-RMS="orte mpich2 ibm.pe ibm.ll"
+
+# This should get replaced by build script with the actual
+# PTP build version number. The script can also be run out of CVS,
+# in which case there is no version.
+VERSION=_@buildVersion@
+if [ `expr "$VERSION" : "_@[^@]*@"` -eq 15 ]; then
+	VERSION=
+fi
+
+RMS="mpich2 ibm.pe ibm.ll"
 
 KNOWN_PLUGINS="\
-	org.eclipse.ptp.utils*\
-	org.eclipse.ptp.proxy*\
-	org.eclipse.ptp.debug.sdm*"
+	org.eclipse.ptp.utils$VERSION\
+	org.eclipse.ptp.proxy$VERSION\
+	org.eclipse.ptp.debug.sdm$VERSION"
 		
 PARENT=`dirname $PWD`
 PLUGIN=`basename $PWD`
@@ -19,7 +28,7 @@ fi
 
 for rms in $RMS
 do
-	KNOWN_PLUGINS="$KNOWN_PLUGINS org.eclipse.ptp.rm.$rms.proxy*"
+	KNOWN_PLUGINS="$KNOWN_PLUGINS org.eclipse.ptp.rm.$rms.proxy$VERSION"
 done
 
 cd $PARENT
