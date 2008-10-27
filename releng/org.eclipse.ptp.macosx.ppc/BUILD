@@ -6,8 +6,8 @@
 # This should get replaced by build script with the actual
 # PTP build version number. The script can also be run out of CVS,
 # in which case there is no version.
-VERSION=_@buildVersion@
-if [ `expr "$VERSION" : "_@[^@]*@"` -eq 15 ]; then
+VERSION="_@buildVersion@"
+if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
 	VERSION=
 fi
 
