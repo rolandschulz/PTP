@@ -15,5 +15,7 @@
     </topic>
  </topic>
  <topic href="html/tasks/analyze_code.html" label="Analyze Code">
+ </topic>
+ <topic href="PLUGINS_ROOT/org.eclipse.rse.doc.user/tasks/tmanagesearch.html" label="Search for text and files on remote servers">
  </topic> 
 </toc>
