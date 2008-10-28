@@ -289,16 +289,16 @@ public class RemoteResourceBrowser extends Dialog {
 		layout.numColumns = 3;
 		layout.marginWidth = 0;
 		connComp.setLayout(layout);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		connComp.setLayoutData(gd);
 
 		Label label = new Label(connComp, SWT.NONE);
 		label.setText(Messages.RemoteResourceBrowser_connectonLabel);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		label.setLayoutData(gd);
 
 		connectionCombo = new Combo(connComp, SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		connectionCombo.setLayoutData(gd);
 		connectionCombo.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent event) {
@@ -312,13 +312,15 @@ public class RemoteResourceBrowser extends Dialog {
 
 		newButton = new Button(connComp, SWT.PUSH);
 		newButton.setText(Messages.RemoteResourceBrowser_newConnection);
+		gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		newButton.setLayoutData(gd);
 		newButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
 				if (uiConnMgr != null) {
-					//IRemoteConnection conn = uiConnMgr.newConnection(getShell());
-					//if (conn != null) {
-					//	updateConnectionCombo(conn);
-					//}
+					IRemoteConnection conn = uiConnMgr.newConnection(getShell());
+					if (conn != null) {
+						updateConnectionCombo(conn);
+					}
 				}
 			}
 		});
@@ -434,6 +436,7 @@ public class RemoteResourceBrowser extends Dialog {
 		Composite main = (Composite) super.createDialogArea(parent);
 		
 		final Composite dialogComp = new Composite(main, SWT.NONE);
+		dialogComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		dialogComp.setLayout(layout);
