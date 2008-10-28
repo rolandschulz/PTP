@@ -5,10 +5,16 @@
 	<topic href="html/tasks/creating_a_remote_project.html" label="Creating A Remote Project">
 	</topic>
  <topic href="html/tasks/work_with_remote_project_files.html" label="Work With Remote Project Files">
+    <topic href="html/tasks/converting_to_remote_project.html" label="Converting to a remote project">
+    </topic>
+    <topic href="html/tasks/creating_c_file.html" label="Creating a C/C++ file">
+    </topic>
+    <topic href="html/tasks/creating_makefile.html" label="Creating a makefile">
+    </topic>
  </topic>
  <topic href="html/tasks/configuring_the_parser.html" label="Configuring The Parser">
  </topic>
- <topic href="html/tasks/write_remote_code.html" label="Write Remote Code">
+ <topic href="html/tasks/write_remote_code.html" label="Writing Remote Code">
     <topic href="html/tasks/customize_the_remote_c_editor.html" label="Customize The Remote C/C++ Editor">
     </topic>
     <topic href="html/tasks/remote_content_assist.html" label="Remote Content Assist">
