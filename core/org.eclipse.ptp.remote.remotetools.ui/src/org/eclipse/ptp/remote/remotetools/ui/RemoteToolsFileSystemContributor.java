@@ -29,9 +29,11 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -43,17 +45,28 @@ public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 	public URI browseFileSystem(String initialPath, Shell shell) {
 		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID);
 		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
-		IRemoteUIFileManager fileMgr = uiServices.getUIFileManager();
-		fileMgr.showConnections(true);
-		IPath path = fileMgr.browseDirectory(shell, "Browse File System", initialPath);
+		IRemoteUIFileManager uiFileMgr = uiServices.getUIFileManager();
+		uiFileMgr.showConnections(true);
+		IPath path = uiFileMgr.browseDirectory(shell, "Browse File System", initialPath);
 		if (path != null) {
-			IRemoteConnection conn = fileMgr.getConnection();
-			try {
-				return new URI("remotetools", conn.getAddress(), path.toPortableString(), null);
-			} catch (URISyntaxException e) {
-			}
+			IRemoteConnection conn = uiFileMgr.getConnection();
+			IRemoteFileManager fileMgr = services.getFileManager(conn);
+			return ((RemoteToolsFileManager)fileMgr).toURI(path);
 		}
 		
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ide.fileSystem.FileSystemContributor#getURI(java.lang.String)
+	 */
+	@Override
+	public URI getURI(String string) {
+		try {
+			return new URI(string);
+		}
+		catch (URISyntaxException e) {
+		}
 		return null;
 	}
 }
