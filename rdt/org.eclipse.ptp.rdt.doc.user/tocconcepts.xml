@@ -11,10 +11,6 @@
       </topic>
    </topic>
    <topic href="html/concepts/providers.html" label="Providers">
-      <topic href="html/concepts/build_service_providers.html" label="Build Service Providers">
-      </topic>
-      <topic href="html/concepts/c_indexing_service_providers.html" label="C/C++ Indexing Service Providers">
-      </topic>
    </topic>
    <topic href="html/concepts/service_model.html" label="Service Model">
    </topic> 
