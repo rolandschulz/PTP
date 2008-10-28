@@ -50,6 +50,7 @@
       <import plugin="org.eclipse.rse.subsystems.files.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.console" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.files.ui"/>
    </requires>
 
    <plugin
@@ -72,5 +73,11 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rdt.doc.user"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

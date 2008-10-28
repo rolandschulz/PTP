@@ -103,6 +103,7 @@ plugin@org.eclipse.ptp.perf.toolopts=@ptpTag@,:pserver:anonymous@dev.eclipse.org
 plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core
 plugin@org.eclipse.ptp.rdt.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui
 plugin@org.eclipse.ptp.rdt.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.services
+plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user
 
 ! Cell Plugins
 plugin@org.eclipse.ptp.cell=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell
