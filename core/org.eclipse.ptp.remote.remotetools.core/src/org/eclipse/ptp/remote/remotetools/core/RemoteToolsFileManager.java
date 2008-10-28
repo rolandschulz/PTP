@@ -91,9 +91,9 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	}
 	
 	public IPath getWorkingDirectory() {
-		String cwd = "//";
+		String cwd = "//"; //$NON-NLS-1$
 		try {
-			cwd = exeMgr.getExecutionTools().executeWithOutput("pwd").trim();
+			cwd = exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
 		} catch (RemoteExecutionException e) {
 		} catch (RemoteConnectionException e) {
 		} catch (CancelException e) {
@@ -125,15 +125,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 */
 	public URI toURI(IPath path) {
 		try {
-			String auth = connection.getAddress();
-			String user = connection.getUsername();
-			if (user != null && !user.equals("")) {
-				auth = user + "@" + auth;
-			}
-			if (!path.isAbsolute()) {
-				path = getWorkingDirectory().append(path);
-			}
-			return new URI("remotetools", auth, path.toPortableString(), null); //$NON-NLS-1$
+			return new URI("remotetools", connection.getName(), path.toPortableString(), null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}

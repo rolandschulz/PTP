@@ -42,10 +42,10 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @return an RemoteToolsFileStore instance for the URI.
 	 */
 	public static RemoteToolsFileStore getInstance(URI uri) throws IOException {
+		String name = uri.getAuthority();
 		String path = uri.getPath();
-		String hostName = uri.getHost();
 		IRemoteConnectionManager connMgr = RemoteToolsServices.getInstance().getConnectionManager();
-		RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(hostName);
+		RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(name);
 		IRemoteFileManager fileMgr = RemoteToolsServices.getInstance().getFileManager(conn);
 		return (RemoteToolsFileStore)fileMgr.getResource(new Path(path), new NullProgressMonitor());
 	}
