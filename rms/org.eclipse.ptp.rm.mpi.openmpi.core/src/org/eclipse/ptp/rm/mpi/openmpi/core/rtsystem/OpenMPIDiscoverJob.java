@@ -35,6 +35,7 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -181,6 +182,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 				attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailed, e.getMessage())));
 				rts.changeMachine(machineID, attrManager);
+				rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
 			}
 			throw e;
 		} catch (Exception e) {
@@ -191,6 +193,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 			attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
 			rts.changeMachine(machineID, attrManager);
+			rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e));
 		}
 	}
 
