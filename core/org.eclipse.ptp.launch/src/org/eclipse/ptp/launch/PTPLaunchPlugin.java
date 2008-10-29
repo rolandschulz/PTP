@@ -150,7 +150,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.launch", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.launch", path); //$NON-NLS-1$
 	}    
 
 	/**
@@ -231,7 +231,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	public ResourceBundle getResourceBundle() {
 		try {
 			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.launch.LaunchPluginResources");
+				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.launch.LaunchPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}

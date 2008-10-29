@@ -40,7 +40,7 @@ public class DownloadRule implements ISynchronizationRule {
 	 * List of remote source paths, represented as strings.
 	 * They may be files or directories.
 	 */
-	private List remoteFileList = new ArrayList();
+	private List<String> remoteFileList = new ArrayList<String>();
 
 	/*
 	 * Default constructor.
@@ -96,7 +96,7 @@ public class DownloadRule implements ISynchronizationRule {
 		} else {
 			this.localDirectory = null;
 		}
-		this.remoteFileList = new ArrayList(rule.remoteFileList);
+		this.remoteFileList = new ArrayList<String>(rule.remoteFileList);
 	}
 
 	private void throwError(String string) {
@@ -155,7 +155,7 @@ public class DownloadRule implements ISynchronizationRule {
 	 * The rule as a serialized string.
 	 */
 	public String toString() {
-		List l = new ArrayList();
+		List<String> l = new ArrayList<String>();
 		if (localDirectory != null) {
 			l.add(SerializationKeys.KEY_LOCAL_PATH+" "+localDirectory.trim()); //$NON-NLS-1$
 		}
@@ -185,7 +185,7 @@ public class DownloadRule implements ISynchronizationRule {
 			}
 			l.add(s);			
 		}
-		for (Iterator iter = remoteFileList.iterator(); iter.hasNext();) {
+		for (Iterator<String> iter = remoteFileList.iterator(); iter.hasNext();) {
 			String remotePath = (String) iter.next();
 			if (remotePath == null) continue;
 			if (remotePath.trim().length() == 0) continue;
@@ -193,7 +193,7 @@ public class DownloadRule implements ISynchronizationRule {
 			l.add(SerializationKeys.KEY_REMOTE_PATH+" "+remotePath.trim());  //$NON-NLS-1$
 		}
 		String result = new String(SerializationKeys.TYPE_DOWNLOAD);
-		for (Iterator iter = l.iterator(); iter.hasNext();) {
+		for (Iterator<String> iter = l.iterator(); iter.hasNext();) {
 			String element = (String) iter.next();
 			result += "\n" + element; //$NON-NLS-1$
 		}
@@ -276,8 +276,8 @@ public class DownloadRule implements ISynchronizationRule {
 		return result;
 	}
 	
-	public class RemoteFileIteratorAsString implements Iterator {
-		Iterator iteratorref = remoteFileList.iterator();
+	public class RemoteFileIteratorAsString implements Iterator<Object> {
+		Iterator<String> iteratorref = remoteFileList.iterator();
 		
 		public boolean hasNext() {
 			return iteratorref.hasNext();
@@ -298,11 +298,11 @@ public class DownloadRule implements ISynchronizationRule {
 		}
 	}
 
-	public Iterator remoteIteratorAsString() {
+	public Iterator<?> remoteIteratorAsString() {
 		return new RemoteFileIteratorAsString();
 	}
 
-	public Iterator remoteIteratorAsPath() {
+	public Iterator<?> remoteIteratorAsPath() {
 		return new RemoteFileIteratorAsPath();
 	}
 
@@ -332,7 +332,7 @@ public class DownloadRule implements ISynchronizationRule {
 	}
 
 	public void removeRemoteFile(String entry) {
-		for (Iterator iter = remoteFileList.iterator(); iter.hasNext();) {
+		for (Iterator<String> iter = remoteFileList.iterator(); iter.hasNext();) {
 			String element = (String) iter.next();
 			if (element.equals(entry)) {
 				iter.remove();
