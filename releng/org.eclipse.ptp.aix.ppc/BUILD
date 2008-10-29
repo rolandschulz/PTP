@@ -38,7 +38,7 @@ do
 	if [ -e $plugin/configure ]; then
 		echo "Building $plugin..."
 		(cd $plugin; \
-		sh configure --prefix=$PREFIX && \
+		ksh93 configure --prefix=$PREFIX && \
 		chmod +x install-sh && \
 		make install)
 		echo; echo
