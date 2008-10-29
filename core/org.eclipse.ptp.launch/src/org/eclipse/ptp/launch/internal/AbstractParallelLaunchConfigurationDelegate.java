@@ -980,11 +980,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 */
 	protected void verifyDebuggerPath(ILaunchConfiguration configuration) throws CoreException {
 		String dbgPath = getDebuggerExePath(configuration);
-		IPath path = verifyResource(dbgPath, configuration);
-		if (path == null) {
+		try {
+			verifyResource(dbgPath, configuration);
+		} catch (CoreException e) {
 			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found,
-					new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {dbgPath})),
-								IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+					new FileNotFoundException(e.getLocalizedMessage()), IStatus.INFO);
 		}
 	}
 
@@ -1000,13 +1000,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			return new Path(getExecutablePath(configuration));
 		} else {
 			String exePath = getExecutablePath(configuration);
-			IPath path = verifyResource(exePath, configuration);
-			if (path == null) {
+			try {
+				return verifyResource(exePath, configuration);
+			} catch (CoreException e) {
 				abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
-						new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {exePath})),
-								IStatus.INFO);
+						new FileNotFoundException(e.getLocalizedMessage()),	IStatus.INFO);
+				return null;
 			}
-			return path;
 		}
 	}
 
@@ -1053,29 +1053,33 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
 		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
-		if (rm != null) {
-			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-				if (remoteServices != null) {
-					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-					IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
-					IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
-					try {
-						IPath resPath = new Path(path);
-						IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
-						if (res.fetchInfo().exists()) {
-							return resPath;
-						}
-					} catch (IOException e) {
-					}
-				}
-			} else {
-				// FIXME: work out what to do for RM's that don't extend AbstractRemoteResourceManagerConfiguration
-			}
+		if (rm == null) {
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager, null, IStatus.ERROR);
 		}
-		return null;
+		
+		IResourceManagerConfiguration conf = rm.getConfiguration();
+		if (!(conf instanceof AbstractRemoteResourceManagerConfiguration)) {
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Unsupported_resource_manager_type, null, IStatus.ERROR);
+		}
+		
+		AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+		if (remoteServices == null) {
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services, null, IStatus.ERROR);
+		}
+		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+		IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
+		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		IPath resPath = new Path(path);
+		try {
+			IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
+			if (!res.fetchInfo().exists()) {
+				abort(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {path}), null, IStatus.INFO);
+			}
+		} catch (IOException e) {
+			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Error_fetching_resource, e.getCause(), IStatus.ERROR);
+		}
+		return resPath;
 	}
 
 	/**
@@ -1204,9 +1208,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
         	path = verifyExecutablePath(configuration).removeLastSegments(1);
 		} else {
 			path = verifyResource(workPath, configuration);
-		}
-        if (path == null) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Working_directory_does_not_exist, null, IStatus.INFO);
 		}
 		return path.toString();
     }
