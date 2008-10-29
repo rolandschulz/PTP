@@ -93,7 +93,7 @@ MIIntToCString(int val)
 		str_ptr = 0;
 	}
 
-	if (str_ptr++ == NUM_STRINGS) {
+	if (++str_ptr == NUM_STRINGS) {
 		str_ptr = 0;
 	}
 
