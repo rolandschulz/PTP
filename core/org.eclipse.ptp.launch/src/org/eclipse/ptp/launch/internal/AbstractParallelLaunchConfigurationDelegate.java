@@ -705,6 +705,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		/*
 		 * Collect attributes from Debugger tab
 		 */
+		verifyDebuggerPath(configuration);
 		Boolean stopInMainFlag = getDebuggerStopInMainFlag(configuration);
 		attrMgr.addAttribute(JobAttributes.getDebuggerStopInMainFlagAttributeDefinition().create(stopInMainFlag));
 
@@ -977,7 +978,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @param path
 	 * @throws CoreException
 	 */
-	protected void verifyDebuggerPath(String dbgPath, ILaunchConfiguration configuration) throws CoreException {
+	protected void verifyDebuggerPath(ILaunchConfiguration configuration) throws CoreException {
+		String dbgPath = getDebuggerExePath(configuration);
 		IPath path = verifyResource(dbgPath, configuration);
 		if (path == null) {
 			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found,
