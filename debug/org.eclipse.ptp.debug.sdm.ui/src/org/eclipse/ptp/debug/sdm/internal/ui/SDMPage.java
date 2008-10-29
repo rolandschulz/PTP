@@ -55,7 +55,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IResourceManagerControl resourceManager = null;
 	private IRemoteServices remoteServices = null;
 	private String errMsg = null;
-	private boolean pathIsDirty = false;
+	private boolean pathIsDirty = true;
 	
 	protected Text fRMDebuggerPathText = null;
 	protected Text fRMDebuggerAddressText = null;
@@ -154,7 +154,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		errMsg = null;
 		if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			errMsg = Messages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
 		} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
