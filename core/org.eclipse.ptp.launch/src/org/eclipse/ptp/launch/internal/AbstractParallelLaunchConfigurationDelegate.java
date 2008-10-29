@@ -118,7 +118,7 @@ import org.eclipse.ptp.utils.core.linux.ArgumentParser;
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		LaunchConfigurationDelegate implements ILaunchProcessCallback {
-	private List extraSynchronizationRules;
+	private List<ISynchronizationRule> extraSynchronizationRules;
 	public enum JobStatus {SUBMITTED, COMPLETED, ERROR}
 
 	/**
@@ -145,7 +145,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			this.launch = launch;
 			this.attrMgr = attrMgr;
 			this.debugger = debugger;
-			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count);
+			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count); //$NON-NLS-1$
 		}
 
 		/**
@@ -749,7 +749,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		try {
 			dbgCfg = PTPDebugCorePlugin.getDefault().getDebugConfiguration(getDebuggerID(config));
 		} catch (CoreException e) {
-			System.out.println("ParallelLaunchConfigurationDelegate.getDebugConfig() Error");
+			System.out.println("ParallelLaunchConfigurationDelegate.getDebugConfig() Error"); //$NON-NLS-1$
 			throw e;
 		}
 		return dbgCfg;
@@ -969,7 +969,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		Throwable exception = new FileNotFoundException(Messages.AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable);
 		int code = IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
 		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code, Messages.AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable, exception);
-		status.add(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), code, exception == null ? "" : exception.getLocalizedMessage(), exception));
+		status.add(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), code, exception == null ? "" : exception.getLocalizedMessage(), exception)); //$NON-NLS-1$
 		throw new CoreException(status);
 	}
 
@@ -1136,14 +1136,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 
 						if(!rres.fetchInfo().exists()) {
 							// Local file not found!
-							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Remote resource doesn't exist!"));
+							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+									Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
 						}
 						IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
 
 						// Copy file
 						rres.copy(lres, EFS.OVERWRITE, monitor);
 					} catch (IOException e) {
-						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Could not retrieve remote resource info!"));
+						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+								Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_remote_resource_info));
 					}
 	/*			}
 			} else {
@@ -1171,7 +1173,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 						IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
 						if(!lres.fetchInfo().exists()) {
 							// Local file not found!
-							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Local resource doesn't exist!"));
+							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+									Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
 						}
 						IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
 
@@ -1179,7 +1182,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 						lres.copy(rres, EFS.OVERWRITE, monitor);
 
 					} catch (IOException e) {
-						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Could not retrieve local resource info!"));
+						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+								Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_local_resource_info));
 					}
 	}
 
@@ -1221,7 +1225,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		// This faction generate action objects which execute according to rules
 		RuleActionFactory ruleActFactory = new RuleActionFactory(configuration, this, monitor);
 
-		List rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList());
+		List<?> rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList<String>());
 
 		// Iterate over rules executing them
 		for (Object ruleObj : rulesList) {
@@ -1242,7 +1246,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 				IPTPLaunchConfigurationConstants.ATTR_SYNC_AFTER, false);
 		if(!syncAfter)
 			return;
-		List rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList());
+		List<?> rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList<String>());
 
 		// This faction generate action objects which execute according to rules
 		RuleActionFactory ruleActFactory = new RuleActionFactory(configuration, this, new NullProgressMonitor());
@@ -1262,19 +1266,18 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * Returns the (possible empty) list of synchronization rule objects according to the rules described in the configuration.
 	 */
 	protected ISynchronizationRule[] getSynchronizeRules(ILaunchConfiguration configuration) throws CoreException {
-		List ruleStrings = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList());
-		List result = new ArrayList();
+		List<?> ruleStrings = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList<String>());
+		List<ISynchronizationRule> result = new ArrayList<ISynchronizationRule>();
 
-		for (Iterator iter = ruleStrings.iterator(); iter.hasNext();) {
-			String element = (String) iter.next();
+		for (Object ruleObj : ruleStrings) {
+			String element = (String) ruleObj;
 			try {
 				ISynchronizationRule rule = RuleFactory.createRuleFromString(element);
 				result.add(rule);
 			} catch (RuntimeException e) {
-				// FIXME Externalize
 				throw new CoreException(new Status(Status.ERROR,
 						PTPLaunchPlugin.PLUGIN_ID,
-						"Error converting rules"));
+						Messages.AbstractParallelLaunchConfigurationDelegate_Error_converting_rules));
 			}
 		}
 
@@ -1292,9 +1295,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-
-				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices");
+				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices"); //$NON-NLS-1$
 				if (localServices != null) {
 					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
@@ -1336,7 +1337,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			return null;
 		}
 		if (! configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true)) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Parallel launcher does not support replacing all environment variables on remote environment."));
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), 
+					Messages.AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support));
 		}
 
 		List<String> strings = new ArrayList<String>(configEnv.size());
@@ -1345,7 +1347,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			Entry<?,?> entry = (Entry<?, ?>) iter.next();
 			String key = (String) entry.getKey();
             String value = (String) entry.getValue();
-            strings.add(key+"="+value);
+            strings.add(key+"="+value); //$NON-NLS-1$
 
 		}
 		return strings.toArray(new String[strings.size()]);

@@ -45,7 +45,7 @@ public class UploadRule implements ISynchronizationRule {
 	 * List of local paths, represented as strings.
 	 * They may be files or directories.
 	 */
-	private List localFileList = new ArrayList();
+	private List<String> localFileList = new ArrayList<String>();
 
 	/*
 	 * Default constructor.
@@ -103,7 +103,7 @@ public class UploadRule implements ISynchronizationRule {
 		} else {
 			this.remoteDirectory = null;
 		}
-		this.localFileList = new ArrayList(rule.localFileList);
+		this.localFileList = new ArrayList<String>(rule.localFileList);
 	}
 
 	private void throwError(String string) {
@@ -166,7 +166,7 @@ public class UploadRule implements ISynchronizationRule {
 	 * The rule as a serialized string.
 	 */
 	public String toString() {
-		List l = new ArrayList();
+		List<String> l = new ArrayList<String>();
 		if (remoteDirectory != null) {
 			l.add(SerializationKeys.KEY_REMOTE_PATH+" "+remoteDirectory.trim()); //$NON-NLS-1$
 		}
@@ -202,7 +202,7 @@ public class UploadRule implements ISynchronizationRule {
 			}
 			l.add(s);			
 		}
-		for (Iterator iter = localFileList.iterator(); iter.hasNext();) {
+		for (Iterator<String> iter = localFileList.iterator(); iter.hasNext();) {
 			String localpath = (String) iter.next();
 			if (localpath == null) continue;
 			if (localpath.trim().length() == 0) continue;
@@ -210,7 +210,7 @@ public class UploadRule implements ISynchronizationRule {
 			l.add(SerializationKeys.KEY_LOCAL_PATH+" "+localpath.trim());  //$NON-NLS-1$
 		}
 		String result = new String(SerializationKeys.TYPE_UPLOAD);
-		for (Iterator iter = l.iterator(); iter.hasNext();) {
+		for (Iterator<String> iter = l.iterator(); iter.hasNext();) {
 			String element = (String) iter.next();
 			result += "\n" + element; //$NON-NLS-1$
 		}
@@ -309,8 +309,8 @@ public class UploadRule implements ISynchronizationRule {
 		return result;
 	}
 	
-	public class LocalFileIteratorAsString implements Iterator {
-		Iterator iteratorref = localFileList.iterator();
+	public class LocalFileIteratorAsString implements Iterator<Object> {
+		Iterator<String> iteratorref = localFileList.iterator();
 		
 		public boolean hasNext() {
 			return iteratorref.hasNext();
@@ -337,15 +337,15 @@ public class UploadRule implements ISynchronizationRule {
 		}
 	}
 
-	public Iterator localIteratorAsString() {
+	public Iterator<?> localIteratorAsString() {
 		return new LocalFileIteratorAsString();
 	}
 
-	public Iterator localIteratorAsPath() {
+	public Iterator<?> localIteratorAsPath() {
 		return new LocalFileIteratorAsPath();
 	}
 
-	public Iterator localIteratorAsFile() {
+	public Iterator<?> localIteratorAsFile() {
 		return new LocalFileIteratorAsFile();
 	}
 
@@ -386,7 +386,7 @@ public class UploadRule implements ISynchronizationRule {
 	}
 
 	public void removeLocalFile(String entry) {
-		for (Iterator iter = localFileList.iterator(); iter.hasNext();) {
+		for (Iterator<String> iter = localFileList.iterator(); iter.hasNext();) {
 			String element = (String) iter.next();
 			if (element.equals(entry)) {
 				iter.remove();

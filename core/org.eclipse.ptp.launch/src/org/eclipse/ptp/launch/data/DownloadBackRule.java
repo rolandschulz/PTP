@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.IPath;
 
 
 public class DownloadBackRule implements ISynchronizationRule {
-	List remoteFiles = new ArrayList();
-	List localFiles = new ArrayList();
+	List<IPath> remoteFiles = new ArrayList<IPath>();
+	List<File> localFiles = new ArrayList<File>();
 	
 	public DownloadBackRule() {
 	}
