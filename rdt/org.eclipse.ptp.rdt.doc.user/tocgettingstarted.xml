@@ -16,7 +16,11 @@
    </topic>
    <topic href="html/gettingstarted/creating_a_remote_project.html" label="Creating A Remote Project">
    </topic>
-   <topic href="html/gettingstarted/editing_remote_code.html" label="Editing Remote Code">
+   <topic href="html/gettingstarted/editing_remote_code.html" label="Creating and Editing Remote Code">
+      <topic href="html/gettingstarted/creating_your_cpp_file.html" label="Creating your C++ file">
+      </topic>
+      <topic href="html/gettingstarted/creating_your_makefile.html" label="Creating your makefile">
+      </topic>
    </topic>
    <topic href="html/gettingstarted/analysis_of_remote_code.html" label="Analysis of Remote Code">
    </topic> 
