@@ -56,6 +56,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteServices remoteServices = null;
 	private String errMsg = null;
 	private boolean pathIsDirty = true;
+	private boolean pathIsValid = false;
 	
 	protected Text fRMDebuggerPathText = null;
 	protected Text fRMDebuggerAddressText = null;
@@ -154,20 +155,56 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
-			errMsg = Messages.getString("SDMDebuggerPage.err1"); //$NON-NLS-1$
-		} else if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
-			errMsg = Messages.getString("SDMDebuggerPage.err3"); //$NON-NLS-1$
-		} else if (pathIsDirty) {
-			if  (!verifyPath(fRMDebuggerPathText.getText())) {
-				errMsg = Messages.getString("SDMDebuggerPage.err4"); //$NON-NLS-1$
+		setErrorMessage(null);
+		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
+			setErrorMessage(Messages.getString("SDMDebuggerPage.err3")); //$NON-NLS-1$
+		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
+			setErrorMessage(Messages.getString("SDMDebuggerPage.err1")); //$NON-NLS-1$
+		} else {
+			if (pathIsDirty) {
+				if (!verifyPath(fRMDebuggerPathText.getText())) {
+					pathIsValid = false;
+				} else {
+					pathIsValid = true;
+				}
+				pathIsDirty = false;
+			} 
+			
+			if (!pathIsValid) {
+				setErrorMessage(Messages.getString("SDMDebuggerPage.err4")); //$NON-NLS-1$
 			}
-			pathIsDirty = false;
 		}
-		setErrorMessage(errMsg);
-		return (errMsg == null);
+		return (getErrorMessage() == null);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
+	 */
+	@Override
+	public boolean canSave() {
+		setErrorMessage(null);
+		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
+			setErrorMessage(Messages.getString("SDMDebuggerPage.err3")); //$NON-NLS-1$
+		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
+			setErrorMessage(Messages.getString("SDMDebuggerPage.err1")); //$NON-NLS-1$
+		} else {
+			if (pathIsDirty) {
+				if (!verifyPath(fRMDebuggerPathText.getText())) {
+					pathIsValid = false;
+				} else {
+					pathIsValid = true;
+				}
+				pathIsDirty = false;
+			} 
+			
+			if (!pathIsValid) {
+				setErrorMessage(Messages.getString("SDMDebuggerPage.err4")); //$NON-NLS-1$
+			}
+		}
+		//setErrorMessage(errMsg);
+		return (getErrorMessage() == null);
+	}
+	
 	/**
 	 * Verify that the supplied path exists on the remote system
 	 * 
