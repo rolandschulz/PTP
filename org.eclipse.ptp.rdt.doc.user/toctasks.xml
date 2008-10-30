@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Tasks" link_to="toc.xml#tasks"> 
-	<topic href="html/tasks/creating_a_remote_project.html" label="Creating A Remote Project">
+<toc label="Tasks" link_to="toc.xml#tasks" topic="html/gettingstarted/creating_a_remote_project.html"> 
+	<topic href="html/gettingstarted/creating_a_remote_project.html" label="Creating A Remote Project">
 	</topic>
  <topic href="html/tasks/work_with_remote_project_files.html" label="Work With Remote Project Files">
     <topic href="html/tasks/converting_to_remote_project.html" label="Converting to a remote project">
