@@ -38,7 +38,7 @@ import org.eclipse.ui.IMemento;
 public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	public PEResourceManagerFactory() {
-		super("PE");
+		super("IBM Parallel Environment");
 	}
 
 	/* (non-Javadoc)
