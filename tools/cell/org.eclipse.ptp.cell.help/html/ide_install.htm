@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Language" content="en-us">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>IBM SDK for Multicore Acceleration IDE</title>
+	<title>PTP Cell/B.E IDE</title>
 	<link rel="stylesheet" type="text/css" href="../help.css">
 </head>
 <body bgcolor="white">
@@ -11,7 +11,7 @@
 <p>
 <h4>1.) Install Java 1.5 (<a href="http://java.sun.com/javase/downloads/index_jdk5.jsp" target="_new">Sun's</a>)</h4>
 <ul>
-	<li>The default JRE that comes installed with Fedora (GCJ) is <i>not</i> sufficient.</li>
+	<li>The default JRE that comes installed with some Linux distributions (GCJ) is <i>not</i> sufficient.</li>
 	<li>Note: if you have a 64bit PPC machine, you will need to install and use a 32bit Java runtime environment, as Eclipse for PPC is compiled for the 32bit architecture.</li>
 </ul>
 
@@ -29,43 +29,23 @@ OR
 
 <h4>3.) Install <a href="http://www.eclipse.org/" target="_new">Eclipse 3.2</a></h4>
 <ul>
-<li>Note: The Cell IDE is <i>not</i> compatible with Eclipse 3.3</li>
+<li>Note: The PTP Cell/B.E is <i>not</i> compatible with Eclipse 3.3</li>
 </ul>
 
-<h4>4.) Install <a href="http://www.eclipse.org/cdt/downloads.php" target="_new">CDT 4.0</a> plugins into Eclipse</h4>
+<h4>4.) Install <a href="http://www.eclipse.org/cdt/downloads.php" target="_new">CDT</a> plug-ins into Eclipse</h4>
 
-<h4>5.) Install the <a href="http://www-128.ibm.com/developerworks/power/cell/">Cell Broadband Engine SDK v3.0</a></h4>
+<h4>5.) Install the <a href="http://www-128.ibm.com/developerworks/power/cell/">Cell Broadband Engine SDK v3.1</a></h4>
 
-<h4>6.) Install the Cell IDE RPM</h4>
-<ul>
-<li>To install the Cell IDE RPM, log in as your root (admin) user and perform one of the two installation methods:
-<ol>
-	<li>Download the RPM from the <a href="http://www-128.ibm.com/developerworks/power/cell/" target="_new">developerWorks IDE site</a>, and install it using the RPM command:</li>
-<pre>  > rpm -ivh cellide-3.0.0-[RELEASE_NUM].noarch.rpm</pre></li>
-OR
-<li>If you have the "cell-install" rpm installed, you can use yum:
-<pre>  > yum install cellide</pre></li>
-</ol>
-</li>
-</ul>
+<h4>6.) Install the PTP Cell/B.E into Eclipse via PTP update site</h4>
 
-<h4>7.) Install the Cell IDE into Eclipse via update manager</h4>
-<ol>
-	<li>With Eclipse open, click <b>Help -&gt; Software Updates -&gt; Find and Install...</b></li>
-	<li>Select <b>Search for new features to install</b>, then press <b>Next</b></li>
-	<li>Click <b>New Local Site...</b></li>
-	<li>Navigate to <b>/opt/cell/ide/</b></li> and click <b>OK</b></li>
-	<li>Click <b>Finish</b>; and follow the onscreen instructions.</li>
-</ol>
-
-<h4>8.) Install the ALF IDE template package</h4>
+<h4>7.) Install the ALF IDE template package</h4>
 <ul>
 	<li>If you wish to use the ALF IDE Wizard, you will need to install the ALF IDE template RPM ("alf-ide-template"). 
 	Make sure you have the Cell SDK's "cell-install" RPM package installed, then execute the following command:
 	<pre>  > yum install alf-ide-template</pre></li>
 </ul>
 
-<h4>9.) Restart your system to ensure all settings take effect</h4>
+<h4>8.) Restart Eclipse to ensure all settings take effect</h4>
 <ul>
 <li>Note: it is a good idea to run eclipse with <i>-clean</i> at least the first time after you install new plug-ins to make
 sure eclipse will refresh its plug-in cache</li>

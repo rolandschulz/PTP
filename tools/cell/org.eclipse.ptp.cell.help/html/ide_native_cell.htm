@@ -3,26 +3,26 @@
 <head>
 	<meta http-equiv="Content-Language" content="en-us">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>IBM SDK for Multicore Acceleration IDE</title>
+	<title>PTP Cell/B.E IDE</title>
 	<link rel="stylesheet" type="text/css" href="../help.css">
 </head>
 <body bgcolor="white"><p>
-<h3>Running the Cell IDE on the Cell Broadband Engine</h3>
+<h3>Running the PTP Cell/B.E on the Cell Broadband Engine</h3>
 IBM's SDK for Multicore Acceleration IDE can now be run on a machine with a Cell BE processor (as of version 3.0). There are 
 a few topics worth discussing if you are planning on utilizing this new supported platform to run the IDE. This document covers these topics.
 <br>
 <h4>Managed Builder Paths</h4>
-The GNU and XL tool paths are at different locations on a native Cell BE machine than on a "typical", non-Cell machine. The Cell IDE's default
+The GNU and XL tool paths are at different locations on a native Cell BE machine than on a "typical", non-Cell machine. The PTP Cell/B.E's default
 paths reflect the default Cell SDK tool paths of a non-Cell computer, so these paths must be corrected. This can be done as follows:
 <ol>
-	<li>After <a href="ide_install.htm">installing the Cell IDE</a>, open Eclipse preferences by clicking <b>Window -&gt; Preferences</b></li>
+	<li>After <a href="ide_install.htm">installing the PTP Cell/B.E</a>, open Eclipse preferences by clicking <b>Window -&gt; Preferences</b></li>
 	<li>Open the <b>GNU Tools Managed Build Paths</b> preference page: <b>Cell -&gt; Managed Builder Paths -&gt; GNU Tools Managed Build Paths</b></li>
 	<li>Click <b>Find it!</b> to automatically find the GNU tools location, or click <b>Browse...</b> to manually select the location</li>
 	<li>Do the same for the <b>XL Tools Managed Build Paths</b> preference page</li>
 </ol>
 <br>
 <h4>Debugging Cell Applications</h4>
-Debugging Cell applications while running the Cell IDE on a native Cell BE machine requires a few changes in the debugger configuration in order
+Debugging Cell applications while running the PTP Cell/B.E on a native Cell BE machine requires a few changes in the debugger configuration in order
 to function properly. Unlike attempting to debug Cell applications remotely via SSH, debugging locally does not require the use of gdbserver. 
 Also, instead of creating a <b>C/C++ Cell Target Application</b> debug configuration, you can simply create a <b>C/C++ Local Application</b> configuration (see fig.1 below). 
 Note: other debugger configurations/combinations are possible, but here I only describe one of them.
@@ -50,7 +50,7 @@ Running applications locally on a Cell machine can be accomplished by using eith
 the <b>C/C++ Cell Target Application</b> launch configuration.</p><p>
 The <b>C/C++ Cell Target Application</b> launcher was initially designed to allow for the running/debugging of applications on a Cell 
 simulator/machine, while the development of that application was done on a computer without a Cell processor. However, this same launcher can 
-also be used to deploy an application locally if you are running the Cell IDE on a machine with a Cell processor. In order to accomplish this, 
+also be used to deploy an application locally if you are running the PTP Cell/B.E on a machine with a Cell processor. In order to accomplish this, 
 all that needs to be done is to create a <b>Cell Box</b> environment (in the <b>Cell Environments</b> view) with the configuration option 
 <b>Localhost</b> selected (instead of <b>Remote host</b> being selected). After clicking the green arrow to start the localhost Cell Box, it 
 can then be used as the target environment in the <b>C/C++ Cell Target Application</b> launcher. 

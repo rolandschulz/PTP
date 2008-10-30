@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Language" content="en-us">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>IBM SDK for Multicore Acceleration IDE</title>
+	<title>PTP Cell/B.E IDE</title>
 	<link rel="stylesheet" type="text/css" href="../help.css">
 </head>
 <body bgcolor="white"><p>
@@ -11,7 +11,7 @@
 <p>
 IBM's SDK for Multicore Acceleration IDE establishes connections to remote cell environments using Secure Shell (SSH).
 Two SSH authentication methods are supported: password based and public key based. This document explains how to configure your client and server (as well 
-as how to configure the Cell IDE's environments) to use the public key authentication method.
+as how to configure the PTP Cell/B.E's environments) to use the public key authentication method.
 <h4>Verify Software</h4>
 First, confirm that OpenSSH is the SSH software installed on the client system. Public key generation may me different under different implementations
 of SSH. The <b>ssh -V</b> command will print the version of your SSH software:
@@ -49,7 +49,7 @@ then you will be asked for the passphrase when you connect:
  Enter passphrase for key '/home/user/.ssh/id_rsa':
 </pre>
 <h4>Cell Environment Configuration</h4>
-Finally, the Cell Environment inside the Cell IDE needs to be configured. Note that public key authentication can be used on any of the Cell target environment types
+Finally, the Cell Environment inside the PTP Cell/B.E needs to be configured. Note that public key authentication can be used on any of the Cell target environment types
 except for the <b>Local Cell Simulator</b> type. The following steps explain how to configure your Cell Environment:
 <ul>
 <li>In Eclipse, open the <b>Cell Environments</b> view</li>
