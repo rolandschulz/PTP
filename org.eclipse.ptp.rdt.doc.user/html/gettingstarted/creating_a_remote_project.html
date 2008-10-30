@@ -1,15 +1,182 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-   <head>
-      <title>Title</title>
-   </head>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<title>Creating a Remote C/C++ Project</title>
+</head>
 
-   <body>
-      <h2>
-         Title
-      </h2>
-      <p>
-         Body
-      </p>
-   </body>
+<body>
+<h1>Creating a Remote C/C++ Project</h1>
+
+<p>
+Before creating a Remote C/C++ Project it is recommended that you
+have already established a connection to a remote RDT server.
+<ul>
+<li><a href="server_installation.html">RDT Server Installation</a></li>
+<li><a href="creating_a_connection.html">Connecting to a Remote RDT Server</a></li>
+</ul>
+</p>
+
+<h3>Remote C/C++ Project Wizard</h3>
+
+<p>
+Disclaimer: The Remote C/C++ Project Wizard is based on the CDT new project wizard which
+was originally designed to create local projects. Therefore some aspects of the wizard
+interface are not ideal for the scenario of creating a remote project. The remote project
+must be set up correctly or it will not work properly. The following steps describe in
+detail what must be done to correctly set up a remote project.
+</p>
+
+
+<ol>
+	<li>
+		To create a new Remote C/C++ Project begin by opening the 
+		<b>New Remote C/C++ Project Wizard</b> by going to 
+		<b>File &gt; New &gt; New Remote C/C++ Project</b>.
+		<br><br>
+		<img src="../../images/new_project_wizard/menu_create_project.png" alt="File > New > New Remote C/C++ Project">
+		<br><br><br>
+	</li>
+
+	<li>
+		Enter the project name.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_enter_project_name.png" alt="Enter Project Name">
+		<br><br><br>
+	</li>
+
+	<li>
+		Uncheck the checkbox that says <b>Use default location</b>. The default location
+		is the local file system which is not appropriate for remote projects.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_uncheck_default_location.png" alt="Uncheck Default Location">
+		<br><br><br>
+	</li>
+
+	<li>
+		Choose a file system type for hosting the remote project. RDT currently ships with the <b>RSE
+		file system</b>, so it is recommended that you choose that. Do not choose <b>default</b>
+		because the default file system is the local file system.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_choose_file_system.png" alt="Choose File System">
+		<br><br><br>
+	</li>
+
+	<li>
+		Now the location of the project root folder must be entered into the <b>Location</b> field.
+		This field requires a correctly formatted URI (Uniform Resource Identifier). If you do not know the
+		URI of the project folder then it is recommended that you use the <b>Browse...</b> button.  
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_browse_file_system.png" alt="Browse File System">
+		<br><br><br>
+	</li>
+
+	<li>
+		If you have chosen RSE as the file system then the RSE <b>Browse for Folder</b> dialog will appear.
+		In this dialog first choose a connection to a running RDT server.
+		<br><br>
+		<img src="../../images/new_project_wizard/browse_connection.png" alt="Choose a Connection">
+		<br><br><br>
+	</li>
+
+	<li>
+		Choose a folder and click OK.
+		<br><br>
+		<img src="../../images/new_project_wizard/browse_folder.png" alt="Choose a Folder">
+		<br><br><br>
+	</li>
+	
+	<li>
+		The URI of the chosen folder will appear in the <b>Location</b> field.
+		You may create a sub-folder by editing the URI and adding the name of the sub-folder 
+		at the end.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_uri.png" alt="Choose a Folder">
+		<br><br><br>
+	</li>
+
+	<li>
+		In the <b>Project type</b> field expand <b>Remote Makefile Project</b> and select 
+		<b>Empty Project</b>. If this project type is not chosen then executing remote
+		builds will not work.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_select_makefile_project.png" alt="Select Makefile Project">
+		<br><br><br>
+	</li>
+
+	<li>
+		At the bottom of the wizard uncheck the checkbox that says <b>Show project types and toolchains
+		only if they are supported on the platform</b>. If this checkbox is checked then the wizard
+		will filter out what it thinks are unsupported toolchains. Unfortunately the wizard only examines
+		the local machine for supported toolchains and does not examine the remote machine where the project
+		will be located. 
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_uncheck_toolchains.png" alt="Uncheck Toolchains">
+		<br><br><br>
+	</li>
+
+	<li>
+		Select a toolchain. A toolchain is a set of tools (such as a compiler, linker, and assembler) 
+		intended to build your project.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_select_toolchain.png" alt="Select a Toolchain">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Click <b>Next</b>.
+	</li>
+	
+	<li>
+		The next page of the wizard allows you to select available build configurations.
+		It is not necessary to make any changes on this page because additional build 
+		configurations can be created after the project has been created.
+		Click <b>Next</b>.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_page_2.png" alt="Configurations">
+		<br><br><br>
+	</li>
+
+
+	<li>
+		The next page of the wizard requires you to manually configure RDT services.
+		First configure the <b>Build</b> service. Select <b>RDT Remote Build Service</b>
+		as the service provider, then click <b>Configure</b>.
+		<br><br>
+		<img src="../../images/new_project_wizard/services_build.png" alt="Configure the Build Service">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Select the same provider and connection that you used on the first page of the wizard
+		then click <b>OK</b>.
+		<br><br>
+		<img src="../../images/new_project_wizard/services_build_configure.png" alt="Configure the Build Service">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Now configure the <b>C/C++ Indexing</b> service. Select <b>RDT Remote C/C++ Indexing Service</b>
+		as the service provider, then click <b>Configure</b>.
+		<br><br>
+		<img src="../../images/new_project_wizard/services_indexing.png" alt="Configure the Build Service">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Select the same connection that you used on the first page of the wizard, then click <b>OK</b>.
+		<br><br>
+		<img src="../../images/new_project_wizard/services_indexing_configure.png" alt="Configure the Build Service">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Click <b>Finish</b>. Creating the project may take a few minutes. Once the project has been 
+		created it will appear in the <b>Project Explorer</b> view.
+	</li>
+
+</ol>
+<br><br><br>
+</body>
 </html>
