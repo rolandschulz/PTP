@@ -89,4 +89,8 @@
          id="org.eclipse.ptp.cell"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.rm.mpich2"
+         version="0.0.0"/>
+
 </feature>
