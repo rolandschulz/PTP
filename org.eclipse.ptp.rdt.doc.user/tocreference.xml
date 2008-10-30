@@ -2,7 +2,13 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Reference" link_to="toc.xml#reference"> 
-	<topic label="Remote C/C++ New Project Wizard"  href="html/reference/remote_c_new_project_wizard.html"> 
+	<topic label="Remote C/C++ New Project Wizard"  href="html/reference/remote_c_new_project_wizard.html">
+    <topic href="html/reference/remote_c_new_project_wizard_1.html" label="Name, Location, Project Type and Toolchain Page">
+    </topic>
+    <topic href="html/reference/remote_c_new_project_wizard_2.html" label="Configurations Page">
+    </topic>
+    <topic href="html/reference/remote_c_new_project_wizard_3.html" label="Service Providers Page">
+    </topic> 
 	</topic>
  <topic label="Remote C/C++ Views and Editors">
     <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor">
