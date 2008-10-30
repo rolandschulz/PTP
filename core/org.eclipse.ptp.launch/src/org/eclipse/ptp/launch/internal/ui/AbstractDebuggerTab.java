@@ -224,6 +224,21 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		return true;
 	}
 
+	public boolean canSave() {
+		setErrorMessage(null);
+		setMessage(null);
+		if (getDebugConfig() == null) {
+			setErrorMessage(Messages.AbstractDebuggerTab_No_debugger_available);
+			return false;
+		}
+
+		ILaunchConfigurationTab dynamicTab = getDynamicTab();
+		if (dynamicTab != null) {
+			return dynamicTab.canSave();
+		}
+		return true;
+	}
+	
 	protected void setInitializeDefault(boolean init) {
 		fInitDefaults = init;
 	}
