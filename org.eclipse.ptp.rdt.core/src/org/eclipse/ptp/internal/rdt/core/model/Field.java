@@ -12,10 +12,12 @@
 package org.eclipse.ptp.internal.rdt.core.model;
 
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPMember;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.IField;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
+import org.eclipse.ptp.rdt.core.RDTLog;
 
 public class Field extends VariableDeclaration implements IField {
 	private static final long serialVersionUID = 1L;
@@ -36,6 +38,24 @@ public class Field extends VariableDeclaration implements IField {
 
 	public Field(Parent parent, org.eclipse.cdt.core.dom.ast.IField binding) throws DOMException {
 		super(parent, ICElement.C_FIELD, binding);
+		if (binding instanceof ICPPMember) {
+			ICPPMember member= (ICPPMember) binding;
+			try {
+				switch (member.getVisibility()) {
+				case ICPPMember.v_private:
+					fVisibility = ASTAccessVisibility.PRIVATE;
+					break;
+				case ICPPMember.v_protected:
+					fVisibility = ASTAccessVisibility.PROTECTED;
+					break;
+				case ICPPMember.v_public:
+					fVisibility = ASTAccessVisibility.PUBLIC;
+					break;
+				}
+			} catch (DOMException e) {
+				RDTLog.logError(e);
+			}
+		}
 	}
 
 	public boolean isMutable() throws CModelException {
