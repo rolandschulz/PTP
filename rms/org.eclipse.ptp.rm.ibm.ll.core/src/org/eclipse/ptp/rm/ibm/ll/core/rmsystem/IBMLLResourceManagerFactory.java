@@ -34,7 +34,7 @@ import org.eclipse.ui.IMemento;
 public class IBMLLResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	public IBMLLResourceManagerFactory() {
-		super("IBMLL");
+		super("IBM LoadLeveler");
 	}
 
 	/* (non-Javadoc)
