@@ -62,7 +62,7 @@
 		<unzip src="${rseDist}" dest="${buildDirectory}"/>
 		<unzip src="${cdtDist}" dest="${buildDirectory}/eclipse"/>
 		<unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/>
-		<unzip src="${photranDist}" dest="${buildDirectory}/eclipse/dropins"/>
+		<unzip src="${photranDist}" dest="${buildDirectory}/eclipse"/>
 	</target>
 	
 	<target name="zips" depends="init,unzip">
