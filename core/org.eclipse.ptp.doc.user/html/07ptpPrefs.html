@@ -62,8 +62,6 @@
 <dl>
 <dt><b>SDM client host</b> (default localhost)</dt><dd>This specifies the host on which Eclipse is running. It is used to establish communication between the SDM and Eclipse. In situations where a parallel job is being debugged remotely, this should be the host name of the &quot;front end&quot; on which Eclipse is running.</dd>
 <dt><b>Backend debugger</b> (default gdb-mi)</dt><dd>The name of the backend debugger to use when debugging the application. This is an internal name known by the SDM, not the name of the debugger itself. Currently only gdb using the MI mode is supported.</dd>
-<dt><b>Path to backend debugger</b> (default empty)</dt><dd>This can be used to specify the path to the backend debugger, if it is located in a non standard place. Useful on machines that do not have physical disks or network filesystems on compute nodes. </dd>
-<dt><b>SDM executable</b> (default sdm location)</dt><dd>The path to the SDM executable. This is normally installed in an Eclipse plugin and is automatically determined. </dd>
 <dt><b>Extra SDM arguments</b> (default empty)</dt><dd>Any extra arguments that need to be supplied to the sdm (e.g. for debugging purposes)</dd>
 </dl>
 
@@ -76,22 +74,27 @@ and <a href="PLUGINS_ROOT/org.eclipse.ptp.ibmpe.help/html/PEMainHelp.html">Paral
 for details on their preference pages.</p>
 
 
-<h2 id="orte"></a>Open RTE Preferences (PTP &gt; Resource Managers &gt; Open RTE)</h2>
+<h2 id="orte"></a>Open MPI Preferences (PTP &gt; Resource Managers &gt; Open MPI)</h2>
 
-<p> These are preferences specific to the Open Runtime Environment (Open RTE).</p>
-<p><script> thumb("images/07prefsORTE.png")</script>
+<p> These are preferences specific to Open MPI.</p>
 
-<h3>PTP Proxy Server</h3>
-<p>Specifies the location  
-    of the Open RTE proxy server executable. Default location of the proxy agent.
-    This is automatically determined and  does not need to be changed.<p>
+<h3>Open MPI 1.2</h3>
+<p>Specifies the defaults for Open MPI version 1.2.<p>
+<dl>
+<dt><b>Launch command</b></dt><dd>The default command used to launch applications.</dd>
+<dt><b>Debug command</b></dt><dd>The default command used to launch the debugger.</dd>
+<dt><b>Discover command</b></dt><dd>The default command used to discover the system configuration.</dd>
+<dt><b>Path to installation</b></dt><dd>The default path to the Open MPI installation.</dd>
+</dl>
 
-<h3>Multiplexing Options</h3>
-<p>Specifies the default method for connection between Eclipse and the proxy agent. Does not
-need to be changed.</p>
-
-<h3>Other Options</h3>
-<p>These options do not need to be changed.</p>
+<h3>Open MPI 1.3</h3>
+<p>Specifies the defaults for Open MPI version 1.3.<p>
+<dl>
+<dt><b>Launch command</b></dt><dd>The default command used to launch applications.</dd>
+<dt><b>Debug command</b></dt><dd>The default command used to launch the debugger.</dd>
+<dt><b>Discover command</b></dt><dd>The default command used to discover the system configuration.</dd>
+<dt><b>Path to installation</b></dt><dd>The default path to the Open MPI installation.</dd>
+</dl>
 
 <h2 id="viewer">Viewer (PTP &gt; Viewer)</h2>
 <p>These preferences are used to change the behavior of some of the PTP views. They do not normally need to be altered.</p>
