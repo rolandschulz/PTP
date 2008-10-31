@@ -115,11 +115,20 @@ public class RemoteToolsFileStore extends FileStore {
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor)
 	throws CoreException {
 		FileInfo info = new FileInfo(new Path(remoteItem.getPath()).lastSegment());
-		if (remoteItem == null || !remoteItem.exists()) {
+
+		try {
+			remoteItem.refreshAttributes();
+		} catch(Exception e) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+					e.getMessage(), e));
+		}
+		
+		if (!remoteItem.exists()) {
 			info.setExists(false);
 			return info;
-		}
-
+		}	
+		
 		info.setExists(true);
 		info.setLastModified(remoteItem.getModificationTime());
 		info.setDirectory(isDirectory);
