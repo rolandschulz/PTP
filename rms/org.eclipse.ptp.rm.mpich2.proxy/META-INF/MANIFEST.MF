@@ -1,6 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Proxy Server for MPICH2
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.mpich2.proxy
-Bundle-Version: 2.0.0.qualifier
-Bundle-Vendor: Eclipse.org
+Bundle-Version: 2.1.0.qualifier
+Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin

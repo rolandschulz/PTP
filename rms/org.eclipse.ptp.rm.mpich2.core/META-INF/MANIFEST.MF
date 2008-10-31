@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: MPICH2 Core Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.mpich2.core;singleton:=true
-Bundle-Version: 2.0.1.qualifier
+Bundle-Version: 2.1.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.mpich2.core.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.rm.remote
 Eclipse-LazyStart: true
-Bundle-Vendor: Los Alamos National Laboratory
+Bundle-Vendor: %pluginProvider
 Export-Package: org.eclipse.ptp.rm.mpich2.core,
  org.eclipse.ptp.rm.mpich2.core.rmsystem,
  org.eclipse.ptp.rm.mpich2.core.rtsystem
