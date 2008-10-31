@@ -236,16 +236,39 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openOutputStream(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public OutputStream openOutputStream(int options, IProgressMonitor monitor)
-	throws CoreException {
+	public synchronized OutputStream openOutputStream(int options, IProgressMonitor monitor)
+		throws CoreException {
 
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 			"Is a directory"));
 		}
+		
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		
 		try {
 			uploadExecution = exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath());
+			
+			while (!monitor.isCanceled() && !remoteItem.exists()) {
+				wait(500);
+				
+				try {
+					remoteItem.refreshAttributes();
+				} catch(Exception e) {
+					throw new CoreException(new Status(IStatus.ERROR,
+							RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+							e.getMessage(), e));
+				}
+			}
+			
+			if (monitor.isCanceled()) {
+				uploadExecution.cancel();
+				return null;
+			}
+			
 			return uploadExecution.getOutputStreamToProcessRemoteFile();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
