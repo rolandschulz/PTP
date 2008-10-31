@@ -1,75 +1,74 @@
 <html>
 <head>
-<title>New and Noteworthy - Parallel Tools Platform (PTP) Release 2.0 </title>
+<title>New and Noteworthy - Parallel Tools Platform (PTP) Release 2.1 </title>
 <link rel="stylesheet" type="text/css" href="help.css">
 </head>
 <body>
-<h1>Parallel Tools Platform (PTP) Release 2.0 - New and Noteworthy</h1>
+<h1>Parallel Tools Platform (PTP) Release 2.1 - New and Noteworthy</h1>
 
-<p>This version has had many enhancements and bug fixes since the 1.1.1  
-release. Some of the major new features include:</p>
+<p>This version has had many enhancements and bug fixes since the 2.0  
+release. Detailed PTP 2.1 release notes, including installation instructions, are available
+    	at <a href="http://wiki.eclipse.org/PTP/release_notes/2.1">
+    	http://wiki.eclipse.org/PTP/release_notes/2.1</a></p>
 <dl>
-<dt>Monitor/launch/debug on multiple systems</dt>
+<dt>Resource Managers</dt>
 <dd>
-2.0 allows multiple systems to be configured simultaneously. Machine  
-and node status is displayed for each system, and jobs can be launched  
-and debugged onto the different machines from within a single Eclipse  
-session.
+New more flexible resource manager for Open MPI. This resource manager does not require a proxy agent to be running on the target system, and can be use as a 
+template to target other MPI implementations. It also works with Open MPI 1.2 and 1.3.
+Improvements have also been made to the Parallel Environment resource manager, as well as adding
+support for the new debugger.
 </dd>
 <br>
-<dt>Support for resource managers</dt>
+<dl>
+<dt>Parallel Debugger</dt>
 <dd>
-Adds support for job schedulers as well as interactive runtime  
-systems. Support for LoadLeveler is included by default. Additional  
-job schedulers (e.g. PBS, LSF, SLURM, etc.) will become available in  
-the future.
+The debugger dependency on MPI has now been removed. This allows the debugger to work with virtually any MPI implementation. 
+The debugger also provides a flexible architecture allows different routing and communication layers as well as 
+full asynchronous command support
 </dd>
 <br>
-<dt>Remote monitoring, launch and debugging</dt>
+<dl>
+<dt>Parallel Language Development Tools (PLDT)</dt>
 <dd>
-In 1.1.1, Eclipse had to be running on the same machine that the  
-parallel job was launched on. In 2.0, Eclipse can be running on your  
-workstation, but you can still monitor, launch and debug applications  
-on remote machines.
+Support for Unified Parallel C (UPC) has been added, along with new MPI code templates.
 </dd>
 <br>
-<dt>Port forwarding for remote connections</dt>
+<dl>
+<dt>External Tools Framework (formerly the Performance Tools Framework)</dt>
 <dd>
-For sites that only allow a single ssh connection, 2.0 now adds  
-support for tunneling all proxy and debug traffic across a single  
-connection.
+Support for PAPI Component counter selection has been added, along with parametric analysis capabilities 
+(supported primarily for TAU at this time). Significant modifications have been made to increase work-flow flexibility
 </dd>
 <br>
-<dt>Combined console</dt>
+<dl>
+<dt>Remote Development Tools (RDT)</dt>
 <dd>
-In addition to the per-process windows that display standard out, 2.0  
-provides a single console window that combines output from all  
-processes into a single view.
+A new Remote Development Tools environment that enables C and C++ projects to be located on a remote machine. 
+RDT provides remote indexing and parsing services, a new remote C/C++ project wizard, automatic source code 
+delta handling (the index is automatically updated when files in your project are added/removed/changed), 
+remote "scanner info" support to allow the user to define include paths and defined preprocessor macros as a 
+context for the parser to operate, and remote Search, Call Hierarchy, Navigation (e.g. Go To Declaration), 
+Content Assist, and Type Hierarchy support. RDT also provides remote Standard Make functionality 
+for building remote makefile-based projects.
 </dd>
 <br>
-<dt>Debugger improvements</dt>
+<dl>
+<dt>Services Model</dt>
 <dd>
-Includes a completely re-designed debugger framework, improvements to  
-line markers and marker colors, and tooltip popup display of variables.
+The PTP service model allows the user to configure how services on their system are mapped to service providers
+and locations (e.g. to a remote machine). This allows ISVs and tool implementers to define new services, and 
+contribute providers to any defined services.
 </dd>
 <br>
-<dt>Parallel Language Development Tools</dt>
+<dl>
+<dt>Cell/B.E. IDE</dt>
 <dd>
-All the features of PLDT 2.0, including MPI Barrier analysis
-and new wizards for conveniently creating MPI and OpenMP project.
-</dd>
-<br>
-<dt>Update site support</dt>
-<dd>
-PTP can now be completely downloaded and installed from an Eclipse  
-update site.
-</dd>
-<br>
-<dt>PTP 2.0 Release Notes</dt>
-<dd>
-Detailed PTP 2.0 release notes including installation instructions are available
-    	at <a href="http://wiki.eclipse.org/PTP/release_notes/2.0">
-    	http://wiki.eclipse.org/PTP/release_notes/2.0</a>
+The Cell/B.E. IDE provides a fully-featured IDE for developing applications for the Cell Broadband Engine. It includes
+features such as custom source code templates for Cell development, full configurable build properties for PPU and 
+SPU using GNU and XL compilers, managed build for PPU and SPU using GNU and XL compilers, remote launch and debug of 
+Cell applications, and support for PPU & SPU combined remote debugger. The Cell/B.E. IDE also provides support for
+Cell performance tools, the ALF programming model, IBM PDT (Performance Debug Tools) instrumentation plugins, and
+Mambo Simulator plugins.
 </dd>
 </dl>
 
