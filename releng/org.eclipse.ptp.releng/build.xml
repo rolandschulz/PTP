@@ -326,6 +326,9 @@
 			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.common"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.help"/>
+		</antcall>		
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.lapi"/>
 		</antcall>		
 		<antcall target="tagone">
