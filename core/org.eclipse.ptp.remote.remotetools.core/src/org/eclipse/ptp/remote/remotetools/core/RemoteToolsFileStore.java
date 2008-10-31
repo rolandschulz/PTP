@@ -70,8 +70,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public String[] childNames(int options, IProgressMonitor monitor)
-	throws CoreException {
+	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException {
 		IRemoteItem[] items;
 		try {
 			items = exeMgr.getRemoteFileTools().listItems(remoteItem.getPath());
@@ -96,8 +95,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.core.filesystem.provider.FileStore#delete(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void delete(int options, IProgressMonitor monitor)
-	throws CoreException {
+	public void delete(int options, IProgressMonitor monitor) throws CoreException {
 		try {
 			exeMgr.getRemoteFileTools().removeFile(remoteItem.getPath());
 		}
@@ -112,8 +110,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.core.filesystem.provider.FileStore#fetchInfo(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IFileInfo fetchInfo(int options, IProgressMonitor monitor)
-	throws CoreException {
+	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
 		FileInfo info = new FileInfo(new Path(remoteItem.getPath()).lastSegment());
 
 		try {
@@ -199,8 +196,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#mkdir(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IFileStore mkdir(int options, IProgressMonitor monitor)
-	throws CoreException {
+	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
 		try {
 			exeMgr.getRemoteFileTools().createDirectory(remoteItem.getPath());
 		} catch (Exception e) {
@@ -216,8 +212,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openInputStream(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public InputStream openInputStream(int options, IProgressMonitor monitor)
-	throws CoreException {
+	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
@@ -236,9 +231,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openOutputStream(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public synchronized OutputStream openOutputStream(int options, IProgressMonitor monitor)
-		throws CoreException {
-
+	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
 		if (isDirectory) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
@@ -251,19 +244,21 @@ public class RemoteToolsFileStore extends FileStore {
 		
 		try {
 			uploadExecution = exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath());
-			
-			while (!monitor.isCanceled() && !remoteItem.exists()) {
-				wait(500);
-				
-				try {
-					remoteItem.refreshAttributes();
-				} catch(Exception e) {
-					throw new CoreException(new Status(IStatus.ERROR,
-							RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-							e.getMessage(), e));
+
+			synchronized (remoteItem) {
+				while (!monitor.isCanceled() && !remoteItem.exists()) {
+					remoteItem.wait(500);
+					
+					try {
+						remoteItem.refreshAttributes();
+					} catch(Exception e) {
+						throw new CoreException(new Status(IStatus.ERROR,
+								RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+								e.getMessage(), e));
+					}
 				}
 			}
-			
+
 			if (monitor.isCanceled()) {
 				uploadExecution.cancel();
 				return null;
@@ -281,8 +276,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#putInfo(org.eclipse.ptp.remote.core.IRemoteResourceInfo, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void putInfo(IFileInfo info, int options,
-			IProgressMonitor monitor) throws CoreException {
+	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
 		try {
 			if (uploadExecution != null) {
 				if (!uploadExecution.wasFinished()) {
