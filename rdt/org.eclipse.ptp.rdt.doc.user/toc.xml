@@ -4,8 +4,6 @@
 <toc label="RDT User Documentation" topic="html/toc.html">
    <topic href="html/readme.html" label="Important Notes Before You Begin">
    </topic>
-   <topic href="html/release_notes.html" label="Release Notes">
-   </topic>
    <topic label="Getting Started">
       <anchor id="gettingstarted"/>
    </topic>
