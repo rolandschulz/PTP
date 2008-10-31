@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>MPI Templates</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1 id="top"> <img src="images/analyze.gif"> MPI  Templates</h1>
+<p>To ease with common patterns of MPI programming, code templates are provided for
+a small number of patterns.  More can be easily added.
+<p>This allows quick entry of common patterns in MPI programming.
+<p>For example, for MPI send-receive,
+<ul>
+<li>Edit a C source code file in the CDT editor.
+<li>Enter:  <code>mpisr</code> and hit Ctrl-space
+<br>Note: On Mac, you may need to hit Ctrl-space twice.
+</li>
+<li>Select the template you want (mpisr is probably the only one) and hit Enter. This expands to the following:
+
+<p><img src="images/mpiTemplates.png">
+</ul>
+<p>Type over any of the included sample variable names, and all occurrences of that name within the template code will
+be changed accordingly.
+<p>One other pattern is also included.  Type  <code>mpiif</code> and hit Ctrl-space
+to see initialize and finalize API calls.
+<p>To see the code templates, and add your own:
+<ul>
+<li>Bring up Eclipse preferences (Windows/Linux: Window > Preferences;  Mac:  Eclipse > Preferences)
+<li>Open C/C++, Editor, Templates
+</li>
+<lp>
+<img src="images/mpiTemplatesMod.png"></lp>
+<li>The sample for MPI Send Receive is shown.  You can add your own or modify any you like.
+
+</ul>
+<p>If you have ideas for more MPI (or other) templates, please consider contributing these to PTP!
+Send email to ptp-dev@eclipse.org (<a href="https://dev.eclipse.org/mailman/listinfo/ptp-dev">Developer mailing list</a>).  
+
+
+<p>&nbsp;
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>

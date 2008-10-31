@@ -13,7 +13,7 @@ CDT 4.0 refers to a C project in which it manages the makefile as  a "Managed Ma
 and a project which 
 you supply the makefile is a "Standard Make project."
 <p>CDT 5.0 refers to a C project in which it manages the makefile as just a "C Project" and a project which 
-you supply the makefile is a "Makefile project."
+you supply the makefile is a <a href="setupMakefileProject.html">"Makefile project."</a>
 <p>Both terminologies are sometimes used in these instructions.
 <h2>Project Setup</h2>
 <p>To use  the PTP Parallel Language Development
@@ -31,13 +31,20 @@ you'll be prompted to set up the preferences to point to the appropriate header 
 <p>To specify the MPI include path, use Window > Preferences. (For Mac, use Eclipse > Preferences)
 Under PTP, Parallel Language Development Tools, MPI...
 (Note: If you do not have core PTP installed, the "Parallel Language 
-Development Tools" section in the preferences will be included without it.)
+Development Tools" section in the preferences will be in the main list.)
 
 <p>Add the path to MPI include paths  - this tells PLDT what symbols to look
 for in the MPI Artifact view.  You can also specify the default MPI build command.
 These values will make the MPI New Project Wizard page make more
 accurate predictions of settings for new projects.
 <br><img src="images/pldt-prefs1.png">
+
+<p>The "Prompt to include MPI APIs found in other locations (C only)" indicates whether 
+it will ask you if MPI APIS found elsewhere 
+will be considered as artifacts.  For example, if you point to &lt;install-loc&gt;/include in the MPI include paths here,
+but your source files actually include header files from /usr/local/include, it will prompt you to consider these as well 
+during the analysis.
+This is only valid for C projects, not C++ projects.
 <p>Hit OK to close the Preferences dialog.
 
 
@@ -91,7 +98,13 @@ above to set the MPI information for a project,
 the MPI information can be added to the project manually as follows.
 <ol>
 <li>Create a C project 
+<ul>
 
+<li>Note: the following description is for a regular C project (also known as a "Managed Build" CDT project).
+For information about Makefile projects, in which you provide the makefile yourself, 
+see <a href="setupMakefileProject.html">Setup for Makefile projects</a>.
+</li>
+</ul>
 <li>Set up the include paths etc:
 <br>To bring up the Project Properties, rightMouse on the project name, and select "Properties" (at the bottom of the context menu list)
 <br>Project Properties, C/C++ Build, Configuration Settings,
@@ -116,7 +129,10 @@ You probably also need to do the same for the linker tool.
 <p>
 
 </ol>
-
+<p>Note that the above instructions describe how to add information to C projects in which the makefile is generated for you,
+previously known as "Managed Build" projects.  If you provide your own makefile, you will create a "Makefile project"
+and create the makefile within that project.
+See <a href="makefileSetup.html">Setting up project properties for a Makefile project</a>.
 <p>Now continue to set up to <a href="run.html">run the MPI tools</a>
 
 <p>&nbsp;
