@@ -14,6 +14,7 @@
 <li><a href="#create">Creating a parallel launch configuration</a></li>
 <li><a href="#resources">Completing the <b>Resources tab</b></a></li>
 <li><a href="#application">Completing the <b>Application tab</b></a></li>
+<li><a href="#synchronize">Completing the <b>Synchronize tab</b></a></li>
 <li><a href="#debugger">Completing the <b>Debugger tab</b></a></li>
 <li><a href="#arguments">Completing the <b>Arguments tab</b></a></li>
 <li><a href="#launch">Launching the application</b></a></li>
@@ -51,21 +52,82 @@ order to launch a job, and specifies the number of processes to use for the appl
 <ol>
 <li><p>Ensure that the correct the <b>Parallel Project</b> is selected. This is the project containing the source
 and binaries for the application.</p><p><br></p></li>
-<li><p>Select the <b>Application Program</b> (executable) that you wish to launch by clicking on 
-the <b>Browse</b> button. If you are running the application on the local machine, you will need 
-to navigate to the workspace and project directory. In this case, and if you are using a debug 
-configuration, the executable will be located in the Debug folder of your project.</p><p><br></p>
-<p>If you are running the application on a remote machine you will need to navigate to the location 
-of the executable on that machine. If the project was <i>built</i> locally, then you will have to 
-manually copy the executable to the remote machine first.</p><p><br></p>
-<p><script> thumb("images/03launch2.png") </script></p><p><br></p>
+
+<li><p>Select the <b>Application Program</b> (executable) you wish to launch. 
+If the Resource Manager is connected to a remote target, then this means the path of the executable on the remote target. 
+Otherwise, for a Resource Manager on the local machine, it should be the path to the executable within the project directory. </p><p><br></p></li>
+
+<li><p>If you are running the application on a remote machine and the project was <i>built</i> locally, then you will have to copy 
+the executable to the remote machine first. For this purpose, you may enable <b>Copy executable from local filesystem</b> and fill
+<b>Path to the local file</b> with the path to the executable within the project directory. This configures the launcher to copy the 
+executable automatically to the remote target before starting the run/debug session. If not enabled, then you will need to
+copy the executable manually to the remote target.</p>
+<p><br></p>
 </li>
+<p><script> thumb("images/03launch6.png") </script></p><p><br></p>
+
 <li><p>If you wish to have the output from all processes in a single output console,
 check the <b>Display combined output in a console view</b> option.</p><p><br></p>
 </li>
 </ol>
 
-<h2 id="debugger">Step 4: Complete the Debugger tab</h2>
+<h2 id="synchronize">Step 4: Complete the <b>Synchronize</b> tab</h2>
+<p>
+The <b>Synchronize tab</b> is used in scenarios where the Resource Manager is connected to a remote target.
+The tab specifies rules that describe files or directories that need to be copied (<i>uploaded</i>) to the remote target before starting the parallel application execution. 
+Typically, this feature is used to upload dependencies (like dynamic libraries) or input data for test cases.
+</p>
+<p>
+This tab also allows to specify rules describing files on the remote host to be retrieved back (<i>downloaded</i>) to the local host after the parallel application finishes execution, as output data produced by the parallel application execution.
+</p>
+
+<ol>
+<li><p>If you wish to enable file transfer to the remote target, enable the <b>Upload rules enabled</b> or
+<b>Download rules enabled</b> according which direction of file transfer is required.</p>
+<p><script> thumb("images/03launch7.png") </script></p><p><br></p>
+</li>
+
+<li>
+<p>
+In order to specify files to be copied to the remote target (<i>uploaded</i>), click on <b>New upload rule</b>.
+</p>
+<p>
+An upload rule lists a collection of files or directories that shall be copied into a single directory.
+</p>
+<p>
+If <b>Use directory from launch configuration</b> is enabled, then the listed files or directories are copied to the working directory specified on the launch configuration. 
+At the moment, this is equivalent to same directory that contains the executable for the parallel application. 
+If not enabled, they you must specify on <b>Remote directory</b> a path where the files or directories will be placed. 
+The path may be absolute or relative (to the working directory).
+</p>
+<p>
+In the list underneath, <b>Selected file(s)</b>, add the files or directories that shall be copied.
+Click on <b>File(s)</b> to  select one or more individual files from anywhere in the local file system. 
+The <b>Directory</b> button works similarly to select a directory from the local file system. 
+Directories are copied recursively. 
+The <b>Workspace</b> button allows easily choosing files from the current workspace.
+</p>
+<p>
+On the bottom of the dialog, you may wish to set attributes to be applied to the copied files on the remote target. 
+The options <b>Readonly</b> or <b>Executable</b> sets all copied files to read-only or executable on the remote host.
+If <b>Preserve time attributes</b> is enabled, then the remote copy will assume the same time stamp then the local file, otherwise, the time stamp will be the time the file was copied.
+Also, if the file already exists on the remote target, you may choose how to react in <b>If file already exists</b>.
+<p><script> thumb("images/03launch8.png") </script></p><p><br></p>
+<p><br></p>
+</li>
+<li>
+In order to specify files to be copied from the remote target (<i>downloaded</i>) after the parallel application finishes, click on <b>New download rule</b>.
+</p>
+<p>
+An download rule  lists a collection of files or directories that shall be copied into a single local directory. 
+Its optins are very similar to the upload rule.
+</p>
+<p><script> thumb("images/03launch9.png") </script></p><p><br></p>
+<p><br></p>
+</li>
+</ol>
+
+<h2 id="debugger">Step 5: Complete the Debugger tab</h2>
 <p>The <b>Debugger tab</b> is only required if you are planning to debug the application. However 
 it is a good idea to complete it now, even if you are only planning to launch a non-debug job.</p>
 <ol>
@@ -100,7 +162,7 @@ in the <code>sshd</code> configuration file on the remote system (see the manual
 </li>
 </ol>
 
-<h2 id="arguments">Step 5: Complete the Arguments tab</h2>
+<h2 id="arguments">Step 6: Complete the Arguments tab</h2>
 <p></p>
 <ol>
 <li><p>Enter any <i>program</i> arguments.</p><p><br></p></li>
