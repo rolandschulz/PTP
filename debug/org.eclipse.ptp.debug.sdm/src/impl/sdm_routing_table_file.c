@@ -19,8 +19,9 @@ static char * MPIRankVars[] = {
 	NULL
 };
 
-#define BUFFER_SIZE 255
-#define ROUTING_TABLE_TIMEOUT 1000
+#define BUFFER_SIZE				255
+#define ROUTING_TABLE_TIMEOUT	1000 /* number of tries */
+#define ROUTING_TABLE_WAIT		1000*1000 /* usec */
 
 static int wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsigned sec);
 static int read_routing_table_entry(FILE *routing_file, routing_table_entry *entry);
@@ -322,7 +323,7 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 				break;
 			case -2:
 				// Size not available yet. Close file and wait
-				fclose(*routing_file);
+				fclose(fp);
 				break;
 			default:
 				// We have file size. Now wait until effective file size equals
@@ -337,7 +338,7 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 			}
 		}
 
-		sleep(1);
+		usleep(ROUTING_TABLE_WAIT);
 	}
 
 	return -2;
