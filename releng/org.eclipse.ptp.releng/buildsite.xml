@@ -36,6 +36,9 @@
 	<feature url="features/org.eclipse.ptp.remote_@buildVersion@.jar" id="org.eclipse.ptp.remote" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
+	<feature url="features/org.eclipse.ptp.rm.mpich2_@buildVersion@.jar" id="org.eclipse.ptp.rm.mpich2" version="@buildVersion@">
+		<category name="Parallel Tools Platform 2.1"/>
+	</feature>
 	<feature url="features/org.eclipse.ptp.rm.openmpi_@buildVersion@.jar" id="org.eclipse.ptp.rm.openmpi" version="@buildVersion@">
 		<category name="Parallel Tools Platform 2.1"/>
 	</feature>
