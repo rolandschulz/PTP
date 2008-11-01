@@ -4,7 +4,7 @@
 		<group style-id="content-group" id="orgeclipseptphelp-introLink-group">
        		<link label="Parallel Tools Platform" 
        		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.help/html/newNoteworthy.html" id="orgeclipseptphelp-introLink" style-id="content-link">
-          		<text>Find out the new features in PTP 2.0.</text>
+          		<text>Find out the new features in PTP 2.1.</text>
        		</link>
        	</group>
   	</extensionContent>
