@@ -23,11 +23,19 @@ PTP provides an integrated parallel debugger that provides a range of basic debu
 
 <h2>Analysis Tools</h2>
 
-These tools are built on the C/C++ Development Tools (CDT) abstract syntax tree infrastructure and use static analysis techniques to provide a range of advanced editing and error checking features. Examples include content assist for MPI and OpenMP directives, barrier analysis for MPI programs, and concurrency analysis for OpenMP programs.  Future versions of PTP will combine this with the performance framework to provide dynamic analysis functions, such as parallelization assistance.
+These tools are built on the C/C++ Development Tools (CDT) abstract syntax tree infrastructure and use static 
+analysis techniques to provide a range of advanced editing and error checking features. Examples include content 
+assist for MPI, OpenMP, LAPI, and UPC APIs and directives, barrier analysis for MPI programs, and concurrency analysis for OpenMP 
+programs.  Future versions of PTP will combine this with the External Tools Framework  to provide dynamic 
+analysis functions, such as parallelization assistance.
 
-<h2>Performance Tools</h2>
+<h2>External Tools Framework and Performance Tools</h2>
 
-The performance tools framework provides a simple mechanism for integrating external performance tools with PTP. By providing an XML description file, the tool is able to be integrated with the editor, build, and launch systems. Currently, support is provided for the Tuning and Analysis Utilities (TAU) performance analysis system.
+The External Tools Framework (formerly the Performance Tools Framework) provides a simple mechanism 
+for integrating external performance tools, and other arbitrary external tools, with PTP. 
+By providing an XML description file, the tool is able to be integrated with the editor, build, and 
+launch systems. Currently, support is provided for the Tuning and Analysis Utilities (TAU) performance analysis 
+system.
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
