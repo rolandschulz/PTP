@@ -79,7 +79,7 @@ public class BindingAdapterTests {
 	
 	public void assertName(IASTName name, Class<?> modelClass, Class<?> parentClass) throws CModelException, DOMException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		IBinding binding = name.resolveBinding();
-		ITranslationUnit parentUnit = new TranslationUnit(null, "unit", null);
+		ITranslationUnit parentUnit = new TranslationUnit(null, "unit", null, null);
 		ICElement element = BindingAdapter.adaptBinding(parentUnit, binding, true);
 		Assert.assertTrue(modelClass.isAssignableFrom(element.getClass()));
 		Assert.assertEquals(binding.getName(), element.getElementName());

@@ -355,15 +355,20 @@ public class IndexQueries {
 		return getTranslationUnit(cproject, name.getFileLocation(), converter);
 	}
 
-	private static ITranslationUnit getTranslationUnit(ICProject cproject, final IASTFileLocation fileLocation, IIndexLocationConverter converter) {
+	private static ITranslationUnit getTranslationUnit(ICProject cproject, final IASTFileLocation fileLocation,
+			IIndexLocationConverter converter) {
+		if (converter == null)
+			throw new IllegalArgumentException();
+
 		if (fileLocation != null) {
-			IPath path= Path.fromOSString(fileLocation.getFileName());
-			TranslationUnit unit = new TranslationUnit(cproject, path.lastSegment(), cproject == null ? null : cproject.getElementName());
+			IPath path = Path.fromOSString(fileLocation.getFileName());
 			if (converter != null) {
 				IIndexFileLocation location = converter.fromInternalFormat(fileLocation.getFileName());
-				unit.setLocationURI(location.getURI());
+				TranslationUnit unit = new TranslationUnit(cproject, path.lastSegment(), cproject == null ? null : cproject
+						.getElementName(), location.getURI());
+				return unit;
 			}
-			return unit;
+
 		}
 		return null;
 	}
