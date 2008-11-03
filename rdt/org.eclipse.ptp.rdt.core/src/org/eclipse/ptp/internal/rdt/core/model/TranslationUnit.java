@@ -12,6 +12,7 @@
 package org.eclipse.ptp.internal.rdt.core.model;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
@@ -49,15 +50,16 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 
 	private IScannerInfo fScannerInfo;
 	
-	public TranslationUnit(ICElement parent, String name, String projectName) {
+	public TranslationUnit(ICElement parent, String name, String projectName, URI locationURI) {
 		super(parent, ICElement.C_UNIT, name);
-		if (projectName != null) {
-			setCProject(new CProject(projectName));
-		}
 		
-		else {
+		if(projectName == null || locationURI == null) {
 			throw new IllegalArgumentException();
 		}
+		
+		setCProject(new CProject(projectName));
+			
+		fLocation = locationURI;
 	}
 
 	public TranslationUnit(Parent parent, ITranslationUnit element) {
