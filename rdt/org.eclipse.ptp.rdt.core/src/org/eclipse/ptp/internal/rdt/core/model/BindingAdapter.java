@@ -142,7 +142,8 @@ public class BindingAdapter {
 		if (tu instanceof TranslationUnit) {
 			parent = (Parent) tu;
 		} else if (tu == null) {
-			parent = new TranslationUnit(null, "", null); //$NON-NLS-1$
+			throw new IllegalArgumentException();
+			//parent = new TranslationUnit(null, "", null); //$NON-NLS-1$
 		}
 		else {
 			parent = new TranslationUnit(null, tu);
