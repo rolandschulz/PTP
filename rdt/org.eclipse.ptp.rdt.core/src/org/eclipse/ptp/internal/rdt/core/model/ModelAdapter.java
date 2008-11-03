@@ -142,7 +142,7 @@ public class ModelAdapter {
 		case ICElement.C_UNIT:
 			ITranslationUnit tu = (ITranslationUnit) element;
 			if(tu.isWorkingCopy())
-				result = new WorkingCopy(parent, tu, ((IWorkingCopy)tu).getContents());
+				result = new WorkingCopy(parent, tu, tu.getContents());
 			else
 				result = new TranslationUnit(parent, tu);
 			break;
