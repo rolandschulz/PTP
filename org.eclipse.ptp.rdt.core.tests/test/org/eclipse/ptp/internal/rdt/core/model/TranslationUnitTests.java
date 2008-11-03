@@ -41,8 +41,7 @@ public class TranslationUnitTests {
 		}
 		file.deleteOnExit();
 		
-		TranslationUnit unit = new TranslationUnit(null, file.getName(), "test"); //$NON-NLS-1$
-		unit.setLocationURI(new URI("file:///" + file.getAbsolutePath().replace('\\', '/'))); //$NON-NLS-1$
+		TranslationUnit unit = new TranslationUnit(null, file.getName(), "test", new URI("file:///" + file.getAbsolutePath().replace('\\', '/'))); //$NON-NLS-1$
 		IScannerInfo scannerInfo = new IScannerInfo() {
 			public Map<String, String> getDefinedSymbols() {
 				return Collections.emptyMap();
