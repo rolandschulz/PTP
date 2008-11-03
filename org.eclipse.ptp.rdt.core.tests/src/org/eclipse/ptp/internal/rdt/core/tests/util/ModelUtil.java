@@ -67,7 +67,7 @@ public class ModelUtil {
 	}
 	
 	public static TranslationUnit buildModel(ILanguage language, String name, String code) throws CoreException, DOMException {
-		TranslationUnit translationUnit = new TranslationUnit(null, name, null);
+		TranslationUnit translationUnit = new TranslationUnit(null, name, null, null);
 		CModelBuilder2 builder = new CModelBuilder2(translationUnit, new NullProgressMonitor());
 		IASTTranslationUnit ast = buildAST(language, name, code);
 		builder.parse(ast);

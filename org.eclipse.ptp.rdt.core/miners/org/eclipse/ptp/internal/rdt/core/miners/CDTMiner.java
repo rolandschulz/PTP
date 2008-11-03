@@ -865,7 +865,8 @@ public class CDTMiner extends Miner {
 					IBinding binding= name.resolveBinding();
 					if (isRelevantForCallHierarchy(binding)) {
 						if (name.isDefinition()) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, new RemoteCProjectFactory());
+							IIndexLocationConverter converter = getLocationConverter(hostName);
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, converter, new RemoteCProjectFactory());
 							if (elem != null) {
 								definitions = new ICElement[]{elem};
 							}
@@ -983,17 +984,6 @@ public class CDTMiner extends Miner {
 		finally {
 			statusDone(status);
 		}
-	}
-	
-	
-	private ITranslationUnit getFakeTranslationUnitForFile(String projectName,
-			IIndexFileLocation location) {
-		TranslationUnit tu = new TranslationUnit(null, location.getFullPath(), projectName);
-		
-		tu.setPath(new Path(location.getFullPath()));
-		tu.setLocationURI(location.getURI());
-		
-		return tu;
 	}
 
 	public static boolean isRelevantForCallHierarchy(IBinding binding) {
