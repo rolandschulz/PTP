@@ -17,9 +17,6 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.parallel;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +39,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
+import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
 import org.eclipse.ptp.perf.internal.PerfBuilder;
@@ -49,6 +47,10 @@ import org.eclipse.ptp.perf.internal.PerfLauncher;
 import org.eclipse.ptp.perf.internal.PerfPostlaunch;
 import org.eclipse.ptp.perf.internal.PerfStep;
 import org.eclipse.ptp.perf.internal.PerformanceLaunchManager;
+import org.eclipse.ptp.perf.toolopts.BuildTool;
+import org.eclipse.ptp.perf.toolopts.ExecTool;
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
+import org.eclipse.ptp.perf.toolopts.PostProcTool;
 
 public class PerformanceParametricLaunchManager extends
 		PerformanceLaunchManager {
@@ -656,15 +658,22 @@ public class PerformanceParametricLaunchManager extends
 //		{
 //			firstRuns=buildopts.size()-1*params.size();
 //		}
-
+		
+		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
+		/*
+		 * TODO: Make this robust!  (Allow for or explicitly prohibit advanced tool combinations)
+		 */
+		BuildTool b = pproc.getFirstBuilder();//.perfTools.get(0);
+		ExecTool e = pproc.getFirstRunner();
+		PostProcTool p = pproc.getFirstAnalyzer();
+		
 		int numruns=0;
 		// here is where the outer loop for the parametric study should go - for
 		// build parameters, like optimization.
 		for (int bDex=0;bDex<buildopts.size();bDex++) {
 
 			Map<String,String> optM =buildopts.get(bDex);
-			final PerfBuilder builder = new PerfBuilder(configuration,
-					projNameAttribute, appPathAttribute,optM);
+			final PerfBuilder builder = new PerfBuilder(configuration,b,projNameAttribute, appPathAttribute,optM);
 
 //			if(optM!=null)
 //				builder.setBuildMods(optM);
@@ -678,8 +687,8 @@ public class PerformanceParametricLaunchManager extends
 			
 			 try {
 			 builder.join();
-			 } catch (InterruptedException e) {
-			 e.printStackTrace();
+			 } catch (InterruptedException ie) {
+			 ie.printStackTrace();
 			 }
 
 			//int i = 0; 
@@ -752,7 +761,7 @@ public class PerformanceParametricLaunchManager extends
 						.getLaunchMode(), launchIn.getSourceLocator());// launchIn
 																		// ;
 
-				final PerfLauncher launcher = new PerfLauncher(tmpConfig,
+				final PerfLauncher launcher = new PerfLauncher(tmpConfig,e,
 						appNameAttribute, projNameAttribute, appPathAttribute,
 						builder.getProgramPath(), paraDel, launch);
 				steps.add(launcher);
@@ -762,7 +771,7 @@ public class PerformanceParametricLaunchManager extends
 				 * run step
 				 */
 
-				PerfPostlaunch analyzer = new PerfPostlaunch(tmpConfig,
+				PerfPostlaunch analyzer = new PerfPostlaunch(tmpConfig,p,
 						projNameAttribute, builder.getOutputLocation());
 				steps.add(analyzer);
 

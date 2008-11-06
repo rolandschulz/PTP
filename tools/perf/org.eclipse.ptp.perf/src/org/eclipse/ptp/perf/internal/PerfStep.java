@@ -28,11 +28,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
-import org.eclipse.ptp.perf.toolopts.PerformanceTool;
 import org.eclipse.ptp.perf.toolopts.ToolApp;
 import org.eclipse.ptp.perf.toolopts.ToolIO;
+import org.eclipse.ptp.perf.toolopts.ToolsOptionsConstants;
 
 
 /**
@@ -78,7 +77,7 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	protected IProject thisProject = null;
 	//protected String outputLocation=null;
 	protected ILaunchConfiguration configuration=null;
-	protected final PerformanceTool tool;
+	//protected final PerformanceProcess tool;
 	protected Map<String, String> IOMap=null;
 	
 	protected PerfStep(ILaunchConfiguration conf,String name, String projnameattrib) throws CoreException{
@@ -90,7 +89,7 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 		projectLocation=thisCProject.getResource().getLocation().toOSString();
 		
 		IOMap=new HashMap<String,String>();
-		this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL, (String)null));
+		//this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL, (String)null));
 	}
 //	
 //	/**
@@ -174,13 +173,19 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	
 
 	
+//	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration) throws CoreException
+//	{
+//		return getToolArguments(app,configuration,"");
+//	}
 	
-	
-	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration) throws CoreException
+	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration, String outputloc) throws CoreException
 	{
 		if(app==null)
 			return("");
-		String allargs=app.getArguments(configuration).replaceAll(IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION, projectLocation)+parseInput(app)+" "+parseOutput(app);
+		//Formerly replaced with projectLocation global variable.  May be the same?
+		String allargs=app.getArguments(configuration);
+		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_LOCATION, outputloc);
+		allargs=allargs+parseInput(app)+" "+parseOutput(app);
 		return allargs;
 	}
 	
@@ -274,12 +279,17 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 		return command;
 	}
 	
-	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration) throws CoreException
+//	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration) throws CoreException
+//	{
+//		return getToolCommand(app,configuration,"");
+//	}
+	
+	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration,String outputloc) throws CoreException
 	{
 		String command=getToolExecutable(app);
 		if (command==null)
 			return null;
 		
-		return command+" "+getToolArguments(app,configuration);
+		return command+" "+getToolArguments(app,configuration,outputloc);
 	}
 }

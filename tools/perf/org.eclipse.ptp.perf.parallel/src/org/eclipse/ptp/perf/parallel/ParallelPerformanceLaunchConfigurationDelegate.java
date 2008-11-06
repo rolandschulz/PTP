@@ -19,7 +19,6 @@ package org.eclipse.ptp.perf.parallel;
 
 import java.io.File;
 
-import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;

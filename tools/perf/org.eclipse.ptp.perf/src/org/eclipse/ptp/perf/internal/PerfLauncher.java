@@ -15,6 +15,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.toolopts.ExecTool;
 
 public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigurationConstants{
 
@@ -48,7 +49,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	 * */
 	//private boolean runbuilt=false;
 	
-	//private final PerformanceTool tool;//=null;//Activator.getTool();// .tools[0].toolPanes[0];;
+	//private final PerformanceProcess tool;//=null;//Activator.getTool();// .tools[0].toolPanes[0];;
 	
 	/**  Executable (application) attribute name 	 */
 	private String appnameattrib=null;
@@ -57,11 +58,13 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	
 	private ILaunch launch=null;
 	private LaunchConfigurationDelegate paraDel=null;
+	private ExecTool tool=null;
 	
 	
-	public PerfLauncher(ILaunchConfiguration conf,String ana,String projnameatt,String apa,String progPath,LaunchConfigurationDelegate pd,ILaunch launcher) throws CoreException{
+	public PerfLauncher(ILaunchConfiguration conf, ExecTool etool, String ana,String projnameatt,String apa,String progPath,LaunchConfigurationDelegate pd,ILaunch launcher) throws CoreException{
 		super(conf,"Running Application",projnameatt);
 		launch=launcher;
+		tool=etool;
 		paraDel=pd;
 		appnameattrib=ana;
 		apppathattrib=apa;
@@ -94,8 +97,8 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	 */
 	public boolean performLaunch(LaunchConfigurationDelegate paraDel, ILaunch launch, IProgressMonitor monitor) throws Exception{
 
-		if(tool==null)
-			throw new Exception("No valid tool configuration found");
+		//if(tool==null)
+			//throw new Exception("No valid tool configuration found");
 		
 //		if(!runbuilt)
 //			return false;
@@ -115,7 +118,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 			}
 		}
 		
-		if(tool.prependExecution)
+		if(tool!=null)//.prependExecution)
 		{
 			String prog = confWC.getAttribute(appnameattrib, EMPTY_STRING);
 			//TODO: This needs to work for PTP too eventually
@@ -138,12 +141,12 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 			
 				confWC.setAttribute(appnameattrib, firstExecUtil);
 				
-				String otherUtils=getToolArguments(tool.execUtils[0],configuration);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
+				String otherUtils=getToolArguments(tool.execUtils[0],configuration, projectLocation);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
 				
 				for(int i=1;i<tool.execUtils.length;i++)
 				{
 					//TODO: Check paths of other tools
-					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration);//tool.execUtils[i].getCommand(configuration);
+					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration, projectLocation);//tool.execUtils[i].getCommand(configuration);
 				}
 				swappedArgs=true;
 				if(traceOn)System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+otherUtils+" "+prog+" "+arg);
@@ -192,7 +195,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	{
 		ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
 		
-		if(tool.prependExecution&&swappedArgs)
+		if(tool!=null&&tool.prependExecution&&swappedArgs)
 		{
 			confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, saveApp);
 			confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, saveArgs);

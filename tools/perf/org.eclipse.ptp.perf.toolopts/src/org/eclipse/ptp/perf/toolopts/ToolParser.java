@@ -61,8 +61,8 @@ public class ToolParser extends DefaultHandler{
 	 */
 	private static final String ANALYZE = "analyze";
 	
-	private static final String PROCESS = "process";
-	private static final String VIEW = "view";
+	//private static final String PROCESS = "process";
+	//private static final String VIEW = "view";
 	
 	/**
 	 * Top level element of options pane definition structure
@@ -139,8 +139,11 @@ public class ToolParser extends DefaultHandler{
 	private boolean inAnalysis=false;
 	
 	private Stack<String> tagStack = new Stack<String>();
-	protected ArrayList<PerformanceTool> performanceTools= new ArrayList<PerformanceTool>();
-	private PerformanceTool currentTool;
+	protected ArrayList<PerformanceProcess> performanceTools= new ArrayList<PerformanceProcess>();
+	private PerformanceProcess currentTool;
+	private BuildTool buildTool;
+	private ExecTool execTool;
+	private PostProcTool ppTool;
 	/**
 	 * Contains the list of tool panes for the current tool app
 	 */
@@ -154,7 +157,7 @@ public class ToolParser extends DefaultHandler{
 	/**
 	 * Contains the list of argument strings for the current tool.
 	 */
-	private ArrayList<String> currentArgs;
+	private ArrayList<ToolArgument> currentArgs;
 	/**
 	 * The tool app currently being worked on
 	 */
@@ -197,14 +200,21 @@ public class ToolParser extends DefaultHandler{
 		if(name.equals(TOOLSET))
 		{
 			oldParser=true;
-			parseOldStart(uri, localName, name,atts);
+			System.out.println("XML Format Not Supported");
+			//parseOldStart(uri, localName, name,atts);
 			return;
 		}
 		if(name.equals(TOOL))
 		{
 			inTool=true;
-			currentTool=new PerformanceTool();
-			currentTool.toolID=currentTool.toolName=getAttribute("name",atts);
+			currentTool=new PerformanceProcess();
+			currentTool.toolName=getAttribute("name",atts);
+			currentTool.toolID= getAttribute("id",atts);
+			if(currentTool.toolID==null)
+			{
+				currentTool.toolID=currentTool.toolName;
+			}
+			
 		}
 		else if(name.equals(COMPILE))
 		{
@@ -212,18 +222,25 @@ public class ToolParser extends DefaultHandler{
 			{
 				inCompilation=true;
 				currentTool.recompile=true;
-				currentTool.replaceCompiler=getBooleanAttribute("replace",false,atts);
+				buildTool=new BuildTool();
+				buildTool.toolID=currentTool.toolID;
+				buildTool.replaceCompiler=getBooleanAttribute("replace",false,atts);
+				buildTool.requireTrue=getAttribute("if",atts);
 			}
 		}
 		else if(name.equals(EXECUTE)&&!inExecution)
 		{
 			inExecution=true;
+			execTool=new ExecTool();
 			toolApps=new ArrayList<ToolApp>();
+			execTool.requireTrue=getAttribute("if",atts);
 		}
 		else if(name.equals(ANALYZE)&&!inAnalysis)
 		{
 			inAnalysis=true;
+			ppTool=new PostProcTool();
 			toolApps=new ArrayList<ToolApp>();
+			ppTool.requireTrue=getAttribute("if",atts);
 		}
 		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(ALLCOMP)||name.equals(UTILITY))
 		{
@@ -233,6 +250,7 @@ public class ToolParser extends DefaultHandler{
 				currentApp.toolCommand=getAttribute("command",atts);
 				currentApp.toolID=getAttribute("id",atts);
 				currentApp.toolGroup=getAttribute("group",atts);
+				currentApp.outToFile=getAttribute("outtofile",atts);
 				if(currentApp.toolGroup!=null&&currentApp.toolCommand!=null)
 					currentTool.groupApp.put(currentApp.toolGroup, currentApp.toolCommand);
 				if(inExecution)
@@ -242,13 +260,24 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(ARGUMENT))
 		{
 			if(currentArgs==null)
-				currentArgs=new ArrayList<String>();
-			currentArgs.add(getAttribute("value",atts));
+				currentArgs=new ArrayList<ToolArgument>();
+			
+			boolean local=getBooleanAttribute("localdir",false,atts);
+			
+			String flag=getAttribute("flag",atts);
+			String val=getAttribute("value",atts);
+			String sep=getAttribute("separator",atts);
+			
+//			if(local){
+//				arg=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+arg;//Must be the same as IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION
+//			}
+			currentArgs.add(new ToolArgument(flag,val,sep,local));
+			
 		}
 		else if(name.equals(OPTIONPANE))
 		{
 			boolean virtual=getBooleanAttribute("virtual",false,atts);
-			//TODO: Make -absolutely- certain that nothing ever tries to greate a UI instance of a virtual pane!
+			//TODO: Make -absolutely- certain that nothing ever tries to create a UI instance of a virtual pane!
 			
 			toolOptions=new ArrayList<ToolOption>();
 			currentPane=new ToolPane(virtual);
@@ -329,13 +358,16 @@ public class ToolParser extends DefaultHandler{
 	{
 		if(currentArgs!=null&&currentArgs.size()>0)
 		{
-			currentApp.arguments=new String[currentArgs.size()];
+			currentApp.arguments=new ToolArgument[currentArgs.size()];
 			currentArgs.toArray(currentApp.arguments);
 		}
 		if(toolPanes!=null&&toolPanes.size()>0)
 		{
 			currentApp.toolPanes=new ToolPane[toolPanes.size()];
 			toolPanes.toArray(currentApp.toolPanes);
+		}
+		if(currentApp.toolID==null){
+			currentApp.toolID=currentTool.toolID;
 		}
 		currentArgs=null;
 		toolPanes=null;
@@ -347,7 +379,8 @@ public class ToolParser extends DefaultHandler{
 		
 		if(oldParser)
 		{
-			parseOldEnd(uri,localName, name);
+			System.out.println("XML Format not supported");
+			//parseOldEnd(uri,localName, name);
 			return;
 		}
 		
@@ -359,41 +392,47 @@ public class ToolParser extends DefaultHandler{
 		//Compilation specific attributes
 		else if(name.equals(CC)&&inCompilation)
 		{
-			if(currentTool!=null)
+			if(currentTool!=null&&buildTool!=null)
 			{
-				currentTool.ccCompiler=finishApp();
+				buildTool.ccCompiler=finishApp();
 			}
 		}
 		else if(name.equals(CXX)&&inCompilation)
 		{
-			if(currentTool!=null)
+			if(currentTool!=null&&buildTool!=null)
 			{
-				currentTool.cxxCompiler=finishApp();
+				buildTool.cxxCompiler=finishApp();
 			}
 		}
 		else if(name.equals(F90)&&inCompilation)
 		{
-			if(currentTool!=null)
+			if(currentTool!=null&&buildTool!=null)
 			{
-				currentTool.f90Compiler=finishApp();
+				buildTool.f90Compiler=finishApp();
 			}
 		}
 		else if(name.equals(ALLCOMP)&&inCompilation)
 		{
-			if(currentTool!=null)
+			if(currentTool!=null&&buildTool!=null)
 			{
-				currentTool.allCompilers=finishApp();
+				buildTool.allCompilers=finishApp();
 			}
 		}
 		else if(name.equals(COMPILE))
 		{
+			if(currentTool!=null&&buildTool!=null)
+			{
+				currentTool.perfTools.add(buildTool);
+			}
 			inCompilation=false;
 		}
 		//Execution specific attributes
 		else if(name.equals(EXECUTE)&&inExecution)
 		{
-			currentTool.execUtils=new ToolApp[toolApps.size()];
-			toolApps.toArray(currentTool.execUtils);
+			
+			execTool.execUtils=new ToolApp[toolApps.size()];
+			toolApps.toArray(execTool.execUtils);
+			currentTool.perfTools.add(execTool);
 			inExecution=false;
 		}
 		else if(name.equals(UTILITY))
@@ -403,8 +442,9 @@ public class ToolParser extends DefaultHandler{
 		}
 		else if(name.equals(ANALYZE)&&inAnalysis)
 		{
-			currentTool.analysisCommands=new ToolApp[toolApps.size()];
-			toolApps.toArray(currentTool.analysisCommands);
+			ppTool.analysisCommands=new ToolApp[toolApps.size()];
+			toolApps.toArray(ppTool.analysisCommands);
+			currentTool.perfTools.add(ppTool);
 			inAnalysis=false;
 		}
 
@@ -492,312 +532,312 @@ public class ToolParser extends DefaultHandler{
 	
 	
 	
-	/*
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * depricated...someday
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
-	
-	
-	private ToolApp oldFinishApp()
-	{
-		if(currentArgs!=null&&currentArgs.size()>0)
-		{
-			currentApp.arguments=new String[currentArgs.size()];
-			currentArgs.toArray(currentApp.arguments);
-		}
-		if(toolPanes!=null&&toolPanes.size()>0)
-		{
-			currentApp.toolPanes=new ToolPane[toolPanes.size()];
-			toolPanes.toArray(currentApp.toolPanes);
-		}
-		currentArgs=null;
-		toolPanes=null;
-		currentApp.toolCommand=content.peek().toString().trim();
-		return currentApp;
-	}
-	
-	private boolean inExecUtil=false;
-	private boolean inAnaTool=false;
-	void parseOldStart(String uri, String localName, String name, Attributes atts)
-	{	
-		name=name.toLowerCase();
-		
-		if(name.equals(TOOL))
-		{
-			inTool=true;
-			currentTool=new PerformanceTool();
-		}
-		else if(name.equals(COMPILE))
-		{
-			if(inTool&&currentTool!=null)
-			{
-				inCompilation=true;
-				currentTool.recompile=true;
-				int repdex = atts.getIndex("replace");
-				if(repdex>=0)
-				{
-					if(atts.getValue(repdex).toLowerCase().equals("true"))
-						currentTool.replaceCompiler=true;
-				}
-			}
-		}
-		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(ALLCOMP))
-		{
-			if(inCompilation&&currentTool!=null)
-			{
-				currentApp=new ToolApp();
-			}
-		}
-		else if(name.equals(EXECUTE)&&!inExecution)
-		{
-			inExecution=true;
-			toolApps=new ArrayList<ToolApp>();
-		}
-		else if(name.equals(UTILITY)&&!inExecUtil)
-		{
-			inExecUtil=true;
-			currentApp=new ToolApp();
-		}
-		else if(name.equals(ANALYZE)&&!inAnalysis)
-		{
-			inAnalysis=true;
-			toolApps=new ArrayList<ToolApp>();
-		}
-		else if((name.equals(PROCESS)||name.equals(VIEW))&&!inAnaTool)
-		{
-			inAnaTool=true;
-			currentApp=new ToolApp();
-		}
-		else if(name.equals(ARGUMENT))
-		{
-			currentArgs=new ArrayList<String>();
-		}
-		else if(name.equals(OPTIONPANE))
-		{
-			boolean virtual=false;
-			//TODO: Make -absolutely- certain that nothing ever tries to greate a UI instance of a virtual pane!
-			int optdex = atts.getIndex("virtual");
-			if(optdex>=0)
-			{
-				if(atts.getValue(optdex).equals("true"))
-				{
-					virtual=true;
-				}
-			}
-			
-			toolOptions=new ArrayList<ToolOption>();
-			currentPane=new ToolPane(virtual);
-			optdex = atts.getIndex(PREPENDWITH);
-			if(optdex>=0)
-			{
-				currentPane.prependOpts=atts.getValue(optdex);
-			}
-			optdex = atts.getIndex(ENCLOSEWITH);
-			if(optdex>=0)
-			{
-				currentPane.encloseOpts=atts.getValue(optdex);
-			}
-			optdex = atts.getIndex(SEPARATEWITH);
-			if(optdex>=0)
-			{
-				currentPane.separateOpts=atts.getValue(optdex);
-			}
-		}
-		else if(name.equals(TOGOPT))
-		{
-			actOpt=new ToolOption();
-			int defdex = atts.getIndex("defstate");
-			if(defdex>=0)
-			{
-				if(atts.getValue(defdex).toLowerCase().equals("on"))
-					actOpt.defState=true;
-			}
-		}
-		else if(name.equals(NAME))
-		{
-			if(actOpt!=null&&tagStack.peek().equals(TOGOPT))
-			{
-				int eqdex = atts.getIndex("equals");
-				if(eqdex>=0)
-				{
-					String useeq = atts.getValue(eqdex).toLowerCase();
-					if(useeq.equals("false"))
-					{
-						actOpt.useEquals=false;
-					}
-				}
-			}
-		}
-		else if(name.equals(VALUE))
-		{
-			if(actOpt!=null&&tagStack.peek().equals(TOGOPT))
-			{
-				int typedex = atts.getIndex("type");
-				if(typedex>=0)
-				{
-					String type = atts.getValue(typedex).toLowerCase();
-					if(type.equals("text"))
-						actOpt.type=ToolOption.TEXT;
-					else if(type.equals("dir"))
-						actOpt.type=ToolOption.DIR;
-					else if(type.equals("file"))
-						actOpt.type=ToolOption.FILE;
-					else if(type.equals("number"))
-						actOpt.type=ToolOption.NUMBER;
-					else if(type.equals("combo"))
-						actOpt.type=ToolOption.COMBO;
-				}
-			}
-		}
-
-		tagStack.push(name.toLowerCase());
-		content.push(new StringBuffer());
-	}
-
-	void parseOldEnd(String uri, String localName, String name)
-	{
-		name = name.toLowerCase();
-		if(name.equals(TOOL))
-		{
-			currentTool.toolID=currentTool.toolName=content.peek().toString().trim();
-			performanceTools.add(currentTool);
-		}
-		//Compilation specific attributes
-		else if(name.equals(CC)&&inCompilation)
-		{
-			if(currentTool!=null)
-			{
-				//currentTool.prependExecution=true;
-				currentTool.ccCompiler=oldFinishApp();
-			}
-		}
-		else if(name.equals(CXX)&&inCompilation)
-		{
-			if(currentTool!=null)
-			{
-				//currentTool.prependExecution=true;
-				currentTool.cxxCompiler=oldFinishApp();
-			}
-		}
-		else if(name.equals(F90)&&inCompilation)
-		{
-			if(currentTool!=null)
-			{
-				//currentTool.prependExecution=true;
-				currentTool.f90Compiler=oldFinishApp();
-			}
-		}
-		else if(name.equals(ALLCOMP)&&inCompilation)
-		{
-			if(currentTool!=null)
-			{
-				//currentTool.prependExecution=true;
-				currentTool.allCompilers=oldFinishApp();
-			}
-		}
-		else if(name.equals(COMPILE))
-		{
-			inCompilation=false;
-		}
-		//Execution specific attributes
-		else if(name.equals(EXECUTE)&&inExecution)
-		{
-			currentTool.execUtils=new ToolApp[toolApps.size()];
-			toolApps.toArray(currentTool.execUtils);
-			inExecution=false;
-		}
-		else if(name.equals(UTILITY)&&inExecUtil)
-		{
-			inExecUtil=false;
-			toolApps.add(oldFinishApp());
-			currentTool.prependExecution=true;
-			currentApp=null;
-		}
-		else if((name.equals(PROCESS)||name.equals(VIEW))&&inAnaTool)
-		{
-			inAnaTool=false;
-			toolApps.add(oldFinishApp());
-			currentApp=null;
-		}
-		else if(name.equals(ANALYZE)&&inAnalysis)
-		{
-			currentTool.analysisCommands=new ToolApp[toolApps.size()];
-			toolApps.toArray(currentTool.analysisCommands);
-			inAnalysis=false;
-		}
-		else if(name.equals(ARGUMENT))
-		{
-			currentArgs.add(content.peek().toString().trim());
-		}
-		
-		//Options-related tags
-		else if(name.equals(OPTIONPANE))
-		{
-			if(toolOptions!=null)
-			{
-				if(toolPanes==null)
-					toolPanes=new ArrayList<ToolPane>();
-				currentPane.setName(content.peek().toString().trim());
-				currentPane.setOptions(toolOptions);
-				toolPanes.add(currentPane);
-			}
-		}
-		else if(name.equals(TOGOPT))
-		{
-			if(actOpt!=null)
-			{
-				actOpt=ToolMaker.finishToolOption(actOpt,"");
-				toolOptions.add(actOpt);
-			}
-		}
-		else if(name.equals(TIP))
-		{
-			if(actOpt!=null)
-				actOpt.toolTip=content.peek().toString().trim();
-		}
-		else if(name.equals(LABEL))
-		{
-			if(actOpt!=null)
-				actOpt.optLabel=content.peek().toString().trim();
-		}
-		else if(name.equals(NAME))
-		{
-			if(actOpt!=null)
-			{
-				actOpt.optName=content.peek().toString().trim();
-			}
-		}
-		else if(name.equals(DEFAULT))
-		{
-			if(actOpt!=null)
-				actOpt.optLabel=content.peek().toString().trim();
-		}
-		
-		tagStack.pop();
-		content.pop();
-	}
+//	/*
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * depricated...someday
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 * 
+//	 */
+//	
+//	
+//	private ToolApp oldFinishApp()
+//	{
+//		if(currentArgs!=null&&currentArgs.size()>0)
+//		{
+//			currentApp.arguments=new String[currentArgs.size()];
+//			currentArgs.toArray(currentApp.arguments);
+//		}
+//		if(toolPanes!=null&&toolPanes.size()>0)
+//		{
+//			currentApp.toolPanes=new ToolPane[toolPanes.size()];
+//			toolPanes.toArray(currentApp.toolPanes);
+//		}
+//		currentArgs=null;
+//		toolPanes=null;
+//		currentApp.toolCommand=content.peek().toString().trim();
+//		return currentApp;
+//	}
+//	
+//	private boolean inExecUtil=false;
+//	private boolean inAnaTool=false;
+//	void parseOldStart(String uri, String localName, String name, Attributes atts)
+//	{	
+//		name=name.toLowerCase();
+//		
+//		if(name.equals(TOOL))
+//		{
+//			inTool=true;
+//			currentTool=new PerformanceProcess();
+//		}
+//		else if(name.equals(COMPILE))
+//		{
+//			if(inTool&&currentTool!=null)
+//			{
+//				inCompilation=true;
+//				currentTool.recompile=true;
+//				int repdex = atts.getIndex("replace");
+//				if(repdex>=0)
+//				{
+//					if(atts.getValue(repdex).toLowerCase().equals("true"))
+//						currentTool.replaceCompiler=true;
+//				}
+//			}
+//		}
+//		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(ALLCOMP))
+//		{
+//			if(inCompilation&&currentTool!=null)
+//			{
+//				currentApp=new ToolApp();
+//			}
+//		}
+//		else if(name.equals(EXECUTE)&&!inExecution)
+//		{
+//			inExecution=true;
+//			toolApps=new ArrayList<ToolApp>();
+//		}
+//		else if(name.equals(UTILITY)&&!inExecUtil)
+//		{
+//			inExecUtil=true;
+//			currentApp=new ToolApp();
+//		}
+//		else if(name.equals(ANALYZE)&&!inAnalysis)
+//		{
+//			inAnalysis=true;
+//			toolApps=new ArrayList<ToolApp>();
+//		}
+//		else if((name.equals(PROCESS)||name.equals(VIEW))&&!inAnaTool)
+//		{
+//			inAnaTool=true;
+//			currentApp=new ToolApp();
+//		}
+//		else if(name.equals(ARGUMENT))
+//		{
+//			currentArgs=new ArrayList<String>();
+//		}
+//		else if(name.equals(OPTIONPANE))
+//		{
+//			boolean virtual=false;
+//			//TODO: Make -absolutely- certain that nothing ever tries to greate a UI instance of a virtual pane!
+//			int optdex = atts.getIndex("virtual");
+//			if(optdex>=0)
+//			{
+//				if(atts.getValue(optdex).equals("true"))
+//				{
+//					virtual=true;
+//				}
+//			}
+//			
+//			toolOptions=new ArrayList<ToolOption>();
+//			currentPane=new ToolPane(virtual);
+//			optdex = atts.getIndex(PREPENDWITH);
+//			if(optdex>=0)
+//			{
+//				currentPane.prependOpts=atts.getValue(optdex);
+//			}
+//			optdex = atts.getIndex(ENCLOSEWITH);
+//			if(optdex>=0)
+//			{
+//				currentPane.encloseOpts=atts.getValue(optdex);
+//			}
+//			optdex = atts.getIndex(SEPARATEWITH);
+//			if(optdex>=0)
+//			{
+//				currentPane.separateOpts=atts.getValue(optdex);
+//			}
+//		}
+//		else if(name.equals(TOGOPT))
+//		{
+//			actOpt=new ToolOption();
+//			int defdex = atts.getIndex("defstate");
+//			if(defdex>=0)
+//			{
+//				if(atts.getValue(defdex).toLowerCase().equals("on"))
+//					actOpt.defState=true;
+//			}
+//		}
+//		else if(name.equals(NAME))
+//		{
+//			if(actOpt!=null&&tagStack.peek().equals(TOGOPT))
+//			{
+//				int eqdex = atts.getIndex("equals");
+//				if(eqdex>=0)
+//				{
+//					String useeq = atts.getValue(eqdex).toLowerCase();
+//					if(useeq.equals("false"))
+//					{
+//						actOpt.useEquals=false;
+//					}
+//				}
+//			}
+//		}
+//		else if(name.equals(VALUE))
+//		{
+//			if(actOpt!=null&&tagStack.peek().equals(TOGOPT))
+//			{
+//				int typedex = atts.getIndex("type");
+//				if(typedex>=0)
+//				{
+//					String type = atts.getValue(typedex).toLowerCase();
+//					if(type.equals("text"))
+//						actOpt.type=ToolOption.TEXT;
+//					else if(type.equals("dir"))
+//						actOpt.type=ToolOption.DIR;
+//					else if(type.equals("file"))
+//						actOpt.type=ToolOption.FILE;
+//					else if(type.equals("number"))
+//						actOpt.type=ToolOption.NUMBER;
+//					else if(type.equals("combo"))
+//						actOpt.type=ToolOption.COMBO;
+//				}
+//			}
+//		}
+//
+//		tagStack.push(name.toLowerCase());
+//		content.push(new StringBuffer());
+//	}
+//
+//	void parseOldEnd(String uri, String localName, String name)
+//	{
+//		name = name.toLowerCase();
+//		if(name.equals(TOOL))
+//		{
+//			currentTool.toolID=currentTool.toolName=content.peek().toString().trim();
+//			performanceTools.add(currentTool);
+//		}
+//		//Compilation specific attributes
+//		else if(name.equals(CC)&&inCompilation)
+//		{
+//			if(currentTool!=null)
+//			{
+//				//currentTool.prependExecution=true;
+//				currentTool.ccCompiler=oldFinishApp();
+//			}
+//		}
+//		else if(name.equals(CXX)&&inCompilation)
+//		{
+//			if(currentTool!=null)
+//			{
+//				//currentTool.prependExecution=true;
+//				currentTool.cxxCompiler=oldFinishApp();
+//			}
+//		}
+//		else if(name.equals(F90)&&inCompilation)
+//		{
+//			if(currentTool!=null)
+//			{
+//				//currentTool.prependExecution=true;
+//				currentTool.f90Compiler=oldFinishApp();
+//			}
+//		}
+//		else if(name.equals(ALLCOMP)&&inCompilation)
+//		{
+//			if(currentTool!=null)
+//			{
+//				//currentTool.prependExecution=true;
+//				currentTool.allCompilers=oldFinishApp();
+//			}
+//		}
+//		else if(name.equals(COMPILE))
+//		{
+//			inCompilation=false;
+//		}
+//		//Execution specific attributes
+//		else if(name.equals(EXECUTE)&&inExecution)
+//		{
+//			currentTool.execUtils=new ToolApp[toolApps.size()];
+//			toolApps.toArray(currentTool.execUtils);
+//			inExecution=false;
+//		}
+//		else if(name.equals(UTILITY)&&inExecUtil)
+//		{
+//			inExecUtil=false;
+//			toolApps.add(oldFinishApp());
+//			currentTool.prependExecution=true;
+//			currentApp=null;
+//		}
+//		else if((name.equals(PROCESS)||name.equals(VIEW))&&inAnaTool)
+//		{
+//			inAnaTool=false;
+//			toolApps.add(oldFinishApp());
+//			currentApp=null;
+//		}
+//		else if(name.equals(ANALYZE)&&inAnalysis)
+//		{
+//			currentTool.analysisCommands=new ToolApp[toolApps.size()];
+//			toolApps.toArray(currentTool.analysisCommands);
+//			inAnalysis=false;
+//		}
+//		else if(name.equals(ARGUMENT))
+//		{
+//			currentArgs.add(content.peek().toString().trim());
+//		}
+//		
+//		//Options-related tags
+//		else if(name.equals(OPTIONPANE))
+//		{
+//			if(toolOptions!=null)
+//			{
+//				if(toolPanes==null)
+//					toolPanes=new ArrayList<ToolPane>();
+//				currentPane.setName(content.peek().toString().trim());
+//				currentPane.setOptions(toolOptions);
+//				toolPanes.add(currentPane);
+//			}
+//		}
+//		else if(name.equals(TOGOPT))
+//		{
+//			if(actOpt!=null)
+//			{
+//				actOpt=ToolMaker.finishToolOption(actOpt,"");
+//				toolOptions.add(actOpt);
+//			}
+//		}
+//		else if(name.equals(TIP))
+//		{
+//			if(actOpt!=null)
+//				actOpt.toolTip=content.peek().toString().trim();
+//		}
+//		else if(name.equals(LABEL))
+//		{
+//			if(actOpt!=null)
+//				actOpt.optLabel=content.peek().toString().trim();
+//		}
+//		else if(name.equals(NAME))
+//		{
+//			if(actOpt!=null)
+//			{
+//				actOpt.optName=content.peek().toString().trim();
+//			}
+//		}
+//		else if(name.equals(DEFAULT))
+//		{
+//			if(actOpt!=null)
+//				actOpt.optLabel=content.peek().toString().trim();
+//		}
+//		
+//		tagStack.pop();
+//		content.pop();
+//	}
 	
 }

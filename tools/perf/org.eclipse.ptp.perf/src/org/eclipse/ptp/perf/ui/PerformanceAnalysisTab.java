@@ -29,7 +29,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
-import org.eclipse.ptp.perf.toolopts.PerformanceTool;
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.ptp.perf.toolopts.ToolPane;
 import org.eclipse.ptp.perf.toolopts.ToolPaneListener;
 import org.eclipse.swt.SWT;
@@ -60,11 +60,13 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	 */
 	protected boolean noPTP=false;
 	
-	protected final PerformanceTool[] tools=Activator.getTools();//null;
+	protected final PerformanceProcess[] tools=Activator.getTools();//null;
 
 	protected Combo toolTypes;
 
 	protected Button buildonlyCheck;
+	
+	protected Button analyzeonlyCheck;
 	
 	protected Button noParallelRun;
 
@@ -106,8 +108,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//		PerformanceTool[] tauTool=null;
-//		PerformanceTool[] otherTools=null;
+//		PerformanceProcess[] tauTool=null;
+//		PerformanceProcess[] otherTools=null;
 //		if(tauToolXML!=null&&tauToolXML.canRead())
 //		{
 //			tauTool=ToolMaker.makeTools(tauToolXML);
@@ -133,8 +135,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //		}
 //		
 //		if(toolxml.canRead())
-//			otherTools=ToolMaker.makeTools(toolxml); //PerformanceTool.getSample();//new PerformanceTool[1];;
-//		tools=new PerformanceTool[1+otherTools.length];
+//			otherTools=ToolMaker.makeTools(toolxml); //PerformanceProcess.getSample();//new PerformanceProcess[1];;
+//		tools=new PerformanceProcess[1+otherTools.length];
 //		tools[0]=tauTool[0];
 //		for(int i=0;i<otherTools.length;i++)
 //		{
@@ -222,6 +224,10 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		buildonlyCheck = createCheckButton(toolComp,
 				"Build the instrumented executable but do not launch it");
 		buildonlyCheck.addSelectionListener(listener);
+		
+		
+		analyzeonlyCheck=createCheckButton(toolComp,"Select existing performance data to analyze with the selected tool");
+		analyzeonlyCheck.addSelectionListener(listener);
 //		nocleanCheck = createCheckButton(toolComp,
 //				"Keep instrumented executable");
 //		nocleanCheck.addSelectionListener(listener);
@@ -396,6 +402,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			}
 			
 			buildonlyCheck.setSelection(configuration.getAttribute(BUILDONLY, false));
+			analyzeonlyCheck.setSelection(configuration.getAttribute(ANALYZEONLY, false));
 			//nocleanCheck.setSelection(configuration.getAttribute(NOCLEAN, false));
 			if(panes!=null)
 			for(int i=0;i<panes.length;i++)
@@ -417,7 +424,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //	 * @param tool
 //	 * @param configuration
 //	 */
-//	private void applyToolConfiguration(PerformanceTool tool, ILaunchConfigurationWorkingCopy configuration)
+//	private void applyToolConfiguration(PerformanceProcess tool, ILaunchConfigurationWorkingCopy configuration)
 //	{
 //		String binpath=pstore.getString(TOOL_BIN_ID+"."+tool.toolID)+File.separator;
 //		
@@ -457,10 +464,11 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //		else
 		if(tools!=null&&tools.length>=1)
 		{
-			if(toolTypes.getSelectionIndex()==0)
-				configuration.setAttribute(TAULAUNCH, true);
-			else
-				configuration.setAttribute(TAULAUNCH, false);
+			/*In theory his is moot!*/
+//			if(toolTypes.getSelectionIndex()==0)
+//				configuration.setAttribute(TAULAUNCH, true);
+//			else
+//				configuration.setAttribute(TAULAUNCH, false);
 
 			configuration.setAttribute(USE_EXEC_UTIL, tools[toolTypes.getSelectionIndex()].prependExecution);
 			configuration.setAttribute(PERF_RECOMPILE, tools[toolTypes.getSelectionIndex()].recompile);
@@ -476,6 +484,9 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		configuration.setAttribute(BUILDONLY,
 				buildonlyCheck.getSelection());
+		
+		configuration.setAttribute(ANALYZEONLY,
+				analyzeonlyCheck.getSelection());
 		//configuration.setAttribute(NOCLEAN,nocleanCheck.getSelection());
 		if(panes!=null)
 		for(int i=0;i<panes.length;i++)

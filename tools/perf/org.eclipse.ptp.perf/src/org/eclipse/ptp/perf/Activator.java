@@ -31,7 +31,11 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
+import org.eclipse.ptp.perf.toolopts.BuildTool;
+import org.eclipse.ptp.perf.toolopts.ExecTool;
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.ptp.perf.toolopts.PerformanceTool;
+import org.eclipse.ptp.perf.toolopts.PostProcTool;
 import org.eclipse.ptp.perf.toolopts.ToolApp;
 import org.eclipse.ptp.perf.toolopts.ToolMaker;
 import org.eclipse.ptp.perf.toolopts.ToolPane;
@@ -50,9 +54,9 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	private static PerformanceTool[] tools=null;
+	private static PerformanceProcess[] tools=null;
 	
-	public static PerformanceTool[] getTools()
+	public static PerformanceProcess[] getTools()
 	{
 		return tools;
 	}
@@ -62,7 +66,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @param toolName
 	 * @return
 	 */
-	public static PerformanceTool getTool(String toolName)
+	public static PerformanceProcess getTool(String toolName)
 	{
 		for(int i=0;i<tools.length;i++)
 		{
@@ -79,7 +83,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @param dex
 	 * @return
 	 */
-	public static PerformanceTool getTool(int dex)
+	public static PerformanceProcess getTool(int dex)
 	{
 		if(dex<tools.length)
 		{
@@ -120,39 +124,47 @@ public class Activator extends AbstractUIPlugin {
 		
 		for(int i=0;i<tools.length;i++)
 		{
-			ToolApp compApp=tools[i].getCcCompiler();
-			if(compApp!=null)
-			{
-				insertPanes(compApp.toolPanes,paneList);
-			}
-			compApp=tools[i].getCxxCompiler();
-			if(compApp!=null)
-			{
-				insertPanes(compApp.toolPanes,paneList);
-			}
-			compApp=tools[i].getF90Compiler();
-			if(compApp!=null)
-			{
-				insertPanes(compApp.toolPanes,paneList);
-			}
-			compApp=tools[i].getGlobalCompiler();
-			if(compApp!=null)
-			{
-				insertPanes(compApp.toolPanes,paneList);
-			}
-			
-			if(tools[i].execUtils!=null&&tools[i].execUtils.length>0)  
-			{
-				for(int j=0;j<tools[i].execUtils.length;j++)
+			for(int j=0;j<tools[i].perfTools.size();j++){
+				PerformanceTool t = tools[i].perfTools.get(j);
+				if(t instanceof BuildTool)
 				{
-					insertPanes(tools[i].execUtils[j].toolPanes,paneList);
+					BuildTool bt = (BuildTool)t;
+					ToolApp compApp=bt.getCcCompiler();
+					if(compApp!=null)
+					{
+						insertPanes(compApp.toolPanes,paneList);
+					}
+					compApp=bt.getCxxCompiler();
+					if(compApp!=null)
+					{
+						insertPanes(compApp.toolPanes,paneList);
+					}
+					compApp=bt.getF90Compiler();
+					if(compApp!=null)
+					{
+						insertPanes(compApp.toolPanes,paneList);
+					}
+					compApp=bt.getGlobalCompiler();
+					if(compApp!=null)
+					{
+						insertPanes(compApp.toolPanes,paneList);
+					}
 				}
-			}
-			if(tools[i].analysisCommands!=null&&tools[i].analysisCommands.length>0)
-			{
-				for(int j=0;j<tools[i].analysisCommands.length;j++)
+				else if(t instanceof ExecTool)  
 				{
-					insertPanes(tools[i].analysisCommands[j].toolPanes,paneList);
+					ExecTool et = (ExecTool)t;
+					for(int k=0;k<et.execUtils.length;k++)
+					{
+						insertPanes(et.execUtils[k].toolPanes,paneList);
+					}
+				}
+				else if(t instanceof PostProcTool)
+				{
+					PostProcTool pt = (PostProcTool)t;
+					for(int k=0;k<pt.analysisCommands.length;k++)
+					{
+						insertPanes(pt.analysisCommands[k].toolPanes,paneList);
+					}
 				}
 			}
 		}
@@ -225,25 +237,40 @@ public class Activator extends AbstractUIPlugin {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//		PerformanceTool[] tauTool=null;
-		ArrayList<PerformanceTool> theTools=new ArrayList<PerformanceTool>();//null;
+//		PerformanceProcess[] tauTool=null;
+		ArrayList<PerformanceProcess> theTools=new ArrayList<PerformanceProcess>();//null;
 //		if(tauToolXML!=null&&tauToolXML.canRead())
 //		{
 //			tauTool=ToolMaker.makeTools(tauToolXML);
 //		}
 		
-		File toolxml= new File(getPreferenceStore().getString(IPerformanceLaunchConfigurationConstants.XMLLOCID));
-		if(!toolxml.canRead()||!toolxml.exists())
+		
+		String fiList=getPreferenceStore().getString(IPerformanceLaunchConfigurationConstants.XMLLOCID);
+		String[] fiLocs = fiList.split(",,,");
+		
+		ArrayList<File> files = new ArrayList<File>();
+		File fi=null;
+		for(int i=0;i<fiLocs.length;i++){
+			fi=new File(fiLocs[i]);
+			if(fi.canRead()&&fi.isFile()){
+				files.add(fi);
+			}
+		}
+		
+		
+		if(files.size()==0)
 		{
+			//File toolxml= new File();
 			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse");
 			if(epath!=null)
 			{
-				toolxml=new File(epath);
+				File toolxml=new File(epath);
 				if(toolxml.canRead()&&toolxml.exists())
 				{
 					toolxml=new File(toolxml.getPath()+File.separator+"tool.xml");
-					if(toolxml.canRead()&&toolxml.exists())
+					if(toolxml.canRead()&&toolxml.isFile())
 					{
+						files.add(toolxml);
 						//tools=ToolMaker.makeTools(toolxml);
 						this.getPreferenceStore().setValue(IPerformanceLaunchConfigurationConstants.XMLLOCID, toolxml.getPath());
 					}
@@ -263,24 +290,30 @@ public class Activator extends AbstractUIPlugin {
 		}
 		
 		
-		if(toolxml.canRead()&&toolxml.exists())
+		for(int i=0;i<files.size();i++)
 		{
-			tools=ToolMaker.makeTools(toolxml); //PerformanceTool.getSample();//new PerformanceTool[1];;
+			try{
+			tools=ToolMaker.makeTools(files.get(i)); //PerformanceProcess.getSample();//new PerformanceProcess[1];;
+			}catch(Exception e){
+				tools=null;
+				System.out.println("Problem reading "+files.get(i).toString());
+			}
 			//numOTools=otherTools.length;
 			if(tools!=null)
 				for(int j=0;j<tools.length;j++)
 				{
 					theTools.add(tools[j]);
 				}
+			tools=null;
 		}
 		
 			
 		
 		tools =
-			(PerformanceTool[]) theTools.toArray(
-					new PerformanceTool[theTools.size()]);
+			(PerformanceProcess[]) theTools.toArray(
+					new PerformanceProcess[theTools.size()]);
 		
-//		tools=new PerformanceTool[numOTools];
+//		tools=new PerformanceProcess[numOTools];
 //		//tools[0]=tauTool[0];
 //		for(int i=0;i<numOTools;i++)
 //		{

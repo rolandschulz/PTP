@@ -39,7 +39,7 @@ public class ToolApp {
 	/**
 	 * The array of string arguments assoicated with this tool
 	 */
-	public String[] arguments=null;
+	public ToolArgument[] arguments=null;
 	
 //	public String queryText=null;
 //	public String queryMessage=null;
@@ -62,6 +62,11 @@ public class ToolApp {
 	 * The array of toolPanes associated with this tool
 	 */
 	public ToolPane[] toolPanes=null;
+	
+	/**
+	 * The file to which the standard out of this tool must be written
+	 */
+	public String outToFile=null;
 	
 	public ToolIO[] inputArgs=null;
 	public ToolIO[] outputArgs=null;
@@ -139,7 +144,7 @@ public class ToolApp {
 			for(int i =0;i<arguments.length;i++)
 			{
 				if(arguments[i]!=null)
-					args+=" "+arguments[i];
+					args+=" "+arguments[i].getArg();
 			}
 		
 		return args;

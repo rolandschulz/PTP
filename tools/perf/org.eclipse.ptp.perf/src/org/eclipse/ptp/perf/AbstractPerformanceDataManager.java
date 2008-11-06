@@ -61,4 +61,10 @@ public abstract class AbstractPerformanceDataManager {
 	 */
 	public abstract void view();
 	
+	/**
+	 * Used to indicate that this analysis operation is being conducted by the user on arbitrary external data.  The
+	 * configuration may be an invalid source for some parameters.
+	 */
+	public abstract void setExternalTarget(boolean external);
+	
 }

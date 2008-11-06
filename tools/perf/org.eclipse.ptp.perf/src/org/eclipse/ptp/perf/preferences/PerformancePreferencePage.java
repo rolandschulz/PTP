@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -51,8 +51,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public class PerformancePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, IPerformanceLaunchConfigurationConstants
 {
-	protected Text XMLLoc = null;
+	protected List XMLLocs = null;
 	protected Button browseXMLButton = null;
+	protected Button removeItemButton = null;
 	//protected Button checkAutoOpts=null;
 	//protected Button checkAixOpts=null;
 
@@ -67,12 +68,15 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 			if(source == browseXMLButton) {
 				handleXMLBrowseButtonSelected();
 			}
+			if(source== removeItemButton){
+				handleRemoveItem();
+			}
 			updatePreferencePage();
 		}
 
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(source==XMLLoc){
+			if(source==XMLLocs){
 			}
 
 			updatePreferencePage();
@@ -111,18 +115,22 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 		aGroup.setText("Performance Tool Configuration");
 
 		Composite xmlcom = new Composite(aGroup, SWT.NONE);
-		xmlcom.setLayout(createGridLayout(3, false, 0, 0));
+		xmlcom.setLayout(createGridLayout(2, false, 0, 0));
 		xmlcom.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
 		Label tauarchComment = new Label(xmlcom, SWT.WRAP);
 		tauarchComment.setText("Tool Definition File:");
-		XMLLoc = new Text(xmlcom, SWT.BORDER | SWT.SINGLE);
-		XMLLoc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		XMLLoc.addModifyListener(listener);
+		XMLLocs = new List(xmlcom, SWT.BORDER |SWT.V_SCROLL);
+		XMLLocs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		//XMLLocs.add.addModifyListener(listener);
 
 		browseXMLButton = new Button(xmlcom,SWT.PUSH);
-		browseXMLButton.setText("Browse");
+		browseXMLButton.setText("Add");
 		browseXMLButton.addSelectionListener(listener);
+		
+		removeItemButton=new Button(xmlcom,SWT.PUSH);
+		removeItemButton.setText("Remove");
+		removeItemButton.addSelectionListener(listener);
 		//TODO: Implement tau-option checking
 //		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 //		gridData.horizontalSpan = 3;
@@ -140,6 +148,11 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 //		checkAutoOpts.addSelectionListener(listener);
 	}
 
+	
+	protected void handleRemoveItem(){
+		XMLLocs.remove(XMLLocs.getSelectionIndices());
+	}
+	
 	/**
 	 * Allow user to specify a TAU arch directory.  The specified directory must contain at least one 
 	 * recognizable TAU makefile in its lib sub-directory to be accepted.
@@ -149,7 +162,12 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 	{
 		FileDialog dialog = new FileDialog(getShell());
 		File path=null;
-		String correctPath = getFieldContent(XMLLoc.getText());
+		String correctPath=null;
+		int maxXDex=XMLLocs.getItemCount()-1;
+		if(maxXDex>=0)
+		{
+			correctPath = getFieldContent(XMLLocs.getItem(maxXDex));
+		}
 		if (correctPath != null) {
 			path = new File(correctPath);
 			if (path.exists())
@@ -170,7 +188,20 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 //		File test = new File(tlpath);
 
 		dialog.setText("Select tool definition xml file");
-		XMLLoc.setText(dialog.open());
+		
+		String out=getFieldContent(dialog.open());
+		
+		if(out!=null)
+		{
+			File test = new File(out);
+			if(test.canRead()&&test.isFile())
+			{
+				XMLLocs.add(out);
+			}
+			else{
+				//TODO: print a warning?
+			}
+		}
 		//dialog.setMessage("You must select a valid TAU architecture directory.  Such a directory should be created when you configure and install TAU.  It must contain least one valid stub makefile configured with the Program Database Toolkit (pdt)");
 
 //		String selectedPath=null;
@@ -199,8 +230,13 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 	private void loadSaved()
 	{
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
-
-		XMLLoc.setText(preferences.getString(XMLLOCID));
+		String fiList=preferences.getString(XMLLOCID);
+		
+		String[] files = fiList.split(",,,");
+		for(String s : files)
+		{
+			XMLLocs.add(s);//setText(preferences.getString(XMLLOCID));
+		}
 		//TODO: Add checks
 //		checkAutoOpts.setSelection(preferences.getBoolean("TAUCheckForAutoOptions"));
 //		if(checkAixOpts!=null)
@@ -210,8 +246,16 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 	public boolean performOk() 
 	{
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
-
-		preferences.setValue(XMLLOCID,XMLLoc.getText());
+		
+		String fiList="";
+		
+		for(int i=0;i<XMLLocs.getItemCount();i++){
+			fiList+=XMLLocs.getItem(i);
+			if(i<XMLLocs.getItemCount()-1){
+				fiList+=",,,";
+			}
+		}
+		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
 		Activator.getDefault().refreshTools();
 		//TODO: Add checks
 //		preferences.setValue("TAUCheckForAutoOptions", checkAutoOpts.getSelection());
@@ -262,6 +306,8 @@ public class PerformancePreferencePage extends PreferencePage implements IWorkbe
 
 	protected String getFieldContent(String text) 
 	{
+		if(text==null)
+			return null;
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
 			return null;
 

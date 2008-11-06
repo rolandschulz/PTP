@@ -82,6 +82,10 @@ public interface ITAULaunchConfigurationConstants {
 	 * ID of the selective instrumentation file
 	 */
 	public static final String SELECT_FILE = "selective_instrumentation_file_path";
+	/**
+	 * ID of variable to indicate use of automatic selective instrumentation file generation with tau_reduce
+	 */
+	public static final String TAU_REDUCE="use_automatic_tau_reduce";
 	
 	/**
 	 * ID of the perfdmf database

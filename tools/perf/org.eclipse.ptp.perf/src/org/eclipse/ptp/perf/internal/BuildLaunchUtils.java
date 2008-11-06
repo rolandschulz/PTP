@@ -19,8 +19,12 @@ package org.eclipse.ptp.perf.internal;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +33,7 @@ import java.util.TimeZone;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
-import org.eclipse.ptp.perf.toolopts.PerformanceTool;
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -102,7 +106,7 @@ public class BuildLaunchUtils {
 	 * @param tools The array of tools to be checked
 	 * @param force If true existing values will be overridden.
 	 */
-	public static void getAllToolPaths(PerformanceTool[] tools,boolean force)
+	public static void getAllToolPaths(PerformanceProcess[] tools,boolean force)
 	{
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 
@@ -221,35 +225,109 @@ public class BuildLaunchUtils {
 	 */
 	public static boolean runTool(String tool, String[] env, File directory)
 	{
-		String s = new String();
-		try {
+//		String s = new String();
+//		try {
+//			Process p = Runtime.getRuntime().exec(tool, env, directory);
+//			int i = p.waitFor();
+//			if (i == 0)
+//			{
+//				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//				//read the output from the command
+//				while ((s = stdInput.readLine()) != null) 
+//				{
+//					System.out.println(s);
+//				}
+//			}
+//			else 
+//			{
+//				BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+//				//read the output from the command
+//				while ((s = stdErr.readLine()) != null) 
+//				{
+//					System.err.println(s);
+//				}
+//				return false;
+//			}
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//			return false;
+//			}
+//		return true;
+		
+		return runTool(tool,env,directory,null);
+	}
+	
+	public static boolean runTool(String tool, String[] env, File directory, String output){
+		try{
+		
+			OutputStream fos = null;
+			if(output!=null)
+			{
+				File test = new File(output);
+				File parent=test.getParentFile();
+				if(parent==null||!parent.canRead())
+				{
+					output=directory+File.separator+output;
+				}
+				fos=new FileOutputStream(output);
+			}
 			Process p = Runtime.getRuntime().exec(tool, env, directory);
-			int i = p.waitFor();
-			if (i == 0)
+			StreamRunner errRun=new StreamRunner(p.getErrorStream(),"err",null);
+			StreamRunner outRun=new StreamRunner(p.getInputStream(),"out",fos);
+			errRun.start();
+			outRun.start();
+			int eval=p.waitFor();
+			if(fos!=null)
 			{
-				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				//read the output from the command
-				while ((s = stdInput.readLine()) != null) 
-				{
-					System.out.println(s);
-				}
+				fos.flush();
+				fos.close();
 			}
-			else 
-			{
-				BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-				//read the output from the command
-				while ((s = stdErr.readLine()) != null) 
-				{
-					System.err.println(s);
-				}
-				return false;
-			}
+		
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 			return false;
 			}
 		return true;
+	}
+	
+	static class StreamRunner extends Thread
+	{
+		InputStream is;
+		OutputStream os;
+		String type;
+		StreamRunner(InputStream is, String type, OutputStream os){
+			this.is=is;
+			this.os=os;
+			this.type=type;
+		}
+		public void run(){
+			try{
+				PrintWriter pw=null;
+				if(os!=null)
+				{
+					pw=new PrintWriter(os);
+				}
+				
+				InputStreamReader isr=new InputStreamReader(is);
+				BufferedReader br=new BufferedReader(isr);
+				String line=null;
+				while((line=br.readLine())!=null){
+					if(pw!=null){
+						pw.println(line);
+					}
+					else{
+						System.out.println(line);
+					}
+				}
+				if(pw!=null){
+					pw.flush();
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
 	}
 	
 }

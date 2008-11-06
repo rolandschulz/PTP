@@ -51,7 +51,7 @@ public class ToolMaker {
 	 * @param tooldef The xml file containing the definition of one or more tool-panes
 	 * @return The array of defined but uninitialized ToolPanes defined in the provided xml file
 	 */
-	public static PerformanceTool[] makeTools(File tooldef){
+	public static PerformanceProcess[] makeTools(File tooldef){
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		//factory.setValidating(false);
 		ToolParser tparser = new ToolParser();
@@ -67,7 +67,7 @@ public class ToolMaker {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		PerformanceTool[] tparr = new PerformanceTool[tparser.performanceTools.size()];
+		PerformanceProcess[] tparr = new PerformanceProcess[tparser.performanceTools.size()];
 		tparser.performanceTools.toArray(tparr);
 		return tparr;
 	}

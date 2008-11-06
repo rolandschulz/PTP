@@ -22,6 +22,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.ptp.perf.Activator;
+import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.toolopts.BuildTool;
+import org.eclipse.ptp.perf.toolopts.ExecTool;
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
+import org.eclipse.ptp.perf.toolopts.PerformanceTool;
+import org.eclipse.ptp.perf.toolopts.PostProcTool;
 
 public class PerformanceLaunchManager {
 	
@@ -47,6 +54,27 @@ public class PerformanceLaunchManager {
 		projNameAttribute=projNameAtt;
 	}
 	
+	private static boolean runStep(PerfStep step){
+		step.schedule();
+		try {
+			step.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
+		return step.getResult().isOK();
+	}
+	
+	private static boolean canRun(ILaunchConfiguration configuration, String toolReq) throws CoreException{
+		
+		if(toolReq==null){
+			return true;
+		}
+		
+		return configuration.getAttribute(toolReq, false);
+	
+	}
+	
 	/**
 	 * The primary launch command of this launch configuration delegate.  The operations in this function are divided into
 	 * three jobs:  Buildig, Running and Data collection
@@ -56,112 +84,104 @@ public class PerformanceLaunchManager {
 	{
 		final ILaunch launch = launchIn;
 		
+		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
+		String bProgPath=null;
+		String bOutLoc=null;
+		//boolean built=false;
+		boolean ran=false;
+		PerfBuilder builder = null;
+		PerfLauncher launcher=null;
 		
-		/**
-		 * Uses the specified tool's build settings on the build manager for this project, 
-		 * producing a new build configuration and instrumented binary file
-		 */
-		final PerfBuilder builder = new PerfBuilder(configuration, projNameAttribute,appPathAttribute);
+		boolean buildOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY, false);
+		boolean analyzeOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.ANALYZEONLY, false);
 		
-		builder.schedule();
-		try {
-			builder.join();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		
-		if(!builder.getResult().isOK()){
+		if(buildOnly){
+			builder = new PerfBuilder(configuration, pproc.getFirstBuilder(), projNameAttribute,appPathAttribute);
+			runStep(builder);
 			return;
 		}
 		
-		/**
-		 * Execute the program specified in the build step
-		 */
-		final PerfLauncher launcher = new PerfLauncher(configuration,appNameAttribute ,projNameAttribute, appPathAttribute,
-				builder.getProgramPath(),paraDel,launch);
-		
-		launcher.schedule();
-		try {
-			launcher.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		if(!launcher.getResult().isOK()){
+		if(analyzeOnly){
+			//String lookdir="somedir";
+			PerfPostlaunch analyzer=new PerfPostlaunch(configuration,pproc.getFirstAnalyzer(),projNameAttribute,null);
+			runStep(analyzer);
 			return;
 		}
 		
 		
-		/**
-		 * Collect performance data from the execution handled in the run step
-		 */
-		final PerfPostlaunch analyzer=new PerfPostlaunch(configuration,projNameAttribute,builder.getOutputLocation());
-		
-		analyzer.schedule();
-		
-		//final PerformanceLaunchSteps tauManager = new PerformanceLaunchSteps(configuration,appNameAttribute ,projNameAttribute, appPathAttribute,null,null);//, bLTool
-		
-	
-//		Job tauBuild=new Job(buildText){
-//			protected IStatus run(IProgressMonitor monitor) {
-//				try {
-//					builder.buildIndstrumented(monitor);
-//				} catch (Exception e) {
-//					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Build Incomplete",e);
-//				}
-//				return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Build Successful",null);
-//			}
-//		};
-		
-		
-//		final Job tauRun=new Job(launchText)
-//		{
-//			protected IStatus run(IProgressMonitor monitor) {
-//				try {
-//				if(!tauManager.performLaunch(paraDel, launch, monitor))
-//					return new Status(IStatus.WARNING,"com.ibm.jdg2e.concurrency",IStatus.WARNING,"Nothing to run",null);
-//				} catch (Exception e) {
-//						try {
-//							tauManager.cleanup();
-//						} catch (CoreException e1) {}
-//					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Execution Error",e);
-//				}
-//				return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Execution Complete",null);
-//			}
-//		};
-		
+		if(!pproc.recompile){
+			builder = new PerfBuilder(configuration, null, projNameAttribute,appPathAttribute);
+			if(!runStep(builder)){
+				return;
+			}
+			bProgPath=builder.getProgramPath();
+			bOutLoc=builder.getOutputLocation();
+			//built=true;
+			if(!pproc.prependExecution&&!(pproc.perfTools.get(0) instanceof ExecTool)){
+				launcher = new PerfLauncher(configuration,null,appNameAttribute ,projNameAttribute, appPathAttribute,
+						bProgPath,paraDel,launch);
+				
+				if(!runStep(launcher)){
+					return;
+				}
+				ran=true;
+			}
+		}
 
-//		final Job tauCollect=new Job(collectText){
-//
-//			protected IStatus run(IProgressMonitor monitor) {
-//				try{
-//					tauManager.postlaunch(monitor);
-//				}catch(Exception e){
-//					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Data Collection Error",e);
-//				}
-//				return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Data Collected",null);
-//			}
-//		};
-
-//		/**
-//		 * Manages job execution order
-//		 */
-//		JobChangeAdapter tauChange = new JobChangeAdapter(){
-//			public void done (IJobChangeEvent event){
-//				if(event.getJob().getName().equals(buildText)&&event.getResult().isOK())
-//				{
-//					tauRun.schedule();
-//				}
-//				else
-//				if(event.getJob().getName().equals(launchText)&&event.getResult().isOK())
-//				{
-//					tauCollect.schedule();
-//				}
-//			}
-//		};
 		
-//		tauBuild.addJobChangeListener(tauChange);
-//		tauRun.addJobChangeListener(tauChange);
-//		tauBuild.schedule();
+		for(int i=0;i<pproc.perfTools.size();i++){//PerformanceTool t : pproc.perfTools){
+			PerformanceTool t = pproc.perfTools.get(i);
+			
+			if(!canRun(configuration,t.requireTrue))
+			{
+				continue;
+			}
+			
+			if(t instanceof BuildTool)
+			{
+				/**
+				 * Uses the specified tool's build settings on the build manager for this project, 
+				 * producing a new build configuration and instrumented binary file
+				 */
+				builder = new PerfBuilder(configuration, (BuildTool)t, projNameAttribute,appPathAttribute);
+				if(!runStep(builder)){
+					return;
+				}
+				bProgPath=builder.getProgramPath();
+				bOutLoc=builder.getOutputLocation();
+				//built=true;
+				
+				if(!pproc.prependExecution&&!ran&&i<pproc.perfTools.size()-1&&!(pproc.perfTools.get(i+1) instanceof ExecTool)){
+					launcher = new PerfLauncher(configuration,null,appNameAttribute ,projNameAttribute, appPathAttribute,
+							bProgPath,paraDel,launch);
+					
+					if(!runStep(launcher)){
+						return;
+					}
+					ran=true;
+				}
+			}
+			else if(t instanceof ExecTool){
+				/**
+				 * Execute the program specified in the build step
+				 */
+				launcher = new PerfLauncher(configuration,(ExecTool)t,appNameAttribute ,projNameAttribute, appPathAttribute,
+						bProgPath,paraDel,launch);
+				
+				if(!runStep(launcher)){
+					return;
+				}
+			}
+			else if(t instanceof PostProcTool){
+				/**
+				 * Collect performance data from the execution handled in the run step
+				 */
+				final PerfPostlaunch analyzer=new PerfPostlaunch(configuration,(PostProcTool)t,projNameAttribute,bOutLoc);
+				
+				if(!runStep(analyzer)){
+					return;
+				}
+			}
+		}
 	}
 }

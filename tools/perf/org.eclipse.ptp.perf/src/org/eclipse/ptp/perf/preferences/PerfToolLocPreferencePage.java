@@ -29,7 +29,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
-import org.eclipse.ptp.perf.toolopts.PerformanceTool;
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -123,7 +123,7 @@ public class PerfToolLocPreferencePage extends PreferencePage implements IWorkbe
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 		Iterator<Map.Entry<String,String>> eIt = null;
 		String me = null;
-		PerformanceTool[] tools=Activator.getTools();
+		PerformanceProcess[] tools=Activator.getTools();
 		Set<String> groups = new LinkedHashSet<String>();
 		for (int i = 0; i < tools.length; i++) 
 		{

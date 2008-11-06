@@ -10,13 +10,21 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.perf.AbstractPerformanceDataManager;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.toolopts.PostProcTool;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfigurationConstants{
 	
 	String outputLocation;
+	private PostProcTool tool=null;
+	boolean externalTarget=false;
+	String projName=null;
 	
-	public PerfPostlaunch(ILaunchConfiguration conf, String projnameatt,String outLoc) throws CoreException{
+	public PerfPostlaunch(ILaunchConfiguration conf, PostProcTool ppTool, String projnameatt,String outLoc) throws CoreException{
 		super(conf,"Analysis",projnameatt);
+		tool=ppTool;
 		outputLocation=outLoc;
 	}
 	
@@ -50,11 +58,11 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 					//TODO: put internal in defined strings
 					if(tool.analysisCommands[i].toolGroup==null||!tool.analysisCommands[i].toolGroup.equals("internal"))
 					{
-						runTool=getToolCommand(tool.analysisCommands[i],configuration);//tool.analysisCommands[i].toolCommand;
+						runTool=getToolCommand(tool.analysisCommands[i],configuration,outputLocation);//tool.analysisCommands[i].toolCommand;
 						//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
 						if(runTool!=null)
 						{
-							BuildLaunchUtils.runTool(runTool, null, projectLoc);
+							BuildLaunchUtils.runTool(runTool, null, projectLoc,tool.analysisCommands[i].outToFile);
 						}
 						else
 						{
@@ -66,7 +74,30 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 						AbstractPerformanceDataManager manager=Activator.getPerfDataManager(tool.analysisCommands[i].toolCommand);
 						if(manager!=null)
 						{
-							manager.process(thisCProject.getElementName(), configuration, outputLocation);
+							if(externalTarget){
+								
+//								Display.getDefault().syncExec(new Runnable() {
+//									
+//									public void run() {
+//										InputDialog id = new InputDialog(PlatformUI.getWorkbench()
+//												.getDisplay()
+//												.getActiveShell(), "Input Project Name", "", "", null);
+//										
+//										int res=id.open();
+//										if(res==id.OK)
+//										{
+//											projName=id.getValue();
+//										}
+//									}
+//								});
+								
+								manager.setExternalTarget(true);
+							}
+							else
+							{
+								projName=thisCProject.getElementName();
+							}
+							manager.process(projName, configuration, outputLocation);
 						}
 					}
 				}
@@ -78,6 +109,25 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		
+		if(outputLocation==null)
+		{
+			Display.getDefault().syncExec(new Runnable() {
+		
+				public void run() {
+					DirectoryDialog dl = new DirectoryDialog(PlatformUI.getWorkbench()
+							.getDisplay()
+							.getActiveShell());
+					dl.setText("Select the directory containing performance data");
+					outputLocation=dl.open();
+				}
+			});
+			if(outputLocation==null){
+				return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"No Data Specified",null);
+			}
+			externalTarget=true;
+		}
+		
 		try{
 			postlaunch(monitor);
 		}catch(Exception e){

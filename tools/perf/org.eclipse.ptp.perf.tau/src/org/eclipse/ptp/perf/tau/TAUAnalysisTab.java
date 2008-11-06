@@ -50,6 +50,7 @@ import org.eclipse.ptp.perf.tau.papiselect.papic.EventTreeDialog;
 import org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.ptp.perf.toolopts.ToolPane;
 import org.eclipse.ptp.perf.toolopts.ToolPaneListener;
+import org.eclipse.ptp.perf.toolopts.ToolsOptionsConstants;
 import org.eclipse.ptp.perf.ui.AbstractPerformanceConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -262,7 +263,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	protected Map<String, Object> varmap = null;
 
 	//TODO:  This isn't generic.  We need to get this pane explicitly
-	protected final ToolPane tauOpts = Activator.getTool("TAU").getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
+	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder().getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
 
 //	protected ToolPane custOpts=null;
 
@@ -813,7 +814,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		browseSelfileButton.addSelectionListener(listener);
 
 		selectRadios[3] = createRadioButton(selinstComp, "Automatic");
-		selectRadios[3].setEnabled(false);
+		//selectRadios[3].setEnabled(false);
 		for (int i = 0; i < selectRadios.length; i++) {
 			selectRadios[i].addSelectionListener(listener);
 		}
@@ -1124,7 +1125,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 			if(selected==1)
 			{
 				//configuration.getLocation().toOSString();
-				selpath=IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION+File.separator+"tau.selective";
+				selpath=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+"tau.selective";
 				selcommand="-optTauSelectFile="+selpath;
 			}
 			else
@@ -1135,6 +1136,13 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 					if(!selpath.equals(""))
 						selcommand="-optTauSelectFile="+selpath;
 				}
+			
+			if(selected==3){
+					configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_REDUCE, true);
+				}
+			else{
+				configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_REDUCE, false);
+			}
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_COMMAND,selcommand);
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT,selected);
 		}

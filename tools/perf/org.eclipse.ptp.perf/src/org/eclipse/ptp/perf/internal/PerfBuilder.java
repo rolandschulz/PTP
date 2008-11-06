@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.toolopts.BuildTool;
 
 public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigurationConstants{
 	
@@ -62,16 +63,19 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	
 	private String newname=null;
 	private String binary=null;
+	private BuildTool tool=null;
 	
-	public PerfBuilder(ILaunchConfiguration conf, String projnameattrib, String apa, Map<String,String> buildMods) throws CoreException{
+	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool, String projnameattrib, String apa, Map<String,String> buildMods) throws CoreException{
 		super(conf,"Instrumenting/Building",projnameattrib);
 		this.buildMods=buildMods;
+		tool=btool;
 		initBuild(conf,projnameattrib,apa);
 	}
 	
 	
-	public PerfBuilder(ILaunchConfiguration conf, String projnameattrib, String apa) throws CoreException{
+	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool, String projnameattrib, String apa) throws CoreException{
 		super(conf,"Instrumenting/Building",projnameattrib);
+		tool=btool;
 		initBuild(conf,projnameattrib,apa);
 	}
 	
@@ -103,10 +107,10 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	 */
 	public void buildIndstrumented(IProgressMonitor monitor) throws Exception
 	{			
-		if(tool==null)
-			throw new Exception("No valid tool configuration found");
+		//if(tool==null)
+		//	throw new Exception("No valid tool configuration found");
 		//runbuilt = true;
-		if(tool.recompile)
+		if(tool!=null)
 		{
 			if(!ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
 			{
@@ -152,10 +156,10 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			}
 //TODO:  Make this work again (i.e. distinguish between all-compiler and discrete compiler systems)
 			BufferedWriter makeOut = new BufferedWriter(new FileWriter(compilerInclude));
-			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
-			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+"\n");
+			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation);
+			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration, outputLocation)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration, outputLocation)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration, outputLocation)+" "+allargs+"\n");
 			makeOut.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -253,7 +257,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		
 		//Make the new configuration name, and if there is already a configuration with that name, remove it.
 		String basename=selectedconf.getName();
-        newname=null;//=basename+"_PerformanceAnalysis";
+        newname=null;//=basename+"_PerformanceAnalysis"; //TODO:  FIX RECOVERY OF TOOLID!!!
 		
         String addname=configuration.getAttribute(TOOLCONFNAME+tool.toolID, DEFAULT_TOOLCONFNAME);
         //if(basename.indexOf(addname)<0)
@@ -345,7 +349,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		String allargs="";
 		if(!tool.getGlobalCompiler().equals(tool.getCcCompiler()))
 		{
-			allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
+			allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation);
 		}
 		int numChanges=0;
 		for(int i =0;i<tools.length;i++){
@@ -377,15 +381,15 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			String toolid=tools[i].getId();
 			if(toolid.indexOf(".c.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration, outputLocation),allargs,tool.replaceCompiler);
 			}
 			if(toolid.indexOf(".cpp.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration, outputLocation),allargs,tool.replaceCompiler);
 			}
 			if(toolid.indexOf(".fortran.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration, outputLocation),allargs,tool.replaceCompiler);
 			}
 		}
 		//System.out.println(tbpath+File.separator+"tau_xxx.sh"+tauCompilerArgs);
@@ -456,7 +460,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	}
 
 	public void restoreBuild(){
-		if(tool.recompile&&ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
+		if(ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
 		{
 			ManagedBuildManager.setDefaultConfiguration(thisCProject.getProject(),olddefbuildconf);
 //			if(!configuration.getAttribute(NOCLEAN, false)&&managedBuildProj!=null&&newBuildConfig!=null)
