@@ -111,7 +111,7 @@ public class InactiveCodeHighlighting implements ICReconcilingListener, ITextInp
 						IStatus result = Status.OK_STATUS;
 						if (fTranslationUnit != null) {
 							final ASTProvider astProvider= CUIPlugin.getDefault().getASTProvider();
-							result= astProvider.runOnAST(fTranslationUnit, ASTProvider.WAIT_YES, monitor, new ASTCache.ASTRunnable() {
+							result= astProvider.runOnAST(fTranslationUnit, ASTProvider.WAIT_IF_OPEN, monitor, new ASTCache.ASTRunnable() {
 								public IStatus runOnAST(ILanguage lang, IASTTranslationUnit ast) {
 									reconciled(ast, true, monitor);
 									return Status.OK_STATUS;
