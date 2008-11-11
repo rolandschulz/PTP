@@ -277,7 +277,8 @@ public class BuildLaunchUtils {
 			StreamRunner outRun=new StreamRunner(p.getInputStream(),"out",fos);
 			errRun.start();
 			outRun.start();
-			int eval=p.waitFor();
+			//int eval=
+				p.waitFor();
 			if(fos!=null)
 			{
 				fos.flush();

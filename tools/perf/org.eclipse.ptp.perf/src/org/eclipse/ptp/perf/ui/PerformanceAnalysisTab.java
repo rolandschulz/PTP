@@ -17,15 +17,25 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.ui;
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
@@ -44,9 +54,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ListDialog;
 
 /**
  * Defines the tab of the performance-analysis launch configuration system where performance-analysis options are selected
@@ -69,6 +82,9 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	protected Button analyzeonlyCheck;
 	
 	protected Button noParallelRun;
+	
+	protected Button addWorkflowB;
+	protected Button removeWorkflowB;
 
 	//protected Button nocleanCheck;
 
@@ -153,8 +169,15 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			ModifyListener, IPropertyChangeListener {
 		public void widgetSelected(SelectionEvent e) {
 
-//			Object source = e.getSource();
+			Object source = e.getSource();
 
+			if(source.equals(addWorkflowB))
+			{
+				addWorkflow();
+			}
+			if(source.equals(removeWorkflowB)){
+				removeWorkflow();
+			}
 //			if(source.equals(relocateTools))
 //			{
 //				BuildLaunchUtils.getAllToolPaths(tools, true);
@@ -173,6 +196,104 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 	}
 
+	private void warnXMLChange(){
+		MessageDialog
+		.openInformation(
+				PlatformUI.getWorkbench()
+						.getDisplay()
+						.getActiveShell(),
+				"TAU Warning",
+				"Your changes will not take full effect until you open and close this window.");
+	}
+	
+	private void addWorkflow(){
+		FileDialog dialog = new FileDialog(getShell());
+
+		dialog.setText("Select tool definition xml file");
+		
+		String out=getFieldContent(dialog.open());
+		
+		if(out==null)
+			return;
+		
+		File test = new File(out);
+		if(!test.canRead()||!test.isFile())
+		{
+			return;
+		}
+			
+		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		String fiList=preferences.getString(XMLLOCID);
+		
+		String[] x = fiList.split(",,,");
+		LinkedHashSet<String> files = new LinkedHashSet<String>();
+		for(int i=0;i<x.length;i++){
+			files.add(x[i]);
+		}
+		files.add(out);
+		
+		fiList="";
+		
+		Iterator<String> fit = files.iterator();
+		
+		while(fit.hasNext()){
+			fiList+=fit.next();
+			if(fit.hasNext()){
+				fiList+=",,,";
+			}
+		}
+		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
+		Activator.getDefault().refreshTools();
+		warnXMLChange();
+		
+	}
+	
+	private void removeWorkflow(){
+		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		String fiList=preferences.getString(XMLLOCID);
+		
+		String[] x = fiList.split(",,,");
+		LinkedHashSet<String> files = new LinkedHashSet<String>();
+		for(int i=0;i<x.length;i++){
+			files.add(x[i]);
+		}
+		
+		ArrayContentProvider acp = new ArrayContentProvider(); 
+		//acp.getElements(x);
+		
+		ListDialog ld = new ListDialog(getShell());
+		
+		ld.setContentProvider(acp);
+		ld.setBlockOnOpen(true);
+		ld.setLabelProvider(new LabelProvider());
+		ld.setInput(x);
+		ld.setHelpAvailable(false);
+		ld.setTitle("Remove Workflow Files");
+		ld.open();
+		if(ld.getReturnCode()==Dialog.CANCEL)
+		{
+			return;
+		}
+		Object[] y = ld.getResult();
+		for(int i=0;i<y.length;i++){
+			files.remove((String)y[i]);
+		}
+		
+		fiList="";
+		
+		Iterator<String> fit = files.iterator();
+		
+		while(fit.hasNext()){
+			fiList+=fit.next();
+			if(fit.hasNext()){
+				fiList+=",,,";
+			}
+		}
+		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
+		Activator.getDefault().refreshTools();
+		warnXMLChange();
+	}
+	
 	protected WidgetListener listener = new WidgetListener();
 
 	
@@ -214,11 +335,16 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		toolComboComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label makeLab = new Label(toolComboComp, 0);
-		makeLab.setText("Select Analysis Tool:");
+		makeLab.setText("Select Tool:");
 		
 		toolTypes=new Combo(toolComboComp, SWT.DROP_DOWN|SWT.READ_ONLY|SWT.BORDER);
 		toolTypes.addSelectionListener(listener);
-		
+		addWorkflowB=new Button(toolComboComp, SWT.NONE);
+		addWorkflowB.setText("Add");
+		addWorkflowB.addSelectionListener(listener);
+		removeWorkflowB=new Button(toolComboComp,SWT.NONE);
+		removeWorkflowB.setText("Remove");
+		removeWorkflowB.addSelectionListener(listener);
 		createVerticalSpacer(toolComp, 1);
 
 		buildonlyCheck = createCheckButton(toolComp,

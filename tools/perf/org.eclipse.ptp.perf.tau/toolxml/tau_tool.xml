@@ -1,4 +1,4 @@
-q<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <tool name="TAU">
 	<compile replace="true">
 		<CC command="tau_cc.sh" group="tau"/>
@@ -135,6 +135,15 @@ q<?xml version="1.0" encoding="UTF-8"?>
 			<togoption label="AppF90" optname="-optAppF90" tooltip="Specifies the fallback F90 compiler.">
 				<optvalue type="text"/>
 			</togoption>
+			
+			<togoption label="Shared" optname="-optShared" tooltip="Use shared library version of TAU."/>
+			
+			<togoption label="CompInst" optname="-optCompInst" tooltip="Use compiler-based instrumentation."/>
+			
+			<togoption label="PDTInst" optname="-optPDTInst" tooltip="Use PDT-based instrumentation."/>
+			
+			<togoption label="DisableHeaderInst" optname="-optDisableHeaderInst" tooltip="Disable instrumentation of headers"/>
+			
 		</optionpane>
 		<optionpane title="tau_makefile" virtual="true"/>
 		<optionpane title="selective_instrumentation_arg" virtual="true"/>
