@@ -273,12 +273,13 @@ public class BuildLaunchUtils {
 				fos=new FileOutputStream(output);
 			}
 			Process p = Runtime.getRuntime().exec(tool, env, directory);
-			StreamRunner errRun=new StreamRunner(p.getErrorStream(),"err",null);
 			StreamRunner outRun=new StreamRunner(p.getInputStream(),"out",fos);
-			errRun.start();
+			StreamRunner errRun=new StreamRunner(p.getErrorStream(),"err",null);
 			outRun.start();
+			errRun.start();
+			outRun.join();
 			//int eval=
-				p.waitFor();
+			p.waitFor();
 			if(fos!=null)
 			{
 				fos.flush();

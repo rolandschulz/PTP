@@ -149,6 +149,27 @@
 		<optionpane title="selective_instrumentation_arg" virtual="true"/>
 		</allcompilers>
 	</compile>
+	<execute if="use_automatic_tau_reduce"/>
+	<analyze if="use_automatic_tau_reduce">
+		<utility command="pprof" group="tau" outtofile="pprof.txt">
+			<argument flag="-d"/>
+		</utility>
+		<utility command="tau_reduce" group="tau">
+			<argument flag="-f" separator=" " value="pprof.txt" localdir="true"/> 
+			<argument flag="-o" separator=" " value="tau_select.txt" localdir="true"/>
+		</utility>
+	</analyze>
+	<compile replace="true" if="use_automatic_tau_reduce">
+		<CC command="tau_cc.sh" group="tau"/>
+		<CXX command="tau_cxx.sh" group="tau"/>
+		<F90 command="tau_f90.sh" group="tau"/>
+		<allcompilers group="tau">
+		<optionpane title="Tau Compiler" virtual="true"/>
+		<optionpane title="tau_makefile" virtual="true"/>
+		<argument flag="-optTauSelectFile" separator="=" value="tau_select.txt" localdir="true"/>
+		</allcompilers>
+	</compile>
+	<execute/>	
 	<analyze>
 		<utility command="process-TAU-data" group="internal"/>
 	</analyze>
