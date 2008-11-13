@@ -13,6 +13,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.toolopts.ExecTool;
@@ -155,8 +156,17 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 		}
 		configuration = confWC.doSave();
 		
+		boolean reRun=launch.isTerminated();
+		if(reRun){
+			IProcess[] ip=launch.getProcesses();
+			for(IProcess p : ip)
+			{
+				launch.removeProcess(p);
+			}
+		}
 
 		paraDel.launch(configuration, ILaunchManager.RUN_MODE, launch, monitor);
+		
 		
 		//IProcess[] ips=launch.getProcesses();
 			
