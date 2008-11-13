@@ -111,5 +111,32 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
         }
         
     }
+    
+    
+    /**
+     * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
+     * @param projectName The project that produced the data
+     * @param projectType The TAU options used in the production of the data
+     * @param location The location of the profile data
+     * @return True on success, false on failure to upload
+     */
+    public static boolean addPerformanceData(String projectName, String projectType, String trialName, String location, String dbname) {
+        try {
+            PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage()
+            .showView("org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView");
+
+            // when that class is initialized, it will call registerPerfDMFView so we can get a handle on it
+            return theView.addProfile(projectName, projectType, trialName, location, dbname);
+            
+            //return true;
+
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
+        
+    }
 
 }

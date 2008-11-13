@@ -410,14 +410,16 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 		return new File(ppp.ppk);
 	}
 	
-	private static boolean addToDatabase(String directory, String database, final String projname, final String projtype, final String projtrial, String xmlMetaData){
+	private static boolean addToDatabase(final String directory, final String database, final String projname, final String projtype, final String projtrial, String xmlMetaData){
 
 		boolean hasdb=false;
 		try {
 			//if(usingParameters)
 			//{
+			
 			if(database!=null&&!database.equals(ITAULaunchConfigurationConstants.NODB))
 			{
+				/* TODO: Re-enable this or find another way to support metadata uploading!
 				String metaSpec=" ";
 				File xmlFi=null;
 				if(xmlMetaData!=null&&xmlMetaData.length()>0){
@@ -439,7 +441,7 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 						e.printStackTrace();
 					}
 				}
-
+				
 				String db="";
 				if(!database.equals("Default")){
 					db=" -c "+database;
@@ -451,6 +453,7 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 				ex+="perfdmf_loadtrial -a "+projname+" -x "+projtype+" -n "+projtrial+db+metaSpec+ directory;//-m metaDataFile
 				hasdb=BuildLaunchUtils.runTool(ex, null,new File(directory));
 				
+				
 				if(hasdb==false)
 				{
 					return false;
@@ -460,6 +463,8 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 				if(xmlFi!=null){
 					xmlFi.delete();
 				}
+				
+				
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						//}
@@ -469,7 +474,19 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 						PerfDMFUIPlugin.displayPerformanceData(projname,projtype,projtrial);//,directory, database
 						//}
 					}});
+				*/
 				
+				class DBView implements Runnable{
+					boolean hasdb=false;
+					public void run() {
+						hasdb = PerfDMFUIPlugin.addPerformanceData(projname,projtype, projtrial, directory, database);
+						
+					}
+					
+				}
+				DBView dbv=new DBView();
+				Display.getDefault().syncExec(dbv);
+				hasdb=dbv.hasdb;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

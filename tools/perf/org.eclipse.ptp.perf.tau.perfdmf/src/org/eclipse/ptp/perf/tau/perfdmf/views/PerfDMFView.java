@@ -18,6 +18,7 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.tau.perfdmf.views;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -80,12 +81,15 @@ import edu.uoregon.tau.paraprof.ParaProfTrial;
 import edu.uoregon.tau.paraprof.interfaces.EclipseHandler;
 import edu.uoregon.tau.perfdmf.Application;
 import edu.uoregon.tau.perfdmf.DBDataSource;
+import edu.uoregon.tau.perfdmf.DataSource;
 import edu.uoregon.tau.perfdmf.Database;
 import edu.uoregon.tau.perfdmf.DatabaseAPI;
+import edu.uoregon.tau.perfdmf.DatabaseException;
 import edu.uoregon.tau.perfdmf.Experiment;
 import edu.uoregon.tau.perfdmf.Function;
 import edu.uoregon.tau.perfdmf.SourceRegion;
 import edu.uoregon.tau.perfdmf.Trial;
+import edu.uoregon.tau.perfdmf.UtilFncs;
 /**
  * Defines a perfdmf database browser view and associated operations
  * @author wspear
@@ -769,7 +773,7 @@ public class PerfDMFView extends ViewPart {
     	
     	return true;
     }
-    /*
+    
     public boolean addProfile(String project, String projectType, String trialName, String directory, String dbname) {
     	DatabaseAPI dbApi=null;
     	try {
@@ -865,5 +869,5 @@ public class PerfDMFView extends ViewPart {
         }
 
         return true;
-    }*/
+    }
 }

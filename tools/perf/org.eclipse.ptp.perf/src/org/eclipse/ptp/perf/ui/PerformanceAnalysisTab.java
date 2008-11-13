@@ -340,10 +340,10 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		toolTypes=new Combo(toolComboComp, SWT.DROP_DOWN|SWT.READ_ONLY|SWT.BORDER);
 		toolTypes.addSelectionListener(listener);
 		addWorkflowB=new Button(toolComboComp, SWT.NONE);
-		addWorkflowB.setText("Add");
+		addWorkflowB.setText("Add Workflow XML File");
 		addWorkflowB.addSelectionListener(listener);
 		removeWorkflowB=new Button(toolComboComp,SWT.NONE);
-		removeWorkflowB.setText("Remove");
+		removeWorkflowB.setText("Remove Workflow XML File");
 		removeWorkflowB.addSelectionListener(listener);
 		createVerticalSpacer(toolComp, 1);
 
