@@ -39,7 +39,7 @@ import org.eclipse.ui.PlatformUI;
 public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 	//private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 	
-	private static final String tbpath = BuildLaunchUtils.getToolPath("tau");
+	private static String tbpath = null;
 	
 	/**
 	 * Returns the TAU makefile associated with the supplied launch configuration
@@ -76,7 +76,7 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 	}
 
 	public void process(String projname, ILaunchConfiguration configuration,String directory) throws CoreException {
-		
+		tbpath=BuildLaunchUtils.getToolPath("tau");
 		if(useExt||projname==null){
 			boolean usePortal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
 			String[] profIDs = getProfIDs();//manageProfiles(projectLocation,dbname,usePortal);
@@ -88,13 +88,18 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			File[] profs = getProfiles(directory);
 			if(profs==null||profs.length==0)
 			{
-				MessageDialog
-				.openInformation(
-						PlatformUI.getWorkbench()
-						.getDisplay()
-						.getActiveShell(),
-						"TAU Warning",
-				"No profile data was located.  Please make sure profile data is available");
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						MessageDialog
+						.openInformation(
+								PlatformUI.getWorkbench()
+								.getDisplay()
+								.getActiveShell(),
+								"TAU Warning",
+						"No profile data was located.  Please make sure profile data is available");
+					}});
+				
+				
 				return;
 			}
 			
@@ -106,13 +111,19 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			String database= PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null));
 			boolean hasdb=addToDatabase(directory,database,projname,projtype,projtrial,xmlMetaData);
 			if (!hasdb) {
-				MessageDialog
-				.openInformation(
-						PlatformUI.getWorkbench()
-						.getDisplay()
-						.getActiveShell(),
-						"TAU Warning",
-				"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+				
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						MessageDialog
+						.openInformation(
+								PlatformUI.getWorkbench()
+								.getDisplay()
+								.getActiveShell(),
+								"TAU Warning",
+						"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+					}});
+				
+				
 				return;
 			}
 			
@@ -120,13 +131,18 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 				File ppkfile=getPPKFile(directory,projname,projtype,projtrial);
 				if(ppkfile==null||!ppkfile.canRead())
 				{
-					MessageDialog
-					.openInformation(
-							PlatformUI.getWorkbench()
-							.getDisplay()
-							.getActiveShell(),
-							"TAU Warning",
-					"Could not generate ppk file from profile data");
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							MessageDialog
+							.openInformation(
+									PlatformUI.getWorkbench()
+									.getDisplay()
+									.getActiveShell(),
+									"TAU Warning",
+							"Could not generate ppk file from profile data");
+						}});
+					
+					
 				}
 				else{
 					
@@ -185,13 +201,16 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			File[] profs = getProfiles(directory);
 			if(!useP&&profs==null||profs.length==0)
 			{
-				MessageDialog
-				.openInformation(
-						PlatformUI.getWorkbench()
-						.getDisplay()
-						.getActiveShell(),
-						"TAU Warning",
-				"No profile data was located.  Please make sure profile data is available");
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						MessageDialog
+						.openInformation(
+								PlatformUI.getWorkbench()
+								.getDisplay()
+								.getActiveShell(),
+								"TAU Warning",
+						"No profile data was located.  Please make sure profile data is available");
+					}});
 			}
 			
 			boolean runtauinc = configuration.getAttribute(ITAULaunchConfigurationConstants.TAUINC, false);
@@ -204,35 +223,47 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			String database= PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null));
 			boolean hasdb=addToDatabase(directory,database,projname,projtype,projtrial,xmlMetaData);
 			if (!hasdb&&!useP) {
-				MessageDialog
-				.openInformation(
-						PlatformUI.getWorkbench()
-						.getDisplay()
-						.getActiveShell(),
-						"TAU Warning",
-				"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+				
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						MessageDialog
+						.openInformation(
+								PlatformUI.getWorkbench()
+								.getDisplay()
+								.getActiveShell(),
+								"TAU Warning",
+						"Adding data to your perfdmf database failed.  Please make sure that you have successfully run perfdmf_configure with your selected TAU installation.");
+					}});
+				
+				
 			}
 			
 			boolean keepprofs = configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false);
 			boolean useportal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);//TODO: Enable portal use via external data interface
 			
-			if(keepprofs||useportal){
+			if(keepprofs||!hasdb||useportal){
 				File ppkfile=getPPKFile(directory,projname,projtype,projtrial);
 				if(ppkfile==null||!ppkfile.canRead())
 				{
-					MessageDialog
-					.openInformation(
-							PlatformUI.getWorkbench()
-							.getDisplay()
-							.getActiveShell(),
-							"TAU Warning",
-					"Could not generate ppk file from profile data");
+					
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							MessageDialog
+							.openInformation(
+									PlatformUI.getWorkbench()
+									.getDisplay()
+									.getActiveShell(),
+									"TAU Warning",
+							"Could not generate ppk file from profile data");
+						}});
+					
+					
 				}
 				else{
 					if(useportal){
 						runPortal(ppkfile);
 					}
-					if(keepprofs){
+					if(keepprofs||!hasdb){
 						movePakFile(directory,projtype,projtrial,ppkfile);
 					}
 					else{
@@ -363,8 +394,10 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 
 
 				String ppkname = projname + "_" + projtype + "_" + projtrial+ ".ppk";
-				String paraprof = tbpath + File.separator
-				+ "paraprof --pack " + ppkname;
+				String paraprof = "";
+				if(tbpath!=null && tbpath.length()>0)
+					paraprof+= tbpath + File.separator;
+				paraprof+= "paraprof --pack " + ppkname;
 				System.out.println(paraprof);
 				ppk = directory + File.separator + ppkname;
 
@@ -412,7 +445,10 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 					db=" -c "+database;
 				}
 
-				String ex = tbpath+File.separator+"perfdmf_loadtrial -a "+projname+" -x "+projtype+" -n "+projtrial+db+metaSpec+ directory;//-m metaDataFile
+				String ex = "";
+				if(tbpath!=null && tbpath.length()>0)
+					ex+=tbpath+File.separator;
+				ex+="perfdmf_loadtrial -a "+projname+" -x "+projtype+" -n "+projtrial+db+metaSpec+ directory;//-m metaDataFile
 				hasdb=BuildLaunchUtils.runTool(ex, null,new File(directory));
 				
 				if(hasdb==false)
@@ -483,7 +519,10 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 					*/					
 					
 						String mpilistname = projname + "_" + projtype + "_" + projtrial+ ".includelist";
-						String tauinc = "cd " + directory + " ; " + tbpath + File.separator+ "tauinc.sh > " + mpilistname;
+						String tauinc = "cd " + directory + " ; ";
+						if(tbpath!=null && tbpath.length()>0)
+							tauinc+= tbpath + File.separator;
+						tauinc+= "tauinc.sh > " + mpilistname;
 						System.out.println(tauinc);
 						try{
 							String[] cmd = {"sh", "-c", tauinc};
@@ -566,7 +605,10 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			return;
 		}
 
-		String perf2tau = tbpath+File.separator+"perf2tau";
+		String perf2tau = "";
+		if(tbpath!=null && tbpath.length()>0)
+			perf2tau+=tbpath+File.separator;
+		perf2tau+="perf2tau";
 		
 		BuildLaunchUtils.runTool(perf2tau,null,dir);
 		

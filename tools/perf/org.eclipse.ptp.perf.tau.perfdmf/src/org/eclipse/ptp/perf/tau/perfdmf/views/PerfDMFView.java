@@ -72,6 +72,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
+import edu.uoregon.tau.perfdmf.DatabaseAPI;
+
 import edu.uoregon.tau.paraprof.GlobalDataWindow;
 import edu.uoregon.tau.paraprof.ParaProf;
 import edu.uoregon.tau.paraprof.ParaProfTrial;
@@ -422,7 +424,7 @@ public class PerfDMFView extends ViewPart {
          * expose its hierarchy.
          */
         private boolean initialize() {
-
+        	DatabaseAPI dbApi=null;
             try {
 
                 ParaProf.eclipseHandler = new EclipseHandler() {
@@ -446,7 +448,7 @@ public class PerfDMFView extends ViewPart {
                 invisibleRoot = new TreeNode("", null);
                 //String perfdmf = System.getProperty("user.home") + "/.ParaProf/perfdmf.cfg";
 
-               DatabaseAPI dbApi = new DatabaseAPI();
+               dbApi = new DatabaseAPI();
                Database database=getDatabase(databaseName);
                if(database==null)
                {   
@@ -483,9 +485,16 @@ public class PerfDMFView extends ViewPart {
                     invisibleRoot.addChild(root);
 
                 }
-                dbApi.terminate();
+                
             } catch (Exception e) {
-                //e.printStackTrace();
+                e.printStackTrace();
+            }
+            finally{
+            	if(dbApi!=null)
+            	{
+            		dbApi.db().close();
+            		dbApi.terminate();
+                }
             }
             
             return true;

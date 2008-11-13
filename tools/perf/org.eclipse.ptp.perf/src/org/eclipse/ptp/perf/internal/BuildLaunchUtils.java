@@ -259,6 +259,7 @@ public class BuildLaunchUtils {
 	}
 	
 	public static boolean runTool(String tool, String[] env, File directory, String output){
+		int eval=-1;
 		try{
 		
 			OutputStream fos = null;
@@ -278,8 +279,7 @@ public class BuildLaunchUtils {
 			outRun.start();
 			errRun.start();
 			outRun.join();
-			//int eval=
-			p.waitFor();
+			eval=p.waitFor();
 			if(fos!=null)
 			{
 				fos.flush();
@@ -291,7 +291,7 @@ public class BuildLaunchUtils {
 			e.printStackTrace();
 			return false;
 			}
-		return true;
+		return (eval==0);//true;
 	}
 	
 	static class StreamRunner extends Thread
