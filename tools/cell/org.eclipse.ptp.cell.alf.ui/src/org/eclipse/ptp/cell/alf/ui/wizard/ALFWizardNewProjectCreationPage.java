@@ -19,8 +19,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.cell.alf.ui.Messages;
-import org.eclipse.ptp.cell.utils.packagemanager.PackageManagementSystemManager;
-import org.eclipse.ptp.cell.utils.packagemanager.PackageManager;
+//import org.eclipse.ptp.cell.utils.packagemanager.PackageManagementSystemManager;
+//import org.eclipse.ptp.cell.utils.packagemanager.PackageManager;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 
@@ -69,18 +69,18 @@ public class ALFWizardNewProjectCreationPage extends WizardNewProjectCreationPag
 			/*
 			 * Do the RPM check.
 			 */
-			PackageManager manager = PackageManagementSystemManager.getPackageManager();
+			/*PackageManager manager = PackageManagementSystemManager.getPackageManager();
 			boolean alfPackage1 = manager.query("alf-cross-devel"); //$NON-NLS-1$
 			boolean alfPackage2 = manager.query("alf-hybrid-cross-devel"); //$NON-NLS-1$
 			boolean alfPackage3 = manager.query("alf"); //$NON-NLS-1$
 			boolean alfPackage4 = manager.query("alf-devel"); //$NON-NLS-1$
 			boolean alfPackage5 = manager.query("alf-hybrid"); //$NON-NLS-1$
 			boolean alfPackage6 = manager.query("alf-hybrid-devel"); //$NON-NLS-1$
-			boolean alfPackage7 = manager.query("alf-ide-template"); //$NON-NLS-1$
+			boolean alfPackage7 = manager.query("alf-ide-template"); //$NON-NLS-1$ */
 			
 			RPMsChecked = true;
 			
-			if(!alfPackage1 && !alfPackage2 && !alfPackage3 && !alfPackage4 && !alfPackage5 && !alfPackage6){
+			/*if(!alfPackage1 && !alfPackage2 && !alfPackage3 && !alfPackage4 && !alfPackage5 && !alfPackage6){
 				RPMErrorMessage = Messages.ALFWizard_errorAlfNotInstalled;
 				openErrorMessage(Messages.ALFWizard_projectNamePageTitle, Messages.ALFWizard_errorAlfNotInstalled);
 				RPMsValidated = false;
@@ -92,7 +92,7 @@ public class ALFWizardNewProjectCreationPage extends WizardNewProjectCreationPag
 				openErrorMessage(Messages.ALFWizard_projectNamePageTitle, Messages.ALFWizard_errorALFTemplateNotInstalled);
 				RPMsValidated = false;
 				return false;
-			}
+			} */
 			RPMsValidated = true;
 		}
 		/*

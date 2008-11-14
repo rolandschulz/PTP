@@ -1588,7 +1588,6 @@
 				id="cell.managedbuild.toolchain.cell.gnu"
 				name="%ToolChainName.gnu.Gen"
 				isAbstract="true"
-				isToolChainSupported="org.eclipse.ptp.cell.managedbuilder.gnu.ui.internal.ManagedGNUToolChainSupport"
 				archList="x86,x86_64,ppc,ppc64"
 				osList="linux"
 				configurationEnvironmentSupplier="org.eclipse.ptp.cell.managedbuilder.gnu.core.GnuToolChainEnvironmentSupplier"

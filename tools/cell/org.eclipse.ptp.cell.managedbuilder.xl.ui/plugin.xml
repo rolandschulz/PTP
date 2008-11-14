@@ -1878,7 +1878,6 @@
 				id="cell.managedbuild.toolchain.cell.xl"
 				name="%ToolChainName.xl.Gen"
 				isAbstract="true"
-				isToolChainSupported="org.eclipse.ptp.cell.managedbuilder.xl.ui.internal.ManagedXLToolChainSupport"
 				archList="x86,x86_64,ppc,ppc64"
 				osList="linux"
 				configurationEnvironmentSupplier="org.eclipse.ptp.cell.managedbuilder.xl.core.XlToolChainEnvironmentSupplier"

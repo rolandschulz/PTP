@@ -89,12 +89,12 @@ public class GdbClientSearcher extends StringFieldEditorPreferenceSearcher {
 		// ppu-gdb is not in the $PATH environment variable. The search
 		// continues
 		// Verify if ppu-gdb rpm package is installed or not
-		gdbClient = PackageManagementSystemManager.getPackageManager().searchFileInQueryListAndReturnFullPath(GDB_PACKAGE_NAME, GDB_CLIENT_EXECUTABLE);
+		/*gdbClient = PackageManagementSystemManager.getPackageManager().searchFileInQueryListAndReturnFullPath(GDB_PACKAGE_NAME, GDB_CLIENT_EXECUTABLE);
 		if (isValidGdbClient(gdbClient)) {
 			Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "Value returned from package management system is valid"); //$NON-NLS-1$
 			setText(gdbClient);
 			return;
-		}
+		}*/
 		Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "All fast searches failed,"); //$NON-NLS-1$
 		// None of the searches returned successfully.
 		throw new SearchFailedException(SearcherMessages.fastSearchFailedMessage);

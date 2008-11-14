@@ -90,9 +90,9 @@ public class LocalLaunchEnvironment implements ITargetTypeExtension {
 
 	public AbstractEnvironmentDialogPage dialogPageFactory(ITargetElement element) {
 		// Check if simulator is installed
-		if (!PackageManagementSystemManager.getPackageManager().query(SimulatorProperties.simulatorPackage)) {
+		/*if (!PackageManagementSystemManager.getPackageManager().query(SimulatorProperties.simulatorPackage)) {
 			return new DummyEnvironmentDialogPage(LocalDefaultValues.DefaultTargetName);
-		}
+		}*/
 		ConfigurationPage page = new ConfigurationPage(element.getName(), 
 				new LocalConfigurationBean(element.getAttributes(), element.getId()));
 		page.setAvailableAutomaticNetwork(true);
@@ -104,9 +104,9 @@ public class LocalLaunchEnvironment implements ITargetTypeExtension {
 	
 	public AbstractEnvironmentDialogPage dialogPageFactory() {
 		// Check if simulator is installed.
-		if (!PackageManagementSystemManager.getPackageManager().query(SimulatorProperties.simulatorPackage)) {
+		/*if (!PackageManagementSystemManager.getPackageManager().query(SimulatorProperties.simulatorPackage)) {
 			return new DummyEnvironmentDialogPage(LocalDefaultValues.DefaultTargetName);
-		}
+		}*/
 		ConfigurationPage page = new ConfigurationPage(LocalDefaultValues.DefaultTargetName,
 				new LocalConfigurationBean());
 		page.setAvailableAutomaticNetwork(true);

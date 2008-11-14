@@ -89,7 +89,7 @@ public class SysrootSearcher extends StringFieldEditorPreferenceSearcher {
 		// mainLib is not in the $PATH environment variable. The search
 		// continues
 		// Verify if the package is installed or not
-		sysrootPath = PackageManagementSystemManager.getPackageManager()
+		/*sysrootPath = PackageManagementSystemManager.getPackageManager()
 				.searchFileInQueryListAndReturnInitialPathSegments(
 						CellProperties.searchInPackage,
 						File.separator
@@ -98,7 +98,7 @@ public class SysrootSearcher extends StringFieldEditorPreferenceSearcher {
 			Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "Value returned from package management system is valid"); //$NON-NLS-1$
 			setText(sysrootPath);
 			return;
-		}
+		}*/
 		Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "All fast searches failed,"); //$NON-NLS-1$
 		
 		// None of the searches returned successfully.

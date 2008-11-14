@@ -80,7 +80,7 @@ public class XlToolsSearcher extends StringFieldEditorPreferenceSearcher {
 		// ppu-gcc are not in the $PATH environment variable. The search
 		// continues
 		// Verify if the package is installed or not
-		xlToolsPath = PackageManagementSystemManager
+		/*xlToolsPath = PackageManagementSystemManager
 				.getPackageManager()
 				.searchFileInQueryListAndReturnInitialPathSegments(
 						XlToolsProperties.ppuxlcPackage,
@@ -89,7 +89,7 @@ public class XlToolsSearcher extends StringFieldEditorPreferenceSearcher {
 			Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "Value returned from package management system is valid"); //$NON-NLS-1$
 			setText(xlToolsPath);
 			return;
-		}
+		}*/
 		Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "All fast searches failed,"); //$NON-NLS-1$
 		// None of the searches returned successfully.
 		throw new SearchFailedException(

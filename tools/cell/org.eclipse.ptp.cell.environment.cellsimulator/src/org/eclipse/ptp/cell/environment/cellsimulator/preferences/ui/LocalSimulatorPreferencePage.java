@@ -65,12 +65,12 @@ public class LocalSimulatorPreferencePage extends FieldEditorPreferencePage
 		setPreferenceStore(store);
 
 		// Check if simulator is installed.
-		if (!PackageManagementSystemManager.getPackageManager().query(SimulatorProperties.simulatorPackage)) {
+		/*if (!PackageManagementSystemManager.getPackageManager().query(SimulatorProperties.simulatorPackage)) {
 			this.isSimulatorInstalled = true;
 			setDescription(Messages.LocalSimulatorPreferencePage_Description_NoLocalSimulator);
 		} else {
 			setDescription(Messages.LocalSimulatorPreferencePage_Description);
-		}
+		} */
 	}
 
 	protected void createFieldEditors() {

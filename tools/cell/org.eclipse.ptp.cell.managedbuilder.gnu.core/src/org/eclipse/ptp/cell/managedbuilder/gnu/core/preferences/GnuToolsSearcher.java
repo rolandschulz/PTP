@@ -81,7 +81,7 @@ public class GnuToolsSearcher extends StringFieldEditorPreferenceSearcher {
 		// ppu-gcc are not in the $PATH environment variable. The search
 		// continues
 		// Verify if the package is installed or not
-		gnuToolsPath = PackageManagementSystemManager.getPackageManager()
+		/*gnuToolsPath = PackageManagementSystemManager.getPackageManager()
 				.searchFileInQueryListAndReturnInitialPathSegments(
 						GnuToolsProperties.ppugccPackage,
 						File.separator
@@ -90,7 +90,7 @@ public class GnuToolsSearcher extends StringFieldEditorPreferenceSearcher {
 			Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "Value returned from package management system is valid"); //$NON-NLS-1$
 			setText(gnuToolsPath);
 			return;
-		}
+		}*/
 		Debug.POLICY.trace(Debug.DEBUG_SEARCHER, "All fast searches failed,"); //$NON-NLS-1$
 		// None of the searches returned successfully.
 		throw new SearchFailedException(

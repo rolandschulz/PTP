@@ -116,7 +116,7 @@ public class InstallDirectorySearcher extends
 		// snif and systemsim-cell are not in the $PATH environment
 		// variable. The search continues
 		// Verify if simulator rpm package is installed or not
-		systemsim_top = PackageManagementSystemManager
+		/*systemsim_top = PackageManagementSystemManager
 				.getPackageManager()
 				.searchFileInQueryListAndReturnInitialPathSegments(
 						LocalSimulatorProperties.systemsim_cell_package,
@@ -127,7 +127,7 @@ public class InstallDirectorySearcher extends
 		if (isValidInstallDirectory(systemsim_top)) {
 			setText(systemsim_top);
 			return;
-		}
+		} */
 		// None of the searches returned successfully.
 		throw new SearchFailedException(
 				SearcherMessages.fastSearchFailedMessage);

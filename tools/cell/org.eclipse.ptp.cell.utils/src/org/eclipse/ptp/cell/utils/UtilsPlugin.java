@@ -47,10 +47,10 @@ public class UtilsPlugin extends Plugin {
 			Date date = new Date();
 			Debug.POLICY.trace("Bundle started at {0}", date.toString()); //$NON-NLS-1$
 		}
-		if (Debug.DEBUG_PLATFORM) {
+		/*if (Debug.DEBUG_PLATFORM) {
 			Platform.getOSArch();
 			Platform.getOSLinuxDistro();
-		}
+		}*/
 
 	}
 
