@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.utils.DebugUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
+import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
