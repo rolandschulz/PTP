@@ -29,6 +29,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.ToolsRMUIPlugin;
+import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -342,12 +343,12 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		layout.marginWidth = 0;
 		contents.setLayout(layout);
 
-		createOpenMPIContents(contents);
+		createContents(contents);
 
 		return contents;
 	}
 
-	protected void createOpenMPIContents(Composite parent) {
+	protected void createContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 4;
