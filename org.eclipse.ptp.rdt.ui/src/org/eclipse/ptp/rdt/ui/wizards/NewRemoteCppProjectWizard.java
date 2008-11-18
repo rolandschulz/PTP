@@ -12,7 +12,9 @@ package org.eclipse.ptp.rdt.ui.wizards;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
+import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
+import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -33,12 +35,16 @@ import org.eclipse.swt.widgets.Composite;
  *
  */
 public class NewRemoteCppProjectWizard extends CDTCommonProjectWizard {
-
+	private static final String PREFIX= "CProjectWizard"; //$NON-NLS-1$
+	private static final String wz_title = Messages.getString("NewRemoteCppProjectWizard_0"); //$NON-NLS-1$
+	private static final String wz_desc = Messages.getString("NewRemoteCppProjectWizard_1"); //$NON-NLS-1$
+	
 	/**
 	 * 
 	 */
 	public NewRemoteCppProjectWizard() {
-		super(Messages.getString("NewRemoteCppProjectWizard_0"), Messages.getString("NewRemoteCppProjectWizard_1")); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		super(wz_title, wz_desc);
 	}
 
 
@@ -72,5 +78,19 @@ public class NewRemoteCppProjectWizard extends CDTCommonProjectWizard {
 	protected void initializeDefaultPageImageDescriptor() {
 		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#addPages()
+	 */
+	@Override
+	public void addPages() {
+		fMainPage= new RDTMainWizardPage(CUIPlugin.getResourceString(PREFIX));
+		fMainPage.setTitle(wz_title);
+		fMainPage.setDescription(wz_desc);
+		addPage(fMainPage);
+	}
+	
+	
 
 }
