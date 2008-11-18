@@ -32,8 +32,8 @@ import org.eclipse.ptp.rdt.ui.messages.Messages;
  */
 public class RemoteMakefileWizard extends AbstractCWizard {
 
-	private static final String ID = "org.eclipse.ptp.rdt.ui.wizards.RemoteMakefileWizard"; //$NON-NLS-1$
-	private static final String NAME = Messages.getString("RemoteMakefileWizard.0"); //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ptp.rdt.ui.wizards.RemoteMakefileWizard"; //$NON-NLS-1$
+	public static final String NAME = Messages.getString("RemoteMakefileWizard.0"); //$NON-NLS-1$
 	public static final String EMPTY_PROJECT = Messages.getString("RemoteMakefileWizard.1"); //$NON-NLS-1$
 
 	public RemoteMakefileWizard() {
