@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.osgi.framework.BundleContext;
 
