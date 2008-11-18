@@ -301,7 +301,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		@Override
 		public void setConfig(IResourceManagerConfiguration configuration) {
-			super.setConfig(config);
+			super.setConfig(configuration);
 			// Store a local reference to the configuration
 			this.config = (AbstractToolRMConfiguration) configuration;
 		}
@@ -497,7 +497,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			fileMgr.setConnection(connection);
 
 			String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere //$NON-NLS-1$
-			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath);
+			IPath selectedPath = fileMgr.browseDirectory(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath);
 			if (selectedPath != null) {
 				remoteInstallPathText.setText(selectedPath.toString());
 			}
