@@ -152,7 +152,7 @@ AbstractToolRMConfigurationWizardPage {
 		contents.setLayout(layout);
 
 		createVersionContents(contents);
-		createOpenMPIContents(contents);
+		createContents(contents);
 
 		return contents;
 	}
