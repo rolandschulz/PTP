@@ -403,13 +403,14 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommand);
 
 			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 1, 1));
+			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			periodicMonitorCmdText.addModifyListener(getWidgetListener());
 
 			label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommandPeriod);
+
 			periodicMonitorTimeSpinner = new Spinner(contents, SWT.SINGLE | SWT.BORDER);
-			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false, 1, 1));
+			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 			periodicMonitorTimeSpinner.addModifyListener(getWidgetListener());
 		}
 
@@ -433,14 +434,12 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PathInstallation);
 
 			remoteInstallPathText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.horizontalSpan = 2;
-			gd.widthHint = 60;
-			remoteInstallPathText.setLayoutData(gd);
 			remoteInstallPathText.addModifyListener(getWidgetListener());
+			remoteInstallPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 			browseButton = SWTUtil.createPushButton(contents, "Browse", null); //$NON-NLS-1$
 			browseButton.addSelectionListener(getWidgetListener());
+			browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		}
 	}
 
