@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
@@ -149,7 +149,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 
 	@Override
-	public AbstractEffectiveTollRMConfiguration retrieveEffectiveToolRmConfiguration() {
+	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
 		return new EffectiveOpenMPIResourceManagerConfiguration(getRmConfiguration());
 	}
 }

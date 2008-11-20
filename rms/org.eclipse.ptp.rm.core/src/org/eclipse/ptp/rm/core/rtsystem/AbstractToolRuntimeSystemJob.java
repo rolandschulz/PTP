@@ -43,7 +43,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
@@ -51,7 +51,7 @@ import org.eclipse.ptp.utils.core.linux.ArgumentParser;
  * Implements a job that controls the parallel application launched with a command line tool.
  * This class is different from {@link AbstractRemoteCommandJob} because it is not aimed towards parsing output of the
  * tool called by command line, but to prepare a whole launch environment for the command line tool, also supporting
- * semantings of the parallel application launcher.
+ * semantics of the parallel application launcher.
  *
  * @author Daniel Felix Ferber
  */
@@ -425,7 +425,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		/*
 		 * Create launch command. If there is no launch command, simply launch the executable.
 		 */
-		AbstractEffectiveTollRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
+		AbstractEffectiveToolRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
 		List<String> command = new ArrayList<String>();
 		if (! effectiveConfiguration.hasLaunchCmd()) {
 			// Fall back to calling the executable.
@@ -449,7 +449,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		/*
 		 * Create debug command. If there is no debug command, simply launch the executable.
 		 */
-		AbstractEffectiveTollRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
+		AbstractEffectiveToolRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
 		List<String> command = new ArrayList<String>();
 		if (! effectiveConfiguration.hasDebugCmd()) {
 			// Fall back to calling the executable.

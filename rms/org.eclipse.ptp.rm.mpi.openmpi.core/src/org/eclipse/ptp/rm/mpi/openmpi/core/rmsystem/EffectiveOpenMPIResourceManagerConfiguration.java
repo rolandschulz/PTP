@@ -1,13 +1,13 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
 
 public class EffectiveOpenMPIResourceManagerConfiguration extends
-AbstractEffectiveTollRMConfiguration {
+AbstractEffectiveToolRMConfiguration {
 
 	public EffectiveOpenMPIResourceManagerConfiguration(
 			AbstractToolRMConfiguration configuration) {
