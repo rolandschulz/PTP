@@ -20,7 +20,7 @@ package org.eclipse.ptp.rm.core.rmsystem;
  * 
  * @author Daniel Felix Ferber
  */
-public class AbstractEffectiveTollRMConfiguration {
+public class AbstractEffectiveToolRMConfiguration {
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private String launchCmd;
 	private String debugCmd;
@@ -33,7 +33,7 @@ public class AbstractEffectiveTollRMConfiguration {
 
 	private AbstractToolRMConfiguration configuration;
 
-	public AbstractEffectiveTollRMConfiguration(
+	public AbstractEffectiveToolRMConfiguration(
 			AbstractToolRMConfiguration configuration) {
 		this.configuration = configuration;
 		this.capabilities = configuration.getCapabilities();
