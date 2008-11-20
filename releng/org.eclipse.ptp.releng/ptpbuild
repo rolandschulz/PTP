@@ -25,6 +25,11 @@ STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
 # download location for builds
 BUILDS_DIR=/home/www/tools/ptp/builds/$PTP_VERSION
 
+if [ ! -d $BUILDS_DIR ]; then
+        echo "$BUILDS_DIR doesn't exist, please create first"
+        exit 1
+fi
+
 # create the releng staging directory and go there
 mkdir -p $STAGING_DIR
 cd $STAGING_DIR
