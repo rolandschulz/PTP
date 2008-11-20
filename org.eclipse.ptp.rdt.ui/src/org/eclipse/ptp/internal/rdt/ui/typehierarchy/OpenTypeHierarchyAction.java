@@ -18,6 +18,7 @@
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.typehierarchy.Messages;
 import org.eclipse.cdt.internal.ui.typehierarchy.TypeHierarchyUI;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -28,7 +29,6 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
-import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;

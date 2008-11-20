@@ -20,12 +20,12 @@ package org.eclipse.ptp.internal.rdt.ui.search.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.CSearchUtil;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.IWorkingSet;
