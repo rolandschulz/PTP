@@ -24,6 +24,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.util.StatusLineHandler;
@@ -33,7 +34,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.texteditor.ITextEditor;
