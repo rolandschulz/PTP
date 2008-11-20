@@ -69,8 +69,8 @@
          id="org.eclipse.ptp.rdt.ui.remoteceditor"
          point="org.eclipse.ui.editors">
       <editor
-            class="org.eclipse.ptp.internal.rdt.ui.editor.CEditor"
-            contributorClass="org.eclipse.ptp.internal.rdt.ui.editor.CEditorActionContributor"
+            class="org.eclipse.ptp.internal.rdt.ui.editor.RemoteCEditor"
+            contributorClass="org.eclipse.cdt.internal.ui.editor.CEditorActionContributor"
             default="true"
             icon="icons/view16/remoteccppeditortab.gif"
             id="org.eclipse.pdt.rdt.ui.editor.CEditor"
@@ -350,15 +350,6 @@
                class="org.eclipse.core.resources.IProject">
          </selection>
       </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-       <hyperlinkDetector
-            class="org.eclipse.ptp.internal.rdt.ui.editor.CElementHyperlinkDetector"
-            id="org.eclipse.ptp.internal.rdt.ui.editor.CElementHyperlinkDetector"
-            name="%cElementHyperlinkDetector"
-            targetId="org.eclipse.cdt.ui.cCode">
-      </hyperlinkDetector>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
