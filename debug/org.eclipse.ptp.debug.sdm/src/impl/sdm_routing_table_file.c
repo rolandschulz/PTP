@@ -68,6 +68,11 @@ sdm_routing_table_init(int argc, char *argv[])
 	}
 	close_routing_file(rt_file);
 
+	if (tbl_size == 0) {
+		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Invalid routing file size\n");
+		return -1;
+	}
+
 	sdm_route_set_size(tbl_size+1);
 	SDM_MASTER = tbl_size;
 
