@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.core.RDTLog;
 
 /**
  * Project nature for remote projects.
@@ -65,7 +66,19 @@ public class RemoteNature implements IProjectNature {
 
 	public static void addRemoteNature(IProject prj, IProgressMonitor monitor) throws CoreException {
 		CProjectNature.addNature(prj, RemoteNature.REMOTE_NATURE_ID, monitor);
-		
+	}
+	
+	/**
+	 * Returns true if the given project has the remote nature.
+	 * @throws NullPointerException if project is null
+	 */
+	public static boolean hasRemoteNature(IProject project) {
+		try {
+			return project.hasNature(REMOTE_NATURE_ID);
+		} catch (CoreException e) {
+			RDTLog.logError(e);
+			return false;
+		}
 	}
 
 }
