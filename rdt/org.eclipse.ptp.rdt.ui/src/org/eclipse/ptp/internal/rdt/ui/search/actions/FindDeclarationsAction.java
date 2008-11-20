@@ -18,9 +18,10 @@
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
 
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.PDOMSearchQuery;
-import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
+
 import org.eclipse.ui.IWorkbenchSite;
 
 

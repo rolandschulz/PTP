@@ -38,7 +38,6 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.internal.rdt.ui.actions,
  org.eclipse.ptp.internal.rdt.ui.callhierarchy,
  org.eclipse.ptp.internal.rdt.ui.contentassist,
- org.eclipse.ptp.internal.rdt.ui.editor,
  org.eclipse.ptp.internal.rdt.ui.includebrowser,
  org.eclipse.ptp.internal.rdt.ui.preferences,
  org.eclipse.ptp.internal.rdt.ui.search,

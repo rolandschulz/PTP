@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.CSearchUtil;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.internal.rdt.ui.editor.CEditor;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
