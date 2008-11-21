@@ -82,13 +82,21 @@ public class Messages extends NLS {
 	public static String MPICH2DiscoverJob_name;
 	public static String MPICH2DiscoverJob_parsingErrorMessage;
 	public static String MPICH2DiscoverJob_processErrorMessage;
+	
+	public static String MPICH2MonitorJob_interruptedErrorMessage;
+	public static String MPICH2MonitorJob_name;
+	public static String MPICH2MonitorJob_parsingErrorMessage;
+	public static String MPICH2MonitorJob_processErrorMessage;
+
 	public static String MPICH2ProcessMapText12Parser_Exception_InvalidLine;
 	public static String MPICH2ProcessMapText12Parser_Exception_MissingDisplayMapInformation;
 	public static String MPICH2ProcessMapText12Parser_Exception_BrokenDisplayMapInformation;
+	
 	public static String MPICH2ProcessMapXml13Parser_Exception_AttributeNotInteger;
 	public static String MPICH2ProcessMapXml13Parser_Exception_MissingAttribute;
 	public static String MPICH2ProcessMapXml13Parser_Exception_UnknownAttribute;
 	public static String MPICH2ProcessMapXml13Parser_Exception_UnknownElement;
+	
 	public static String MPICH2RuntimeSystem_JobName;
 	public static String MPICH2RuntimeSystemJob_Exception_FailedParse;
 	public static String MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch;

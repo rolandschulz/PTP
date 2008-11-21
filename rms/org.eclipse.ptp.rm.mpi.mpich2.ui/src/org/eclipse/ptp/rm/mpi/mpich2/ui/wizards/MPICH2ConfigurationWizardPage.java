@@ -111,7 +111,10 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 	}
 
 	public MPICH2ConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, MPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES , Messages.MPICH2ConfigurationWizardPage_Name, Messages.MPICH2ConfigurationWizardPage_Title, Messages.MPICH2ConfigurationWizardPage_Description);
+		super(wizard, MPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES, 
+				Messages.MPICH2ConfigurationWizardPage_Name, 
+				Messages.MPICH2ConfigurationWizardPage_Title, 
+				Messages.MPICH2ConfigurationWizardPage_Description);
 	}
 
 	@Override

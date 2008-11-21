@@ -28,7 +28,7 @@ import org.eclipse.ui.IMemento;
 public class MPICH2ResourceManagerConfiguration extends
 AbstractToolRMConfiguration implements Cloneable {
 
-	public static int MPICH2_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
+	public static int MPICH2_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_PERIODIC_MONITOR | CAP_REMOTE_INSTALL_PATH;
 
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
@@ -95,6 +95,8 @@ AbstractToolRMConfiguration implements Cloneable {
 		setLaunchCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_LAUNCH_CMD));
 		setDebugCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DEBUG_CMD));
 		setDiscoverCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DISCOVER_CMD));
+		setPeriodicMonitorCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
+		setPeriodicMonitorTime(prefs.getInt(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME));
 		setRemoteInstallPath(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		//		setUseToolDefaults(prefs.getBoolean(MPICH213PreferenceManager.PREFIX + MPICH213PreferenceManager.PREFS_USE_DEFAULTS));
 	}
