@@ -91,8 +91,18 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				try {
 					String line = stdoutBufferedReader.readLine();
 					while (line != null) {
+						int index = 0;
+						int pos = line.indexOf(": "); //$NON-NLS-1$
+						if (pos > 0) {
+							try {
+								index = Integer.parseInt(line.substring(0, pos));
+								line = line.substring(pos+1);
+							} catch (NumberFormatException e) {
+								// ignore
+							}
+						}
 						synchronized (lock1) {
-							IPProcess ipProc = ipJob.getProcessByIndex(0);
+							IPProcess ipProc = ipJob.getProcessByIndex(index);
 							if (ipProc != null) {
 								ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
 							}
@@ -129,8 +139,18 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				try {
 					String line = stderrBufferedReader.readLine();
 					while (line != null) {
+						int index = 0;
+						int pos = line.indexOf(": "); //$NON-NLS-1$
+						if (pos > 0) {
+							try {
+								index = Integer.parseInt(line.substring(0, pos));
+								line = line.substring(pos+1);
+							} catch (NumberFormatException e) {
+								// ignore
+							}
+						}
 						synchronized (lock1) {
-							IPProcess ipProc = ipJob.getProcessByIndex(0);
+							IPProcess ipProc = ipJob.getProcessByIndex(index);
 							if (ipProc != null) {
 								ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 							}
