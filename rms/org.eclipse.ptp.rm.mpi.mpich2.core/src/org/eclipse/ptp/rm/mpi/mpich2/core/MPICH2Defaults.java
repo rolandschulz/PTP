@@ -33,6 +33,8 @@ public class MPICH2Defaults {
 	public static String LAUNCH_CMD = null;
 	public static String DEBUG_CMD = null;
 	public static String DISCOVER_CMD = null;
+	public static String PERIODIC_CMD = null;
+	public static int PERIODIC_TIME = 0;
 	public static String PATH = null;
 	public static boolean USE_DEFAULTS = false;
 
@@ -46,12 +48,15 @@ public class MPICH2Defaults {
 		LAUNCH_CMD = getString(bundle, properties, "LAUNCH_CMD"); //$NON-NLS-1$
 		DEBUG_CMD = getString(bundle, properties, "DEBUG_CMD"); //$NON-NLS-1$
 		DISCOVER_CMD = getString(bundle, properties, "DISCOVER_CMD"); //$NON-NLS-1$
+		PERIODIC_CMD = getString(bundle, properties, "PERIODIC_CMD"); //$NON-NLS-1$
+		PERIODIC_TIME = getInteger(bundle, properties, "PERIODIC_TIME"); //$NON-NLS-1$
 		PATH = getString(bundle, properties, "PATH"); //$NON-NLS-1$
 		USE_DEFAULTS = getBoolean(bundle, properties, "USE_DEFAULTS"); //$NON-NLS-1$
 
 		assert LAUNCH_CMD != null;
 		assert DEBUG_CMD != null;
 		assert DISCOVER_CMD != null;
+		assert PERIODIC_CMD != null;
 		assert PATH != null;
 	}
 

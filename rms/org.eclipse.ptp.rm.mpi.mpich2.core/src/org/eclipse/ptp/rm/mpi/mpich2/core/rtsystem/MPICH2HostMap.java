@@ -80,7 +80,7 @@ public class MPICH2HostMap {
 
 	List<Host> hosts = new ArrayList<Host>();
 	Map<String, Host> hostNameToHost = new HashMap<String, Host>();
-	boolean hasErrors = false;
+	public boolean hasErrors = false;
 
 	protected void addHost(Host host) {
 		hosts.add(host);

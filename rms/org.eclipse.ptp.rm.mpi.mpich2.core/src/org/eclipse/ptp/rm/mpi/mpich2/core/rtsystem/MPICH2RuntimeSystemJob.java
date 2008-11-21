@@ -16,38 +16,26 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
-import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2JobAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
-import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem.MPICH2ProcessMap.Process;
 
 /**
  * 
@@ -59,9 +47,6 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
-
-	/** Information parsed from launch command. */
-	MPICH2ProcessMap map;
 
 	/**
 	 * Process IDs created by this job. The first process (zero index) is special,
@@ -83,8 +68,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
-		final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), Messages.MPICH2RuntimeSystemJob_ProcessName, 0);
-		processIDs = new String[] { zeroIndexProcessID } ;
+		//final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), Messages.MPICH2RuntimeSystemJob_ProcessName, 0);
+		//processIDs = new String[] { zeroIndexProcessID } ;
 
 		/*
 		 * Listener that saves stdout.
@@ -103,12 +88,14 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			public void run() {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", jobID); //$NON-NLS-1$
 				BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
-				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
 					String line = stdoutBufferedReader.readLine();
 					while (line != null) {
 						synchronized (lock1) {
-							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							IPProcess ipProc = ipJob.getProcessByIndex(0);
+							if (ipProc != null) {
+								ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							}
 							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
 						}
 						line = stdoutBufferedReader.readLine();
@@ -118,19 +105,6 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					MPICH2Plugin.log(e);
 				} finally {
 					stdoutPipedStreamListener.disable();
-					//					if (stdoutObserver != null) {
-					//						stdoutObserver.removeListener(stdoutPipedStreamListener);
-					//					}
-					//					try {
-					//						stdoutOutputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
-					//					try {
-					//						stdoutInputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", jobID); //$NON-NLS-1$
 			}
@@ -152,13 +126,14 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			public void run() {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", jobID); //$NON-NLS-1$
 				final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
-				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
 					String line = stderrBufferedReader.readLine();
 					while (line != null) {
 						synchronized (lock1) {
-							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
-							//							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							IPProcess ipProc = ipJob.getProcessByIndex(0);
+							if (ipProc != null) {
+								ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
+							}
 							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
 						}
 						line = stderrBufferedReader.readLine();
@@ -168,78 +143,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					MPICH2Plugin.log(e);
 				} finally {
 					stderrPipedStreamListener.disable();
-					//					if (stderrObserver != null) {
-					//						stderrObserver.removeListener(stderrPipedStreamListener);
-					//					}
-					//					try {
-					//						stderrOutputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
-					//					try {
-					//						stderrInputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", jobID); //$NON-NLS-1$
-			}
-		};
-
-		/*
-		 * Thread that parses map information.
-		 */
-		final PipedOutputStream parserOutputStream = new PipedOutputStream();
-		final PipedInputStream parserInputStream = new PipedInputStream();
-		try {
-			parserInputStream.connect(parserOutputStream);
-		} catch (IOException e) {
-			assert false; // This exception is not possible
-		}
-		final InputStreamListenerToOutputStream parserPipedStreamListener = new InputStreamListenerToOutputStream(parserOutputStream);
-		Thread parserThread = new Thread() {
-			@Override
-			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", jobID); //$NON-NLS-1$
-				MPICH2ResourceManagerConfiguration configuration = (MPICH2ResourceManagerConfiguration) getRtSystem().getRmConfiguration();
-				//try {
-					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
-					//if (configuration.getVersionId().equals(MPICH2ResourceManagerConfiguration.VERSION_12)) {
-					//	map = MPICH2ProcessMapText12Parser.parse(parserInputStream);
-					//} else if (configuration.getVersionId().equals(MPICH2ResourceManagerConfiguration.VERSION_13)) {
-					//	map = MPICH2ProcessMapXml13Parser.parse(parserInputStream, new IOpenMpiProcessMapXml13ParserListener() {
-					//		public void startDocument() {
-								// Empty
-					//		}
-					//		public void endDocument() {
-								/*
-								 * Turn of listener that generates input for parser when parsing finishes.
-								 * If not done, the parser will close the piped inputstream, making the listener
-								 * get IOExceptions for closed stream.
-								 */
-					//			if (stderrObserver != null) {
-					//				parserPipedStreamListener.disable();
-					//				stderrObserver.removeListener(parserPipedStreamListener);
-					//			}
-					//		}
-					//	});
-					//} else {
-					//	assert false;
-					//}
-				//} catch (IOException e) {
-					/*
-					 * If output could not be parsed, the kill the mpi process.
-					 */
-				//	parserException = e;
-				//	process.destroy();
-				//	DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {0}", e); //$NON-NLS-1$
-				//} finally {
-				//	parserPipedStreamListener.disable();
-				//	if (stderrObserver != null) {
-				//		stderrObserver.removeListener(parserPipedStreamListener);
-				//	}
-				//}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: finished", jobID); //$NON-NLS-1$
 			}
 		};
 
@@ -249,7 +154,6 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		stdoutThread.start();
 		stderrThread.start();
-		parserThread.start();
 
 		stderrObserver = new InputStreamObserver(process.getErrorStream());
 		stdoutObserver = new InputStreamObserver(process.getInputStream());
@@ -257,85 +161,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		stdoutObserver.addListener(stdoutPipedStreamListener);
 		stderrObserver.addListener(stderrPipedStreamListener);
 
-		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
-		MPICH2ResourceManagerConfiguration configuration = (MPICH2ResourceManagerConfiguration) getRtSystem().getRmConfiguration();
-		//if (configuration.getVersionId().equals(MPICH2ResourceManagerConfiguration.VERSION_12)) {
-		//	stderrObserver.addListener(parserPipedStreamListener);
-		//} else if (configuration.getVersionId().equals(MPICH2ResourceManagerConfiguration.VERSION_13)) {
-		//	stdoutObserver.addListener(parserPipedStreamListener);
-		//} else {
-		//	assert false;
-		//}
-
 		stderrObserver.start();
 		stdoutObserver.start();
-
-		try {
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting for display-map parser thread to finish", jobID); //$NON-NLS-1$
-			parserThread.join();
-		} catch (InterruptedException e) {
-			// Do nothing.
-		}
-
-		if (parserException != null) {
-			process.destroy();
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_FailedParse, parserException));
-		}
-
-		/*
-		 * Copy job attributes from map.
-		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", jobID); //$NON-NLS-1$
-		rtSystem.changeJob(getJobID(), map.getAttributeManager());
-
-		/*
-		 * Copy process attributes from map.
-		 */
-		List<Process> newProcesses = map.getProcesses();
-		processIDs = new String[newProcesses.size()];
-		IPMachine ipMachine = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getMachineById(rtSystem.getMachineID());
-		for (Process newProcess : newProcesses) {
-			String nodename = newProcess.getNode().getName();
-			String nodeID = rtSystem.getNodeIDforName(nodename);
-			if (nodeID == null) {
-				process.destroy();
-				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, parserException));
-			}
-
-			String processName = newProcess.getName();
-			int processIndex = newProcess.getIndex();
-			String processID = null;
-			if (processIndex == 0) {
-				processID = zeroIndexProcessID;
-			} else {
-				processID = rtSystem.createProcess(getJobID(), processName, processIndex);
-			}
-			processIDs[processIndex] = processID;
-
-			AttributeManager attrMgr = new AttributeManager();
-			attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(processName));
-			attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
-			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
-			try {
-				attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(newProcess.getIndex()));
-			} catch (IllegalValueException e) {
-				// Is always valid.
-				assert false;
-			}
-			attrMgr.addAttributes(newProcess.getAttributeManager().getAttributes());
-			rtSystem.changeProcess(processID, attrMgr);
-
-			IPProcessControl processControl = (IPProcessControl) ipJob.getProcessById(processID);
-			IPNode node = ipMachine.getNodeById(nodeID);
-
-			/*
-			 * Although one could call processControl.addNode(node) to assign the process to the node, this does not work.
-			 * It is necessary to call nodeControl.addProcesses(processControl) instead.
-			 */
-			IPNodeControl nodeControl = (IPNodeControl) node;
-			nodeControl.addProcesses(Arrays.asList(new IPProcessControl[] {processControl} ));
-		}
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: finished updating model", jobID); //$NON-NLS-1$
 	}
 
 	@Override
@@ -462,6 +289,12 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * A shortcut that generates arguments for the MPICH2 run command.
 		 */
 		newAttributes.add(MPICH2LaunchAttributes.getEnvironmentArgsAttributeDefinition().create());
+		
+		/*
+		 * The jobid is used to alias the MPICH2 job so that it can be matched later.
+		 */
+		newAttributes.add(MPICH2JobAttributes.getJobIdAttributeDefinition().create(jobID));
+		
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
 	}
 

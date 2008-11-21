@@ -32,11 +32,11 @@ public class MPICH2PreferenceManager extends AbstractToolsPreferenceManager {
 
 	public static void initializePreferences() {
 		Preferences preferences = MPICH2Plugin.getDefault().getPluginPreferences();
-		// Initialize only preferences as in OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
 		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, MPICH2Defaults.LAUNCH_CMD);
 		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, MPICH2Defaults.DEBUG_CMD);
 		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, MPICH2Defaults.DISCOVER_CMD);
+		preferences.setDefault(PREFIX + PREFS_PERIODIC_MONITOR_CMD, MPICH2Defaults.PERIODIC_CMD);
+		preferences.setDefault(PREFIX + PREFS_PERIODIC_MONITOR_TIME, MPICH2Defaults.PERIODIC_TIME);
 		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, MPICH2Defaults.PATH);
-		//		preferences.setDefault(PREFIX + PREFS_USE_DEFAULTS, MPICH2Defaults.USE_DEFAULTS);
 	}
 }

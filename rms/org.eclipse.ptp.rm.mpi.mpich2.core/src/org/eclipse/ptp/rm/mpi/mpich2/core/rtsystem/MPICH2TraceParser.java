@@ -19,7 +19,7 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 
 /**
  * 
- * @author Daniel Felix Ferber
+ * @author Greg Watson
  *
  */
 public class MPICH2TraceParser {
@@ -45,7 +45,7 @@ public class MPICH2TraceParser {
 			if (! matcher.matches()) {
 				// Ignore the line
 				parser.map.hasErrors = true;
-				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Ignoring invalid line: '{0}'", line); //$NON-NLS-1$
+				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Ignoring invalid line: {0}", line); //$NON-NLS-1$
 				continue;
 			}
 
@@ -54,7 +54,6 @@ public class MPICH2TraceParser {
 				String port = matcher.group(2);
 				String addr = matcher.group(3);
 				parser.map.addHost(host, addr, port);
-				System.out.println("found host " + host + " addr " + addr + " port " + port); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "found host " + host + " addr " + addr + " port " + port); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}

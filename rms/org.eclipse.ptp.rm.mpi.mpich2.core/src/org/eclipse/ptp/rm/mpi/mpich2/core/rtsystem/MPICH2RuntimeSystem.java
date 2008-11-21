@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveTollRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.mpich2.core.parameters.Parameters;
@@ -44,10 +44,10 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/** Mapping of discovered hosts and their ID for IPHost elements. */
 	private Map<String,String> hostToElementMap = new HashMap<String, String>();
 
-	public MPICH2RuntimeSystem(Integer openmpi_rmid,
+	public MPICH2RuntimeSystem(Integer rmid,
 			MPICH2ResourceManagerConfiguration config,
 			AttributeDefinitionManager attrDefMgr) {
-		super(openmpi_rmid, config, attrDefMgr);
+		super(rmid, config, attrDefMgr);
 	}
 
 	protected void setMachineID(String machineID) {
@@ -124,8 +124,9 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	protected Job createDiscoverJob() {
-		if (! rmConfiguration.hasDiscoverCmd())
+		if (!rmConfiguration.hasDiscoverCmd()) {
 			return null;
+		}
 		Job job = new MPICH2DiscoverJob(this);
 		job.setPriority(Job.INTERACTIVE);
 		job.setSystem(false);
@@ -135,7 +136,14 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	protected Job createPeriodicMonitorJob() {
-		return null;
+		if (!rmConfiguration.hasPeriodicMonitorCmd()) {
+			return null;
+		}
+		Job job = new MPICH2PeriodicJob(this);
+		job.setPriority(Job.INTERACTIVE);
+		job.setSystem(false);
+		job.setUser(false);
+		return job;
 	}
 
 	@Override
@@ -150,7 +158,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 
 	@Override
-	public AbstractEffectiveTollRMConfiguration retrieveEffectiveToolRmConfiguration() {
+	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
 		return new EffectiveMPICH2ResourceManagerConfiguration(getRmConfiguration());
 	}
 }
