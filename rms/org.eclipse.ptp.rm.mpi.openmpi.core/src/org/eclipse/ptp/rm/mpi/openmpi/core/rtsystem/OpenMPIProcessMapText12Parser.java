@@ -27,6 +27,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIApplicationAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes.MappingMode;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 
 /**
  * 

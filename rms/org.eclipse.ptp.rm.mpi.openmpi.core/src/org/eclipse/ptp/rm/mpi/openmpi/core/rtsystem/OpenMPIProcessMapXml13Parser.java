@@ -27,6 +27,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

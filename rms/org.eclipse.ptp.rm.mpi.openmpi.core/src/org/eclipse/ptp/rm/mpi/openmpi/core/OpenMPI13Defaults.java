@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.osgi.framework.Bundle;
 
 /**

@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.core;
 
 import org.eclipse.ptp.core.attributes.ArrayAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 
 /**
  * 

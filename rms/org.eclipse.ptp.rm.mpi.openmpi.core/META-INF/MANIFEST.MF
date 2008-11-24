@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.search
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.mpi.openmpi.core,
+ org.eclipse.ptp.rm.mpi.openmpi.core.messages,
  org.eclipse.ptp.rm.mpi.openmpi.core.parameters,
  org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem,
  org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem
