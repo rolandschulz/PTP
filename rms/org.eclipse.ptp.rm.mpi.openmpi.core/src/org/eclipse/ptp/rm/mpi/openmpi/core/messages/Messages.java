@@ -8,12 +8,63 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
+package org.eclipse.ptp.rm.mpi.openmpi.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.openmpi.core.messages.messages"; //$NON-NLS-1$
+	public static String OpenMPI12Defaults_Exception_FailedReadFile;
+	public static String OpenMPI12Defaults_FailedParseInteger;
+	public static String OpenMPI12Defaults_MissingValue;
+	
+	public static String OpenMPI13Defaults_Exception_FailedReadFile;
+	public static String OpenMPI13Defaults_FailedParseInteger;
+	public static String OpenMPI13Defaults_MissingValue;
+	
+	public static String OpenMPIApplicationAttributes_effectiveOpenMPIEnvAttrDef_description;
+	public static String OpenMPIApplicationAttributes_effectiveOpenMPIEnvAttrDef_title;
+	public static String OpenMPIApplicationAttributes_effectiveOpenMPIProgArgsAttrDef_description;
+	public static String OpenMPIApplicationAttributes_effectiveOpenMPIProgArgsAttrDef_title;
+	public static String OpenMPIApplicationAttributes_effectiveOpenMPIWorkingDirAttrDef_description;
+	public static String OpenMPIApplicationAttributes_effectiveOpenMPIWorkingDirAttrDef_title;
+	
+	public static String OpenMPIJobAttributes_hostnameAttrDef_description;
+	public static String OpenMPIJobAttributes_hostnameAttrDef_title;
+	public static String OpenMPIJobAttributes_mappingModeAttrDef_description;
+	public static String OpenMPIJobAttributes_mappingModeAttrDef_title;
+	public static String OpenMPIJobAttributes_mpiJobIdAttrDef_description;
+	public static String OpenMPIJobAttributes_mpiJobIdAttrDef_title;
+	public static String OpenMPIJobAttributes_vpidRangeAttrDef_description;
+	public static String OpenMPIJobAttributes_vpidRangeAttrDef_title;
+	public static String OpenMPIJobAttributes_vpidStartAttrDef_description;
+	public static String OpenMPIJobAttributes_vpidStartAttrDef_title;
+	
+	public static String OpenMPILaunchAttributes_environmentArgsAttrDef_description;
+	public static String OpenMPILaunchAttributes_environmentArgsAttrDef_title;
+	public static String OpenMPILaunchAttributes_environmentKeyAttrDef_description;
+	public static String OpenMPILaunchAttributes_environmentKeyAttrDef_title;
+	public static String OpenMPILaunchAttributes_launchArgsAttrDef_description;
+	public static String OpenMPILaunchAttributes_launchArgsAttrDef_title;
+	
+	public static String OpenMPIMachineAttributes_statusMessageAttrDef_description;
+	public static String OpenMPIMachineAttributes_statusMessageAttrDef_title;
+	
+	public static String OpenMPINodeAttributes_maxNumNodesAttrDef_description;
+	public static String OpenMPINodeAttributes_maxNumNodesAttrDef_title;
+	public static String OpenMPINodeAttributes_numNodesAttrDef_description;
+	public static String OpenMPINodeAttributes_numNodesAttrDef_title;
+	public static String OpenMPINodeAttributes_oversubscribedAttrDef_description;
+	public static String OpenMPINodeAttributes_oversubscribedAttrDef_title;
+	public static String OpenMPINodeAttributes_statusMessageAttrDef_description;
+	public static String OpenMPINodeAttributes_statusMessageAttrDef_title;
+	
+	public static String OpenMPIPlugin_Exception_InternalError;
+
+	public static String OpenMPIResourceManagerConfiguration_defaultDescription;
+	public static String OpenMPIResourceManagerConfiguration_defaultName;
+	public static String OpenMPIResourceManagerFactory_ResourceManagerName;
+
 	public static String OpenMPIDiscoverJob_defaultQueueName;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandFailed;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandFailedParseHostFile;
@@ -36,13 +87,16 @@ public class Messages extends NLS {
 	public static String OpenMPIDiscoverJob_name;
 	public static String OpenMPIDiscoverJob_parsingErrorMessage;
 	public static String OpenMPIDiscoverJob_processErrorMessage;
+	
 	public static String OpenMPIProcessMapText12Parser_Exception_InvalidLine;
 	public static String OpenMPIProcessMapText12Parser_Exception_MissingDisplayMapInformation;
 	public static String OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation;
+	
 	public static String OpenMPIProcessMapXml13Parser_Exception_AttributeNotInteger;
 	public static String OpenMPIProcessMapXml13Parser_Exception_MissingAttribute;
 	public static String OpenMPIProcessMapXml13Parser_Exception_UnknownAttribute;
 	public static String OpenMPIProcessMapXml13Parser_Exception_UnknownElement;
+	
 	public static String OpenMPIRuntimeSystem_JobName;
 	public static String OpenMPIRuntimeSystemJob_Exception_FailedParse;
 	public static String OpenMPIRuntimeSystemJob_Exception_HostnamesDoNotMatch;

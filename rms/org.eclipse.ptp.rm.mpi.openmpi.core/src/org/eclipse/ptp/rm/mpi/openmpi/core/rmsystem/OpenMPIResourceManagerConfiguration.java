@@ -16,6 +16,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
 
