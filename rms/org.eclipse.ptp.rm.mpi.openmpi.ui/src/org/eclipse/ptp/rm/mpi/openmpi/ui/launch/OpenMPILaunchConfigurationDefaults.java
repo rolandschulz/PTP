@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.osgi.framework.Bundle;
 
 
@@ -32,6 +33,7 @@ import org.osgi.framework.Bundle;
  */
 public class OpenMPILaunchConfigurationDefaults {
 	public static int ATTR_NUMPROCS;
+	public static boolean ATTR_BYNODE;
 	public static boolean ATTR_BYSLOT;
 	public static boolean ATTR_NOOVERSUBSCRIBE;
 	public static boolean ATTR_NOLOCAL;
@@ -54,6 +56,7 @@ public class OpenMPILaunchConfigurationDefaults {
 		Properties properties = read(defaultsPropertiesPath, bundle);
 
 		ATTR_NUMPROCS = getInteger(bundle, properties, "NUMPROCS"); //$NON-NLS-1$
+		ATTR_BYNODE = getBoolean(bundle, properties, "BYNODE"); //$NON-NLS-1$
 		ATTR_BYSLOT = getBoolean(bundle, properties, "BYSLOT"); //$NON-NLS-1$
 		ATTR_NOOVERSUBSCRIBE = getBoolean(bundle, properties, "NOOVERSUBSCRIBE"); //$NON-NLS-1$
 		ATTR_NOLOCAL = getBoolean(bundle, properties, "NOLOCAL"); //$NON-NLS-1$

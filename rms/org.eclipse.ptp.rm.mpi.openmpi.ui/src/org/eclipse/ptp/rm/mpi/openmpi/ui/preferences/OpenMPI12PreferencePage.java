@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.preferences;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.preferences.AbstractToolsPreferencePage;
 
 /**

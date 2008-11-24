@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 
+import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
@@ -18,8 +19,7 @@ import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
  * @author Daniel Felix Ferber
  *
  */
-public final class OpenMPIRMConfigurationWizardPage extends
-AbstractRemoteResourceManagerConfigurationWizardPage {
+public final class OpenMPIRMConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
 
 	public OpenMPIRMConfigurationWizardPage(RMConfigurationWizard wizard) {
 		super(wizard, Messages.OpenMPIRMConfigurationWizardPage_Title);
