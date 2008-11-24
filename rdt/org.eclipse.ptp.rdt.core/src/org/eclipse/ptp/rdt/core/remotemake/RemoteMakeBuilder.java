@@ -30,6 +30,8 @@ import org.eclipse.cdt.make.core.MakeCorePlugin;
 import org.eclipse.cdt.make.internal.core.MakeMessages;
 import org.eclipse.cdt.make.internal.core.StreamMonitor;
 import org.eclipse.cdt.make.internal.core.scannerconfig.ScannerInfoConsoleParserFactory;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.filesystem.IFileStore;
@@ -39,6 +41,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -391,5 +394,26 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		if (buffer.length() > 0)
 			aList.add(buffer.toString());
 		return (String[]) aList.toArray(new String[aList.size()]);
+	}
+	
+	protected String[] getTargets(int kind, IMakeBuilderInfo info) {
+		IManagedBuildInfo mbsInfo = ManagedBuildManager.getBuildInfo(getProject());
+		IConfiguration config = mbsInfo.getDefaultConfiguration();
+		IBuilder builder = config.getBuilder();
+		
+		String targets = ""; //$NON-NLS-1$
+		switch (kind) {
+			case IncrementalProjectBuilder.AUTO_BUILD :
+				targets = builder.getAutoBuildTarget();
+				break;
+			case IncrementalProjectBuilder.INCREMENTAL_BUILD : // now treated as the same!
+			case IncrementalProjectBuilder.FULL_BUILD :
+				targets = builder.getIncrementalBuildTarget();
+				break;
+			case IncrementalProjectBuilder.CLEAN_BUILD :
+				targets = builder.getCleanBuildTarget();
+				break;
+		}
+		return makeArray(targets);
 	}
 }
