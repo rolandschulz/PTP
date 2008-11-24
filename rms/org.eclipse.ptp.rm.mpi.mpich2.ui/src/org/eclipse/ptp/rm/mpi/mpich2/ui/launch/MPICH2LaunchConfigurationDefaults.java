@@ -85,9 +85,8 @@ public class MPICH2LaunchConfigurationDefaults {
 		String value = properties.getProperty(key);
 		if (value == null) {
 			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.MPICH2LaunchConfigurationDefaults_MissingValue, key)));
-		} else {
-			return value;
 		}
+		return value;
 	}
 
 	public static int getInteger(Bundle bundle, Properties properties, String key) throws CoreException {

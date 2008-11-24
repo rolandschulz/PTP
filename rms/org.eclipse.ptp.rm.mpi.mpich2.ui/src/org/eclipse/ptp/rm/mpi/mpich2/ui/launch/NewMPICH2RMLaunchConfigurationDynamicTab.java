@@ -24,6 +24,6 @@ public class NewMPICH2RMLaunchConfigurationDynamicTab extends ExtendableRMLaunch
 	public NewMPICH2RMLaunchConfigurationDynamicTab(IResourceManager rm) {
 		super();
 		addDynamicTab(new BasicMPICH2RMLaunchConfigurationDynamicTab());
-		addDynamicTab(new AdvancedMPICH2RMLaunchConfigurationDynamicTab(rm));
+		addDynamicTab(new AdvancedMPICH2RMLaunchConfigurationDynamicTab());
 	}
 }

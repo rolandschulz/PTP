@@ -22,7 +22,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
-import org.eclipse.ptp.rm.mpi.mpich2.core.parameters.Parameters;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.EffectiveMPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
 
@@ -32,8 +31,6 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfigur
  *
  */
 public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
-
-	private Parameters params = new Parameters();
 
 	/** The machine where open mpi is running on. */
 	private String machineID;
@@ -64,10 +61,6 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	public String getQueueID() {
 		return queueID;
-	}
-
-	public Parameters getParameters() {
-		return params;
 	}
 
 	public String getNodeIDforName(String hostname) {
