@@ -298,8 +298,6 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends AbstractRMLaunch
 		gd.heightHint = 20;
 		hostListText.setLayoutData(gd);
 		hostListText.addModifyListener(getListener());
-
-
 	}
 
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
@@ -337,19 +335,11 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends AbstractRMLaunch
 		return new RMLaunchValidation(true, null);
 	}
 
-	private DataSource getBasicDataSource() {
-		return (DataSource)getDataSource();
-	}
-
 	@Override
 	public void updateControls() {
 		prefixText.setEnabled(usePrefixButton.getSelection());
 		browseButton.setEnabled(hostFileButton.getSelection());
 		hostFileText.setEnabled(hostFileButton.getSelection());
 		hostListText.setEnabled(hostListButton.getSelection());
-	}
-
-	private DataSource getLocalDataSource() {
-		return (DataSource)super.getDataSource();
 	}
 }

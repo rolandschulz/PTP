@@ -21,10 +21,8 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
-import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -33,13 +31,11 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2NodeAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
-import org.eclipse.ptp.rm.mpi.mpich2.core.parameters.Parameters;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem.MPICH2HostMap.Host;
 
 /**
  * 
- * @author Daniel Felix Ferber
+ * @author Greg Watson
  *
  */
 public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
@@ -65,11 +61,9 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 		IRemoteServices remoteServices = rts.getRemoteServices();
 		assert remoteServices != null;
 		IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-		Parameters params = rts.getParameters();
 		Map<String, String> hostToElementMap = rts.getHostToElementMap();
 		MPICH2ResourceManagerConfiguration rmConfiguration = (MPICH2ResourceManagerConfiguration) rts.getRmConfiguration();
 		assert fileMgr != null;
-		assert params != null;
 		assert hostToElementMap != null;
 
 		/*
@@ -93,20 +87,23 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 			/*
 			 * Parse output of trace command that describes the system configuration.
 			 */
-			MPICH2HostMap hostMap = MPICH2TraceParser.parse(output);
+			MPICH2TraceParser parser = new MPICH2TraceParser();
+			MPICH2HostMap hostMap = parser.parse(output);
+			if (hostMap == null) {
+				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
+				machine.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_HostFileParseError));
+				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage()));
+			}
 
 			/*
 			 * Create model according to data from discover.
 			 */
-			int rankCounter = 0;
-			boolean hasSomeError = false;
-			assert hostMap != null;
+			int nodeCounter = 0;
 
 			for (MPICH2HostMap.Host host : hostMap.getHosts()) {
 
 				// Add node to model
-				String nodeId = rts.createNode(machineID, host.getName(), rankCounter++);
-				IPNode node = machine.getNodeById(nodeId);
+				String nodeId = rts.createNode(machineID, host.getName(), nodeCounter++);
 				hostToElementMap.put(host.getName(), nodeId);
 
 				// Add processor information to node.
@@ -119,34 +116,8 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 						assert false;
 					}
 				}
-				if (host.getMaxNumProcessors() != 0) {
-					try {
-						attrManager.addAttribute(MPICH2NodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(host.getMaxNumProcessors()));
-					} catch (IllegalValueException e) {
-						// This situation is not possible since host.getMaxNumProcessors() is always valid.
-						assert false;
-					}
-				}
-				if (host.getErrors() != 0) {
-					if ((host.getErrors() & Host.ERR_MAX_NUM_SLOTS) != 0) {
-						attrManager.addAttribute(MPICH2NodeAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_InvalidMaxSlotsParameter));
-					} else if ((host.getErrors() & Host.ERR_NUM_SLOTS) != 0) {
-						attrManager.addAttribute(MPICH2NodeAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_InvalidSlotsParameter));
-					} else if ((host.getErrors() & Host.ERR_UNKNOWN_ATTR) != 0) {
-						attrManager.addAttribute(MPICH2NodeAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_IgnoredInvalidParameter));
-					}
-					attrManager.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
-					hasSomeError = true;
-				}
 				rts.changeNode(nodeId, attrManager);
 			}
-			if (hostMap.hasErrors) {
-				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				machine.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_HostFileParseError));
-			}
-			if (hostMap.hasParseErrors() || hasSomeError)
-				throw new CoreException(new Status(IStatus.WARNING, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2DiscoverJob_Exception_HostFileErrors));
-
 		} catch (CoreException e) {
 			/*
 			 * Show message of core exception and change machine status to error.

@@ -19,15 +19,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
@@ -40,36 +52,131 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 /**
  * 
  * @author Daniel Felix Ferber
+ * @author Greg Watson
  *
  */
 public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
-	Object lock1 = new Object();
-
+	
+	private Object lock1 = new Object();
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
-	/**
-	 * Process IDs created by this job. The first process (zero index) is special,
-	 * because it is always created.
-	 */
-	String processIDs[];
+	protected final ReentrantLock procsLock = new ReentrantLock();
+	protected final Condition procsCondition = procsLock.newCondition();
+	protected int numRunningProcs = 0;
 
-	/** Exception raised while parsing mpi map information. */
-	IOException parserException = null;
-
+	protected IProcessListener processListener = new IProcessListener() {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+		 */
+		public void handleEvent(IProcessChangeEvent e) {
+			if (e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition()) != null
+					&& e.getSource().getState() == ProcessAttributes.State.RUNNING) {
+				procsLock.lock();
+				try {
+					numRunningProcs++;
+					procsCondition.signalAll();
+				} finally {
+					procsLock.unlock();
+				}
+			}
+		}
+	};
+	
+	protected IJobChildListener jobChildListener = new IJobChildListener() {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
+		 */
+		public void handleEvent(IChangedProcessEvent e) {
+			// ignore
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
+		 */
+		public void handleEvent(INewProcessEvent e) {
+			for (IPProcess process : e.getProcesses()) {
+				process.addElementListener(processListener);
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+		 */
+		public void handleEvent(IRemoveProcessEvent e) {
+			for (IPProcess process : e.getProcesses()) {
+				process.removeElementListener(processListener);
+			}
+		}
+	};
+	
 	public MPICH2RuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
 
-	@Override
-	protected void doExecutionStarted() throws CoreException {
-		/*
-		 * Create a zero index job.
-		 */
+	private void changeAllProcessesStatus(State newState) {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
-		//final String zeroIndexProcessID = rtSystem.createProcess(getJobID(), Messages.MPICH2RuntimeSystemJob_ProcessName, 0);
-		//processIDs = new String[] { zeroIndexProcessID } ;
+
+		/*
+		 * Mark all running and starting processes as finished.
+		 */
+		List<String> ids = new ArrayList<String>();
+		for (IPProcess ipProcess : ipJob.getProcesses()) {
+			switch (ipProcess.getState()) {
+			case EXITED:
+			case ERROR:
+			case EXITED_SIGNALLED:
+				break;
+			case RUNNING:
+			case STARTING:
+			case SUSPENDED:
+			case UNKNOWN:
+				ids.add(ipProcess.getID());
+				break;
+			}
+		}
+
+		AttributeManager attrMrg = new AttributeManager();
+		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
+		for (String processId : ids) {
+			rtSystem.changeProcess(processId, attrMrg);
+		}
+	}
+
+	@Override
+	protected void doBeforeExecution(IProgressMonitor monitor) throws CoreException {
+		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
+		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
+		ipJob.addChildListener(jobChildListener);
+	}
+
+	@Override
+	protected void doExecutionCleanUp(IProgressMonitor monitor) {
+		if (process != null) {
+			process.destroy();
+		}
+		if (stderrObserver != null) {
+			stderrObserver.kill();
+			stderrObserver = null;
+		}
+		if (stdoutObserver != null) {
+			stdoutObserver.kill();
+			stdoutObserver = null;
+		}
+		// TODO: more cleanup?
+		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+	}
+
+	@Override
+	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
+		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+	}
+
+	@Override
+	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
+		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
+		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 
 		/*
 		 * Listener that saves stdout.
@@ -86,7 +193,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		Thread stdoutThread = new Thread() {
 			@Override
 			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", getJobID()); //$NON-NLS-1$
 				BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
 				try {
 					String line = stdoutBufferedReader.readLine();
@@ -134,7 +241,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		Thread stderrThread = new Thread() {
 			@Override
 			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", getJobID()); //$NON-NLS-1$
 				final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
 				try {
 					String line = stderrBufferedReader.readLine();
@@ -154,21 +261,21 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							if (ipProc != null) {
 								ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 							}
-							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
+							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
 						line = stderrBufferedReader.readLine();
 					}
 				} catch (IOException e) {
-					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: {0}", e); //$NON-NLS-1$
+					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: {1}", getJobID(), e); //$NON-NLS-1$
 					MPICH2Plugin.log(e);
 				} finally {
 					stderrPipedStreamListener.disable();
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", getJobID()); //$NON-NLS-1$
 			}
 		};
 
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", getJobID()); //$NON-NLS-1$
 		/*
 		 * Create and start listeners.
 		 */
@@ -183,100 +290,38 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		stderrObserver.start();
 		stdoutObserver.start();
-	}
-
-	@Override
-	protected void doWaitExecution() throws CoreException {
+		
 		/*
-		 * Wait until both stdout and stderr stop because stream are closed.
-		 * This means that the process has finished.
+		 * At this point we need to pause until all processes have started. This is because
+		 * the model semantics are such that the job state must not be set to RUNNING until
+		 * all the job's processes (if there are any) have been created and also set to RUNNING.
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
-		try {
-			stderrObserver.join();
-		} catch (InterruptedException e1) {
-			// Ignore
-		}
-
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
-		try {
-			stdoutObserver.join();
-		} catch (InterruptedException e1) {
-			// Ignore
-		}
-
+		
 		/*
-		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
+		 * We know that a MPICH2 job has a number of processes attribute
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", jobID); //$NON-NLS-1$
-		try {
-			process.waitFor();
-		} catch (InterruptedException e) {
-			// Ignore
+		int numProcs = 1;
+		IntegerAttribute numProcsAttr = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
+		if (numProcsAttr != null) {
+			numProcs = numProcsAttr.getValue().intValue();
 		}
-
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", jobID); //$NON-NLS-1$
-	}
-
-	@Override
-	protected void doTerminateJob() {
-		// Empty implementation.
-	}
-
-	@Override
-	protected void doExecutionFinished() throws CoreException {
-		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
-	}
-
-	private void changeAllProcessesStatus(State newState) {
-		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
-
-		/*
-		 * Mark all running and starting processes as finished.
-		 */
-		List<String> ids = new ArrayList<String>();
-		for (IPProcess ipProcess : ipJob.getProcesses()) {
-			switch (ipProcess.getState()) {
-			case EXITED:
-			case ERROR:
-			case EXITED_SIGNALLED:
-				break;
-			case RUNNING:
-			case STARTING:
-			case SUSPENDED:
-			case UNKNOWN:
-				ids.add(ipProcess.getID());
-				break;
+		
+		procsLock.lock();
+		try {
+			while (!monitor.isCanceled() && numRunningProcs < numProcs) {
+				try {
+					procsCondition.await(500, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					// ignore
+				}
 			}
-		}
-
-		AttributeManager attrMrg = new AttributeManager();
-		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
-		for (String processId : ids) {
-			rtSystem.changeProcess(processId, attrMrg);
+		} finally {
+			procsLock.unlock();
 		}
 	}
 
 	@Override
-	protected void doExecutionCleanUp() {
-		if (process != null) {
-			process.destroy();
-		}
-		if (stderrObserver != null) {
-			stderrObserver.kill();
-			stderrObserver = null;
-		}
-		if (stdoutObserver != null) {
-			stdoutObserver.kill();
-			stdoutObserver = null;
-		}
-		// TODO: more cleanup?
-		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
-	}
-
-	@Override
-	protected void doBeforeExecution() throws CoreException {
+	protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing to do
 	}
 
@@ -326,8 +371,41 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doPrepareExecution() throws CoreException {
-		// Nothing to do
+	protected void doTerminateJob() {
+		// Empty implementation.
+	}
+
+	@Override
+	protected void doWaitExecution(IProgressMonitor monitor) throws CoreException {
+		/*
+		 * Wait until both stdout and stderr stop because stream are closed.
+		 * This means that the process has finished.
+		 */
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
+		try {
+			stderrObserver.join();
+		} catch (InterruptedException e1) {
+			// Ignore
+		}
+
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
+		try {
+			stdoutObserver.join();
+		} catch (InterruptedException e1) {
+			// Ignore
+		}
+
+		/*
+		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
+		 */
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", jobID); //$NON-NLS-1$
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			// Ignore
+		}
+
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", jobID); //$NON-NLS-1$
 	}
 
 }

@@ -23,14 +23,18 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
  *
  */
 public class MPICH2TraceParser {
-	private MPICH2TraceParser() {
-		// Do not allow instances.
-	}
-
+	private String errorMessage = null;
 	private MPICH2HostMap map = new MPICH2HostMap();
 	private static Pattern pattern = Pattern.compile("([^_]+)_([0-9])+ \\(([0-9.]+)\\)"); //$NON-NLS-1$
 
-	public static MPICH2HostMap parse(BufferedReader reader) throws IOException {
+	/**
+	 * Parse the output of the mpdtrace command.
+	 * 
+	 * @param reader
+	 * @return an MPICH2HostMap containing the known hosts, or null if there was an error
+	 * @throws IOException
+	 */
+	public MPICH2HostMap parse(BufferedReader reader) throws IOException {
 		MPICH2TraceParser parser = new MPICH2TraceParser();
 		String line;
 		while ((line = reader.readLine()) != null) {
@@ -42,11 +46,17 @@ public class MPICH2TraceParser {
 			}
 
 			Matcher matcher = pattern.matcher(line);
-			if (! matcher.matches()) {
-				// Ignore the line
-				parser.map.hasErrors = true;
-				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Ignoring invalid line: {0}", line); //$NON-NLS-1$
-				continue;
+			if (!matcher.matches()) {
+				/*
+				 * Probably an error from mpdtrace. Collect lines and mark error.
+				 */
+				errorMessage = ""; //$NON-NLS-1$
+				
+				while ((line = reader.readLine()) != null) {
+					errorMessage += line + "\n"; //$NON-NLS-1$
+				}
+				
+				return null;
 			}
 
 			if (matcher.matches() && matcher.groupCount() == 3) {
@@ -59,6 +69,13 @@ public class MPICH2TraceParser {
 		}
 		
 		return parser.map;
+	}
+	
+	/**
+	 * @return error message
+	 */
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 }
 
