@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -47,6 +48,7 @@ import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.IOpenMpiProcessMapXml13ParserListener;
@@ -79,7 +81,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doExecutionStarted() throws CoreException {
+	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
 		/*
 		 * Create a zero index job.
 		 */
@@ -382,7 +384,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doWaitExecution() throws CoreException {
+	protected void doWaitExecution(IProgressMonitor monitor) throws CoreException {
 		/*
 		 * Wait until both stdout and stderr stop because stream are closed.
 		 * This means that the process has finished.
@@ -420,7 +422,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doExecutionFinished() throws CoreException {
+	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
 		if (process.exitValue() != 0) {
 			changeJobState(JobAttributes.State.ERROR);
 			if (! terminateJobFlag) {
@@ -463,7 +465,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doExecutionCleanUp() {
+	protected void doExecutionCleanUp(IProgressMonitor monitor) {
 		if (process != null) {
 			process.destroy();
 			process = null;
@@ -481,7 +483,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doBeforeExecution() throws CoreException {
+	protected void doBeforeExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing to do
 	}
 
@@ -525,7 +527,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doPrepareExecution() throws CoreException {
+	protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing to do
 	}
 
