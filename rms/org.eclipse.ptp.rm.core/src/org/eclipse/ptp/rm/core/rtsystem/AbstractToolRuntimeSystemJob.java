@@ -59,6 +59,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 	protected String jobID;
 	protected String queueID;
+	protected boolean debug = false;
 	protected IRemoteProcess process = null;
 	protected AttributeManager attrMgr;
 	protected AbstractToolRuntimeSystem rtSystem;
@@ -97,9 +98,18 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	public AttributeManager getAttrMgr() {
 		return attrMgr;
 	}
+	
+	public boolean isDebug() {
+		return debug;
+	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		if (debugAttr != null) {
+			debug = debugAttr.getValue().booleanValue();
+		}
+		
 		changeJobState(JobAttributes.State.STARTED);
 
 		if (DebugUtil.RTS_JOB_TRACING_MORE) {
@@ -112,10 +122,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 		try {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle prepare", jobID); //$NON-NLS-1$
-			doPrepareExecution();
+			doPrepareExecution(monitor);
 		} catch (CoreException e) {
 			changeJobState(JobAttributes.State.ERROR);
 			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_PrepareExecution, e);
+		}
+		
+		if (monitor.isCanceled()) {
+			changeJobState(JobAttributes.State.TERMINATED);
+			return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 		}
 
 		try {
@@ -128,14 +143,11 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			String directory = null;
 			try {
 				AttributeManager baseSubstitutionAttributeManager = retrieveBaseSubstitutionAttributes();
-				//System.out.println(baseSubstitutionAttributeManager);
 				environment = retrieveEnvironment(baseSubstitutionAttributeManager);
 				directory = retrieveWorkingDirectory(baseSubstitutionAttributeManager);
 
 				AttributeManager commandSubstitutionAttributeManager = retrieveCommandSubstitutionAttributes(baseSubstitutionAttributeManager, directory, environment);
-				//System.out.println(commandSubstitutionAttributeManager);
-				BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
-				if (debugAttr != null && debugAttr.getValue()) {
+				if (isDebug()) {
 					command = retrieveCreateDebugCommand(commandSubstitutionAttributeManager);
 				} else {
 					command = retrieveCreateLaunchCommand(commandSubstitutionAttributeManager);
@@ -164,10 +176,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle before execution", jobID); //$NON-NLS-1$
-				doBeforeExecution();
+				doBeforeExecution(monitor);
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
+			}
+
+			if (monitor.isCanceled()) {
+				changeJobState(JobAttributes.State.TERMINATED);
+				return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 			}
 
 			/*
@@ -185,20 +202,30 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle start", jobID); //$NON-NLS-1$
-				doExecutionStarted();
+				doExecutionStarted(monitor);
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionStarted, e);
+			}
+
+			if (monitor.isCanceled()) {
+				changeJobState(JobAttributes.State.TERMINATED);
+				return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 			}
 
 			changeJobState(JobAttributes.State.RUNNING);
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
-				doWaitExecution();
+				doWaitExecution(monitor);
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_WaitExecution, e);
+			}
+
+			if (monitor.isCanceled()) {
+				changeJobState(JobAttributes.State.TERMINATED);
+				return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 			}
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", jobID, process.exitValue()); //$NON-NLS-1$
@@ -214,7 +241,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle finish", jobID); //$NON-NLS-1$
-				doExecutionFinished();
+				doExecutionFinished(monitor);
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionFinished, e);
@@ -239,21 +266,21 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				changeJobState(JobAttributes.State.TERMINATED);
 				break;
 			}
-			doExecutionCleanUp();
+			doExecutionCleanUp(monitor);
 		}
 	}
 
-	abstract protected void doPrepareExecution() throws CoreException;
+	abstract protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException;
 
-	abstract protected void doExecutionCleanUp();
+	abstract protected void doExecutionCleanUp(IProgressMonitor monitor);
 
-	abstract protected void doWaitExecution() throws CoreException;
+	abstract protected void doWaitExecution(IProgressMonitor monitor) throws CoreException;
 
-	abstract protected void doExecutionFinished() throws CoreException;
+	abstract protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException;
 
-	abstract protected void doExecutionStarted() throws CoreException;
+	abstract protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException;
 
-	abstract protected void doBeforeExecution() throws CoreException;
+	abstract protected void doBeforeExecution(IProgressMonitor monitor) throws CoreException;
 
 	abstract protected void doTerminateJob();
 

@@ -30,6 +30,7 @@ public class Messages extends NLS {
 	public static String AbstractToolRuntimeSystemJob_Exception_PrepareExecution;
 	public static String AbstractToolRuntimeSystemJob_Exception_WaitExecution;
 	public static String AbstractToolRuntimeSystemJob_Success;
+	public static String AbstractToolRuntimeSystemJob_UserCanceled;
 	
 	public static String ToolsRMPlugin_Exception_InternalError;
 	

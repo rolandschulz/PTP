@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.rm.core.utils.ITextInputStreamListener;
@@ -38,22 +39,22 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doBeforeExecution() throws CoreException {
+	protected void doBeforeExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing
 	}
 
 	@Override
-	protected void doExecutionFinished() throws CoreException {
+	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
 		// Nothing
 	}
 
 	@Override
-	protected void doExecutionStarted() throws CoreException {
+	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
 		// Nothing
 	}
 
 	@Override
-	protected void doExecutionCleanUp() {
+	protected void doExecutionCleanUp(IProgressMonitor monitor) {
 		// Nothing
 	}
 
@@ -61,7 +62,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 * Only consumes application output.
 	 */
 	@Override
-	protected void doWaitExecution() throws CoreException {
+	protected void doWaitExecution(IProgressMonitor monitor) throws CoreException {
 		BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		BufferedReader errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
@@ -146,7 +147,7 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doPrepareExecution() throws CoreException {
+	protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing to do
 	}
 
