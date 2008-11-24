@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
@@ -55,6 +56,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 
 	Composite control;
 	Spinner numProcsSpinner;
+	Button byNodeButton;
 	Button bySlotButton;
 	Button noOversubscribeButton;
 	Button noLocalButton;
@@ -73,7 +75,10 @@ AbstractRMLaunchConfigurationDynamicTab {
 
 		@Override
 		protected void doModifyText(ModifyEvent e) {
-			if (e.getSource() == numProcsSpinner || e.getSource() == prefixText || e.getSource() == hostFileText || e.getSource() == hostListText) {
+			if (e.getSource() == numProcsSpinner 
+					|| e.getSource() == prefixText 
+					|| e.getSource() == hostFileText 
+					|| e.getSource() == hostListText) {
 				//				getDataSource().justValidate();
 			} else{
 				super.doModifyText(e);
@@ -82,9 +87,15 @@ AbstractRMLaunchConfigurationDynamicTab {
 
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == bySlotButton || e.getSource() == noOversubscribeButton || e.getSource() == noLocalButton || e.getSource() == usePrefixButton) {
+			if (e.getSource() == byNodeButton 
+					|| e.getSource() == bySlotButton 
+					|| e.getSource() == noOversubscribeButton 
+					|| e.getSource() == noLocalButton 
+					|| e.getSource() == usePrefixButton) {
 				//				getDataSource().justValidate();
-			} else if (e.getSource() == usePrefixButton || e.getSource() == hostFileButton || e.getSource() == hostListButton) {
+			} else if (e.getSource() == usePrefixButton 
+					|| e.getSource() == hostFileButton 
+					|| e.getSource() == hostListButton) {
 				//				getDataSource().justValidate();
 				updateControls();
 			} else {
@@ -96,6 +107,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 	class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
 		private int numProcs;
+		private boolean byNode;
 		private boolean bySlot;
 		private boolean noOversubscribe;
 		private boolean noLocal;
@@ -113,6 +125,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		@Override
 		protected void copyFromFields() throws ValidationException {
 			numProcs = numProcsSpinner.getSelection();
+			byNode = byNodeButton.getSelection();
 			bySlot = bySlotButton.getSelection();
 			noOversubscribe = noOversubscribeButton.getSelection();
 			noLocal = noLocalButton.getSelection();
@@ -127,6 +140,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		@Override
 		protected void copyToFields() {
 			numProcsSpinner.setSelection(numProcs);
+			byNodeButton.setSelection(byNode);
 			bySlotButton.setSelection(bySlot);
 			noOversubscribeButton.setSelection(noOversubscribe);
 			noLocalButton.setSelection(noLocal);
@@ -141,6 +155,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		@Override
 		protected void copyToStorage() {
 			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, numProcs);
+			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, byNode);
 			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT, bySlot);
 			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE, noOversubscribe);
 			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_NOLOCAL, noLocal);
@@ -155,6 +170,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		@Override
 		protected void loadDefault() {
 			numProcs = OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS;
+			byNode = OpenMPILaunchConfigurationDefaults.ATTR_BYNODE;
 			bySlot = OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT;
 			noOversubscribe = OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE;
 			noLocal = OpenMPILaunchConfigurationDefaults.ATTR_NOLOCAL;
@@ -171,6 +187,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		protected void loadFromStorage() {
 			try {
 				numProcs = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
+				byNode = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);
 				bySlot = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT);
 				noOversubscribe = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE, OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE);
 				noLocal = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NOLOCAL, OpenMPILaunchConfigurationDefaults.ATTR_NOLOCAL);
@@ -263,8 +280,12 @@ AbstractRMLaunchConfigurationDynamicTab {
 		optionsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		optionsGroup.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Title_OptionsGroup);
 		layout = new GridLayout();
-		layout.numColumns = 3;
+		layout.numColumns = 4;
 		optionsGroup.setLayout(layout);
+
+		byNodeButton = new Button(optionsGroup, SWT.CHECK);
+		byNodeButton.addSelectionListener(getListener());
+		byNodeButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_ByNode);
 
 		bySlotButton = new Button(optionsGroup, SWT.CHECK);
 		bySlotButton.addSelectionListener(getListener());
@@ -283,7 +304,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		usePrefixButton.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_Prefix);
 
 		prefixText = new Text(optionsGroup, SWT.BORDER);
-		prefixText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		prefixText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		prefixText.addModifyListener(getListener());
 
 		final Group hostGroup = new Group(control, SWT.NONE);
@@ -349,6 +370,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration,
 			IResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE, OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NOLOCAL, OpenMPILaunchConfigurationDefaults.ATTR_NOLOCAL);

@@ -25,6 +25,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 public class OpenMPILaunchConfiguration {
 	public static final String ATTR_BASE = OpenMPIUIPlugin.PLUGIN_ID + ".launchAttributes"; //$NON-NLS-1$
 	public static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs"; //$NON-NLS-1$
+	public static final String ATTR_BYNODE = ATTR_BASE + ".byNode"; //$NON-NLS-1$
 	public static final String ATTR_BYSLOT = ATTR_BASE + ".bySlot"; //$NON-NLS-1$
 	public static final String ATTR_NOOVERSUBSCRIBE = ATTR_BASE + ".noOversubscribe"; //$NON-NLS-1$
 	public static final String ATTR_NOLOCAL = ATTR_BASE + ".noLocal"; //$NON-NLS-1$
@@ -42,10 +43,11 @@ public class OpenMPILaunchConfiguration {
 	static String calculateArguments(ILaunchConfiguration configuration) throws CoreException {
 		if (configuration.getAttribute(ATTR_USEDEFAULTARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS)) {
 			String launchArgs = "-np " + Integer.toString(configuration.getAttribute(ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS)); //$NON-NLS-1$
+			if (configuration.getAttribute(ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE)) {
+				launchArgs += " -bynode"; //$NON-NLS-1$
+			}
 			if (configuration.getAttribute(ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT)) {
 				launchArgs += " -byslot"; //$NON-NLS-1$
-			} else {
-				launchArgs += " -bynode"; //$NON-NLS-1$
 			}
 			if (configuration.getAttribute(ATTR_NOOVERSUBSCRIBE, OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE)) {
 				launchArgs += " -nooversubscribe"; //$NON-NLS-1$

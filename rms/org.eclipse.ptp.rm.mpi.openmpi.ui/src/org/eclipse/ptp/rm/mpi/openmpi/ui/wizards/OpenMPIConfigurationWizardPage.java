@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.WizardPageDataSource;
