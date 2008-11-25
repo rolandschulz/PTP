@@ -104,7 +104,7 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 			}
 		}
 		//cleanup();
-		System.out.println("Postlaunch job done");
+		//System.out.println("Postlaunch job done");
 	}
 
 	@Override

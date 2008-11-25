@@ -83,7 +83,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		apppathattrib=apa;
 		outputLocation=projectLocation;
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
-			
+		if(tool==null)return;
 		if(ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
 		{
 			runbuilt=initMMBuild();

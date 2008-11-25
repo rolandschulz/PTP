@@ -43,6 +43,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	
 	private String saveApp=null;
 	private String saveArgs=null;
+	private String savePath=null;
 	private boolean swappedArgs=false;
 	
 	/**
@@ -97,7 +98,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	 * @throws Exception 
 	 */
 	public boolean performLaunch(LaunchConfigurationDelegate paraDel, ILaunch launch, IProgressMonitor monitor) throws Exception{
-
+		try{
 		//if(tool==null)
 			//throw new Exception("No valid tool configuration found");
 		
@@ -115,6 +116,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 				IFile path = thisProject.getFile(progPath);
 				//System.out.println(path.exists());
 				//System.out.println(path.getLocation().toString());
+				savePath=confWC.getAttribute(apppathattrib, (String)null);
 				confWC.setAttribute(apppathattrib,  path.getLocation().toString());
 			}
 		}
@@ -192,8 +194,11 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 //				Thread.sleep(1000);
 //			}
 			
-		System.out.println("Launch supposedly complete");
+		//System.out.println("Launch supposedly complete");
 		return true;
+		}finally{
+			cleanup();
+		}
 	}
 
 	/**
@@ -205,7 +210,11 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	{
 		ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
 		
-		if(tool!=null&&tool.prependExecution&&swappedArgs)
+		if(apppathattrib!=null&&savePath!=null){
+			confWC.setAttribute(apppathattrib, savePath);
+		}
+		
+		if(tool!=null&&swappedArgs)//tool.prependExecution&&
 		{
 			confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, saveApp);
 			confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, saveArgs);
