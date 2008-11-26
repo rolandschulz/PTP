@@ -269,7 +269,13 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
-			// Don't need to do anything
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					if (!elementViewComposite.isDisposed()) {
+						machineTableViewer.refresh(true);
+					}
+				}
+			});
 		}
 		
 		/* (non-Javadoc)
