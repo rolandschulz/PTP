@@ -861,7 +861,7 @@ ASTLogicalConstNode:<LogicalConstant> ::=
   | -:T_ASTERISK (inline):<CharLength>
   | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_COMMA -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
   | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_COMMA            kindExpr:<Expr> -:T_RPAREN
-  | -:T_LPAREN                                              -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
+  | -:T_LPAREN                                                     -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
   | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_RPAREN
   | -:T_LPAREN              (inline):<CharLenParamValue> -:T_RPAREN
 <CharLenParamValue> ::=
