@@ -16,7 +16,7 @@
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
-	<property name="ptpVersion" value="2.1.0"/>
+	<property name="ptpVersion" value="2.1.1"/>
 	<property name="copyToDir" value="/home/www/tools/ptp/builds/${ptpVersion}/latest"/>
 	
 	<property name="serverBaseName" value="rdt-server"/>
