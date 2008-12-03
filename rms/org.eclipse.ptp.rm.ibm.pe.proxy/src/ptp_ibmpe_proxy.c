@@ -641,7 +641,7 @@ static enum_launch_attr enum_attrs[] = {
     {"MP_INSTANCES", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Window or IP Instances",
      "Number of user space windows or IP addresses to assign (MP_INSTANCES)", "", "|max"},
     {"MP_RETRY", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
-     "Period in seconds between node allocation retries (MP_RETRY)", "0", "|,wait"},
+     "Period in seconds between node allocation retries (MP_RETRY)", "0", "|wait"},
     /*
      * Node tab related attributes
      */
@@ -705,6 +705,8 @@ int_launch_attr int_attrs[] = {
 
     {"MP_RETRYCOUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
      "Number of times to retry node allocation (MP_RETRYCOUNT)", 1, 1, INT_MAX},
+    {"MP_RETRY_INT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
+     "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1, INT_MAX},
 	/*
 	 * Performance tab related attributes
 	 */
@@ -1455,7 +1457,9 @@ startup_monitor(void *job_ident)
     time_t last_mtime;
     struct stat fileinfo;
     int i;
+    char *proxy_taskid;
     List *new_nodes;
+    List *taskid_list;
     char jobid_str[30];
     char procid_str[12];
     char procname[20];
@@ -1465,6 +1469,7 @@ startup_monitor(void *job_ident)
     if (job->discovered_job) {
 	new_nodes = NewList();
     }
+    taskid_list = NewList();
     snprintf(tasklist_path, sizeof tasklist_path, "/tmp/.ppe.%d.attach.cfg", job->poe_pid);
     tasklist_path[sizeof tasklist_path - 1] = '\0';
     print_message(TRACE_DETAIL_MESSAGE, "Waiting for task config file %s\n", tasklist_path);
@@ -1631,13 +1636,8 @@ startup_monitor(void *job_ident)
 	    }
 	}
     }
-    /*
-     * attach.cfg file is complete and has been parsed. Notify the
-     * front end that the job is running
-     */
     job->tasks = tasks;
     job->numtasks = numtasks;
-    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_RUNNING);
     /*
      * For each task in the application, send a new process event to the
      * GUI.
@@ -1708,9 +1708,11 @@ startup_monitor(void *job_ident)
 	    }
 	    else {
 		sprintf(procid_str, "%d", taskp[i].proxy_taskid);
+                AddToList(taskid_list, strdup(procid_str));
 		sprintf(procname, "task_%d", i);
-		proxy_add_process(msg, procid_str, procname, PROC_STATE_RUNNING, 3);
+		proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
 		proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_generated_node_id);
+                AddToList(taskid_list, &(node->proxy_generated_node_id));
 		proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
 		proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
 	    }
@@ -1736,8 +1738,9 @@ startup_monitor(void *job_ident)
 
 		node->task_count = node->task_count + 1;
 		sprintf(procid_str, "%d", taskp[i].proxy_taskid);
+                AddToList(taskid_list, strdup(procid_str));
 		sprintf(procname, "task_%d", i);
-		proxy_add_process(msg, procid_str, procname, PROC_STATE_RUNNING, 3);
+		proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
 		proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_nodeid);
 		proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
 		proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
@@ -1745,6 +1748,26 @@ startup_monitor(void *job_ident)
 	}
     }
     enqueue_event(msg);
+      /*
+       * Notify front end that each task is started
+       */
+    SetList(taskid_list);
+    proxy_taskid = GetListElement(taskid_list);
+    while (proxy_taskid != NULL) {
+        proxy_msg *msg;
+
+        msg = proxy_process_change_event(start_events_transid, proxy_taskid, 1);
+        free(proxy_taskid);
+        proxy_add_string_attribute(msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
+        enqueue_event(msg);
+        proxy_taskid = GetListElement(taskid_list);
+    }
+    DestroyList(taskid_list, NULL);
+    /*
+     * attach.cfg file is complete and has been parsed. Notify the
+     * front end that the job is running
+     */
+    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_RUNNING);
     /*
      * Now that all task pids are known, I/O from the application can be
      * enabled since we can now map I/O to a specific pid. This is done
