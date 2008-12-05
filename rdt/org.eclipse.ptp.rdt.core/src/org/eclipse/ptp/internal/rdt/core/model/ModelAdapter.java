@@ -15,6 +15,7 @@ import java.util.LinkedList;
 
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IEnumeration;
 import org.eclipse.cdt.core.model.IEnumerator;
 import org.eclipse.cdt.core.model.IField;
@@ -38,8 +39,6 @@ import org.eclipse.cdt.core.model.ITypeDef;
 import org.eclipse.cdt.core.model.IUsing;
 import org.eclipse.cdt.core.model.IVariable;
 import org.eclipse.cdt.core.model.IVariableDeclaration;
-import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.core.runtime.IPath;
 
 public class ModelAdapter {
 	/**
@@ -157,7 +156,10 @@ public class ModelAdapter {
 			parent.addChild(result);
 		}
 		
-		result.setCProject(new CProject(element.getCProject().getElementName()));
+		ICProject project = element.getCProject();
+		if(project != null)
+			result.setCProject(new CProject(project.getElementName()));
+		
 		result.setLocationURI(element.getLocationURI());
 		result.setPath(element.getPath());
 		
@@ -189,7 +191,4 @@ public class ModelAdapter {
 		return parent;
 	}
 	
-	IPath adaptPath(IPath path) {
-		return new Path(path.toPortableString());
-	}
 }

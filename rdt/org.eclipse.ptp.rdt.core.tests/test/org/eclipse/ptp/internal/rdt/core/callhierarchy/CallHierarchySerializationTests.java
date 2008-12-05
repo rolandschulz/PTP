@@ -11,30 +11,34 @@
 
 package org.eclipse.ptp.internal.rdt.core.callhierarchy;
 
+import java.util.Arrays;
+
+import junit.framework.TestCase;
+
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.ptp.internal.rdt.core.tests.util.ModelUtil;
-import org.junit.Assert;
-import org.junit.Test;
 
-public class CallHierarchySerializationTests {
-	@Test
+@SuppressWarnings("restriction")
+public class CallHierarchySerializationTests extends TestCase {
+	
+	
 	public void testCalledByResult() throws Exception {
 		CalledByResult result = new CalledByResult();
 		CalledByResult result2 = ModelUtil.reconstitute(result);
-		Assert.assertEquals(result.getElements().length, result2.getElements().length);
+		assertEquals(result.getElements().length, result2.getElements().length);
 	}
 	
-	@Test
+	
 	public void testCallsToResult() throws Exception {
 		CallsToResult result = new CallsToResult();
 		CallsToResult result2 = ModelUtil.reconstitute(result);
-		Assert.assertArrayEquals(result.getElementSets(), result2.getElementSets());
+		assertTrue(Arrays.equals(result.getElementSets(), result2.getElementSets()));
 	}
 	
-	@Test
+	
 	public void testCElementSet() throws Exception {
 		CElementSet set = new CElementSet(new ICElement[0]);
 		CElementSet set2 = ModelUtil.reconstitute(set);
-		Assert.assertEquals(set, set2);
+		assertEquals(set, set2);
 	}
 }
