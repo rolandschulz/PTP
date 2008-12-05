@@ -12,6 +12,8 @@
 package org.eclipse.ptp.internal.rdt.core.tests.util;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -32,6 +34,7 @@ import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.model.CModelBuilder2;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 
+@SuppressWarnings("restriction")
 public class ModelUtil {
 	public static IASTTranslationUnit buildAST(ILanguage language, String name, String code) throws CoreException {
 		CodeReader reader = new CodeReader(name, code.toCharArray());
@@ -66,8 +69,9 @@ public class ModelUtil {
 		return language.getASTTranslationUnit(reader, scanInfo, fileCreator, index, log);
 	}
 	
-	public static TranslationUnit buildModel(ILanguage language, String name, String code) throws CoreException, DOMException {
-		TranslationUnit translationUnit = new TranslationUnit(null, name, null, null);
+	public static TranslationUnit buildModel(ILanguage language, String name, String code) throws CoreException, DOMException, URISyntaxException {
+		URI fakeURI = new URI("file://fake");
+		TranslationUnit translationUnit = new TranslationUnit(null, name, "fakename", fakeURI);
 		CModelBuilder2 builder = new CModelBuilder2(translationUnit, new NullProgressMonitor());
 		IASTTranslationUnit ast = buildAST(language, name, code);
 		builder.parse(ast);
