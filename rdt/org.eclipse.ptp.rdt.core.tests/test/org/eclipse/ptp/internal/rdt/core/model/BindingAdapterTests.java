@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -44,10 +46,9 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.ITypeDef;
 import org.eclipse.cdt.core.model.IVariable;
 import org.eclipse.ptp.internal.rdt.core.tests.util.ModelUtil;
-import org.junit.Assert;
-import org.junit.Test;
 
-public class BindingAdapterTests {
+@SuppressWarnings("restriction")
+public class BindingAdapterTests extends TestCase {
 	protected ILanguage getLanguage() {
 		return GPPLanguage.getDefault();
 	}
@@ -77,25 +78,26 @@ public class BindingAdapterTests {
 		return collector.getNames();
 	}
 	
+	
 	public void assertName(IASTName name, Class<?> modelClass, Class<?> parentClass) throws CModelException, DOMException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		IBinding binding = name.resolveBinding();
 		ITranslationUnit parentUnit = new TranslationUnit(null, "unit", null, null);
 		ICElement element = BindingAdapter.adaptBinding(parentUnit, binding, true);
-		Assert.assertTrue(modelClass.isAssignableFrom(element.getClass()));
-		Assert.assertEquals(binding.getName(), element.getElementName());
+		assertTrue(modelClass.isAssignableFrom(element.getClass()));
+		assertEquals(binding.getName(), element.getElementName());
 
 		if (element instanceof ISourceReference) {
 			ISourceReference reference = (ISourceReference) element;
 			ITranslationUnit unit = reference.getTranslationUnit();
-			Assert.assertNotNull(unit);
+			assertNotNull(unit);
 		}
 		
 		ICElement parent = element.getParent();
-		Assert.assertNotNull(parent);
-		Assert.assertTrue(parentClass.isAssignableFrom(parent.getClass()));
+		assertNotNull(parent);
+		assertTrue(parentClass.isAssignableFrom(parent.getClass()));
 	}
 
-	@Test
+
 	public void testEnumeration() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "enum E { a, b, c };");
 		List<IASTName> names = collectNames(ast);
@@ -105,35 +107,35 @@ public class BindingAdapterTests {
 		assertName(names.get(3), IEnumerator.class, ITranslationUnit.class);
 	}
 	
-	@Test
+	
 	public void testFunction() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "int f(double x) { return 1; }");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(0), IFunction.class, ITranslationUnit.class);
 	}
 
-	@Test
+	
 	public void testFunctionTemplate() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "template<class T> int f(T x) { return 1; }");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(1), IFunctionTemplate.class, ITranslationUnit.class);
 	}
 
-	@Test
+	
 	public void testFunctionTemplateDeclaration() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "template<class T> int f(T x);");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(1), IFunctionTemplateDeclaration.class, ITranslationUnit.class);
 	}
 	
-	@Test
+	
 	public void testNamespace() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "namespace N { int x; }");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(0), INamespace.class, ITranslationUnit.class);
 	}
 
-	@Test
+	
 	public void testStructure() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "struct S { static int f; S(); ~S(); void m(double x); template<class T> T f(T x) { return x; }; }; S::S() {}");
 		List<IASTName> names = collectNames(ast);
@@ -146,14 +148,14 @@ public class BindingAdapterTests {
 		assertName(names.get(12), IMethod.class, IStructure.class);
 	}
 
-	@Test
+	
 	public void testStructureTemplateDeclaration() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "template<class U> struct S;");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(1), IStructureTemplateDeclaration.class, ITranslationUnit.class);
 	}
 
-	@Test
+	
 	public void testStructureTemplate() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "template<class U> struct S { static U f; S(); ~S(); void m(double x); template<class T> T f(T x) { return x; } template<class V> void setData(V data); }; template<class V> void S::setData(V data) {}");
 		List<IASTName> names = collectNames(ast);
@@ -161,21 +163,21 @@ public class BindingAdapterTests {
 		assertName(names.get(19), IMethodTemplate.class, IStructure.class);
 	}
 
-	@Test
+	
 	public void testTypeDef() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "typedef int word;");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(0), ITypeDef.class, ITranslationUnit.class);
 	}
 
-	@Test
+	
 	public void testVariable() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "static int x = 1;");
 		List<IASTName> names = collectNames(ast);
 		assertName(names.get(0), IVariable.class, ITranslationUnit.class);
 	}
 
-	@Test
+	
 	public void testFieldSpecialization() throws Exception {
 		IASTTranslationUnit ast = ModelUtil.buildAST(getLanguage(), "", "template <bool threads, int inst> class default_alloc_template {static char* S_start_free; }; template <bool threads, int inst> char* default_alloc_template<threads, inst>::S_start_free = 0;");
 		List<IASTName> names = collectNames(ast);
