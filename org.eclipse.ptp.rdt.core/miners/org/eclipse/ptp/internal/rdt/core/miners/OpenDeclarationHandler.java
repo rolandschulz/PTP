@@ -53,6 +53,9 @@ public class OpenDeclarationHandler {
 	private static final int KIND_USING_DECL = 1;
 	private static final int KIND_DEFINITION = 2;
 
+	private static int PARSE_MODE_FAST = 
+		ITranslationUnit.AST_SKIP_ALL_HEADERS | 
+		ITranslationUnit.AST_CONFIGURE_USING_SOURCE_CONTEXT;
 	
 	
 	public static OpenDeclarationResult handleOpenDeclaration(String scopeName, ITranslationUnit workingCopy, String selectedText, int selectionStart, int selectionLength) {
@@ -108,7 +111,7 @@ public class OpenDeclarationHandler {
 	
 	private static OpenDeclarationResult doHandleOpenDeclaration(String scopeName, ITranslationUnit workingCopy, String selectedText, 
 			                                                     int selectionStart, int selectionLength, IIndex index) throws CoreException {
-		IASTTranslationUnit ast = workingCopy.getAST(index, 0);
+		IASTTranslationUnit ast = workingCopy.getAST(index, PARSE_MODE_FAST);
 		
 		final IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
 		IASTName searchName = nodeSelector.findEnclosingName(selectionStart, selectionLength);
@@ -204,6 +207,8 @@ public class OpenDeclarationHandler {
 			if(binding == null)
 				return null;
 			IASTFileLocation loc = astName.getFileLocation();
+			if(loc == null)
+				return null;
 			offset = loc.getNodeOffset();
 			length = loc.getNodeLength();
 		}

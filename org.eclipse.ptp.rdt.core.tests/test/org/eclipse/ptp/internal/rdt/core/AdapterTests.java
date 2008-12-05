@@ -15,20 +15,20 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.ModelManipulationTestBase;
-import org.junit.Assert;
 
+@SuppressWarnings("restriction")
 public class AdapterTests extends ModelManipulationTestBase {
 
 	@Override
 	protected void manipulate(ICElement element) throws Exception {
 		ICElement adapted = ModelAdapter.adaptElement(null, element, -1, false);
-		Assert.assertEquals(element.getElementType(), adapted.getElementType());
-		Assert.assertEquals(element.getElementName(), adapted.getElementName());
+		assertEquals(element.getElementType(), adapted.getElementType());
+		assertEquals(element.getElementName(), adapted.getElementName());
 		
 		if (element instanceof ISourceReference) {
 			ISourceReference reference1 = (ISourceReference) element;
 			ISourceReference reference2 = (ISourceReference) adapted;
-			Assert.assertEquals(reference1.getSourceRange(), reference2.getSourceRange());
+			assertEquals(reference1.getSourceRange(), reference2.getSourceRange());
 		}
 	}
 }

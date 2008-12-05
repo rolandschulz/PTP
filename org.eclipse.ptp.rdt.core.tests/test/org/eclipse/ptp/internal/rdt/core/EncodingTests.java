@@ -11,18 +11,13 @@
 
 package org.eclipse.ptp.internal.rdt.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.util.Arrays;
 
-import org.eclipse.cdt.core.model.ICElement;
-import org.eclipse.ptp.internal.rdt.core.callhierarchy.CElementSet;
-import org.junit.Assert;
-import org.junit.Test;
+import junit.framework.TestCase;
 
-public class EncodingTests {
-	@Test public void testFullRange() 
+
+public class EncodingTests extends TestCase {
+	public void testFullRange() 
 	{
 		byte[] data = new byte[256];
 		for (int i = 0; i < data.length; i++) {
@@ -30,39 +25,39 @@ public class EncodingTests {
 		}
 		String encoded = Serializer.encodeBase64(data, 0, data.length);
 		byte[] decoded = Serializer.decodeBase64(encoded);
-		Assert.assertArrayEquals(data, decoded);
+		assertTrue(Arrays.equals(data, decoded));
 	}
 
-	@Test public void testZeroPad() 
+	public void testZeroPad() 
 	{
 		byte[] data = new byte[] { 1, 2, 3, };
 		String encoded = Serializer.encodeBase64(data, 0, data.length);
 		byte[] decoded = Serializer.decodeBase64(encoded);
-		Assert.assertArrayEquals(data, decoded);
+		assertTrue(Arrays.equals(data, decoded));
 	}
 	
-	@Test public void testOnePad() 
+	public void testOnePad() 
 	{
 		byte[] data = new byte[] { 1, 2, };
 		String encoded = Serializer.encodeBase64(data, 0, data.length);
 		byte[] decoded = Serializer.decodeBase64(encoded);
-		Assert.assertArrayEquals(data, decoded);
+		assertTrue(Arrays.equals(data, decoded));
 	}
 
-	@Test public void testTwoPad() 
+	public void testTwoPad() 
 	{
 		byte[] data = new byte[] { 1 };
 		String encoded = Serializer.encodeBase64(data, 0, data.length);
 		byte[] decoded = Serializer.decodeBase64(encoded);
-		Assert.assertArrayEquals(data, decoded);
+		assertTrue(Arrays.equals(data, decoded));
 	}
 	
-	@Test public void testZeroPad2() 
+	public void testZeroPad2() 
 	{
 		byte[] data = new byte[] { -84, -19, 0 };
 		String encoded = Serializer.encodeBase64(data, 0, data.length);
 		byte[] decoded = Serializer.decodeBase64(encoded);
-		Assert.assertArrayEquals(data, decoded);
+		assertTrue(Arrays.equals(data, decoded));
 	}
 	
 }

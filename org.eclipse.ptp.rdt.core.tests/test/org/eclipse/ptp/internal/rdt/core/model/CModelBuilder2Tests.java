@@ -11,9 +11,10 @@
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
 
-import org.eclipse.cdt.core.dom.ast.DOMException;
+import junit.framework.TestCase;
+
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
 import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage;
 import org.eclipse.cdt.core.model.CModelException;
@@ -33,17 +34,17 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.ITypeDef;
 import org.eclipse.cdt.core.model.IVariableDeclaration;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.internal.rdt.core.tests.util.ModelUtil;
-import org.junit.Assert;
-import org.junit.Test;
 
-public class CModelBuilder2Tests {
-	protected TranslationUnit buildModel(ILanguage language, String name, String code) throws CoreException, DOMException {
+import org.eclipse.ptp.internal.rdt.core.tests.util.ModelUtil;
+
+@SuppressWarnings("restriction")
+public class CModelBuilder2Tests extends TestCase {
+	
+	protected TranslationUnit buildModel(ILanguage language, String name, String code) throws Exception {
 		return ModelUtil.buildModel(language, name, code);
 	}
 	
-	@Test public void testFunction() throws Exception {
+	public void testFunction() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "int main() {};");
 		ICElement[] children = unit.getChildren();
@@ -51,7 +52,7 @@ public class CModelBuilder2Tests {
 		assertFunction(children[0], ICElement.C_FUNCTION, "main", new String[0], "int");
 	}
 
-	@Test public void testFunctionDeclaration() throws Exception {
+	public void testFunctionDeclaration() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "int main();");
 		ICElement[] children = unit.getChildren();
@@ -59,7 +60,7 @@ public class CModelBuilder2Tests {
 		assertFunction(children[0], ICElement.C_FUNCTION_DECLARATION, "main", new String[0], "int");
 	}
 	
-	@Test public void testUninitializedVariable() throws Exception {
+	public void testUninitializedVariable() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "double variable; static int staticVariable; const long constVariable; volatile short volatileVariable; extern int externVariable;");
 		ICElement[] children = unit.getChildren();
@@ -72,7 +73,7 @@ public class CModelBuilder2Tests {
 		assertVariable(children[4], ICElement.C_VARIABLE_DECLARATION, "externVariable", "int", false, false, false);
 	}
 
-	@Test public void testVariable() throws Exception {
+	public void testVariable() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "double variable = 1;");
 		ICElement[] children = unit.getChildren();
@@ -81,7 +82,7 @@ public class CModelBuilder2Tests {
 		assertVariable(children[0], "variable", "double", false, false, false);
 	}
 
-	@Test public void testVariableTemplate() throws Exception {
+	public void testVariableTemplate() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "template <bool threads, int inst> char* default_alloc_template<threads, inst>::S_start_free = 0;");
 		ICElement[] children = unit.getChildren();
@@ -90,7 +91,7 @@ public class CModelBuilder2Tests {
 		assertTemplate(children[0], ICElement.C_TEMPLATE_VARIABLE, "default_alloc_template<threads,inst>::S_start_free", new String[] { "bool", "int" });
 	}
 	
-	@Test public void testMultiVariable() throws Exception {
+	public void testMultiVariable() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "float x, y;");
 		ICElement[] children = unit.getChildren();
@@ -102,7 +103,7 @@ public class CModelBuilder2Tests {
 		assertEquals(ICElement.C_VARIABLE, children[1].getElementType());
 	}
 	
-	@Test public void testEmptyNamespace() throws Exception {
+	public void testEmptyNamespace() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "namespace N {}");
 		ICElement[] children = unit.getChildren();
@@ -112,7 +113,7 @@ public class CModelBuilder2Tests {
 		assertEquals(0, namespaceChildren.length);
 	}
 	
-	@Test public void testNamespace() throws Exception {
+	public void testNamespace() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "namespace N { int a; double b; }");
 		ICElement[] children = unit.getChildren();
@@ -125,7 +126,7 @@ public class CModelBuilder2Tests {
 		assertVariable(namespaceChildren[1], "b", "double", false, false, false);
 	}
 	
-	@Test public void testClassDeclaration() throws Exception {
+	public void testClassDeclaration() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C;");
 		ICElement[] children = unit.getChildren();
@@ -133,7 +134,7 @@ public class CModelBuilder2Tests {
 		assertCompositeType(children[0], ICElement.C_CLASS_DECLARATION, "C", false, false);
 	}
 
-	@Test public void testStructDeclaration() throws Exception {
+	public void testStructDeclaration() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "struct S;");
 		ICElement[] children = unit.getChildren();
@@ -141,7 +142,7 @@ public class CModelBuilder2Tests {
 		assertCompositeType(children[0], ICElement.C_STRUCT_DECLARATION, "S", false, false);
 	}
 
-	@Test public void testUnionDeclaration() throws Exception {
+	public void testUnionDeclaration() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "union U;");
 		ICElement[] children = unit.getChildren();
@@ -149,7 +150,7 @@ public class CModelBuilder2Tests {
 		assertCompositeType(children[0], ICElement.C_UNION_DECLARATION, "U", false, false);
 	}
 
-	@Test public void testEmptyClass() throws Exception {
+	public void testEmptyClass() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C {};");
 		ICElement[] children = unit.getChildren();
@@ -162,7 +163,7 @@ public class CModelBuilder2Tests {
 		assertEquals(0, classChildren.length);
 	}
 	
-	@Test public void testEmptyStruct() throws Exception {
+	public void testEmptyStruct() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "struct S {};");
 		ICElement[] children = unit.getChildren();
@@ -175,7 +176,7 @@ public class CModelBuilder2Tests {
 		assertEquals(0, classChildren.length);
 	}
 	
-	@Test public void testEmptyUnion() throws Exception {
+	public void testEmptyUnion() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "union U {};");
 		ICElement[] children = unit.getChildren();
@@ -188,7 +189,7 @@ public class CModelBuilder2Tests {
 		assertEquals(0, classChildren.length);
 	}
 
-	@Test public void testClass() throws CoreException, DOMException {
+	public void testClass() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C { int privateField; public: C(); C(int p); ~C(); };");
 		ICElement[] children = unit.getChildren();
@@ -204,7 +205,7 @@ public class CModelBuilder2Tests {
 		assertDestructor(classChildren[3], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, false, false, "");
 	}
 	
-	@Test public void testAbstractClass() throws CoreException, DOMException {
+	public void testAbstractClass() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C { protected: virtual C() = 0; virtual C(int p); public: virtual ~C(); };");
 		ICElement[] children = unit.getChildren();
@@ -219,7 +220,7 @@ public class CModelBuilder2Tests {
 		assertDestructor(classChildren[2], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, true, false, "virtual");
 	}
 	
-	@Test public void testPureVirtualDestructor() throws CoreException, DOMException {
+	public void testPureVirtualDestructor() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C { public: virtual ~C() = 0; };");
 		ICElement[] children = unit.getChildren();
@@ -232,7 +233,7 @@ public class CModelBuilder2Tests {
 		assertDestructor(classChildren[0], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, true, true, "virtual");
 	}
 
-	@Test public void testStruct() throws CoreException, DOMException {
+	public void testStruct() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "struct S { int publicField; };");
 		ICElement[] children = unit.getChildren();
@@ -245,7 +246,7 @@ public class CModelBuilder2Tests {
 		assertField(classChildren[0], "publicField", "int", ASTAccessVisibility.PUBLIC, false, false, false, false);
 	}
 	
-	@Test public void testUnion() throws CoreException, DOMException {
+	public void testUnion() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "union U { int publicField; };");
 		ICElement[] children = unit.getChildren();
@@ -258,7 +259,7 @@ public class CModelBuilder2Tests {
 		assertField(classChildren[0], "publicField", "int", ASTAccessVisibility.PUBLIC, false, false, false, false);
 	}
 
-	@Test public void testField() throws Exception {
+	public void testField() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C {private: int privateField; protected: double protectedField; public: float publicField; static short staticField; const double constField; volatile int volatileField; const volatile long constVolatileField; mutable long mutableField; };");
 		ICElement[] children = unit.getChildren();
@@ -279,7 +280,7 @@ public class CModelBuilder2Tests {
 		assertField(classChildren[7], "mutableField", "long", ASTAccessVisibility.PUBLIC, false, false, false, true);
 	}
 
-	@Test public void testInclude() throws CoreException, DOMException {
+	public void testInclude() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "#include <stdio.h>\n#include \"other.h\"");
 		ICElement[] children = unit.getChildren();
@@ -289,7 +290,7 @@ public class CModelBuilder2Tests {
 		assertInclude(children[1], "other.h", false);
 	}
 	
-	@Test public void testAnonymousEnumeration() throws CoreException, DOMException {
+	public void testAnonymousEnumeration() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "enum { first = 1, second, third };");
 		ICElement[] children = unit.getChildren();
@@ -303,7 +304,7 @@ public class CModelBuilder2Tests {
 		assertEnumerator(enumChildren[2], "third", null);
 	}
 	
-	@Test public void testEnumeration() throws CoreException, DOMException {
+	public void testEnumeration() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "enum MyEnum { first, second, third };");
 		ICElement[] children = unit.getChildren();
@@ -317,7 +318,7 @@ public class CModelBuilder2Tests {
 		assertEnumerator(enumChildren[2], "third", null);
 	}
 
-	@Test public void testPlainDefine() throws CoreException, DOMException {
+	public void testPlainDefine() throws Exception{
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "#define ONE 1");
 		ICElement[] children = unit.getChildren();
@@ -325,7 +326,7 @@ public class CModelBuilder2Tests {
 		assertMacro(children[0], "ONE");
 	}
 	
-	@Test public void testFunctionStyleDefine() throws CoreException, DOMException {
+	public void testFunctionStyleDefine() throws Exception{
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "#define PRINT(string,msg)  printf(string, msg)");
 		ICElement[] children = unit.getChildren();
@@ -333,7 +334,7 @@ public class CModelBuilder2Tests {
 		assertMacro(children[0], "PRINT");
 	}
 	
-	@Test public void testNestedNamespace() throws CoreException, DOMException {
+	public void testNestedNamespace() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "namespace MyPackage { class Hello { namespace MyNestedPackage { class Y {}; } }; }");
 		ICElement[] children = unit.getChildren();
@@ -350,7 +351,7 @@ public class CModelBuilder2Tests {
 		assertCompositeType(nestedChildren[0], ICElement.C_CLASS, "Y", true, false);
 	}
 	
-	@Test public void testDerivedClass() throws CoreException, DOMException {
+	public void testDerivedClass() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class Y {}; class X : public Y { double privateField; public: X(int x) : Y(x) {} };");
 		ICElement[] children = unit.getChildren();
@@ -360,10 +361,10 @@ public class CModelBuilder2Tests {
 		
 		IStructure derived = (IStructure) children[1];
 		assertEquals(ASTAccessVisibility.PUBLIC, derived.getSuperClassAccess("Y"));
-		Assert.assertArrayEquals(new String[] { "Y" }, derived.getSuperClassesNames());
+		assertTrue(Arrays.equals(new String[] { "Y" }, derived.getSuperClassesNames()));
 	}
 	
-	@Test public void testTypedef() throws CoreException, DOMException {
+	public void testTypedef() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "struct MyStruct { int sint; }; typedef struct MyStruct myStruct;");
 		ICElement[] children = unit.getChildren();
@@ -372,7 +373,7 @@ public class CModelBuilder2Tests {
 		assertTypedef(children[1], "myStruct", "struct MyStruct");
 	}
 	
-	@Test public void testElaboratedType() throws CoreException, DOMException {
+	public void testElaboratedType() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "typedef struct { int ss; } myTypedef;");
 		ICElement[] children = unit.getChildren();
@@ -381,7 +382,7 @@ public class CModelBuilder2Tests {
 		assertTypedef(children[1], "myTypedef", "struct");
 	}
 	
-	@Test public void testFunctionPointer() throws CoreException, DOMException {
+	public void testFunctionPointer() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "static void * (*orig_malloc_hook)(const char *file, int line, size_t size);");
 		ICElement[] children = unit.getChildren();
@@ -389,7 +390,7 @@ public class CModelBuilder2Tests {
 		assertVariable(children[0], "orig_malloc_hook", "void*(*)(const char*, int, size_t)", true, false, false);
 	}
 	
-	@Test public void testTemplateFunction() throws CoreException, DOMException {
+	public void testTemplateFunction() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "template<class A, typename B=C> A aTemplatedFunction( B bInstance );");
 		ICElement[] children = unit.getChildren();
@@ -398,10 +399,10 @@ public class CModelBuilder2Tests {
 		assertFunction(children[0], ICElement.C_TEMPLATE_FUNCTION_DECLARATION, "aTemplatedFunction", new String[] { "B" }, "A");
 		
 		IFunctionDeclaration function = (IFunctionDeclaration) children[0];
-		Assert.assertArrayEquals(new String[] { "B" }, function.getParameterTypes());
+		assertTrue(Arrays.equals(new String[] { "B" }, function.getParameterTypes()));
 	}
 	
-	@Test public void testTemplateMethod() throws CoreException, DOMException {
+	public void testTemplateMethod() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class enclosing { public: template<class A, typename B=C> A aTemplatedMethod( B bInstance ); };");
 		ICElement[] children = unit.getChildren();
@@ -413,7 +414,7 @@ public class CModelBuilder2Tests {
 		assertMethod(classChildren[0], ICElement.C_TEMPLATE_METHOD_DECLARATION, "aTemplatedMethod", ASTAccessVisibility.PUBLIC, false, false, false, false, new String[] { "B" }, "A");
 	}
 	
-	@Test public void testTemplateClass() throws CoreException, DOMException {
+	public void testTemplateClass() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "template<class T, typename Tibor = junk> class myarray {};");
 		ICElement[] children = unit.getChildren();
@@ -422,7 +423,7 @@ public class CModelBuilder2Tests {
 		assertTemplate(children[0], ICElement.C_TEMPLATE_CLASS, "myarray", new String[] { "T", "Tibor" });
 	}
 	
-	@Test public void testTemplateStruct() throws CoreException, DOMException {
+	public void testTemplateStruct() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "template<class T, typename Tibor = junk> struct mystruct {};");
 		ICElement[] children = unit.getChildren();
@@ -431,7 +432,7 @@ public class CModelBuilder2Tests {
 		assertTemplate(children[0], ICElement.C_TEMPLATE_STRUCT, "mystruct", new String[] { "T", "Tibor" });
 	}
 	
-	@Test public void testTemplateUnion() throws CoreException, DOMException {
+	public void testTemplateUnion() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "template<class T, typename Tibor = junk> union myunion {};");
 		ICElement[] children = unit.getChildren();
@@ -440,7 +441,7 @@ public class CModelBuilder2Tests {
 		assertTemplate(children[0], ICElement.C_TEMPLATE_UNION, "myunion", new String[] { "T", "Tibor" });
 	}
 
-	@Test public void testArray() throws CoreException, DOMException {
+	public void testArray() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "int myArray [5][];");
 		ICElement[] children = unit.getChildren();
@@ -448,7 +449,7 @@ public class CModelBuilder2Tests {
 		assertVariable(children[0], "myArray", "int[][]", false, false, false);
 	}
 	
-	@Test public void testArrayParameter() throws CoreException, DOMException {
+	public void testArrayParameter() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "int main(int argc, char * argv[]);");
 		ICElement[] children = unit.getChildren();
@@ -456,7 +457,7 @@ public class CModelBuilder2Tests {
 		assertFunction(children[0], ICElement.C_FUNCTION_DECLARATION, "main", new String[] { "int", "char*[]" }, "int");
 	}
 	
-	@Test public void testBug180815() throws CoreException, DOMException {
+	public void testBug180815() throws Exception {
 		ILanguage language = getCLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "struct bug180815 { int i,j; } bug180815_var0, bug180815_var1;");
 		ICElement[] children = unit.getChildren();
@@ -466,7 +467,7 @@ public class CModelBuilder2Tests {
 		assertVariable(children[2], "bug180815_var1", "struct bug180815", false, false, false);
 	}
 	
-	@Test public void testConstructor() throws Exception {
+	public void testConstructor() throws Exception {
 		ILanguage language = getCPPLanguage();
 		ITranslationUnit unit = buildModel(language , "test", "class C { C::C(); C::~C(); };");
 		ICElement[] children = unit.getChildren();
@@ -525,7 +526,7 @@ public class CModelBuilder2Tests {
 		assertEquals(isStatic, variable.isStatic());
 		assertEquals(isConst, variable.isConst());
 		assertEquals(isVolatile, variable.isVolatile());
-		Assert.assertNotNull(variable.getTypeName());
+		assertNotNull(variable.getTypeName());
 		assertEquals(typeName, variable.getTypeName());
 	}
 
@@ -555,7 +556,7 @@ public class CModelBuilder2Tests {
 		assertEquals(isPureVirtual, method.isPureVirtual());
 		
 		String[] types = method.getParameterTypes();
-		Assert.assertArrayEquals(expectedParameterTypes, types);
+		assertTrue(Arrays.equals(expectedParameterTypes, types));
 		assertEquals(returnType, method.getReturnType());
 	}
 
@@ -565,7 +566,7 @@ public class CModelBuilder2Tests {
 		IFunctionDeclaration method = (IFunctionDeclaration) element;
 		
 		String[] types = method.getParameterTypes();
-		Assert.assertArrayEquals(expectedParameterTypes, types);
+		assertTrue(Arrays.equals(expectedParameterTypes, types));
 		assertEquals(returnType, method.getReturnType());
 	}
 
@@ -602,7 +603,7 @@ public class CModelBuilder2Tests {
 		assertEquals(type, element.getElementType());
 		assertEquals(name, element.getElementName());
 		ITemplate template = (ITemplate) element;
-		Assert.assertArrayEquals(templateParameterTypes, template.getTemplateParameterTypes());
+		assertTrue(Arrays.equals(templateParameterTypes, template.getTemplateParameterTypes()));
 	}
 	
 	protected ILanguage getCLanguage() {

@@ -13,8 +13,14 @@ package org.eclipse.ptp.rdt.services.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -35,8 +41,20 @@ public class ServiceModelManagerTests {
 		File file = File.createTempFile("serviceModelTest", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		ServiceModelManager manager = ServiceModelManager.getInstance();
-		manager.saveModelConfiguration(file);
-		manager.loadModelConfiguration(file);
+		
+		Writer writer = new BufferedWriter(new FileWriter(file));
+		try {
+			manager.saveModelConfiguration(writer);
+		} finally {
+			writer.close();
+		}
+		
+		Reader reader = new BufferedReader(new FileReader(file));
+		try {
+			manager.loadModelConfiguration(reader);
+		} finally {
+			reader.close();
+		}
 	}
 	
 	void addProvider(String providerId, IService service, IServiceConfiguration config) {

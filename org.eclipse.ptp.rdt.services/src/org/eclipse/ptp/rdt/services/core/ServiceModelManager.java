@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -349,10 +351,10 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @throws IOException 
 	 * @throws NullPointerException if file is null
 	 */
-	public void saveModelConfiguration(File file) throws IOException {
-		if(file == null)
+	public void saveModelConfiguration(Writer writer) throws IOException {
+		if(writer == null)
 			throw new NullPointerException();
-		saveModelConfiguration(configurations, file);
+		saveModelConfiguration(configurations, writer);
 	}
 	
 	/**
@@ -365,11 +367,17 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @throws IOException
 	 */
 	public void saveModelConfiguration() throws IOException {
-		saveModelConfiguration(defaultSaveFile.toFile());
+		File file = defaultSaveFile.toFile();
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		try {
+			saveModelConfiguration(writer);
+		} finally {
+			writer.close();
+		}
 	}
 	
 	
-	private static void saveModelConfiguration(Map<IProject, Map<String, IServiceConfiguration>> model, File file) throws IOException {
+	private static void saveModelConfiguration(Map<IProject, Map<String, IServiceConfiguration>> model, Writer writer) throws IOException {
 		XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
 		
 		for (Entry<IProject, Map<String, IServiceConfiguration>> entry : model.entrySet()) {
@@ -407,12 +415,7 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}
 			
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		try {
-			rootMemento.save(writer);
-		} finally {
-			writer.close();
-		}
+		rootMemento.save(writer);
 	}
 	
 	
@@ -428,8 +431,14 @@ public class ServiceModelManager implements IServiceModelManager {
 	 */
 	public void loadModelConfiguration() throws IOException, CoreException {
 		File file = defaultSaveFile.toFile();
-		if(file.exists())
-			loadModelConfiguration(file);
+		if(file.exists()) {
+			Reader reader = new BufferedReader(new FileReader(file));
+			try {
+				loadModelConfiguration(reader);
+			} finally {
+				reader.close();
+			}
+		}
 	}
 	
 	
@@ -441,45 +450,37 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
 	 * @throws IOException 
 	 */
-	public void loadModelConfiguration(File file) throws IOException, CoreException {
-		// Clear out the existing model
-		initialize();
+	public void loadModelConfiguration(Reader reader) throws IOException, CoreException {
+		initialize(); // Clear out the existing model
 		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		BufferedReader reader = new BufferedReader(new FileReader(file));
+		XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
 		
-		try {
-			XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
+		for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
+			String projectName = projectMemento.getString(ATTR_NAME);
+			IProject project = root.getProject(projectName);
 			
-			for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
-				String projectName = projectMemento.getString(ATTR_NAME);
-				IProject project = root.getProject(projectName);
-				
-				// Skip over projects that aren't in the workspace.
-				if (!project.exists()) {
-					continue;
+			// Skip over projects that aren't in the workspace.
+			if (!project.exists())
+				continue;
+			
+			for (IMemento configMemento : projectMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
+				String configName = configMemento.getString(ATTR_NAME);
+				ServiceConfiguration config = new ServiceConfiguration(configName);
+				for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
+					String serviceId = serviceMemento.getString(ATTR_ID);
+					String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
+					
+					IService service = getService(serviceId);
+					IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+					IServiceProvider provider = getServiceProvider(descriptor);
+					IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+					provider.restoreState(providerMemento);
+					config.setServiceProvider(service, provider);
 				}
-				
-				for (IMemento configMemento : projectMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
-					String configName = configMemento.getString(ATTR_NAME);
-					ServiceConfiguration config = new ServiceConfiguration(configName);
-					for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
-						String serviceId = serviceMemento.getString(ATTR_ID);
-						String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
-						
-						IService service = getService(serviceId);
-						IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
-						IServiceProvider provider = getServiceProvider(descriptor);
-						IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-						provider.restoreState(providerMemento);
-						config.setServiceProvider(service, provider);
-					}
-					putConfiguration(project, config);
-				}
-			} 
-		} finally {
-			reader.close();
-		}
+				putConfiguration(project, config);
+			}
+		} 
 	}
 
 	
