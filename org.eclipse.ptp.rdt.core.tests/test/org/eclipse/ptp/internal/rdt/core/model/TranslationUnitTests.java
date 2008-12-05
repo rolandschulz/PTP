@@ -21,16 +21,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Assert;
-import org.junit.Test;
 
-public class TranslationUnitTests {
+@SuppressWarnings("restriction")
+public class TranslationUnitTests extends TestCase {
+	
 	IASTTranslationUnit parse(String contents) throws CoreException, URISyntaxException, IOException {
 		File file = File.createTempFile("test" + System.currentTimeMillis(), ".cpp");  //$NON-NLS-1$//$NON-NLS-2$
 		FileWriter writer = new FileWriter(file);
@@ -56,19 +58,18 @@ public class TranslationUnitTests {
 		return unit.getAST();
 	}
 	
-	@Test
 	public void testParseEmptyAST() throws Exception {
 		IASTTranslationUnit ast = parse(""); //$NON-NLS-1$
-		Assert.assertNotNull(ast);
+		assertNotNull(ast);
 	}
 
-	@Test
+	
 	public void testParseSimpleAST() throws Exception {
 		IASTTranslationUnit ast = parse("int x;"); //$NON-NLS-1$
-		Assert.assertNotNull(ast);
+		assertNotNull(ast);
 		List<IASTName> names = getNames(ast);
-		Assert.assertEquals(1, names.size());
-		Assert.assertEquals("x", names.get(0).toString()); //$NON-NLS-1$
+		assertEquals(1, names.size());
+		assertEquals("x", names.get(0).toString()); //$NON-NLS-1$
 	}
 	
 	public List<IASTName> getNames(IASTTranslationUnit unit) {
