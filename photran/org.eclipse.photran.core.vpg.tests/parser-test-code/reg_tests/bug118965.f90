@@ -110,7 +110,7 @@ contains
      call CleanTemp(A)
 
   end subroutine CmTimesRealScalarCm
- 
+
   subroutine CmTimesRealScalarRm(C, s, A)
      type(Cmat), intent(out) :: C
      real(wp), intent(in) :: s
@@ -141,7 +141,7 @@ contains
      call CleanTemp(A)
 
   end subroutine CmTimesRealScalarRm
- 
+
   subroutine CmTimesComplexScalarCm(C, s, A)
      type(Cmat), intent(out) :: C
      complex(wp), intent(in) :: s
@@ -168,7 +168,7 @@ contains
      call CleanTemp(A)
 
   end subroutine CmTimesComplexScalarCm
- 
+
 
 
 end module CmatProduct_m
