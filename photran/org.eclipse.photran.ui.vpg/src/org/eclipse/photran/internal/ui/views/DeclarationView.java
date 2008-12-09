@@ -173,10 +173,10 @@ public class DeclarationView extends ViewPart
     {
         if (editor != null)
         {
-            String contentAssistEnabledProperty = SearchPathProperties.getProperty(
+            String declViewEnabledProperty = SearchPathProperties.getProperty(
                 editor.getIFile().getProject(),
-                SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
-            if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true"))
+                SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME);
+            if (declViewEnabledProperty != null && declViewEnabledProperty.equals("true"))
             {
                 addCaretMovementListenerTo(editor);
                 FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
@@ -312,7 +312,9 @@ public class DeclarationView extends ViewPart
         if (event.getSelection() instanceof TextSelection && tokenList != null && defMap != null)
         {
             String description = defMap.lookup((TextSelection)event.getSelection(), tokenList);
-            update(description == null ? "" : description);
+            update(description == null
+                ? "" 
+                : description);
         }
         else
         {
