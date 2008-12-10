@@ -1,7 +1,7 @@
 NEW IN THIS BETA:
-- Find All References
-- Fortran 2003
-- New gfortran error parser
++ Find All References
++ Fortran 2003
++ New gfortran error parser
 
 
 
@@ -13,7 +13,25 @@ GRANT/SUPPORT REQUIREMENTS
 - Parse kinds and character lengths and include in Type
 
 
+
 FOR NEXT BETA
+
+- Fortran 2003
+  + Section 2
+  + Section 4
+  + Section 5
+  - Section 6
+  - Section 8
+  - Section 9
+  - Section 11
+  - Section 12
+
++ Fortran Decl View not populating when it should
++ Refactorings should not work if VPG is turned off (give appropriate error
+  instead of "please select an ..." error when VPG is disabled)
++ Renaming outu in "write (outu, ..." doesn't work (bstfit.f90)
+
+- Rename bug: local variable may not shadow program name
 - Preproc substring bug
 - Open Decl error message
 - Persist project properties
@@ -22,35 +40,28 @@ FOR NEXT BETA
 - If I click on new source file, I can choose between a C and a C++ template or <no template>. However, there's no FORTRAN-template. This is a usability feature, I hope this is not too hard to add.
 - It is possible to get have source tarball releases as well?
 
-
 - Change hasEqEqOp() to hasEqOp() in ASTOperatorNode
 - Add function testing stuff
 - Get rid of VarOrFnRefNode
 - Should be able to parenthesize arg to subroutine
 - What is /= in ASTOperatorNode?
 
-- Refactorings should not work if VPG is turned off
-
-- Refactoring gives "please select an ..." error when VPG is disabled
-
 - Multiple parsing start symbols
 
 - No renaming of namelist variables
 
-Link interfaces to function definitions
-Bug in indexing - not linking identifiers
-Should be able to set parenthesis tokens
-Where to insert type decl stmt?  Send fn name to Stas
-Give subroutine and function parameter, subroutine and function argument, subroutine and function nodes common parents
-Link subprograms across files
-
-Parser bug: does not accept "common // a,b"
-
-mailinglists.php -- See "Re: MySQL Error" e-mail
+- Link interfaces to function definitions
+- Bug in indexing: not linking identifiers
+- Should be able to set parenthesis tokens
+- Where to insert type decl stmt?  Send fn name to Stas
+- Give subroutine and function parameter, subroutine and function argument, subroutine and function nodes common parents
+- Link subprograms across files
+- Parser bug: does not accept "common // a,b"
+- mailinglists.php -- See "Re: MySQL Error" e-mail
 
 
-STAS'S STUFF:
-Move save vars to common block
-Common to composite type
-Move composite type from common to local pointer
-Pass that pointer around
+STAS is going to...
+1. Move save vars to common block
+2. Common to composite type
+3. Move composite type from common to local pointer
+4. Pass that pointer around
