@@ -92,6 +92,8 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
+        ensureProjectHasRefactoringEnabled();
+        
         findEnclosingCommonBlock();
         determineEnclosingCommonBlockName();
         determineAffectedFiles();

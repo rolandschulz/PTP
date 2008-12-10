@@ -70,6 +70,8 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
+        ensureProjectHasRefactoringEnabled();
+        
         Token token = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         selectedScope = token == null ? null : token.getEnclosingScope();
         

@@ -48,6 +48,7 @@ import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.text.edits.ReplaceEdit;
 
 import bz.over.vpg.TokenRef;
@@ -525,6 +526,15 @@ public abstract class FortranRefactoring extends Refactoring
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     
+    protected void ensureProjectHasRefactoringEnabled() throws PreconditionFailure
+    {
+        String declViewEnabledProperty = SearchPathProperties.getProperty(
+            fileInEditor.getProject(),
+            SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
+        if (declViewEnabledProperty == null || !declViewEnabledProperty.equals("true"))
+            fail("Please enable analysis and refactoring in the project properties.");
+    }
+
     protected boolean isIdentifier(Token token)
     {
         return token != null && token.getTerminal() == Terminal.T_IDENT;

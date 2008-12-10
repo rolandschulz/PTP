@@ -68,6 +68,8 @@ public class ExtractLocalVariableRefactoring //extends FortranRefactoring
 //    @Override
 //    protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
 //    {
+//    ensureProjectHasRefactoringEnabled();
+//    
 //        subexpression = this.findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor);
 //        enclosingExpr = (ASTExpressionNode)this.findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor, Nonterminal.EXPR, false);
 //        enclosingAction = (ASTActionStmtNode)this.findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor, Nonterminal.ACTION_STMT, false);

@@ -76,6 +76,8 @@ public class RenameRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
+        ensureProjectHasRefactoringEnabled();
+        
         oldName = findEnclosingToken().getText();
         definitionToRename = findDeclarationToRename();
         

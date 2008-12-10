@@ -64,6 +64,8 @@ public class ExtractProcedureRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
+        ensureProjectHasRefactoringEnabled();
+        
     	stmtSeq = this.findEnclosingStatementSequence(this.astOfFileInEditor, this.selectedRegionInEditor);
         
         if (stmtSeq == null) fail("Please select a sequence of statements to extract.");

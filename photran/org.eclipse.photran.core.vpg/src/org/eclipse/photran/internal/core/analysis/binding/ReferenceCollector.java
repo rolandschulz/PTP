@@ -70,6 +70,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineArgNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineParNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.parser.ASTUFPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.ASTVariableNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -84,6 +85,13 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  */
 class ReferenceCollector extends BindingCollector
 {
+    @Override public void visitASTUFPrimaryNode(ASTUFPrimaryNode node)
+    {
+        super.traverseChildren(node);
+        if (node.getName() != null)
+            bind(node.getName().getName());
+    }
+
     // <NamedConstantUse> ::= T_IDENT
 
     @Override public void visitASTNamedConstantUseNode(ASTNamedConstantUseNode node)
