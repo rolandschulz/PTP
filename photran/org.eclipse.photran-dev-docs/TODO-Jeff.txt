@@ -14,6 +14,22 @@ GRANT/SUPPORT REQUIREMENTS
 
 
 
+ECLIPSE FOUNDATION REQUIREMENTS
+- Photran CQ 2737
+  - Nicolas Chen
+  + Cheah Chin Fei
+  - Dirk Rosson
+  + Kdeeker
+  + Slicter
+  + John Goode
+  - Abe Hassan
+  - Sean Kim
+  - Walt Brained (WB)
+  + Stoyan Gaydarov
+
+- Eli Grammar CQ 2880
+
+
 FOR NEXT BETA
 
 - Fortran 2003
@@ -26,10 +42,10 @@ FOR NEXT BETA
   - Section 11
   - Section 12
 
-+ Fortran Decl View not populating when it should
++ Fortran Decl View not populating when it should (12/9/08)
 + Refactorings should not work if VPG is turned off (give appropriate error
-  instead of "please select an ..." error when VPG is disabled)
-+ Renaming outu in "write (outu, ..." doesn't work (bstfit.f90)
+  instead of "please select an ..." error when VPG is disabled) (12/9/08)
++ Renaming outu in "write (outu, ..." doesn't work (bstfit.f90) (12/9/08)
 
 - Rename bug: local variable may not shadow program name
 - Preproc substring bug
