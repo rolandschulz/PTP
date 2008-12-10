@@ -80,11 +80,11 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	//protected final PerformanceProcess tool;
 	protected Map<String, String> IOMap=null;
 	
-	protected PerfStep(ILaunchConfiguration conf,String name, String projnameattrib) throws CoreException{
+	protected PerfStep(ILaunchConfiguration conf,String name) throws CoreException{
 		super(name);
 		configuration=conf;
 		
-		thisProject = getProject(projnameattrib, configuration);
+		thisProject = getProject(configuration);
 		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
 		projectLocation=thisCProject.getResource().getLocation().toOSString();
 		
@@ -138,8 +138,8 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	 * @return The project associated with this manager's launch configuration, or null if no project is found
 	 * @throws CoreException
 	 */
-	protected static IProject getProject(String projnameattrib, ILaunchConfiguration configuration) throws CoreException {
-		String projectName = configuration.getAttribute(projnameattrib, (String)null);
+	protected static IProject getProject(ILaunchConfiguration configuration) throws CoreException {
+		String projectName = configuration.getAttribute(configuration.getAttribute(PERF_PROJECT_NAME_TAG, (String)null), (String)null);
 		if (projectName != null) {
 			projectName = projectName.trim();
 			if (projectName.length() > 0) {

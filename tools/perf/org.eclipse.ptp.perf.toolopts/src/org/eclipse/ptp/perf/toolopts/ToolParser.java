@@ -20,6 +20,7 @@ package org.eclipse.ptp.perf.toolopts;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import org.eclipse.ptp.perf.toolopts.PerformanceProcess.Parametric;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -121,6 +122,14 @@ public class ToolParser extends DefaultHandler{
 	 * Element to specify an argument to a compiler, run utility or analysis tool
 	 */
 	private static final String ARGUMENT="argument";
+	private static final String ENVVAR="envvar";
+	
+	private static final String PARAMETRIC="parametric";
+	private static final String WEAKSCALING="weakscaling";
+	private static final String NUMPROCS="numprocs";
+	private static final String COMPILEROPT="compileropt";
+	private boolean inParametric=false;
+	
 
 	private boolean inTool=false;
 	/**
@@ -242,6 +251,14 @@ public class ToolParser extends DefaultHandler{
 			toolApps=new ArrayList<ToolApp>();
 			ppTool.requireTrue=getAttribute("if",atts);
 		}
+		else if(name.equals(PARAMETRIC)&&inTool&&!inParametric&&currentTool!=null){
+			inParametric=true;
+			currentTool.para=new Parametric();
+			currentTool.para.runParametric=true;
+			currentTool.para.weakScaling=getBooleanAttribute(WEAKSCALING,false,atts);
+			currentTool.para.mpiProcs=getAttribute(NUMPROCS,atts);
+			currentTool.para.compileropt=getAttribute(COMPILEROPT,atts);
+		}
 		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(ALLCOMP)||name.equals(UTILITY))
 		{
 			if(inTool&&currentTool!=null)
@@ -257,8 +274,36 @@ public class ToolParser extends DefaultHandler{
 					currentTool.prependExecution=true;
 			}
 		}
+		else if(name.equals(ENVVAR)){
+			if(inParametric)
+			{
+				currentTool.para.varNames.add(getAttribute("name",atts));
+				currentTool.para.varValues.add(getAttribute("values",atts));
+				
+				String weak ="0";
+				if(getBooleanAttribute(WEAKSCALING,false,atts)){
+					weak="1";
+				}
+				currentTool.para.varWeakBools.add(weak);
+			}
+			else{
+				
+			}
+		}
 		else if(name.equals(ARGUMENT))
 		{
+			if(inParametric)
+			{
+				currentTool.para.argNames.add(getAttribute("name",atts));
+				currentTool.para.argValues.add(getAttribute("values",atts));
+				
+				String weak ="0";
+				if(getBooleanAttribute(WEAKSCALING,false,atts)){
+					weak="1";
+				}
+				currentTool.para.argWeakBools.add(weak);
+			}
+			else{
 			if(currentArgs==null)
 				currentArgs=new ArrayList<ToolArgument>();
 			
@@ -272,7 +317,7 @@ public class ToolParser extends DefaultHandler{
 //				arg=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+arg;//Must be the same as IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION
 //			}
 			currentArgs.add(new ToolArgument(flag,val,sep,local));
-			
+			}
 		}
 		else if(name.equals(OPTIONPANE))
 		{
@@ -410,6 +455,9 @@ public class ToolParser extends DefaultHandler{
 			{
 				buildTool.f90Compiler=finishApp();
 			}
+		}
+		else if(name.equals(PARAMETRIC)){
+			inParametric=false;
 		}
 		else if(name.equals(ALLCOMP)&&inCompilation)
 		{

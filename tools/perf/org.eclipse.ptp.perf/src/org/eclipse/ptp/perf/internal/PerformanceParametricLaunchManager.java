@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.perf.parallel;
+package org.eclipse.ptp.perf.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,66 +37,49 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
-import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
-import org.eclipse.ptp.perf.internal.PerfBuilder;
-import org.eclipse.ptp.perf.internal.PerfLauncher;
-import org.eclipse.ptp.perf.internal.PerfPostlaunch;
-import org.eclipse.ptp.perf.internal.PerfStep;
-import org.eclipse.ptp.perf.internal.PerformanceLaunchManager;
 import org.eclipse.ptp.perf.toolopts.BuildTool;
 import org.eclipse.ptp.perf.toolopts.ExecTool;
 import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.ptp.perf.toolopts.PostProcTool;
 
-public class PerformanceParametricLaunchManager extends
-		PerformanceLaunchManager {
+public class PerformanceParametricLaunchManager{
 
-	private static final String tmp = "org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs";
+	private static final String NUMBER_MPI_PROCS = "org.eclipse.ptp.rm.mpi.openmpi.ui.launchAttributes.numProcs";//"org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs";
+	                                                
 
-	/**
-	 * Keeps track of the configurations created for each run so they can be
-	 * deleted in sequence
-	 */
-	final Queue<ILaunchConfiguration> configs = new LinkedList<ILaunchConfiguration>();
+	//LaunchFactory lf = null;
+	//LaunchConfigurationDelegate paraDel = null;
+	
+//	/**
+//	 * inherited constructor
+//	 * 
+//	 * @param delegate
+//	 * @param appNameAtt
+//	 * @param projNameAtt
+//	 * @see org.eclipse.ptp.perf.internal.PerformanceLaunchManager
+//	 */
+//	public PerformanceParametricLaunchManager(LaunchConfigurationDelegate delegate, LaunchFactory lf) {
+//		this.lf=lf;
+//		//this.paraDel=delegate;
+//		//super(delegate);
+//	}
 
-	/**
-	 * Keeps track of the performance analysis step jobs so they can be
-	 * scheduled in sequence
-	 */
-	final Queue<PerfStep> steps = new LinkedList<PerfStep>();
-
-	/**
-	 * inherited constructor
-	 * 
-	 * @param delegate
-	 * @param appNameAtt
-	 * @param projNameAtt
-	 * @see org.eclipse.ptp.perf.internal.PerformanceLaunchManager
-	 */
-	public PerformanceParametricLaunchManager(
-			LaunchConfigurationDelegate delegate, String appNameAtt,
-			String projNameAtt) {
-		super(delegate, appNameAtt, projNameAtt);
-	}
-
-	/**
-	 * inherited constructor
-	 * 
-	 * @param delegate
-	 * @param appNameAtt
-	 * @param projNameAtt
-	 * @param appPathAtt
-	 * @see org.eclipse.ptp.perf.internal.PerformanceLaunchManager
-	 */
-	public PerformanceParametricLaunchManager(
-			LaunchConfigurationDelegate delegate, String appNameAtt,
-			String projNameAtt, String appPathAtt) {
-		super(delegate, appNameAtt, projNameAtt, appPathAtt);
-	}
+//	/**
+//	 * inherited constructor
+//	 * 
+//	 * @param delegate
+//	 * @param appNameAtt
+//	 * @param projNameAtt
+//	 * @param appPathAtt
+//	 * @see org.eclipse.ptp.perf.internal.PerformanceLaunchManager
+//	 */
+//	public PerformanceParametricLaunchManager(
+//			LaunchConfigurationDelegate delegate, String appNameAtt,
+//			String projNameAtt, String appPathAtt) {
+//		super(delegate, appNameAtt, projNameAtt, appPathAtt);
+//	}
 
 	/**
 	 * One object, two strings
@@ -459,8 +442,13 @@ public class PerformanceParametricLaunchManager extends
 	 * @return
 	 */
 	static List<String> getComArgs(String combined) {
-		StringTokenizer st = new StringTokenizer(combined, ",");
 		List<String> numProcesses = new ArrayList<String>();
+		if(combined==null){
+			return numProcesses;
+		}
+		
+		StringTokenizer st = new StringTokenizer(combined, ",");
+		
 		while (st.hasMoreTokens()) {
 			numProcesses.add(st.nextToken());
 		}
@@ -528,34 +516,7 @@ public class PerformanceParametricLaunchManager extends
 	//private int curRuns=0;
 	//private int topRun=-1;
 	
-	/**
-	 * Manages job execution order
-	 */
-	JobChangeAdapter tauChange = new JobChangeAdapter() {
-		public void done(IJobChangeEvent event) {
-
-			// TODO: Add checks for successful compilation/execution
-//			if (event.getJob() instanceof PerfPostlaunch)
-//			{
-//				curRuns++;//TODO: This is not the right place to increment this!
-//			}
-			//System.out.println("FR: "+firstRuns+" CR: "+curRuns);
-			if (event.getJob() instanceof PerfPostlaunch){// && curRuns>=topRun) {
-				try {
-					configs.poll().delete();
-				} catch (CoreException e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (!steps.isEmpty()) {
-				System.out.println("About to run job " + steps.size() + " "
-						+ steps.element().getName());
-				steps.poll().schedule();
-				System.out.println("Done.  Jobs left: " + steps.size());
-			}
-		}
-	};
+	
 
 	
 	/**
@@ -563,43 +524,142 @@ public class PerformanceParametricLaunchManager extends
 	 * operations in this function are divided into three jobs: Building,
 	 * Running and Data collection
 	 */
-	public void launch(ILaunchConfiguration configuration, String mode,
+	public static void launch(ILaunchConfiguration configuration, LaunchConfigurationDelegate paraDel, ILaunchFactory lf, String mode,
 			ILaunch launchIn, IProgressMonitor monitor) throws CoreException // ,
 																				// TAULaunch
 																				// bLTool
 	{
+		
+		/**
+		 * Keeps track of the configurations created for each run so they can be
+		 * deleted in sequence
+		 */
+		final Queue<ILaunchConfiguration> configs = new LinkedList<ILaunchConfiguration>();
 
+		/**
+		 * Keeps track of the performance analysis step jobs so they can be
+		 * scheduled in sequence
+		 */
+		final Queue<PerfStep> steps = new LinkedList<PerfStep>();
+		
+		/**
+		 * Manages job execution order
+		 */
+		JobChangeAdapter tauChange = new JobChangeAdapter() {
+			public void done(IJobChangeEvent event) {
+
+				// TODO: Add checks for successful compilation/execution
+//				if (event.getJob() instanceof PerfPostlaunch)
+//				{
+//					curRuns++;//TODO: This is not the right place to increment this!
+//				}
+				//System.out.println("FR: "+firstRuns+" CR: "+curRuns);
+				if (event.getJob() instanceof PerfPostlaunch){// && curRuns>=topRun) {
+					try {
+						configs.poll().delete();
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
+				}
+
+				if (!steps.isEmpty()) {
+					System.out.println("About to run job " + steps.size() + " "
+							+ steps.element().getName());
+					steps.poll().schedule();
+					System.out.println("Done.  Jobs left: " + steps.size());
+				}
+			}
+		};
+		
+		
+		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
+		//paraDel=lcd;
+		//this.lf=lf;
 		// here is where the loop(s) for the parametric study should go - for
 		// runtime parameters, like #procs
-		String processorOptionString = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_NUM_PROCESSORS,
-				"1");// "1,2";//,4,8";
-		// TODO: validate this string first?
-		List<String> argNames = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_ARG_NAMES,(List) null);
-		List<String> argVars = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_ARG_VALUES,
-				(List) null);
+		String processorOptionString=null;
+		List<String> argVars = null;
+		List<String> argNames = null;
+		List<String> argBools = null;
+		List<String> varNames = null;
+		List<String> varVars = null;
+		List<String> varBools = null;
+		String optLevStr = null;
+		boolean allCom = false;
+		boolean parallel=lf!=null&&lf.getType().equals(ILaunchFactory.PARALLEL);
 		
-		List<String> argBools = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_ARG_BOOLS,
-				(List) null);
+		if(pproc.para!=null&&pproc.para.runParametric){
+			processorOptionString=pproc.para.mpiProcs;
+			argNames=pproc.para.argNames;
+			argVars = pproc.para.argValues;
+			argBools = pproc.para.argWeakBools;
+			
+			varNames = pproc.para.varNames;
+			varVars = pproc.para.varValues;
+			varBools = pproc.para.varWeakBools;
+			
+			optLevStr = pproc.para.compileropt;
+			allCom = !pproc.para.weakScaling;
+		}
+		else
+		{
+			processorOptionString = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_NUM_PROCESSORS,"1");// "1,2";//,4,8";
+			// TODO: validate this string first?
+			argNames = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_ARG_NAMES,(List) null);
+			argVars = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_ARG_VALUES,	(List) null);
+			argBools = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_ARG_BOOLS,	(List) null);
 		
-		List<String> varNames = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_VAR_NAMES,
-				(List) null);
-		List<String> varVars = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_VAR_VALUES,
-				(List) null);
-		List<String> varBools = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_VAR_BOOLS,
-				(List) null);
+			varNames = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_VAR_NAMES,	(List) null);
+			varVars = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_VAR_VALUES,	(List) null);
+			varBools = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_VAR_BOOLS,	(List) null);
+			optLevStr = configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_OPT_LEVELS,"");
+			allCom=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_ALL_COMBO, false);
+		}
 		
 		String timestamp=BuildLaunchUtils.getNow();
 		
-		boolean allCom=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_ALL_COMBO, false);
-
 		List<RunParams> params = null;
-		
+		if(!parallel)
+		{
+			if(allCom){
+				processorOptionString="1";
+			}
+			else{
+			int min = -1;
+			
+			if(argVars!=null){
+			for(int i=0;i<argVars.size();i++){
+				int count=getComArgs(argVars.get(i)).size();
+				if(min==-1||min>count)
+					min=count;
+			}
+			}
+			if(varVars!=null){
+				for(int i=0;i<varVars.size();i++){
+					int count=getComArgs(varVars.get(i)).size();
+					if(min==-1||min>count)
+						min=count;
+				}
+			}
+			
+			if(min==-1)
+			{
+				min=0;
+			}
+			
+			String agg="";
+			for(int i =0;i<min;i++){
+				agg+="1";
+				if(i<min-1){
+					agg+=",";
+				}
+			}
+			if(agg.length()==0){
+				agg="1";
+			}
+			processorOptionString=agg;
+			}
+		}
 		if(!allCom){
 			params=getWeakParams(processorOptionString,
 					argNames, argVars, varNames, varVars);
@@ -622,10 +682,7 @@ public class PerformanceParametricLaunchManager extends
 		}
 
 		
-		String optLevStr = configuration.getAttribute(
-				IPerformanceLaunchConfigurationConstants.PARA_OPT_LEVELS,
-				"");
-		
+
 		List<String> optLevs=getComArgs(optLevStr);
 		
 		List<Map<String,String>> buildopts = new ArrayList<Map<String,String>>();
@@ -659,13 +716,13 @@ public class PerformanceParametricLaunchManager extends
 //			firstRuns=buildopts.size()-1*params.size();
 //		}
 		
-		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
+		
 		/*
 		 * TODO: Make this robust!  (Allow for or explicitly prohibit advanced tool combinations)
 		 */
-		BuildTool b = pproc.getFirstBuilder();//.perfTools.get(0);
-		ExecTool e = pproc.getFirstRunner();
-		PostProcTool p = pproc.getFirstAnalyzer();
+		BuildTool bTool = pproc.getFirstBuilder(configuration);//.perfTools.get(0);
+		ExecTool eTool = pproc.getFirstRunner(configuration);
+		PostProcTool pTool = pproc.getFirstAnalyzer(configuration);
 		
 		int numruns=0;
 		// here is where the outer loop for the parametric study should go - for
@@ -673,7 +730,7 @@ public class PerformanceParametricLaunchManager extends
 		for (int bDex=0;bDex<buildopts.size();bDex++) {
 
 			Map<String,String> optM =buildopts.get(bDex);
-			final PerfBuilder builder = new PerfBuilder(configuration,b,projNameAttribute, appPathAttribute,optM);
+			PerfBuilder builder = new PerfBuilder(configuration,bTool,optM);
 
 //			if(optM!=null)
 //				builder.setBuildMods(optM);
@@ -704,46 +761,47 @@ public class PerformanceParametricLaunchManager extends
 				
 				RunParams param =params.get(lDex);
 				
-				int numProcs = param.numProcs;
-
-				System.out.println("doing " + numProcs + " processors...");
+				
 
 				// get a working copy
-				ILaunchConfigurationWorkingCopy wc = configuration
-						.copy(configuration.getName() + " ParameterSet_" + numruns);
+				ILaunchConfigurationWorkingCopy wc = configuration.copy(configuration.getName() + " ParameterSet_" + numruns);
 				// TODO: need this constant!
-				wc.setAttribute(tmp, numProcs);
-				
-				wc.setAttribute(IPerformanceLaunchConfigurationConstants.PERF_XML_METADATA, getTauMetadata(optM,param));
-				
-				wc.setAttribute(IPerformanceLaunchConfigurationConstants.PERF_EXPERIMENT_APPEND, timestamp);
+				if(parallel){
+					int numProcs = param.numProcs;
 
+					//System.out.println("doing " + numProcs + " processors...");
+					wc.setAttribute(NUMBER_MPI_PROCS, numProcs);
+				}
+
+				String argConfigTag=wc.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_ATTR_ARGUMENTS_TAG,"");
+				
 				/* Set up application arguments for this run */
 				if (param.args != null) {
-					String arg = wc
-							.getAttribute(
-									IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS,
-									"");// ICDTLaunchConfigurationConstants.
-										// ATTR_PROGRAM_ARGUMENTS
+					String arg = wc.getAttribute(argConfigTag,"");// ICDTLaunchConfigurationConstants.// ATTR_PROGRAM_ARGUMENTS
 					arg += " " + param.args;
-					wc.setAttribute(
-							IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS,
-							arg);
+					wc.setAttribute(argConfigTag,arg);
 				}
 
 				/* Set up environment variables for this run */
 				if (param.vars != null) {
 					Map<String, Object> envvars = null;
-					envvars = wc.getAttribute(
-							ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
-							(Map) null);
+					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,(Map) null);
 					if (envvars == null) {
 						envvars = new HashMap<String, Object>();
 					}
 					envvars.putAll(param.vars);
-					wc.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
-							envvars);
+					wc.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,envvars);
 				}
+				
+				
+				
+				/*
+				 * TAU Specific settings.  These will only be used by the TAU analysis phase.
+				 * TODO: Move tool specific settings out of the core plugin
+				 * */
+				wc.setAttribute(IPerformanceLaunchConfigurationConstants.PERF_XML_METADATA, getTauMetadata(optM,param));
+				
+				wc.setAttribute(IPerformanceLaunchConfigurationConstants.PERF_EXPERIMENT_APPEND, timestamp);
 				
 				/*The final analysis run should also launch perfexplorer*/
 				wc.setAttribute(IPerformanceLaunchConfigurationConstants.PERF_LAUNCH_PERFEX, false);
@@ -751,32 +809,38 @@ public class PerformanceParametricLaunchManager extends
 					wc.setAttribute(IPerformanceLaunchConfigurationConstants.PERF_LAUNCH_PERFEX, true);
 				}
 
-				final ILaunchConfiguration tmpConfig = wc.doSave();
+				ILaunchConfiguration tmpConfig = wc.doSave();
 				configs.add(tmpConfig);
 
 				/**
 				 * Execute the program specified in the build step
 				 */
-				final ILaunch launch = new PLaunch(tmpConfig, launchIn
-						.getLaunchMode(), launchIn.getSourceLocator());// launchIn
+				
+				ILaunch launch=launchIn;
+				if(lf!=null)
+				{
+					launch = lf.makeLaunch(tmpConfig, launchIn.getLaunchMode(), launchIn.getSourceLocator());// launchIn
+				}
+				
 																		// ;
 
-				final PerfLauncher launcher = new PerfLauncher(tmpConfig,e,
-						appNameAttribute, projNameAttribute, appPathAttribute,
-						builder.getProgramPath(), paraDel, launch);
+				final PerfLauncher launcher = new PerfLauncher(tmpConfig,eTool,	builder.getProgramPath(), paraDel, launch);
 				steps.add(launcher);
-
+				launcher.addJobChangeListener(tauChange);
+				
 				/**
 				 * Collect performance data from the execution handled in the
 				 * run step
 				 */
 
-				PerfPostlaunch analyzer = new PerfPostlaunch(tmpConfig,p,
-						projNameAttribute, builder.getOutputLocation());
-				steps.add(analyzer);
+				//if(pTool!=null){
+					PerfPostlaunch analyzer = new PerfPostlaunch(tmpConfig,pTool,builder.getOutputLocation());
+					steps.add(analyzer);
+					analyzer.addJobChangeListener(tauChange);
+				//}
 
-				launcher.addJobChangeListener(tauChange);
-				analyzer.addJobChangeListener(tauChange);
+				
+				
 				
 				numruns++;
 			} // end of inner loop for runtime parameters

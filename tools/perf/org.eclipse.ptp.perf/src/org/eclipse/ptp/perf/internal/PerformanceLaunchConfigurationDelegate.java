@@ -49,9 +49,15 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 		String projName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME,"defaultValue");
 		wc.setAttribute(PERF_EXECUTABLE_NAME, progName);
 		wc.setAttribute(PERF_PROJECT_NAME, projName);
+		wc.setAttribute(PERF_ATTR_ARGUMENTS_TAG, ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS);
+		wc.setAttribute(PERF_PROJECT_NAME_TAG, ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
+		wc.setAttribute(PERF_EXECUTABLE_NAME_TAG, ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME);
+		wc.setAttribute(PERF_EXECUTABLE_PATH_TAG, (String)null);
 		wc.doSave();
 		
-		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new LocalRunLaunchDelegate(),ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
+		ILaunchFactory lf = null;//TODO: Make a real non-parallel launch factory class.
+		
+		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new LocalRunLaunchDelegate(),lf);//,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 		plaunch.launch(configuration, mode, launchIn, monitor);//,tool
 		
 	}

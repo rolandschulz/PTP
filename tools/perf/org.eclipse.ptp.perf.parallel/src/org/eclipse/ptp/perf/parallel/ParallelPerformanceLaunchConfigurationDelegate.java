@@ -19,6 +19,7 @@ package org.eclipse.ptp.perf.parallel;
 
 import java.io.File;
 
+//import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -27,6 +28,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.internal.ParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
+import org.eclipse.ptp.perf.internal.ILaunchFactory;
 import org.eclipse.ptp.perf.internal.PerformanceLaunchManager;
 
 /**
@@ -47,17 +49,16 @@ public class ParallelPerformanceLaunchConfigurationDelegate extends ParallelLaun
 		String projName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,"defaultValue");
 		wc.setAttribute(PERF_EXECUTABLE_NAME, progPath+File.separator+progName);
 		wc.setAttribute(PERF_PROJECT_NAME, projName);
+		wc.setAttribute(PERF_ATTR_ARGUMENTS_TAG, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS);
+		wc.setAttribute(PERF_PROJECT_NAME_TAG, IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME);
+		wc.setAttribute(PERF_EXECUTABLE_NAME_TAG, IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME);
+		wc.setAttribute(PERF_EXECUTABLE_PATH_TAG, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
 		wc.doSave();
 		
-		boolean useParam=configuration.getAttribute(PARA_USE_PARAMETRIC, false);
-		if(useParam)
+		ILaunchFactory lf = new ParallelLaunchFactory();
+		
 		{
-			PerformanceParametricLaunchManager plaunch=new PerformanceParametricLaunchManager(new ParallelLaunchConfigurationDelegate(),IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
-			plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
-		}
-		else
-		{
-			PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new ParallelLaunchConfigurationDelegate(),IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
+			PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new ParallelLaunchConfigurationDelegate(), lf);//,IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
 			plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
 		}
 	}

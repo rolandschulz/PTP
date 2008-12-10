@@ -97,6 +97,10 @@ public interface IPerformanceLaunchConfigurationConstants {
 	 */
 	public static final String PERF_EXECUTABLE_NAME= "perf_executable_name";
 	public static final String PERF_PROJECT_NAME= "perf_project_name";
+	public static final String PERF_ATTR_ARGUMENTS_TAG="perf_framework_attribute_for_arguments_value";
+	public static final String PERF_EXECUTABLE_NAME_TAG= "perf_executable_name_tag_for_name_value";
+	public static final String PERF_PROJECT_NAME_TAG= "perf_project_name_tag_for_name_value";
+	public static final String PERF_EXECUTABLE_PATH_TAG= "perf_executable_path_tag_for_path_value";
 	
 	//The following are for parametric test values
 	

@@ -2,7 +2,7 @@ package org.eclipse.ptp.perf.internal;
 
 import java.io.File;
 
-import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
+//import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -57,25 +57,36 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	private String appnameattrib=null;
 	/** Executable (application) path attribute name */
 	private String apppathattrib=null;
+	private String appargattrib=null;
 	
 	private ILaunch launch=null;
 	private LaunchConfigurationDelegate paraDel=null;
 	private ExecTool tool=null;
 	
 	
-	public PerfLauncher(ILaunchConfiguration conf, ExecTool etool, String ana,String projnameatt,String apa,String progPath,LaunchConfigurationDelegate pd,ILaunch launcher) throws CoreException{
-		super(conf,"Running Application",projnameatt);
+	public PerfLauncher(ILaunchConfiguration conf, ExecTool etool, String progPath,LaunchConfigurationDelegate pd,ILaunch launcher) throws CoreException{
+		super(conf,"Running Application");
 		launch=launcher;
 		tool=etool;
 		paraDel=pd;
-		appnameattrib=ana;
-		apppathattrib=apa;
+		//String ana,String projnameatt,String apa,
+		appnameattrib=conf.getAttribute(PERF_EXECUTABLE_NAME_TAG, (String)null);
+		apppathattrib=conf.getAttribute(PERF_EXECUTABLE_PATH_TAG, (String)null);
+		appargattrib=conf.getAttribute(PERF_ATTR_ARGUMENTS_TAG, (String)null);
 		this.progPath=progPath;
 		
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		
+//		try {
+//			System.out.println("The job that is actually running thinks it has mpi procs of: "+this.configuration.getAttribute("org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs", -1));
+//		} catch (CoreException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+		
 		try {
 			//System.out.println("In tauManger "+tauManager.getConfiguration().getAttribute(tmp, -1)+" vs launch "+tmpConfig.getAttribute(tmp, -1));
 		if(!performLaunch(paraDel, launch, monitor))
@@ -125,7 +136,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 		{
 			String prog = confWC.getAttribute(appnameattrib, EMPTY_STRING);
 			//TODO: This needs to work for PTP too eventually
-			String arg = confWC.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, EMPTY_STRING);
+			String arg = confWC.getAttribute(appargattrib, EMPTY_STRING);
 			saveApp=prog;
 			saveArgs=arg;
 			
@@ -153,7 +164,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 				}
 				swappedArgs=true;
 				if(traceOn)System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+otherUtils+" "+prog+" "+arg);
-				confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, otherUtils+" "+prog+" "+arg);
+				confWC.setAttribute(appargattrib, otherUtils+" "+prog+" "+arg);
 			}
 		}
 		configuration = confWC.doSave();
@@ -216,8 +227,8 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 		
 		if(tool!=null&&swappedArgs)//tool.prependExecution&&
 		{
-			confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, saveApp);
-			confWC.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, saveArgs);
+			confWC.setAttribute(appnameattrib, saveApp);
+			confWC.setAttribute(appargattrib, saveArgs);
 		}
 		
 		confWC.setAttribute(appnameattrib, application);

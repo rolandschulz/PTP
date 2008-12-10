@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
+
 
 /**
  * Encapsulates all relevant attributes of a performance toolchain
@@ -31,6 +33,21 @@ import java.util.Map;
  *
  */
 public class PerformanceProcess {
+	
+	public static class Parametric{
+		public boolean runParametric=false;
+		public boolean weakScaling=false;
+		public String mpiProcs="1";
+		public List<String> argWeakBools=new ArrayList<String>();
+		public List<String> argNames=new ArrayList<String>();
+		public List<String> argValues=new ArrayList<String>();
+		
+		public List<String> varWeakBools=new ArrayList<String>();
+		public List<String> varNames=new ArrayList<String>();
+		public List<String> varValues=new ArrayList<String>();
+		public String compileropt;
+	}
+	
 	public String toolID=null;
 	public String toolName=null;
 	
@@ -54,33 +71,45 @@ public class PerformanceProcess {
 	 */
 	public List<PerformanceTool> perfTools=null; 
 	
+	
+	
+	/**
+	 * Parametric elements
+	 */
+	public Parametric para=null;
+	/**
+	 * End parametric
+	 */
 	public PerformanceProcess()
 	{
 		perfTools=new ArrayList<PerformanceTool>();
 		groupApp=new HashMap<String, String>();
 	}
 	
-	public BuildTool getFirstBuilder(){
+	public BuildTool getFirstBuilder(ILaunchConfiguration configuration){
 		for(int i=0;i<perfTools.size();i++){
-			if(perfTools.get(i) instanceof BuildTool){
+			PerformanceTool pt = perfTools.get(i);
+			if(pt instanceof BuildTool&&(configuration==null||pt.canRun(configuration))){
 				return (BuildTool) perfTools.get(i);
 			}
 		}
 		return null;
 	}
 	
-	public ExecTool getFirstRunner(){
+	public ExecTool getFirstRunner(ILaunchConfiguration configuration){
 		for(int i=0;i<perfTools.size();i++){
-			if(perfTools.get(i) instanceof ExecTool){
+			PerformanceTool pt = perfTools.get(i);
+			if(pt instanceof ExecTool &&(configuration==null||pt.canRun(configuration))){
 				return (ExecTool) perfTools.get(i);
 			}
 		}
 		return null;
 	}
 	
-	public PostProcTool getFirstAnalyzer(){
+	public PostProcTool getFirstAnalyzer(ILaunchConfiguration configuration){
 		for(int i=0;i<perfTools.size();i++){
-			if(perfTools.get(i) instanceof PostProcTool){
+			PerformanceTool pt = perfTools.get(i);
+			if(pt instanceof PostProcTool &&(configuration==null||pt.canRun(configuration))){
 				return (PostProcTool) perfTools.get(i);
 			}
 		}

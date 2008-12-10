@@ -1,4 +1,21 @@
-package org.eclipse.ptp.perf.parallel;
+/****************************************************************************
+ *			Tuning and Analysis Utilities
+ *			http://www.cs.uoregon.edu/research/paracomp/tau
+ ****************************************************************************
+ * Copyright (c) 1997-2006
+ *    Department of Computer and Information Science, University of Oregon
+ *    Advanced Computing Laboratory, Los Alamos National Laboratory
+ *    Research Center Juelich, ZAM Germany	
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Wyatt Spear - initial API and implementation
+ ****************************************************************************/
+package org.eclipse.ptp.perf.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +63,16 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 	private Text trial;
 	private Text script;
 	private Button scriptBrowse;
+	
+	private boolean parallel=false;
+	
+	private ParametricParameterTab(){
+		
+	}
+	
+	public ParametricParameterTab(boolean parallel){
+		this.parallel=parallel;
+	}
 	
 	/**
 	 * Listen for activity in the options widgets
@@ -111,25 +138,29 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		lab.setLayoutData(fill3);
 		
 		
-		lab = new Label(parent,SWT.NONE);
-		lab.setText("MPI Processes");
+		String allComText="Checked: one run for every combination of values.  Unchecked: Each parameter must have the same number of values, runs will be executed with the first option, second, and so forth.";
 		
-		processors=new Text(parent,SWT.BORDER);
-		processors.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		processors.addModifyListener(wl);
+		if(parallel){
+			lab = new Label(parent,SWT.NONE);
+			lab.setText("MPI Processes");
 		
-		lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		lab.setLayoutData(fill3);
+			processors=new Text(parent,SWT.BORDER);
+			processors.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			processors.addModifyListener(wl);
 		
+			lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+			lab.setLayoutData(fill3);
 		
+			allComText="Check to perform one run for every combination of values: compiler * mpi-processes * arguments * environment-variables.  Unchecked means one parameteric option per processor count (weak scaling)";
+		}
 		
 		//cmpTab=makeArgTable(parent,"Flags","Variables");//TODO: Make a compiler table
 		allCom=new Button(parent,SWT.CHECK);
 		allCom.setText("Run jobs for all combinations");
-		allCom.setToolTipText("Perform one run for every combination of values: compiler * mpi-processes * arguments * environment-variables");
+		allCom.setToolTipText(allComText);
 		allCom.addSelectionListener(wl);
 		//simWeak.setLayoutData(fill3);
-		
+	
 		lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		lab.setLayoutData(fill3);
 		
@@ -317,13 +348,17 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		
 		
 		try {
-			processors.setText(configuration.getAttribute(PARA_NUM_PROCESSORS, "1"));
+			if(parallel){
+				processors.setText(configuration.getAttribute(PARA_NUM_PROCESSORS, "1"));
+				
+			}
+			allCom.setSelection(configuration.getAttribute(PARA_ALL_COMBO, false));
 			optLevels.setText(configuration.getAttribute(PARA_OPT_LEVELS, ""));
 			setTableList(argTab,configuration.getAttribute(PARA_ARG_NAMES, (List<String>)null),configuration.getAttribute(PARA_ARG_VALUES, (List<String>)null),configuration.getAttribute(PARA_ARG_BOOLS, (List<String>)null));
 			setTableList(varTab,configuration.getAttribute(PARA_VAR_NAMES, (List<String>)null),configuration.getAttribute(PARA_VAR_VALUES, (List<String>)null),configuration.getAttribute(PARA_VAR_BOOLS, (List<String>)null));
 			
 			useParam.setSelection(configuration.getAttribute(PARA_USE_PARAMETRIC, false));			
-			allCom.setSelection(configuration.getAttribute(PARA_ALL_COMBO, false));
+			
 			
 			script.setText(configuration.getAttribute(PARA_PERF_SCRIPT, ""));
 		
@@ -378,7 +413,16 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 	}
 	
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(PARA_NUM_PROCESSORS, processors.getText());
+		
+		if(parallel){
+			configuration.setAttribute(PARA_NUM_PROCESSORS, processors.getText());
+			
+		}
+		configuration.setAttribute(PARA_ALL_COMBO, allCom.getSelection());
+//		else
+//		{
+//			configuration.setAttribute(PARA_NUM_PROCESSORS, "not_parallel");
+//		}
 		configuration.setAttribute(PARA_OPT_LEVELS, optLevels.getText());
 		configuration.setAttribute(PARA_ARG_NAMES, getTableList(argTab,0));
 		configuration.setAttribute(PARA_ARG_VALUES, getTableList(argTab,1));
@@ -392,7 +436,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		configuration.setAttribute(PARA_USE_PARAMETRIC, useParam.getSelection());
 		
 		
-		configuration.setAttribute(PARA_ALL_COMBO, allCom.getSelection());
+		
 		
 		configuration.setAttribute(PARA_PERF_SCRIPT, script.getText());
 	}
@@ -403,28 +447,56 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 	private static final String weakError="Checked parameters must have at most 1 flag/name and exactly as many variables a there are processor counts";
 	
+	private static final String noParError="Checked parameters must have at most 1 flag/name and the same number of variables";
+	
 	public boolean isValid(ILaunchConfiguration config){
 		
 		setErrorMessage(null);
 		setMessage(null);
 		
 		super.isValid(config);
-		
-		
+
+		boolean ok=true;
 		boolean all=allCom.getSelection();
-		
-		
-		int numProcArgs=getComArgs(processors.getText()).size();
-		
-		boolean ok = checkTableCounts(argTab,numProcArgs,!all);
-		ok &= checkTableCounts(varTab,numProcArgs,!all);
-		
-		if(!ok)
-		{
-			setErrorMessage(weakError);
+		if(parallel){
+			int numProcArgs=getComArgs(processors.getText()).size();
+
+			ok = checkTableCounts(argTab,numProcArgs,!all);
+			ok &= checkTableCounts(varTab,numProcArgs,!all);
+
+			if(!ok)
+			{
+				setErrorMessage(weakError);
+			}
+		}
+		else{
+			ok=checkNoParTableCounts(argTab,!all);
+			ok &= checkNoParTableCounts(varTab,!all);
+			if(!ok){
+				setErrorMessage(noParError);
+			}
 		}
 		
 		return ok;
+	}
+	
+	private static boolean checkNoParTableCounts(Table t, boolean all){
+		TableItem[] tis=t.getItems();
+		int n = -1;
+		for(TableItem ti:tis){
+			if(ti.getChecked()||all)
+			{	
+				if(n==-1)
+				{
+					n=getComArgs(ti.getText(1)).size();
+				}
+				if(getComArgs(ti.getText(0)).size()>1  ||  getComArgs(ti.getText(1)).size()!=n){
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	private static boolean checkTableCounts(Table t, int n,boolean all){
@@ -484,8 +556,31 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		StringTokenizer st = new StringTokenizer(combined, ",");
 		List<String> numProcesses = new ArrayList<String>();
 		while (st.hasMoreTokens()) {
-			numProcesses.add(st.nextToken());
+			numProcesses.add(st.nextToken().trim());
 		}
+		return numProcesses;
+	}
+	
+	/**
+	 * Given two numeric values seperated by a bar, returns a list of all numeric values in the range.
+	 * @param combined
+	 * @return
+	 */
+	static List<String> getRangeArgs(String combined){
+		List<String> numProcesses = new ArrayList<String>();
+		
+		StringTokenizer st = new StringTokenizer(combined, "-");
+		
+		if(st.countTokens()==2){
+			String from=st.nextToken().trim();
+			String to = st.nextToken().trim();
+			int fromi=Integer.parseInt(from);
+			int toi=Integer.parseInt(to);
+			for(int i=fromi;i<=toi;i++){
+				numProcesses.add(i+"");
+			}
+		}
+		
 		return numProcesses;
 	}
 

@@ -50,7 +50,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	
 
 	/** Executable (application) path attribute name */
-	private String apppathattrib=null;
+	//private String apppathattrib=null;
 	private IManagedProject managedBuildProj=null;
 	private IConfiguration newBuildConfig=null;
 	private String buildConf = null;
@@ -65,22 +65,22 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	private String binary=null;
 	private BuildTool tool=null;
 	
-	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool, String projnameattrib, String apa, Map<String,String> buildMods) throws CoreException{
-		super(conf,"Instrumenting/Building",projnameattrib);
+	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool,Map<String,String> buildMods) throws CoreException{
+		super(conf,"Instrumenting/Building");
 		this.buildMods=buildMods;
 		tool=btool;
-		initBuild(conf,projnameattrib,apa);
+		initBuild(conf);
 	}
 	
 	
-	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool, String projnameattrib, String apa) throws CoreException{
-		super(conf,"Instrumenting/Building",projnameattrib);
+	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool) throws CoreException{
+		super(conf,"Instrumenting/Building");
 		tool=btool;
-		initBuild(conf,projnameattrib,apa);
+		initBuild(conf);
 	}
 	
-	private void initBuild(ILaunchConfiguration conf, String projnameattrib, String apa)throws CoreException{
-		apppathattrib=apa;
+	private void initBuild(ILaunchConfiguration conf)throws CoreException{
+		//apppathattrib=apa;
 		outputLocation=projectLocation;
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
 		if(tool==null)return;
@@ -271,7 +271,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		//System.out.println(progPath);
 		
 		//TODO: We have to do this because PTP puts its output in the build directory
-		if(apppathattrib!=null)
+		if(configuration.getAttribute(PERF_EXECUTABLE_PATH_TAG, (String)null)!=null)
 		{
 			outputLocation=thisProject.getFile(newname).getLocation().toOSString();
 		}

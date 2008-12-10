@@ -31,6 +31,7 @@ import org.eclipse.ptp.launch.ui.DebuggerTab;
 import org.eclipse.ptp.launch.ui.ResourcesTab;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.ui.AbstractPerformanceConfigurationTab;
+import org.eclipse.ptp.perf.ui.ParametricParameterTab;
 import org.eclipse.ptp.perf.ui.PerformanceAnalysisTab;
 
 /**
@@ -46,15 +47,15 @@ public class ParallelPerformanceLaunchConfigurationTabGroup extends AbstractLaun
 		
 		ArrayList<AbstractPerformanceConfigurationTab> perfTabs=Activator.getPerfTabs();
 		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[numStatTabs+perfTabs.size()];
-		tabs[1]=new ResourcesTab();
 		tabs[0]=new ParallelPerfRecompMainTab();
+		tabs[1]=new ResourcesTab();
 		tabs[2]=new DebuggerTab(false);
 		tabs[3]=new ArgumentsTab();
 		tabs[4]=new SourceLookupTab();
 		tabs[5]=new EnvironmentTab();
 		tabs[6]=new CommonTab();
 		tabs[7]=new PerformanceAnalysisTab(true);
-		tabs[8]=new ParametricParameterTab();
+		tabs[8]=new ParametricParameterTab(true);
 		
 		Iterator<AbstractPerformanceConfigurationTab> perfIt=perfTabs.iterator();
 		int tabDex=numStatTabs;

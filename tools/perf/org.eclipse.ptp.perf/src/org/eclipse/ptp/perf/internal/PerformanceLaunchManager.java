@@ -36,23 +36,26 @@ public class PerformanceLaunchManager {
 	protected static final String launchText="Executing Instrumented Project";
 	protected static final String collectText="Collecting Performance Data";
 	
-	protected String appNameAttribute;
-	protected String projNameAttribute;
-	protected String appPathAttribute=null;
+	//protected String appNameAttribute;
+	//protected String projNameAttribute;
+	//protected String appPathAttribute=null;
 	protected LaunchConfigurationDelegate paraDel;
 	
-	public PerformanceLaunchManager(LaunchConfigurationDelegate delegate, String appNameAtt,String projNameAtt){
+	private ILaunchFactory lf = null;
+	
+	public PerformanceLaunchManager(LaunchConfigurationDelegate delegate, ILaunchFactory lf){//, String appNameAtt,String projNameAtt){
 		paraDel=delegate;
-		appNameAttribute=appNameAtt;
-		projNameAttribute=projNameAtt;
+		this.lf=lf;
+		//appNameAttribute=appNameAtt;
+		//projNameAttribute=projNameAtt;
 	}
 	
-	public PerformanceLaunchManager(LaunchConfigurationDelegate delegate, String appNameAtt,String projNameAtt, String appPathAtt){
-		paraDel=delegate;
-		appNameAttribute=appNameAtt;
-		appPathAttribute=appPathAtt;
-		projNameAttribute=projNameAtt;
-	}
+//	public PerformanceLaunchManager(LaunchConfigurationDelegate delegate, String appNameAtt,String projNameAtt, String appPathAtt){
+//		paraDel=delegate;
+//		//appNameAttribute=appNameAtt;
+//		//appPathAttribute=appPathAtt;
+//		//projNameAttribute=projNameAtt;
+//	}
 	
 	private static boolean runStep(PerfStep step){
 		step.schedule();
@@ -65,15 +68,7 @@ public class PerformanceLaunchManager {
 		return step.getResult().isOK();
 	}
 	
-	private static boolean canRun(ILaunchConfiguration configuration, String toolReq) throws CoreException{
-		
-		if(toolReq==null){
-			return true;
-		}
-		
-		return configuration.getAttribute(toolReq, false);
 	
-	}
 	
 	/**
 	 * The primary launch command of this launch configuration delegate.  The operations in this function are divided into
@@ -84,7 +79,22 @@ public class PerformanceLaunchManager {
 	{
 		final ILaunch launch = launchIn;
 		
+		
+		//System.out.println("The Class Is: "+launch.getClass().getName());
+		
 		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
+		
+		
+		boolean useParam=configuration.getAttribute(org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants.PARA_USE_PARAMETRIC, false)||(pproc.para!=null&&pproc.para.runParametric);
+		if(useParam)
+		{
+			//PerformanceParametricLaunchManager pmetlaunch=new PerformanceParametricLaunchManager();
+			PerformanceParametricLaunchManager.launch(configuration,paraDel,lf,mode, launchIn, monitor);// tool, 
+			return;
+		}
+		//else
+		
+		
 		String bProgPath=null;
 		String bOutLoc=null;
 		//boolean built=false;
@@ -96,21 +106,21 @@ public class PerformanceLaunchManager {
 		boolean analyzeOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.ANALYZEONLY, false);
 		
 		if(buildOnly){
-			builder = new PerfBuilder(configuration, pproc.getFirstBuilder(), projNameAttribute,appPathAttribute);
+			builder = new PerfBuilder(configuration, pproc.getFirstBuilder(configuration));
 			runStep(builder);
 			return;
 		}
 		
 		if(analyzeOnly){
 			//String lookdir="somedir";
-			PerfPostlaunch analyzer=new PerfPostlaunch(configuration,pproc.getFirstAnalyzer(),projNameAttribute,null);
+			PerfPostlaunch analyzer=new PerfPostlaunch(configuration,pproc.getFirstAnalyzer(configuration),null);
 			runStep(analyzer);
 			return;
 		}
 		
 		
 		if(!pproc.recompile){
-			builder = new PerfBuilder(configuration, null, projNameAttribute,appPathAttribute);
+			builder = new PerfBuilder(configuration, null);
 			if(!runStep(builder)){
 				return;
 			}
@@ -118,8 +128,7 @@ public class PerformanceLaunchManager {
 			bOutLoc=builder.getOutputLocation();
 			//built=true;
 			if(!pproc.prependExecution&&!(pproc.perfTools.get(0) instanceof ExecTool)){
-				launcher = new PerfLauncher(configuration,null,appNameAttribute ,projNameAttribute, appPathAttribute,
-						bProgPath,paraDel,launch);
+				launcher = new PerfLauncher(configuration,null,	bProgPath,paraDel,launch);
 				
 				if(!runStep(launcher)){
 					return;
@@ -132,7 +141,7 @@ public class PerformanceLaunchManager {
 		for(int i=0;i<pproc.perfTools.size();i++){//PerformanceTool t : pproc.perfTools){
 			PerformanceTool t = pproc.perfTools.get(i);
 			
-			if(!canRun(configuration,t.requireTrue))
+			if(!t.canRun(configuration))//!canRun(configuration,t.requireTrue))
 			{
 				continue;
 			}
@@ -143,7 +152,7 @@ public class PerformanceLaunchManager {
 				 * Uses the specified tool's build settings on the build manager for this project, 
 				 * producing a new build configuration and instrumented binary file
 				 */
-				builder = new PerfBuilder(configuration, (BuildTool)t, projNameAttribute,appPathAttribute);
+				builder = new PerfBuilder(configuration, (BuildTool)t);
 				if(!runStep(builder)){
 					return;
 				}
@@ -152,8 +161,7 @@ public class PerformanceLaunchManager {
 				//built=true;
 				
 				if(!pproc.prependExecution&&!ran&&i<pproc.perfTools.size()-1&&!(pproc.perfTools.get(i+1) instanceof ExecTool)){
-					launcher = new PerfLauncher(configuration,null,appNameAttribute ,projNameAttribute, appPathAttribute,
-							bProgPath,paraDel,launch);
+					launcher = new PerfLauncher(configuration,null,	bProgPath,paraDel,launch);
 					
 					if(!runStep(launcher)){
 						return;
@@ -165,8 +173,7 @@ public class PerformanceLaunchManager {
 				/**
 				 * Execute the program specified in the build step
 				 */
-				launcher = new PerfLauncher(configuration,(ExecTool)t,appNameAttribute ,projNameAttribute, appPathAttribute,
-						bProgPath,paraDel,launch);
+				launcher = new PerfLauncher(configuration,(ExecTool)t,bProgPath,paraDel,launch);
 				
 				if(!runStep(launcher)){
 					return;
@@ -176,7 +183,7 @@ public class PerformanceLaunchManager {
 				/**
 				 * Collect performance data from the execution handled in the run step
 				 */
-				final PerfPostlaunch analyzer=new PerfPostlaunch(configuration,(PostProcTool)t,projNameAttribute,bOutLoc);
+				final PerfPostlaunch analyzer=new PerfPostlaunch(configuration,(PostProcTool)t,bOutLoc);
 				
 				if(!runStep(analyzer)){
 					return;

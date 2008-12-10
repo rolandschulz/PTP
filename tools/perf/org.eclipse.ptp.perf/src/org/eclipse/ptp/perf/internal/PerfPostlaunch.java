@@ -22,8 +22,8 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 	boolean externalTarget=false;
 	String projName=null;
 	
-	public PerfPostlaunch(ILaunchConfiguration conf, PostProcTool ppTool, String projnameatt,String outLoc) throws CoreException{
-		super(conf,"Analysis",projnameatt);
+	public PerfPostlaunch(ILaunchConfiguration conf, PostProcTool ppTool, String outLoc) throws CoreException{
+		super(conf,"Analysis");
 		tool=ppTool;
 		outputLocation=outLoc;
 	}
@@ -109,6 +109,10 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		
+		if(tool==null){
+			return new Status(IStatus.WARNING,"com.ibm.jdg2e.concurrency",IStatus.OK,"No Analysis Tool Provided, No Data Collected",null);
+		}
 		
 		if(outputLocation==null)
 		{

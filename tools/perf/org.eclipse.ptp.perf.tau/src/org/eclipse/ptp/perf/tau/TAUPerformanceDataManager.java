@@ -19,10 +19,7 @@ package org.eclipse.ptp.perf.tau;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.PrintStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -277,7 +274,10 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			boolean useperfex=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_LAUNCH_PERFEX, false);
 			if(useperfex){
 				String perfexScript=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.PARA_PERF_SCRIPT,(String)null);
-				runPerfEx(directory,database,projname,projtype,perfexScript);
+				
+				if(perfexScript!=null&&perfexScript.length()>0){
+					runPerfEx(directory,database,projname,projtype,perfexScript);
+				}
 			}
 		}
 		

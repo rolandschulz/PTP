@@ -263,7 +263,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	protected Map<String, Object> varmap = null;
 
 	//TODO:  This isn't generic.  We need to get this pane explicitly
-	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder().getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
+	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
 
 //	protected ToolPane custOpts=null;
 

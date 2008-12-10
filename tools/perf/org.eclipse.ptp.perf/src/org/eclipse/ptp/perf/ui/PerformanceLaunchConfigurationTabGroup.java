@@ -42,16 +42,17 @@ public class PerformanceLaunchConfigurationTabGroup extends
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		
 		ArrayList<AbstractPerformanceConfigurationTab> perfTabs=Activator.getPerfTabs();
-		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[7+perfTabs.size()];
+		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[8+perfTabs.size()];
 		tabs[0]=new PerfRecompMainTab(true);
-		tabs[1]=new CArgumentsTab();
-		tabs[2]=new EnvironmentTab();
-		tabs[3]=new PerformanceAnalysisTab(true);
-		tabs[4]=new CDebuggerTab(false);
-		tabs[5]=new SourceLookupTab();
-		tabs[6]=new CommonTab();
+		tabs[1]=new CDebuggerTab(false);
+		tabs[2]=new CArgumentsTab();
+		tabs[3]=new EnvironmentTab();
+		tabs[4]=new SourceLookupTab();
+		tabs[5]=new CommonTab();
+		tabs[6]=new PerformanceAnalysisTab(true);
+		tabs[7]=new ParametricParameterTab(false);
 		Iterator<AbstractPerformanceConfigurationTab> perfIt=perfTabs.iterator();
-		int tabDex=7;
+		int tabDex=8;
 		while(perfIt.hasNext())
 		{
 			tabs[tabDex]=perfIt.next();
