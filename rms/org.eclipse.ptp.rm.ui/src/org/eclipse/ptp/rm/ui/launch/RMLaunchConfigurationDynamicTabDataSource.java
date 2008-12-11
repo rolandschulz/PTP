@@ -38,36 +38,36 @@ public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSour
 		page.updateControls();
 	}
 
-	void setQueue(IPQueue queue) {
+	public void setQueue(IPQueue queue) {
 		this.queue = queue;
 	}
 
-	protected IPQueue getQueue() {
+	public IPQueue getQueue() {
 		return queue;
 	}
 
-	void setResourceManager(IResourceManager resourceManager) {
+	public void setResourceManager(IResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
 	}
 
-	protected IResourceManager getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return resourceManager;
 	}
 
-	void setConfiguration(ILaunchConfiguration configuration) {
+	public void setConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
-	protected ILaunchConfiguration getConfiguration() {
+	public ILaunchConfiguration getConfiguration() {
 		return configuration;
 	}
 
-	void setConfigurationWorkingCopy(
+	public void setConfigurationWorkingCopy(
 			ILaunchConfigurationWorkingCopy configurationWorkingCopy) {
 		this.configurationWorkingCopy = configurationWorkingCopy;
 	}
 
-	protected ILaunchConfigurationWorkingCopy getConfigurationWorkingCopy() {
+	public ILaunchConfigurationWorkingCopy getConfigurationWorkingCopy() {
 		return configurationWorkingCopy;
 	}
 }
