@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -23,15 +22,11 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2NodeAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
 
 /**
  * 
@@ -53,19 +48,6 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 
 	@Override
 	protected void parse(BufferedReader output) throws CoreException {
-		/*
-		 * Local copy of attributes from the RuntimeSystem
-		 */
-		IRemoteConnection connection = rts.getConnection();
-		assert connection != null;
-		IRemoteServices remoteServices = rts.getRemoteServices();
-		assert remoteServices != null;
-		IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-		Map<String, String> hostToElementMap = rts.getHostToElementMap();
-		MPICH2ResourceManagerConfiguration rmConfiguration = (MPICH2ResourceManagerConfiguration) rts.getRmConfiguration();
-		assert fileMgr != null;
-		assert hostToElementMap != null;
-
 		/*
 		 * MPI resource manager have only one machine and one queue.
 		 * There they are implicitly "discovered".
@@ -104,7 +86,6 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 
 				// Add node to model
 				String nodeId = rts.createNode(machineID, host.getName(), nodeCounter++);
-				hostToElementMap.put(host.getName(), nodeId);
 
 				// Add processor information to node.
 				AttributeManager attrManager = new AttributeManager();

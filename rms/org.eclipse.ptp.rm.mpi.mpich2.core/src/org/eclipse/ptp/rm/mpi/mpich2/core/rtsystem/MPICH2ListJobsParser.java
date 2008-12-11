@@ -21,10 +21,11 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
  *
  */
 public class MPICH2ListJobsParser {
-	public enum JobListState {JOBLIST_INIT, JOBLIST_START, JOBLIST_END, JOBLIST_COMPLETE}
+	public enum JobListState {JOBLIST_INIT, JOBLIST_START, JOBLIST_END, JOBLIST_COMPLETE, JOBLIST_ERROR}
 	
 	private JobListState state;
 	private MPICH2JobMap map = new MPICH2JobMap();
+	private String errorMsg;
 	
 	/**
 	 * @param parser
@@ -43,9 +44,8 @@ public class MPICH2ListJobsParser {
 			key = parts[0].trim();
 			value = parts[1].trim();
 		} else {
-			// Ignore the line
-			map.hasErrors = true;
-			DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Ignoring invalid line: '{0}'", line); //$NON-NLS-1$
+			state = JobListState.JOBLIST_ERROR;
+			errorMsg = line;
 			return;
 		}
 		
@@ -65,6 +65,14 @@ public class MPICH2ListJobsParser {
 			job.setRank(Integer.parseInt(value));
 		} else if ("pgm".equals(key)) { //$NON-NLS-1$
 			job.setPgm(value);
+		} else {
+			state = JobListState.JOBLIST_ERROR;
+			errorMsg = line;
+			return;
+		}
+		
+		if (job.isComplete()) {
+			state = JobListState.JOBLIST_END;
 		}
 	}
 	
@@ -114,11 +122,6 @@ public class MPICH2ListJobsParser {
 				}
 				
 				processJobInfo(line, job);
-				
-				if (job != null && job.isComplete()) {
-					state = JobListState.JOBLIST_END;
-					break;
-				}
 				break;
 				
 			case JOBLIST_END:
@@ -140,10 +143,23 @@ public class MPICH2ListJobsParser {
 				
 			case JOBLIST_COMPLETE:
 				break;
+				
+			case JOBLIST_ERROR:
+				while ((line = reader.readLine()) != null) {
+					errorMsg += "\n" + line; //$NON-NLS-1$
+				}
+				return null;
 			}
 		}
 		
 		return map;
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getErrorMessage() {
+		return errorMsg;
 	}
 }
 
