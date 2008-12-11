@@ -87,7 +87,9 @@ public class Messages extends NLS {
 	public static String MPICH2MonitorJob_name;
 	public static String MPICH2MonitorJob_parsingErrorMessage;
 	public static String MPICH2MonitorJob_processErrorMessage;
-
+	public static String MPICH2MonitorJob_Exception_CommandFailed;
+	public static String MPICH2MonitorJob_Exception_InternalError;
+	
 	public static String MPICH2ProcessMapText12Parser_Exception_InvalidLine;
 	public static String MPICH2ProcessMapText12Parser_Exception_MissingDisplayMapInformation;
 	public static String MPICH2ProcessMapText12Parser_Exception_BrokenDisplayMapInformation;

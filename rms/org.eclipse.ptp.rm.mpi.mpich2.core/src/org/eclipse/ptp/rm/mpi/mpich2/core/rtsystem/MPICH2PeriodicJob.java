@@ -32,6 +32,7 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 
 /**
@@ -79,7 +80,11 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			/*
 			 * Parse output of mpdlistjobs command.
 			 */
-			MPICH2JobMap jobMap = new MPICH2ListJobsParser().parse(output);
+			MPICH2ListJobsParser parser = new MPICH2ListJobsParser();
+			MPICH2JobMap jobMap = parser.parse(output);
+			if (jobMap == null) {
+				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage()));
+			}
 
 			/*
 			 * Update model according to data. First create any new jobs.
@@ -124,7 +129,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			if (e.getStatus().getSeverity() == IStatus.ERROR) {
 				AttributeManager attrManager = new AttributeManager();
 				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandFailed, e.getMessage())));
+				attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2MonitorJob_Exception_CommandFailed, e.getMessage())));
 				rts.changeMachine(machine.getID(), attrManager);
 			}
 			throw e;
@@ -134,7 +139,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			 */
 			AttributeManager attrManager = new AttributeManager();
 			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
+			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2MonitorJob_Exception_InternalError, e.getMessage())));
 			rts.changeMachine(machine.getID(), attrManager);
 		}
 	}
