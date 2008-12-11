@@ -72,14 +72,14 @@ import org.eclipse.swt.widgets.Text;
 public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
 AbstractRMLaunchConfigurationDynamicTab {
 
-	Composite control;
-	Button useArgsDefaultsButton;
-	Text argsText;
-	Button useParamsDefaultsButton;
-	CheckboxTableViewer paramsViewer;
-	Table paramsTable;
+	protected Composite control;
+	protected Button useArgsDefaultsButton;
+	protected Text argsText;
+	protected Button useParamsDefaultsButton;
+	protected CheckboxTableViewer paramsViewer;
+	protected Table paramsTable;
 
-	Parameters ompiParameters;
+	protected Parameters ompiParameters;
 
 	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm) {
 		ompiParameters = ((OpenMPIResourceManager) rm).getParameters();
@@ -93,7 +93,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == paramsViewer) {
+			if (e.getSource() == paramsViewer || e.getSource() == useArgsDefaultsButton) {
 				updateControls();
 			} else {
 				super.doWidgetSelected(e);
@@ -114,7 +114,6 @@ AbstractRMLaunchConfigurationDynamicTab {
 	class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
 		private boolean useDefArgs;
 		private String args;
-
 		private boolean useDefParams;
 		private Map<String, String> params;
 
@@ -216,28 +215,6 @@ AbstractRMLaunchConfigurationDynamicTab {
 					}
 				}
 			}
-		}
-
-		/**
-		 * Convert a comma separated list into one host per line
-		 * 
-		 * @param list
-		 * @return
-		 */
-		private String hostListToText(String list) {
-			if (list == null)
-				return ""; //$NON-NLS-1$
-			String result = ""; //$NON-NLS-1$
-			String[] values = list.split(","); //$NON-NLS-1$
-			for (int i = 0; i < values.length; i++) {
-				if (!values[i].equals("")) { //$NON-NLS-1$
-					if (i > 0) {
-						result += "\r"; //$NON-NLS-1$
-					}
-					result += values[i];
-				}
-			}
-			return result;
 		}
 	}
 
@@ -521,11 +498,15 @@ AbstractRMLaunchConfigurationDynamicTab {
 	public void updateControls() {
 		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
 		paramsTable.setEnabled(!useParamsDefaultsButton.getSelection());
-		// if (getLocalDataSource().useDefArgs) {
-		// String launchArgs =
-		// OpenMPILaunchConfiguration.calculateArguments(getControl());
-		// argsText.setText(launchArgs);
-		// }
+		if (getLocalDataSource().useDefArgs) {
+			String launchArgs = ""; //$NON-NLS-1$
+			try {
+				launchArgs = OpenMPILaunchConfiguration.calculateArguments(getLocalDataSource().getConfiguration());
+			} catch (CoreException e) {
+				// ignore
+			}
+			argsText.setText(launchArgs);
+		}
 	}
 
 	private DataSource getLocalDataSource() {
