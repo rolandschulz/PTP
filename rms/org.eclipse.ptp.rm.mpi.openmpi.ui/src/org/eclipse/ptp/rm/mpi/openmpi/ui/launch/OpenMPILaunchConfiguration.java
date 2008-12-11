@@ -72,10 +72,9 @@ public class OpenMPILaunchConfiguration {
 				}
 			}
 			return launchArgs;
-		} else {
-			String launchArgs = configuration.getAttribute(ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
-			return launchArgs;
 		}
+
+		return configuration.getAttribute(ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
 	}
 
 	/**
