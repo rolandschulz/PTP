@@ -47,6 +47,13 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(strings.h sys/time.h unistd.h)
 
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+        CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+        CFLAGS="$CFLAGS -Wall"
+fi
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
 AC_STRUCT_TM
