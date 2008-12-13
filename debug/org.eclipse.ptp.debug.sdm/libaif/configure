@@ -6058,6 +6058,13 @@ fi
 done
 
 
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+        CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+        CFLAGS="$CFLAGS -Wall"
+fi
+
 { echo "$as_me:$LINENO: checking whether time.h and sys/time.h may both be included" >&5
 echo $ECHO_N "checking whether time.h and sys/time.h may both be included... $ECHO_C" >&6; }
 if test "${ac_cv_header_time+set}" = set; then

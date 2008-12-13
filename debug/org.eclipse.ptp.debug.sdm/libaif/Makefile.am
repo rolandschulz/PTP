@@ -14,7 +14,7 @@ libaif_a_SOURCES =			aif.c \
 							util.c \
 							aif.x
 					
-libaif_a_CFLAGS =			$(AM_CFLAGS) -Wall
+libaif_a_CFLAGS =			$(AM_CFLAGS) 
 
 testaif_SOURCES =			testaif.c
 testaif_CFLAGS =			-I. $(AM_CFLAGS) -g

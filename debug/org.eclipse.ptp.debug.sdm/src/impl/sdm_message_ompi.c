@@ -19,7 +19,6 @@
 #include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
 
 #include "compat.h"
 #include "list.h"

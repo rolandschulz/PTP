@@ -3713,7 +3713,14 @@ else
 fi
 
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+        CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+        CFLAGS="$CFLAGS -Wall"
+fi
+
+CFLAGS="$CFLAGS -I$UTILS/include -I$PROXY/include"
 LIBS="$LIBS -L$UTILS -L$PROXY"
 
 

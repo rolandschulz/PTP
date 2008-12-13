@@ -18,8 +18,9 @@
  ******************************************************************************/
 
 #include "config.h"
-
+#ifndef _AIX
 #include <getopt.h>
+#endif
 #include <stdlib.h>
 #include <stdarg.h>
 
@@ -34,6 +35,7 @@
 extern void client(char *proxy, char *host, int port);
 extern void server(dbg_backend *dbgr);
 
+#ifndef _AIX
 static struct option longopts[] = {
 	{"debugger",		required_argument,	NULL,	'b'},
 	{"debugger_path",	required_argument,	NULL, 	'e'},
@@ -46,6 +48,7 @@ static struct option longopts[] = {
 #endif /* DEBUG */
 	{NULL,				0,					NULL,	0}
 };
+#endif
 
 #ifdef DEBUG
 static char * shortopts = "b:e:P:p:h:d:m";
@@ -98,7 +101,12 @@ main(int argc, char *argv[])
 	char *			path = NULL;
 	proxy *			p;
 	dbg_backend *	d;
+#ifdef _AIX
+	int				n;
+	char *			cp;
+#endif
 
+#ifndef _AIX
 	while ((ch = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
 		switch (ch) {
 		case 'b':
@@ -139,6 +147,73 @@ main(int argc, char *argv[])
 			return 1;
 		}
 	}
+#else
+		/*
+		 * AIX does not support GNU style getopt with long options.
+		 * Parse options by string comparison instead.
+		 */
+	n = 1;
+	while (n < argc) {
+		cp = strchr(argv[n], '=');
+		if (cp == NULL) {
+			if (strcmp(argv[n], "--master") == 0) {
+				/* No action required */
+#ifdef DEBUG
+			} else if (strcmp(argv[n], "--debug") == 0) {
+				debug_level = DEBUG_LEVEL_ALL;
+#endif
+			}
+			else {
+				fprintf(stderr,
+					"sdm [--debugger=value] [--debugger_path=path]\n"
+					"    [--proxy=proxy]\n"
+					"    [--host=host_name] [--port=port]\n"
+					"	 [--master]\n"
+#ifdef DEBUG
+					"    [--debug[=level]]\n"
+#endif /* DEBUG */
+				);
+				return 1;
+			}
+		}
+		else {
+			*cp = '\0';
+			if (strcmp(argv[n], "--debugger") == 0) {
+				debugger_str = strdup(cp + 1);
+			}
+			else if (strcmp(argv[n], "--debugger_path") == 0) {
+				path = strdup(cp + 1);
+			}
+			else if (strcmp(argv[n], "--proxy") == 0) {
+				proxy_str = strdup(cp + 1);
+			}
+			else if (strcmp(argv[n], "--port") == 0) {
+				port = (int) strtol(cp + 1, NULL, 10);
+			}
+			else if (strcmp(argv[n], "--host") == 0) {
+				host = strdup(cp + 1);
+			}
+#ifdef DEBUG
+			else if (strcmp(argv[n], "--debug") == 0) {
+				debug_level = (int) strtol(cp + 1, NULL, 10);
+			}
+#endif
+			else {
+				fprintf(stderr,
+					"sdm [--debugger=value] [--debugger_path=path]\n"
+					"    [--proxy=proxy]\n"
+					"    [--host=host_name] [--port=port]\n"
+					"	 [--master]\n"
+#ifdef DEBUG
+					"    [--debug[=level]]\n"
+#endif /* DEBUG */
+				);
+				return 1;
+			}
+		}
+		n = n + 1;
+	}
+#endif
 
 	if (find_dbg_backend(debugger_str, &d) < 0) {
 		fprintf(stderr, "No such backend: \"%s\"\n", debugger_str);

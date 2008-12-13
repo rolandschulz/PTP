@@ -41,7 +41,14 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+        CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+        CFLAGS="$CFLAGS -Wall"
+fi
+
+CFLAGS="$CFLAGS -I$UTILS/include -I$PROXY/include"
 LIBS="$LIBS -L$UTILS -L$PROXY"
 
 dnl
