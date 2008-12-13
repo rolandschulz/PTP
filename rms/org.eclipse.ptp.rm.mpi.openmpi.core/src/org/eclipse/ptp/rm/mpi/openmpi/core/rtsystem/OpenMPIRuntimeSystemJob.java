@@ -36,6 +36,8 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
@@ -436,31 +438,39 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	private void changeAllProcessesStatus(State newState) {
 		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
-		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
+		final IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID());
+		if (rm != null) {
+			final IPQueue queue = rm.getQueueById(getQueueID());
+			if (queue != null) {
+				final IPJob ipJob = queue.getJobById(getJobID());
+				if (ipJob != null) {
 
-		/*
-		 * Mark all running and starting processes as finished.
-		 */
-		List<String> ids = new ArrayList<String>();
-		for (IPProcess ipProcess : ipJob.getProcesses()) {
-			switch (ipProcess.getState()) {
-			case EXITED:
-			case ERROR:
-			case EXITED_SIGNALLED:
-				break;
-			case RUNNING:
-			case STARTING:
-			case SUSPENDED:
-			case UNKNOWN:
-				ids.add(ipProcess.getID());
-				break;
+					/*
+					 * Mark all running and starting processes as finished.
+					 */
+					List<String> ids = new ArrayList<String>();
+					for (IPProcess ipProcess : ipJob.getProcesses()) {
+						switch (ipProcess.getState()) {
+						case EXITED:
+						case ERROR:
+						case EXITED_SIGNALLED:
+							break;
+						case RUNNING:
+						case STARTING:
+						case SUSPENDED:
+						case UNKNOWN:
+							ids.add(ipProcess.getID());
+							break;
+						}
+					}
+			
+					AttributeManager attrMrg = new AttributeManager();
+					attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
+					for (String processId : ids) {
+						rtSystem.changeProcess(processId, attrMrg);
+					}
+				}
 			}
-		}
-
-		AttributeManager attrMrg = new AttributeManager();
-		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
-		for (String processId : ids) {
-			rtSystem.changeProcess(processId, attrMrg);
 		}
 	}
 
