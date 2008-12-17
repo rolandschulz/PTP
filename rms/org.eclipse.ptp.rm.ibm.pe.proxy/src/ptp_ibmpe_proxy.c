@@ -75,6 +75,8 @@
 #include <llapi.h>
 #endif
 
+#define PE_DUAL_POE_DEBUG				/* Include code for PE proxy support for the dual poe debugger.*/
+
 #define DEFAULT_PROXY "tcp"
 #define DEFAULT_QUEUE_NAME "default"
 #define SKIPPING_SPACES			1
@@ -86,6 +88,7 @@
 #ifndef POE
 #define POE "/usr/bin/poe"
 #endif /* POE */
+#define PMD_HELPER				"/usr/bin/pmdhelper"		/* default dual poe debugger helper */
 #define INFO_MESSAGE 0
 #define TRACE_MESSAGE 1
 #define TRACE_DETAIL_MESSAGE 2
@@ -102,7 +105,7 @@
 #define ATTR_ALWAYS_ALLOWED 0xffffffff
 #define TRACE_ENTRY print_message(TRACE_MESSAGE, ">>> %s entered. (Line %d)\n", __FUNCTION__, __LINE__);
 #define TRACE_EXIT print_message(TRACE_MESSAGE, "<<< %s exited. (Line %d)\n", __FUNCTION__, __LINE__);
-#define TRACE_DETAIL(format, ...) print_message(TRACE_DETAIL_MESSAGE, format)
+#define TRACE_DETAIL(format) print_message(TRACE_DETAIL_MESSAGE, format)
 #define TRACE_DETAIL_V(format, ...) print_message(TRACE_DETAIL_MESSAGE, format, __VA_ARGS__)
 
 typedef struct jobinfo *jobinfoptr;	/* Forward reference to jobinfo         */
@@ -124,11 +127,15 @@ typedef struct {
     char *hostname;		/* Hostname of node where task is       */
 } taskinfo;
 
-typedef struct {
+typedef struct jobinfo {
     int proxy_jobid;		/* Job id assigned by proxy             */
     char *submit_jobid;		/* Jobid used when submitted by GUI     */
     pid_t poe_pid;		/* Process id for main poe process      */
     pid_t task0_pid;		/* Process id for app. task 0           */
+#ifdef PE_DUAL_POE_DEBUG
+    jobinfoptr debugger_job;    /* reference to debugger job */
+    jobinfoptr debuggee_job;    /* reference to debuggee job */
+#endif
     int debugging;		/* Job is being debugged 		*/
     char *sdm_debugdir;         /* Directory path for SDM debugger      */
     char *sdm_debugname;        /* Pathname to the top level debugger   */
@@ -199,21 +206,22 @@ typedef struct {
 
 static RETSIGTYPE ptp_signal_handler(int sig);
 static int server(char *name, char *host, int port);
-static int start_daemon(int trans_id, int nargs, char *args[]);
-static int define_model(int trans_id, int nargs, char *args[]);
-static int run(int trans_id, int nargs, char *args[]);
-static int terminate_job(int trans_id, int nargs, char *args[]);
-static int quit(int trans_id, int nargs, char *args[]);
+static int PE_start_daemon(int trans_id, int nargs, char *args[]);
+static int PE_define_model(int trans_id, int nargs, char *args[]);
+static int PE_submit_job(int trans_id, int nargs, char *args[]);
+static int PE_terminate_job(int trans_id, int nargs, char *args[]);
+static int PE_quit(int trans_id, int nargs, char *args[]);
+static int PE_start_events(int trans_id, int nargs, char *args[]);
+static int PE_halt_events(int trans_id, int nargs, char *args[]);
 static int shutdown_proxy(void);
-static int start_events(int trans_id, int nargs, char *args[]);
-static int halt_events(int trans_id, int nargs, char *args[]);
+static void job_enqueue(jobinfo *, pid_t);
 static void post_error(int trans_id, int type, char *msg);
 static void post_submitjob_error(int trans_id, char *subid, char *msg);
-static char **create_exec_parmlist(char *execname, char *targetname, char *args);
-static char **create_child_sdm_parmlist(char *debugdir, char *debugname, int debug_args_count, char **debug_args);
-static char **create_debug_parmlist(char *debugname, int debug_args_count, char **debug_args);
+static char **create_exec_parmlist(char *execname, char *targetname, char *args, char *helper);
+static char **create_child_sdm_parmlist(char *debugger_path, char *debugger_name, int debug_args_count, char **debug_args);
+static char **create_debug_parmlist(char *debugger_name, int debug_args_count, char **debug_args);
 static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem,
-			       char *mp_rdma_count);
+			       char *mp_rdma_count, char *debugger_id, int is_debugger);
 static void add_environment_variable(char *env_var);
 static int setup_stdio_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
 			  int *fd, int *redirect);
@@ -271,18 +279,18 @@ extern char **environ;
 static int events_enabled = 0;
 static int shutdown_requested;
 static int ptp_signal_exit;
-static List *jobs;		/* Jobs run by this proxy                   */
+static List *jobs = NULL;		/* Jobs run by this proxy                   */
 static Hash *nodes;		/* Nodes currently in use                   */
-static int node_count;		/* Number of active nodes                   */
-static int global_node_index;	/* Sequentially assigned node number        */
+static int node_count = 0;		/* Number of active nodes                   */
+static int global_node_index = 0;	/* Sequentially assigned node number        */
 static RETSIGTYPE(*saved_signals[NSIG]) (int);
-static proxy_svr *pe_proxy;	/* Handle for proxy message link            */
+static proxy_svr *pe_proxy = NULL;	/* Handle for proxy message link            */
 static int base_id;		/* Base id for proxy objects                */
 static int last_id = 1;		/* Last assigned object id                  */
 static int queue_id;		/* Object id for our queue                  */
 static int machine_id;		/* Object id for our machine                */
 static int start_events_transid;	/* start_events command id          */
-static int run_miniproxy;	/* Run miniproxy at proxy shutdown */
+static int run_miniproxy = 0;	/* Run miniproxy at proxy shutdown */
 static char emsg_buffer[_POSIX_PATH_MAX + 50];	/* Buffer for building error msg */
 static int use_load_leveler = 0;	/* Use LL resource managment/tracking      */
 static char *user_libpath;	/* Alternate libdir for LoadLeveler      */
@@ -482,8 +490,14 @@ static proxy_svr_helper_funcs helper_funcs = { NULL, NULL };
  * Proxy infrastructure expects commands in exactly this sequence.
  * Be careful when adding or deleting commands
  */
-static proxy_cmd cmds[] = { quit, start_daemon, define_model, start_events,
-    halt_events, run, terminate_job
+static proxy_cmd cmds[] = {
+		PE_quit,
+		PE_start_daemon,
+		PE_define_model,
+		PE_start_events,
+		PE_halt_events,
+		PE_submit_job,
+		PE_terminate_job
 };
 static proxy_commands command_tab = { 0, sizeof cmds / sizeof(proxy_cmd), cmds };
 
@@ -504,7 +518,7 @@ static string_launch_attr string_launch_attrs[] = {
     {"PE_STDOUT_PATH", ATTR_ALWAYS_ALLOWED, "Stdout Path",
      "Specify path for stdout output file", ""},
     {"PE_STDERR_PATH", ATTR_ALWAYS_ALLOWED, "Stderr Path",
-     "Specify path for stderr output file", ""},
+      "Specify path for stderr output file", ""},
     /*
      * I/O Related attributes
      */
@@ -703,17 +717,17 @@ int_launch_attr int_attrs[] = {
     {"MP_TASKS_PER_NODE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Tasks per Node",
      "Number of tasks to assign to a node (MP_TASKS_PER_NODE)", 1, 1, INT_MAX},
 
-    {"MP_RETRYCOUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
+    {"MP_RETRY_COUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
      "Number of times to retry node allocation (MP_RETRYCOUNT)", 1, 1, INT_MAX},
     {"MP_RETRY_INT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
-     "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1, INT_MAX},
+    "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1, INT_MAX},
 	/*
 	 * Performance tab related attributes
 	 */
     {"MP_ACK_THRESH", ATTR_ALWAYS_ALLOWED, "Acknowledgment Threshold",
      "Specify packet acknowledgment threshhold (MP_ACK_THRESH)", 30, 1, 31},
     {"MP_EAGER_LIMIT", ATTR_ALWAYS_ALLOWED, "Eager Limit",
-     "Specify rondezvous protocol message size threshhold (MP_EAGER_LIMIT)",
+     "Specify rendezvous protocol message size threshold (MP_EAGER_LIMIT)",
      0x10000, 1, INT_MAX},
     {"MP_MSG_ENVELOPE_BUF", ATTR_ALWAYS_ALLOWED, "Envelope Buffer Size",
      "Specify size of message envelope buffer (MP_MSG_ENVELOPE_BUF)",
@@ -772,13 +786,13 @@ long_int_launch_attr long_int_attrs[] = {
 
 /*************************************************************************/
 int
-start_daemon(int trans_id, int nargs, char *args[])
+PE_start_daemon(int trans_id, int nargs, char *args[])
 {
     /*
      * Proxy startup. Allocate a list to contain machine definitions, where
      * each unique hostfile defines a new machine. Create a thread that
      * will monitor started poe processes for termination and will
-     * notify the front end that the poe process has terminatred.
+     * notify the front end that the poe process has terminated.
      */
     pthread_attr_t term_thread_attrs;
     struct passwd *userinfo;
@@ -806,7 +820,7 @@ start_daemon(int trans_id, int nargs, char *args[])
 }
 
 int
-define_model(int trans_id, int nargs, char *args[])
+PE_define_model(int trans_id, int nargs, char *args[])
 {
     /*
      * Send the attribute definitions, launch attribute definitions,
@@ -840,7 +854,7 @@ define_model(int trans_id, int nargs, char *args[])
 }
 
 int
-start_events(int trans_id, int nargs, char *args[])
+PE_start_events(int trans_id, int nargs, char *args[])
 {
     /*
      * Send the complete machine state to the GUI. In PE standalone case,
@@ -894,7 +908,7 @@ start_events(int trans_id, int nargs, char *args[])
 	discover_jobs();
     }
     /*
-     * Do not send an acknowledgment for the start_events command here
+     * Do not send an acknowledgment for the PE_start_events command here
      * since asynchronous event notifications for new machine, node,
      * process, job, as well as state changes in those objects use the
      * start_events transaction id. If an ack is sent here, that
@@ -907,7 +921,7 @@ start_events(int trans_id, int nargs, char *args[])
 }
 
 int
-run(int trans_id, int nargs, char *args[])
+PE_submit_job(int trans_id, int nargs, char *args[])
 {
     /*
      * Submit a Parallel Environmnent application for execution.
@@ -925,8 +939,8 @@ run(int trans_id, int nargs, char *args[])
      */
     char *execname;
     char *execdir;
-    char *debugdir;
-    char *debugname;
+    char *debugger_path;
+    char *debugger_name;
     char **debug_args;
     char *argp;
     char *jobid;
@@ -941,6 +955,12 @@ run(int trans_id, int nargs, char *args[])
     char *mp_rdma_count_2;
     char **envp;
     jobinfo *job;
+    int  debug_dual_poe_mode = 0;
+    char pe_debugger_id[32] = { 0 };		// POE PID of parallel debugger.
+    char *pmd_helper = 0;
+#ifdef PE_DUAL_POE_DEBUG
+    jobinfo *debugger_job;
+#endif
     int i;
     int debug_arg_count;
     int label_io;
@@ -952,7 +972,7 @@ run(int trans_id, int nargs, char *args[])
     int mp_buffer_mem_set;
     int mp_rdma_count_set;
     int redirect;
-    int debug_mode;
+    int debug_sdm_mode;
     char mp_rdma_count_value[50];
     char mp_buffer_mem_value[50];
 
@@ -977,7 +997,7 @@ run(int trans_id, int nargs, char *args[])
     mp_rdma_count_set = 0;
     mp_rdma_count_value[0] = '\0';
     debug_arg_count = 0;
-    debug_mode = 0;
+    debug_sdm_mode = 0;
     /*
      * Process arguments passed to this function
      */
@@ -1017,7 +1037,7 @@ run(int trans_id, int nargs, char *args[])
 		    }
 		}
 		/*
-		 * If MP_INFOLELEL is > 1 char, then convert from label
+		 * If MP_INFOLEVEL is > 1 char, then convert from label
 		 * name to real setting value. Note that the original
 		 * setting is overwritten, which is ok since the
 		 * new value is guaranteed to be shorter than the
@@ -1094,6 +1114,20 @@ run(int trans_id, int nargs, char *args[])
 		    mp_rdma_count_2 = cp + 1;
 		    mp_rdma_count_set = 1;
 		}
+#ifdef PE_DUAL_POE_DEBUG
+		else if (strcmp(args[i], "PE_DEBUG_MODE") == 0) {
+			if (strcasecmp(cp+1, "sdm") == 0)
+				debug_sdm_mode = 1;
+			else if (strcasecmp(cp+1, "dual") == 0) {
+				debug_dual_poe_mode++;
+				if (!pmd_helper)
+					pmd_helper = PMD_HELPER;
+			}
+		}
+		else if (strcmp(args[i], "PE_DEBUG_HELPER") == 0) {
+			pmd_helper = cp + 1;
+		}
+#endif
 	    }
 	}
 	else {
@@ -1123,17 +1157,17 @@ run(int trans_id, int nargs, char *args[])
 		else if (strcmp(args[i], JOB_ENV_ATTR) == 0) {
 		}
 		else if (strcmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR) == 0) {
-		    debugname = strdup(cp);
+		    debugger_name = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR) == 0) {
-		    debugdir = strdup(cp);
+			debugger_path = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_DEBUG_ARGS_ATTR) == 0) {
 		    debug_args[debug_arg_count] = strdup(cp);
 		    debug_arg_count = debug_arg_count + 1;
 		}
 		else if (strcmp(args[i], JOB_DEBUG_FLAG_ATTR) == 0) {
-		    debug_mode = 1;
+		    debug_sdm_mode = 1;
 		}
 		else if (strcmp(args[i], "debugStopInMain") == 0) {
 		}
@@ -1175,6 +1209,97 @@ run(int trans_id, int nargs, char *args[])
     }
     job = (jobinfo *) malloc(sizeof(jobinfo));
     malloc_check(job, __FUNCTION__, __LINE__);
+    memset(job, 0, sizeof(jobinfo));
+#ifdef PE_DUAL_POE_DEBUG
+    /*DEBUG*/
+	if (debug_dual_poe_mode) {
+		char *debugger_full_path;
+
+		debug_sdm_mode = 0;			// disable SDM debugger launch.
+		/*
+		 * If no path is specified, then try to locate execuable.
+		 */
+		if (debugger_path == NULL || debugger_name == NULL) {
+			post_submitjob_error(trans_id, jobid, "Debugger executuable not found");
+			return PROXY_RES_OK;
+		} else {
+			asprintf(&debugger_full_path, "%s/%s", debugger_path, debugger_name);
+		}
+
+		if (access(debugger_full_path, X_OK) < 0) {
+			post_submitjob_error(trans_id, jobid, strerror(errno));
+			return PROXY_RES_OK;
+		}
+
+	    debugger_job = (jobinfo *) malloc(sizeof(jobinfo));
+	    malloc_check(debugger_job, __FUNCTION__, __LINE__);
+	    memset(debugger_job, 0, sizeof(jobinfo));
+	    debugger_job->debuggee_job = job;
+	    job->debugger_job = debugger_job;
+
+	    TRACE_DETAIL("+++ Forking poe/debugger process\n");
+	    pid = fork();
+	    if (pid == 0) {
+	    	char **debugger_args;
+	    	char **debugger_envp;
+	    	int max_fd;
+	    	int a;
+
+	    	debug_arg_count++;
+			debugger_args = (char **)malloc((debug_arg_count+3) * sizeof(char *));
+			debugger_args[0] = POE;
+			debugger_args[1] = debugger_full_path;
+			/* Use --jobid to inform node elements of debugger what their poe pid is.
+			 * This 'jobid' will be used to set up a message queue to accept connections
+			 * from the application process when it launches on the node.
+			 */
+			asprintf(&debugger_args[2], "--jobid=%d", getpid());
+			for (i = 0, a = 3; i < nargs; i++) {
+				if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
+					debugger_args[a] = strchr(args[i], '=') + 1;
+					a++;
+				}
+			}
+			debugger_args[a] = NULL;
+
+			snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
+			debugger_envp = create_env_array(args, 0, NULL, NULL, pe_debugger_id, 1);
+
+			max_fd = sysconf(_SC_OPEN_MAX);
+			for (i = STDERR_FILENO + 1; i < max_fd; i++) {
+			    close(i);
+			}
+			/*
+			 * Invoke the debugger as a target of 'poe'
+			 */
+			TRACE_DETAIL_V("+++ Ready to invoke debugger %s\n", debugger_full_path);
+			i = 0;
+			while (debugger_envp[i] != NULL) {
+			    TRACE_DETAIL_V("Target debugger_envp[%d]: %s\n", i, debugger_envp[i]);
+			    i++;
+			}
+			i = 0;
+			while (debugger_args[i] != NULL) {
+			    TRACE_DETAIL_V("Target debugger_args[%d]: %s\n", i, debugger_args[i]);
+			    i++;
+			}
+			status = execve(POE, debugger_args, debugger_envp);
+			print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", debugger_args[0], strerror(errno));
+			post_submitjob_error(trans_id, jobid, "Exec failed");
+			TRACE_EXIT;
+			exit(1);
+	    }
+	    else if (pid == -1) {
+		    post_submitjob_error(trans_id, jobid, "Debugger fork failed");
+		    return PROXY_RES_OK;
+		}
+	    /* Parent continues on... */
+		/* Augment the application's environment to include a debug marker based upon the poe pid of the debugger. */
+		snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", pid);
+		debugger_job->poe_pid = pid;
+		/* TODO: Do some more initialization of debugger_job here */
+	}
+#endif
     TRACE_DETAIL("+++ Setting up stdio pipe descriptors\n");
     TRACE_DETAIL_V("+++ stdout path: %s\n", stdout_path == NULL ? "NULL" : stdout_path);
     TRACE_DETAIL_V("+++ stderr path: %s\n", stderr_path == NULL ? "NULL" : stderr_path);
@@ -1220,7 +1345,7 @@ run(int trans_id, int nargs, char *args[])
     job->stderr_info.cp = job->stderr_info.write_buf;
     job->stderr_info.write_func = send_stderr;
     job->discovered_job = 0;
-    envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value);
+    envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value, pe_debugger_id, 0);
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
     if (pid == 0) {
@@ -1228,6 +1353,8 @@ run(int trans_id, int nargs, char *args[])
 	char poe_target[_POSIX_PATH_MAX * 2 + 2];
 	int max_fd;
 
+	snprintf(poe_target, sizeof poe_target, "%s/%s", execdir, execname);
+	poe_target[sizeof poe_target - 1] = '\0';
 	/*
 	 * Set up executable argument list and environment variables first
 	 * since there is a small timing window where a second run command
@@ -1235,12 +1362,12 @@ run(int trans_id, int nargs, char *args[])
 	 * for the first run, resulting in modification of the first program's
 	 * parameters and environment variables.
 	 */
-	TRACE_DETAIL("+++ Creating poe exec() parameter list\n");
-	if (debug_mode) {
-	    argv = create_child_sdm_parmlist(debugdir, debugname, debug_arg_count, debug_args);
+	TRACE_DETAIL_V("+++ Creating poe exec() parameter list %s\n", pmd_helper ? "with pmdhelper" : "");
+	if (debug_sdm_mode) {
+	    argv = create_child_sdm_parmlist(debugger_path, debugger_name, debug_arg_count, debug_args);
 	}
 	else {
-	    argv = create_exec_parmlist(POE, poe_target, argp);
+	    argv = create_exec_parmlist(POE, poe_target, argp, pmd_helper);
 	}
 	/*
 	 * Connect stdio to pipes or files owned by parent process (the
@@ -1271,8 +1398,7 @@ run(int trans_id, int nargs, char *args[])
 	/*
 	 * Invoke the application as a target of 'poe'
 	 */
-	snprintf(poe_target, sizeof poe_target, "%s/%s", execdir, execname);
-	poe_target[sizeof poe_target - 1] = '\0';
+	TRACE_DETAIL_V("+++ Ready to invoke %s\n", poe_target);
 	i = 0;
 	while (envp[i] != NULL) {
 	    TRACE_DETAIL_V("Target env[%d]: %s\n", i, envp[i]);
@@ -1283,7 +1409,6 @@ run(int trans_id, int nargs, char *args[])
 	    TRACE_DETAIL_V("Target arg[%d]: %s\n", i, argv[i]);
 	    i = i + 1;
 	}
-	TRACE_DETAIL("+++ Ready to invoke child process\n");
 	status = execve("/usr/bin/poe", argv, envp);
 	print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
 	post_submitjob_error(trans_id, jobid, "Exec failed");
@@ -1292,53 +1417,35 @@ run(int trans_id, int nargs, char *args[])
     }
     else {
 	if (pid == -1) {
+#ifdef PE_DUAL_POE_DEBUG
+            if (debug_dual_poe_mode) {
+                /* TODO: Take down debugger poe. */
+            }
+#endif
 	    post_submitjob_error(trans_id, jobid, "Fork failed");
 	    return PROXY_RES_OK;
 	}
 	else {
-	    char jobname[40];
-	    char queue_id_str[12];
-	    char jobid_str[12];
-
+#ifdef PE_DUAL_POE_DEBUG
+            if (debug_dual_poe_mode) {
+                job_enqueue(debugger_job, debugger_job->poe_pid);
+            }
+#endif
 	    if (!job->stdout_redirect) {
 		close(stdout_pipe[1]);
 	    }
 	    if (!job->stderr_redirect) {
 		close(stderr_pipe[1]);
 	    }
-	    /*
-	     * Update job information for application and notify front end
-	     * that job is started.
-	     */
-	    job->tasks = NULL;
-	    job->poe_pid = pid;
-	    job->task0_pid = -1;
-	    job->submit_time = time(NULL);
-	    job->proxy_jobid = generate_id();
-	    job->debugging = debug_mode;
-            if (debug_mode) {
-                job->debugging = debug_mode;
+            job->debugging = debug_sdm_mode;
+            if (debug_sdm_mode) {
                 job->sdm_envp = envp;
-                job->sdm_debugdir = debugdir;
-                job->sdm_debugname = debugname;
+                job->sdm_debugdir = debugger_path;
+                job->sdm_debugname = debugger_name;
                 job->sdm_debugargs = debug_args;
                 job->sdm_debug_arg_count = debug_arg_count;
             }
-	    TRACE_DETAIL_V("+++ Created poe process pid %d for jobid %d\n", job->poe_pid,
-			   job->proxy_jobid);
-	    /*
-	     * Create thread to watch for application's attach.cfg file to
-	     * be created
-	     */
-	    pthread_create(&job->startup_thread, &thread_attrs, startup_monitor, job);
-	    AddToList(jobs, job);
-	    snprintf(jobname, sizeof jobname, "%s.%s", my_username, job->submit_jobid);
-	    sprintf(queue_id_str, "%d", queue_id);
-	    sprintf(jobid_str, "%d", job->proxy_jobid);
-	    jobname[sizeof jobname - 1] = '\0';
-	    enqueue_event(proxy_new_job_event(start_events_transid,
-					      queue_id_str, jobid_str, jobname, JOB_STATE_INIT,
-					      job->submit_jobid));
+            job_enqueue(job, pid);
 	}
     }
     send_ok_event(trans_id);
@@ -1347,7 +1454,7 @@ run(int trans_id, int nargs, char *args[])
 }
 
 int
-halt_events(int trans_id, int nargs, char *args[])
+PE_halt_events(int trans_id, int nargs, char *args[])
 {
     /*
      * Set flag indicating events are shut down, and send OK acks for
@@ -1365,7 +1472,7 @@ halt_events(int trans_id, int nargs, char *args[])
 }
 
 int
-terminate_job(int trans_id, int nargs, char *args[])
+PE_terminate_job(int trans_id, int nargs, char *args[])
 {
     /*
      * Terminate the application. The initial kill is SIGTERM. If that
@@ -1394,6 +1501,15 @@ terminate_job(int trans_id, int nargs, char *args[])
 	job = GetListElement(jobs);
     }
     if (job != NULL) {
+#ifdef PE_DUAL_POE_DEBUG
+    	/* Is this a debugger job? */
+    	if (job->debuggee_job) {
+    		jobinfo *debuggee_job = job->debuggee_job;
+    		job->debuggee_job = NULL;
+    		kill (debuggee_job->poe_pid, SIGTERM);
+    		pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) debuggee_job->poe_pid);
+    	}
+#endif
 	kill(job->poe_pid, SIGTERM);
 	/*
 	 * Create a thread to kill the process with kill(9) if the
@@ -1408,7 +1524,7 @@ terminate_job(int trans_id, int nargs, char *args[])
 }
 
 int
-quit(int trans_id, int nargs, char *args[])
+PE_quit(int trans_id, int nargs, char *args[])
 {
     void *thread_status;
 
@@ -1429,6 +1545,45 @@ quit(int trans_id, int nargs, char *args[])
     shutdown_requested = 1;
     TRACE_EXIT;
     return PROXY_RES_OK;
+}
+
+/*************************************************************************/
+/*                                                                       */
+/* Job support routines.                                                 */
+/*                                                                       */
+/*************************************************************************/
+void
+job_enqueue(jobinfo *job, pid_t pid)
+{
+    char jobname[40];
+    char queue_id_str[12];
+    char jobid_str[12];
+
+    /*
+     * Update job information for application and notify front end that job is started.
+     */
+    job->tasks = NULL;
+    job->poe_pid = pid;
+    job->task0_pid = -1;
+    job->submit_time = time(NULL);
+    job->proxy_jobid = generate_id();
+    TRACE_DETAIL_V("+++ Created poe process pid %d for jobid %d\n", job->poe_pid, job->proxy_jobid);
+    /*
+     * Create thread to watch for application's attach.cfg file to be created.
+     */
+    pthread_create(&job->startup_thread, &thread_attrs, startup_monitor, job);
+    AddToList(jobs, job);
+#ifdef PE_DUAL_POE_DEBUG
+    if (job->debuggee_job)
+    	return;		// Don't report debugger
+#endif
+    snprintf(jobname, sizeof jobname, "%s.%s", my_username, job->submit_jobid);
+    jobname[sizeof jobname - 1] = '\0';
+    sprintf(queue_id_str, "%d", queue_id);
+    sprintf(jobid_str, "%d", job->proxy_jobid);
+    enqueue_event(proxy_new_job_event(start_events_transid,
+				      queue_id_str, jobid_str, jobname, JOB_STATE_INIT,
+				      job->submit_jobid));
 }
 
 /*************************************************************************/
@@ -1490,7 +1645,7 @@ startup_monitor(void *job_ident)
 	    }
 	}
     }
-    TRACE_DETAIL("+++ Have task config file\n");
+    TRACE_DETAIL_V("+++ Have task config file %s\n", tasklist_path);
     done = 0;
     while (!done) {
 	char *lineptr;
@@ -1638,6 +1793,10 @@ startup_monitor(void *job_ident)
     }
     job->tasks = tasks;
     job->numtasks = numtasks;
+#ifdef PE_DUAL_POE_DEBUG
+    if (job->debuggee_job != NULL)        /* The debugger job doesn't report */
+    	goto out;
+#endif
     /*
      * For each task in the application, send a new process event to the
      * GUI.
@@ -1802,8 +1961,7 @@ startup_monitor(void *job_ident)
 	    strcat(debugger, "/");
 	    strcat(debugger, job->sdm_debugname);
 sleep(5);
-	    status = execve(debugger, argv, NULL);
-	    //status = execve(debugger, argv, job->sdm_envp);
+	    status = execve(debugger, argv, job->sdm_envp);
 	    print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
 	    TRACE_EXIT;
 	    exit(1);
@@ -1821,6 +1979,9 @@ sleep(5);
 	    }
         }
     }
+#ifdef PE_DUAL_POE_DEBUG
+  out:
+#endif
     /*
      * The startup thread exits at this point, so clear the reference in
      * the job info
@@ -2988,7 +3149,7 @@ monitor_LoadLeveler_jobs(void *job_ident)
 
 /**************************************************************************/
 char **
-create_exec_parmlist(char *execname, char *targetname, char *args)
+create_exec_parmlist(char *execname, char *targetname, char *args, char *helper)
 {
     char *tokenized_args;
     char *cp;
@@ -3007,13 +3168,20 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
      * 'This is an arg with a "quoted string" inside'
      */
     TRACE_ENTRY;
-    arg_count = 0;
+    arg_count = 3;
+    if (helper)
+    	arg_count++;
     if (args == NULL) {
-	argv = malloc(3 * sizeof(char *));
+	argv = malloc(arg_count * sizeof(char *));
 	malloc_check(argv, __FUNCTION__, __LINE__);
-	argv[0] = execname;
-	argv[1] = targetname;
-	argv[2] = NULL;
+	i = 0;
+	argv[i++] = execname;
+#ifdef PE_DUAL_POE_DEBUG
+	if (helper)
+		argv[i++] = helper;
+#endif
+	argv[i++] = targetname;
+	argv[i++] = NULL;
     }
     else {
 	quote = '\0';
@@ -3024,7 +3192,7 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 	    switch (*cp) {
 		case ' ':
 		    if (state == PARSING_UNQUOTED_ARG) {
-			arg_count = arg_count + 1;
+				arg_count++;
 			*cp = '\0';
 			state = SKIPPING_SPACES;
 		    }
@@ -3033,7 +3201,7 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 		case '\'':
 		    if (state == PARSING_QUOTED_ARG) {
 			if (*cp == quote) {
-			    arg_count = arg_count + 1;
+				arg_count++;
 			    quote = '\0';
 			    *cp = '\0';
 			    state = SKIPPING_SPACES;
@@ -3049,14 +3217,13 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 			state = PARSING_UNQUOTED_ARG;
 		    }
 	    }
-	    cp = cp + 1;
+	    cp++;
 	}
 	if (state != SKIPPING_SPACES) {
 	    /*
-	     * Last arg is terminated by ending '\0' so needs to be counted
-	     * here
+	     * Last arg is terminated by ending '\0' so needs to be counted here
 	     */
-	    arg_count = arg_count + 1;
+		arg_count++;
 	}
 	/*
 	 * The second pass allocates argv, with one extra slot for the
@@ -3066,11 +3233,15 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 	 * over an initial quote, if present. The trailing quote in a
 	 * quoted arg was removed by the first pass tokenizing step.
 	 */
-	argv = malloc(sizeof(char *) * (arg_count + 3));
+	argv = malloc(sizeof(char *) * arg_count);
 	malloc_check(argv, __FUNCTION__, __LINE__);
-	argv[0] = execname;
-	argv[1] = targetname;
-	i = 2;
+	i = 0;
+	argv[i++] = execname;
+#ifdef PE_DUAL_POE_DEBUG
+	if (helper)
+		argv[i++] = helper;
+#endif
+	argv[i++] = targetname;
 	cp = tokenized_args;
 	state = SKIPPING_SPACES;
 	while (i < (arg_count + 2)) {
@@ -3083,7 +3254,7 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 		    else {
 			argv[i] = cp;
 		    }
-		    i = i + 1;
+		    i++;
 		}
 	    }
 	    else {
@@ -3091,7 +3262,7 @@ create_exec_parmlist(char *execname, char *targetname, char *args)
 		    state = SKIPPING_SPACES;
 		}
 	    }
-	    cp = cp + 1;
+	    cp++;
 	}
 	argv[i] = NULL;
     }
@@ -3112,7 +3283,7 @@ create_debug_parmlist(char *debugname, int debug_args_count, char **debug_args)
     argv[n++] = debugname;
     argv[n++] = "--master";
     for (i = 0; i < debug_args_count; i++) {
-    	argv[n++] = debug_args[i];
+	argv[n++] = debug_args[i];
     }
     argv[n++] = NULL;
     return argv;
@@ -3125,7 +3296,7 @@ create_child_sdm_parmlist(char *debugdir, char *debugname, int debug_args_count,
     char **argv;
     int len;
     int n;
-    int	i;
+    int i;
 
     len = strlen(debugdir) + strlen(debugname) + 2;
     debugger = (char *) malloc(len * sizeof(char));
@@ -3137,14 +3308,14 @@ create_child_sdm_parmlist(char *debugdir, char *debugname, int debug_args_count,
     argv[n++] = "poe";
     argv[n++] = debugger;
     for (i = 0; i < debug_args_count; i++) {
-    	argv[n++] = debug_args[i];
+	argv[n++] = debug_args[i];
     }
     argv[n++] = NULL;
     return argv;
 }
 
 char **
-create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count)
+create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id, int is_debugger)
 {
     /*
      * Set up the environment variable array for the target application.
@@ -3160,6 +3331,7 @@ create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_
      * No other environment variables are passed to the application.
      */
     int i;
+    int has_mp_procs = 0;
 
     TRACE_ENTRY;
     env_array_size = 100;
@@ -3167,23 +3339,50 @@ create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_
     env_array = (char **) malloc(sizeof(char *) * env_array_size);
     for (i = 0; args[i] != NULL; i++) {
 	if (strncmp(args[i], "MP_", 3) == 0) {
-	    add_environment_variable(strdup(args[i]));
+#ifdef PE_DUAL_POE_DEBUG
+		if (is_debugger && strncmp(args[i], "MP_PROCS=", 9) == 0) {
+			int nprocs = atoi(args[i] + 9) + 1;
+			char procs_str[128];
+
+			snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
+			add_environment_variable(strdup(procs_str));
+			has_mp_procs = 1;
+		}
+		else if (is_debugger && strncmp(args[i], "MP_MSG_API=", 11) == 0) {
+			/* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
+		}
+		else {
+			add_environment_variable(strdup(args[i]));
+		}
+#else
+		add_environment_variable(strdup(args[i]));
+#endif
 	}
 	else {
 	    if (strncmp(args[i], "env=", 4) == 0) {
-		add_environment_variable(strdup(args[i]) + 4);
+	    	add_environment_variable(strdup(args[i]) + 4);
 	    }
 	}
     }
+#ifdef PE_DUAL_POE_DEBUG
+    if (is_debugger && !has_mp_procs)
+    	add_environment_variable("MP_PROCS=2");
+#endif
+
     if (split_io == 1) {
 	add_environment_variable("MP_LABELIO=yes");
     }
-    if (mp_buffer_mem[0] != '\0') {
+    if (mp_buffer_mem && mp_buffer_mem[0] != '\0') {
 	add_environment_variable(mp_buffer_mem);
     }
-    if (mp_rdma_count[0] != '\0') {
+    if (mp_rdma_count && mp_rdma_count[0] != '\0') {
 	add_environment_variable(mp_rdma_count);
     }
+#ifdef PE_DUAL_POE_DEBUG
+    if (debugger_id && debugger_id[0] != '\0') {
+    	add_environment_variable(debugger_id);
+    }
+#endif
     if (use_load_leveler) {
 	add_environment_variable("MP_RESD=yes");
 	print_message(TRACE_DETAIL_MESSAGE, "PE Job uses LoadLeveler resource management\n");
@@ -3301,15 +3500,11 @@ update_nodes(int trans_id, FILE * hostlist)
      */
     char *res;
     char *valstr;
-    struct group *grp;
-    struct passwd *pwd;
     char hostname[256];
     List *new_nodes;
 
     TRACE_ENTRY;
     valstr = NULL;
-    pwd = getpwuid(geteuid());
-    grp = getgrgid(getgid());
     res = fgets(hostname, sizeof(hostname), hostlist);
     new_nodes = NewList();
     while (res != NULL) {
@@ -5008,9 +5203,9 @@ send_stdout(jobinfo * job, char *buf)
     if (job->split_io) {
         cp = strchr(buf, ':');
         if (cp != NULL) {
-	    *cp = '\0';
-	    task = atoi(buf);
-	    *cp = ':';
+	        *cp = '\0';
+	        task = atoi(buf);
+	        *cp = ':';
 	    if (job->label_io) {
 	        outp = buf;
 	    }
@@ -5025,7 +5220,7 @@ send_stdout(jobinfo * job, char *buf)
     }
     else {
         task = 0;
-	outp = buf;
+        outp = buf;
     }
     send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, outp);
 }
@@ -5275,6 +5470,13 @@ enqueue_event(proxy_msg * msg)
     proxy_svr_queue_msg(pe_proxy, msg);
 }
 
+static void
+print_usage(char *progname)
+{
+	print_message(FATAL_MESSAGE,
+		  "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] [--template_override=file] [--template_write=y|n] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
+		   progname);
+}
 /*************************************************************************/
 
 /* Proxy startup and command loop                                        */
@@ -5290,7 +5492,6 @@ main(int argc, char *argv[])
     int rc;
     int debug;
     char *cp;
-    int n;
 
     strcpy(miniproxy_path, argv[0]);
     cp = strrchr(miniproxy_path, '/');
@@ -5369,9 +5570,7 @@ main(int argc, char *argv[])
 		run_miniproxy = 1;
 		break;
 	    default:
-		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] [--template_override=file] [--template_write=y|n] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
-			      argv[0]);
+                print_usage(argv[0]);
 		exit(1);
 	}
     }
@@ -5383,7 +5582,7 @@ main(int argc, char *argv[])
      * Make sure that this is maintained in sync with the above
      * getopt_long loop.
      */
-    n = 1;
+    int n = 1;
     while (n < argc) {
 	cp = strchr(argv[n], '=');
 	if (cp == NULL) {
@@ -5401,9 +5600,7 @@ main(int argc, char *argv[])
 	    }
 	    else {
 		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
-		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
-			      argv[0]);
+    		print_usage(argv[0]);
 		exit(1);
 	    }
 	}
@@ -5465,9 +5662,7 @@ main(int argc, char *argv[])
 	    }
 	    else {
 		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
-		print_message(FATAL_MESSAGE,
-			      "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
-			      argv[0]);
+		print_usage(argv[0]);
 		exit(1);
 	    }
 	}
@@ -5507,7 +5702,6 @@ find_load_leveler_library()
     int lib_found;
     int i;
     int status;
-    int save_errno;
     struct stat statinfo;
 
     if (user_libpath != NULL) {	/* if user specified lib */
@@ -5533,7 +5727,6 @@ find_load_leveler_library()
 #ifdef _AIX
 		strcat(ibmll_libpath_name, "(shr.o)");
 #endif
-		save_errno = errno;
 		print_message(INFO_MESSAGE,
 			      "Successful search: Found LoadLeveler shared library %s\n",
 			      ibmll_libpath_name);
@@ -5543,7 +5736,7 @@ find_load_leveler_library()
 	    else {
 		print_message(ERROR_MESSAGE,
 			      "Search failure: \"stat\" of LoadLeveler shared library %s returned errno=%d.\n",
-			      ibmll_libpath_name, save_errno);
+			      ibmll_libpath_name, errno);
 	    }
 	}
 	i++;
@@ -5596,7 +5789,7 @@ server(char *name, char *host, int port)
 	print_message(INFO_MESSAGE, "proxy_connect fails with %d status.\n", rc);
 	return 0;
     }
-    print_message(INFO_MESSAGE, "Running IBMPE proxy on port %d\n", port);
+    print_message(INFO_MESSAGE, "Running IBMPE proxy to host %s via port %d\n", host, port);
 
     while (ptp_signal_exit == 0 && !shutdown_requested) {
 	if ((proxy_svr_progress(pe_proxy) != PROXY_RES_OK)) {
@@ -5663,7 +5856,7 @@ print_message(int type, const char *format, ...)
 {
     va_list ap;
     char timebuf[20];
-    time_t clock;
+    time_t my_clock;
     struct tm a_tm;
     int thread_id = 0;
 
@@ -5675,8 +5868,8 @@ print_message(int type, const char *format, ...)
 	    break;
 	}
     }
-    time(&clock);		/* what time is it ? */
-    localtime_r(&clock, &a_tm);
+    time(&my_clock);		/* what time is it ? */
+    localtime_r(&my_clock, &a_tm);
     strftime(&timebuf[0], 15, "%m/%d %02H:%02M:%02S", &a_tm);
 
     va_start(ap, format);
@@ -5796,8 +5989,13 @@ print_message_args(int argc, char *optional_args[])
 {
     int i;
     if (optional_args != NULL) {
+        if (argc < 0) {
+        	argc = 0;
+        	while (optional_args[argc] != NULL)
+        		++argc;
+        }
 	for (i = 0; i < argc; i++) {
-	    print_message(TRACE_MESSAGE, " '%s\n'", optional_args[i]);
+	    print_message(TRACE_MESSAGE, " '%s'\n", optional_args[i]);
 	}
     }
 }
