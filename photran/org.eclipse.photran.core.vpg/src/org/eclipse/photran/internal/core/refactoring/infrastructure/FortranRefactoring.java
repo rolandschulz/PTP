@@ -528,10 +528,12 @@ public abstract class FortranRefactoring extends Refactoring
     
     protected void ensureProjectHasRefactoringEnabled() throws PreconditionFailure
     {
-        String declViewEnabledProperty = SearchPathProperties.getProperty(
+        if (PhotranVPG.inTestingMode()) return;
+        
+        String vpgEnabledProperty = SearchPathProperties.getProperty(
             fileInEditor.getProject(),
             SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
-        if (declViewEnabledProperty == null || !declViewEnabledProperty.equals("true"))
+        if (vpgEnabledProperty == null || !vpgEnabledProperty.equals("true"))
             fail("Please enable analysis and refactoring in the project properties.");
     }
 
