@@ -31,6 +31,11 @@ public abstract class BindingCollector extends ASTVisitor
 {
 	protected PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
 
+    protected void markSubprogramExport(IFile file, Token subprogramName)
+    {
+        vpg.markFileAsExportingSubprogram(file, subprogramName.getText());
+    }
+
     protected void markModuleExport(IFile file, Token moduleName)
     {
         vpg.markFileAsExportingModule(file, moduleName.getText());

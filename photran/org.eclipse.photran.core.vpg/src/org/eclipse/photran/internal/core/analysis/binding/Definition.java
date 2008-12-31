@@ -12,7 +12,10 @@ package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
@@ -23,10 +26,12 @@ import org.eclipse.photran.internal.core.analysis.types.FunctionType;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.analysis.types.TypeProcessor;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
 import org.eclipse.photran.internal.core.parser.ASTAccessSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
@@ -406,6 +411,65 @@ public class Definition implements Serializable, Comparable<Definition>
 		return result;
     }
     
+    /** @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
+     * Definitions; otherwise, <code>null</code> */
+    public List<Definition> resolveInterfaceBinding()
+    {
+        if (!isInInterfaceBlock()) return Collections.emptyList();
+
+        Token token = getTokenRef().findToken();
+        ScopingNode scopeOfThisDef = token.getEnclosingScope();
+        ScopingNode parentScope = scopeOfThisDef.getEnclosingScope();
+        
+        ArrayList<Definition> result = collectResolutions(token, scopeOfThisDef);
+        if (resolvesToSubprogramArgument(result)) return Collections.emptyList();
+        if (needToResolveInParentScope(result)) result = collectResolutions(token, parentScope);
+        result.addAll(collectMatchingExternalSubprograms(token));
+        return result;
+    }
+
+    private boolean isInInterfaceBlock()
+    {
+        Token tok = getTokenRef().findTokenOrReturnNull();
+        return tok != null && tok.findNearestAncestor(ASTInterfaceBlockNode.class) != null;
+    }
+    
+    private ArrayList<Definition> collectResolutions(Token token, ScopingNode scope)
+    {
+        ArrayList<Definition> result = new ArrayList<Definition>();
+        for (PhotranTokenRef d : scope.manuallyResolve(new FakeToken(token, token.getText())))
+        {
+            Definition def = PhotranVPG.getInstance().getDefinitionFor(d);
+            if (def != null)
+                result.add(def);
+        }
+        return result;
+    }
+
+    private boolean resolvesToSubprogramArgument(ArrayList<Definition> listOfDefs)
+    {
+        for (Definition def : listOfDefs)
+            if (def != null && def.isSubprogramArgument())
+                return true;
+        
+        return false;
+    }
+
+    private boolean needToResolveInParentScope(ArrayList<Definition> result)
+    {
+        // If the subprogram declaration in the INTERFACE block only resolves to
+        // itself, then we should check the parent scope: There might be a
+        // matching subprogram imported from a module (or defined as an external
+        // subprogram) there.
+        
+        return result.size() < 2;
+    }
+    
+    private ArrayList<Definition> collectMatchingExternalSubprograms(Token token)
+    {
+        return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(token.getText());
+    }
+
     @Override public String toString()
     {
         return canonicalizedName

@@ -26,10 +26,12 @@ import org.eclipse.photran.internal.core.parser.ASTDataComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTEntryStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTForallConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTIfThenStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
@@ -43,10 +45,12 @@ import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
@@ -243,7 +247,7 @@ class DefinitionCollector extends BindingCollector
         for (int i = 0; i < groups.size(); i++)
         {
             Token name = groups.get(i).getNamelistGroupName();
-            Token object = groups.get(i).getVariableName();
+            //Token object = groups.get(i).getVariableName();
             if (name != null) addDefinition(name, Definition.Classification.NAMELIST);
         }
     }
@@ -578,5 +582,37 @@ class DefinitionCollector extends BindingCollector
         super.traverseChildren(node);
         
         // Assume this is actually an assignment statement instead of a statement function
+    }
+
+    @Override public void visitASTExecutableProgramNode(ASTExecutableProgramNode node)
+    {
+        super.visitASTExecutableProgramNode(node);
+        markExternalSubprogramExports(node);
+    }
+
+    private void markExternalSubprogramExports(ASTExecutableProgramNode node)
+    {
+        for (IProgramUnit pu : node.getProgramUnitList())
+        {
+            if (pu instanceof ASTSubroutineSubprogramNode)
+            {
+                ASTSubroutineSubprogramNode subroutine = (ASTSubroutineSubprogramNode)pu;
+                markSubprogramExport(subroutine.getSubroutineStmt().getSubroutineName().getSubroutineName());
+            }
+            else if (pu instanceof ASTFunctionSubprogramNode)
+            {
+                ASTFunctionSubprogramNode function = (ASTFunctionSubprogramNode)pu;
+                markSubprogramExport(function.getFunctionStmt().getFunctionName().getFunctionName());
+            }
+        }
+    }
+    
+    private void markSubprogramExport(Token subprogramNameToken)
+    {
+        try
+        {
+            markSubprogramExport(file, subprogramNameToken);
+        }
+        catch (Exception e) { throw new Error(e); }
     }
 }

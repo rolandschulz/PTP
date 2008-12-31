@@ -54,10 +54,15 @@ public class PhotranVPGBuilder extends PhotranVPG
 		super();
 	}
 
-	public void markFileAsExportingModule(IFile file, String moduleName)
-	{
-		db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
-	}
+    public void markFileAsExportingSubprogram(IFile file, String subprogramName)
+    {
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "subprogram:" + canonicalizeIdentifier(subprogramName), getFilenameForIFile(file)));
+    }
+
+    public void markFileAsExportingModule(IFile file, String moduleName)
+    {
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
+    }
 	
 	public void markFileAsImportingModule(IFile file, String moduleName)
 	{
