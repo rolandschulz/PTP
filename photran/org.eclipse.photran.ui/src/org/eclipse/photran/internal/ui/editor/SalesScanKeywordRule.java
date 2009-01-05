@@ -524,7 +524,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("do");
             // BEGIN FORTRAN 2003
             else if (keyword.equalsIgnoreCase("interface"))
-                return precedingKeyword.equalsIgnoreCase("abstract");
+                return precedingKeyword.equalsIgnoreCase("abstract") || precedingKeyword.equalsIgnoreCase("end");
             // END FORTRAN 2003
             else
                 return precedingKeyword.equalsIgnoreCase("end");
