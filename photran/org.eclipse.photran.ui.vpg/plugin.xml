@@ -271,20 +271,26 @@
                path="org.eclipse.jdt.ui.refactoring.menu/debugging"
                id="org.eclipse.photran.ui.AnalysisDebuggingMenu">
             <separator name="debugging"/>
+            <separator name="debugginginterfaces"/>
             <separator name="vpgstats"/>
             <separator name="vpgdb"/>
          </menu>
+         <action
+               label="Find Matching &amp;Interface Declarations"
+               class="org.eclipse.photran.internal.ui.actions.FindMatchingInterfaceDeclarations"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugginginterfaces"
+               id="org.eclipse.photran.ui.FindMatchingInterfaceDeclarationsAction"/>
+         <action
+               label="Resolve &amp;Interface Binding"
+               class="org.eclipse.photran.internal.ui.actions.ResolveInterfaceBinding"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugginginterfaces"
+               id="org.eclipse.photran.ui.ResolveInterfaceBindingAction"/>
          <action
                label="Select &amp;Enclosing Scope"
                class="org.eclipse.photran.internal.ui.actions.SelectEnclosingScope"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
                definitionId="org.eclipse.photran.ui.SelectEnclosingScopeCommand"
                id="org.eclipse.photran.ui.FindEnclosingScopeAction"/>
-         <action
-               label="Resolve &amp;Interface Binding"
-               class="org.eclipse.photran.internal.ui.actions.ResolveInterfaceBinding"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
-               id="org.eclipse.photran.ui.ResolveInterfaceBindingAction"/>
          <action
                label="&amp;Find All Declarations in Scope"
                class="org.eclipse.photran.internal.ui.actions.FindAllDeclarationsInScope"

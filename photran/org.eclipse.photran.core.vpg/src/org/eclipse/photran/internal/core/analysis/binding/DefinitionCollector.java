@@ -33,6 +33,8 @@ import org.eclipse.photran.internal.core.parser.ASTForallConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTIfThenStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceBodyNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
@@ -50,6 +52,7 @@ import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
@@ -612,6 +615,42 @@ class DefinitionCollector extends BindingCollector
         try
         {
             markSubprogramExport(file, subprogramNameToken);
+        }
+        catch (Exception e) { throw new Error(e); }
+    }
+
+    @Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
+    {
+        super.visitASTInterfaceBlockNode(node);
+        if (node.getInterfaceStmt().getGenericName() == null
+            && node.getInterfaceStmt().getGenericSpec() == null)
+            markExternalSubprogramImports(node);
+    }
+
+    private void markExternalSubprogramImports(ASTInterfaceBlockNode node)
+    {
+        for (IInterfaceSpecification pu : node.getInterfaceBlockBody())
+        {
+            if (pu instanceof ASTInterfaceBodyNode)
+            {
+                ASTInterfaceBodyNode b = (ASTInterfaceBodyNode)pu;
+                
+                Token name;
+                if (b.getFunctionStmt() != null)
+                    name = b.getFunctionStmt().getFunctionName().getFunctionName();
+                else
+                    name = b.getSubroutineStmt().getSubroutineName().getSubroutineName();
+                
+                markSubprogramImport(name);
+            }
+        }
+    }
+    
+    private void markSubprogramImport(Token subprogramNameToken)
+    {
+        try
+        {
+            markSubprogramImport(file, subprogramNameToken);
         }
         catch (Exception e) { throw new Error(e); }
     }

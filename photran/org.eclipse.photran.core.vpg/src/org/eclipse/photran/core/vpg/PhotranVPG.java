@@ -10,10 +10,13 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 import bz.over.vpg.eclipse.EclipseVPG;
@@ -270,40 +273,100 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     private PhotranTokenRef attemptToMatch(String cname, IProgramUnit pu)
     {
         if (pu instanceof ASTSubroutineSubprogramNode)
-        {
-            ASTSubroutineSubprogramNode subroutine = (ASTSubroutineSubprogramNode)pu;
-            Token nameToken = subroutine.getSubroutineStmt().getSubroutineName().getSubroutineName();
+            return attemptToMatch(cname, ((ASTSubroutineSubprogramNode)pu).getSubroutineStmt());
+        else if (pu instanceof ASTFunctionSubprogramNode)
+            return attemptToMatch(cname, ((ASTFunctionSubprogramNode)pu).getFunctionStmt());
+        else
+            return null;
+    }
+
+    private PhotranTokenRef attemptToMatch(String cname, ASTSubroutineStmtNode functionStmt)
+    {
+        return attemptToMatch(cname, functionStmt.getSubroutineName().getSubroutineName());
+    }
+
+    private PhotranTokenRef attemptToMatch(String cname, ASTFunctionStmtNode functionStmt)
+    {
+        return attemptToMatch(cname, functionStmt.getFunctionName().getFunctionName());
+    }
+
+    private PhotranTokenRef attemptToMatch(String cname, Token nameToken)
+    {
             String thisSub = canonicalizeIdentifier(nameToken.getText());
             if (thisSub.equals(cname))
                 return nameToken.getTokenRef();
-        }
-        else if (pu instanceof ASTFunctionSubprogramNode)
-        {
-            ASTFunctionSubprogramNode function = (ASTFunctionSubprogramNode)pu;
-            Token nameToken = function.getFunctionStmt().getFunctionName().getFunctionName();
-            String thisFn = canonicalizeIdentifier(nameToken.getText());
-            if (thisFn.equals(cname))
-                return nameToken.getTokenRef();
-        }
-        
-        return null;
+            else
+                return null;
     }
     
-    private ArrayList<Definition> mapDefinitions(ArrayList<PhotranTokenRef> tokenRefs)
+//    private ArrayList<Definition> mapDefinitions(ArrayList<PhotranTokenRef> tokenRefs)
+//    {
+//        ArrayList<Definition> result = new ArrayList<Definition>();
+//        for (PhotranTokenRef tr : tokenRefs)
+//        {
+//            Definition def = getDefinitionFor(tr);
+//            if (def != null)
+//                result.add(def);
+//        }
+//        return result;
+//    }
+    
+    public ArrayList<Definition> findAllDeclarationsInInterfacesForExternalSubprogram(String name)
     {
         ArrayList<Definition> result = new ArrayList<Definition>();
-        for (PhotranTokenRef tr : tokenRefs)
-        {
-            Definition def = getDefinitionFor(tr);
-            if (def != null)
-                result.add(def);
-        }
+        for (IFile file : findFilesThatImportSubprogram(name))
+            result.addAll(findInterfaceSubprograms(name, file));
+        return result;
+    }
+
+    private ArrayList<Definition> findInterfaceSubprograms(String name, IFile file)
+    {
+        ArrayList<Definition> result = new ArrayList<Definition>();
+        
+        IFortranAST ast = acquireTransientAST(file);
+        if (ast != null)
+            ast.accept(new InterfaceVisitor(result, PhotranVPG.canonicalizeIdentifier(name)));
+        
         return result;
     }
     
+    private final class InterfaceVisitor extends GenericASTVisitor
+    {
+        private final ArrayList<Definition> result;
+        private final String canonicalizedName;
+        
+        public InterfaceVisitor(ArrayList<Definition> result, String canonicalizedName)
+        {
+            this.result = result;
+            this.canonicalizedName = canonicalizedName;
+        }
+
+        @Override public void visitASTFunctionStmtNode(ASTFunctionStmtNode node)
+        {
+            addIfDefinedInInterface(PhotranVPG.this.attemptToMatch(canonicalizedName, node));
+        }
+
+        @Override public void visitASTSubroutineStmtNode(ASTSubroutineStmtNode node)
+        {
+            addIfDefinedInInterface(PhotranVPG.this.attemptToMatch(canonicalizedName, node));
+        }
+
+        private void addIfDefinedInInterface(PhotranTokenRef tr)
+        {
+            Definition def = tr == null ? null : getDefinitionFor(tr);
+            if (def != null && def.isExternalSubprogramReferenceInInterfaceBlock())
+                result.add(def);
+        }
+    }
+
     public List<IFile> findFilesThatExportSubprogram(String subprogramName)
     {
         return getOutgoingDependenciesFrom("subprogram:" + canonicalizeIdentifier(subprogramName));
+    }
+
+    public List<IFile> findFilesThatImportSubprogram(String subprogramName)
+    {
+        return getIncomingDependenciesTo("subprogram:" + canonicalizeIdentifier(subprogramName));
     }
 
     public List<IFile> findFilesThatExportModule(String moduleName)

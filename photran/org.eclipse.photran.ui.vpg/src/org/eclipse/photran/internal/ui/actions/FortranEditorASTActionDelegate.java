@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -95,7 +95,6 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
         return ast;
     }
 
-    @SuppressWarnings("unchecked")
     protected Token findEnclosingToken(IFortranAST ast, ITextSelection textSelection)
     {
         for (Token token : new IterableWrapper<Token>(ast))
@@ -104,7 +103,7 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
         return null;
     }
 
-    protected Definition openSelectionDialog(List<Definition> defs)
+    protected Definition openSelectionDialog(Collection<Definition> defs)
     {
         ElementListSelectionDialog dlg = new ElementListSelectionDialog(getShell(), new LabelProvider()
         {

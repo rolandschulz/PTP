@@ -59,6 +59,11 @@ public class PhotranVPGBuilder extends PhotranVPG
         db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "subprogram:" + canonicalizeIdentifier(subprogramName), getFilenameForIFile(file)));
     }
 
+    public void markFileAsImportingSubprogram(IFile file, String subprogramName)
+    {
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "subprogram:" + canonicalizeIdentifier(subprogramName)));
+    }
+
     public void markFileAsExportingModule(IFile file, String moduleName)
     {
         db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
@@ -268,37 +273,50 @@ public class PhotranVPGBuilder extends PhotranVPG
 
         try
         {
-            IFile file = getIFileForFilename(filename);
-            final int WAITING_FOR_TOKEN = 0, LAST_TOKEN_WAS_USE = 1, LAST_TOKEN_WAS_MODULE = 2;
-            
-            int state = WAITING_FOR_TOKEN;
-            for (Token tok = lexer.yylex(); tok != null && tok.getTerminal() != Terminal.END_OF_INPUT; tok = lexer.yylex())
-            {
-                if (state == WAITING_FOR_TOKEN && tok.getTerminal() == Terminal.T_USE)
-                {
-                    state = LAST_TOKEN_WAS_USE;
-                }
-                else if (state == WAITING_FOR_TOKEN && tok.getTerminal() == Terminal.T_MODULE)
-                {
-                    state = LAST_TOKEN_WAS_MODULE;
-                }
-                else if (state == LAST_TOKEN_WAS_USE)
-                {
-                    if (tok.getTerminal() == Terminal.T_IDENT)
-                        markFileAsImportingModule(file, tok.getText());
-                    state = WAITING_FOR_TOKEN;
-                }
-                else if (state == LAST_TOKEN_WAS_MODULE)
-                {
-                    if (tok.getTerminal() == Terminal.T_IDENT)
-                        markFileAsExportingModule(file, tok.getText());
-                    state = WAITING_FOR_TOKEN;
-                }
-            }
+            calculateFileDepsFromModuleAndUseStmts(filename, lexer);
         }
         catch (Exception e)
         {
             logError(e);
+        }
+    }
+
+    /**
+     * Calculates what modules are imported or exported by a particular file and marks these dependencies in the VPG.
+     * 
+     * Since the dependency calculation will be run on every file in the workspace, it is essential that this method
+     * be fast (while remaining accurate).  This implementation uses the lexer to find the token sequences "USE x"
+     * and "MODULE x", which is equivalent to but significantly faster than parsing the file and traversing the AST
+     * to find USE and MODULE statements.  
+     */
+    private void calculateFileDepsFromModuleAndUseStmts(String filename, IAccumulatingLexer lexer) throws Exception
+    {
+        IFile file = getIFileForFilename(filename);
+        final int WAITING_FOR_TOKEN = 0, LAST_TOKEN_WAS_USE = 1, LAST_TOKEN_WAS_MODULE = 2;
+        
+        int state = WAITING_FOR_TOKEN;
+        for (Token tok = lexer.yylex(); tok != null && tok.getTerminal() != Terminal.END_OF_INPUT; tok = lexer.yylex())
+        {
+            if (state == WAITING_FOR_TOKEN && tok.getTerminal() == Terminal.T_USE)
+            {
+                state = LAST_TOKEN_WAS_USE;
+            }
+            else if (state == WAITING_FOR_TOKEN && tok.getTerminal() == Terminal.T_MODULE)
+            {
+                state = LAST_TOKEN_WAS_MODULE;
+            }
+            else if (state == LAST_TOKEN_WAS_USE)
+            {
+                if (tok.getTerminal() == Terminal.T_IDENT)
+                    markFileAsImportingModule(file, tok.getText());
+                state = WAITING_FOR_TOKEN;
+            }
+            else if (state == LAST_TOKEN_WAS_MODULE)
+            {
+                if (tok.getTerminal() == Terminal.T_IDENT)
+                    markFileAsExportingModule(file, tok.getText());
+                state = WAITING_FOR_TOKEN;
+            }
         }
     }
     
