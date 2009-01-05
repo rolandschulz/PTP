@@ -11,6 +11,7 @@
 + Refactorings should not work if VPG is turned off -- give appropriate error
   instead of "please select an ..." error when VPG is disabled (12/9/08)
 + Renaming outu in "write (outu, ..." doesn't work in bstfit.f90 (12/9/08)
++ Link interfaces to function definitions (12/31/08) and vice versa (1/4-5/08)
 - Refactorings should not be available for fixed form files
 - Rename bug: local variable may not shadow program name
 - Preproc substring bug
@@ -27,7 +28,6 @@
 - What is /= in ASTOperatorNode?
 - Multiple parsing start symbols
 - No renaming of namelist variables
-- Link interfaces to function definitions
 - Bug in indexing: not linking identifiers
 - Should be able to set parenthesis tokens
 - Where to insert type decl stmt?  Send fn name to Stas
