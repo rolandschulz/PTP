@@ -458,7 +458,8 @@ public class Definition implements Serializable, Comparable<Definition>
         {
             Definition def = PhotranVPG.getInstance().getDefinitionFor(d);
             if (def != null)
-                result.add(def);
+                if ((def.isSubprogram() && !def.isInInterfaceBlock()) || def.isSubprogramArgument())
+                    result.add(def);
         }
         return result;
     }
