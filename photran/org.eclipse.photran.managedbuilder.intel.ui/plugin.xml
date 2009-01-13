@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>	
 <?eclipse version="3.2"?>
 <plugin>
 
@@ -52,14 +52,14 @@
                id="intel.fortran.link.option.rtlibs.default">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.link.option.rtlibs.i_dynamic"
-               command="-i-dynamic"
-               id="intel.fortran.link.option.rtlibs.i_dynamic">
+               name="%Option.intel.fortran.link.option.rtlibs.shared_intel"
+               command="-shared-intel"
+               id="intel.fortran.link.option.rtlibs.shared_intel">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.link.option.rtlibs.i_static"
-               command="-i-static"
-               id="intel.fortran.link.option.rtlibs.i_static">
+               name="%Option.intel.fortran.link.option.rtlibs.static_intel"
+               command="-static-intel"
+               id="intel.fortran.link.option.rtlibs.static_intel">
             </enumeratedOptionValue>
          </option>
          <option
@@ -137,7 +137,7 @@
               <enablement 
               	type="ALL">
 			  	<checkOption 
-			  		optionId="gnu.cpp.link.option.shared"
+			  		optionId="intel.fortran.link.option.shared"
 			  		value="false"/>
 			  </enablement>
          </outputType>
@@ -149,7 +149,7 @@
               <enablement 
               	type="ALL">
 			  	<checkOption 
-			  		optionId="gnu.cpp.link.option.shared"
+			  		optionId="intel.fortran.link.option.shared"
 			  		value="true"/>
 			  </enablement>
          </outputType>         
@@ -345,7 +345,7 @@
             defaultValue="false"
             name="%Option.intel.fortran.optimize.buffio"
             category="intel.linux.fortran.compiler.category.optimization"
-            command="-assume buffered-io"
+            command="-assume buffered_io"
             commandFalse=""
             valueType="boolean"
             id="intel.linux.fortran.compiler.optimization.buffio">
@@ -356,39 +356,26 @@
             valueType="enumerated"
             id="intel.linux.fortran.compiler.optimization.inline.expand">
             <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.inline.default"
+               isDefault="true"
+               command=""
+               id="inl.exp.default">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
                name="%Option.intel.fortran.optimize.inline.disable"
-               command="-Ob0"
+               command="-inline-level=0"
                id="inl.exp.none">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                name="%Option.intel.fortran.optimize.inline.inlinedir"
-               command="-Ob1"
+               command="-inline-level=1"
                id="inl.exp.inlinedir">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                name="%Option.intel.fortran.optimize.inline.anysuitable"
-               isDefault="true"
-               command=""
+               command="-inline-level=2"
                id="inl.exp.anysuitable">
             </enumeratedOptionValue>
-            <enablement 
-              	type="CONTAINER_ATTRIBUTE" 
-              	attribute="defaultValue" 
-              	value="inl.exp.anysuitable"
-              	extensionAdjustment="false">
-			  	<checkBuildProperty 
-			  		property="org.eclipse.cdt.build.core.buildType"
-			  		value="org.eclipse.cdt.build.core.buildType.release"/>
-			  </enablement>
-              <enablement 
-              	type="CONTAINER_ATTRIBUTE" 
-              	attribute="defaultValue" 
-              	value="inl.exp.none"
-              	extensionAdjustment="false">
-			  	<checkBuildProperty 
-			  		property="org.eclipse.cdt.build.core.buildType"
-			  		value="org.eclipse.cdt.build.core.buildType.debug"/>
-			</enablement>
          </option>
          <option
             defaultValue=""
@@ -546,6 +533,15 @@
             commandFalse=""
             valueType="boolean"
             id="intel.linux.fortran.compiler.codegen.fpic">
+            <enablement 
+              	type="CONTAINER_ATTRIBUTE" 
+              	attribute="defaultValue" 
+              	value="true"
+              	extensionAdjustment="false">
+			  	<checkBuildProperty 
+			  		property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"/>
+			</enablement>
          </option>
          <option
             name="%Option.intel.fortran.codegen.genreent"
@@ -1499,19 +1495,38 @@
             name="%Option.intel.fortran.optimize.fp"
             category="intel.linux.fortran.compiler.category.optimization"
             valueType="boolean"
-            id="intel.linux.fortran.compiler.optimization.fp"
-            command="-fp"
+            id="intel.linux.fortran.compiler.optimization.fp.x86"
+            command="-fno-omit-frame-pointer"
             commandFalse=""
             defaultValue="false">
          </option>
          <option
             defaultValue="true"
-            name="%Option.intel.fortran.optimize.prefetch"
+            name="%Option.intel.fortran.optimize.opt_prefetch"
             category="intel.linux.fortran.compiler.category.optimization"
-            command=""
-            commandFalse="-prefetch-"
-            valueType="boolean"
-            id="intel.linux.fortran.compiler.optimization.prefetch">
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.optimization.opt_prefetch.x86">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.0"
+               isDefault="true"
+               command=""
+               id="intel.opt.opt_prefetch.0.x86">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.1"
+               command="-opt-prefetch=1"
+               id="intel.opt.opt_prefetch.1.x86">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.2"
+               command="-opt-prefetch=2"
+               id="intel.opt.opt_prefetch.2.x86">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.3"
+               command="-opt-prefetch=3"
+               id="intel.opt.opt_prefetch.3.x86">
+            </enumeratedOptionValue>
          </option>
          <option
             name="%Option.intel.fortran.optimize.forintelprocessor"
@@ -1552,24 +1567,24 @@
                id="intel.cg.usenone">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.useintelextensions.axk"
-               command="-axK"
-               id="intel.cg.p3">
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSE2"
+               command="-axSSE2"
+               id="intel.cg.useSSE2">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.useintelextensions.axn"
-               command="-axN"
-               id="intel.cg.p4and">
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSE3"
+               command="-axSSE3"
+               id="intel.cg.useSSE3">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.useintelextensions.axb"
-               command="-axB"
-               id="intel.cg.pmand">
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSSE3"
+               command="-axSSSE3"
+               id="intel.cg.useSSSE3">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.useintelextensions.axp"
-               command="-axP"
-               id="intel.cg.prsctt">
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSE41"
+               command="-axSSE4.1"
+               id="intel.cg.useSSE41">
             </enumeratedOptionValue>
          </option>
          <option
@@ -1584,24 +1599,29 @@
                id="intel.cg.reqnone">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.reqintelextensions.xk"
-               command="-xK"
-               id="intel.cg.reqp3">
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE2"
+               command="-xSSE2"
+               id="intel.cg.reqSSE2">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.reqintelextensions.xn"
-               command="-xN"
-               id="intel.cg.reqp4and">
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE3"
+               command="-xSSE3"
+               id="intel.cg.reqSSE3">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.reqintelextensions.xb"
-               command="-xB"
-               id="intel.cg.reqpmand">
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE3_ATOM"
+               command="-xSSE3_ATOM"
+               id="intel.cg.reqSSE3_ATOM">
             </enumeratedOptionValue>
             <enumeratedOptionValue
-               name="%Option.intel.fortran.codegen.reqintelextensions.xp"
-               command="-xP"
-               id="intel.cg.reqprsctt">
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSSE3"
+               command="-xSSSE3"
+               id="intel.cg.reqSSSE3">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE41"
+               command="-xSSE4.1"
+               id="intel.cg.reqSSE41">
             </enumeratedOptionValue>
          </option>
          <option
@@ -1659,12 +1679,202 @@
             defaultValue="false"
             name="%Option.intel.fortran.fp.stack"
             category="intel.linux.fortran.compiler.category.fp"
-            command="-fpstkchk"
+            command="-fp-stack-check"
             valueType="boolean"
             id="intel.linux.fortran.compiler.fp.stack">
          </option>
       </tool>
 <!-- End Intel Fortran compiler x86 specific definitions -->
+
+<!-- Begin Intel Fortran compiler x86_64 specific definitions -->
+      <tool  
+         id="photran.managedbuild.tool.intel.fortran.compiler.x86_64"
+         superClass="photran.managedbuild.tool.intel.fortran.compiler"
+         name="%ToolName.compiler.intel.fortran.x86_64">
+         <option
+            name="%Option.intel.fortran.optimize.fp"
+            category="intel.linux.fortran.compiler.category.optimization"
+            valueType="boolean"
+            id="intel.linux.fortran.compiler.optimization.fp.x86_64"
+            command="-fno-omit-frame-pointer"
+            commandFalse=""
+            defaultValue="false">
+         </option>
+         <option
+            defaultValue="true"
+            name="%Option.intel.fortran.optimize.opt_prefetch"
+            category="intel.linux.fortran.compiler.category.optimization"
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.optimization.opt_prefetch.x86_64">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.0"
+               isDefault="true"
+               command=""
+               id="intel.opt.opt_prefetch.0.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.1"
+               command="-opt-prefetch=1"
+               id="intel.opt.opt_prefetch.1.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.2"
+               command="-opt-prefetch=2"
+               id="intel.opt.opt_prefetch.2.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.opt_prefetch.3"
+               command="-opt-prefetch=3"
+               id="intel.opt.opt_prefetch.3.x86_64">
+            </enumeratedOptionValue>
+         </option>
+         <option
+            name="%Option.intel.fortran.codegen.useintelextensions"
+            category="intel.linux.fortran.compiler.category.codegen"
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.codegen.useintelextensions.x86_64">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.useintelextensions.none"
+               command=""
+               isDefault="true"
+               id="intel.cg.usenone.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSE3"
+               command="-axSSE3"
+               id="intel.cg.useSSE3.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSSE3"
+               command="-axSSSE3"
+               id="intel.cg.useSSSE3.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.useintelextensions.axSSE41"
+               command="-axSSE4.1"
+               id="intel.cg.useSSE41.x86_64">
+            </enumeratedOptionValue>
+         </option>
+         <option
+            name="%Option.intel.fortran.codegen.reqintelextensions"
+            category="intel.linux.fortran.compiler.category.codegen"
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.codegen.reqintelextensions.x86_64">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.reqintelextensions.none"
+               command=""
+               isDefault="true"
+               id="intel.cg.reqnone.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE3"
+               command="-xSSE3"
+               id="intel.cg.reqSSE3.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE3_ATOM"
+               command="-xSSE3_ATOM"
+               id="intel.cg.reqSSE3_ATOM.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSSE3"
+               command="-xSSSE3"
+               id="intel.cg.reqSSSE3.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.codegen.reqintelextensions.xSSE41"
+               command="-xSSE4.1"
+               id="intel.cg.reqSSE41.x86_64">
+            </enumeratedOptionValue>
+         </option>
+         <option
+            name="%Option.intel.fortran.optimize.forintelprocessor"
+            category="intel.linux.fortran.compiler.category.optimization"
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.optimization.forintelprocessor.x86_64">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.forintelprocessor.blended"
+               command="-mtune pentium"
+               id="intel.opt.gb.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.forintelprocessor.g5"
+               command="-mtune pentium-mmx"
+               id="intel.opt.g5.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.forintelprocessor.g6"
+               command="-mtune pentiumpro"
+               id="intel.opt.g6.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.optimize.forintelprocessor.g7"
+               isDefault="true"
+               command=""
+               id="intel.opt.g7.x86_64">
+            </enumeratedOptionValue>
+         </option>
+         <option
+            name="%Option.intel.fortran.diags.vecreport"
+            category="intel.linux.fortran.compiler.category.diags"
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.diags.vectorizer.x86_64">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.none"
+               isDefault="true"
+               command=""
+               id="diags.vectorizer.none.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.0"
+               command="-vec-report0"
+               id="diags.vectorizer.0.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.1"
+               command="-vec-report1"
+               id="diags.vectorizer.1.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.2"
+               command="-vec-report2"
+               id="diags.vectorizer.2.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.3"
+               command="-vec-report3"
+               id="diags.vectorizer.3.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.4"
+               command="-vec-report4"
+               id="diags.vectorizer.4.x86_64">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.5"
+               command="-vec-report5"
+               id="diags.vectorizer.5.x86_64">
+            </enumeratedOptionValue>
+         </option>
+         <option
+            defaultValue="true"
+            name="%Option.intel.fortran.fp.fpport"
+            category="intel.linux.fortran.compiler.category.fp"
+            command=""
+            commandFalse="-no-fp-port"
+            valueType="boolean"
+            id="intel.linux.fortran.compiler.fp.fpport.x86_64">
+         </option>
+         <option
+            defaultValue="false"
+            name="%Option.intel.fortran.fp.stack"
+            category="intel.linux.fortran.compiler.category.fp"
+            command="-fp-stack-check"
+            valueType="boolean"
+            id="intel.linux.fortran.compiler.fp.stack.x86_64">
+         </option>
+      </tool>
+<!-- End Intel Fortran compiler x86_64 specific definitions -->
 
 <!-- Begin Intel Fortran compiler ipf specific definitions -->
       <tool  
@@ -1697,20 +1907,6 @@
                id="intel.opt.g2">
             </enumeratedOptionValue>
          </option>
-         <option
-            id="intel.linux.fortran.compiler.codegen.fpic.ipf"
-            superClass="intel.linux.fortran.compiler.codegen.fpic">
-            <enablement 
-              	type="CONTAINER_ATTRIBUTE" 
-              	attribute="defaultValue" 
-              	value="true"
-              	extensionAdjustment="false">
-			  	<checkBuildProperty 
-			  		property="org.eclipse.cdt.build.core.buildArtefactType"
-			  		value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"/>
-			</enablement>
-         </option>
-         
       </tool>
 <!-- End Intel Fortran compiler ipf specific definitions -->
 
@@ -1771,6 +1967,62 @@
             </toolChain>
 
 <!-- End Intel Fortran x86 compiler tool-chain definition -->
+
+<!-- Begin Intel Fortran x86_64 compiler tool-chain definition -->
+            <toolChain
+               archList="x86_64"
+               osList="linux"
+               name="%ToolChainName.x86_64"
+               targetTool="photran.managedbuild.tool.intel.fortran.linker;photran.managedbuild.tool.intel.fortran.archiver"
+               id="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+		       <targetPlatform
+		          id="photran.managedbuild.target.intel.platform.x86_64.base"
+		          name="%PlatformName.x86_64"
+		          binaryParser="org.eclipse.cdt.core.ELF"
+		          osList="linux"
+                  archList="x86_64">
+               </targetPlatform>
+               <builder
+                  superClass="cdt.managedbuild.target.gnu.builder"
+                  id="photran.managedbuild.target.intel.builder.x86_64.base">
+               </builder>               
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base"
+                  superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64">
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.x86_64.base"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker">
+                  <enablement 
+              	    type="ALL">
+              	    <not>
+			  	      <checkBuildProperty 
+			  		    property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		    value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			  	    </not>
+			      </enablement>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base"
+                  superClass="cdt.managedbuild.tool.gnu.assembler">
+               </tool>
+			   <tool
+		    		  id="photran.managedbuild.tool.intel.fortran.archiver.x86_64.base"
+			          superClass="photran.managedbuild.tool.intel.fortran.archiver">
+			      <enablement 
+              	     type="ALL">
+			  	     <checkBuildProperty 
+			  		     property="org.eclipse.cdt.build.core.buildArtefactType"
+			  		     value="org.eclipse.cdt.build.core.buildArtefactType.staticLib"/>
+			      </enablement>
+               </tool>                 
+            </toolChain>
+
+<!-- End Intel Fortran x86_64 compiler tool-chain definition -->
 
 <!-- Begin Intel Fortran IPF compiler tool-chain definition -->
             <toolChain
@@ -1954,6 +2206,105 @@
             </toolChain>
          </configuration>
 
+          <configuration
+            name="%ConfigName.x86_64.Dbg"
+            id="photran.managedbuild.config.intel.fortran.exe.x86_64.debug"
+            parent="photran.managedbuild.config.intel.fortran.base"
+	        buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.exe.x86_64.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+		       <targetPlatform
+		          id="photran.managedbuild.target.intel.platform.exe.x86_64.debug"
+		          superClass="photran.managedbuild.target.intel.platform.x86_64.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86_64.base"
+                  id="photran.managedbuild.target.intel.builder.exe.x86_64.debug">
+               </builder>               
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.exe.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base">                          
+                  <option
+                     id="photran.intel.gnu.c.compiler.exe.x86_64.debug.option.optimization.level"
+                     superClass="gnu.c.compiler.option.optimization.level">
+                  </option>
+                  <option   
+                     id="photran.intel.gnu.c.compiler.exe.x86_64.debug.option.debugging.level"					     
+                     superClass="gnu.c.compiler.option.debugging.level">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.exe.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base">
+                  <option
+                     id="intel.linux.fortran.compiler.exe.x86_64.debug.general.optimization"
+                     superClass="intel.linux.fortran.compiler.general.optimization">
+                  </option>
+                  <option
+                     id="intel.linux.fortran.compiler.exe.x86_64.debug.general.debug"
+                     superClass="intel.linux.fortran.compiler.general.debug">
+                  </option>
+                  <option
+                     id="intel.linux.fortran.compiler.exe.x86_64.debug.optimization.inline.expand"
+                     superClass="intel.linux.fortran.compiler.optimization.inline.expand">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.exe.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86_64.base">
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.exe.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base">
+               </tool>   
+            </toolChain>
+         </configuration>
+         <configuration
+            name="%ConfigName.x86_64.Rel"
+            id="photran.managedbuild.config.intel.fortran.exe.x86_64.release"
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.exe.x86_64.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+               <targetPlatform
+                  id="photran.managedbuild.target.intel.platform.fortran.exe.x86_64.release"
+                  superClass="photran.managedbuild.target.intel.platform.x86_64.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86_64.base"
+                  id="photran.managedbuild.target.intel.builder.exe.x86_64.release">
+               </builder> 
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.exe.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base">                          
+                  <option
+                     id="photran.intel.gnu.c.compiler.exe.x86_64.release.option.optimization.level"
+                     superClass="gnu.c.compiler.option.optimization.level">
+                  </option>
+                  <option
+                     id="photran.intel.gnu.c.compiler.exe.x86_64.release.option.debugging.level"
+                     superClass="gnu.c.compiler.option.debugging.level">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.exe.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base">                     
+               </tool>
+
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.exe.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86_64.base">
+               </tool> 
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.exe.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base">
+               </tool>   
+            </toolChain>
+         </configuration>
+
+ 
          <configuration
             name="%ConfigName.ipf.Dbg"
             id="photran.managedbuild.config.intel.fortran.exe.ipf.debug"
@@ -2157,6 +2508,104 @@
                <tool
                   id="photran.managedbuild.tool.intel.gnu.assembler.ar.x86.release"
                   superClass="photran.managedbuild.tool.intel.gnu.assembler.x86.base">
+               </tool>   
+            </toolChain>
+         </configuration>
+
+         <configuration
+            name="%ConfigName.x86_64.Dbg"
+            id="photran.managedbuild.config.intel.fortran.ar.x86_64.debug"
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.ar.x86_64.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+               <targetPlatform
+                  id="photran.managedbuild.target.intel.platform.ar.x86_64.debug"
+                  superClass="photran.managedbuild.target.intel.platform.x86_64.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86_64.base"
+                  id="photran.managedbuild.target.intel.builder.ar.x86_64.debug">
+               </builder>               
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.ar.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base">                          
+                  <option
+                     id="photran.intel.gnu.c.compiler.ar.x86_64.debug.option.optimization.level"
+                     superClass="gnu.c.compiler.option.optimization.level">
+                  </option>
+                  <option   
+                     id="photran.intel.gnu.c.compiler.ar.x86_64.debug.option.debugging.level"					     
+                     superClass="gnu.c.compiler.option.debugging.level">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.ar.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base">
+                  <option
+                     id="intel.linux.fortran.compiler.ar.x86_64.debug.general.optimization"
+                     superClass="intel.linux.fortran.compiler.general.optimization">
+                  </option>
+                  <option
+                     id="intel.linux.fortran.compiler.ar.x86_64.debug.general.debug"
+                     superClass="intel.linux.fortran.compiler.general.debug">
+                  </option>
+                  <option
+                     id="intel.linux.fortran.compiler.ar.x86_64.debug.optimization.inline.expand"
+                     superClass="intel.linux.fortran.compiler.optimization.inline.expand">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.archiver.ar.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.fortran.archiver.x86_64.base">
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.ar.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base">
+               </tool>   
+            </toolChain>
+         </configuration>
+         <configuration
+            name="%ConfigName.x86_64.Rel"
+            id="photran.managedbuild.config.intel.fortran.ar.x86_64.release"
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.ar.x86_64.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+               <targetPlatform
+                  id="photran.managedbuild.target.intel.platform.fortran.ar.x86_64.release"
+                  superClass="photran.managedbuild.target.intel.platform.x86_64.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86_64.base"
+                  id="photran.managedbuild.target.intel.builder.ar.x86_64.release">
+               </builder> 
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.ar.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base">                          
+                  <option
+                     id="photran.intel.gnu.c.compiler.ar.x86_64.release.option.optimization.level"
+                     superClass="gnu.c.compiler.option.optimization.level">
+                  </option>
+                  <option
+                     id="photran.intel.gnu.c.compiler.ar.x86_64.release.option.debugging.level"
+                     superClass="gnu.c.compiler.option.debugging.level">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.ar.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base">                     
+               </tool>
+
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.archiver.ar.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.fortran.archiver.x86_64.base">
+               </tool> 
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.ar.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base">
                </tool>   
             </toolChain>
          </configuration>
@@ -2373,6 +2822,112 @@
                </tool>
             </toolChain>
          </configuration>
+
+         <configuration
+            name="%ConfigName.x86_64.Dbg"
+            id="photran.managedbuild.config.intel.fortran.so.x86_64.debug"
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.so.x86_64.debug"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+               <targetPlatform
+                  id="photran.managedbuild.target.intel.platform.so.x86_64.debug"
+                  superClass="photran.managedbuild.target.intel.platform.x86_64.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86_64.base"
+                  id="photran.managedbuild.target.intel.builder.so.x86_64.debug">
+               </builder>               
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.so.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base">                          
+                  <option
+                     id="photran.intel.gnu.c.compiler.so.x86_64.debug.option.optimization.level"
+                     superClass="gnu.c.compiler.option.optimization.level">
+                  </option>
+                  <option   
+                     id="photran.intel.gnu.c.compiler.so.x86_64.debug.option.debugging.level"					     
+                     superClass="gnu.c.compiler.option.debugging.level">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.so.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base">
+                  <option
+                     id="intel.linux.fortran.compiler.so.x86_64.debug.general.optimization"
+                     superClass="intel.linux.fortran.compiler.general.optimization">
+                  </option>
+                  <option
+                     id="intel.linux.fortran.compiler.so.x86_64.debug.general.debug"
+                     superClass="intel.linux.fortran.compiler.general.debug">
+                  </option>
+                  <option
+                     id="intel.linux.fortran.compiler.so.x86_64.debug.optimization.inline.expand"
+                     superClass="intel.linux.fortran.compiler.optimization.inline.expand">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.so.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86_64.base">
+                  <outputType
+                     superClass="photran.managedbuild.tool.intel.fortran.linker.output.so"
+                     id="photran.managedbuild.tool.intel.fortran.linker.so.x86_64.debug.output">
+                  </outputType>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.so.x86_64.debug"
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base">
+               </tool>   
+            </toolChain>
+         </configuration>
+         <configuration
+            name="%ConfigName.x86_64.Rel"
+            id="photran.managedbuild.config.intel.fortran.so.x86_64.release"
+            parent="photran.managedbuild.config.intel.fortran.base"
+            buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release">
+            <toolChain
+               id="photran.managedbuild.toolchain.intel.fortran.so.x86_64.release"
+               superClass="photran.managedbuild.toolchain.intel.fortran.x86_64.base">
+               <targetPlatform
+                  id="photran.managedbuild.target.intel.platform.fortran.so.x86_64.release"
+                  superClass="photran.managedbuild.target.intel.platform.x86_64.base">
+               </targetPlatform>
+               <builder
+                  superClass="photran.managedbuild.target.intel.builder.x86_64.base"
+                  id="photran.managedbuild.target.intel.builder.so.x86_64.release">
+               </builder> 
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.c.compiler.so.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.gnu.c.compiler.x86_64.base">
+                  <option
+                     id="photran.intel.gnu.c.compiler.so.x86_64.release.option.optimization.level"
+                     superClass="gnu.c.compiler.option.optimization.level">
+                  </option>
+                  <option
+                     id="photran.intel.gnu.c.compiler.so.x86_64.release.option.debugging.level"
+                     superClass="gnu.c.compiler.option.debugging.level">
+                  </option>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.compiler.so.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.fortran.compiler.x86_64.base">                     
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.fortran.linker.so.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.fortran.linker.x86_64.base">
+                  <outputType
+                     superClass="photran.managedbuild.tool.intel.fortran.linker.output.so"
+                     id="photran.managedbuild.tool.intel.fortran.linker.so.x86_64.release.output">
+                  </outputType>
+               </tool>
+               <tool
+                  id="photran.managedbuild.tool.intel.gnu.assembler.so.x86_64.release"
+                  superClass="photran.managedbuild.tool.intel.gnu.assembler.x86_64.base">
+               </tool>
+            </toolChain>
+         </configuration>
+
          <configuration
             name="%ConfigName.ipf.Dbg"
             id="photran.managedbuild.config.intel.fortran.so.ipf.debug"
@@ -2415,10 +2970,6 @@
                   <option
                      id="intel.linux.fortran.compiler.so.ipf.debug.optimization.inline.expand"
                      superClass="intel.linux.fortran.compiler.optimization.inline.expand">
-                  </option>
-                  <option
-                     id="intel.linux.fortran.compiler.so.ipf.so.debug.option.codegen.fpic"
-                     superClass="intel.linux.fortran.compiler.codegen.fpic.ipf">
                   </option>
                </tool>
                <tool
@@ -2466,10 +3017,6 @@
                <tool
                   id="photran.managedbuild.tool.intel.fortran.compiler.so.ipf.release"
                   superClass="photran.managedbuild.tool.intel.fortran.compiler.ipf.base">                     
-                  <option
-                     id="intel.linux.fortran.compiler.so.ipf.so.release.option.codegen.fpic"
-                     superClass="intel.linux.fortran.compiler.codegen.fpic.ipf">
-                  </option>
                </tool>
                <tool
                   id="photran.managedbuild.tool.intel.fortran.linker.so.ipf.release"
