@@ -10,6 +10,7 @@
  *******************************************************************************/ 
 package org.eclipse.ptp.rdt.core.tests;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,9 +33,6 @@ import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 public class ConnectionManager {
 
 	public static final String PROPERTY_CONNECTION_CLASS = "connection.class";
-	
-	
-	
 	public static final String PROPERTY_WORKSPACE    = "project.workspace";
 	public static final String PROPERTY_SERVICE_MODEL_CONFIG_FILE = "project.servicemodel";
 	
@@ -44,7 +42,7 @@ public class ConnectionManager {
 	
 	private IRDTTestConnection connection;
 	private Properties properties;
-	private String serviceModelConfigFile;
+	private File serviceModelConfigFile;
 	
 	
 	private ConnectionManager() {}
@@ -61,11 +59,11 @@ public class ConnectionManager {
 	 * configuration file.
 	 * @throws IOException if there is a problem reading the properties file
 	 */
-	public void initialize(String propertiesFileName, String serviceModelConfigFileName) throws IOException {
-		properties = new Properties();
-		properties.load(new FileInputStream(propertiesFileName));
+	public void initialize(File propertyFile, File serviceModelFile) throws IOException {
+		properties = new Properties();		
+		properties.load(new FileInputStream(propertyFile));
 		
-		this.serviceModelConfigFile = serviceModelConfigFileName;
+		this.serviceModelConfigFile = serviceModelFile;
 	}
 	
 	public boolean isConnected() {

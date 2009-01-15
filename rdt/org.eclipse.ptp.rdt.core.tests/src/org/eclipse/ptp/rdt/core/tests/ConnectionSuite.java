@@ -10,10 +10,9 @@
  *******************************************************************************/ 
 package org.eclipse.ptp.rdt.core.tests;
 
+import java.io.File;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-
-
 
 /**
  * A test suite that will establish a connection before running the tests.
@@ -21,16 +20,16 @@ import junit.framework.TestSuite;
 
 public class ConnectionSuite extends TestSuite {
 
-	private String propertyFile;
-	private String serviceModelFile;
+	private File propertyFile;
+	private File serviceModelFile;
 
 	public ConnectionSuite() {
 		
 	}
 	
-	public ConnectionSuite(String propertyFile, String serviceModelFile) {
-		this.propertyFile = propertyFile;
-		this.serviceModelFile = serviceModelFile;
+	public ConnectionSuite(File propertiesFile, File serviceModelFile2) {
+		this.propertyFile = propertiesFile;
+		this.serviceModelFile = serviceModelFile2;
 	}
 	
 	public void connect() throws Exception {
