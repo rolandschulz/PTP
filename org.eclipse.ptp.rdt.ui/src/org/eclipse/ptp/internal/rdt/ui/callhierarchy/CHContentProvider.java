@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
 import java.util.ArrayList;
 
 import org.eclipse.cdt.core.dom.ast.IEnumerator;
+import org.eclipse.cdt.core.index.IIndexFile;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -143,7 +144,7 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 			});
 		}
 		ITranslationUnit tu= CModelUtil.getTranslationUnit(element);
-		return new Object[] { new CHNode(null, tu, 0, element) };
+		return new Object[] { new CHNode(null, tu, 0, element, -1) };
 	}
 
 	private Object[] asyncronouslyComputeReferencedBy(CHNode parent) throws CoreException, InterruptedException {
@@ -217,7 +218,8 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 	
 	private CHNode createRefbyNode(CHNode parent, ICElement element, IIndexName[] refs) throws CoreException {
 		ITranslationUnit tu= CModelUtil.getTranslationUnit(element);
-		CHNode node= new CHNode(parent, tu, refs[0].getFile().getTimestamp(), element);
+		final IIndexFile file = refs[0].getFile();
+		CHNode node= new CHNode(parent, tu, refs[0].getFile().getTimestamp(), element, file.getLinkageID());
 		if (element instanceof IVariable || element instanceof IEnumerator) {
 			node.setInitializer(true);
 		}
@@ -257,12 +259,14 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 
 		CHNode node;
 		long timestamp= references[0].getFile().getTimestamp();
+		final IIndexFile file = references[0].getFile();
+		final int linkageID= file.getLinkageID();
 		
 		if (elements.length == 1) {
-			node= new CHNode(parent, tu, timestamp, elements[0]);
+			node= new CHNode(parent, tu, timestamp, elements[0], linkageID);
 		}
 		else {
-			node= new CHMultiDefNode(parent, tu, timestamp, elements);
+			node= new CHMultiDefNode(parent, tu, timestamp, elements, linkageID);
 		}
 		
 		boolean readAccess= false;
