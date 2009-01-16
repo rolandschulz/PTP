@@ -39,10 +39,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	private String machineID;
 	/** The queue that dispatches jobs to mpi. */
 	private String queueID;
-	/** List of hosts discovered for the machine. */
-	private OpenMPIHostMap hostMap;
-	/** Mapping of discovered hosts and their ID for IPHost elements. */
-	private Map<String,String> hostToElementMap = new HashMap<String, String>();
+	/** Mapping of discovered hosts and their ID for IPNode elements. */
+	private Map<String,String> nodeToIDMap = new HashMap<String, String>();
 
 	public OpenMPIRuntimeSystem(Integer openmpi_rmid,
 			OpenMPIResourceManagerConfiguration config,
@@ -71,19 +69,11 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	}
 
 	public String getNodeIDforName(String hostname) {
-		return hostToElementMap.get(hostname);
+		return nodeToIDMap.get(hostname);
 	}
 
-	public OpenMPIHostMap getHostMap() {
-		return hostMap;
-	}
-
-	protected void setHostMap(OpenMPIHostMap hostMap) {
-		this.hostMap = hostMap;
-	}
-
-	public Map<String, String> getHostToElementMap() {
-		return hostToElementMap;
+	public void setNodeIDForName(String name, String id) {
+		nodeToIDMap.put(name, id);
 	}
 
 	/*
