@@ -342,13 +342,13 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		processIDs = new String[newProcesses.size()];
 		IPMachine ipMachine = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getMachineById(rtSystem.getMachineID());
 		for (Process newProcess : newProcesses) {
-			String nodename = newProcess.getNode().getName();
+			String nodename = newProcess.getNode().getResolvedName();
 			String nodeID = rtSystem.getNodeIDforName(nodename);
 			if (nodeID == null) {
 				process.destroy();
 				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIRuntimeSystemJob_Exception_HostnamesDoNotMatch, parserException));
 			}
-
+			
 			String processName = newProcess.getName();
 			int processIndex = newProcess.getIndex();
 			String processID = null;

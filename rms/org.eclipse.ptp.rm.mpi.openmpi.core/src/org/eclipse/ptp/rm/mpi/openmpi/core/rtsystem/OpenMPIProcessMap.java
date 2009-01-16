@@ -12,7 +12,10 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
 
@@ -64,29 +67,36 @@ public class OpenMPIProcessMap {
 	 * @author dfferber
 	 */
 	static public class Node {
-		// Information provided only by openmpi 1.2
-		int index;
-
 		// Information provided by openmpi 1.2 and 1.3
 		private String name = null;
+		private List<String> resolvedNames = new ArrayList<String>();
+		private Iterator<String> iterator = null;
 
 		final private AttributeManager attributeManager = new AttributeManager();
 
 		// References to processes.
 		private List<Process> processes = new ArrayList<Process>();
 
-		public Node(int index, String name) {
+		public Node(String name) {
 			super();
-			this.index = index;
 			this.name = name;
-		}
-
-		public int getIndex() {
-			return index;
 		}
 
 		public String getName() {
 			return name;
+		}
+		
+		public String getResolvedName() {
+			if (iterator == null || !iterator.hasNext()) {
+				iterator = resolvedNames.listIterator();
+			}
+			return iterator.next();
+		}
+		
+		public void addResolvedName(String name) {
+			if (!resolvedNames.contains(name)) {
+				resolvedNames.add(name);
+			}
 		}
 
 		public AttributeManager getAttributeManager() {
@@ -145,7 +155,7 @@ public class OpenMPIProcessMap {
 
 	final private AttributeManager attributeManager = new AttributeManager();
 	final private List<Application> applications = new ArrayList<Application>();
-	final private List<Node> nodes = new ArrayList<Node>();
+	final private Map<String,Node> nodes = new HashMap<String,Node>();
 	final private List<Process> processes = new ArrayList<Process>();
 
 	public OpenMPIProcessMap() {
@@ -157,7 +167,7 @@ public class OpenMPIProcessMap {
 	}
 
 	public List<Node> getNodes() {
-		return Collections.unmodifiableList(nodes);
+		return Collections.unmodifiableList(new ArrayList<Node>(nodes.values()));
 	}
 
 	public List<Application> getAppContexts() {
@@ -168,15 +178,19 @@ public class OpenMPIProcessMap {
 		return attributeManager;
 	}
 
-	void addApplication(Application application) {
+	public void addApplication(Application application) {
 		this.applications.add(application);
 	}
 
-	void addNode(Node node) {
-		nodes.add(node);
+	public void addNode(Node node) {
+		nodes.put(node.getName(), node);
+	}
+	
+	public Node getNode(String name) {
+		return nodes.get(name);
 	}
 
-	void addProcess(Process process) {
+	public void addProcess(Process process) {
 		processes.add(process);
 		process.node.processes.add(process);
 	}

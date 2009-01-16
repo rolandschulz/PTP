@@ -22,7 +22,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
-import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
+import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 
@@ -33,7 +33,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfig
  */
 public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
-	private Parameters params = new Parameters();
+	private OmpiInfo info = new OmpiInfo();
 
 	/** The machine where open mpi is running on. */
 	private String machineID;
@@ -66,8 +66,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		return queueID;
 	}
 
-	public Parameters getParameters() {
-		return params;
+	public OmpiInfo getOmpiInfo() {
+		return info;
 	}
 
 	public String getNodeIDforName(String hostname) {
