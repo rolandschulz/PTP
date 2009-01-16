@@ -37,7 +37,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
+import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters.Parameter;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
@@ -79,10 +79,10 @@ AbstractRMLaunchConfigurationDynamicTab {
 	protected CheckboxTableViewer paramsViewer;
 	protected Table paramsTable;
 
-	protected Parameters ompiParameters;
+	protected OmpiInfo info;
 
 	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm) {
-		ompiParameters = ((OpenMPIResourceManager) rm).getParameters();
+		info = ((OpenMPIResourceManager) rm).getOmpiInfo();
 	}
 
 	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener
@@ -142,9 +142,9 @@ AbstractRMLaunchConfigurationDynamicTab {
 			useArgsDefaultsButton.setSelection(useDefArgs);
 			useParamsDefaultsButton.setSelection(useDefParams);
 
-			if (ompiParameters != null) {
+			if (info != null) {
 				for (Entry<String, String> param : params.entrySet()) {
-					Parameter p = ompiParameters.getParameter(param.getKey());
+					Parameter p = info.getParameter(param.getKey());
 					if (p != null) {
 						p.setValue(param.getValue());
 						paramsViewer.setChecked(p, true);
@@ -294,9 +294,9 @@ AbstractRMLaunchConfigurationDynamicTab {
 			}
 
 			public Object[] getElements(Object inputElement) {
-				if (inputElement != null && inputElement instanceof Parameters) {
-					Parameters params = (Parameters) inputElement;
-					return params.getParameters();
+				if (inputElement != null && inputElement instanceof OmpiInfo) {
+					OmpiInfo info = (OmpiInfo) inputElement;
+					return info.getParameters();
 				}
 				return null;
 			}
@@ -359,8 +359,8 @@ AbstractRMLaunchConfigurationDynamicTab {
 
 		addColumns();
 
-		if (ompiParameters != null) {
-			paramsViewer.setInput(ompiParameters);
+		if (info != null) {
+			paramsViewer.setInput(info);
 		}
 
 	}

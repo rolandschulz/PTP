@@ -91,7 +91,7 @@ public class OpenMPIProcessMapText12Parser {
 			throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 		}
 
-		OpenMPIProcessMap.Node node = new OpenMPIProcessMap.Node(nodeIndex, nodeName);
+		OpenMPIProcessMap.Node node = new OpenMPIProcessMap.Node(nodeName);
 		map.addNode(node);
 
 		// Daemon name:

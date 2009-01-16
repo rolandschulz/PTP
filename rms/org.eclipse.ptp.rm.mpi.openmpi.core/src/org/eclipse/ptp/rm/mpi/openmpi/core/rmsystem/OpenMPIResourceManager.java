@@ -15,7 +15,7 @@ import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
-import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
+import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIRuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
@@ -49,15 +49,15 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	}
 
 	/**
-	 * Get OpenMPI parameters
+	 * Get OpenMPI info
 	 * 
-	 * @return parameters
+	 * @return OmpiInfo
 	 */
-	public Parameters getParameters() {
+	public OmpiInfo getOmpiInfo() {
 		if (rts == null)
 			return null;
 		try {
-			return rts.getParameters().clone();
+			return rts.getOmpiInfo().clone();
 		} catch (CloneNotSupportedException e) {
 			return null;
 		}
