@@ -38,20 +38,14 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.rm.mpich2.core"
+         id="org.eclipse.ptp.rm.mpi.mpich2.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.mpich2.proxy"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.mpich2.ui"
+         id="org.eclipse.ptp.rm.mpi.mpich2.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
