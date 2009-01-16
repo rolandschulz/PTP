@@ -98,6 +98,7 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 					}
 				}
 				rts.changeNode(nodeId, attrManager);
+				rts.setNodeIDForName(host.getName(), nodeId);
 			}
 		} catch (CoreException e) {
 			/*
