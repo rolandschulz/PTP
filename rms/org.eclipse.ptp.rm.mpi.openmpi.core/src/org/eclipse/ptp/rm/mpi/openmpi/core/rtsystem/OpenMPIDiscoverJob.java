@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
-import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -81,10 +80,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		assert remoteServices != null;
 		IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 		OmpiInfo info = rts.getOmpiInfo();
-		Map<String, String> hostToElementMap = rts.getHostToElementMap();
 		OpenMPIResourceManagerConfiguration rmConfiguration = (OpenMPIResourceManagerConfiguration) rts.getRmConfiguration();
 		assert fileMgr != null;
-		assert hostToElementMap != null;
 
 		/*
 		 * MPI resource manager have only one machine and one queue.
@@ -134,7 +131,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				// Add node to model
 				String nodeId = rts.createNode(machineID, host.getName(), rankCounter++);
 				IPNode node = machine.getNodeById(nodeId);
-				hostToElementMap.put(host.getName(), nodeId);
+				rts.setNodeIDForName(host.getName(), nodeId);
 
 				// Add processor information to node.
 				AttributeManager attrManager = new AttributeManager();
