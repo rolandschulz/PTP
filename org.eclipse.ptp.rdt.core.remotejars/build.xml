@@ -31,7 +31,7 @@
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
 	<property name="platformVersion" value="R-3.4-200806172000"/>
 	<property name="platformBaseName" value="eclipse-platform-3.4"/>
-	<property name="cdtCoreVersion" value="5.0.2.200811280802"/>
+	<property name="cdtCoreVersion" value="5.0.2.200901160801"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 
 	<property name="coreRuntimeVersion" value="3.4.0.v20080512"/>
