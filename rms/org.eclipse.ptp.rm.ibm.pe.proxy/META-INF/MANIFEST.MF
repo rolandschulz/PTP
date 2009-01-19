@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP Proxy Server for Parallel Environment
 Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.pe.proxy
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 2.1.1.qualifier
 Bundle-Vendor: IBM
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ptp.proxy,
