@@ -6,3 +6,4 @@ Makefile
 config.h
 autom4te.cache
 *.a
+a.out.dSYM
