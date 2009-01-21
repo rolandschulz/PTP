@@ -40,7 +40,14 @@ public class RemoteNavigationService extends AbstractRemoteService implements IN
 		ICIndexSubsystem subsystem = getSubSystem();
 		
 		if(unit instanceof TranslationUnit) {
-			IScannerInfo scannerInfo = RemoteScannerInfoProviderFactory.getScannerInfo(unit.getResource());
+			IScannerInfo scannerInfo = null;
+			if(unit.getResource() == null) {
+				// external translation unit... get scanner info from the context?
+				scannerInfo = RemoteScannerInfoProviderFactory.getScannerInfo(unit.getCProject().getProject());
+			}
+			else {
+				scannerInfo = RemoteScannerInfoProviderFactory.getScannerInfo(unit.getResource());
+			}
 			((TranslationUnit)unit).setASTContext(scannerInfo);
 		}
 		
