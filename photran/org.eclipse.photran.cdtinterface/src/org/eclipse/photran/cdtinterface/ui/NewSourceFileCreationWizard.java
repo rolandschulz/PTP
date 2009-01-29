@@ -6,19 +6,34 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     UIUC - Initial API and implementation
+ *     QNX Software Systems - initial API and implementation
+ *     UIUC - Modification for Photran
  *******************************************************************************/
 package org.eclipse.photran.cdtinterface.ui;
 
+import org.eclipse.cdt.internal.ui.wizards.filewizard.AbstractFileCreationWizard;
+import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
 
-/** Wizard to create a new source file */
-public class NewSourceFileCreationWizard extends org.eclipse.cdt.ui.wizards.NewSourceFileCreationWizard
+/**
+ * Wizard to create a new source file
+ * 
+ * Based on {@link org.eclipse.cdt.ui.wizards.NewSourceFileCreationWizard}
+ */
+public class NewSourceFileCreationWizard extends AbstractFileCreationWizard
 {
     public NewSourceFileCreationWizard()
     {
         super();
 		setDefaultPageImageDescriptor(CDTInterfacePlugin.getImageDescriptor("icons/wizban/newffile_wiz.gif"));
-		setWindowTitle("New Source File");
+        setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+		setWindowTitle("New Fortran Source File");
+    }
+
+    public void addPages() {
+        super.addPages();
+        fPage = new NewSourceFileCreationWizardPage();
+        addPage(fPage);
+        fPage.init(getSelection());
     }
 }

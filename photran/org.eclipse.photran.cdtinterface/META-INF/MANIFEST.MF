@@ -27,5 +27,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.managedbuilder.ui,
  org.eclipse.cdt.launch,
  org.eclipse.debug.core,
- org.eclipse.debug.ui
+ org.eclipse.debug.ui,
+ org.eclipse.jface.text;bundle-version="3.4.0"
 Eclipse-LazyStart: true

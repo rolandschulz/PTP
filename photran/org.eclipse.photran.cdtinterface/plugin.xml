@@ -264,6 +264,17 @@
       </actionSet>
    </extension>
    
+   <!--- Editor templates -->
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <!--contextType
+            name="%c.contextType.name"
+            class="org.eclipse.cdt.internal.corext.template.c.CContextType"
+            id="org.eclipse.cdt.ui.text.templates.c">
+      </contextType-->
+      <include file="templates/fortran-codetemplates.xml" />
+   </extension>
+   
    <!--=============================-->
    <!-- ActionSet-part associations -->
    <!--=============================-->

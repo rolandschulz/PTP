@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+/*******************************************************************************
+ * Copyright (c) 2000, 2007, 2009, University of Illinois at Urbana-Champaign,
+ * IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *     Anton Leherbauer (Wind River Systems)
+ *     Jeff Overbey (UIUC) - Modifications for Photran
+ *******************************************************************************/
+-->
+
+<templates>
+
+<!-- See SimpleTemplateVariableResolver hierarchy
+  ${file_name}
+  ${file_base}
+  ${file_loc}
+  ${file_path}
+  ${project_name}
+  ${user}
+  ${date}
+  ${year}
+  ${time} 
+-->
+
+<template
+    name="Default fixed-form Fortran source file template"
+    id="org.eclipse.photran.codetemplates.fixedsourcefile"
+    description="Default template for newly created fixed-form Fortran source files"
+    context="org.eclipse.photran.core.fixedFormFortranSource.contenttype_context"
+    enabled="true">c ${file_base}
+          implicit none
+      end
+</template>
+
+<template
+    name="Default free-form Fortran source file template"
+    id="org.eclipse.photran.codetemplates.freesourcefile"
+    description="Default template for newly created free-form Fortran source files"
+    context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
+    enabled="true">! ${file_base}
+    implicit none
+end
+</template>
+
+<template
+    name="Fortran module (free form)"
+    id="org.eclipse.photran.codetemplates.freemodulesourcefile"
+    description="Fortran 90 module (free format)"
+    context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
+    enabled="true">! ${file_name} - Implementation of the ${file_base} module
+module ${file_base}
+    implicit none
+end module ${file_base}
+</template>
+
+<template
+    name="Fortran class (free form)"
+    id="org.eclipse.photran.codetemplates.freeclasssourcefile"
+    description="Fortran 2003 class (free format)"
+    context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
+    enabled="true">! ${file_name} - Implementation of the ${file_base} class and ${file_base}_module module
+module ${file_base}_module
+    implicit none
+    private
+
+    type, public :: ${file_base}
+        private
+        integer :: field_name
+    contains
+        procedure :: method_name
+        final :: destructor
+    end type ${file_base}
+
+contains
+
+    subroutine method_name(self)
+        class(${file_base}), intent(in) :: self
+    end subroutine
+    
+    subroutine destructor(self)
+        type(${file_base}), intent(in) :: self
+    end subroutine
+
+end module ${file_base}_module
+</template>
+
+</templates>
